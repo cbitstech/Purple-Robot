@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">Purple Robot Manager</string>
+
+    <string name="startup_loading_message">Starting up&#8230;</string>
+    <string name="crash_toast_text">Whoops - the app has crashed. Sending a report to the developer.</string>
+    <string name="toast_incorrect_password">Incorrect password. Please try again.</string>
+
+    <string name="config_settings_category">Settings &amp; Options</string>
+
+    <string name="config_json_url_label">JSON Configuration URL</string>
+    <string name="config_json_url_title">JSON Configuration URL</string>
+    <string name="config_json_url_message">Please enter the URL for the application configuration file.</string>
+
+    <string name="config_password_label">Configuration Password</string>
+    <string name="config_password_title">Configuration Password</string>
+    <string name="config_password_message">Please enter the password required to configure this launcher.</string>
+
+    <string name="error_json_set_uri">Unable to automatically set configuration from the web. Please verify that the configuration file is valid and reachable from the public Internet.</string>
+    <string name="error_json_set_uri_password">Unable to automatically set configuration from the web while the password is set.</string>
+    <string name="success_json_set_uri">Successfully configured via the web.</string>
+
+    <string name="text_startup_password_hint">Enter configuration password</string>
+    <string name="button_submit_password">Change Configuration</string>
+    <string name="button_exit">Exit</string>
+
+    <string name="ical_template">BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//CBITs/Purple Robot Manager//NONSGML v1.0//EN\nBEGIN:VEVENT\nUID:%1$s@cbits.northwestern.edu\nDTSTAMP:%1$s\nDTSTART:%1$s\nDTEND:%2$s\nSUMMARY:%3$s%4$s\nEND:VEVENT\nEND:VCALENDAR</string>
+</resources>
