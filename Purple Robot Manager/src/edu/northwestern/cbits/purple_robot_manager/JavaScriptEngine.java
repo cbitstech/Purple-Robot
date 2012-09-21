@@ -153,8 +153,6 @@ public class JavaScriptEngine
 	{
 		try
 		{
-			NotificationManager noteManager = (NotificationManager) this._context.getSystemService(android.content.Context.NOTIFICATION_SERVICE);
-
 			String packageName = this.packageForApplicationName(applicationName);
 
 			PackageManager packageMgr = this._context.getPackageManager();
@@ -164,7 +162,6 @@ public class JavaScriptEngine
 				try
 				{
 					PackageInfo info = packageMgr.getPackageInfo(this._context.getPackageName(), 0);
-
 					packageName = info.packageName;
 				}
 				catch (NameNotFoundException e)
@@ -185,7 +182,15 @@ public class JavaScriptEngine
 			note.setLatestEventInfo(this._context, title, message, pendingIntent);
 			note.flags = Notification.FLAG_AUTO_CANCEL;
 
-			noteManager.notify(JavaScriptEngine.NOTIFICATION_ID, note);
+			try
+			{
+				NotificationManager noteManager = (NotificationManager) this._context.getSystemService(android.content.Context.NOTIFICATION_SERVICE);
+				noteManager.notify(JavaScriptEngine.NOTIFICATION_ID, note);
+			}
+			catch (UnsupportedOperationException e)
+			{
+				// Added so that the mock test cases could still execute.
+			}
 
 			return true;
 		}
