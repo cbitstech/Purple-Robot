@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:orientation="horizontal"
+	android:background="@drawable/appwidget_dark_bg">
+	<ImageView
+	    android:src="@drawable/ic_launcher"
+	    android:layout_width="72dp"
+	    android:layout_height="72dp"
+	    android:layout_gravity="top"
+	    android:scaleType="fitXY"
+	    android:paddingTop="4dp"
+	    android:paddingBottom="8dp"
+	    android:paddingLeft="8dp"
+	    android:paddingRight="8dp"
+	    android:adjustViewBounds="true" />
+	<LinearLayout
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:paddingTop="4dp"
+	    android:paddingBottom="8dp"
+	    android:paddingLeft="0dp"
+	    android:paddingRight="8dp"
+	    android:orientation="vertical">
+	    <TextView
+	        android:id="@+id/widget_title_text"
+	        android:text="@string/widget_test_title"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:textColor="@android:color/white"
+	        android:textSize="20sp"
+	        android:textStyle="bold"
+	        android:lines="1"
+		    android:paddingBottom="4dp"
+	        android:ellipsize="end"
+	        android:typeface="sans" />
+	    <TextView
+	        android:id="@+id/widget_message_text"
+	        android:text="@string/widget_test_message"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:textSize="14sp"
+	        android:lines="8"
+	        android:ellipsize="end"
+	        android:typeface="sans" />
+	</LinearLayout>
+</LinearLayout>

@@ -13,12 +13,15 @@ import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.RemoteViews;
 import android.widget.Toast;
 
 public class JavaScriptEngine
@@ -53,6 +56,26 @@ public class JavaScriptEngine
 		ScriptableObject.putProperty(this._scope, "PurpleRobot", thisWrapper);
 
 		return this._jsContext.evaluateString(this._scope, script, "<engine>", 1, null);
+	}
+
+	public boolean updateWidget(final String title, final String message, final String appName, final Object launchParams)
+	{
+		Log.e("PRM", "UPDATING WIDGET!!!!");
+
+		AppWidgetManager widgetManager = AppWidgetManager.getInstance(this._context);
+
+		ComponentName provider = new ComponentName(this._context.getPackageName(), PurpleRobotAppWidgetProvider.class.getName());
+
+		int[] widgetIds = widgetManager.getAppWidgetIds(provider);
+
+		RemoteViews views = new RemoteViews(this._context.getPackageName(), R.layout.layout_widget);
+
+		views.setCharSequence(R.id.widget_title_text, "setText", title);
+		views.setCharSequence(R.id.widget_message_text, "setText", message);
+
+		widgetManager.updateAppWidget(widgetIds, views);
+
+		return true;
 	}
 
 	public boolean emitToast(final String message, final boolean longDuration)

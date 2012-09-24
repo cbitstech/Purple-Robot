@@ -17,6 +17,12 @@
 				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>
 		</receiver>
+		<receiver android:name=".PurpleRobotAppWidgetProvider">
+			<intent-filter>
+				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+			</intent-filter>
+			<meta-data android:name="android.appwidget.provider" android:resource="@xml/appwidget_info" />
+		</receiver>
 		<service android:enabled="true" android:exported="false" android:name=".ManagerService">
 			<intent-filter>
 				<action android:name="purple_robot_manager_periodic_check" />

@@ -24,4 +24,6 @@
     <string name="button_exit">Exit</string>
 
     <string name="ical_template">BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//CBITs/Purple Robot Manager//NONSGML v1.0//EN\nBEGIN:VEVENT\nUID:%1$s@cbits.northwestern.edu\nDTSTAMP:%1$s\nDTSTART:%1$s\nDTEND:%2$s\nSUMMARY:%3$s%4$s\nEND:VEVENT\nEND:VCALENDAR</string>
+    <string name="widget_test_title">This is an intentionally long string created to see if the widget will truncate the title.</string>
+    <string name="widget_test_message">This is an intentionally long string created to see if the widget will truncate the message. Rinse and repeat: This is an intentionally long string created to see if the widget will truncate the message.</string>
 </resources>
