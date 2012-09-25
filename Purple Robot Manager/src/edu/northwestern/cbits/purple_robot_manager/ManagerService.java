@@ -34,13 +34,9 @@ public class ManagerService extends IntentService
 
 	protected void onHandleIntent(Intent intent)
 	{
-		Log.e("PRM", "SERVER GOT INTENT " + intent.getAction());
-
 		if (APPLICATION_LAUNCH_INTENT.equalsIgnoreCase(intent.getAction()))
 		{
 			String packageName = intent.getStringExtra(APPLICATION_LAUNCH_INTENT_PACKAGE);
-
-			Log.e("PRM", "LAUNCH PACKAGE " + packageName);
 
 			if (packageName != null)
 			{
@@ -50,8 +46,6 @@ public class ManagerService extends IntentService
 				if (launchIntent != null)
 				{
 					String launchParams = intent.getStringExtra(APPLICATION_LAUNCH_INTENT_PARAMETERS);
-
-					Log.e("PRM", "LAUNCH PARAMS " + launchParams);
 
 					if (launchParams != null)
 					{
@@ -109,13 +103,11 @@ public class ManagerService extends IntentService
 					}
 					else if (INCOMING_DATA_INTENT.equals(intent.getAction())) // TODO: Define trigger...
 					{
-						Log.e("PRM", "TODO: Check if need to do something based on incoming FUNF or other data.");
+//						Log.e("PRM", "TODO: Check if need to do something based on incoming FUNF or other data.");
 					}
 
 					if (execute)
 					{
-						Log.e("PRM", "FIRING " + trigger.name());
-
 						trigger.execute(this);
 					}
 				}
