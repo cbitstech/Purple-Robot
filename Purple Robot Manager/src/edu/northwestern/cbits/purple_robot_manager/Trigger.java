@@ -2,6 +2,7 @@ package edu.northwestern.cbits.purple_robot_manager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.mozilla.javascript.EvaluatorException;
 
 import android.content.Context;
 
@@ -39,9 +40,16 @@ public abstract class Trigger
 	{
 		if (this._action != null)
 		{
-			JavaScriptEngine engine = new JavaScriptEngine(context);
+			try
+			{
+				JavaScriptEngine engine = new JavaScriptEngine(context);
 
-			engine.runScript(this._action);
+				engine.runScript(this._action);
+			}
+			catch (EvaluatorException e)
+			{
+				e.printStackTrace();
+			}
 		}
 	}
 

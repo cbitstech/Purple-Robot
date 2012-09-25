@@ -3,7 +3,6 @@ package edu.northwestern.cbits.purple_robot_manager;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager.LayoutParams;
@@ -16,6 +15,9 @@ public class DialogActivity extends Activity
 	public static String DIALOG_TITLE = "dialog_title";
 	public static String DIALOG_CONFIRM_BUTTON = "dialog_confirm";
 	public static String DIALOG_CANCEL_BUTTON= "dialog_cancel";
+
+	public static String DIALOG_CONFIRM_SCRIPT = "dialog_confirm_script";
+	public static String DIALOG_CANCEL_SCRIPT = "dialog_cancel_script";
 
 	protected void onCreate(Bundle savedInstanceState)
     {
@@ -31,6 +33,7 @@ public class DialogActivity extends Activity
 		super.onResume();
 
 		final DialogActivity me = this;
+		final JavaScriptEngine jsEngine = new JavaScriptEngine(this);
 
         final TextView messageText = (TextView) this.findViewById(R.id.text_dialog_message);
 
@@ -39,7 +42,8 @@ public class DialogActivity extends Activity
         String title = intent.getStringExtra(DialogActivity.DIALOG_TITLE);
         String message = intent.getStringExtra(DialogActivity.DIALOG_MESSAGE);
 
-        final String key = title + message;
+        final String confirmScript = intent.getStringExtra(DialogActivity.DIALOG_CONFIRM_SCRIPT);
+        final String cancelScript = intent.getStringExtra(DialogActivity.DIALOG_CANCEL_SCRIPT);
 
         this.setTitle(title);
 
@@ -55,9 +59,8 @@ public class DialogActivity extends Activity
         {
 			public void onClick(View v)
 			{
-				Log.e("PRM", "CONFIRM");
-
-				JavaScriptEngine.executeConfirmClosure(key);
+				if (confirmScript != null)
+					jsEngine.runScript(confirmScript);
 
 				me.finish();
 			}
@@ -67,13 +70,11 @@ public class DialogActivity extends Activity
         {
 			public void onClick(View v)
 			{
-				Log.e("PRM", "CANCEL");
-
-				JavaScriptEngine.executeCancelClosure(key);
+				if (confirmScript != null)
+					jsEngine.runScript(cancelScript);
 
 				me.finish();
 			}
         });
     }
-
 }

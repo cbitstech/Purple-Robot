@@ -2,10 +2,12 @@ package edu.northwestern.cbits.purple_robot_manager;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import org.json.JSONObject;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.EvaluatorException;
-import org.mozilla.javascript.Script;
+import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
@@ -20,7 +22,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
-import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
@@ -31,11 +32,6 @@ public class JavaScriptEngine
 	private android.content.Context _context = null;
 
 	private static Map<String, String> packageMap = null;
-
-	private static Map<String, Script> confirmMap = new HashMap<String, Script>();
-	private static Map<String, Script> cancelMap = new HashMap<String, Script>();
-	private static Map<String, Context> contextMap = new HashMap<String, Context>();
-	private static Map<String, Scriptable> scopeMap = new HashMap<String, Scriptable>();
 
 	private Context _jsContext = null;
 	private Scriptable _scope = null;
@@ -58,10 +54,8 @@ public class JavaScriptEngine
 		return this._jsContext.evaluateString(this._scope, script, "<engine>", 1, null);
 	}
 
-	public boolean updateWidget(final String title, final String message, final String appName, final Object launchParams)
+	public boolean updateWidget(final String title, final String message, final String applicationName, final NativeObject launchParams, final String script)
 	{
-		Log.e("PRM", "UPDATING WIDGET!!!!");
-
 		AppWidgetManager widgetManager = AppWidgetManager.getInstance(this._context);
 
 		ComponentName provider = new ComponentName(this._context.getPackageName(), PurpleRobotAppWidgetProvider.class.getName());
@@ -72,6 +66,35 @@ public class JavaScriptEngine
 
 		views.setCharSequence(R.id.widget_title_text, "setText", title);
 		views.setCharSequence(R.id.widget_message_text, "setText", message);
+
+		String packageName = this.packageForApplicationName(applicationName);
+
+		if (packageName != null)
+		{
+			Intent intent = new Intent(ManagerService.APPLICATION_LAUNCH_INTENT);
+			intent.putExtra(ManagerService.APPLICATION_LAUNCH_INTENT_PACKAGE, packageName);
+
+			if (script != null)
+				intent.putExtra(ManagerService.APPLICATION_LAUNCH_INTENT_POSTSCRIPT, script);
+
+			if (launchParams != null)
+			{
+				HashMap<String, String> launchMap = new HashMap<String, String>();
+
+				for (Entry<Object, Object> e : launchParams.entrySet())
+				{
+					launchMap.put(e.getKey().toString(), e.getValue().toString());
+				}
+
+				JSONObject jsonMap = new JSONObject(launchMap);
+
+				intent.putExtra(ManagerService.APPLICATION_LAUNCH_INTENT_PARAMETERS, jsonMap.toString());
+			}
+
+			PendingIntent pi = PendingIntent.getService(this._context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+			views.setOnClickPendingIntent(R.id.widget_root_layout, pi);
+		}
 
 		widgetManager.updateAppWidget(widgetIds, views);
 
@@ -241,57 +264,17 @@ public class JavaScriptEngine
 		return null;
 	}
 
-	public void closureTest(Object o)
+	public void showNativeDialog(String title, String message, String confirmTitle, String cancelTitle, String confirmScript, String cancelScript)
 	{
-		Log.e("PRM", "CLOSURE: " + o.getClass());
-	}
-
-	private static void clearClosures(String key)
-	{
-		confirmMap.remove(key);
-		cancelMap.remove(key);
-		contextMap.remove(key);
-		scopeMap.remove(key);
-	}
-
-	public static void executeConfirmClosure(String key)
-	{
-//		Script script = confirmMap.get(key);
-
-//		Context context = contextMap.get(key);
-//		Scriptable scope = scopeMap.get(key);
-
-//		script.exec(context, scope);
-
-		JavaScriptEngine.clearClosures(key);
-	}
-
-	public static void executeCancelClosure(String key)
-	{
-//		Script script = cancelMap.get(key);
-
-//		Context context = contextMap.get(key);
-//		Scriptable scope = scopeMap.get(key);
-
-//		script.exec(context, scope);
-
-		JavaScriptEngine.clearClosures(key);
-	}
-
-	public void showNativeDialog(String title, String message, String confirmTitle, String cancelTitle, Script confirmClosure, Script denyClosure)
-	{
-		String key = title + message;
-
-		JavaScriptEngine.confirmMap.put(key, confirmClosure);
-		JavaScriptEngine.cancelMap.put(key, denyClosure);
-		JavaScriptEngine.contextMap.put(key, this._jsContext);
-		JavaScriptEngine.scopeMap.put(key, this._scope);
-
 		Intent intent = new Intent(this._context, DialogActivity.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
 		intent.putExtra(DialogActivity.DIALOG_TITLE, title);
 		intent.putExtra(DialogActivity.DIALOG_MESSAGE, message);
 		intent.putExtra(DialogActivity.DIALOG_CONFIRM_BUTTON, confirmTitle);
 		intent.putExtra(DialogActivity.DIALOG_CANCEL_BUTTON, cancelTitle);
+		intent.putExtra(DialogActivity.DIALOG_CONFIRM_SCRIPT, confirmScript);
+		intent.putExtra(DialogActivity.DIALOG_CANCEL_SCRIPT, cancelScript);
 
 		this._context.startActivity(intent);
 	}

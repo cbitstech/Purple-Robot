@@ -4,6 +4,8 @@
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
 	android:orientation="horizontal"
+	android:id="@+id/widget_root_layout"
+	android:clickable="true"
 	android:background="@drawable/appwidget_dark_bg">
 	<ImageView
 	    android:src="@drawable/ic_launcher"
@@ -15,6 +17,7 @@
 	    android:paddingBottom="8dp"
 	    android:paddingLeft="8dp"
 	    android:paddingRight="8dp"
+	    android:contentDescription=""
 	    android:adjustViewBounds="true" />
 	<LinearLayout
 	    android:layout_width="fill_parent"
@@ -33,6 +36,7 @@
 	        android:textSize="20sp"
 	        android:textStyle="bold"
 	        android:lines="1"
+	        android:singleLine="true"
 		    android:paddingBottom="4dp"
 	        android:ellipsize="end"
 	        android:typeface="sans" />
@@ -40,10 +44,12 @@
 	        android:id="@+id/widget_message_text"
 	        android:text="@string/widget_test_message"
 	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
+	        android:layout_height="112sp"
 	        android:textSize="14sp"
-	        android:lines="8"
-	        android:ellipsize="end"
+	        android:singleLine="false"
+	        android:maxLines="6"
+	        android:minLines="6"
+	        android:lines="6"
 	        android:typeface="sans" />
 	</LinearLayout>
 </LinearLayout>
