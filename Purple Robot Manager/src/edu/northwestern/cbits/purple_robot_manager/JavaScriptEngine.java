@@ -54,19 +54,8 @@ public class JavaScriptEngine
 		return this._jsContext.evaluateString(this._scope, script, "<engine>", 1, null);
 	}
 
-	public boolean updateWidget(final String title, final String message, final String applicationName, final NativeObject launchParams, final String script)
+	private Intent constructLaunchIntent(final String applicationName, final NativeObject launchParams, final String script)
 	{
-		AppWidgetManager widgetManager = AppWidgetManager.getInstance(this._context);
-
-		ComponentName provider = new ComponentName(this._context.getPackageName(), PurpleRobotAppWidgetProvider.class.getName());
-
-		int[] widgetIds = widgetManager.getAppWidgetIds(provider);
-
-		RemoteViews views = new RemoteViews(this._context.getPackageName(), R.layout.layout_widget);
-
-		views.setCharSequence(R.id.widget_title_text, "setText", title);
-		views.setCharSequence(R.id.widget_message_text, "setText", message);
-
 		String packageName = this.packageForApplicationName(applicationName);
 
 		if (packageName != null)
@@ -91,6 +80,35 @@ public class JavaScriptEngine
 				intent.putExtra(ManagerService.APPLICATION_LAUNCH_INTENT_PARAMETERS, jsonMap.toString());
 			}
 
+			return intent;
+		}
+
+		return null;
+	}
+
+	public boolean updateWidget(final String title, final String message, final String applicationName)
+	{
+		return this.updateWidget(title, message, applicationName, new NativeObject(), null);
+	}
+
+
+	public boolean updateWidget(final String title, final String message, final String applicationName, final NativeObject launchParams, final String script)
+	{
+		AppWidgetManager widgetManager = AppWidgetManager.getInstance(this._context);
+
+		ComponentName provider = new ComponentName(this._context.getPackageName(), PurpleRobotAppWidgetProvider.class.getName());
+
+		int[] widgetIds = widgetManager.getAppWidgetIds(provider);
+
+		RemoteViews views = new RemoteViews(this._context.getPackageName(), R.layout.layout_widget);
+
+		views.setCharSequence(R.id.widget_title_text, "setText", title);
+		views.setCharSequence(R.id.widget_message_text, "setText", message);
+
+		Intent intent = this.constructLaunchIntent(applicationName, launchParams, script);
+
+		if (intent != null)
+		{
 			PendingIntent pi = PendingIntent.getService(this._context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 			views.setOnClickPendingIntent(R.id.widget_root_layout, pi);
@@ -181,11 +199,15 @@ public class JavaScriptEngine
 
 	public boolean launchApplication(String applicationName)
 	{
-		String packageName = this.packageForApplicationName(applicationName);
+		return this.launchApplication(applicationName, new NativeObject(), null);
+	}
 
-		if (packageName != null)
+	public boolean launchApplication(String applicationName, final NativeObject launchParams, final String script)
+	{
+		Intent intent = this.constructLaunchIntent(applicationName, launchParams, script);
+
+		if (intent != null)
 		{
-			Intent intent = this._context.getPackageManager().getLaunchIntentForPackage(packageName);
 			this._context.startActivity(intent);
 
 			return true;
@@ -194,38 +216,31 @@ public class JavaScriptEngine
 		return false;
 	}
 
-	@SuppressWarnings("deprecation")
 	public boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen)
+	{
+		return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen, new NativeObject(), null);
+	}
+
+	public boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen, final NativeObject launchParams, final String script)
 	{
 		try
 		{
-			String packageName = this.packageForApplicationName(applicationName);
-
-			PackageManager packageMgr = this._context.getPackageManager();
-
-			if (packageName == null)
-			{
-				try
-				{
-					PackageInfo info = packageMgr.getPackageInfo(this._context.getPackageName(), 0);
-					packageName = info.packageName;
-				}
-				catch (NameNotFoundException e)
-				{
-					e.printStackTrace();
-				}
-			}
-
 			long now = System.currentTimeMillis();
 
 			if (displayWhen < now)
 				displayWhen = now;
 
-			Intent intent = packageMgr.getLaunchIntentForPackage(packageName);
-			PendingIntent pendingIntent = PendingIntent.getActivity(this._context, 0, intent, 0);
-
 			Notification note = new Notification(R.drawable.ic_launcher, message, displayWhen);
-			note.setLatestEventInfo(this._context, title, message, pendingIntent);
+
+			Intent intent = this.constructLaunchIntent(applicationName, launchParams, script);
+
+			if (intent != null)
+			{
+				PendingIntent pendingIntent = PendingIntent.getActivity(this._context, 0, intent, 0);
+
+				note.setLatestEventInfo(this._context, title, message, pendingIntent);
+			}
+
 			note.flags = Notification.FLAG_AUTO_CANCEL;
 
 			try

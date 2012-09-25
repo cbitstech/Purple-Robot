@@ -206,5 +206,8 @@ public class JavaScriptEngineTest extends InstrumentationTestCase
 
 		Assert.fail("Need to add test for dialog method...");
 		Assert.fail("Need to add test for widget method...");
+
+		Assert.fail("Need to add test for methods supporting app launch parameters and post-launch scripts...");
+
 	}
 }
