@@ -28,6 +28,7 @@
 				<action android:name="purple_robot_manager_periodic_check" />
 				<action android:name="purple_robot_manager_incoming_data" />
 				<action android:name="purple_robot_manager_application_launch" />
+				<action android:name="purple_robot_manager_refresh_configuration" />
 			</intent-filter>
 	    </service>
  		<activity android:name=".StartActivity" android:label="@string/app_name">

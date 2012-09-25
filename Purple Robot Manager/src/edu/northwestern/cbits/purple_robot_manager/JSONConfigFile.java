@@ -78,7 +78,9 @@ public class JSONConfigFile
 
 		long now = System.currentTimeMillis();
 
-		if (now - lastUpdate > 1000 * 60 * 60 * 24)
+		int interval = Integer.parseInt(prefs.getString("config_json_refresh_interval", "60"));
+
+		if (now - lastUpdate > 1000 * 60 * interval)
 		{
 			String uriString = prefs.getString("config_json_url", null);
 

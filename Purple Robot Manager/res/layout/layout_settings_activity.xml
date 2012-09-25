@@ -4,13 +4,6 @@
         android:title="@string/config_settings_category"
         android:key="first_category">
         <EditTextPreference
-            android:key="config_json_url"
-            android:title="@string/config_json_url_label"
-            android:dialogTitle="@string/config_json_url_title"
-            android:dialogMessage="@string/config_json_url_message"
-            android:singleLine="true"
-            android:defaultValue="" />
-        <EditTextPreference
             android:key="config_password"
             android:title="@string/config_password_label"
             android:dialogTitle="@string/config_password_title"
@@ -18,5 +11,23 @@
 			android:inputType="textPassword"
             android:singleLine="true"
             android:defaultValue="" />
-    </PreferenceCategory>
+        <EditTextPreference
+            android:key="config_json_url"
+            android:title="@string/config_json_url_label"
+            android:dialogTitle="@string/config_json_url_title"
+            android:dialogMessage="@string/config_json_url_message"
+            android:singleLine="true"
+            android:defaultValue="" />
+        <ListPreference
+            android:key="config_json_refresh_interval"
+            android:entries="@array/json_refresh_interval_labels"
+            android:entryValues="@array/json_refresh_interval_values"
+            android:title="@string/config_json_refresh_interval_label"
+            android:dialogTitle="@string/config_json_refresh_interval_title"
+            android:summary="@string/config_json_refresh_interval_message"
+            android:defaultValue="60" />
+   		<Preference android:title="@string/config_refresh_json_label"
+            android:key="config_json_refresh_manually"
+            android:defaultValue="0" />
+	    </PreferenceCategory>
 </PreferenceScreen>

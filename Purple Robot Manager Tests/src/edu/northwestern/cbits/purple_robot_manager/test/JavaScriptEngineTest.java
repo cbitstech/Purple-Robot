@@ -204,6 +204,71 @@ public class JavaScriptEngineTest extends InstrumentationTestCase
 			Assert.fail("Threw error on PurpleRobot.versionCode method.");
 		}
 
+		/*
+		 * Need to mock up some objects to test the following...
+		 *
+
+		String key = "test_string";
+		String value = "test_string_value";
+
+		try
+		{
+			Object result = engine.runScript("PurpleRobot.persistString('" + key  + "', '" + value + "');");
+
+			if (result instanceof Boolean)
+			{
+				Boolean resultBool = (Boolean) result;
+
+				Assert.assertTrue(resultBool.booleanValue());
+			}
+			else
+				Assert.fail("Value returned from PurpleRobot.persistString is not a Boolean: " + result.getClass());
+		}
+		catch (EcmaError e)
+		{
+			Assert.fail("Threw error on PurpleRobot.persistString method.");
+		}
+
+		try
+		{
+			Object result = engine.runScript("PurpleRobot.fetchString('" + key + "');");
+
+			if (result instanceof NativeJavaObject)
+			{
+				NativeJavaObject javaObj = (NativeJavaObject) result;
+
+				if (NativeJavaObject.canConvert(result, String.class))
+				{
+					String resultString = (String) javaObj.unwrap();
+
+					Assert.assertEquals(value, resultString);
+				}
+				else
+				{
+					Assert.fail("Value returned from PurpleRobot.fetchString cannot convert to a String: " + result);
+				}
+			}
+		}
+		catch (EcmaError e)
+		{
+			Assert.fail("Threw error on PurpleRobot.fetchString method.");
+		}
+
+		try
+		{
+			engine.runScript("PurpleRobot.persistString('" + key  + "', null);");
+
+			Object result = engine.runScript("PurpleRobot.fetchString('" + key + "');");
+
+			Assert.assertNull(result);
+		}
+		catch (EcmaError e)
+		{
+			Assert.fail("Threw error on PurpleRobot.fetchString method.");
+		}
+
+		*/
+
 		Assert.fail("Need to add test for dialog method...");
 		Assert.fail("Need to add test for widget method...");
 

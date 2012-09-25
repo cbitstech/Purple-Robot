@@ -18,15 +18,20 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
 public class JavaScriptEngine
 {
+	private static String JS_ENGINE_PERSISTENCE_PREFIX = "purple_robot_js_persist_prefix_";
+
 	private static final int NOTIFICATION_ID = 1;
 
 	private android.content.Context _context = null;
@@ -308,5 +313,29 @@ public class JavaScriptEngine
 		}
 
 		return -1;
+	}
+
+	public boolean persistString(String key, String value)
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+		Editor editor = prefs.edit();
+
+		key = JS_ENGINE_PERSISTENCE_PREFIX + key;
+
+		if (value != null)
+			editor.putString(key,  value.toString());
+		else
+			editor.remove(key);
+
+		return editor.commit();
+	}
+
+	public String fetchString(String key)
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+
+		key = JS_ENGINE_PERSISTENCE_PREFIX + key;
+
+		return prefs.getString(key, null);
 	}
 }

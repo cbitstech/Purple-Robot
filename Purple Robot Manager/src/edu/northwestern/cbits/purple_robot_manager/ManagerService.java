@@ -22,6 +22,8 @@ public class ManagerService extends IntentService
 	public static String APPLICATION_LAUNCH_INTENT_PARAMETERS = "purple_robot_manager_widget_launch_parameters";
 	public static String APPLICATION_LAUNCH_INTENT_POSTSCRIPT = "purple_robot_manager_widget_launch_postscript";
 
+	public static String REFRESH_CONFIGURATION = "purple_robot_manager_refresh_configuration";
+
 	public ManagerService()
 	{
 		super("ManagerService");
@@ -41,7 +43,6 @@ public class ManagerService extends IntentService
 			if (packageName != null)
 			{
 				Intent launchIntent = this.getPackageManager().getLaunchIntentForPackage(packageName);
-
 
 				if (launchIntent != null)
 				{

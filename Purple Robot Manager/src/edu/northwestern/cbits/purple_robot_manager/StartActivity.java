@@ -107,13 +107,7 @@ public class StartActivity extends Activity
         {
 			public void onClick(View v)
 			{
-//				Intent intent = new Intent(ManagerService.PERIODIC_CHECK_INTENT);
-//				me.startService(intent);
-
-//				me.finish();
-
-		        JavaScriptEngine js = new JavaScriptEngine(me);
-		        js.runScript("PurpleRobot.showNativeDialog('TITLE', 'MESSAGE', 'CONFIRM', 'CANCEL', function() { PurpleRobot.emitToast('CONFIRM!!!', false); }, function() { PurpleRobot.emitToast('CANCEL!!!', false); });");
+				me.finish();
 			}
         });
 
