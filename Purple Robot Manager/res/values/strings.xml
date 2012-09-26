@@ -5,13 +5,19 @@
     <string name="crash_toast_text">Whoops - the app has crashed. Sending a report to the developer.</string>
     <string name="toast_incorrect_password">Incorrect password. Please try again.</string>
 
-    <string name="config_settings_category">Settings &amp; Options</string>
+    <string name="config_settings_category">Configuration Options</string>
+    <string name="config_notifications_category">Notification Options</string>
 
     <string name="config_json_url_label">JSON Configuration URL</string>
-    <string name="config_json_url_title">JSON Configuration URL</string>
     <string name="config_json_url_message">Please enter the URL for the application configuration file.</string>
 
-    <string name="config_refresh_json_label">Refresh JSON Configuration</string>
+    <string name="config_refresh_json_label">Refresh Configuration</string>
+
+    <string name="config_vibrator_pattern_label">Haptic Feedback Pattern</string>
+    <string name="config_vibrator_pattern_message">Default pattern used to provide haptic feedback (vibrations) for events.</string>
+
+    <string name="config_notification_sound_label">Notification Sound</string>
+    <string name="config_notification_sound_summary">System sound used for audible notifications when not otherwise specified.</string>
 
     <string name="config_password_label">Configuration Password</string>
     <string name="config_password_title">Configuration Password</string>
@@ -26,10 +32,10 @@
     <string name="button_exit">Exit</string>
 
     <string name="ical_template">BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//CBITs/Purple Robot Manager//NONSGML v1.0//EN\nBEGIN:VEVENT\nUID:%1$s@cbits.northwestern.edu\nDTSTAMP:%1$s\nDTSTART:%1$s\nDTEND:%2$s\nSUMMARY:%3$s%4$s\nEND:VEVENT\nEND:VCALENDAR</string>
+
     <string name="widget_test_title">This is an intentionally long string created to see if the widget will truncate the title.</string>
     <string name="widget_test_message">This is an intentionally long string created to see if the widget will truncate the message. Rinse and repeat: This is an intentionally long string created to see if the widget will truncate the message.</string>
 
-    <string name="config_json_refresh_interval_label">Configuration Refresh Interval</string>
-    <string name="config_json_refresh_interval_title">Refresh Interval</string>
+    <string name="config_json_refresh_interval_label">Refresh Interval</string>
     <string name="config_json_refresh_interval_message">How often configuration should be refreshed from the server.</string>
 </resources>

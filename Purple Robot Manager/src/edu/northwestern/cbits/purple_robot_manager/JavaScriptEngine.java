@@ -24,7 +24,9 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
+import android.preference.ListPreference;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
@@ -48,6 +50,8 @@ public class JavaScriptEngine
 
 	public Object runScript(String script) throws EvaluatorException
 	{
+		Log.e("PRM", "JS SCRIPT: " + script);
+
 		this._jsContext = Context.enter();
 		this._jsContext.setOptimizationLevel(-1);
 
@@ -338,4 +342,33 @@ public class JavaScriptEngine
 
 		return prefs.getString(key, null);
 	}
+
+	public void vibrate(String pattern)
+	{
+		Intent intent = new Intent(ManagerService.HAPTIC_PATTERN_INTENT);
+		intent.putExtra(ManagerService.HAPTIC_PATTERN_NAME, pattern);
+
+		this._context.startService(intent);
+	}
+
+	public void playTone(String tone)
+	{
+		Intent intent = new Intent(ManagerService.RINGTONE_INTENT);
+
+		if (tone != null)
+			intent.putExtra(ManagerService.RINGTONE_NAME, tone);
+
+		this._context.startService(intent);
+	}
+
+	public void playDefaultTone()
+	{
+		this.playTone(null);
+	}
+
+	public void log(String message)
+	{
+		Log.i("PRM.JavaScript", message);
+	}
+
 }

@@ -18,6 +18,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 public class JSONConfigFile
 {
@@ -43,6 +44,8 @@ public class JSONConfigFile
 
 	public JSONConfigFile(Uri uri) throws IOException, JSONException
 	{
+		Log.e("PRM", "JSON CONFIG URI: " + uri.toString());
+
 		URL u = new URL(uri.toString());
 
 		HttpURLConnection conn = (HttpURLConnection) u.openConnection();

@@ -26,4 +26,49 @@
         <item>30 minutes</item>
         <item>1 hour</item>
     </string-array>
+
+	<string-array name="vibrator_pattern_values">
+        <item>vibrator_blip</item>
+        <item>vibrator_buzz</item>
+   	    <item>vibrator_sos</item>
+    </string-array>
+	<string-array name="vibrator_pattern_labels">
+        <item>Blip</item>
+        <item>Buzz</item>
+   	    <item>S.O.S.</item>
+    </string-array>
+
+	<integer-array name="vibrator_blip">
+        <item>0</item>
+        <item>100</item>
+        <item>1000</item>
+    </integer-array>
+
+	<integer-array name="vibrator_buzz">
+        <item>0</item>
+        <item>1000</item>
+        <item>100</item>
+    </integer-array>
+
+	<integer-array name="vibrator_sos">
+        <item>0</item>
+        <item>200</item>
+        <item>200</item>
+        <item>200</item>
+        <item>200</item>
+        <item>200</item>
+        <item>500</item>
+        <item>500</item>
+        <item>200</item>
+        <item>500</item>
+        <item>200</item>
+        <item>500</item>
+        <item>500</item>
+        <item>200</item>
+        <item>200</item>
+        <item>200</item>
+        <item>200</item>
+        <item>200</item>
+        <item>1000</item>
+	</integer-array>
 </resources>
