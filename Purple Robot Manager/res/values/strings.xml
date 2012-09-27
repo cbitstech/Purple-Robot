@@ -38,4 +38,17 @@
 
     <string name="config_json_refresh_interval_label">Refresh Interval</string>
     <string name="config_json_refresh_interval_message">How often configuration should be refreshed from the server.</string>
+
+    <string name="title_preference_probes_screen">Probe Configuration</string>
+    <string name="title_preference_probes_global_category">Application Options</string>
+
+    <string name="title_preference_probes_enable_probes">Enable Probes</string>
+
+    <string name="title_preference_probes_available_category">Available Probes</string>
+
+    <string name="title_location_probe">Location Probe</string>
+    <string name="summary_location_probe">Records the most accurate location available for the device, given device limitations and respecting battery life.</string>
+
+    <string name="title_enable_probe">Enable Probe</string>
+
 </resources>

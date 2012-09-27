@@ -1,5 +1,6 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
+import edu.northwestern.cbits.purple_robot_manager.probes.ProbesPreferenceScreenBuilder;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -47,6 +48,10 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 				return true;
 			}
         });
+
+        PreferenceScreen probesScreen = ProbesPreferenceScreenBuilder.buildPreferenceScreen(this);
+
+        this.getPreferenceScreen().addPreference(probesScreen);
     }
 
 	public boolean onPreferenceClick(Preference preference)

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/title_preference_probes_global_category">
+       	<CheckBoxPreference
+       	    android:title="@string/title_preference_probes_enable_probes"
+            android:key="config_enable_probes"
+            android:defaultValue="true"/>
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/title_preference_probes_available_category"
+        android:key="key_available_probes" />
+</PreferenceScreen>

@@ -1,5 +1,9 @@
 <resources>
-
     <style name="AppTheme" parent="android:Theme.Light" />
-
+    <style name="PreferencesTheme" parent="android:Theme.Light" >
+	    <item name="android:listViewStyle">@style/lightListView</item>
+	</style>
+	<style name="lightListView">
+    	<item name="android:background">#ffffff</item>
+	</style>
 </resources>

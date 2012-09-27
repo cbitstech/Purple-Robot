@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="@string/title_location_probe"
+    android:summary="@string/summary_location_probe">
+   	<CheckBoxPreference
+		android:title="@string/title_enable_probe"
+		android:key="config_probe_location_enabled"
+		android:defaultValue="true"/>
+</PreferenceScreen>
