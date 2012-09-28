@@ -2,9 +2,15 @@ package edu.northwestern.cbits.purple_robot_manager.probes;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import edu.northwestern.cbits.purple_robot_manager.R;
+
+import android.content.Context;
 
 public abstract class Probe
 {
@@ -131,5 +137,40 @@ public abstract class Probe
 	public String title()
 	{
 		return this._title;
+	}
+
+	@SuppressWarnings("rawtypes")
+	private static List<Class> _probeClasses = new ArrayList<Class>();
+
+	@SuppressWarnings("rawtypes")
+	public static void registerProbeClass(Class probeClass)
+	{
+		if (!Probe._probeClasses.contains(probeClass))
+			Probe._probeClasses.add(probeClass);
+	}
+
+	@SuppressWarnings("rawtypes")
+	public static List<Class> availableProbeClasses()
+	{
+		return Probe._probeClasses;
+	}
+
+	public static void loadProbeClasses(Context context)
+	{
+		String packageName = Probe.class.getPackage().getName();
+
+		String[] probeClasses = context.getResources().getStringArray(R.array.probe_classes);
+
+		for (String className : probeClasses)
+		{
+			try
+			{
+				Probe.registerProbeClass(Class.forName(packageName + "." + className));
+			}
+			catch (ClassNotFoundException e)
+			{
+				e.printStackTrace();
+			}
+		}
 	}
 }

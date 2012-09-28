@@ -3,19 +3,17 @@ package edu.northwestern.cbits.purple_robot_manager.probes;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import edu.northwestern.cbits.purple_robot_manager.R;
 import android.content.Context;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.util.Log;
+import edu.northwestern.cbits.purple_robot_manager.R;
 
 public class ProbesPreferenceScreenBuilder
 {
-	private static Class[] _probeClasses = { LocationProbe.class };
-
-    static PreferenceScreen inflatePreferenceScreenFromResource(PreferenceActivity activity, int resId, PreferenceManager manager)
+	static PreferenceScreen inflatePreferenceScreenFromResource(PreferenceActivity activity, int resId, PreferenceManager manager)
     {
     	try
     	{
@@ -41,7 +39,7 @@ public class ProbesPreferenceScreenBuilder
 
 		PreferenceCategory probesCategory = (PreferenceCategory) screen.findPreference("key_available_probes");
 
-		for (Class probeClass : _probeClasses)
+		for (Class probeClass : Probe.availableProbeClasses())
 		{
 			try
 			{

@@ -51,4 +51,10 @@
 
     <string name="title_enable_probe">Enable Probe</string>
 
+    <string name="probe_period_label">Period</string>
+    <string name="probe_period_summary">Amount of time between probes</string>
+
+    <string name="probe_duration_label">Duration</string>
+    <string name="probe_duration_summary">Maximum amount of time probe can run</string>
+
 </resources>

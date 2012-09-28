@@ -7,6 +7,8 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
+
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.PendingIntent;
@@ -46,6 +48,7 @@ public class ManagerService extends IntentService
 		super(name);
 	}
 
+	@SuppressWarnings("deprecation")
 	protected void onHandleIntent(Intent intent)
 	{
 		if (HAPTIC_PATTERN_INTENT.equalsIgnoreCase(intent.getAction()))
@@ -225,5 +228,7 @@ public class ManagerService extends IntentService
 		PendingIntent pi = PendingIntent.getService(context, 0, new Intent(ManagerService.PERIODIC_CHECK_INTENT), PendingIntent.FLAG_UPDATE_CURRENT);
 
 		alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60000, pi);
+
+		Probe.loadProbeClasses(context);
 	}
 }
