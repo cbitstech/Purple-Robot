@@ -9,13 +9,15 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import edu.mit.media.funf.CustomizedIntentService;
 import edu.mit.media.funf.Utils;
 import edu.mit.media.funf.probe.Probe;
 import edu.mit.media.funf.storage.BundleSerializer;
 import edu.mit.media.funf.storage.NameValueDatabaseService;
+import edu.northwestern.cbits.purple_robot_manager.probes.ProbesPreferenceManager;
 
-public class PurpleRobotPipeline extends CustomizedIntentService
+public class FunfService extends CustomizedIntentService
 {
 	public static final String TAG = "PurpleRobotPipeline";
 	public static final String DEFAULT_PIPELINE_NAME = TAG;
@@ -31,7 +33,7 @@ public class PurpleRobotPipeline extends CustomizedIntentService
 
 	private boolean _isEnabled = true;
 
-	public PurpleRobotPipeline()
+	public FunfService()
 	{
 		super("PurpleRobotPipeline");
 	}
@@ -55,6 +57,8 @@ public class PurpleRobotPipeline extends CustomizedIntentService
 
 	protected void onHandleIntent(Intent intent)
 	{
+		Log.e("PRM", "GOT INTENT WITH ACTION: " + intent.getAction());
+
 		String action = intent.getAction();
 
 		if (ACTION_RELOAD.equals(action))
@@ -92,7 +96,9 @@ public class PurpleRobotPipeline extends CustomizedIntentService
 
 	public void sendProbeRequests()
 	{
-		Map<String,Bundle[]> dataRequests = null; // getConfig().getDataRequests();
+		Map<String,Bundle[]> dataRequests = ProbesPreferenceManager.getDataRequests(this);
+
+		Log.e("PRM", "GOT CONFIG MAP " + dataRequests);
 
 		for (String probeName : dataRequests.keySet())
 		{
@@ -156,6 +162,8 @@ public class PurpleRobotPipeline extends CustomizedIntentService
 
 	public void onDataReceived(Bundle data)
 	{
+		Log.e("PRM", "GOT DATA " + data);
+
 		String dataJson = getBundleSerializer().serialize(data);
 		String probeName = data.getString(Probe.PROBE);
 
@@ -187,9 +195,9 @@ public class PurpleRobotPipeline extends CustomizedIntentService
 
 	public class LocalBinder extends Binder
 	{
-		public PurpleRobotPipeline getService()
+		public FunfService getService()
 		{
-            return PurpleRobotPipeline.this;
+            return FunfService.this;
         }
     }
 

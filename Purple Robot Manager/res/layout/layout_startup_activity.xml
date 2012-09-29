@@ -3,23 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center_vertical|center_horizontal|center"
-    android:orientation="vertical" 
+    android:orientation="vertical"
+    android:id="@+id/layout_start_root"
     android:gravity="center_vertical" >
-    <EditText
-        android:id="@+id/text_startup_password"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical|center_horizontal|center"
-        android:hint="@string/text_startup_password_hint"
-        android:textAppearance="?android:attr/textAppearanceMedium" 
-        android:password="true"
-        android:padding="10dp" />
-    <Button android:id="@+id/button_submit_password"
-        android:text="@string/button_submit_password"
-        android:layout_width="fill_parent"
-        android:layout_height="48dp" />
-    <Button android:id="@+id/button_exit"
-        android:text="@string/button_exit"
-        android:layout_width="fill_parent"
-        android:layout_height="48dp" />
 </LinearLayout>

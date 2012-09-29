@@ -7,9 +7,27 @@
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 	<uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
-	<application android:label="@string/app_name"
+
+    <uses-permission android:name="android.permission.BATTERY_STATS" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.GET_TASKS"/>
+    <uses-permission android:name="com.android.browser.permission.READ_HISTORY_BOOKMARKS" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.GET_TASKS"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+   	<application android:label="@string/app_name"
 		android:icon="@drawable/ic_launcher"
-		android:theme="@style/AppTheme"
+		android:theme="@style/Holo.Theme.Sherlock"
 		android:name="PurpleRobotApplication">
 		<receiver android:enabled="true" android:name=".BootUpReceiver"
 			android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
@@ -34,19 +52,61 @@
 				<action android:name="purple_robot_manager_ringtone" />
 			</intent-filter>
 	    </service>
- 		<activity android:name=".StartActivity" android:label="@string/app_name">
+		<service android:enabled="true" android:exported="false" android:name=".FunfService">
+			<intent-filter>
+				<action android:name="edu.mit.media.funf.reload" />
+			</intent-filter>
+		</service>
+        <!-- Probe Services -->
+        <service android:name="edu.mit.media.funf.probe.builtin.ActivityProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.AndroidInfoProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.ApplicationsProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.AudioFilesProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.BatteryProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.BluetoothProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.BrowserBookmarksProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.BrowserSearchesProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.CallLogProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.CellProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.ContactProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.HardwareInfoProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.ImagesProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.LocationProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.RunningApplicationsProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.ScreenProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.SMSProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.TelephonyProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.TimeOffsetProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.VideosProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.WifiProbe"></service>
+
+        <service android:name="edu.mit.media.funf.probe.builtin.AccelerometerSensorProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.GravitySensorProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.GyroscopeSensorProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.LightSensorProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.LinearAccelerationSensorProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.MagneticFieldSensorProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.OrientationSensorProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.PressureSensorProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.ProximitySensorProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.RotationVectorSensorProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.TemperatureSensorProbe"></service>
+
+        <service android:name="edu.mit.media.funf.probe.builtin.AudioFeaturesProbe"></service>
+        <service android:name="edu.mit.media.funf.probe.builtin.AccelerometerFeaturesProbe"></service>
+		<activity android:name=".StartActivity" android:label="@string/app_name" android:theme="@style/Holo.Theme.Sherlock">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-	        <intent-filter>
-    	        <action android:name="android.intent.action.VIEW" />
+	        </intent-filter>
+            <intent-filter>
+		        <action android:name="android.intent.action.VIEW" />
         	    <category android:name="android.intent.category.DEFAULT" />
             	<category android:name="android.intent.category.BROWSABLE" />
             	<data android:scheme="cbits-prm" />
 	        </intent-filter>
         </activity>
-		<activity android:name=".SettingsActivity" android:label="@string/app_name" android:theme="@style/PreferencesTheme" />
-		<activity android:name=".DialogActivity" android:label="@string/app_name" android:theme="@android:style/Theme.Dialog" />
+		<activity android:name=".SettingsActivity" android:label="@string/app_name" android:theme="@style/Holo.Theme.Sherlock"/>
+		<activity android:name=".DialogActivity" android:label="@string/app_name" android:theme="@style/Holo.Theme.Dialog" />
 	</application>
 </manifest>

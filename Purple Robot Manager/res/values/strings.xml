@@ -27,7 +27,7 @@
     <string name="error_json_set_uri_password">Unable to automatically set configuration from the web while the password is set.</string>
     <string name="success_json_set_uri">Successfully configured via the web.</string>
 
-    <string name="text_startup_password_hint">Enter configuration password</string>
+    <string name="text_startup_password_hint">Password</string>
     <string name="button_submit_password">Change Configuration</string>
     <string name="button_exit">Exit</string>
 
@@ -50,11 +50,17 @@
     <string name="summary_location_probe">Records the most accurate location available for the device, given device limitations and respecting battery life.</string>
 
     <string name="title_enable_probe">Enable Probe</string>
+    <string name="config_notifications_category_label">Sensors &amp; Probes</string>
 
     <string name="probe_period_label">Period</string>
     <string name="probe_period_summary">Amount of time between probes</string>
 
     <string name="probe_duration_label">Duration</string>
     <string name="probe_duration_summary">Maximum amount of time probe can run</string>
+
+    <string name="menu_settings_label">Settings</string>
+
+    <string name="dialog_password_prompt">Settings Password</string>
+    <string name="dialog_password_submit">Login</string>
 
 </resources>
