@@ -11,13 +11,14 @@ import java.util.Map;
 import edu.northwestern.cbits.purple_robot_manager.R;
 
 import android.content.Context;
+import android.os.Bundle;
 
 public abstract class Probe
 {
-	private static final String START_DATE = "START";
-	private static final String END_DATE = "END";
-	private static final String DURATION = "DURATION";
-	private static final String PERIOD = "PERIOD";
+	public static final String START_DATE = "START";
+	public static final String END_DATE = "END";
+	public static final String DURATION = "DURATION";
+	public static final String PERIOD = "PERIOD";
 
 	private static String DATE_FORMAT_STRING = "yyyy-MM-dd HH:mm:ss Z";
 

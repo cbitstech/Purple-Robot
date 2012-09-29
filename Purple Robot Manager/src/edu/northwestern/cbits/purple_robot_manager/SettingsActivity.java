@@ -1,6 +1,8 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
-import edu.northwestern.cbits.purple_robot_manager.probes.ProbesPreferenceScreenBuilder;
+import com.actionbarsherlock.app.SherlockPreferenceActivity;
+
+import edu.northwestern.cbits.purple_robot_manager.probes.ProbesPreferenceManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -9,11 +11,11 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
-import android.preference.PreferenceActivity;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 
-public class SettingsActivity extends PreferenceActivity implements OnPreferenceClickListener
+public class SettingsActivity extends SherlockPreferenceActivity implements OnPreferenceClickListener
 {
 	private static String MANUAL_REFRESH_KEY = "config_json_refresh_manually";
 	private static String HAPTIC_PATTERN_KEY = "config_json_haptic_pattern";
@@ -49,9 +51,10 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 			}
         });
 
-        PreferenceScreen probesScreen = ProbesPreferenceScreenBuilder.buildPreferenceScreen(this);
+        PreferenceScreen probesScreen = ProbesPreferenceManager.buildPreferenceScreen(this);
 
-        this.getPreferenceScreen().addPreference(probesScreen);
+        PreferenceCategory category = (PreferenceCategory) prefs.findPreference("config_settings_probe_category");
+        category.addPreference(probesScreen);
     }
 
 	public boolean onPreferenceClick(Preference preference)

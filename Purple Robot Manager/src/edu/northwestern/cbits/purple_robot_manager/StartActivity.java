@@ -1,20 +1,29 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
-import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Editable;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
-public class StartActivity extends Activity
+import com.WazaBe.HoloEverywhere.app.AlertDialog;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+
+import android.graphics.Shader;
+
+public class StartActivity extends SherlockActivity
 {
 	private void launchPreferences()
 	{
@@ -22,22 +31,28 @@ public class StartActivity extends Activity
 		intent.setClass(this, SettingsActivity.class);
 
 		this.startActivity(intent);
-
-		this.finish();
 	}
 
+	@SuppressWarnings("deprecation")
 	protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
 
         this.setContentView(R.layout.layout_startup_activity);
 
+        Bitmap bmp = BitmapFactory.decodeResource(this.getResources(), R.drawable.tile_background);
+        BitmapDrawable bitmapDrawable = new BitmapDrawable(bmp);
+        bitmapDrawable.setTileModeXY(Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
+
+        LinearLayout layout = (LinearLayout) this.findViewById(R.id.layout_start_root);
+        layout.setBackgroundDrawable(bitmapDrawable);
+
         ManagerService.setupPeriodicCheck(this);
     }
 
 	private void setJsonUri(Uri jsonConfigUri)
 	{
-		final Activity me = this;
+		final StartActivity me = this;
 
 		if (jsonConfigUri.getScheme().equals("cbits-prm"))
 		{
@@ -95,40 +110,7 @@ public class StartActivity extends Activity
 
 		Uri jsonConfigUri = this.getIntent().getData();
 
-        final StartActivity me = this;
-
         final String savedPassword = PreferenceManager.getDefaultSharedPreferences(this).getString("config_password", null);
-
-        final EditText passwordField = (EditText) this.findViewById(R.id.text_startup_password);
-
-        Button exitButton = (Button) this.findViewById(R.id.button_exit);
-
-        exitButton.setOnClickListener(new OnClickListener()
-        {
-			public void onClick(View v)
-			{
-				me.finish();
-			}
-        });
-
-        Button submitButton = (Button) this.findViewById(R.id.button_submit_password);
-
-        submitButton.setOnClickListener(new OnClickListener()
-        {
-			public void onClick(View v)
-			{
-				Editable password = passwordField.getText();
-
-				if (savedPassword == null || savedPassword.equals("") || savedPassword.equals(password.toString()))
-				{
-					me.launchPreferences();
-				}
-				else
-				{
-					Toast.makeText(me, R.string.toast_incorrect_password, Toast.LENGTH_LONG).show();
-				}
-			}
-        });
 
         if (jsonConfigUri != null)
         {
@@ -137,5 +119,60 @@ public class StartActivity extends Activity
         	else
         		Toast.makeText(this, R.string.error_json_set_uri_password, Toast.LENGTH_LONG).show();
         }
+	}
+
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+        MenuInflater inflater = this.getSupportMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+
+        return true;
+	}
+
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+    	{
+    		case R.id.menu_settings_item:
+    	        final String savedPassword = PreferenceManager.getDefaultSharedPreferences(this).getString("config_password", null);
+
+    	        final StartActivity me = this;
+
+				if (savedPassword == null || savedPassword.equals(""))
+					this.launchPreferences();
+				else
+				{
+	    	        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+	    	        builder.setMessage(R.string.dialog_password_prompt);
+	    	        builder.setPositiveButton(R.string.dialog_password_submit, new DialogInterface.OnClickListener()
+	    	        {
+						public void onClick(DialogInterface dialog, int which)
+						{
+							AlertDialog alertDialog = (AlertDialog) dialog;
+
+			    	        final EditText passwordField = (EditText) alertDialog.findViewById(R.id.text_dialog_password);
+
+							Editable password = passwordField.getText();
+
+							if (password.toString().equals(savedPassword))
+								me.launchPreferences();
+							else
+								Toast.makeText(me, R.string.toast_incorrect_password, Toast.LENGTH_LONG).show();
+
+							alertDialog.dismiss();
+						}
+					});
+	    	        builder.setView(me.getLayoutInflater().inflate(R.layout.dialog_password, null));
+
+	    	        AlertDialog alert = builder.create();
+
+	    	        alert.show();
+				}
+
+    	        break;
+		}
+
+    	return true;
     }
 }

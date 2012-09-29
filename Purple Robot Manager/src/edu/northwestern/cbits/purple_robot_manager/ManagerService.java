@@ -230,5 +230,8 @@ public class ManagerService extends IntentService
 		alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60000, pi);
 
 		Probe.loadProbeClasses(context);
+
+		Intent funfIntent = new Intent(FunfService.ACTION_RELOAD);
+		context.startService(funfIntent);
 	}
 }

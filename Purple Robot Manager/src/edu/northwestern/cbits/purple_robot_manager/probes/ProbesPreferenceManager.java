@@ -2,8 +2,11 @@ package edu.northwestern.cbits.purple_robot_manager.probes;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
@@ -11,8 +14,61 @@ import android.preference.PreferenceScreen;
 import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 
-public class ProbesPreferenceScreenBuilder
+public class ProbesPreferenceManager
 {
+	public static Map<String, Bundle[]> getDataRequests(Context context)
+	{
+		HashMap<String, Bundle[]> probesMap = new HashMap<String, Bundle[]>();
+
+		for (Class<Probe> probeClass : Probe.availableProbeClasses())
+		{
+			Log.e("PRM", "GETTING CONFIG FROM " + probeClass.getCanonicalName());
+
+			try
+			{
+				String name = "unknown.probe";
+				Bundle[] bundles = new Bundle[0];
+
+				Method m = probeClass.getDeclaredMethod("funfName");
+				m.setAccessible(true);
+				Object o = m.invoke(null);
+
+				Log.e("PRM", "RETURNED FUNF OBJECT: " + o.getClass());
+
+				if (o instanceof String)
+					name = (String) o;
+
+				m = probeClass.getDeclaredMethod("dataRequestBundles", Context.class);
+
+				m.setAccessible(true);
+				o = m.invoke(null, context);
+
+				if (o instanceof Bundle[])
+					bundles = (Bundle[]) o;
+
+				probesMap.put(name, bundles);
+			}
+			catch (NoSuchMethodException e)
+			{
+				e.printStackTrace();
+			}
+			catch (IllegalArgumentException e)
+			{
+				e.printStackTrace();
+			}
+			catch (IllegalAccessException e)
+			{
+				e.printStackTrace();
+			}
+			catch (InvocationTargetException e)
+			{
+				e.printStackTrace();
+			}
+		}
+
+		return probesMap;
+	}
+
 	static PreferenceScreen inflatePreferenceScreenFromResource(PreferenceActivity activity, int resId, PreferenceManager manager)
     {
     	try
@@ -31,15 +87,16 @@ public class ProbesPreferenceScreenBuilder
 
 	public static PreferenceScreen buildPreferenceScreen(PreferenceActivity activity)
 	{
+		@SuppressWarnings("deprecation")
 		PreferenceManager manager = activity.getPreferenceManager();
 
-		PreferenceScreen screen = ProbesPreferenceScreenBuilder.inflatePreferenceScreenFromResource(activity, R.layout.layout_settings_probes_screen, manager);
+		PreferenceScreen screen = ProbesPreferenceManager.inflatePreferenceScreenFromResource(activity, R.layout.layout_settings_probes_screen, manager);
 		screen.setOrder(0);
 		screen.setTitle(R.string.title_preference_probes_screen);
 
 		PreferenceCategory probesCategory = (PreferenceCategory) screen.findPreference("key_available_probes");
 
-		for (Class probeClass : Probe.availableProbeClasses())
+		for (Class<Probe> probeClass : Probe.availableProbeClasses())
 		{
 			try
 			{
@@ -47,8 +104,6 @@ public class ProbesPreferenceScreenBuilder
 
 				m.setAccessible(true);
 				Object o = m.invoke(null, activity);
-
-				Log.e("PRM", "GOT OBJECT " + o.getClass());
 
 				if (o instanceof PreferenceScreen)
 				{
