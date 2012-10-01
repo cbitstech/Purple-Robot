@@ -2,7 +2,7 @@ package edu.northwestern.cbits.purple_robot_manager;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 
-import edu.northwestern.cbits.purple_robot_manager.probes.ProbesPreferenceManager;
+import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -51,7 +51,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnPr
 			}
         });
 
-        PreferenceScreen probesScreen = ProbesPreferenceManager.buildPreferenceScreen(this);
+        PreferenceScreen probesScreen = ProbeManager.buildPreferenceScreen(this);
 
         PreferenceCategory category = (PreferenceCategory) prefs.findPreference("config_settings_probe_category");
         category.addPreference(probesScreen);
@@ -79,6 +79,9 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnPr
 
 			editor.putLong(JSONConfigFile.JSON_LAST_UPDATE, 0);
 			editor.commit();
+
+			Intent funfIntent = new Intent(FunfService.ACTION_RELOAD);
+			this.startService(funfIntent);
 
             return true;
         }

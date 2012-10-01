@@ -63,4 +63,6 @@
     <string name="dialog_password_prompt">Settings Password</string>
     <string name="dialog_password_submit">Login</string>
 
+    <string name="title_orientation_probe">Device Orientation Probe</string>
+    <string name="summary_orientation_probe">Measures orientation of device.</string>
 </resources>

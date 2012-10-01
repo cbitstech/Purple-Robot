@@ -7,7 +7,10 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
+import edu.northwestern.cbits.purple_robot_manager.triggers.DateTrigger;
+import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 
 import android.app.AlarmManager;
 import android.app.IntentService;
@@ -203,9 +206,9 @@ public class ManagerService extends IntentService
 						if (trigger.matches(this, now))
 							execute = true;
 					}
-					else if (INCOMING_DATA_INTENT.equals(intent.getAction())) // TODO: Define trigger...
+					else if (INCOMING_DATA_INTENT.equals(intent.getAction()))
 					{
-//						Log.e("PRM", "TODO: Check if need to do something based on incoming FUNF or other data.");
+
 					}
 
 					if (execute)
@@ -230,6 +233,7 @@ public class ManagerService extends IntentService
 		alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60000, pi);
 
 		Probe.loadProbeClasses(context);
+		OutputPlugin.loadPluginClasses(context);
 
 		Intent funfIntent = new Intent(FunfService.ACTION_RELOAD);
 		context.startService(funfIntent);

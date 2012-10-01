@@ -9,13 +9,13 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
+import android.support.v4.content.LocalBroadcastManager;
 import edu.mit.media.funf.CustomizedIntentService;
 import edu.mit.media.funf.Utils;
 import edu.mit.media.funf.probe.Probe;
 import edu.mit.media.funf.storage.BundleSerializer;
 import edu.mit.media.funf.storage.NameValueDatabaseService;
-import edu.northwestern.cbits.purple_robot_manager.probes.ProbesPreferenceManager;
+import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 
 public class FunfService extends CustomizedIntentService
 {
@@ -57,8 +57,6 @@ public class FunfService extends CustomizedIntentService
 
 	protected void onHandleIntent(Intent intent)
 	{
-		Log.e("PRM", "GOT INTENT WITH ACTION: " + intent.getAction());
-
 		String action = intent.getAction();
 
 		if (ACTION_RELOAD.equals(action))
@@ -96,9 +94,7 @@ public class FunfService extends CustomizedIntentService
 
 	public void sendProbeRequests()
 	{
-		Map<String,Bundle[]> dataRequests = ProbesPreferenceManager.getDataRequests(this);
-
-		Log.e("PRM", "GOT CONFIG MAP " + dataRequests);
+		Map<String,Bundle[]> dataRequests = ProbeManager.getDataRequests(this);
 
 		for (String probeName : dataRequests.keySet())
 		{
@@ -162,20 +158,20 @@ public class FunfService extends CustomizedIntentService
 
 	public void onDataReceived(Bundle data)
 	{
-		Log.e("PRM", "GOT DATA " + data);
-
 		String dataJson = getBundleSerializer().serialize(data);
 		String probeName = data.getString(Probe.PROBE);
 
 		long timestamp = data.getLong(Probe.TIMESTAMP, 0L);
 
-		Bundle b = new Bundle();
-		b.putString(NameValueDatabaseService.DATABASE_NAME_KEY, getPipelineName());
-		b.putLong(NameValueDatabaseService.TIMESTAMP_KEY, timestamp);
-		b.putString(NameValueDatabaseService.NAME_KEY, probeName);
-		b.putString(NameValueDatabaseService.VALUE_KEY, dataJson);
+		LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(this);
+		Intent intent = new Intent(edu.northwestern.cbits.purple_robot_manager.probes.Probe.PROBE_READING);
 
-		// TODO: Use data.
+		intent.putExtra(NameValueDatabaseService.DATABASE_NAME_KEY, getPipelineName());
+		intent.putExtra(NameValueDatabaseService.TIMESTAMP_KEY, timestamp);
+		intent.putExtra(NameValueDatabaseService.NAME_KEY, probeName);
+		intent.putExtra(NameValueDatabaseService.VALUE_KEY, dataJson);
+
+		localManager.sendBroadcast(intent);
 	}
 
 	public void onStatusReceived(Probe.Status status)

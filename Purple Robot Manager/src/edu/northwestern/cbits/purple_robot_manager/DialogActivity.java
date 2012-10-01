@@ -59,7 +59,7 @@ public class DialogActivity extends Activity
         {
 			public void onClick(View v)
 			{
-				if (confirmScript != null)
+				if (confirmScript != null && confirmScript.length() >= 0)
 					jsEngine.runScript(confirmScript);
 
 				me.finish();
@@ -70,7 +70,7 @@ public class DialogActivity extends Activity
         {
 			public void onClick(View v)
 			{
-				if (confirmScript != null)
+				if (cancelScript != null && cancelScript.length() >= 0)
 					jsEngine.runScript(cancelScript);
 
 				me.finish();

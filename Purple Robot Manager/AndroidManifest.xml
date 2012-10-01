@@ -36,7 +36,7 @@
 				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>
 		</receiver>
-		<receiver android:name=".PurpleRobotAppWidgetProvider">
+		<receiver android:name=".PurpleRobotAppWidgetProvider" android:exported="false">
 			<intent-filter>
 				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
 			</intent-filter>
