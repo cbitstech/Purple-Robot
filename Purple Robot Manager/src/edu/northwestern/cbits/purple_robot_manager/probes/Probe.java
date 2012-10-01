@@ -8,13 +8,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.northwestern.cbits.purple_robot_manager.R;
-
 import android.content.Context;
-import android.os.Bundle;
+import edu.northwestern.cbits.purple_robot_manager.R;
 
 public abstract class Probe
 {
+	public static final String PROBE_READING = "edu.northwestern.cbits.purple_robot.PROBE_READING";
+
 	public static final String START_DATE = "START";
 	public static final String END_DATE = "END";
 	public static final String DURATION = "DURATION";

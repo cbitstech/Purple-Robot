@@ -11,10 +11,9 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 
-public class ProbesPreferenceManager
+public class ProbeManager
 {
 	public static Map<String, Bundle[]> getDataRequests(Context context)
 	{
@@ -22,8 +21,6 @@ public class ProbesPreferenceManager
 
 		for (Class<Probe> probeClass : Probe.availableProbeClasses())
 		{
-			Log.e("PRM", "GETTING CONFIG FROM " + probeClass.getCanonicalName());
-
 			try
 			{
 				String name = "unknown.probe";
@@ -32,8 +29,6 @@ public class ProbesPreferenceManager
 				Method m = probeClass.getDeclaredMethod("funfName");
 				m.setAccessible(true);
 				Object o = m.invoke(null);
-
-				Log.e("PRM", "RETURNED FUNF OBJECT: " + o.getClass());
 
 				if (o instanceof String)
 					name = (String) o;
@@ -79,7 +74,7 @@ public class ProbesPreferenceManager
         }
     	catch(Exception e)
     	{
-            Log.w("PRM", "Could not inflate preference screen from XML", e);
+    		e.printStackTrace();
         }
 
         return null;
@@ -90,7 +85,7 @@ public class ProbesPreferenceManager
 		@SuppressWarnings("deprecation")
 		PreferenceManager manager = activity.getPreferenceManager();
 
-		PreferenceScreen screen = ProbesPreferenceManager.inflatePreferenceScreenFromResource(activity, R.layout.layout_settings_probes_screen, manager);
+		PreferenceScreen screen = ProbeManager.inflatePreferenceScreenFromResource(activity, R.layout.layout_settings_probes_screen, manager);
 		screen.setOrder(0);
 		screen.setTitle(R.string.title_preference_probes_screen);
 

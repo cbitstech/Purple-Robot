@@ -22,7 +22,7 @@ public class LocationProbe extends Probe
 		@SuppressWarnings("deprecation")
 		PreferenceManager manager = activity.getPreferenceManager();
 
-		PreferenceScreen screen = ProbesPreferenceManager.inflatePreferenceScreenFromResource(activity, R.layout.layout_settings_probe_location, manager);
+		PreferenceScreen screen = ProbeManager.inflatePreferenceScreenFromResource(activity, R.layout.layout_settings_probe_location, manager);
 
 		return screen;
 	}

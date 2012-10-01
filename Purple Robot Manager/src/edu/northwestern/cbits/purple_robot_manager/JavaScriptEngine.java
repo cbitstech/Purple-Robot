@@ -24,11 +24,12 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
-import android.preference.ListPreference;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
+
+import com.google.gson.JsonParser;
 
 public class JavaScriptEngine
 {
@@ -50,15 +51,33 @@ public class JavaScriptEngine
 
 	public Object runScript(String script) throws EvaluatorException
 	{
-		Log.e("PRM", "JS SCRIPT: " + script);
+		return this.runScript(script, null, null);
+	}
 
+	public Object runScript(String script, String extrasName, Object extras) throws EvaluatorException
+	{
 		this._jsContext = Context.enter();
 		this._jsContext.setOptimizationLevel(-1);
 
 		this._scope = _jsContext.initStandardObjects();
 
+		if (extras instanceof JSONObject)
+		{
+			JSONObject json = (JSONObject) extras;
+
+			extras = new JsonParser().parse(json.toString());
+		}
+
 		Object thisWrapper = Context.javaToJS(this, this._scope);
 		ScriptableObject.putProperty(this._scope, "PurpleRobot", thisWrapper);
+
+		if (extras != null && extrasName != null)
+		{
+			Log.e("PRM", "SETTING EXTRAS[" + extrasName + "]: " + extras);
+
+			Object extrasWrapper = Context.javaToJS(extras, this._scope);
+			ScriptableObject.putProperty(this._scope, extrasName, extrasWrapper);
+		}
 
 		return this._jsContext.evaluateString(this._scope, script, "<engine>", 1, null);
 	}

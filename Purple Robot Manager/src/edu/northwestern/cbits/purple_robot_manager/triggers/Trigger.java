@@ -1,8 +1,10 @@
-package edu.northwestern.cbits.purple_robot_manager;
+package edu.northwestern.cbits.purple_robot_manager.triggers;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mozilla.javascript.EvaluatorException;
+
+import edu.northwestern.cbits.purple_robot_manager.JavaScriptEngine;
 
 import android.content.Context;
 
@@ -25,6 +27,8 @@ public abstract class Trigger
 
 			if (DateTrigger.TYPE_NAME.equals(type))
 				return new DateTrigger(object);
+			else if (ProbeTrigger.TYPE_NAME.equals(type))
+				return new ProbeTrigger(object);
 		}
 		catch (JSONException e)
 		{
