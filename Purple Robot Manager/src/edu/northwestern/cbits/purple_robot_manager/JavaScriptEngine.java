@@ -72,12 +72,7 @@ public class JavaScriptEngine
 		ScriptableObject.putProperty(this._scope, "PurpleRobot", thisWrapper);
 
 		if (extras != null && extrasName != null)
-		{
-			Log.e("PRM", "SETTING EXTRAS[" + extrasName + "]: " + extras);
-
-			Object extrasWrapper = Context.javaToJS(extras, this._scope);
-			ScriptableObject.putProperty(this._scope, extrasName, extrasWrapper);
-		}
+			script = "var " + extrasName + " = " + extras.toString() + "; " + script;
 
 		return this._jsContext.evaluateString(this._scope, script, "<engine>", 1, null);
 	}
