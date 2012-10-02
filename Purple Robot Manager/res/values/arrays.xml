@@ -6,7 +6,7 @@
     </array>
 
 	<array name="output_plugin_classes">
-        <item>LogCatOutputPlugin</item>
+        <!-- <item>LogCatOutputPlugin</item> -->
         <item>TriggerOutputPlugin</item>
     </array>
 
