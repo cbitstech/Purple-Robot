@@ -29,7 +29,7 @@ public class LogCatOutputPlugin extends OutputPlugin
 
 			object.put("extras", OutputPlugin.jsonForBundle(extras));
 
-			Log.e("PRM", "JSON OBJECT: " + object.toString());
+			Log.e("PRM", "JSON OBJECT: " + object.getJSONObject("extras").getString("NAME"));
 		}
 		catch (JSONException e)
 		{
