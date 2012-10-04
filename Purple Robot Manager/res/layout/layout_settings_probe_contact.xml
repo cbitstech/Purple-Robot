@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="@string/title_contact_probe"
+    android:summary="@string/summary_contact_probe">
+   	<CheckBoxPreference
+		android:title="@string/title_enable_probe"
+		android:key="config_probe_contact_enabled"
+		android:defaultValue="true"/>
+    <ListPreference
+        android:key="config_probe_contact_period"
+        android:entries="@array/probe_period_labels"
+        android:entryValues="@array/probe_period_values"
+        android:title="@string/probe_period_label"
+        android:summary="@string/probe_period_summary"
+        android:defaultValue="1200" />
+    <ListPreference
+        android:key="config_probe_contact_full_list"
+        android:entries="@array/probe_boolean_labels"
+        android:entryValues="@array/probe_boolean_values"
+        android:title="@string/probe_contact_full_label"
+        android:summary="@string/probe_contact_full_summary"
+        android:defaultValue="false" />
+</PreferenceScreen>

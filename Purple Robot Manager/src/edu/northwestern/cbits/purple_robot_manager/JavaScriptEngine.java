@@ -61,13 +61,13 @@ public class JavaScriptEngine
 
 		this._scope = _jsContext.initStandardObjects();
 
-		if (extras instanceof JSONObject)
+/*		if (extras instanceof JSONObject)
 		{
 			JSONObject json = (JSONObject) extras;
 
 			extras = new JsonParser().parse(json.toString());
 		}
-
+*/
 		Object thisWrapper = Context.javaToJS(this, this._scope);
 		ScriptableObject.putProperty(this._scope, "PurpleRobot", thisWrapper);
 

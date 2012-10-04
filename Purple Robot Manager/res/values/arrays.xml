@@ -1,14 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<array name="probe_classes">
-        <item>LocationProbe</item>
-        <item>OrientationProbe</item>
-    </array>
+        <item>funf.LocationProbe</item>
+        <item>funf.BluetoothProbe</item>
+        <item>funf.WifiProbe</item>
+        <item>funf.CellTowerProbe</item>
+        <item>funf.OrientationProbe</item>
+        <item>funf.AccelerometerProbe</item>
+        <item>funf.GravityProbe</item>
+        <item>funf.LinearAccelerationProbe</item>
+        <item>funf.GyroscopeProbe</item>
+        <item>funf.RotationVectorProbe</item>
+        <item>funf.ContactProbe</item>
+        <item>funf.CallLogProbe</item>
+        <item>funf.SmsProbe</item>
+        <item>funf.ActivityProbe</item>
+   	</array>
 
 	<array name="output_plugin_classes">
-        <!-- <item>LogCatOutputPlugin</item> -->
+        <item>LogCatOutputPlugin</item>
         <item>TriggerOutputPlugin</item>
     </array>
+
+	<string-array name="probe_boolean_labels">
+        <item>Yes</item>
+        <item>No</item>
+   	</string-array>
+
+	<string-array name="probe_boolean_values">
+        <item>true</item>
+        <item>false</item>
+    </string-array>
 
 	<string-array name="probe_duration_values">
         <item>15</item>
@@ -18,7 +40,7 @@
 	<string-array name="probe_duration_labels">
         <item>15 seconds</item>
         <item>2 minutes</item>
-        </string-array>
+    </string-array>
 
 	<string-array name="probe_period_values">
         <item>5</item>

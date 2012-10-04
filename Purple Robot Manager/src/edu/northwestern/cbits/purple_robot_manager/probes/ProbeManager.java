@@ -1,6 +1,5 @@
 package edu.northwestern.cbits.purple_robot_manager.probes;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,29 +22,12 @@ public class ProbeManager
 		{
 			try
 			{
-				String name = "unknown.probe";
-				Bundle[] bundles = new Bundle[0];
+				Probe probe = (Probe) probeClass.newInstance();
 
-				Method m = probeClass.getDeclaredMethod("funfName");
-				m.setAccessible(true);
-				Object o = m.invoke(null);
-
-				if (o instanceof String)
-					name = (String) o;
-
-				m = probeClass.getDeclaredMethod("dataRequestBundles", Context.class);
-
-				m.setAccessible(true);
-				o = m.invoke(null, context);
-
-				if (o instanceof Bundle[])
-					bundles = (Bundle[]) o;
+				String name = probe.name(context);
+				Bundle[] bundles = probe.dataRequestBundles(context);
 
 				probesMap.put(name, bundles);
-			}
-			catch (NoSuchMethodException e)
-			{
-				e.printStackTrace();
 			}
 			catch (IllegalArgumentException e)
 			{
@@ -55,7 +37,7 @@ public class ProbeManager
 			{
 				e.printStackTrace();
 			}
-			catch (InvocationTargetException e)
+			catch (InstantiationException e)
 			{
 				e.printStackTrace();
 			}
@@ -64,7 +46,7 @@ public class ProbeManager
 		return probesMap;
 	}
 
-	static PreferenceScreen inflatePreferenceScreenFromResource(PreferenceActivity activity, int resId, PreferenceManager manager)
+	public static PreferenceScreen inflatePreferenceScreenFromResource(PreferenceActivity activity, int resId, PreferenceManager manager)
     {
     	try
     	{
@@ -95,21 +77,11 @@ public class ProbeManager
 		{
 			try
 			{
-				Method m = probeClass.getDeclaredMethod("preferenceScreen", PreferenceActivity.class);
+				Probe probe = (Probe) probeClass.newInstance();
 
-				m.setAccessible(true);
-				Object o = m.invoke(null, activity);
+				PreferenceScreen probeScreen = probe.preferenceScreen(activity);
 
-				if (o instanceof PreferenceScreen)
-				{
-					PreferenceScreen probeScreen = (PreferenceScreen) o;
-
-					probesCategory.addPreference(probeScreen);
-				}
-			}
-			catch (NoSuchMethodException e)
-			{
-				e.printStackTrace();
+				probesCategory.addPreference(probeScreen);
 			}
 			catch (IllegalArgumentException e)
 			{
@@ -119,7 +91,7 @@ public class ProbeManager
 			{
 				e.printStackTrace();
 			}
-			catch (InvocationTargetException e)
+			catch (InstantiationException e)
 			{
 				e.printStackTrace();
 			}
