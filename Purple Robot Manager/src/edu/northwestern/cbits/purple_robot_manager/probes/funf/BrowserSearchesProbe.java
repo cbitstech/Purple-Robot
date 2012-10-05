@@ -1,12 +1,11 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.funf;
 
-import edu.northwestern.cbits.purple_robot_manager.R;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.preference.PreferenceActivity;
-import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
+import edu.northwestern.cbits.purple_robot_manager.R;
 
 public class BrowserSearchesProbe extends PeriodFunfProbe
 {
@@ -33,5 +32,28 @@ public class BrowserSearchesProbe extends PeriodFunfProbe
 	public String probeCategory(Context context)
 	{
 		return context.getResources().getString(R.string.probe_device_interaction_category);
+	}
+
+	public String summarizeValue(Context context, Object object)
+	{
+		if (object instanceof String)
+		{
+			try
+			{
+				String jsonString = (String) object;
+
+				JSONObject json = new JSONObject(jsonString);
+
+				JSONArray bookmarks = json.getJSONObject("extras").getJSONObject("VALUE").getJSONArray("SEARCHES");
+
+				return String.format(context.getResources().getString(R.string.summary_searches_probe), bookmarks.length());
+			}
+			catch (JSONException e)
+			{
+				e.printStackTrace();
+			}
+		}
+
+		return super.summarizeValue(context, object);
 	}
 }

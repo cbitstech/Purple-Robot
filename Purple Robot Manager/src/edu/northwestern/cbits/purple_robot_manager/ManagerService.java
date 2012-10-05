@@ -187,6 +187,12 @@ public class ManagerService extends IntentService
 				}
 			}
 		}
+		else if (REFRESH_CONFIGURATION.equalsIgnoreCase(intent.getAction()))
+		{
+			Intent funfReloadIntent = new Intent(FunfService.ACTION_RELOAD);
+
+			this.startService(funfReloadIntent);
+		}
 		else
 		{
 			try
@@ -224,7 +230,7 @@ public class ManagerService extends IntentService
 		}
 	}
 
-	public static void setupPeriodicCheck(Context context)
+	public static void setupPeriodicCheck(final Context context)
 	{
 		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
@@ -237,5 +243,17 @@ public class ManagerService extends IntentService
 
 		Intent funfIntent = new Intent(FunfService.ACTION_RELOAD);
 		context.startService(funfIntent);
+
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+		prefs.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener()
+		{
+	        public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
+	        {
+	        	Intent reloadIntent = new Intent(ManagerService.REFRESH_CONFIGURATION);
+
+	        	context.startService(reloadIntent);
+	        }
+	    });
 	}
 }

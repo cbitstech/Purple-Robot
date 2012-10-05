@@ -16,10 +16,8 @@ import net.fortuna.ical4j.model.PeriodList;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.R.string;
-
 import android.content.Context;
+import edu.northwestern.cbits.purple_robot_manager.R;
 
 public class DateTrigger extends Trigger
 {
