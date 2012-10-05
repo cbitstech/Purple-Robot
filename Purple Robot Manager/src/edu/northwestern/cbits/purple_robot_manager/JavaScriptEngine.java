@@ -29,8 +29,6 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
-import com.google.gson.JsonParser;
-
 public class JavaScriptEngine
 {
 	private static String JS_ENGINE_PERSISTENCE_PREFIX = "purple_robot_js_persist_prefix_";
@@ -244,6 +242,7 @@ public class JavaScriptEngine
 		return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen, new NativeObject(), null);
 	}
 
+	@SuppressWarnings("deprecation")
 	public boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen, final NativeObject launchParams, final String script)
 	{
 		try
@@ -253,6 +252,7 @@ public class JavaScriptEngine
 			if (displayWhen < now)
 				displayWhen = now;
 
+			@SuppressWarnings("deprecation")
 			Notification note = new Notification(R.drawable.ic_launcher, message, displayWhen);
 
 			Intent intent = this.constructLaunchIntent(applicationName, launchParams, script);

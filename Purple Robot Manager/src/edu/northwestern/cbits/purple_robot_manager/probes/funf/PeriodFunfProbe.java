@@ -43,9 +43,16 @@ public abstract class PeriodFunfProbe extends Probe
 		period.setKey("config_probe_" + key + "_period");
 
 		Preference enabled = screen.findPreference("config_probe_funf_enabled");
-		period.setKey("config_probe_" + key + "_enabled");
+		enabled.setKey("config_probe_" + key + "_enabled");
 
 		return screen;
+	}
+
+	public boolean isEnabled(Context context)
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+		return prefs.getBoolean("config_probe_" + this.key() + "_enabled", true);
 	}
 
 	protected abstract int funfTitle();

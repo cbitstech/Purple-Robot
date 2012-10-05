@@ -172,4 +172,27 @@
 
     <string name="title_time_offset_probe">Time Offset Probe</string>
     <string name="summary_time_offset_probe">Checks NTP servers to determine the devices current offset from the time servers.</string>
+
+    <string name="title_probe_readings">Status</string>
+
+    <string name="summary_accelerator_probe" formatted="false">%.4f X, %.4f Y, %.4f Z</string>
+    <string name="summary_wifi_probe" formatted="false">%d visible networks</string>
+    <string name="summary_battery_probe" formatted="false">%d%% charged</string>
+    <string name="summary_bluetooth_probe" formatted="false">%d visible devices</string>
+    <string name="summary_contact_probe" formatted="false">%d contacts in address book</string>
+    <string name="summary_location_probe" formatted="false">%.4f, %.4f</string>
+    <string name="summary_hardware_info_probe" formatted="false">%s: %s</string>
+    <string name="summary_orientation_probe" formatted="false">Azimuth: %.1f, Pitch: %.1f, Roll: %.1f</string>
+    <string name="summary_activity_probe" formatted="false">High Activity: %d, Low Activity: %d</string>
+    <string name="summary_cell_probe" formatted="false">Cell Tower ID: %s</string>
+    <string name="summary_light_probe" formatted="false">%.4f lux units</string>
+    <string name="summary_bookmarks_probe" formatted="false">%d bookmarks</string>
+    <string name="summary_searches_probe" formatted="false">%d searches</string>
+
+    <string name="menu_pause_toggle_label">Pause</string>
+    <string name="menu_resume_toggle_label">Resume</string>
+    <string name="menu_refresh_label">Refresh</string>
+
+    <string name="toast_refresh_probes">Refreshing probes&#8230;</string>
+
 </resources>

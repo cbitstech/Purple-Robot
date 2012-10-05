@@ -26,8 +26,10 @@ public class FunfService extends CustomizedIntentService
 
 	public static final String ACTION_RELOAD = PREFIX + "reload";
 	public static final String ACTION_ENABLE = PREFIX + "enable";
-	public static final String ACTION_DISABLE = PREFIX + "disable";
+//	public static final String ACTION_DISABLE = PREFIX + "disable";
 	public static final String EXTRA_FORCE_UPLOAD = "FORCE";
+	public static final String ACTION_DISABLE = "PROBE_INTERNAL_DISABLE";
+
 
 	private final IBinder mBinder = new LocalBinder();
 
@@ -96,6 +98,7 @@ public class FunfService extends CustomizedIntentService
 	{
 		Map<String,Bundle[]> dataRequests = ProbeManager.getDataRequests(this);
 
+		// ACTION_DISABLE
 		for (String probeName : dataRequests.keySet())
 		{
 			this.sendProbeRequest(probeName, dataRequests.get(probeName));

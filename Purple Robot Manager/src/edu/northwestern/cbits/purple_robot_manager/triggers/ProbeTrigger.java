@@ -53,7 +53,7 @@ public class ProbeTrigger extends Trigger
 		}
 		catch (EcmaError e)
 		{
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 
 		return false;

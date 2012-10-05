@@ -13,11 +13,4 @@
         android:title="@string/probe_period_label"
         android:summary="@string/probe_period_summary"
         android:defaultValue="1800" />
-    <ListPreference
-        android:key="config_probe_funf_duration"
-        android:entries="@array/probe_duration_labels"
-        android:entryValues="@array/probe_duration_values"
-        android:title="@string/probe_duration_label"
-        android:summary="@string/probe_duration_summary"
-        android:defaultValue="120" />
 </PreferenceScreen>

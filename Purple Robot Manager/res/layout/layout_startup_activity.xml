@@ -6,4 +6,8 @@
     android:orientation="vertical"
     android:id="@+id/layout_start_root"
     android:gravity="center_vertical" >
+    <ListView android:id="@+id/list_probes"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+    </ListView>
 </LinearLayout>

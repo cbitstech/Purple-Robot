@@ -1,25 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<array name="probe_classes">
-        <item>funf.LocationProbe</item>
-        <item>funf.BluetoothProbe</item>
-        <item>funf.WifiProbe</item>
-        <item>funf.CellTowerProbe</item>
-        <item>funf.OrientationProbe</item>
         <item>funf.AccelerometerProbe</item>
-        <item>funf.GravityProbe</item>
-        <item>funf.LinearAccelerationProbe</item>
-        <item>funf.GyroscopeProbe</item>
-        <item>funf.RotationVectorProbe</item>
-        <item>funf.ContactProbe</item>
-        <item>funf.CallLogProbe</item>
-        <item>funf.SmsProbe</item>
+        <item>funf.AndroidInfoProbe</item>
         <item>funf.ActivityProbe</item>
+        <item>funf.AudioFilesProbe</item>
+        <item>funf.BatteryProbe</item>
+        <item>funf.BluetoothProbe</item>
+        <item>funf.BrowserBookmarksProbe</item>
+        <item>funf.BrowserSearchesProbe</item>
+        <item>funf.CallLogProbe</item>
+        <item>funf.CellTowerProbe</item>
+        <item>funf.ContactProbe</item>
+ 		<item>funf.GravityProbe</item>
+        <item>funf.GyroscopeProbe</item>
+        <item>funf.HardwareInfoProbe</item>
+        <item>funf.ImageFilesProbe</item>
+        <item>funf.InstalledApplicationsProbe</item>
+        <item>funf.LightProbe</item>
+        <item>funf.LinearAccelerationProbe</item>
+	    <item>funf.LocationProbe</item>
+		<item>funf.MagneticFieldProbe</item>
+	    <item>funf.OrientationProbe</item>
+	    <item>funf.PressureProbe</item>
+	    <item>funf.ProximityProbe</item>
+        <item>funf.RotationVectorProbe</item>
+	    <item>funf.RunningApplicationsProbe</item>
+	    <item>funf.ScreenProbe</item>
+        <item>funf.SmsProbe</item>
+        <item>funf.TelephonyProbe</item>
+        <item>funf.TemperatureProbe</item>
+        <item>funf.TimeOffsetProbe</item>
+        <item>funf.VideoFilesProbe</item>
+        <item>funf.WifiProbe</item>
    	</array>
 
 	<array name="output_plugin_classes">
-        <item>LogCatOutputPlugin</item>
-        <item>TriggerOutputPlugin</item>
+        <!-- <item>LogCatOutputPlugin</item> -->
+        <!-- <item>TriggerOutputPlugin</item> -->
+        <item>AppDisplayPlugin</item>
     </array>
 
 	<string-array name="probe_boolean_labels">
