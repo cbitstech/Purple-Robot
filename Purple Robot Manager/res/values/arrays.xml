@@ -16,7 +16,7 @@
         <item>funf.GyroscopeProbe</item>
         <item>funf.HardwareInfoProbe</item>
         <item>funf.ImageFilesProbe</item>
-        <item>funf.InstalledApplicationsProbe</item>
+		<item>funf.InstalledApplicationsProbe</item>
         <item>funf.LightProbe</item>
         <item>funf.LinearAccelerationProbe</item>
 	    <item>funf.LocationProbe</item>
@@ -33,11 +33,11 @@
         <item>funf.TimeOffsetProbe</item>
         <item>funf.VideoFilesProbe</item>
         <item>funf.WifiProbe</item>
-   	</array>
+  	</array>
 
 	<array name="output_plugin_classes">
         <!-- <item>LogCatOutputPlugin</item> -->
-        <!-- <item>TriggerOutputPlugin</item> -->
+        <item>TriggerOutputPlugin</item>
         <item>AppDisplayPlugin</item>
     </array>
 

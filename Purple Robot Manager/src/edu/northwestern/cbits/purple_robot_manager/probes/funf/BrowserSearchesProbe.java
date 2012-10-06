@@ -1,11 +1,11 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.funf;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.util.ArrayList;
 
 import android.content.Context;
+import android.os.Bundle;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.StartActivity;
 
 public class BrowserSearchesProbe extends PeriodFunfProbe
 {
@@ -26,7 +26,7 @@ public class BrowserSearchesProbe extends PeriodFunfProbe
 
 	protected int funfSummary()
 	{
-		return R.string.summary_browser_searches_probe;
+		return R.string.summary_browser_searches_probe_desc;
 	}
 
 	public String probeCategory(Context context)
@@ -34,26 +34,10 @@ public class BrowserSearchesProbe extends PeriodFunfProbe
 		return context.getResources().getString(R.string.probe_device_interaction_category);
 	}
 
-	public String summarizeValue(Context context, Object object)
+	public String summarizeValue(Context context, Bundle bundle)
 	{
-		if (object instanceof String)
-		{
-			try
-			{
-				String jsonString = (String) object;
+		ArrayList<Object> searches = (ArrayList<Object>) bundle.get("SEARCHES");
 
-				JSONObject json = new JSONObject(jsonString);
-
-				JSONArray bookmarks = json.getJSONObject("extras").getJSONObject("VALUE").getJSONArray("SEARCHES");
-
-				return String.format(context.getResources().getString(R.string.summary_searches_probe), bookmarks.length());
-			}
-			catch (JSONException e)
-			{
-				e.printStackTrace();
-			}
-		}
-
-		return super.summarizeValue(context, object);
+		return String.format(context.getResources().getString(R.string.summary_searches_probe), searches.size());
 	}
 }

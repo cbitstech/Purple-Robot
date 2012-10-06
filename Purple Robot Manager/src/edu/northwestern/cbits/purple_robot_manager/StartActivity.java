@@ -46,7 +46,7 @@ public class StartActivity extends SherlockActivity
 	private BroadcastReceiver _receiver = null;
 
 	private static List<String> _probeNames = new ArrayList<String>();
-	private static Map<String, String> _probeValues = new HashMap<String, String>();
+	private static Map<String, Bundle> _probeValues = new HashMap<String, Bundle>();
 	private static Map<String, Date> _probeDates = new HashMap<String, Date>();
 
 	private boolean _isPaused = true;
@@ -79,7 +79,7 @@ public class StartActivity extends SherlockActivity
     			if (StartActivity.UPDATE_DISPLAY.equals(intent.getAction()))
     			{
     				String name = intent.getStringExtra(DISPLAY_PROBE_NAME);
-    				String value = intent.getStringExtra(DISPLAY_PROBE_VALUE);
+    				Bundle value = intent.getBundleExtra(DISPLAY_PROBE_VALUE);
 
     				if (StartActivity._probeNames.contains(name))
     					StartActivity._probeNames.remove(name);
@@ -95,7 +95,7 @@ public class StartActivity extends SherlockActivity
 
         ListView listView = (ListView) this.findViewById(R.id.list_probes);
 
-        final SimpleDateFormat sdf = new SimpleDateFormat("MMM d, H:mm");
+        final SimpleDateFormat sdf = new SimpleDateFormat("MMM d, H:mm:ss");
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.layout_probe_row, StartActivity._probeNames)
         {
@@ -112,19 +112,28 @@ public class StartActivity extends SherlockActivity
         		TextView valueField = (TextView) convertView.findViewById(R.id.text_sensor_value);
 
         		String sensorName = StartActivity._probeNames.get(position);
-        		String sensorValue = StartActivity._probeValues.get(sensorName);
+        		Bundle value = StartActivity._probeValues.get(sensorName);
         		Date sensorDate = StartActivity._probeDates.get(sensorName);
 
         		Probe probe = ProbeManager.probeForName(sensorName);
 
-        		if (probe != null)
+        		String formattedValue = "TODO: " + sensorName;
+
+        		if (probe != null && value != null)
         		{
-        			sensorName = probe.title(me);
-        			sensorValue = probe.summarizeValue(me, sensorValue);
+        			try
+        			{
+        				sensorName = probe.title(me);
+        				formattedValue = probe.summarizeValue(me, value);
+        			}
+        			catch (Exception e)
+        			{
+        				e.printStackTrace();
+        			}
         		}
 
         		nameField.setText(sensorName + " (" + sdf.format(sensorDate) + ")");
-        		valueField.setText(sensorValue);
+        		valueField.setText(formattedValue);
 
         		return convertView;
         	}
@@ -153,6 +162,8 @@ public class StartActivity extends SherlockActivity
 
 	        adapter.notifyDataSetChanged();
 
+	        this.getSupportActionBar().setTitle(String.format(this.getResources().getString(R.string.title_probes_count), StartActivity._probeNames.size()));
+
 	        this._lastUpdate = now;
 		}
 	}
@@ -174,8 +185,6 @@ public class StartActivity extends SherlockActivity
 
 	private void setJsonUri(Uri jsonConfigUri)
 	{
-		final StartActivity me = this;
-
 		if (jsonConfigUri.getScheme().equals("cbits-prm"))
 		{
 			Uri.Builder b = jsonConfigUri.buildUpon();
@@ -185,45 +194,7 @@ public class StartActivity extends SherlockActivity
 			jsonConfigUri = b.build();
 		}
 
-		// TODO: Add support for HTTPS?
-
-		final Uri finalUri = jsonConfigUri;
-
-		JSONConfigFile.validateUri(this, jsonConfigUri, true, new Runnable()
-		{
-			public void run()
-			{
-				// Success
-
-				me.runOnUiThread(new Runnable()
-				{
-					public void run()
-					{
-						SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(me);
-						Editor editor = prefs.edit();
-
-						editor.putString("config_json_url", finalUri.toString());
-						editor.commit();
-
-						Toast.makeText(me, R.string.success_json_set_uri, Toast.LENGTH_LONG).show();
-					}
-				});
-			}
-		}, new Runnable()
-		{
-			public void run()
-			{
-				me.runOnUiThread(new Runnable()
-				{
-					public void run()
-					{
-						// Failure
-
-						Toast.makeText(me, R.string.error_json_set_uri, Toast.LENGTH_LONG).show();
-					}
-				});
-			}
-		});
+		JSONConfigFile.updateFromOnline(this, jsonConfigUri);
 	}
 
 	protected void onResume()
@@ -259,13 +230,13 @@ public class StartActivity extends SherlockActivity
     {
         switch (item.getItemId())
     	{
-    		case R.id.menu_refresh_item:
+/*    		case R.id.menu_refresh_item:
 	        	Intent reloadIntent = new Intent(ManagerService.REFRESH_CONFIGURATION);
 	        	this.startService(reloadIntent);
 
 	        	Toast.makeText(this, R.string.toast_refresh_probes, Toast.LENGTH_LONG).show();
 
-    			break;
+    			break; */
     		case R.id.menu_play_toggle_item:
     			boolean doPause = (this._isPaused == false);
 

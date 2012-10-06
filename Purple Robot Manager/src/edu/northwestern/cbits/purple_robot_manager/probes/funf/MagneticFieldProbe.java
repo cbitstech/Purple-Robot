@@ -1,11 +1,9 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.funf;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import edu.northwestern.cbits.purple_robot_manager.R;
 import android.content.Context;
+import android.os.Bundle;
+import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.StartActivity;
 
 public class MagneticFieldProbe extends BasicFunfProbe
 {
@@ -26,7 +24,7 @@ public class MagneticFieldProbe extends BasicFunfProbe
 
 	protected int funfSummary()
 	{
-		return R.string.summary_magnetic_field_probe;
+		return R.string.summary_magnetic_field_probe_desc;
 	}
 
 	public String probeCategory(Context context)
@@ -34,32 +32,12 @@ public class MagneticFieldProbe extends BasicFunfProbe
 		return context.getResources().getString(R.string.probe_environment_category);
 	}
 
-	public String summarizeValue(Context context, Object object)
+	public String summarizeValue(Context context, Bundle bundle)
 	{
-		if (object instanceof String)
-		{
-			try
-			{
-				String jsonString = (String) object;
+		float xReading = bundle.getFloatArray("X")[0];
+		float yReading = bundle.getFloatArray("Y")[0];
+		float zReading = bundle.getFloatArray("Z")[0];
 
-				JSONObject json = new JSONObject(jsonString);
-
-				JSONArray x = json.getJSONObject("extras").getJSONObject("VALUE").getJSONArray("X");
-				JSONArray y = json.getJSONObject("extras").getJSONObject("VALUE").getJSONArray("Y");
-				JSONArray z = json.getJSONObject("extras").getJSONObject("VALUE").getJSONArray("Z");
-
-				double xReading = Double.parseDouble(x.get(0).toString());
-				double yReading = Double.parseDouble(y.get(0).toString());
-				double zReading = Double.parseDouble(z.get(0).toString());
-
-				return String.format(context.getResources().getString(R.string.summary_accelerator_probe), xReading, yReading, zReading);
-			}
-			catch (JSONException e)
-			{
-				e.printStackTrace();
-			}
-		}
-
-		return super.summarizeValue(context, object);
+		return String.format(context.getResources().getString(R.string.summary_magnetic_probe), xReading, yReading, zReading);
 	}
 }

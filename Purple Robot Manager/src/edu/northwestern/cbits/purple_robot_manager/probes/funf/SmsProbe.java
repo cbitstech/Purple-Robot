@@ -1,7 +1,12 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.funf;
 
+import java.util.ArrayList;
+
 import android.content.Context;
+import android.os.Bundle;
+import android.os.Parcelable;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.StartActivity;
 
 public class SmsProbe extends PeriodFunfProbe
 {
@@ -22,11 +27,18 @@ public class SmsProbe extends PeriodFunfProbe
 
 	protected int funfSummary()
 	{
-		return R.string.summary_sms_probe;
+		return R.string.summary_sms_probe_desc;
 	}
 
 	public String probeCategory(Context context)
 	{
 		return context.getResources().getString(R.string.title_sms_probe);
+	}
+
+	public String summarizeValue(Context context, Bundle bundle)
+	{
+		ArrayList<Object> messages = (ArrayList<Object>) bundle.get("MESSAGES");
+
+		return String.format(context.getResources().getString(R.string.summary_sms_probe), messages.size());
 	}
 }

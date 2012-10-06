@@ -1,18 +1,16 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.funf;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.util.ArrayList;
 
-import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
-import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
+import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 
 public class ContactProbe extends Probe
 {
@@ -66,28 +64,10 @@ public class ContactProbe extends Probe
 		return context.getResources().getString(R.string.title_contact_probe);
 	}
 
-	public String summarizeValue(Context context, Object object)
+	public String summarizeValue(Context context, Bundle bundle)
 	{
-		if (object instanceof String)
-		{
-			try
-			{
-				String jsonString = (String) object;
+		ArrayList<Object> contacts = (ArrayList<Object>) bundle.get("CONTACT_DATA");
 
-				JSONObject json = new JSONObject(jsonString);
-
-				JSONArray contacts = json.getJSONObject("extras").getJSONObject("VALUE").getJSONArray("CONTACT_DATA");
-
-				return String.format(context.getResources().getString(R.string.summary_contact_probe), contacts.length());
-			}
-			catch (JSONException e)
-			{
-				e.printStackTrace();
-			}
-		}
-
-		return super.summarizeValue(context, object);
+		return String.format(context.getResources().getString(R.string.summary_contact_probe), contacts.size());
 	}
-
-
 }

@@ -44,6 +44,8 @@ public class JavaScriptEngine
 
 	public JavaScriptEngine(android.content.Context context)
 	{
+		Log.e("PRM", "INITING WITH CONTEXT " + context);
+
 		this._context = context;
 	}
 
@@ -72,7 +74,31 @@ public class JavaScriptEngine
 		if (extras != null && extrasName != null)
 			script = "var " + extrasName + " = " + extras.toString() + "; " + script;
 
+		Log.e("PRM", "JAVASCRIPT: " + script);
+
 		return this._jsContext.evaluateString(this._scope, script, "<engine>", 1, null);
+	}
+
+	private Intent constructDirectLaunchIntent(final String applicationName, final NativeObject launchParams)
+	{
+		String packageName = this.packageForApplicationName(applicationName);
+
+		if (packageName != null)
+		{
+			Intent intent = this._context.getPackageManager().getLaunchIntentForPackage(packageName);
+
+			if (launchParams != null)
+			{
+				for (Entry<Object, Object> e : launchParams.entrySet())
+				{
+					intent.putExtra(e.getKey().toString(), e.getValue().toString());
+				}
+			}
+
+			return intent;
+		}
+
+		return null;
 	}
 
 	private Intent constructLaunchIntent(final String applicationName, final NativeObject launchParams, final String script)
@@ -82,6 +108,8 @@ public class JavaScriptEngine
 		if (packageName != null)
 		{
 			Intent intent = new Intent(ManagerService.APPLICATION_LAUNCH_INTENT);
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
 			intent.putExtra(ManagerService.APPLICATION_LAUNCH_INTENT_PACKAGE, packageName);
 
 			if (script != null)
@@ -229,7 +257,7 @@ public class JavaScriptEngine
 
 		if (intent != null)
 		{
-			this._context.startActivity(intent);
+			this._context.startService(intent);
 
 			return true;
 		}
@@ -255,25 +283,25 @@ public class JavaScriptEngine
 			@SuppressWarnings("deprecation")
 			Notification note = new Notification(R.drawable.ic_launcher, message, displayWhen);
 
-			Intent intent = this.constructLaunchIntent(applicationName, launchParams, script);
+			Intent intent = this.constructDirectLaunchIntent(applicationName, launchParams);
 
 			if (intent != null)
 			{
 				PendingIntent pendingIntent = PendingIntent.getActivity(this._context, 0, intent, 0);
 
 				note.setLatestEventInfo(this._context, title, message, pendingIntent);
-			}
 
-			note.flags = Notification.FLAG_AUTO_CANCEL;
+				note.flags = Notification.FLAG_AUTO_CANCEL;
 
-			try
-			{
-				NotificationManager noteManager = (NotificationManager) this._context.getSystemService(android.content.Context.NOTIFICATION_SERVICE);
-				noteManager.notify(JavaScriptEngine.NOTIFICATION_ID, note);
-			}
-			catch (UnsupportedOperationException e)
-			{
-				// Added so that the mock test cases could still execute.
+				try
+				{
+					NotificationManager noteManager = (NotificationManager) this._context.getSystemService(android.content.Context.NOTIFICATION_SERVICE);
+					noteManager.notify(JavaScriptEngine.NOTIFICATION_ID, note);
+				}
+				catch (UnsupportedOperationException e)
+				{
+					// Added so that the mock test cases could still execute.
+				}
 			}
 
 			return true;
@@ -367,6 +395,7 @@ public class JavaScriptEngine
 
 	public void playTone(String tone)
 	{
+		Log.e("PRM", "PLAYING TONE");
 		Intent intent = new Intent(ManagerService.RINGTONE_INTENT);
 
 		if (tone != null)

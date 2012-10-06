@@ -22,7 +22,7 @@ public class LinearAccelerationProbe extends BasicFunfProbe
 
 	protected int funfSummary()
 	{
-		return R.string.summary_linear_acceleration_probe;
+		return R.string.summary_linear_acceleration_probe_desc;
 	}
 
 	public String probeCategory(Context context)

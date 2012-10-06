@@ -1,11 +1,9 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.funf;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.Context;
+import android.os.Bundle;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.StartActivity;
 
 public class OrientationProbe extends BasicFunfProbe
 {
@@ -26,7 +24,7 @@ public class OrientationProbe extends BasicFunfProbe
 
 	protected int funfSummary()
 	{
-		return R.string.summary_orientation_probe;
+		return R.string.summary_orientation_probe_desc;
 	}
 
 	public String probeCategory(Context context)
@@ -34,32 +32,12 @@ public class OrientationProbe extends BasicFunfProbe
 		return context.getResources().getString(R.string.probe_motion_category);
 	}
 
-	public String summarizeValue(Context context, Object object)
+	public String summarizeValue(Context context, Bundle bundle)
 	{
-		if (object instanceof String)
-		{
-			try
-			{
-				String jsonString = (String) object;
+		float azimuth = bundle.getFloatArray("AZIMUTH")[0];
+		float pitch = bundle.getFloatArray("PITCH")[0];
+		float roll = bundle.getFloatArray("ROLL")[0];
 
-				JSONObject json = new JSONObject(jsonString);
-
-				JSONArray x = json.getJSONObject("extras").getJSONObject("VALUE").getJSONArray("AZIMUTH");
-				JSONArray y = json.getJSONObject("extras").getJSONObject("VALUE").getJSONArray("PITCH");
-				JSONArray z = json.getJSONObject("extras").getJSONObject("VALUE").getJSONArray("ROLL");
-
-				double azimuth = Double.parseDouble(x.get(0).toString());
-				double pitch = Double.parseDouble(y.get(0).toString());
-				double roll = Double.parseDouble(z.get(0).toString());
-
-				return String.format(context.getResources().getString(R.string.summary_orientation_probe), azimuth, pitch, roll);
-			}
-			catch (JSONException e)
-			{
-				e.printStackTrace();
-			}
-		}
-
-		return super.summarizeValue(context, object);
+		return String.format(context.getResources().getString(R.string.summary_orientation_probe), azimuth, pitch, roll);
 	}
 }

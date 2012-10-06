@@ -1,9 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.funf;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.Context;
+import android.os.Bundle;
 import edu.northwestern.cbits.purple_robot_manager.R;
 
 public class BatteryProbe extends PeriodFunfProbe
@@ -25,7 +23,7 @@ public class BatteryProbe extends PeriodFunfProbe
 
 	protected int funfSummary()
 	{
-		return R.string.summary_battery_probe;
+		return R.string.summary_battery_probe_desc;
 	}
 
 	public String probeCategory(Context context)
@@ -38,26 +36,10 @@ public class BatteryProbe extends PeriodFunfProbe
 		return "300";
 	}
 
-	public String summarizeValue(Context context, Object object)
+	public String summarizeValue(Context context, Bundle bundle)
 	{
-		if (object instanceof String)
-		{
-			try
-			{
-				String jsonString = (String) object;
+		int level = bundle.getInt("level");
 
-				JSONObject json = new JSONObject(jsonString);
-
-				int level = json.getJSONObject("extras").getJSONObject("VALUE").getInt("level");
-
-				return String.format(context.getResources().getString(R.string.summary_battery_probe), level);
-			}
-			catch (JSONException e)
-			{
-				e.printStackTrace();
-			}
-		}
-
-		return super.summarizeValue(context, object);
+		return String.format(context.getResources().getString(R.string.summary_battery_probe), level);
 	}
 }

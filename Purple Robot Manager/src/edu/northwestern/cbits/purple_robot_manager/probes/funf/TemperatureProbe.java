@@ -22,7 +22,7 @@ public class TemperatureProbe extends BasicFunfProbe
 
 	protected int funfSummary()
 	{
-		return R.string.summary_temperature_probe;
+		return R.string.summary_temperature_probe_desc;
 	}
 
 	public String probeCategory(Context context)

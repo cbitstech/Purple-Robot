@@ -24,26 +24,26 @@ public class TriggerOutputPlugin extends OutputPlugin
 	{
 		Context context = this.getContext();
 
-		try
+		JSONConfigFile jsonConfig = JSONConfigFile.getSharedFile(context);
+
+		List<Trigger> triggers = jsonConfig.getTriggers(context);
+
+		for (Trigger trigger : triggers)
 		{
-			JSONConfigFile jsonConfig = new JSONConfigFile(context);
-
-			List<Trigger> triggers = jsonConfig.getTriggers();
-
-			for (Trigger trigger : triggers)
+			if (trigger instanceof ProbeTrigger)
 			{
-				if (trigger instanceof ProbeTrigger)
-				{
-					ProbeTrigger probeTrigger = (ProbeTrigger) trigger;
+				ProbeTrigger probeTrigger = (ProbeTrigger) trigger;
 
+				try
+				{
 					if (probeTrigger.matches(context, OutputPlugin.jsonForBundle(intent.getExtras())))
 						trigger.execute(context);
 				}
+				catch (JSONException e)
+				{
+					e.printStackTrace();
+				}
 			}
-		}
-		catch (JSONException e)
-		{
-			e.printStackTrace();
 		}
 	}
 }

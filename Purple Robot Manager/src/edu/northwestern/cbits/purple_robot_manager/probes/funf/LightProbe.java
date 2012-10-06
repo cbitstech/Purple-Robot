@@ -1,10 +1,9 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.funf;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import edu.northwestern.cbits.purple_robot_manager.R;
 import android.content.Context;
+import android.os.Bundle;
+import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.StartActivity;
 
 public class LightProbe extends BasicFunfProbe
 {
@@ -25,7 +24,7 @@ public class LightProbe extends BasicFunfProbe
 
 	protected int funfSummary()
 	{
-		return R.string.summary_light_probe;
+		return R.string.summary_light_probe_desc;
 	}
 
 	public String probeCategory(Context context)
@@ -33,26 +32,10 @@ public class LightProbe extends BasicFunfProbe
 		return context.getResources().getString(R.string.probe_environment_category);
 	}
 
-	public String summarizeValue(Context context, Object object)
+	public String summarizeValue(Context context, Bundle bundle)
 	{
-		if (object instanceof String)
-		{
-			try
-			{
-				String jsonString = (String) object;
+		float lux = bundle.getFloatArray("LUX")[0];
 
-				JSONObject json = new JSONObject(jsonString);
-
-				double lux = json.getJSONObject("extras").getJSONObject("VALUE").getDouble("LUX");
-
-				return String.format(context.getResources().getString(R.string.summary_light_probe), lux);
-			}
-			catch (JSONException e)
-			{
-				e.printStackTrace();
-			}
-		}
-
-		return super.summarizeValue(context, object);
+		return String.format(context.getResources().getString(R.string.summary_light_probe), lux);
 	}
 }

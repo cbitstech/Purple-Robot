@@ -61,9 +61,9 @@ public abstract class Probe
 
 	public abstract boolean isEnabled(Context context);
 
-	public String summarizeValue(Context context, Object object)
+	public String summarizeValue(Context context, Bundle bundle)
 	{
-		return object.getClass().getName() + " --- "  + object.toString();
+		return bundle.toString();
 	}
 
 }
