@@ -1,10 +1,9 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.funf;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.Context;
+import android.os.Bundle;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.StartActivity;
 
 public class HardwareInfoProbe extends PeriodFunfProbe
 {
@@ -25,7 +24,7 @@ public class HardwareInfoProbe extends PeriodFunfProbe
 
 	protected int funfSummary()
 	{
-		return R.string.summary_hardware_info_probe;
+		return R.string.summary_hardware_info_probe_desc;
 	}
 
 	public String probeCategory(Context context)
@@ -38,30 +37,11 @@ public class HardwareInfoProbe extends PeriodFunfProbe
 		return "300";
 	}
 
-	public String summarizeValue(Context context, Object object)
+	public String summarizeValue(Context context, Bundle bundle)
 	{
-		if (object instanceof String)
-		{
-			try
-			{
-				String jsonString = (String) object;
+		String model = bundle.getString("MODEL");
+		String mac = bundle.getString("WIFI_MAC");
 
-				JSONObject json = new JSONObject(jsonString);
-
-				JSONObject value = json.getJSONObject("extras").getJSONObject("VALUE");
-
-				String model = value.getString("MODEL");
-				String mac = value.getString("WIFI_MAC");
-
-				return String.format(context.getResources().getString(R.string.summary_hardware_info_probe), model, mac);
-			}
-			catch (JSONException e)
-			{
-				e.printStackTrace();
-			}
-		}
-
-		return super.summarizeValue(context, object);
+		return String.format(context.getResources().getString(R.string.summary_hardware_info_probe), model, mac);
 	}
-
 }

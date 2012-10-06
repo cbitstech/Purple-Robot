@@ -3,27 +3,25 @@
 	android:versionCode="1"
 	android:versionName="1.0">
 	<uses-sdk android:minSdkVersion="8" android:targetSdkVersion="15" />
-	<uses-permission android:name="android.permission.INTERNET" />
-	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-	<uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
-
-    <uses-permission android:name="android.permission.BATTERY_STATS" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+	<uses-permission android:name="android.permission.BATTERY_STATS" />
     <uses-permission android:name="android.permission.BLUETOOTH"/>
+	<uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+	<uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
     <uses-permission android:name="android.permission.GET_TASKS"/>
-    <uses-permission android:name="com.android.browser.permission.READ_HISTORY_BOOKMARKS" />
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_SMS" />
-    <uses-permission android:name="android.permission.GET_TASKS"/>
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+   	<uses-permission android:name="android.permission.INTERNET" />
+	<uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_LOGS" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+   	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+   	<uses-permission android:name="android.permission.VIBRATE"/>
+	<uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+   	<uses-permission android:name="com.android.browser.permission.READ_HISTORY_BOOKMARKS" />
 
    	<application android:label="@string/app_name"
 		android:icon="@drawable/ic_launcher"
@@ -42,7 +40,7 @@
 			</intent-filter>
 			<meta-data android:name="android.appwidget.provider" android:resource="@xml/appwidget_info" />
 		</receiver>
-		<service android:enabled="true" android:exported="false" android:name=".ManagerService">
+		<service android:enabled="true" android:name=".ManagerService">
 			<intent-filter>
 				<action android:name="purple_robot_manager_periodic_check" />
 				<action android:name="purple_robot_manager_incoming_data" />
@@ -79,7 +77,6 @@
         <service android:name="edu.mit.media.funf.probe.builtin.TimeOffsetProbe"></service>
         <service android:name="edu.mit.media.funf.probe.builtin.VideosProbe"></service>
         <service android:name="edu.mit.media.funf.probe.builtin.WifiProbe"></service>
-
         <service android:name="edu.mit.media.funf.probe.builtin.AccelerometerSensorProbe"></service>
         <service android:name="edu.mit.media.funf.probe.builtin.GravitySensorProbe"></service>
         <service android:name="edu.mit.media.funf.probe.builtin.GyroscopeSensorProbe"></service>

@@ -161,18 +161,9 @@ public class FunfService extends CustomizedIntentService
 
 	public void onDataReceived(Bundle data)
 	{
-		String dataJson = getBundleSerializer().serialize(data);
-		String probeName = data.getString(Probe.PROBE);
-
-		long timestamp = data.getLong(Probe.TIMESTAMP, 0L);
-
 		LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(this);
 		Intent intent = new Intent(edu.northwestern.cbits.purple_robot_manager.probes.Probe.PROBE_READING);
-
-		intent.putExtra(NameValueDatabaseService.DATABASE_NAME_KEY, getPipelineName());
-		intent.putExtra(NameValueDatabaseService.TIMESTAMP_KEY, timestamp);
-		intent.putExtra(NameValueDatabaseService.NAME_KEY, probeName);
-		intent.putExtra(NameValueDatabaseService.VALUE_KEY, dataJson);
+		intent.putExtras(data);
 
 		localManager.sendBroadcast(intent);
 	}

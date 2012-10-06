@@ -13,6 +13,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import edu.mit.media.funf.Utils;
+import edu.mit.media.funf.storage.BundleSerializer;
+import edu.northwestern.cbits.purple_robot_manager.JsonUtils;
 import edu.northwestern.cbits.purple_robot_manager.R;
 
 public abstract class OutputPlugin
@@ -136,31 +139,8 @@ public abstract class OutputPlugin
 
 	public static JSONObject jsonForBundle(Bundle bundle) throws JSONException
 	{
-		JSONObject json = new JSONObject();
+		String jsonString = JsonUtils.getGson().toJson(Utils.getValues(bundle));
 
-		for (String key : bundle.keySet())
-		{
-			Object value = bundle.get(key);
-
-			if (value instanceof String)
-			{
-				try
-				{
-					value = new JSONObject((String) value);
-				}
-				catch (JSONException e)
-				{
-
-				}
-
-				json.put(key, value);
-			}
-			else if (value instanceof Bundle)
-				json.put(key, jsonForBundle(bundle));
-			else
-				json.put(key, value.toString());
-		}
-
-		return json;
+		return new JSONObject(jsonString);
 	}
 }

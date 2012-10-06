@@ -28,11 +28,9 @@ public class AppDisplayPlugin extends OutputPlugin
 
 			Bundle extras = intent.getExtras();
 
-			object.put("extras", OutputPlugin.jsonForBundle(extras));
-
 			Intent displayIntent = new Intent(StartActivity.UPDATE_DISPLAY);
-			displayIntent.putExtra(StartActivity.DISPLAY_PROBE_NAME, object.getJSONObject("extras").getString("NAME"));
-			displayIntent.putExtra(StartActivity.DISPLAY_PROBE_VALUE, object.toString());
+			displayIntent.putExtra(StartActivity.DISPLAY_PROBE_NAME, extras.getString("PROBE"));
+			displayIntent.putExtra(StartActivity.DISPLAY_PROBE_VALUE, extras);
 
 			LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this.getContext());
 

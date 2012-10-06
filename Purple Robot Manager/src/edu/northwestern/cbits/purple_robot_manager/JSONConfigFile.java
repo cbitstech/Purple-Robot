@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,14 +14,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.util.Log;
+import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 
 public class JSONConfigFile
 {
@@ -28,6 +27,76 @@ public class JSONConfigFile
 	public static String JSON_LAST_UPDATE = "json_configuration_last_update";
 
 	private JSONObject parameters = null;
+	private List<Trigger> _triggerList = null;
+
+	private static JSONConfigFile _sharedFile = null;
+	private static Uri _configUri = null;
+
+	public static void updateFromOnline(Context context, Uri uri)
+	{
+		if (!uri.equals(JSONConfigFile._configUri))
+			JSONConfigFile._sharedFile = null;
+
+		if (JSONConfigFile._sharedFile == null)
+		{
+			try
+			{
+				JSONConfigFile._configUri = uri;
+
+				URL u = new URL(JSONConfigFile._configUri.toString());
+
+				HttpURLConnection conn = (HttpURLConnection) u.openConnection();
+
+				BufferedInputStream bin = new BufferedInputStream(conn.getInputStream());
+				ByteArrayOutputStream bout = new ByteArrayOutputStream();
+
+				byte[] buffer = new byte[4096];
+				int read = 0;
+
+				while ((read = bin.read(buffer, 0, buffer.length)) != -1)
+				{
+					bout.write(buffer, 0, read);
+				}
+
+				bin.close();
+
+				String jsonString = new String(bout.toByteArray(), "UTF-8");
+
+				JSONObject json = new JSONObject(jsonString);
+
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				Editor edit = prefs.edit();
+
+				edit.putString(JSONConfigFile.JSON_CONFIGURATION, json.toString());
+
+				edit.commit();
+			}
+			catch (MalformedURLException e)
+			{
+				e.printStackTrace();
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+			catch (JSONException e)
+			{
+				e.printStackTrace();
+			}
+
+			JSONConfigFile._sharedFile = new JSONConfigFile(context);
+		}
+	}
+
+	public static JSONConfigFile getSharedFile(Context context)
+	{
+		if (JSONConfigFile._sharedFile == null)
+			JSONConfigFile._sharedFile = new JSONConfigFile(context);
+
+		JSONConfigFile.update(context);
+
+		return JSONConfigFile._sharedFile;
+	}
 
 	public String getStringParameter(String key)
 	{
@@ -44,41 +113,24 @@ public class JSONConfigFile
 		return null;
 	}
 
-	public JSONConfigFile(Uri uri) throws IOException, JSONException
+	private JSONConfigFile(Context context)
 	{
-		Log.e("PRM", "JSON CONFIG URI: " + uri.toString());
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-		URL u = new URL(uri.toString());
-
-		HttpURLConnection conn = (HttpURLConnection) u.openConnection();
-
-		BufferedInputStream bin = new BufferedInputStream(conn.getInputStream());
-		ByteArrayOutputStream bout = new ByteArrayOutputStream();
-
-		byte[] buffer = new byte[4096];
-		int read = 0;
-
-		while ((read = bin.read(buffer, 0, buffer.length)) != -1)
+		try
 		{
-			bout.write(buffer, 0, read);
+			this.parameters = new JSONObject(prefs.getString(JSONConfigFile.JSON_CONFIGURATION, "{}"));
 		}
-
-		bin.close();
-
-		String jsonString = new String(bout.toByteArray(), "UTF-8");
-
-		this.parameters = new JSONObject(jsonString);
+		catch (JSONException e)
+		{
+			this.parameters = new JSONObject();
+		}
 	}
 
-	public JSONConfigFile(Context context) throws JSONException
+	public static void update(Context context)
 	{
-		final JSONConfigFile me = this;
-
-		this.parameters = new JSONObject();
-
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-		String jsonString = prefs.getString(JSONConfigFile.JSON_CONFIGURATION, "{}");
 		long lastUpdate = prefs.getLong(JSONConfigFile.JSON_LAST_UPDATE, 0);
 
 		long now = System.currentTimeMillis();
@@ -87,72 +139,16 @@ public class JSONConfigFile
 
 		if (now - lastUpdate > 1000 * 60 * interval)
 		{
+			Editor edit = prefs.edit();
+
 			String uriString = prefs.getString("config_json_url", null);
 
 			if (uriString != null)
-			{
-				JSONConfigFile.validateUri(context, Uri.parse(uriString), true, new Runnable()
-				{
-					public void run()
-					{
-						try
-						{
-							String jsonString = prefs.getString(JSONConfigFile.JSON_CONFIGURATION, "{}");
+				JSONConfigFile.updateFromOnline(context, Uri.parse(uriString));
 
-							me.parameters = new JSONObject(jsonString);
-						}
-						catch (JSONException e)
-						{
-							e.printStackTrace();
-						}
-					}
-				}, null);
-			}
+			edit.putLong(JSONConfigFile.JSON_LAST_UPDATE, 0);
+			edit.commit();
 		}
-		else
-			this.parameters = new JSONObject(jsonString);
-	}
-
-	public static void validateUri(final Context context, final Uri jsonConfigUri, final boolean saveIfValid, final Runnable success, final Runnable failure)
-	{
-		Thread t = new Thread(new Runnable()
-		{
-			public void run()
-			{
-				try
-				{
-					JSONConfigFile file = new JSONConfigFile(jsonConfigUri);
-
-					if (file.isValid())
-					{
-						SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-						Editor editor = prefs.edit();
-
-						editor.putString(JSONConfigFile.JSON_CONFIGURATION, file.content());
-						editor.putLong(JSONConfigFile.JSON_LAST_UPDATE, System.currentTimeMillis());
-						editor.commit();
-
-						if (success != null)
-							success.run();
-
-						return;
-					}
-				}
-				catch (IOException e)
-				{
-					e.printStackTrace();
-				}
-				catch (JSONException e)
-				{
-					e.printStackTrace();
-				}
-
-				if (failure != null)
-					failure.run();
-			}
-		});
-
-		t.start();
 	}
 
 	protected String content()
@@ -168,27 +164,30 @@ public class JSONConfigFile
 		return true;
 	}
 
-	public List<Trigger> getTriggers()
+	public List<Trigger> getTriggers(Context context)
 	{
-		List<Trigger> triggerList = new ArrayList<Trigger>();
-
-		try
+		if (this._triggerList == null)
 		{
-			JSONArray triggers = this.parameters.getJSONArray("triggers");
+			this._triggerList = new ArrayList<Trigger>();
 
-			for (int i = 0; triggers != null && i < triggers.length(); i++)
+			try
 			{
-				Trigger t = Trigger.parse(triggers.getJSONObject(i));
+				JSONArray triggers = this.parameters.getJSONArray("triggers");
 
-				if (t != null)
-					triggerList.add(t);
+				for (int i = 0; triggers != null && i < triggers.length(); i++)
+				{
+					Trigger t = Trigger.parse(context, triggers.getJSONObject(i));
+
+					if (t != null)
+						this._triggerList.add(t);
+				}
+			}
+			catch (JSONException e)
+			{
+
 			}
 		}
-		catch (JSONException e)
-		{
-			e.printStackTrace();
-		}
 
-		return triggerList;
+		return this._triggerList;
 	}
 }

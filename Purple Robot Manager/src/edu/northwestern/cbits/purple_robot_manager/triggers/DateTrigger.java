@@ -17,6 +17,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 
 public class DateTrigger extends Trigger
@@ -30,10 +31,11 @@ public class DateTrigger extends Trigger
 	private String _start = null;
 	private String _end = null;
 	private String _repeats = null;
+	private Calendar _calendar = null;
 
-	public DateTrigger(JSONObject object) throws JSONException
+	public DateTrigger(Context context, JSONObject object) throws JSONException
 	{
-		super(object);
+		super(context, object);
 
 		this._start = object.getString(DateTrigger.DATETIME_START);
 		this._end = object.getString(DateTrigger.DATETIME_END);
@@ -41,37 +43,49 @@ public class DateTrigger extends Trigger
 
 		if ("null".equals(this._repeats))
 			this._repeats = null;
+
+		String repeatString = "";
+
+		if (this._repeats != null)
+			repeatString = "\nRRULE:" + this._repeats;
+
+		String icalString = String.format(context.getString(R.string.ical_template), this._start, this._end, this.name(), repeatString);
+
+		StringReader sin = new StringReader(icalString);
+
+		CalendarBuilder builder = new CalendarBuilder();
+
+		try
+		{
+			this._calendar = builder.build(sin);
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		catch (ParserException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	public boolean matches(Context context, Object obj)
 	{
 		if (obj instanceof Date)
 		{
-			try
+			if (this._calendar != null)
 			{
 				Date date = (Date) obj;
 
-				String repeatString = "";
-
-				if (this._repeats != null)
-					repeatString = "\nRRULE:" + this._repeats;
-
-				String icalString = String.format(context.getString(R.string.ical_template), this._start, this._end, this.name(), repeatString);
-
-				StringReader sin = new StringReader(icalString);
-
-				CalendarBuilder builder = new CalendarBuilder();
-
-				Calendar calendar = builder.build(sin);
-
 				// Create the date range which is desired.
+
 				DateTime from = new DateTime(new Date(System.currentTimeMillis() - 5000));
 				DateTime to = new DateTime(new Date(System.currentTimeMillis() + 5000));
 
 				Period period = new Period(from, to);
 
 				// For each VEVENT in the ICS
-				for (Object o : calendar.getComponents("VEVENT"))
+				for (Object o : this._calendar.getComponents("VEVENT"))
 				{
 					Component c = (Component) o;
 
@@ -90,14 +104,6 @@ public class DateTrigger extends Trigger
 						}
 					}
 				}
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-			}
-			catch (ParserException e)
-			{
-				e.printStackTrace();
 			}
 		}
 

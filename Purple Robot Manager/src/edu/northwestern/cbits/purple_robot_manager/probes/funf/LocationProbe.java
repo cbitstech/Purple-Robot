@@ -1,11 +1,10 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.funf;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.Context;
+import android.location.Location;
+import android.os.Bundle;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.StartActivity;
 
 public class LocationProbe extends BasicFunfProbe
 {
@@ -26,7 +25,7 @@ public class LocationProbe extends BasicFunfProbe
 
 	protected int funfSummary()
 	{
-		return R.string.summary_location_probe;
+		return R.string.summary_location_probe_desc;
 	}
 
 	public String probeCategory(Context context)
@@ -44,29 +43,12 @@ public class LocationProbe extends BasicFunfProbe
 		return "120";
 	}
 
-	public String summarizeValue(Context context, Object object)
+	public String summarizeValue(Context context, Bundle bundle)
 	{
-		if (object instanceof String)
-		{
-			try
-			{
-				String jsonString = (String) object;
+		Location location = (Location) bundle.get("LOCATION");
+		double longitude = location.getLongitude();
+		double latitude = location.getLatitude();
 
-				JSONObject json = new JSONObject(jsonString);
-
-				JSONObject location = json.getJSONObject("extras").getJSONObject("VALUE").getJSONObject("LOCATION");
-
-				double longitude = location.getDouble("mLongitude");
-				double latitude = location.getDouble("mLatitude");
-
-				return String.format(context.getResources().getString(R.string.summary_location_probe), latitude, longitude);
-			}
-			catch (JSONException e)
-			{
-				e.printStackTrace();
-			}
-		}
-
-		return super.summarizeValue(context, object);
+		return String.format(context.getResources().getString(R.string.summary_location_probe), latitude, longitude);
 	}
 }

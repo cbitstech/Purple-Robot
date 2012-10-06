@@ -24,6 +24,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 public class ManagerService extends IntentService
 {
@@ -54,6 +55,8 @@ public class ManagerService extends IntentService
 	@SuppressWarnings("deprecation")
 	protected void onHandleIntent(Intent intent)
 	{
+		Log.e("PRM", "MANAGER GOT INTENT: " + intent.getAction());
+
 		if (HAPTIC_PATTERN_INTENT.equalsIgnoreCase(intent.getAction()))
 		{
 			String pattern = intent.getStringExtra(HAPTIC_PATTERN_NAME);
@@ -195,37 +198,30 @@ public class ManagerService extends IntentService
 		}
 		else
 		{
-			try
+			JSONConfigFile jsonConfig = JSONConfigFile.getSharedFile(this);
+
+			List<Trigger> triggers = jsonConfig.getTriggers(this);
+
+			Date now = new Date();
+
+			for (Trigger trigger : triggers)
 			{
-				JSONConfigFile jsonConfig = new JSONConfigFile(this);
+				boolean execute = false;
 
-				List<Trigger> triggers = jsonConfig.getTriggers();
-
-				Date now = new Date();
-
-				for (Trigger trigger : triggers)
+				if (PERIODIC_CHECK_INTENT.equals(intent.getAction()) && trigger instanceof DateTrigger)
 				{
-					boolean execute = false;
-
-					if (PERIODIC_CHECK_INTENT.equals(intent.getAction()) && trigger instanceof DateTrigger)
-					{
-						if (trigger.matches(this, now))
-							execute = true;
-					}
-					else if (INCOMING_DATA_INTENT.equals(intent.getAction()))
-					{
-
-					}
-
-					if (execute)
-					{
-						trigger.execute(this);
-					}
+					if (trigger.matches(this, now))
+						execute = true;
 				}
-			}
-			catch (JSONException e)
-			{
-				e.printStackTrace();
+				else if (INCOMING_DATA_INTENT.equals(intent.getAction()))
+				{
+
+				}
+
+				if (execute)
+				{
+					trigger.execute(this);
+				}
 			}
 		}
 	}

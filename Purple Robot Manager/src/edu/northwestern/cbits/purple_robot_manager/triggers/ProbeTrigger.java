@@ -18,9 +18,9 @@ public class ProbeTrigger extends Trigger
 	private String _test = null;
 	private long _frequency;
 
-	public ProbeTrigger(JSONObject object) throws JSONException
+	public ProbeTrigger(Context context, JSONObject object) throws JSONException
 	{
-		super(object);
+		super(context, object);
 
 		this._test = object.getString(ProbeTrigger.TRIGGER_TEST);
 		this._frequency = object.getLong(ProbeTrigger.TRIGGER_FREQUENCY);

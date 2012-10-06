@@ -1,6 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.funf;
 
 import android.content.Context;
+import android.os.Bundle;
 import edu.northwestern.cbits.purple_robot_manager.R;
 
 public class TimeOffsetProbe extends PeriodFunfProbe
@@ -22,7 +23,7 @@ public class TimeOffsetProbe extends PeriodFunfProbe
 
 	protected int funfSummary()
 	{
-		return R.string.summary_time_offset_probe;
+		return R.string.summary_time_offset_probe_desc;
 	}
 
 	public String probeCategory(Context context)
@@ -35,4 +36,10 @@ public class TimeOffsetProbe extends PeriodFunfProbe
 		return "21600";
 	}
 
+	public String summarizeValue(Context context, Bundle bundle)
+	{
+		double offset = bundle.getDouble("TIME_OFFSET");
+
+		return String.format(context.getResources().getString(R.string.summary_time_offset_probe), offset);
+	}
 }

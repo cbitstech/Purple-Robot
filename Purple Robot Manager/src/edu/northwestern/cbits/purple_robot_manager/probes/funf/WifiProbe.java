@@ -1,11 +1,12 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.funf;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.util.ArrayList;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.os.Parcelable;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.StartActivity;
 
 public class WifiProbe extends PeriodFunfProbe
 {
@@ -26,7 +27,7 @@ public class WifiProbe extends PeriodFunfProbe
 
 	protected int funfSummary()
 	{
-		return R.string.summary_wifi_probe;
+		return R.string.summary_wifi_probe_desc;
 	}
 
 	public String probeCategory(Context context)
@@ -39,26 +40,10 @@ public class WifiProbe extends PeriodFunfProbe
 		return "1200";
 	}
 
-	public String summarizeValue(Context context, Object object)
+	public String summarizeValue(Context context, Bundle bundle)
 	{
-		if (object instanceof String)
-		{
-			try
-			{
-				String jsonString = (String) object;
+		ArrayList<Object> scans = (ArrayList<Object>) bundle.get("SCAN_RESULTS");
 
-				JSONObject json = new JSONObject(jsonString);
-
-				JSONArray scan = json.getJSONObject("extras").getJSONObject("VALUE").getJSONArray("SCAN_RESULTS");
-
-				return String.format(context.getResources().getString(R.string.summary_wifi_probe), scan.length());
-			}
-			catch (JSONException e)
-			{
-				e.printStackTrace();
-			}
-		}
-
-		return super.summarizeValue(context, object);
+		return String.format(context.getResources().getString(R.string.summary_wifi_probe), scans.size());
 	}
 }
