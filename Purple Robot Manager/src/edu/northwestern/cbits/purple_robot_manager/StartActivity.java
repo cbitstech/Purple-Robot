@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Editable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +34,7 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.google.gson.Gson;
 
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
@@ -130,6 +132,11 @@ public class StartActivity extends SherlockActivity
         			{
         				e.printStackTrace();
         			}
+
+        			Bundle sensor = value.getBundle("SENSOR");
+
+        			if (sensor != null && sensor.containsKey("POWER"))
+        				formattedValue += " (" + sensor.getFloat("POWER") + " mA)";
         		}
 
         		nameField.setText(sensorName + " (" + sdf.format(sensorDate) + ")");
