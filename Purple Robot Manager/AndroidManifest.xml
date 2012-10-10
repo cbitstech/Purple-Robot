@@ -5,6 +5,7 @@
 	<uses-sdk android:minSdkVersion="8" android:targetSdkVersion="15" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
 	<uses-permission android:name="android.permission.BATTERY_STATS" />
     <uses-permission android:name="android.permission.BLUETOOTH"/>
@@ -55,7 +56,7 @@
 				<action android:name="edu.mit.media.funf.reload" />
 			</intent-filter>
 		</service>
-        <!-- Probe Services -->
+		<!-- Probe Services -->
         <service android:name="edu.mit.media.funf.probe.builtin.ActivityProbe"></service>
         <service android:name="edu.mit.media.funf.probe.builtin.AndroidInfoProbe"></service>
         <service android:name="edu.mit.media.funf.probe.builtin.ApplicationsProbe"></service>

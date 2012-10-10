@@ -14,7 +14,6 @@ import edu.mit.media.funf.CustomizedIntentService;
 import edu.mit.media.funf.Utils;
 import edu.mit.media.funf.probe.Probe;
 import edu.mit.media.funf.storage.BundleSerializer;
-import edu.mit.media.funf.storage.NameValueDatabaseService;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 
 public class FunfService extends CustomizedIntentService

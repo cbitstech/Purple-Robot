@@ -44,8 +44,6 @@ public class JavaScriptEngine
 
 	public JavaScriptEngine(android.content.Context context)
 	{
-		Log.e("PRM", "INITING WITH CONTEXT " + context);
-
 		this._context = context;
 	}
 
@@ -73,8 +71,6 @@ public class JavaScriptEngine
 
 		if (extras != null && extrasName != null)
 			script = "var " + extrasName + " = " + extras.toString() + "; " + script;
-
-		Log.e("PRM", "JAVASCRIPT: " + script);
 
 		return this._jsContext.evaluateString(this._scope, script, "<engine>", 1, null);
 	}
@@ -395,7 +391,6 @@ public class JavaScriptEngine
 
 	public void playTone(String tone)
 	{
-		Log.e("PRM", "PLAYING TONE");
 		Intent intent = new Intent(ManagerService.RINGTONE_INTENT);
 
 		if (tone != null)
