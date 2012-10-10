@@ -12,19 +12,18 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Editable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.EditText;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,7 +33,6 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.google.gson.Gson;
 
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
@@ -62,7 +60,6 @@ public class StartActivity extends SherlockActivity
 		this.startActivity(intent);
 	}
 
-	@SuppressWarnings("deprecation")
 	protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
@@ -76,22 +73,28 @@ public class StartActivity extends SherlockActivity
 
         this._receiver = new BroadcastReceiver()
     	{
-    		public void onReceive(Context context, Intent intent)
+    		public void onReceive(Context context, final Intent intent)
     		{
-    			if (StartActivity.UPDATE_DISPLAY.equals(intent.getAction()))
+    			me.runOnUiThread(new Runnable()
     			{
-    				String name = intent.getStringExtra(DISPLAY_PROBE_NAME);
-    				Bundle value = intent.getBundleExtra(DISPLAY_PROBE_VALUE);
+    				public void run()
+    				{
+		    			if (StartActivity.UPDATE_DISPLAY.equals(intent.getAction()))
+		    			{
+		    				String name = intent.getStringExtra(DISPLAY_PROBE_NAME);
+		    				Bundle value = intent.getBundleExtra(DISPLAY_PROBE_VALUE);
 
-    				if (StartActivity._probeNames.contains(name))
-    					StartActivity._probeNames.remove(name);
+		    				if (StartActivity._probeNames.contains(name))
+		    					StartActivity._probeNames.remove(name);
 
-    				StartActivity._probeNames.add(0, name);
-    				StartActivity._probeValues.put(name, value);
-    				StartActivity._probeDates.put(name, new Date());
+		    				StartActivity._probeNames.add(0, name);
+		    				StartActivity._probeValues.put(name, value);
+		    				StartActivity._probeDates.put(name, new Date());
 
-    				me.refreshList();
-    			}
+		    				me.refreshList();
+		    			}
+    				}
+    			});
     		}
     	};
 
@@ -119,7 +122,7 @@ public class StartActivity extends SherlockActivity
 
         		Probe probe = ProbeManager.probeForName(sensorName);
 
-        		String formattedValue = "TODO: " + sensorName;
+        		String formattedValue = sensorName;
 
         		if (probe != null && value != null)
         		{
@@ -165,9 +168,14 @@ public class StartActivity extends SherlockActivity
 		{
 	        ListView listView = (ListView) this.findViewById(R.id.list_probes);
 
-	        ArrayAdapter<String> adapter = (ArrayAdapter<String>) listView.getAdapter();
+	        ListAdapter adapter = listView.getAdapter();
 
-	        adapter.notifyDataSetChanged();
+	        if (adapter instanceof BaseAdapter)
+			{
+	        	BaseAdapter baseAdapter = (BaseAdapter) adapter;
+
+	        	baseAdapter.notifyDataSetChanged();
+	        }
 
 	        this.getSupportActionBar().setTitle(String.format(this.getResources().getString(R.string.title_probes_count), StartActivity._probeNames.size()));
 

@@ -7,11 +7,6 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
-import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
-import edu.northwestern.cbits.purple_robot_manager.triggers.DateTrigger;
-import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
-
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.PendingIntent;
@@ -24,7 +19,10 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
-import android.util.Log;
+import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
+import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
+import edu.northwestern.cbits.purple_robot_manager.triggers.DateTrigger;
+import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 
 public class ManagerService extends IntentService
 {
@@ -55,8 +53,6 @@ public class ManagerService extends IntentService
 	@SuppressWarnings("deprecation")
 	protected void onHandleIntent(Intent intent)
 	{
-		Log.e("PRM", "MANAGER GOT INTENT: " + intent.getAction());
-
 		if (HAPTIC_PATTERN_INTENT.equalsIgnoreCase(intent.getAction()))
 		{
 			String pattern = intent.getStringExtra(HAPTIC_PATTERN_NAME);

@@ -1,4 +1,5 @@
 <resources>
+    <string name="sensor_upload_url">http://23.23.186.35:3000/api/submit</string>
     <string name="app_name">Purple Robot</string>
 
     <string name="startup_loading_message">Starting up&#8230;</string>

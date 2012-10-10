@@ -14,7 +14,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import edu.mit.media.funf.Utils;
-import edu.mit.media.funf.storage.BundleSerializer;
 import edu.northwestern.cbits.purple_robot_manager.JsonUtils;
 import edu.northwestern.cbits.purple_robot_manager.R;
 
