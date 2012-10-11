@@ -196,6 +196,9 @@ public class ManagerService extends IntentService
 		{
 			JSONConfigFile jsonConfig = JSONConfigFile.getSharedFile(this);
 
+			if (jsonConfig == null)
+				return;
+
 			List<Trigger> triggers = jsonConfig.getTriggers(this);
 
 			Date now = new Date();

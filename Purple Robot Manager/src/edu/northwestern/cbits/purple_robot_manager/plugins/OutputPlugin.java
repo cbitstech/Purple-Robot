@@ -39,7 +39,6 @@ public abstract class OutputPlugin
 
 	public boolean shouldRespond(String intentAction)
 	{
-		@SuppressWarnings("static-access")
 		String[] actions = this.respondsTo();
 
 		for (String action : actions)

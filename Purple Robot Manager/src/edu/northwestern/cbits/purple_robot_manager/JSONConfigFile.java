@@ -14,6 +14,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.WazaBe.HoloEverywhere.app.Toast;
+
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -24,6 +27,7 @@ import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 public class JSONConfigFile
 {
 	public static String JSON_CONFIGURATION = "json_configuration_contents";
+	public static String JSON_CONFIGURATION_URL = "config_json_url";
 	public static String JSON_LAST_UPDATE = "json_configuration_last_update";
 
 	private JSONObject parameters = null;
@@ -32,59 +36,82 @@ public class JSONConfigFile
 	private static JSONConfigFile _sharedFile = null;
 	private static Uri _configUri = null;
 
-	public static void updateFromOnline(Context context, Uri uri)
+	public static void updateFromOnline(final Context context, final Uri uri)
 	{
 		if (!uri.equals(JSONConfigFile._configUri))
 			JSONConfigFile._sharedFile = null;
 
 		if (JSONConfigFile._sharedFile == null)
 		{
-			try
+			Runnable r = new Runnable()
 			{
-				JSONConfigFile._configUri = uri;
-
-				URL u = new URL(JSONConfigFile._configUri.toString());
-
-				HttpURLConnection conn = (HttpURLConnection) u.openConnection();
-
-				BufferedInputStream bin = new BufferedInputStream(conn.getInputStream());
-				ByteArrayOutputStream bout = new ByteArrayOutputStream();
-
-				byte[] buffer = new byte[4096];
-				int read = 0;
-
-				while ((read = bin.read(buffer, 0, buffer.length)) != -1)
+				public void run()
 				{
-					bout.write(buffer, 0, read);
+					try
+					{
+						JSONConfigFile._configUri = uri;
+
+						URL u = new URL(JSONConfigFile._configUri.toString());
+
+						HttpURLConnection conn = (HttpURLConnection) u.openConnection();
+
+						BufferedInputStream bin = new BufferedInputStream(conn.getInputStream());
+						ByteArrayOutputStream bout = new ByteArrayOutputStream();
+
+						byte[] buffer = new byte[4096];
+						int read = 0;
+
+						while ((read = bin.read(buffer, 0, buffer.length)) != -1)
+						{
+							bout.write(buffer, 0, read);
+						}
+
+						bin.close();
+
+						String jsonString = new String(bout.toByteArray(), "UTF-8");
+
+						JSONObject json = new JSONObject(jsonString);
+
+						SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+						Editor edit = prefs.edit();
+
+						edit.putString(JSONConfigFile.JSON_CONFIGURATION, json.toString());
+						edit.putString(JSONConfigFile.JSON_CONFIGURATION_URL, u.toString());
+
+						edit.commit();
+
+						if (context instanceof Activity)
+						{
+							final Activity activity = (Activity) context;
+
+							activity.runOnUiThread(new Runnable()
+							{
+								public void run()
+								{
+									Toast.makeText(activity, R.string.success_json_set_uri, Toast.LENGTH_LONG).show();
+								}
+							});
+						}
+					}
+					catch (MalformedURLException e)
+					{
+						e.printStackTrace();
+					}
+					catch (IOException e)
+					{
+						e.printStackTrace();
+					}
+					catch (JSONException e)
+					{
+						e.printStackTrace();
+					}
+
+					JSONConfigFile._sharedFile = new JSONConfigFile(context);
 				}
+			};
 
-				bin.close();
-
-				String jsonString = new String(bout.toByteArray(), "UTF-8");
-
-				JSONObject json = new JSONObject(jsonString);
-
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-				Editor edit = prefs.edit();
-
-				edit.putString(JSONConfigFile.JSON_CONFIGURATION, json.toString());
-
-				edit.commit();
-			}
-			catch (MalformedURLException e)
-			{
-				e.printStackTrace();
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-			}
-			catch (JSONException e)
-			{
-				e.printStackTrace();
-			}
-
-			JSONConfigFile._sharedFile = new JSONConfigFile(context);
+			Thread t = new Thread(r);
+			t.start();
 		}
 	}
 
@@ -141,7 +168,7 @@ public class JSONConfigFile
 		{
 			Editor edit = prefs.edit();
 
-			String uriString = prefs.getString("config_json_url", null);
+			String uriString = prefs.getString(JSONConfigFile.JSON_CONFIGURATION_URL, null);
 
 			if (uriString != null)
 				JSONConfigFile.updateFromOnline(context, Uri.parse(uriString));
