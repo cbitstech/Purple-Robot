@@ -79,6 +79,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnPr
 
 			editor.putLong(JSONConfigFile.JSON_LAST_UPDATE, 0);
 			editor.commit();
+			JSONConfigFile.update(this);
 
 			Intent funfIntent = new Intent(FunfService.ACTION_RELOAD);
 			this.startService(funfIntent);

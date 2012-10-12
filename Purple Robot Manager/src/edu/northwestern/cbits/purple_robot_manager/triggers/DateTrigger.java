@@ -18,11 +18,12 @@ import net.fortuna.ical4j.model.PeriodList;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
+
 import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
 import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
 import com.WazaBe.HoloEverywhere.preference.SharedPreferences.Editor;
 
-import android.content.Context;
 import edu.northwestern.cbits.purple_robot_manager.R;
 
 public class DateTrigger extends Trigger

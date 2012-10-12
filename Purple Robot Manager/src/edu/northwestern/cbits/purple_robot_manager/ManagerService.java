@@ -231,7 +231,7 @@ public class ManagerService extends IntentService
 
 		PendingIntent pi = PendingIntent.getService(context, 0, new Intent(ManagerService.PERIODIC_CHECK_INTENT), PendingIntent.FLAG_UPDATE_CURRENT);
 
-		alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60000, pi);
+		alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 15000, pi);
 
 		Probe.loadProbeClasses(context);
 		OutputPlugin.loadPluginClasses(context);

@@ -130,43 +130,46 @@ public class HttpUploadPlugin extends OutputPlugin
 
 					for (File f : pendingFiles)
 					{
-						try
+						if (pendingObjects.size() < 1024)
 						{
-							BufferedReader reader = new BufferedReader(new FileReader(f));
+							try
+							{
+								BufferedReader reader = new BufferedReader(new FileReader(f));
 
-						    StringBuffer sb = new StringBuffer();
-						    String line = null;
+							    StringBuffer sb = new StringBuffer();
+							    String line = null;
 
-						    while((line = reader.readLine()) != null)
-						    {
-						    	sb.append(line);
-						    }
+							    while((line = reader.readLine()) != null)
+							    {
+							    	sb.append(line);
+							    }
 
-						    reader.close();
+							    reader.close();
 
-						    JSONArray jsonArray = new JSONArray(sb.toString());
+							    JSONArray jsonArray = new JSONArray(sb.toString());
 
-						    for (int i = 0; i < jsonArray.length(); i++)
-						    {
-						    	JSONObject jsonObject = jsonArray.getJSONObject(i);
+							    for (int i = 0; i < jsonArray.length(); i++)
+							    {
+							    	JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-						    	pendingObjects.add(jsonObject);
-						    }
+							    	pendingObjects.add(jsonObject);
+							    }
+							}
+							catch (FileNotFoundException e)
+							{
+								e.printStackTrace();
+							}
+							catch (IOException e)
+							{
+								e.printStackTrace();
+							}
+							catch (JSONException e)
+							{
+								e.printStackTrace();
+							}
+
+							f.delete();
 						}
-						catch (FileNotFoundException e)
-						{
-							e.printStackTrace();
-						}
-						catch (IOException e)
-						{
-							e.printStackTrace();
-						}
-						catch (JSONException e)
-						{
-							e.printStackTrace();
-						}
-
-						f.delete();
 					}
 
 					if (pendingObjects.size() > 0)
@@ -243,7 +246,6 @@ public class HttpUploadPlugin extends OutputPlugin
 					            HttpEntity httpEntity = response.getEntity();
 					            String body = EntityUtils.toString(httpEntity);
 
-					            Log.e("PRM", "BODY: " + body);
 					            JSONObject json = new JSONObject(body);
 
 					            String status = json.getString("Status");
@@ -273,9 +275,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 //									JSONObject responseJson = new JSONObject(responsePayload);
 
-//									Log.e("PRM", "CHECKSUM " + json.getString("checksum") + " =? " + responseChecksum);
-
-//									Log.e("PRM", "GOT SUCCESSFUL UPLOAD RESPONSE: " + responseJson);
+									Log.e("PRM", "CHECKSUM " + json.getString("Checksum") + " =? " + responseChecksum);
 
 							    	pendingObjects.removeAll(toUpload);
 
@@ -303,16 +303,19 @@ public class HttpUploadPlugin extends OutputPlugin
 					            httpClient.close();
 							}
 
-							JSONArray toSave = new JSONArray();
-
-							if (pendingObjects.size() > 0)
+							for (int k = 0; pendingObjects.size() > 0; k++)
 							{
-								for (int i = 0; i < pendingObjects.size(); i++)
+								JSONArray toSave = new JSONArray();
+
+								List<JSONObject> toRemove = new ArrayList<JSONObject>();
+
+								for (int i = 0; i < pendingObjects.size() && i < 100; i++)
 								{
 									toSave.put(pendingObjects.get(i));
+									toRemove.add(pendingObjects.get(i));
 								}
 
-								File f = new File(pendingFolder, "pending.json");
+								File f = new File(pendingFolder, "pending_" + k + ".json");
 
 								OutputStream out = new BufferedOutputStream(new FileOutputStream(f));
 
@@ -322,6 +325,8 @@ public class HttpUploadPlugin extends OutputPlugin
 
 								out.flush();
 								out.close();
+
+								pendingObjects.removeAll(toRemove);
 							}
 						}
 						catch (JSONException e)

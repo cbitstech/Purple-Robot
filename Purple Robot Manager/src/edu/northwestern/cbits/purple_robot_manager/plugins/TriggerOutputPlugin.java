@@ -26,6 +26,9 @@ public class TriggerOutputPlugin extends OutputPlugin
 
 		JSONConfigFile jsonConfig = JSONConfigFile.getSharedFile(context);
 
+		if (jsonConfig == null)
+			return;
+
 		List<Trigger> triggers = jsonConfig.getTriggers(context);
 
 		for (Trigger trigger : triggers)
