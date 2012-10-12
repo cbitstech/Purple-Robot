@@ -220,7 +220,7 @@ public class HttpUploadPlugin extends OutputPlugin
 							jsonMessage.put("CBITSUserHash", prefs.getString("config_user_hash", ""));
 
 							MessageDigest md = MessageDigest.getInstance("MD5");
-							byte[] digest = md.digest(("SubmitProbes" + jsonMessage.get("Payload").toString()).getBytes("UTF-8"));
+							byte[] digest = md.digest((jsonMessage.get("CBITSUserHash").toString() + jsonMessage.get("Operation").toString() + jsonMessage.get("Payload").toString()).getBytes("UTF-8"));
 
 							String checksum = (new BigInteger(1, digest)).toString(16);
 
@@ -253,22 +253,14 @@ public class HttpUploadPlugin extends OutputPlugin
 
 					            String status = json.getString("Status");
 
-					            String message = "";
 					            String responsePayload = "";
-					            String operation = "";
-
-					            if (json.has("Message"))
-					            	message = json.getString("Message");
-
-					            if (json.has("Operation"))
-					            	operation = json.getString("Operation");
 
 					            if (json.has("Payload"))
 					            	responsePayload = json.getString("Payload");
 
 					            if (status.equals("error") == false)
 					            {
-									byte[] responseDigest = md.digest((status + message + operation + responsePayload).getBytes("UTF-8"));
+									byte[] responseDigest = md.digest((status + responsePayload).getBytes("UTF-8"));
 									String responseChecksum = (new BigInteger(1, responseDigest)).toString(16);
 
 									while(responseChecksum.length() < 32 )
