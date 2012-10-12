@@ -101,6 +101,8 @@ public class HttpUploadPlugin extends OutputPlugin
 
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getContext());
 
+		final List<String> uploadCount = new ArrayList<String>();
+
 		final Runnable r = new Runnable()
 		{
 			public void run()
@@ -246,6 +248,7 @@ public class HttpUploadPlugin extends OutputPlugin
 					            HttpEntity httpEntity = response.getEntity();
 					            String body = EntityUtils.toString(httpEntity);
 
+					            Log.e("PRM", "TRANSLATING " + body);
 					            JSONObject json = new JSONObject(body);
 
 					            String status = json.getString("Status");
@@ -352,8 +355,10 @@ public class HttpUploadPlugin extends OutputPlugin
 					}
 				}
 
-				if (continueUpload)
+				if (continueUpload && uploadCount.size() < 16)
 				{
+					uploadCount.add("");
+
 					me._lastUpload = 0;
 					this.run();
 				}
