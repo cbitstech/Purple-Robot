@@ -82,8 +82,6 @@ public class HttpUploadPlugin extends OutputPlugin
 			Bundle extras = intent.getExtras();
 
 			JSONObject jsonObject = OutputPlugin.jsonForBundle(extras);
-			jsonObject.put("CBITSUserName", "TODO: CBITSUserName");
-			jsonObject.put("CBITSEventID", "TODO: SOME-GUID-1234");
 
 			this.persistJSONObject(jsonObject);
 			this.uploadPendingObjects();
@@ -213,15 +211,8 @@ public class HttpUploadPlugin extends OutputPlugin
 							JSONObject jsonMessage = new JSONObject();
 
 							jsonMessage.put("Operation", "SubmitProbes");
-
-							JSONObject payload = new JSONObject();
-							payload.put("Name", "Submit Probe Values");
-							payload.put("Value", uploadArray);
-
-							payload.put("CBITSUserId", prefs.getString("config_user_id", ""));
-							payload.put("CBITSUserHash", prefs.getString("config_user_hash", ""));
-
-							jsonMessage.put("Payload", payload.toString());
+							jsonMessage.put("Payload", uploadArray.toString());
+							jsonMessage.put("CBITSUserHash", prefs.getString("config_user_hash", ""));
 
 							MessageDigest md = MessageDigest.getInstance("MD5");
 							byte[] digest = md.digest(("SubmitProbes" + jsonMessage.get("Payload").toString()).getBytes("UTF-8"));
