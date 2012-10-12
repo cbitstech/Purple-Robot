@@ -3,9 +3,13 @@ package edu.northwestern.cbits.purple_robot_manager;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
@@ -16,6 +20,8 @@ import org.json.JSONObject;
 
 import com.WazaBe.HoloEverywhere.app.Toast;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -26,9 +32,11 @@ import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 
 public class JSONConfigFile
 {
-	public static String JSON_CONFIGURATION = "json_configuration_contents";
-	public static String JSON_CONFIGURATION_URL = "config_json_url";
-	public static String JSON_LAST_UPDATE = "json_configuration_last_update";
+	public static final String USER_ID = "user_id";
+	public static final String USER_HASH = "user_hash";
+	public static final String JSON_CONFIGURATION = "json_configuration_contents";
+	public static final String JSON_CONFIGURATION_URL = "config_json_url";
+	public static final String JSON_LAST_UPDATE = "json_configuration_last_update";
 
 	private JSONObject parameters = null;
 	private List<Trigger> _triggerList = null;
@@ -147,11 +155,84 @@ public class JSONConfigFile
 		try
 		{
 			this.parameters = new JSONObject(prefs.getString(JSONConfigFile.JSON_CONFIGURATION, "{}"));
+
+			this.updateSharedPreferences(context);
 		}
 		catch (JSONException e)
 		{
 			this.parameters = new JSONObject();
 		}
+	}
+
+	private void updateSharedPreferences(Context context)
+	{
+		String userId = null;
+		String userHash = null;
+
+		try
+		{
+			if (this.parameters.has(JSONConfigFile.USER_ID))
+				userId = this.parameters.getString(JSONConfigFile.USER_ID);
+
+			if (this.parameters.has(JSONConfigFile.USER_HASH))
+				userHash = this.parameters.getString(JSONConfigFile.USER_HASH);
+		}
+		catch (JSONException e)
+		{
+				e.printStackTrace();
+		}
+
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		Editor editor = prefs.edit();
+
+		if (userId == null)
+			userId = prefs.getString("config_user_id", null);
+
+		if (userId == null)
+		{
+			AccountManager manager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
+			Account[] list = manager.getAccountsByType("com.google");
+
+			if (list.length == 0)
+				list = manager.getAccounts();
+
+			if (list.length > 0)
+			{
+				userId = list[0].name;
+			}
+		}
+
+		if (userId != null && userHash == null)
+		{
+			try
+			{
+				MessageDigest md = MessageDigest.getInstance("MD5");
+				byte[] digest = md.digest(userId.getBytes("UTF-8"));
+
+				userHash = (new BigInteger(1, digest)).toString(16);
+
+				while(userHash.length() < 32 )
+				{
+					userHash = "0" + userHash;
+				}
+			}
+			catch (NoSuchAlgorithmException e)
+			{
+				e.printStackTrace();
+			}
+			catch (UnsupportedEncodingException e)
+			{
+				e.printStackTrace();
+			}
+		}
+
+		if (userId != null)
+			editor.putString("config_user_id", userId);
+
+		if (userHash != null)
+			editor.putString("config_user_hash", userHash);
+
+		editor.commit();
 	}
 
 	public static void update(Context context)
@@ -173,7 +254,7 @@ public class JSONConfigFile
 			if (uriString != null)
 				JSONConfigFile.updateFromOnline(context, Uri.parse(uriString));
 
-			edit.putLong(JSONConfigFile.JSON_LAST_UPDATE, 0);
+			edit.putLong(JSONConfigFile.JSON_LAST_UPDATE, now);
 			edit.commit();
 		}
 	}

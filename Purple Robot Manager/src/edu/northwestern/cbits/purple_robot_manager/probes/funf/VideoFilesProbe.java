@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import android.content.Context;
 import android.os.Bundle;
 import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.StartActivity;
 
 public class VideoFilesProbe extends PeriodFunfProbe
 {
@@ -36,6 +35,7 @@ public class VideoFilesProbe extends PeriodFunfProbe
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
+		@SuppressWarnings("unchecked")
 		ArrayList<Object> files = (ArrayList<Object>) bundle.get("VIDEOS");
 
 		return String.format(context.getResources().getString(R.string.summary_files_probe), files.size());

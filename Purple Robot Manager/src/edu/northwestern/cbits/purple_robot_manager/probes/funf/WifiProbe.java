@@ -4,9 +4,7 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Parcelable;
 import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.StartActivity;
 
 public class WifiProbe extends PeriodFunfProbe
 {
@@ -42,6 +40,7 @@ public class WifiProbe extends PeriodFunfProbe
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
+		@SuppressWarnings("unchecked")
 		ArrayList<Object> scans = (ArrayList<Object>) bundle.get("SCAN_RESULTS");
 
 		return String.format(context.getResources().getString(R.string.summary_wifi_probe), scans.size());

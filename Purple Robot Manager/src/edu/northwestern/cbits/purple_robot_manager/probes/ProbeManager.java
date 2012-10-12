@@ -1,7 +1,9 @@
 package edu.northwestern.cbits.purple_robot_manager.probes;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import android.content.Context;
@@ -18,38 +20,50 @@ import edu.northwestern.cbits.purple_robot_manager.probes.funf.PeriodFunfProbe;
 public class ProbeManager
 {
 	private static Map<String, Probe> _cachedProbes = new HashMap<String, Probe>();
+	private static List<Probe> _probeInstances = null;
+
+	public static List<Probe> allProbes()
+	{
+		if (ProbeManager._probeInstances == null)
+		{
+			ProbeManager._probeInstances = new ArrayList<Probe>();
+
+			for (Class<Probe> probeClass : Probe.availableProbeClasses())
+			{
+				try
+				{
+					Probe probe = (Probe) probeClass.newInstance();
+
+					ProbeManager._probeInstances.add(probe);
+				}
+				catch (InstantiationException e)
+				{
+					e.printStackTrace();
+				}
+				catch (IllegalAccessException e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
+
+		return ProbeManager._probeInstances;
+	}
 
 	public static Map<String, Bundle[]> getDataRequests(Context context)
 	{
 		HashMap<String, Bundle[]> probesMap = new HashMap<String, Bundle[]>();
 
-		for (Class<Probe> probeClass : Probe.availableProbeClasses())
+		for (Probe probe : ProbeManager.allProbes())
 		{
-			try
-			{
-				Probe probe = (Probe) probeClass.newInstance();
+			String name = probe.name(context);
 
-				String name = probe.name(context);
+			Bundle[] bundles = new Bundle[0];
 
-				Bundle[] bundles = new Bundle[0];
+			if (probe.isEnabled(context))
+				bundles = probe.dataRequestBundles(context);
 
-				if (probe.isEnabled(context))
-					bundles = probe.dataRequestBundles(context);
-
-				probesMap.put(name, bundles);
-			}
-			catch (IllegalArgumentException e)
-			{
-				e.printStackTrace();
-			}
-			catch (IllegalAccessException e)
-			{
-				e.printStackTrace();
-			}
-			catch (InstantiationException e)
-			{
-				e.printStackTrace();
-			}
+			probesMap.put(name, bundles);
 		}
 
 		return probesMap;
@@ -76,53 +90,36 @@ public class ProbeManager
 		if (ProbeManager._cachedProbes.containsKey(name))
 			return ProbeManager._cachedProbes.get(name);
 
-		for (Class<Probe> probeClass : Probe.availableProbeClasses())
+		for (Probe probe : ProbeManager.allProbes())
 		{
-			try
+			boolean found = false;
+
+			if (probe instanceof BasicFunfProbe)
 			{
-				boolean found = false;
+				BasicFunfProbe funf = (BasicFunfProbe) probe;
 
-				Probe probe = (Probe) probeClass.newInstance();
-
-				if (probe instanceof BasicFunfProbe)
-				{
-					BasicFunfProbe funf = (BasicFunfProbe) probe;
-
-					if (funf.funfName().equalsIgnoreCase(name))
-						found = true;
-				}
-				else if (probe instanceof PeriodFunfProbe)
-				{
-					PeriodFunfProbe funf = (PeriodFunfProbe) probe;
-
-					if (funf.funfName().equalsIgnoreCase(name))
-						found = true;
-				}
-				else if (probe instanceof ContactProbe)
-				{
-					ContactProbe contact = (ContactProbe) probe;
-
-					if (contact.funfName().equalsIgnoreCase(name))
-						found = true;
-				}
-
-				if (found)
-				{
-					ProbeManager._cachedProbes.put(name, probe);
-					return probe;
-				}
+				if (funf.funfName().equalsIgnoreCase(name))
+					found = true;
 			}
-			catch (IllegalArgumentException e)
+			else if (probe instanceof PeriodFunfProbe)
 			{
-				e.printStackTrace();
+				PeriodFunfProbe funf = (PeriodFunfProbe) probe;
+
+				if (funf.funfName().equalsIgnoreCase(name))
+					found = true;
 			}
-			catch (IllegalAccessException e)
+			else if (probe instanceof ContactProbe)
 			{
-				e.printStackTrace();
+				ContactProbe contact = (ContactProbe) probe;
+
+				if (contact.funfName().equalsIgnoreCase(name))
+					found = true;
 			}
-			catch (InstantiationException e)
+
+			if (found)
 			{
-				e.printStackTrace();
+				ProbeManager._cachedProbes.put(name, probe);
+				return probe;
 			}
 		}
 
@@ -140,28 +137,11 @@ public class ProbeManager
 
 		PreferenceCategory probesCategory = (PreferenceCategory) screen.findPreference("key_available_probes");
 
-		for (Class<Probe> probeClass : Probe.availableProbeClasses())
+		for (Probe probe : ProbeManager.allProbes())
 		{
-			try
-			{
-				Probe probe = (Probe) probeClass.newInstance();
+			PreferenceScreen probeScreen = probe.preferenceScreen(activity);
 
-				PreferenceScreen probeScreen = probe.preferenceScreen(activity);
-
-				probesCategory.addPreference(probeScreen);
-			}
-			catch (IllegalArgumentException e)
-			{
-				e.printStackTrace();
-			}
-			catch (IllegalAccessException e)
-			{
-				e.printStackTrace();
-			}
-			catch (InstantiationException e)
-			{
-				e.printStackTrace();
-			}
+			probesCategory.addPreference(probeScreen);
 		}
 
 		return screen;

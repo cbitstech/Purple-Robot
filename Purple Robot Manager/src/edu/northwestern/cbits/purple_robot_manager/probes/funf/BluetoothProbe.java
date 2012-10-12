@@ -4,9 +4,7 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Parcelable;
 import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.StartActivity;
 
 public class BluetoothProbe extends PeriodFunfProbe
 {
@@ -42,6 +40,7 @@ public class BluetoothProbe extends PeriodFunfProbe
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
+		@SuppressWarnings("unchecked")
 		ArrayList<Object> devices = (ArrayList<Object>) bundle.get("DEVICES");
 
 		return String.format(context.getResources().getString(R.string.summary_bluetooth_probe), devices.size());
