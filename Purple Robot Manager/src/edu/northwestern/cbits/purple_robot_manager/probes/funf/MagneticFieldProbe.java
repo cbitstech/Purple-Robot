@@ -3,7 +3,6 @@ package edu.northwestern.cbits.purple_robot_manager.probes.funf;
 import android.content.Context;
 import android.os.Bundle;
 import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.StartActivity;
 
 public class MagneticFieldProbe extends BasicFunfProbe
 {

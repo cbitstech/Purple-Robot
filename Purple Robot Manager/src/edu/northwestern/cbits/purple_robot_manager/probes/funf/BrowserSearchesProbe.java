@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import android.content.Context;
 import android.os.Bundle;
 import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.StartActivity;
 
 public class BrowserSearchesProbe extends PeriodFunfProbe
 {
@@ -36,6 +35,7 @@ public class BrowserSearchesProbe extends PeriodFunfProbe
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
+		@SuppressWarnings("unchecked")
 		ArrayList<Object> searches = (ArrayList<Object>) bundle.get("SEARCHES");
 
 		return String.format(context.getResources().getString(R.string.summary_searches_probe), searches.size());

@@ -35,6 +35,7 @@ public class AudioFilesProbe extends PeriodFunfProbe
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
+		@SuppressWarnings("unchecked")
 		ArrayList<Object> files = (ArrayList<Object>) bundle.get("AUDIO_FILES");
 
 		return String.format(context.getResources().getString(R.string.summary_files_probe), files.size());

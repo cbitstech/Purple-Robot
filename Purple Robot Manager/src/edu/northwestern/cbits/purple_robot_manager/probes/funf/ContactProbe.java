@@ -66,6 +66,7 @@ public class ContactProbe extends Probe
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
+		@SuppressWarnings("unchecked")
 		ArrayList<Object> contacts = (ArrayList<Object>) bundle.get("CONTACT_DATA");
 
 		return String.format(context.getResources().getString(R.string.summary_contact_probe), contacts.size());

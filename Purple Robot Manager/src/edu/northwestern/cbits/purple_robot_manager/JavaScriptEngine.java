@@ -229,15 +229,16 @@ public class JavaScriptEngine
 
 		String packageName = JavaScriptEngine.packageMap.get(applicationName.toLowerCase());
 
-		if (packageName != null)
-		{
-			PackageManager pkgManager = this._context.getPackageManager();
+		if (packageName == null)
+			packageName = applicationName; // Allows us to launch by package name as well.
 
-			Intent launchIntent = pkgManager.getLaunchIntentForPackage(packageName);
+		PackageManager pkgManager = this._context.getPackageManager();
 
-			if (launchIntent == null) // No matching package found on system...
-				packageName = null;
-		}
+		Intent launchIntent = pkgManager.getLaunchIntentForPackage(packageName);
+
+		if (launchIntent == null) // No matching package found on system...
+
+			packageName = null;
 
 		return packageName;
 	}
@@ -276,7 +277,6 @@ public class JavaScriptEngine
 			if (displayWhen < now)
 				displayWhen = now;
 
-			@SuppressWarnings("deprecation")
 			Notification note = new Notification(R.drawable.ic_launcher, message, displayWhen);
 
 			Intent intent = this.constructDirectLaunchIntent(applicationName, launchParams);

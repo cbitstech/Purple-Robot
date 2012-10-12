@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import android.content.Context;
 import android.os.Bundle;
 import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.StartActivity;
 
 public class InstalledApplicationsProbe extends PeriodFunfProbe
 {
@@ -36,6 +35,7 @@ public class InstalledApplicationsProbe extends PeriodFunfProbe
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
+		@SuppressWarnings("unchecked")
 		ArrayList<Object> apps = (ArrayList<Object>) bundle.get("INSTALLED_APPLICATIONS");
 
 		return String.format(context.getResources().getString(R.string.summary_installed_apps_probe), apps.size());

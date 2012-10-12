@@ -1,5 +1,5 @@
 <resources>
-    <string name="sensor_upload_url">http://23.23.186.35:3000/api/submit</string>
+    <string name="sensor_upload_url">http://165.124.23.217:8093/funfImporter</string>
     <string name="app_name">Purple Robot</string>
 
     <string name="startup_loading_message">Starting up&#8230;</string>
@@ -23,6 +23,10 @@
     <string name="config_password_label">Configuration Password</string>
     <string name="config_password_title">Configuration Password</string>
     <string name="config_password_message">Please enter the password required to configure this launcher.</string>
+
+    <string name="config_user_id_label">User Identifier</string>
+    <string name="config_user_id_title">User Identifier</string>
+    <string name="config_user_id_message">Unique identifier used to associate your data with your online profile.</string>
 
     <string name="error_json_set_uri">Unable to automatically set configuration from the web. Please verify that the configuration file is valid and reachable from the public Internet.</string>
     <string name="error_json_set_uri_password">Unable to automatically set configuration from the web while the password is set.</string>

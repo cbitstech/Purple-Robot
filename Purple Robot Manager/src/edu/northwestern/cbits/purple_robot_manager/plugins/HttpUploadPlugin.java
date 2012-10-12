@@ -31,10 +31,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
+import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
+
 import android.content.Intent;
 import android.content.res.Resources.NotFoundException;
 import android.net.http.AndroidHttpClient;
 import android.os.Bundle;
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
@@ -54,7 +58,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 	private long maxUploadSize()
 	{
-		return 131072; // 128KB
+		return 131072 / 4; // 128KB
 	}
 
 	private long uploadPeriod()
@@ -97,11 +101,13 @@ public class HttpUploadPlugin extends OutputPlugin
 
 		final HttpUploadPlugin me = this;
 
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getContext());
+
 		final Runnable r = new Runnable()
 		{
 			public void run()
 			{
-				boolean continueUpload = true;
+				boolean continueUpload = false;
 
 				long now = System.currentTimeMillis();
 
@@ -206,16 +212,19 @@ public class HttpUploadPlugin extends OutputPlugin
 						{
 							JSONObject jsonMessage = new JSONObject();
 
-							jsonMessage.put("operation", "submit_probes");
+							jsonMessage.put("Operation", "SubmitProbes");
 
 							JSONObject payload = new JSONObject();
-							payload.put("name", "Submit Probe Values");
-							payload.put("value", uploadArray);
+							payload.put("Name", "Submit Probe Values");
+							payload.put("Value", uploadArray);
 
-							jsonMessage.put("payload", payload.toString());
+							payload.put("CBITSUserId", prefs.getString("config_user_id", ""));
+							payload.put("CBITSUserHash", prefs.getString("config_user_hash", ""));
+
+							jsonMessage.put("Payload", payload.toString());
 
 							MessageDigest md = MessageDigest.getInstance("MD5");
-							byte[] digest = md.digest(("submit_probes" + jsonMessage.get("payload").toString()).getBytes("UTF-8"));
+							byte[] digest = md.digest(("SubmitProbes" + jsonMessage.get("Payload").toString()).getBytes("UTF-8"));
 
 							String checksum = (new BigInteger(1, digest)).toString(16);
 
@@ -224,7 +233,7 @@ public class HttpUploadPlugin extends OutputPlugin
 								checksum = "0" + checksum;
 							}
 
-							jsonMessage.put("checksum", checksum);
+							jsonMessage.put("Checksum", checksum);
 
 							AndroidHttpClient httpClient = AndroidHttpClient.newInstance("Purple Robot", me.getContext());
 
@@ -243,14 +252,25 @@ public class HttpUploadPlugin extends OutputPlugin
 					            HttpEntity httpEntity = response.getEntity();
 					            String body = EntityUtils.toString(httpEntity);
 
+					            Log.e("PRM", "BODY: " + body);
 					            JSONObject json = new JSONObject(body);
 
-					            String status = json.getString("status");
-					            String message = json.getString("message");
-					            String operation = json.getString("operation");
-					            String responsePayload = json.getString("payload");
+					            String status = json.getString("Status");
 
-					            if (message.equals("error") == false)
+					            String message = "";
+					            String responsePayload = "";
+					            String operation = "";
+
+					            if (json.has("Message"))
+					            	message = json.getString("Message");
+
+					            if (json.has("Operation"))
+					            	operation = json.getString("Operation");
+
+					            if (json.has("Payload"))
+					            	responsePayload = json.getString("Payload");
+
+					            if (status.equals("error") == false)
 					            {
 									byte[] responseDigest = md.digest((status + message + operation + responsePayload).getBytes("UTF-8"));
 									String responseChecksum = (new BigInteger(1, responseDigest)).toString(16);
@@ -267,30 +287,30 @@ public class HttpUploadPlugin extends OutputPlugin
 //									Log.e("PRM", "GOT SUCCESSFUL UPLOAD RESPONSE: " + responseJson);
 
 							    	pendingObjects.removeAll(toUpload);
+
+									continueUpload = true;
 					            }
 							}
 							catch (NotFoundException e)
 							{
 								e.printStackTrace();
-								continueUpload = false;
 							}
 							catch (URISyntaxException e)
 							{
 								e.printStackTrace();
-								continueUpload = false;
 							}
 							catch (ClientProtocolException e)
 							{
 								e.printStackTrace();
-								continueUpload = false;
 							}
 							catch (IOException e)
 							{
 								e.printStackTrace();
-								continueUpload = false;
 							}
-
-				            httpClient.close();
+							finally
+							{
+					            httpClient.close();
+							}
 
 							JSONArray toSave = new JSONArray();
 
@@ -312,8 +332,6 @@ public class HttpUploadPlugin extends OutputPlugin
 								out.flush();
 								out.close();
 							}
-							else
-								continueUpload = false;
 						}
 						catch (JSONException e)
 						{
@@ -337,8 +355,6 @@ public class HttpUploadPlugin extends OutputPlugin
 						}
 					}
 				}
-				else
-					continueUpload = false;
 
 				if (continueUpload)
 				{

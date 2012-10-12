@@ -4,9 +4,7 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Parcelable;
 import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.StartActivity;
 
 public class SmsProbe extends PeriodFunfProbe
 {
@@ -37,6 +35,7 @@ public class SmsProbe extends PeriodFunfProbe
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
+		@SuppressWarnings("unchecked")
 		ArrayList<Object> messages = (ArrayList<Object>) bundle.get("MESSAGES");
 
 		return String.format(context.getResources().getString(R.string.summary_sms_probe), messages.size());

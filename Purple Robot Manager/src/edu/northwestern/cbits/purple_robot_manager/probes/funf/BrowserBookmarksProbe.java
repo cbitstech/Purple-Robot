@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import android.content.Context;
 import android.os.Bundle;
 import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.StartActivity;
 
 public class BrowserBookmarksProbe extends PeriodFunfProbe
 {
@@ -36,6 +35,7 @@ public class BrowserBookmarksProbe extends PeriodFunfProbe
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
+		@SuppressWarnings("unchecked")
 		ArrayList<Object> bookmarks = (ArrayList<Object>) bundle.get("BOOKMARKS");
 
 		return String.format(context.getResources().getString(R.string.summary_bookmarks_probe), bookmarks.size());
