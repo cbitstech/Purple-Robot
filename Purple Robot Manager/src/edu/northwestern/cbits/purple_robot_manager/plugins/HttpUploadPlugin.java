@@ -35,6 +35,7 @@ import android.content.Intent;
 import android.content.res.Resources.NotFoundException;
 import android.net.http.AndroidHttpClient;
 import android.os.Bundle;
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
@@ -61,7 +62,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 	private long maxUploadSize()
 	{
-		return 131072 / 4; // 128KB
+		return 131072; // 128KB
 	}
 
 	private long uploadPeriod()
@@ -221,9 +222,12 @@ public class HttpUploadPlugin extends OutputPlugin
 							jsonMessage.put(USER_HASH_KEY, me.preferences.getString("config_user_hash", ""));
 
 							MessageDigest md = MessageDigest.getInstance("MD5");
+
 							byte[] digest = md.digest((jsonMessage.get(USER_HASH_KEY).toString() + jsonMessage.get(OPERATION_KEY).toString() + jsonMessage.get(PAYLOAD_KEY).toString()).getBytes("UTF-8"));
 
 							String checksum = (new BigInteger(1, digest)).toString(16);
+
+							Log.e("PRM", "SEND CHECKSUM " + checksum);
 
 							while(checksum.length() < 32 )
 							{
@@ -244,7 +248,10 @@ public class HttpUploadPlugin extends OutputPlugin
 								nameValuePairs.add(new BasicNameValuePair("json", jsonMessage.toString()));
 								httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
+								Log.e("PRM", "SENDING " + httpPost.getEntity().getContentLength() + " BYTES");
 								HttpResponse response = httpClient.execute(httpPost);
+
+								Log.e("PRM", "RECVED " + response.getEntity().getContentLength() + " BYTES");
 
 					            HttpEntity httpEntity = response.getEntity();
 					            String body = EntityUtils.toString(httpEntity);
@@ -254,6 +261,8 @@ public class HttpUploadPlugin extends OutputPlugin
 					            String status = json.getString(STATUS_KEY);
 
 					            String responsePayload = "";
+
+					            Log.e("PRM", "STATUS: " + status);
 
 					            if (json.has(PAYLOAD_KEY))
 					            	responsePayload = json.getString(PAYLOAD_KEY);
@@ -270,11 +279,19 @@ public class HttpUploadPlugin extends OutputPlugin
 
 									if (responseChecksum.equals(json.getString(CHECKSUM_KEY)))
 									{
+										Log.e("PRM", "CHECKSUM VALID");
+
 										pendingObjects.removeAll(toUpload);
 
 										continueUpload = true;
 									}
+									else
+									{
+										Log.e("PRM", "CHECKSUM INVALID");
+									}
 					            }
+					            else
+					            	Log.e("PRM", "MESSAGE: " + responsePayload);
 							}
 							catch (NotFoundException e)
 							{
@@ -295,7 +312,7 @@ public class HttpUploadPlugin extends OutputPlugin
 							finally
 							{
 					            httpClient.close();
-							}
+							} 
 
 							for (int k = 0; pendingObjects.size() > 0; k++)
 							{
