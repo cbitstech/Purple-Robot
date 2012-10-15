@@ -181,7 +181,7 @@ public class JSONConfigFile
 		}
 		catch (JSONException e)
 		{
-				e.printStackTrace();
+			e.printStackTrace();
 		}
 
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);

@@ -31,6 +31,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.WazaBe.HoloEverywhere.preference.SharedPreferences.Editor;
+
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -225,15 +229,63 @@ public class HttpUploadPlugin extends OutputPlugin
 
 							jsonMessage.put(OPERATION_KEY, "SubmitProbes");
 							jsonMessage.put(PAYLOAD_KEY, uploadArray.toString());
-							jsonMessage.put(USER_HASH_KEY, me.preferences.getString("config_user_hash", ""));
+
+							String userHash = me.preferences.getString("config_user_hash", null);
+
+							if (userHash == null)
+							{
+								String userId = "unknown-user";
+
+								Context context = me.getContext();
+
+								AccountManager manager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
+								Account[] list = manager.getAccountsByType("com.google");
+
+								if (list.length == 0)
+									list = manager.getAccounts();
+
+								if (list.length > 0)
+									userId = list[0].name;
+
+								try
+								{
+									MessageDigest md = MessageDigest.getInstance("MD5");
+									byte[] digest = md.digest(userId.getBytes("UTF-8"));
+
+									userHash = (new BigInteger(1, digest)).toString(16);
+
+									while(userHash.length() < 32 )
+									{
+										userHash = "0" + userHash;
+									}
+								}
+								catch (NoSuchAlgorithmException e)
+								{
+									e.printStackTrace();
+								}
+								catch (UnsupportedEncodingException e)
+								{
+									e.printStackTrace();
+								}
+
+								Editor e = me.preferences.edit();
+
+								if (userId != null)
+									e.putString("config_user_id", userId);
+
+								if (userHash != null)
+									e.putString("config_user_hash", userHash);
+
+								e.commit();
+							}
+
+							jsonMessage.put(USER_HASH_KEY, userHash);
 
 							MessageDigest md = MessageDigest.getInstance("MD5");
 
 							byte[] digest = md.digest((jsonMessage.get(USER_HASH_KEY).toString() + jsonMessage.get(OPERATION_KEY).toString() + jsonMessage.get(PAYLOAD_KEY).toString()).getBytes("UTF-8"));
 
 							String checksum = (new BigInteger(1, digest)).toString(16);
-
-							Log.e("PRM", "SEND CHECKSUM " + checksum);
 
 							while(checksum.length() < 32 )
 							{
@@ -267,10 +319,9 @@ public class HttpUploadPlugin extends OutputPlugin
 
 							    noteManager.notify(999, note);
 
-								Log.e("PRM", "SENDING " + httpPost.getEntity().getContentLength() + " BYTES");
+//								Log.e("PRM", "SENDING " + httpPost.getEntity().getContentLength() + " BYTES");
 								HttpResponse response = httpClient.execute(httpPost);
-
-								Log.e("PRM", "RECVED " + response.getEntity().getContentLength() + " BYTES");
+//								Log.e("PRM", "RECVED " + response.getEntity().getContentLength() + " BYTES");
 
 					            HttpEntity httpEntity = response.getEntity();
 					            String body = EntityUtils.toString(httpEntity);
@@ -280,8 +331,6 @@ public class HttpUploadPlugin extends OutputPlugin
 					            String status = json.getString(STATUS_KEY);
 
 					            String responsePayload = "";
-
-					            Log.e("PRM", "STATUS: " + status);
 
 					            if (json.has(PAYLOAD_KEY))
 					            	responsePayload = json.getString(PAYLOAD_KEY);
@@ -298,19 +347,15 @@ public class HttpUploadPlugin extends OutputPlugin
 
 									if (responseChecksum.equals(json.getString(CHECKSUM_KEY)))
 									{
-										Log.e("PRM", "CHECKSUM VALID");
-
 										pendingObjects.removeAll(toUpload);
 
 										continueUpload = true;
 									}
 									else
-									{
 										Log.e("PRM", "CHECKSUM INVALID");
-									}
 					            }
 					            else
-					            	Log.e("PRM", "MESSAGE: " + responsePayload);
+					            	Log.e("PRM", "ERROR MESSAGE: " + responsePayload);
 							}
 							catch (NotFoundException e)
 							{
