@@ -31,20 +31,23 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
-import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
-
 import android.content.Intent;
 import android.content.res.Resources.NotFoundException;
 import android.net.http.AndroidHttpClient;
 import android.os.Bundle;
-import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class HttpUploadPlugin extends OutputPlugin
 {
 	private final static String CACHE_DIR = "http_pending_uploads";
+
+	private final static String USER_HASH_KEY = "UserHash";
+	private final static String OPERATION_KEY = "Operation";
+	private final static String PAYLOAD_KEY = "Payload";
+	private final static String CHECKSUM_KEY = "Checksum";
+	private final static String STATUS_KEY = "Status";
+
 	private List<String> _pendingSaves = new ArrayList<String>();
 	private long _lastSave = 0;
 	private long _lastUpload = 0;
@@ -98,8 +101,6 @@ public class HttpUploadPlugin extends OutputPlugin
 			return;
 
 		final HttpUploadPlugin me = this;
-
-		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getContext());
 
 		final List<String> uploadCount = new ArrayList<String>();
 
@@ -215,12 +216,12 @@ public class HttpUploadPlugin extends OutputPlugin
 						{
 							JSONObject jsonMessage = new JSONObject();
 
-							jsonMessage.put("Operation", "SubmitProbes");
-							jsonMessage.put("Payload", uploadArray.toString());
-							jsonMessage.put("CBITSUserHash", prefs.getString("config_user_hash", ""));
+							jsonMessage.put(OPERATION_KEY, "SubmitProbes");
+							jsonMessage.put(PAYLOAD_KEY, uploadArray.toString());
+							jsonMessage.put(USER_HASH_KEY, me.preferences.getString("config_user_hash", ""));
 
 							MessageDigest md = MessageDigest.getInstance("MD5");
-							byte[] digest = md.digest((jsonMessage.get("CBITSUserHash").toString() + jsonMessage.get("Operation").toString() + jsonMessage.get("Payload").toString()).getBytes("UTF-8"));
+							byte[] digest = md.digest((jsonMessage.get(USER_HASH_KEY).toString() + jsonMessage.get(OPERATION_KEY).toString() + jsonMessage.get(PAYLOAD_KEY).toString()).getBytes("UTF-8"));
 
 							String checksum = (new BigInteger(1, digest)).toString(16);
 
@@ -229,7 +230,7 @@ public class HttpUploadPlugin extends OutputPlugin
 								checksum = "0" + checksum;
 							}
 
-							jsonMessage.put("Checksum", checksum);
+							jsonMessage.put(CHECKSUM_KEY, checksum);
 
 							AndroidHttpClient httpClient = AndroidHttpClient.newInstance("Purple Robot", me.getContext());
 
@@ -248,15 +249,14 @@ public class HttpUploadPlugin extends OutputPlugin
 					            HttpEntity httpEntity = response.getEntity();
 					            String body = EntityUtils.toString(httpEntity);
 
-					            Log.e("PRM", "TRANSLATING " + body);
 					            JSONObject json = new JSONObject(body);
 
-					            String status = json.getString("Status");
+					            String status = json.getString(STATUS_KEY);
 
 					            String responsePayload = "";
 
-					            if (json.has("Payload"))
-					            	responsePayload = json.getString("Payload");
+					            if (json.has(PAYLOAD_KEY))
+					            	responsePayload = json.getString(PAYLOAD_KEY);
 
 					            if (status.equals("error") == false)
 					            {
@@ -268,13 +268,12 @@ public class HttpUploadPlugin extends OutputPlugin
 										responseChecksum = "0" + responseChecksum;
 									}
 
-//									JSONObject responseJson = new JSONObject(responsePayload);
+									if (responseChecksum.equals(json.getString(CHECKSUM_KEY)))
+									{
+										pendingObjects.removeAll(toUpload);
 
-									Log.e("PRM", "CHECKSUM " + json.getString("Checksum") + " =? " + responseChecksum);
-
-							    	pendingObjects.removeAll(toUpload);
-
-									continueUpload = true;
+										continueUpload = true;
+									}
 					            }
 							}
 							catch (NotFoundException e)

@@ -38,6 +38,8 @@ public class JSONConfigFile
 	public static final String JSON_CONFIGURATION_URL = "config_json_url";
 	public static final String JSON_LAST_UPDATE = "json_configuration_last_update";
 
+	private SharedPreferences prefs = null;
+
 	private JSONObject parameters = null;
 	private List<Trigger> _triggerList = null;
 
@@ -150,7 +152,7 @@ public class JSONConfigFile
 
 	private JSONConfigFile(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
 		try
 		{
@@ -237,7 +239,7 @@ public class JSONConfigFile
 
 	public static void update(Context context)
 	{
-		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
 		long lastUpdate = prefs.getLong(JSONConfigFile.JSON_LAST_UPDATE, 0);
 
