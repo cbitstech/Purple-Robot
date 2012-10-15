@@ -31,12 +31,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources.NotFoundException;
 import android.net.http.AndroidHttpClient;
 import android.os.Bundle;
 import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.StartActivity;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class HttpUploadPlugin extends OutputPlugin
@@ -107,6 +112,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 		final Runnable r = new Runnable()
 		{
+			@SuppressWarnings("deprecation")
 			public void run()
 			{
 				boolean continueUpload = false;
@@ -236,7 +242,18 @@ public class HttpUploadPlugin extends OutputPlugin
 
 							jsonMessage.put(CHECKSUM_KEY, checksum);
 
+							NotificationManager noteManager = (NotificationManager) me.getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+
 							AndroidHttpClient httpClient = AndroidHttpClient.newInstance("Purple Robot", me.getContext());
+
+							String title = me.getContext().getString(R.string.notify_upload_data);
+
+						    Notification note = new Notification(R.drawable.ic_notify_sync, title, System.currentTimeMillis());
+						    PendingIntent contentIntent = PendingIntent.getActivity(me.getContext(), 0, new Intent(me.getContext(), StartActivity.class), Notification.FLAG_ONGOING_EVENT);
+
+						    note.setLatestEventInfo(me.getContext(), title, title, contentIntent);
+
+						    note.flags = Notification.FLAG_ONGOING_EVENT;
 
 							try
 							{
@@ -247,6 +264,8 @@ public class HttpUploadPlugin extends OutputPlugin
 								List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 								nameValuePairs.add(new BasicNameValuePair("json", jsonMessage.toString()));
 								httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+							    noteManager.notify(999, note);
 
 								Log.e("PRM", "SENDING " + httpPost.getEntity().getContentLength() + " BYTES");
 								HttpResponse response = httpClient.execute(httpPost);
@@ -307,12 +326,14 @@ public class HttpUploadPlugin extends OutputPlugin
 							}
 							catch (IOException e)
 							{
-								e.printStackTrace();
+
 							}
 							finally
 							{
 					            httpClient.close();
-							} 
+
+					            noteManager.cancel(999);
+							}
 
 							for (int k = 0; pendingObjects.size() > 0; k++)
 							{

@@ -213,4 +213,5 @@
 
     <string name="toast_refresh_probes">Refreshing probes&#8230;</string>
     <string name="title_probes_count" formatted="false">%d Sensors</string>
+    <string name="notify_upload_data">Uploading data to server&#8230;</string>
 </resources>
