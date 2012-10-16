@@ -58,20 +58,53 @@ public class HttpUploadPlugin extends OutputPlugin
 	private final static String CHECKSUM_KEY = "Checksum";
 	private final static String STATUS_KEY = "Status";
 
+	private final static long MAX_UPLOAD_PERIOD = 3600000;
+	private final static long MIN_UPLOAD_PERIOD = 300000;
+
+	private final static long MAX_UPLOAD_SIZE = 524288; // 512KB
+	private final static long MIN_UPLOAD_SIZE = 16384; // 16KB
+
 	private List<String> _pendingSaves = new ArrayList<String>();
 	private long _lastSave = 0;
 	private long _lastUpload = 0;
 
+	private long _uploadSize = MIN_UPLOAD_SIZE;
+	private long _uploadPeriod = MIN_UPLOAD_SIZE;
+
 	private Thread _uploadThread = null;
+
+	private void logSuccess(boolean success)
+	{
+		if (success)
+		{
+			this._uploadSize *=2;
+			this._uploadPeriod /=2;
+		}
+		else
+		{
+			this._uploadSize /=2;
+			this._uploadPeriod *=2;
+		}
+
+		if (this._uploadSize > MAX_UPLOAD_SIZE)
+			this._uploadSize = MAX_UPLOAD_SIZE;
+		else if (this._uploadSize < MIN_UPLOAD_SIZE)
+			this._uploadSize = MIN_UPLOAD_SIZE;
+
+		if (this._uploadPeriod > MAX_UPLOAD_PERIOD)
+			this._uploadPeriod = MAX_UPLOAD_PERIOD;
+		else if (this._uploadPeriod < MIN_UPLOAD_PERIOD)
+			this._uploadPeriod = MIN_UPLOAD_PERIOD;
+	}
 
 	private long savePeriod()
 	{
-		return 30000;
+		return this._uploadPeriod;
 	}
 
 	private long maxUploadSize()
 	{
-		return 131072; // 128KB
+		return this._uploadSize; // 128KB
 	}
 
 	private long uploadPeriod()
@@ -120,6 +153,7 @@ public class HttpUploadPlugin extends OutputPlugin
 			public void run()
 			{
 				boolean continueUpload = false;
+				boolean wasSuccessful = false;
 
 				long now = System.currentTimeMillis();
 
@@ -319,9 +353,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 							    noteManager.notify(999, note);
 
-//								Log.e("PRM", "SENDING " + httpPost.getEntity().getContentLength() + " BYTES");
 								HttpResponse response = httpClient.execute(httpPost);
-//								Log.e("PRM", "RECVED " + response.getEntity().getContentLength() + " BYTES");
 
 					            HttpEntity httpEntity = response.getEntity();
 					            String body = EntityUtils.toString(httpEntity);
@@ -350,6 +382,8 @@ public class HttpUploadPlugin extends OutputPlugin
 										pendingObjects.removeAll(toUpload);
 
 										continueUpload = true;
+
+										wasSuccessful = true;
 									}
 									else
 										Log.e("PRM", "CHECKSUM INVALID");
@@ -438,6 +472,8 @@ public class HttpUploadPlugin extends OutputPlugin
 				}
 
 				me._uploadThread = null;
+
+				me.logSuccess(wasSuccessful);
 			}
 		};
 
@@ -464,9 +500,10 @@ public class HttpUploadPlugin extends OutputPlugin
 	{
 		long now = System.currentTimeMillis();
 
-		this._pendingSaves.add(jsonObject.toString());
+		if (jsonObject != null)
+			this._pendingSaves.add(jsonObject.toString());
 
-		if (now - this._lastSave > this.savePeriod()) // Save files every 15 seconds..
+		if (now - this._lastSave > this.savePeriod() || this._pendingSaves.size() > 128) // Save files every 15 seconds or 128 samples...
 		{
 			this._lastSave = now;
 
@@ -487,7 +524,8 @@ public class HttpUploadPlugin extends OutputPlugin
 				{
 					JSONObject json = new JSONObject(jsonString);
 
-					saveArray.put(json);
+					if (saveArray.length() < 256)
+						saveArray.put(json);
 
 					toRemove.add(jsonString);
 				}
@@ -525,6 +563,21 @@ public class HttpUploadPlugin extends OutputPlugin
 			catch (IOException e)
 			{
 				e.printStackTrace();
+			}
+
+			if (this._pendingSaves.size() > 0)
+			{
+				try
+				{
+					Thread.sleep(1);
+				}
+				catch (InterruptedException e)
+				{
+
+				}
+
+				this._lastSave = 0;
+				this.persistJSONObject(null);
 			}
 		}
 	}
