@@ -531,8 +531,10 @@ public class HttpUploadPlugin extends OutputPlugin
 				}
 				catch (JSONException e)
 				{
-					e.printStackTrace();
-
+					invalidRemove.add(jsonString);
+				}
+				catch (OutOfMemoryError e)
+				{
 					invalidRemove.add(jsonString);
 				}
 			}
