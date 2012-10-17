@@ -1,8 +1,5 @@
 package edu.northwestern.cbits.purple_robot_manager.plugins;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
@@ -13,32 +10,31 @@ public class AppDisplayPlugin extends OutputPlugin
 {
 	public String[] respondsTo()
 	{
-		String[] activeActions = { Probe.PROBE_READING };
+		String[] activeActions = { Probe.PROBE_READING, OutputPlugin.LOG_EVENT, AppDisplayPlugin.DISPLAY_MESSAGE };
 
 		return activeActions;
 	}
 
 	public void processIntent(Intent intent)
 	{
-		JSONObject object = new JSONObject();
+		Bundle extras = intent.getExtras();
 
-		try
+		if (AppDisplayPlugin.DISPLAY_MESSAGE.equals(intent.getAction()))
 		{
-			object.put("intent_action", intent.getAction());
+			Intent displayIntent = new Intent(StartActivity.UPDATE_MESSAGE);
+			displayIntent.putExtra(StartActivity.DISPLAY_MESSAGE, extras.getString("MESSAGE"));
 
-			Bundle extras = intent.getExtras();
-
+			LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this.getContext());
+			manager.sendBroadcast(displayIntent);
+		}
+		else
+		{
 			Intent displayIntent = new Intent(StartActivity.UPDATE_DISPLAY);
 			displayIntent.putExtra(StartActivity.DISPLAY_PROBE_NAME, extras.getString("PROBE"));
 			displayIntent.putExtra(StartActivity.DISPLAY_PROBE_VALUE, extras);
 
 			LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this.getContext());
-
 			manager.sendBroadcast(displayIntent);
-		}
-		catch (JSONException e)
-		{
-			e.printStackTrace();
 		}
 	}
 }

@@ -11,8 +11,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -22,16 +23,14 @@ import java.util.List;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.WazaBe.HoloEverywhere.preference.SharedPreferences.Editor;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -40,10 +39,12 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources.NotFoundException;
 import android.net.http.AndroidHttpClient;
 import android.os.Bundle;
 import android.util.Log;
+
+import com.WazaBe.HoloEverywhere.preference.SharedPreferences.Editor;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.StartActivity;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -95,9 +96,16 @@ public class HttpUploadPlugin extends OutputPlugin
 			this._uploadPeriod = MAX_UPLOAD_PERIOD;
 		else if (this._uploadPeriod < MIN_UPLOAD_PERIOD)
 			this._uploadPeriod = MIN_UPLOAD_PERIOD;
+
+		Log.e("PRM", "NEW UPLOAD VALUES (" + success + "): " + this._uploadSize + " bytes, " + this._uploadPeriod + " ms...");
 	}
 
 	private long savePeriod()
+	{
+		return 30000;
+	}
+
+	private long uploadPeriod()
 	{
 		return this._uploadPeriod;
 	}
@@ -107,15 +115,9 @@ public class HttpUploadPlugin extends OutputPlugin
 		return this._uploadSize; // 128KB
 	}
 
-	private long uploadPeriod()
-	{
-		// TODO: Dynamic uploading period here...
-		return 60000;
-	}
-
 	public String[] respondsTo()
 	{
-		String[] activeActions = { Probe.PROBE_READING };
+		String[] activeActions = { Probe.PROBE_READING, OutputPlugin.FORCE_UPLOAD };
 
 		return activeActions;
 	}
@@ -123,18 +125,27 @@ public class HttpUploadPlugin extends OutputPlugin
 	@Override
 	public void processIntent(Intent intent)
 	{
-		try
+		if (OutputPlugin.FORCE_UPLOAD.equals(intent.getAction()))
 		{
-			Bundle extras = intent.getExtras();
+			this._lastUpload = 0;
 
-			JSONObject jsonObject = OutputPlugin.jsonForBundle(extras);
-
-			this.persistJSONObject(jsonObject);
 			this.uploadPendingObjects();
 		}
-		catch (JSONException e)
+		else
 		{
-			e.printStackTrace();
+			try
+			{
+				Bundle extras = intent.getExtras();
+
+				JSONObject jsonObject = OutputPlugin.jsonForBundle(extras);
+
+				this.persistJSONObject(jsonObject);
+				this.uploadPendingObjects();
+			}
+			catch (JSONException e)
+			{
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -143,23 +154,27 @@ public class HttpUploadPlugin extends OutputPlugin
 		if (this._uploadThread != null)
 			return;
 
+		final long now = System.currentTimeMillis();
+
 		final HttpUploadPlugin me = this;
 
-		final List<String> uploadCount = new ArrayList<String>();
-
-		final Runnable r = new Runnable()
+		if (now - me._lastUpload > me.uploadPeriod())
 		{
-			@SuppressWarnings("deprecation")
-			public void run()
+			final List<String> uploadCount = new ArrayList<String>();
+
+			final Runnable r = new Runnable()
 			{
-				boolean continueUpload = false;
-				boolean wasSuccessful = false;
-
-				long now = System.currentTimeMillis();
-
-				if (now - me._lastUpload > me.uploadPeriod())
+				@SuppressWarnings("deprecation")
+				public void run()
 				{
+					boolean continueUpload = false;
+					boolean wasSuccessful = false;
+
+					Log.e("PRM", "UPLOADING.");
+
 					me._lastUpload = now;
+
+					me.broadcastMessage("LOADING DATA...");
 
 					File pendingFolder = me.getPendingFolder();
 
@@ -184,24 +199,24 @@ public class HttpUploadPlugin extends OutputPlugin
 							{
 								BufferedReader reader = new BufferedReader(new FileReader(f));
 
-							    StringBuffer sb = new StringBuffer();
-							    String line = null;
+								StringBuffer sb = new StringBuffer();
+								String line = null;
 
-							    while((line = reader.readLine()) != null)
-							    {
-							    	sb.append(line);
-							    }
+								while((line = reader.readLine()) != null)
+								{
+									sb.append(line);
+								}
 
-							    reader.close();
+								reader.close();
 
-							    JSONArray jsonArray = new JSONArray(sb.toString());
+								JSONArray jsonArray = new JSONArray(sb.toString());
 
-							    for (int i = 0; i < jsonArray.length(); i++)
-							    {
-							    	JSONObject jsonObject = jsonArray.getJSONObject(i);
+								for (int i = 0; i < jsonArray.length(); i++)
+								{
+									JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-							    	pendingObjects.add(jsonObject);
-							    }
+									pendingObjects.add(jsonObject);
+								}
 							}
 							catch (FileNotFoundException e)
 							{
@@ -219,6 +234,8 @@ public class HttpUploadPlugin extends OutputPlugin
 							f.delete();
 						}
 					}
+
+					me.broadcastMessage("PACKAGING DATA...");
 
 					if (pendingObjects.size() > 0)
 					{
@@ -334,12 +351,12 @@ public class HttpUploadPlugin extends OutputPlugin
 
 							String title = me.getContext().getString(R.string.notify_upload_data);
 
-						    Notification note = new Notification(R.drawable.ic_notify_sync, title, System.currentTimeMillis());
-						    PendingIntent contentIntent = PendingIntent.getActivity(me.getContext(), 0, new Intent(me.getContext(), StartActivity.class), Notification.FLAG_ONGOING_EVENT);
+							Notification note = new Notification(R.drawable.ic_notify_sync, title, System.currentTimeMillis());
+							PendingIntent contentIntent = PendingIntent.getActivity(me.getContext(), 0, new Intent(me.getContext(), StartActivity.class), Notification.FLAG_ONGOING_EVENT);
 
-						    note.setLatestEventInfo(me.getContext(), title, title, contentIntent);
+							note.setLatestEventInfo(me.getContext(), title, title, contentIntent);
 
-						    note.flags = Notification.FLAG_ONGOING_EVENT;
+							note.flags = Notification.FLAG_ONGOING_EVENT;
 
 							try
 							{
@@ -351,24 +368,26 @@ public class HttpUploadPlugin extends OutputPlugin
 								nameValuePairs.add(new BasicNameValuePair("json", jsonMessage.toString()));
 								httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
-							    noteManager.notify(999, note);
+								me.broadcastMessage(httpPost.getEntity().getContentLength() + " UPLOADING...");
+
+								noteManager.notify(999, note);
 
 								HttpResponse response = httpClient.execute(httpPost);
 
-					            HttpEntity httpEntity = response.getEntity();
-					            String body = EntityUtils.toString(httpEntity);
+								HttpEntity httpEntity = response.getEntity();
+								String body = EntityUtils.toString(httpEntity);
 
-					            JSONObject json = new JSONObject(body);
+								JSONObject json = new JSONObject(body);
 
-					            String status = json.getString(STATUS_KEY);
+								String status = json.getString(STATUS_KEY);
 
-					            String responsePayload = "";
+								String responsePayload = "";
 
-					            if (json.has(PAYLOAD_KEY))
-					            	responsePayload = json.getString(PAYLOAD_KEY);
+								if (json.has(PAYLOAD_KEY))
+									responsePayload = json.getString(PAYLOAD_KEY);
 
-					            if (status.equals("error") == false)
-					            {
+								if (status.equals("error") == false)
+								{
 									byte[] responseDigest = md.digest((status + responsePayload).getBytes("UTF-8"));
 									String responseChecksum = (new BigInteger(1, responseDigest)).toString(16);
 
@@ -384,34 +403,54 @@ public class HttpUploadPlugin extends OutputPlugin
 										continueUpload = true;
 
 										wasSuccessful = true;
+
+										Log.e("PRM", "UPLOAD OK");
+
+										me.broadcastMessage("UPLOAD OK");
+
 									}
 									else
-										Log.e("PRM", "CHECKSUM INVALID");
-					            }
-					            else
-					            	Log.e("PRM", "ERROR MESSAGE: " + responsePayload);
-							}
-							catch (NotFoundException e)
-							{
-								e.printStackTrace();
-							}
-							catch (URISyntaxException e)
-							{
-								e.printStackTrace();
-							}
-							catch (ClientProtocolException e)
-							{
-								e.printStackTrace();
-							}
-							catch (IOException e)
-							{
+									{
+										Log.e("PRM", "INVALID CHECKSUM MESSAGE");
 
+										me.broadcastMessage("INVALID CHECKSUM MESSAGE");
+									}
+								}
+								else
+								{
+									Log.e("PRM", "SERVER ERROR: " + responsePayload);
+
+									me.broadcastMessage("SERVER ERROR: " + responsePayload);
+								}
+							}
+							catch (HttpHostConnectException e)
+							{
+								e.printStackTrace();
+								me.broadcastMessage("UNABLE TO CONNECT TO UPLOAD SERVER.");
+							}
+							catch (SocketTimeoutException e)
+							{
+								e.printStackTrace();
+								me.broadcastMessage("SOCKET TIMED OUT.");
+							}
+							catch (SocketException e)
+							{
+								e.printStackTrace();
+								me.broadcastMessage("SOCKET EXCEPTION: " + e.getMessage());
+							}
+							catch (Exception e)
+							{
+								e.printStackTrace();
+
+								Log.e("PRM", "BROADCASTING " + e);
+
+								me.broadcastMessage(e.toString());
 							}
 							finally
 							{
-					            httpClient.close();
+								httpClient.close();
 
-					            noteManager.cancel(999);
+								noteManager.cancel(999);
 							}
 
 							for (int k = 0; pendingObjects.size() > 0; k++)
@@ -461,24 +500,28 @@ public class HttpUploadPlugin extends OutputPlugin
 							e.printStackTrace();
 						}
 					}
+
+					Log.e("PRM", "UPLOAD SUCCESSFUL? " + wasSuccessful);
+
+					me.logSuccess(wasSuccessful);
+
+					Log.e("PRM", "CONTINUE UPLOAD: " + continueUpload + " (" + uploadCount.size() + ")");
+
+					if (continueUpload && uploadCount.size() < 16)
+					{
+						uploadCount.add("");
+
+						me._lastUpload = 0;
+						this.run();
+					}
+
+					me._uploadThread = null;
 				}
+			};
 
-				if (continueUpload && uploadCount.size() < 16)
-				{
-					uploadCount.add("");
-
-					me._lastUpload = 0;
-					this.run();
-				}
-
-				me._uploadThread = null;
-
-				me.logSuccess(wasSuccessful);
-			}
-		};
-
-		this._uploadThread = new Thread(r);
-		this._uploadThread.start();
+			this._uploadThread = new Thread(r);
+			this._uploadThread.start();
+		}
 	}
 
 	private File getPendingFolder()

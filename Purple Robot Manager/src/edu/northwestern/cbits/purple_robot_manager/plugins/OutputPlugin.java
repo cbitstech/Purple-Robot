@@ -8,14 +8,15 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
-import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+
+import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
+import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
+
 import edu.mit.media.funf.Utils;
 import edu.northwestern.cbits.purple_robot_manager.JsonUtils;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -23,7 +24,10 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 public abstract class OutputPlugin
 {
 	public static final String PAYLOAD = "edu.northwestern.cbits.purple_robot.OUTPUT_EVENT_PLUGIN";
-	public static String OUTPUT_EVENT = "edu.northwestern.cbits.purple_robot.OUTPUT_EVENT";
+	public static final String OUTPUT_EVENT = "edu.northwestern.cbits.purple_robot.OUTPUT_EVENT";
+	public static final String LOG_EVENT = "edu.northwestern.cbits.purple_robot.LOG_EVENT";
+	public static final String FORCE_UPLOAD = "edu.northwestern.cbits.purple_robot.FORCE_UPLOAD";
+	public static final String DISPLAY_MESSAGE = "edu.northwestern.cbits.purple_robot.DISPLAY_MESSAGE";
 
 	public abstract String[] respondsTo();
 	public abstract void processIntent(Intent intent);
@@ -42,6 +46,15 @@ public abstract class OutputPlugin
 	public Context getContext()
 	{
 		return this._context;
+	}
+
+	protected void broadcastMessage(String message)
+	{
+		Intent displayIntent = new Intent(OutputPlugin.DISPLAY_MESSAGE);
+		displayIntent.putExtra("MESSAGE", message);
+
+		LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this.getContext());
+		manager.sendBroadcast(displayIntent);
 	}
 
 	public boolean shouldRespond(String intentAction)

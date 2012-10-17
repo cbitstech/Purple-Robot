@@ -64,6 +64,7 @@
     <string name="probe_duration_summary">Maximum amount of time probe can run</string>
 
     <string name="menu_settings_label">Settings</string>
+    <string name="menu_upload_label">Upload data</string>
 
     <string name="dialog_password_prompt">Settings Password</string>
     <string name="dialog_password_submit">Login</string>

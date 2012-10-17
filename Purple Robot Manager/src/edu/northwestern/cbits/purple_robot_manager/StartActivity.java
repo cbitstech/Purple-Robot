@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Editable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,16 +30,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.WazaBe.HoloEverywhere.app.AlertDialog;
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
+import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 
 public class StartActivity extends SherlockActivity
 {
+	public static final String UPDATE_MESSAGE = "UPDATE_LIST_MESSAGE";
+	public static final String DISPLAY_MESSAGE = "DISPLAY_MESSAGE";
 	public static String UPDATE_DISPLAY = "UPDATE_LIST_DISPLAY";
 	public static String DISPLAY_PROBE_NAME = "DISPLAY_PROBE_NAME";
 	public static String DISPLAY_PROBE_VALUE = "DISPLAY_PROBE_VALUE";
@@ -71,6 +76,8 @@ public class StartActivity extends SherlockActivity
 
         final StartActivity me = this;
 
+        ListView listView = (ListView) this.findViewById(R.id.list_probes);
+
         this._receiver = new BroadcastReceiver()
     	{
     		public void onReceive(Context context, final Intent intent)
@@ -93,12 +100,26 @@ public class StartActivity extends SherlockActivity
 
 		    				me.refreshList();
 		    			}
+		    			else if (StartActivity.UPDATE_MESSAGE.equals(intent.getAction()))
+		    			{
+		    				final String message = intent.getStringExtra(StartActivity.DISPLAY_MESSAGE);
+
+		    				me.runOnUiThread(new Runnable()
+		    				{
+								public void run()
+								{
+									ActionBar bar = me.getSupportActionBar();
+
+									bar.setSubtitle(message);
+								}
+		    				});
+
+		    				Log.e("PRM", "UPDATE MESSAGE: " + intent.getStringExtra(StartActivity.DISPLAY_MESSAGE));
+		    			}
     				}
     			});
     		}
     	};
-
-        ListView listView = (ListView) this.findViewById(R.id.list_probes);
 
         final SimpleDateFormat sdf = new SimpleDateFormat("MMM d, H:mm:ss");
 
@@ -156,6 +177,7 @@ public class StartActivity extends SherlockActivity
     	IntentFilter filter = new IntentFilter();
 
     	filter.addAction(StartActivity.UPDATE_DISPLAY);
+    	filter.addAction(StartActivity.UPDATE_MESSAGE);
 
     	broadcastManager.registerReceiver(this._receiver, filter);
     }
@@ -176,6 +198,8 @@ public class StartActivity extends SherlockActivity
 
 	        	baseAdapter.notifyDataSetChanged();
 	        }
+
+	        listView.invalidateViews();
 
 	        this.getSupportActionBar().setTitle(String.format(this.getResources().getString(R.string.title_probes_count), StartActivity._probeNames.size()));
 
@@ -245,13 +269,13 @@ public class StartActivity extends SherlockActivity
     {
         switch (item.getItemId())
     	{
-/*    		case R.id.menu_refresh_item:
-	        	Intent reloadIntent = new Intent(ManagerService.REFRESH_CONFIGURATION);
-	        	this.startService(reloadIntent);
+    		case R.id.menu_upload_item:
+    			LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(this);
+    			Intent intent = new Intent(OutputPlugin.FORCE_UPLOAD);
 
-	        	Toast.makeText(this, R.string.toast_refresh_probes, Toast.LENGTH_LONG).show();
+    			localManager.sendBroadcast(intent);
 
-    			break; */
+    			break;
     		case R.id.menu_play_toggle_item:
     			boolean doPause = (this._isPaused == false);
 
