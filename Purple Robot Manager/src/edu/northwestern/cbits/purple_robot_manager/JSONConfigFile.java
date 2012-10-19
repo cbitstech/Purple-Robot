@@ -18,7 +18,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.WazaBe.HoloEverywhere.app.Toast;
+import com.WazaBe.HoloEverywhere.widget.Toast;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
