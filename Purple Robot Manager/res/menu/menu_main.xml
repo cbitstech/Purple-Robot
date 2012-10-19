@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-    <item android:id="@+id/menu_play_toggle_item"
+<!--    <item android:id="@+id/menu_play_toggle_item"
         android:title="@string/menu_pause_toggle_label"
         android:showAsAction="always"
         android:icon="@drawable/action_pause" />
+-->
     <item android:id="@+id/menu_settings_item"
         android:title="@string/menu_settings_label"
         android:showAsAction="always"

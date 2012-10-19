@@ -3,6 +3,7 @@ package edu.northwestern.cbits.purple_robot_manager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.UUID;
 
 import android.app.PendingIntent;
 import android.content.Intent;
@@ -160,6 +161,9 @@ public class FunfService extends CustomizedIntentService
 
 	public void onDataReceived(Bundle data)
 	{
+		UUID uuid = UUID.randomUUID();
+		data.putString("GUID", uuid.toString());
+
 		LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(this);
 		Intent intent = new Intent(edu.northwestern.cbits.purple_robot_manager.probes.Probe.PROBE_READING);
 		intent.putExtras(data);

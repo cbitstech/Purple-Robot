@@ -1,5 +1,5 @@
 <resources>
-    <string name="sensor_upload_url">http://165.124.23.217:8093/funfImporter</string>
+    <string name="sensor_upload_url">http://prm-test.audacious-software.com/api/submit</string>
     <string name="app_name">Purple Robot</string>
 
     <string name="startup_loading_message">Starting up&#8230;</string>
@@ -215,4 +215,15 @@
     <string name="toast_refresh_probes">Refreshing probes&#8230;</string>
     <string name="title_probes_count" formatted="false">%d Sensors</string>
     <string name="notify_upload_data">Uploading data to server&#8230;</string>
+
+    <string name="message_package_upload">Preparing upload&#8230;</string>
+    <string name="message_upload_successful">Upload successful.</string>
+    <string name="message_checksum_failed">Checksum error.</string>
+    <string name="message_http_connection_error">HTTP connection failure.</string>
+    <string name="message_socket_timeout_error">Socket timeout.</string>
+
+    <string name="message_transmit_bytes" formatted="false">Uploading %d bytes&#8230;</string>
+    <string name="message_server_error" formatted="false">Application error: %s</string>
+    <string name="message_socket_error" formatted="false">Socket error: %s</string>
+    <string name="message_general_error" formatted="false">General error: %s</string>
 </resources>

@@ -110,7 +110,9 @@ public class StartActivity extends SherlockActivity
 								{
 									ActionBar bar = me.getSupportActionBar();
 
-									bar.setSubtitle(message);
+									SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+
+									bar.setSubtitle(sdf.format(new Date())+ ": " + message);
 								}
 		    				});
 
@@ -276,7 +278,7 @@ public class StartActivity extends SherlockActivity
     			localManager.sendBroadcast(intent);
 
     			break;
-    		case R.id.menu_play_toggle_item:
+/*    		case R.id.menu_play_toggle_item:
     			boolean doPause = (this._isPaused == false);
 
     			if (doPause)
@@ -292,7 +294,7 @@ public class StartActivity extends SherlockActivity
 
     			this._isPaused = doPause;
 
-    			break;
+    			break; */
     		case R.id.menu_settings_item:
     	        final String savedPassword = PreferenceManager.getDefaultSharedPreferences(this).getString("config_password", null);
 
