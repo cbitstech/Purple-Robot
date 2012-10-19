@@ -78,9 +78,6 @@
     <string name="title_wifi_probe">WiFi Probe</string>
     <string name="summary_wifi_probe_desc">Records available wireless (WiFi) access points.</string>
 
-    <string name="title_bluetooth_probe">Bluetooth Probe</string>
-    <string name="summary_bluetooth_probe_desc">Detects Bluetooth devices within range.</string>
-
     <string name="title_cell_probe">Cell Tower Probe</string>
     <string name="summary_cell_probe_desc">Records identifiers for the current cell tower that the device is connected to.</string>
 
@@ -139,9 +136,6 @@
 
     <string name="title_browser_bookmarks_probe">Browser Bookmarks Probe</string>
     <string name="summary_browser_bookmarks_probe_desc">Records the bookmarks stored in the browser.</string>
-
-    <string name="title_android_info_probe">Android Information Probe</string>
-    <string name="summary_android_info_probe_desc">Information about the version of Android the device is running.</string>
 
     <string name="title_android_info_probe">Android Information Probe</string>
     <string name="summary_android_info_probe_desc">Information about the version of Android the device is running.</string>
@@ -222,8 +216,10 @@
     <string name="message_http_connection_error">HTTP connection failure.</string>
     <string name="message_socket_timeout_error">Socket timeout.</string>
 
-    <string name="message_transmit_bytes" formatted="false">Uploading %d bytes&#8230;</string>
+    <string name="message_transmit_bytes" formatted="false">Sending %d bytes&#8230;</string>
     <string name="message_server_error" formatted="false">Application error: %s</string>
     <string name="message_socket_error" formatted="false">Socket error: %s</string>
+    <string name="message_unreachable_error">Upload unavailable.</string>
+    <string name="message_response_error">Server response error.</string>
     <string name="message_general_error" formatted="false">General error: %s</string>
 </resources>

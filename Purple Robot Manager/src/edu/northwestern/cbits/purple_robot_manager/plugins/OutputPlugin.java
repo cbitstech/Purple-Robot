@@ -8,12 +8,13 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
+import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 
 import edu.mit.media.funf.Utils;

@@ -5,16 +5,16 @@ import java.util.List;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
-import android.preference.PreferenceScreen;
+
+import com.WazaBe.HoloEverywhere.preference.PreferenceActivity;
+import com.WazaBe.HoloEverywhere.preference.PreferenceScreen;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
 
 public abstract class Probe
 {
 	public static final String PROBE_READING = "edu.northwestern.cbits.purple_robot.PROBE_READING";
 
-//	public static final String START_DATE = "START";
-//	public static final String END_DATE = "END";
 	public static final String DURATION = "DURATION";
 	public static final String PERIOD = "PERIOD";
 
@@ -22,7 +22,7 @@ public abstract class Probe
 	public abstract String title(Context context);
 	public abstract String probeCategory(Context context);
 	public abstract Bundle[] dataRequestBundles(Context context);
-	public abstract PreferenceScreen preferenceScreen(PreferenceActivity activity);
+	public abstract PreferenceScreen preferenceScreen(PreferenceActivity settingsActivity);
 
 	@SuppressWarnings("rawtypes")
 	private static List<Class> _probeClasses = new ArrayList<Class>();

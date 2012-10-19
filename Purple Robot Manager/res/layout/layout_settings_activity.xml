@@ -1,56 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" xmlns:holo="http://schemas.android.com/apk/res-auto">
+    <PreferenceScreen holo:title="TEST SCREEN">
+       	<CheckBoxPreference
+       	    holo:title="@string/title_preference_probes_enable_probes"
+            holo:key="config_enable_probes"
+            holo:defaultValue="true"/>
+    </PreferenceScreen>
     <PreferenceCategory
-        android:key="config_settings_probe_category"
-        android:title="@string/config_notifications_category_label" />
+        holo:key="config_settings_probe_category"
+        holo:title="@string/config_notifications_category_label" />
     <PreferenceCategory
-        android:title="@string/config_notifications_category">
+        holo:title="@string/config_notifications_category">
         <RingtonePreference
-            android:title="@string/config_notification_sound_label"
-            android:summary="@string/config_notification_sound_summary"
-            android:ringtoneType="notification"
-            android:showSilent="false"
-            android:key="config_default_notification_sound" />
+            holo:title="@string/config_notification_sound_label"
+            holo:summary="@string/config_notification_sound_summary"
+            holo:ringtoneType="notification"
+            holo:showSilent="false"
+            holo:key="config_default_notification_sound" />
         <ListPreference
-            android:key="config_json_haptic_pattern"
-            android:entries="@array/vibrator_pattern_labels"
-            android:entryValues="@array/vibrator_pattern_values"
-            android:title="@string/config_vibrator_pattern_label"
-            android:summary="@string/config_vibrator_pattern_message"
-            android:defaultValue="60" />
+            holo:key="config_json_haptic_pattern"
+            holo:entries="@array/vibrator_pattern_labels"
+            holo:entryValues="@array/vibrator_pattern_values"
+            holo:title="@string/config_vibrator_pattern_label"
+            holo:summary="@string/config_vibrator_pattern_message"
+            holo:defaultValue="60" />
         	</PreferenceCategory>
     <PreferenceCategory
-        android:title="@string/config_settings_category">
+        holo:title="@string/config_settings_category">
         <EditTextPreference
-            android:key="config_user_id"
-            android:title="@string/config_user_id_label"
-            android:dialogTitle="@string/config_user_id_title"
-            android:dialogMessage="@string/config_user_id_message"
-            android:singleLine="true"
-            android:defaultValue="" />
+            holo:key="config_user_id"
+            holo:title="@string/config_user_id_label"
+            holo:dialogTitle="@string/config_user_id_title"
+            holo:dialogMessage="@string/config_user_id_message"
+            holo:defaultValue="" />
         <EditTextPreference
-            android:key="config_password"
-            android:title="@string/config_password_label"
-            android:dialogTitle="@string/config_password_title"
-            android:dialogMessage="@string/config_password_message"
-			android:inputType="textPassword"
-            android:singleLine="true"
-            android:defaultValue="" />
+            holo:key="config_password"
+            holo:title="@string/config_password_label"
+            holo:dialogTitle="@string/config_password_title"
+            holo:dialogMessage="@string/config_password_message"
+            holo:defaultValue="" />
         <EditTextPreference
-            android:key="config_json_url"
-            android:title="@string/config_json_url_label"
-            android:dialogMessage="@string/config_json_url_message"
-            android:singleLine="true"
-            android:defaultValue="" />
+            holo:key="config_json_url"
+            holo:title="@string/config_json_url_label"
+            holo:dialogMessage="@string/config_json_url_message"
+            holo:defaultValue="" />
         <ListPreference
-            android:key="config_json_refresh_interval"
-            android:entries="@array/json_refresh_interval_labels"
-            android:entryValues="@array/json_refresh_interval_values"
-            android:title="@string/config_json_refresh_interval_label"
-            android:summary="@string/config_json_refresh_interval_message"
-            android:defaultValue="60" />
-   		<Preference android:title="@string/config_refresh_json_label"
-            android:key="config_json_refresh_manually"
-            android:defaultValue="0" />
+            holo:key="config_json_refresh_interval"
+            holo:entries="@array/json_refresh_interval_labels"
+            holo:entryValues="@array/json_refresh_interval_values"
+            holo:title="@string/config_json_refresh_interval_label"
+            holo:summary="@string/config_json_refresh_interval_message"
+            holo:defaultValue="60" />
+   		<Preference holo:title="@string/config_refresh_json_label"
+            holo:key="config_json_refresh_manually"
+            holo:defaultValue="0" />
 	    </PreferenceCategory>
 </PreferenceScreen>

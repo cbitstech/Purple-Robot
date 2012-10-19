@@ -8,11 +8,14 @@ import java.util.Map;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
-import android.preference.PreferenceCategory;
-import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
+
+import com.WazaBe.HoloEverywhere.preference.PreferenceActivity;
+import com.WazaBe.HoloEverywhere.preference.PreferenceCategory;
+import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
+import com.WazaBe.HoloEverywhere.preference.PreferenceScreen;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.probes.funf.BasicFunfProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.funf.ContactProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.funf.PeriodFunfProbe;
@@ -69,13 +72,13 @@ public class ProbeManager
 		return probesMap;
 	}
 
-	public static PreferenceScreen inflatePreferenceScreenFromResource(PreferenceActivity activity, int resId, PreferenceManager manager)
+	public static PreferenceScreen inflatePreferenceScreenFromResource(PreferenceActivity settingsActivity, int resId, PreferenceManager manager)
     {
     	try
     	{
             Class<PreferenceManager> cls = PreferenceManager.class;
             Method method = cls.getDeclaredMethod("inflateFromResource", Context.class, int.class, PreferenceScreen.class);
-            return (PreferenceScreen) method.invoke(manager, activity, resId, null);
+            return (PreferenceScreen) method.invoke(manager, settingsActivity, resId, null);
         }
     	catch(Exception e)
     	{
@@ -126,20 +129,21 @@ public class ProbeManager
 		return null;
 	}
 
-	public static PreferenceScreen buildPreferenceScreen(PreferenceActivity activity)
+	public static PreferenceScreen buildPreferenceScreen(PreferenceActivity settingsActivity)
 	{
 		@SuppressWarnings("deprecation")
-		PreferenceManager manager = activity.getPreferenceManager();
+		PreferenceManager manager = settingsActivity.getPreferenceManager();
 
-		PreferenceScreen screen = ProbeManager.inflatePreferenceScreenFromResource(activity, R.layout.layout_settings_probes_screen, manager);
+		PreferenceScreen screen = ProbeManager.inflatePreferenceScreenFromResource(settingsActivity, R.layout.layout_settings_probes_screen, manager);
 		screen.setOrder(0);
 		screen.setTitle(R.string.title_preference_probes_screen);
+		screen.setKey(SettingsActivity.PROBES_SCREEN_KEY);
 
 		PreferenceCategory probesCategory = (PreferenceCategory) screen.findPreference("key_available_probes");
 
 		for (Probe probe : ProbeManager.allProbes())
 		{
-			PreferenceScreen probeScreen = probe.preferenceScreen(activity);
+			PreferenceScreen probeScreen = probe.preferenceScreen(settingsActivity);
 
 			probesCategory.addPreference(probeScreen);
 		}
