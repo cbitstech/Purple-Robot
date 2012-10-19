@@ -1,15 +1,16 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.funf;
 
+import com.WazaBe.HoloEverywhere.preference.Preference;
+import com.WazaBe.HoloEverywhere.preference.PreferenceActivity;
+import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
+import com.WazaBe.HoloEverywhere.preference.PreferenceScreen;
+import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.PreferenceActivity;
-import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
 
 public abstract class BasicFunfProbe extends Probe
 {
@@ -27,9 +28,9 @@ public abstract class BasicFunfProbe extends Probe
 		return context.getResources().getString(this.funfTitle());
 	}
 
+	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{
-		@SuppressWarnings("deprecation")
 		PreferenceManager manager = activity.getPreferenceManager();
 
 		PreferenceScreen screen = ProbeManager.inflatePreferenceScreenFromResource(activity, R.layout.layout_settings_probe_funf, manager);

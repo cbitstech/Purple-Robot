@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    android:title="@string/title_screen_probe"
-    android:summary="@string/summary_screen_probe_desc">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" xmlns:holo="http://schemas.android.com/apk/res-auto"
+    holo:title="@string/title_screen_probe"
+    holo:summary="@string/summary_screen_probe_desc">
    	<CheckBoxPreference
-		android:title="@string/title_enable_probe"
-		android:key="config_probe_screen_enabled"
-		android:defaultValue="true"/>
+		holo:title="@string/title_enable_probe"
+		holo:key="config_probe_screen_enabled"
+		holo:defaultValue="true"/>
 </PreferenceScreen>

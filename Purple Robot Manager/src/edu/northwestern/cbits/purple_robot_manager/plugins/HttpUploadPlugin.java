@@ -14,6 +14,7 @@ import java.math.BigInteger;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
+import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -32,6 +33,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.WazaBe.HoloEverywhere.preference.SharedPreferences.Editor;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Notification;
@@ -39,12 +42,10 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
 import android.net.http.AndroidHttpClient;
 import android.os.Bundle;
-
-// import com.WazaBe.HoloEverywhere.preference.SharedPreferences.Editor;
+import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.StartActivity;
@@ -61,7 +62,7 @@ public class HttpUploadPlugin extends OutputPlugin
 	private final static String STATUS_KEY = "Status";
 
 	private final static long MAX_UPLOAD_PERIOD = 3600000;
-	private final static long MIN_UPLOAD_PERIOD = 300000;
+	private final static long MIN_UPLOAD_PERIOD = 60000;
 
 	private final static long MAX_UPLOAD_SIZE = 524288; // 512KB
 	private final static long MIN_UPLOAD_SIZE = 16384; // 16KB
@@ -97,6 +98,8 @@ public class HttpUploadPlugin extends OutputPlugin
 			this._uploadPeriod = MAX_UPLOAD_PERIOD;
 		else if (this._uploadPeriod < MIN_UPLOAD_PERIOD)
 			this._uploadPeriod = MIN_UPLOAD_PERIOD;
+
+		Log.e("PRM", "UPLOAD PARAMS: " + this._uploadSize + " ==> " + this._uploadPeriod);
 	}
 
 	private long savePeriod()
@@ -236,7 +239,7 @@ public class HttpUploadPlugin extends OutputPlugin
 						me.broadcastMessage(R.string.message_package_upload);
 
 						long maxUploadSize = me.maxUploadSize();
-						long tally = 2;
+						long tally = 0;
 
 						List<JSONObject> toUpload = new ArrayList<JSONObject>();
 
@@ -250,9 +253,13 @@ public class HttpUploadPlugin extends OutputPlugin
 
 								int jsonSize = jsonString.toString().getBytes("UTF-8").length;
 
-								if (jsonSize + tally < maxUploadSize)
+								if (jsonSize > maxUploadSize)
 								{
-									tally += jsonSize + 2;
+									// Skip until connection is better...
+								}
+								else if (jsonSize + tally < maxUploadSize)
+								{
+									tally += jsonSize;
 
 									toUpload.add(json);
 								}
@@ -262,6 +269,8 @@ public class HttpUploadPlugin extends OutputPlugin
 								e.printStackTrace();
 							}
 						}
+
+						Log.e("PRM", "UPLOADING " + toUpload.size() + " ITEMS...");
 
 						JSONArray uploadArray = new JSONArray();
 
@@ -354,6 +363,8 @@ public class HttpUploadPlugin extends OutputPlugin
 
 							note.flags = Notification.FLAG_ONGOING_EVENT;
 
+							String body = null;
+
 							try
 							{
 								URI siteUri = new URI(me.getContext().getResources().getString(R.string.sensor_upload_url));
@@ -372,7 +383,7 @@ public class HttpUploadPlugin extends OutputPlugin
 								HttpResponse response = httpClient.execute(httpPost);
 
 								HttpEntity httpEntity = response.getEntity();
-								String body = EntityUtils.toString(httpEntity);
+								body = EntityUtils.toString(httpEntity);
 
 								JSONObject json = new JSONObject(body);
 
@@ -426,12 +437,22 @@ public class HttpUploadPlugin extends OutputPlugin
 								String errorMessage = String.format(resources.getString(R.string.message_socket_error), e.getMessage());
 								me.broadcastMessage(errorMessage);
 							}
+							catch (UnknownHostException e)
+							{
+								me.broadcastMessage(R.string.message_unreachable_error);
+							}
+							catch (JSONException e)
+							{
+								me.broadcastMessage(R.string.message_response_error);
+							}
 							catch (Exception e)
 							{
 								e.printStackTrace();
 
 								String errorMessage = String.format(resources.getString(R.string.message_general_error), e.toString());
 								me.broadcastMessage(errorMessage);
+
+								Log.e("PRM", "GENERAL ERROR BODY: " + body);
 							}
 							finally
 							{
@@ -465,6 +486,8 @@ public class HttpUploadPlugin extends OutputPlugin
 
 								pendingObjects.removeAll(toRemove);
 							}
+
+							me.logSuccess(wasSuccessful);
 						}
 						catch (JSONException e)
 						{
@@ -487,8 +510,6 @@ public class HttpUploadPlugin extends OutputPlugin
 							e.printStackTrace();
 						}
 					}
-
-					me.logSuccess(wasSuccessful);
 
 					if (continueUpload && uploadCount.size() < 16)
 					{

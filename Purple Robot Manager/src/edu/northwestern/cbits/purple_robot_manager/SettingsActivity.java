@@ -1,28 +1,31 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
-import com.actionbarsherlock.app.SherlockPreferenceActivity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+
+import com.WazaBe.HoloEverywhere.preference.ListPreference;
+import com.WazaBe.HoloEverywhere.preference.Preference;
+import com.WazaBe.HoloEverywhere.preference.Preference.OnPreferenceChangeListener;
+import com.WazaBe.HoloEverywhere.preference.Preference.OnPreferenceClickListener;
+import com.WazaBe.HoloEverywhere.preference.PreferenceActivity;
+import com.WazaBe.HoloEverywhere.preference.PreferenceCategory;
+import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
+import com.WazaBe.HoloEverywhere.preference.PreferenceScreen;
+import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
+import com.WazaBe.HoloEverywhere.preference.SharedPreferences.Editor;
 
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.os.Bundle;
-import android.preference.ListPreference;
-import android.preference.Preference;
-import android.preference.Preference.OnPreferenceChangeListener;
-import android.preference.Preference.OnPreferenceClickListener;
-import android.preference.PreferenceCategory;
-import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
 
-public class SettingsActivity extends SherlockPreferenceActivity implements OnPreferenceClickListener
+public class SettingsActivity extends PreferenceActivity implements OnPreferenceClickListener
 {
-	private static String MANUAL_REFRESH_KEY = "config_json_refresh_manually";
-	private static String HAPTIC_PATTERN_KEY = "config_json_haptic_pattern";
-	public static String RINGTONE_KEY = "config_default_notification_sound";
+	public static final String PROBES_SCREEN_KEY = "config_probes_screen";
+	private static final String MANUAL_REFRESH_KEY = "config_json_refresh_manually";
+	private static final String HAPTIC_PATTERN_KEY = "config_json_haptic_pattern";
+	public static final String RINGTONE_KEY = "config_default_notification_sound";
 
-    @SuppressWarnings("deprecation")
-	protected void onCreate(Bundle savedInstanceState)
+	@SuppressWarnings("deprecation")
+	public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
 
@@ -72,6 +75,12 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnPr
 
 			return true;
         }
+        else if (PROBES_SCREEN_KEY.equals(preference.getKey()))
+        {
+        	Log.e("PRM", "START PROBES KEY");
+
+			return true;
+        }
         else if (MANUAL_REFRESH_KEY.equals(preference.getKey()))
         {
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -89,4 +98,6 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnPr
 
         return false;
 	}
+
+
 }
