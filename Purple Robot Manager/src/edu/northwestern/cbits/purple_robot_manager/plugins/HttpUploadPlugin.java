@@ -1,7 +1,10 @@
 package edu.northwestern.cbits.purple_robot_manager.plugins;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
@@ -373,17 +376,46 @@ public class HttpUploadPlugin extends OutputPlugin
 
 								List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 								nameValuePairs.add(new BasicNameValuePair("json", jsonMessage.toString()));
-								httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+								HttpEntity entity = new UrlEncodedFormEntity(nameValuePairs);
+
+//								entity = AndroidHttpClient.getCompressedEntity(EntityUtils.toByteArray(entity), me.getContext().getContentResolver());
+//								httpPost.setHeader("Content-Encoding", "gzip");
+
+								httpPost.setEntity(entity);
 
 								String uploadMessage = String.format(resources.getString(R.string.message_transmit_bytes), httpPost.getEntity().getContentLength());
 								me.broadcastMessage(uploadMessage);
 
 								noteManager.notify(999, note);
 
+								AndroidHttpClient.modifyRequestToAcceptGzipResponse(httpPost);
+
 								HttpResponse response = httpClient.execute(httpPost);
 
 								HttpEntity httpEntity = response.getEntity();
-								body = EntityUtils.toString(httpEntity);
+
+								String contentHeader = response.getFirstHeader("Content-Encoding").getValue();
+
+								if (contentHeader != null && contentHeader.endsWith("gzip"))
+								{
+									BufferedInputStream in = new BufferedInputStream(AndroidHttpClient.getUngzippedContent(httpEntity));
+
+									ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+									int read = 0;
+									byte[] buffer = new byte[1024];
+
+									while((read = in.read(buffer, 0, buffer.length)) != -1)
+									{
+										out.write(buffer, 0, read);
+									}
+
+									in.close();
+
+									body = out.toString("utf-8");
+								}
+								else
+									body = EntityUtils.toString(httpEntity);
 
 								JSONObject json = new JSONObject(body);
 
@@ -449,6 +481,7 @@ public class HttpUploadPlugin extends OutputPlugin
 							{
 								e.printStackTrace();
 
+								e.printStackTrace();
 								String errorMessage = String.format(resources.getString(R.string.message_general_error), e.toString());
 								me.broadcastMessage(errorMessage);
 
