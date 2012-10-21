@@ -14,6 +14,7 @@ import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
 import com.WazaBe.HoloEverywhere.preference.PreferenceScreen;
 import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
 import com.WazaBe.HoloEverywhere.preference.SharedPreferences.Editor;
+import com.actionbarsherlock.view.MenuInflater;
 
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 
@@ -97,6 +98,12 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
         }
 
         return false;
+	}
+
+	@Override
+	public MenuInflater getSupportMenuInflater() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 
