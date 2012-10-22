@@ -8,17 +8,16 @@ import com.WazaBe.HoloEverywhere.preference.ListPreference;
 import com.WazaBe.HoloEverywhere.preference.Preference;
 import com.WazaBe.HoloEverywhere.preference.Preference.OnPreferenceChangeListener;
 import com.WazaBe.HoloEverywhere.preference.Preference.OnPreferenceClickListener;
-import com.WazaBe.HoloEverywhere.preference.PreferenceActivity;
 import com.WazaBe.HoloEverywhere.preference.PreferenceCategory;
 import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
 import com.WazaBe.HoloEverywhere.preference.PreferenceScreen;
 import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
 import com.WazaBe.HoloEverywhere.preference.SharedPreferences.Editor;
-import com.actionbarsherlock.view.MenuInflater;
+import com.WazaBe.HoloEverywhere.sherlock.SPreferenceActivity;
 
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 
-public class SettingsActivity extends PreferenceActivity implements OnPreferenceClickListener
+public class SettingsActivity extends SPreferenceActivity implements OnPreferenceClickListener
 {
 	public static final String PROBES_SCREEN_KEY = "config_probes_screen";
 	private static final String MANUAL_REFRESH_KEY = "config_json_refresh_manually";
@@ -99,12 +98,4 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 
         return false;
 	}
-
-	@Override
-	public MenuInflater getSupportMenuInflater() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
 }

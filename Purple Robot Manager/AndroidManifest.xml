@@ -92,8 +92,8 @@
 
         <service android:name="edu.mit.media.funf.probe.builtin.AudioFeaturesProbe"></service>
         <service android:name="edu.mit.media.funf.probe.builtin.AccelerometerFeaturesProbe"></service>
-		<activity android:name=".StartActivity" android:label="@string/app_name" android:theme="@style/Holo.Theme.Sherlock">
-            <intent-filter>
+		<activity android:name=".StartActivity" android:label="@string/app_name" android:theme="@style/Holo.Theme.Sherlock" android:launchMode="singleTask">
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
 	        </intent-filter>

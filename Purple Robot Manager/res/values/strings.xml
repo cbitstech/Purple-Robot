@@ -222,4 +222,7 @@
     <string name="message_unreachable_error">Upload unavailable.</string>
     <string name="message_response_error">Server response error.</string>
     <string name="message_general_error" formatted="false">General error: %s</string>
+
+  	<string name="notify_running">Purple Robot is collecting data&#8230;</string>
+
 </resources>

@@ -14,6 +14,7 @@ import org.mozilla.javascript.ScriptableObject;
 import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
 import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
 import com.WazaBe.HoloEverywhere.preference.SharedPreferences.Editor;
+import com.WazaBe.HoloEverywhere.widget.Toast;
 
 import android.app.Activity;
 import android.app.Notification;
@@ -28,7 +29,6 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
 public class JavaScriptEngine
 {
