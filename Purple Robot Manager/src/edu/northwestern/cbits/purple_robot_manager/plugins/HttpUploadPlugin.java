@@ -3,7 +3,6 @@ package edu.northwestern.cbits.purple_robot_manager.plugins;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
@@ -36,8 +35,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.WazaBe.HoloEverywhere.preference.SharedPreferences.Editor;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Notification;
@@ -49,6 +46,8 @@ import android.content.res.Resources;
 import android.net.http.AndroidHttpClient;
 import android.os.Bundle;
 import android.util.Log;
+
+import com.WazaBe.HoloEverywhere.preference.SharedPreferences.Editor;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.StartActivity;
@@ -65,9 +64,9 @@ public class HttpUploadPlugin extends OutputPlugin
 	private final static String STATUS_KEY = "Status";
 
 	private final static long MAX_UPLOAD_PERIOD = 3600000;
-	private final static long MIN_UPLOAD_PERIOD = 60000;
+	private final static long MIN_UPLOAD_PERIOD = 300000;
 
-	private final static long MAX_UPLOAD_SIZE = 524288; // 512KB
+	private final static long MAX_UPLOAD_SIZE = 1048576; // 1MB
 	private final static long MIN_UPLOAD_SIZE = 16384; // 16KB
 
 	private List<String> _pendingSaves = new ArrayList<String>();
@@ -359,7 +358,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 							String title = me.getContext().getString(R.string.notify_upload_data);
 
-							Notification note = new Notification(R.drawable.ic_notify_sync, title, System.currentTimeMillis());
+							Notification note = new Notification(R.drawable.ic_notify_foreground, title, System.currentTimeMillis());
 							PendingIntent contentIntent = PendingIntent.getActivity(me.getContext(), 0, new Intent(me.getContext(), StartActivity.class), Notification.FLAG_ONGOING_EVENT);
 
 							note.setLatestEventInfo(me.getContext(), title, title, contentIntent);
