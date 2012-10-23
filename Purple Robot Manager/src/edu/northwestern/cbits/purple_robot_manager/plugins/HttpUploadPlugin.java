@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -17,11 +18,18 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.UnknownHostException;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+
+import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
+import javax.crypto.CipherOutputStream;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -100,8 +108,6 @@ public class HttpUploadPlugin extends OutputPlugin
 			this._uploadPeriod = MAX_UPLOAD_PERIOD;
 		else if (this._uploadPeriod < MIN_UPLOAD_PERIOD)
 			this._uploadPeriod = MIN_UPLOAD_PERIOD;
-
-		Log.e("PRM", "UPLOAD PARAMS: " + this._uploadSize + " ==> " + this._uploadPeriod);
 	}
 
 	private long savePeriod()
@@ -153,6 +159,60 @@ public class HttpUploadPlugin extends OutputPlugin
 		}
 	}
 
+	private String getUserHash()
+	{
+		String userHash = this.preferences.getString("config_user_hash", null);
+
+		if (userHash == null)
+		{
+			String userId = "unknown-user";
+
+			Context context = this.getContext();
+
+			AccountManager manager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
+			Account[] list = manager.getAccountsByType("com.google");
+
+			if (list.length == 0)
+				list = manager.getAccounts();
+
+			if (list.length > 0)
+				userId = list[0].name;
+
+			try
+			{
+				MessageDigest md = MessageDigest.getInstance("MD5");
+				byte[] digest = md.digest(userId.getBytes("UTF-8"));
+
+				userHash = (new BigInteger(1, digest)).toString(16);
+
+				while(userHash.length() < 32 )
+				{
+					userHash = "0" + userHash;
+				}
+			}
+			catch (NoSuchAlgorithmException e)
+			{
+				e.printStackTrace();
+			}
+			catch (UnsupportedEncodingException e)
+			{
+				e.printStackTrace();
+			}
+
+			Editor e = this.preferences.edit();
+
+			if (userId != null)
+				e.putString("config_user_id", userId);
+
+			if (userHash != null)
+				e.putString("config_user_hash", userHash);
+
+			e.commit();
+		}
+
+		return userHash;
+	}
+
 	private void uploadPendingObjects()
 	{
 		if (this._uploadThread != null)
@@ -174,6 +234,38 @@ public class HttpUploadPlugin extends OutputPlugin
 				{
 					boolean continueUpload = false;
 					boolean wasSuccessful = false;
+
+					Cipher encrypt = null;
+					Cipher decrypt = null;
+
+					try
+					{
+						String keyString = "PRM" + (new StringBuffer(me.getUserHash())).reverse().toString();
+						SecretKeySpec secretKey;
+						secretKey = new SecretKeySpec(keyString.getBytes("utf-8"),"AES");
+
+				        encrypt = Cipher.getInstance("AES/CBC/PKCS5Padding");
+				        encrypt.init(Cipher.ENCRYPT_MODE, secretKey);
+
+				        decrypt = Cipher.getInstance("AES/CBC/PKCS5Padding");
+				        decrypt.init(Cipher.ENCRYPT_MODE, secretKey);
+					}
+					catch (UnsupportedEncodingException e)
+					{
+						throw new RuntimeException(e);
+					}
+					catch (NoSuchAlgorithmException e)
+					{
+						throw new RuntimeException(e);
+					}
+					catch (NoSuchPaddingException e)
+					{
+						throw new RuntimeException(e);
+					}
+					catch (InvalidKeyException e)
+					{
+						throw new RuntimeException(e);
+					}
 
 					me._lastUpload = now;
 
@@ -198,19 +290,21 @@ public class HttpUploadPlugin extends OutputPlugin
 						{
 							try
 							{
-								BufferedReader reader = new BufferedReader(new FileReader(f));
+						        CipherInputStream cin = new CipherInputStream(new FileInputStream(f), decrypt);
 
-								StringBuffer sb = new StringBuffer();
-								String line = null;
+						        ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-								while((line = reader.readLine()) != null)
-								{
-									sb.append(line);
-								}
+						        byte[] buffer = new byte[1024];
+						        int read = 0;
 
-								reader.close();
+						        while ((read = cin.read(buffer, 0, buffer.length)) != -1)
+						        {
+						        	baos.write(buffer, 0, read);
+						        }
 
-								JSONArray jsonArray = new JSONArray(sb.toString());
+						        cin.close();
+
+								JSONArray jsonArray = new JSONArray(baos.toString("utf-8"));
 
 								for (int i = 0; i < jsonArray.length(); i++)
 								{
@@ -288,54 +382,7 @@ public class HttpUploadPlugin extends OutputPlugin
 							jsonMessage.put(OPERATION_KEY, "SubmitProbes");
 							jsonMessage.put(PAYLOAD_KEY, uploadArray.toString());
 
-							String userHash = me.preferences.getString("config_user_hash", null);
-
-							if (userHash == null)
-							{
-								String userId = "unknown-user";
-
-								Context context = me.getContext();
-
-								AccountManager manager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
-								Account[] list = manager.getAccountsByType("com.google");
-
-								if (list.length == 0)
-									list = manager.getAccounts();
-
-								if (list.length > 0)
-									userId = list[0].name;
-
-								try
-								{
-									MessageDigest md = MessageDigest.getInstance("MD5");
-									byte[] digest = md.digest(userId.getBytes("UTF-8"));
-
-									userHash = (new BigInteger(1, digest)).toString(16);
-
-									while(userHash.length() < 32 )
-									{
-										userHash = "0" + userHash;
-									}
-								}
-								catch (NoSuchAlgorithmException e)
-								{
-									e.printStackTrace();
-								}
-								catch (UnsupportedEncodingException e)
-								{
-									e.printStackTrace();
-								}
-
-								Editor e = me.preferences.edit();
-
-								if (userId != null)
-									e.putString("config_user_id", userId);
-
-								if (userHash != null)
-									e.putString("config_user_hash", userHash);
-
-								e.commit();
-							}
+							String userHash = me.getUserHash();
 
 							jsonMessage.put(USER_HASH_KEY, userHash);
 
@@ -507,14 +554,14 @@ public class HttpUploadPlugin extends OutputPlugin
 
 								File f = new File(pendingFolder, "pending_" + k + ".json");
 
-								OutputStream out = new BufferedOutputStream(new FileOutputStream(f));
+						        CipherOutputStream cout = new CipherOutputStream(new FileOutputStream(f), encrypt);
 
 								byte[] jsonBytes = toSave.toString().getBytes("UTF-8");
 
-								out.write(jsonBytes);
+								cout.write(jsonBytes);
 
-								out.flush();
-								out.close();
+								cout.flush();
+								cout.close();
 
 								pendingObjects.removeAll(toRemove);
 							}
@@ -527,11 +574,11 @@ public class HttpUploadPlugin extends OutputPlugin
 						}
 						catch (NoSuchAlgorithmException e)
 						{
-							e.printStackTrace();
+							throw new RuntimeException(e);
 						}
 						catch (UnsupportedEncodingException e)
 						{
-							e.printStackTrace();
+							throw new RuntimeException(e);
 						}
 						catch (FileNotFoundException e)
 						{
@@ -627,14 +674,24 @@ public class HttpUploadPlugin extends OutputPlugin
 
 			try
 			{
-				OutputStream out = new BufferedOutputStream(new FileOutputStream(f));
+		        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+
+		        String keyString = "PRM" + (new StringBuffer(this.getUserHash())).reverse().toString();
+
+		        keyString = keyString.substring(0, 16);
+
+		        SecretKeySpec secretKey = new SecretKeySpec(keyString.getBytes("utf-8"),"AES");
+
+		        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+
+		        CipherOutputStream cout = new CipherOutputStream(new FileOutputStream(f), cipher);
 
 				byte[] jsonBytes = saveArray.toString().getBytes("UTF-8");
 
-				out.write(jsonBytes);
+				cout.write(jsonBytes);
 
-				out.flush();
-				out.close();
+				cout.flush();
+				cout.close();
 
 				this._pendingSaves.removeAll(toRemove);
 			}
@@ -644,11 +701,23 @@ public class HttpUploadPlugin extends OutputPlugin
 			}
 			catch (UnsupportedEncodingException e)
 			{
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
 			catch (IOException e)
 			{
 				e.printStackTrace();
+			}
+			catch (InvalidKeyException e)
+			{
+				throw new RuntimeException(e);
+			}
+			catch (NoSuchAlgorithmException e)
+			{
+				throw new RuntimeException(e);
+			}
+			catch (NoSuchPaddingException e)
+			{
+				throw new RuntimeException(e);
 			}
 
 			if (this._pendingSaves.size() > 0)
