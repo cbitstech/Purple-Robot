@@ -39,7 +39,7 @@
         <!-- <item>LogCatOutputPlugin</item> -->
         <item>TriggerOutputPlugin</item>
         <item>AppDisplayPlugin</item>
-        <item>HttpUploadPlugin</item>
+        <!-- <item>HttpUploadPlugin</item> -->
     </array>
 
 	<string-array name="probe_boolean_labels">
