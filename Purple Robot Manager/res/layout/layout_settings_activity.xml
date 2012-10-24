@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" xmlns:holo="http://schemas.android.com/apk/res-auto">
-    <PreferenceScreen holo:title="TEST SCREEN">
-       	<CheckBoxPreference
-       	    holo:title="@string/title_preference_probes_enable_probes"
-            holo:key="config_enable_probes"
-            holo:defaultValue="true"/>
-    </PreferenceScreen>
     <PreferenceCategory
         holo:key="config_settings_probe_category"
         holo:title="@string/config_notifications_category_label" />
@@ -24,7 +18,18 @@
             holo:title="@string/config_vibrator_pattern_label"
             holo:summary="@string/config_vibrator_pattern_message"
             holo:defaultValue="60" />
-        	</PreferenceCategory>
+   	</PreferenceCategory>
+    <PreferenceCategory
+        holo:title="TODO: Data Settings">
+      	<CheckBoxPreference
+       	    holo:title="TODO: Send sensor data to server?"
+            holo:key="config_enable_data_server"
+            holo:defaultValue="true"/>
+      	<CheckBoxPreference
+       	    holo:title="TODO: WiFi Only?"
+            holo:key="config_restrict_data_wifi"
+            holo:defaultValue="false"/>
+	</PreferenceCategory>
     <PreferenceCategory
         holo:title="@string/config_settings_category">
         <EditTextPreference

@@ -1,23 +1,20 @@
 package edu.northwestern.cbits.purple_robot_manager.plugins;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.UnknownHostException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -29,6 +26,7 @@ import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.http.HttpEntity;
@@ -55,8 +53,11 @@ import android.net.http.AndroidHttpClient;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
+import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
 import com.WazaBe.HoloEverywhere.preference.SharedPreferences.Editor;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.StartActivity;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -76,6 +77,8 @@ public class HttpUploadPlugin extends OutputPlugin
 
 	private final static long MAX_UPLOAD_SIZE = 1048576; // 1MB
 	private final static long MIN_UPLOAD_SIZE = 16384; // 16KB
+
+	private static final String CRYPTO_ALGORITHM = "AES/CBC/PKCS5Padding";
 
 	private List<String> _pendingSaves = new ArrayList<String>();
 	private long _lastSave = 0;
@@ -159,6 +162,31 @@ public class HttpUploadPlugin extends OutputPlugin
 		}
 	}
 
+	private SecretKeySpec keyForCipher(String cipherName) throws UnsupportedEncodingException
+	{
+		String userHash = this.getUserHash();
+		String keyString = (new StringBuffer(userHash)).reverse().toString();
+
+		if ("AES".equals(cipherName))
+		{
+			byte[] stringBytes = keyString.getBytes("UTF-8");
+
+			byte[] keyBytes = new byte[32];
+			Arrays.fill(keyBytes, (byte) 0x00);
+
+			for (int i = 0; i < keyBytes.length && i < stringBytes.length; i++)
+			{
+				keyBytes[i] = stringBytes[i];
+			}
+
+			SecretKeySpec key = new SecretKeySpec(keyBytes, cipherName);
+
+			return key;
+		}
+
+		return keyForCipher("AES");
+	}
+
 	private String getUserHash()
 	{
 		String userHash = this.preferences.getString("config_user_hash", null);
@@ -240,15 +268,15 @@ public class HttpUploadPlugin extends OutputPlugin
 
 					try
 					{
-						String keyString = "PRM" + (new StringBuffer(me.getUserHash())).reverse().toString();
-						SecretKeySpec secretKey;
-						secretKey = new SecretKeySpec(keyString.getBytes("utf-8"),"AES");
+						SecretKeySpec secretKey = me.keyForCipher("AES");
 
-				        encrypt = Cipher.getInstance("AES/CBC/PKCS5Padding");
-				        encrypt.init(Cipher.ENCRYPT_MODE, secretKey);
+				        IvParameterSpec ivParameterSpec = new IvParameterSpec(me.getIVBytes());
 
-				        decrypt = Cipher.getInstance("AES/CBC/PKCS5Padding");
-				        decrypt.init(Cipher.ENCRYPT_MODE, secretKey);
+				        encrypt = Cipher.getInstance(HttpUploadPlugin.CRYPTO_ALGORITHM);
+				        encrypt.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec);
+
+				        decrypt = Cipher.getInstance(HttpUploadPlugin.CRYPTO_ALGORITHM);
+				        decrypt.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec);
 					}
 					catch (UnsupportedEncodingException e)
 					{
@@ -263,6 +291,10 @@ public class HttpUploadPlugin extends OutputPlugin
 						throw new RuntimeException(e);
 					}
 					catch (InvalidKeyException e)
+					{
+						throw new RuntimeException(e);
+					}
+					catch (InvalidAlgorithmParameterException e)
 					{
 						throw new RuntimeException(e);
 					}
@@ -304,7 +336,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 						        cin.close();
 
-								JSONArray jsonArray = new JSONArray(baos.toString("utf-8"));
+								JSONArray jsonArray = new JSONArray(baos.toString("UTF-8"));
 
 								for (int i = 0; i < jsonArray.length(); i++)
 								{
@@ -458,7 +490,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 									in.close();
 
-									body = out.toString("utf-8");
+									body = out.toString("UTF-8");
 								}
 								else
 									body = EntityUtils.toString(httpEntity);
@@ -607,6 +639,13 @@ public class HttpUploadPlugin extends OutputPlugin
 		}
 	}
 
+	protected byte[] getIVBytes()
+	{
+		byte[] bytes = { (byte) 0xff, 0x00, 0x11, (byte) 0xee, 0x22, (byte) 0xdd, 0x33, (byte) 0xcc, 0x44, (byte) 0xbb, 0x55, (byte) 0xaa, 0x66, (byte) 0x99, 0x77, (byte) 0x88 };
+
+		return bytes;
+	}
+
 	protected void broadcastMessage(int stringId)
 	{
 		this.broadcastMessage(this.getContext().getResources().getString(stringId));
@@ -629,6 +668,11 @@ public class HttpUploadPlugin extends OutputPlugin
 
 	private void persistJSONObject(JSONObject jsonObject)
 	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getContext());
+
+		if (prefs.getBoolean("config_enable_data_server", true) == false)
+			return;
+
 		long now = System.currentTimeMillis();
 
 		if (jsonObject != null)
@@ -674,15 +718,11 @@ public class HttpUploadPlugin extends OutputPlugin
 
 			try
 			{
-		        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+				SecretKeySpec secretKey = this.keyForCipher("AES");
+		        IvParameterSpec ivParameterSpec = new IvParameterSpec(this.getIVBytes());
 
-		        String keyString = "PRM" + (new StringBuffer(this.getUserHash())).reverse().toString();
-
-		        keyString = keyString.substring(0, 16);
-
-		        SecretKeySpec secretKey = new SecretKeySpec(keyString.getBytes("utf-8"),"AES");
-
-		        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+				Cipher cipher = Cipher.getInstance(HttpUploadPlugin.CRYPTO_ALGORITHM);
+				cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec);
 
 		        CipherOutputStream cout = new CipherOutputStream(new FileOutputStream(f), cipher);
 
@@ -716,6 +756,10 @@ public class HttpUploadPlugin extends OutputPlugin
 				throw new RuntimeException(e);
 			}
 			catch (NoSuchPaddingException e)
+			{
+				throw new RuntimeException(e);
+			}
+			catch (InvalidAlgorithmParameterException e)
 			{
 				throw new RuntimeException(e);
 			}
