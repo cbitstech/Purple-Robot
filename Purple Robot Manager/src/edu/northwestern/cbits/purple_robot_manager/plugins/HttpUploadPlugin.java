@@ -26,6 +26,7 @@ import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.NullCipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -49,7 +50,10 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.http.AndroidHttpClient;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -167,7 +171,7 @@ public class HttpUploadPlugin extends OutputPlugin
 		String userHash = this.getUserHash();
 		String keyString = (new StringBuffer(userHash)).reverse().toString();
 
-		if ("AES".equals(cipherName))
+		if (cipherName != null && cipherName.startsWith("AES"))
 		{
 			byte[] stringBytes = keyString.getBytes("UTF-8");
 
@@ -184,7 +188,7 @@ public class HttpUploadPlugin extends OutputPlugin
 			return key;
 		}
 
-		return keyForCipher("AES");
+		return keyForCipher(HttpUploadPlugin.CRYPTO_ALGORITHM);
 	}
 
 	private String getUserHash()
@@ -254,6 +258,7 @@ public class HttpUploadPlugin extends OutputPlugin
 		{
 			final List<String> uploadCount = new ArrayList<String>();
 			final Resources resources = this.getContext().getResources();
+			final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getContext());
 
 			final Runnable r = new Runnable()
 			{
@@ -263,40 +268,43 @@ public class HttpUploadPlugin extends OutputPlugin
 					boolean continueUpload = false;
 					boolean wasSuccessful = false;
 
-					Cipher encrypt = null;
-					Cipher decrypt = null;
+					Cipher encrypt = new NullCipher();
+					Cipher decrypt = new NullCipher();
 
-					try
+					if (prefs.getBoolean("config_http_encrypt", true))
 					{
-						SecretKeySpec secretKey = me.keyForCipher("AES");
+						try
+						{
+							SecretKeySpec secretKey = me.keyForCipher(HttpUploadPlugin.CRYPTO_ALGORITHM);
 
-				        IvParameterSpec ivParameterSpec = new IvParameterSpec(me.getIVBytes());
+					        IvParameterSpec ivParameterSpec = new IvParameterSpec(me.getIVBytes());
 
-				        encrypt = Cipher.getInstance(HttpUploadPlugin.CRYPTO_ALGORITHM);
-				        encrypt.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec);
+					        encrypt = Cipher.getInstance(HttpUploadPlugin.CRYPTO_ALGORITHM);
+					        encrypt.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec);
 
-				        decrypt = Cipher.getInstance(HttpUploadPlugin.CRYPTO_ALGORITHM);
-				        decrypt.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec);
-					}
-					catch (UnsupportedEncodingException e)
-					{
-						throw new RuntimeException(e);
-					}
-					catch (NoSuchAlgorithmException e)
-					{
-						throw new RuntimeException(e);
-					}
-					catch (NoSuchPaddingException e)
-					{
-						throw new RuntimeException(e);
-					}
-					catch (InvalidKeyException e)
-					{
-						throw new RuntimeException(e);
-					}
-					catch (InvalidAlgorithmParameterException e)
-					{
-						throw new RuntimeException(e);
+					        decrypt = Cipher.getInstance(HttpUploadPlugin.CRYPTO_ALGORITHM);
+					        decrypt.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec);
+						}
+						catch (UnsupportedEncodingException e)
+						{
+							throw new RuntimeException(e);
+						}
+						catch (NoSuchAlgorithmException e)
+						{
+							throw new RuntimeException(e);
+						}
+						catch (NoSuchPaddingException e)
+						{
+							throw new RuntimeException(e);
+						}
+						catch (InvalidKeyException e)
+						{
+							throw new RuntimeException(e);
+						}
+						catch (InvalidAlgorithmParameterException e)
+						{
+							throw new RuntimeException(e);
+						}
 					}
 
 					me._lastUpload = now;
@@ -455,9 +463,6 @@ public class HttpUploadPlugin extends OutputPlugin
 								List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 								nameValuePairs.add(new BasicNameValuePair("json", jsonMessage.toString()));
 								HttpEntity entity = new UrlEncodedFormEntity(nameValuePairs);
-
-//								entity = AndroidHttpClient.getCompressedEntity(EntityUtils.toByteArray(entity), me.getContext().getContentResolver());
-//								httpPost.setHeader("Content-Encoding", "gzip");
 
 								httpPost.setEntity(entity);
 
@@ -634,8 +639,38 @@ public class HttpUploadPlugin extends OutputPlugin
 				}
 			};
 
-			this._uploadThread = new Thread(r);
-			this._uploadThread.start();
+			boolean doUpload = true;
+
+			if (prefs.getBoolean("config_restrict_data_wifi", false))
+			{
+				WifiManager wifi = (WifiManager) this.getContext().getSystemService(Context.WIFI_SERVICE);
+
+				if (wifi.isWifiEnabled())
+				{
+					ConnectivityManager connection = (ConnectivityManager) this.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+					NetworkInfo netInfo = connection.getActiveNetworkInfo();
+
+					if (netInfo != null && netInfo.getType() != ConnectivityManager.TYPE_WIFI && netInfo.getState() != NetworkInfo.State.CONNECTED &&  netInfo.getState() != NetworkInfo.State.CONNECTING)
+						doUpload = false;
+				}
+				else
+					doUpload = false;
+			}
+
+			if (doUpload)
+			{
+				this._uploadThread = new Thread(r);
+				this._uploadThread.start();
+			}
+			else
+			{
+				// Skip this cycle...
+
+				this.broadcastMessage(R.string.message_wifi_pending);
+
+				this._lastUpload = now;
+			}
 		}
 	}
 
@@ -718,11 +753,16 @@ public class HttpUploadPlugin extends OutputPlugin
 
 			try
 			{
-				SecretKeySpec secretKey = this.keyForCipher("AES");
+				SecretKeySpec secretKey = this.keyForCipher(HttpUploadPlugin.CRYPTO_ALGORITHM);
 		        IvParameterSpec ivParameterSpec = new IvParameterSpec(this.getIVBytes());
 
-				Cipher cipher = Cipher.getInstance(HttpUploadPlugin.CRYPTO_ALGORITHM);
-				cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec);
+		        Cipher cipher = new NullCipher();
+
+		        if (prefs.getBoolean("config_http_encrypt", true))
+		        {
+		        	cipher = Cipher.getInstance(HttpUploadPlugin.CRYPTO_ALGORITHM);
+		        	cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec);
+		        }
 
 		        CipherOutputStream cout = new CipherOutputStream(new FileOutputStream(f), cipher);
 

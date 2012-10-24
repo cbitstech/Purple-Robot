@@ -223,6 +223,18 @@
     <string name="message_response_error">Server response error.</string>
     <string name="message_general_error" formatted="false">General error: %s</string>
 
-  	<string name="notify_running">Purple Robot is collecting data&#8230;</string>
+    <string name="message_wifi_pending">Waiting for WiFi&#8230;</string>
+
+    <string name="notify_running">Purple Robot is collecting data&#8230;</string>
+
+    <string name="title_http_upload_section">Data Upload Settings</string>
+    <string name="title_http_upload_uri">HTTP Upload Endpoint</string>
+    <string name="summary_http_upload_uri">URL of the HTTP endpoint where sensor data will be logged.</string>
+    <string name="title_http_upload_enabled">Enable HTTP Upload</string>
+    <string name="title_http_upload_wifi_only">Only Use WiFi Connection</string>
+    <string name="summary_http_upload_wifi_only">Disable uploads using cellular and other mobile connection types.</string>
+
+    <string name="title_http_encrypt">Encrypt Sensor Data</string>
+    <string name="summary_http_encrypt">Encrypt the collected sensor data on the local device and in transmissions.</string>
 
 </resources>
