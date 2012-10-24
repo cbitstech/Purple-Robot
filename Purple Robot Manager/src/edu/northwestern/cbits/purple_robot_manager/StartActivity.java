@@ -254,9 +254,9 @@ public class StartActivity extends SherlockActivity
         		Toast.makeText(this, R.string.error_json_set_uri_password, Toast.LENGTH_LONG).show();
         }
 
-        this.refreshList();
-
         this._isPaused = false;
+
+        this.refreshList();
 	}
 
 	public boolean onCreateOptionsMenu(Menu menu)
@@ -278,23 +278,6 @@ public class StartActivity extends SherlockActivity
     			localManager.sendBroadcast(intent);
 
     			break;
-/*    		case R.id.menu_play_toggle_item:
-    			boolean doPause = (this._isPaused == false);
-
-    			if (doPause)
-    			{
-    				item.setIcon(R.drawable.action_play);
-    				item.setTitle(R.string.menu_resume_toggle_label);
-    			}
-    			else
-    			{
-    				item.setIcon(R.drawable.action_pause);
-    				item.setTitle(R.string.menu_pause_toggle_label);
-    			}
-
-    			this._isPaused = doPause;
-
-    			break; */
     		case R.id.menu_settings_item:
     	        final String savedPassword = PreferenceManager.getDefaultSharedPreferences(this).getString("config_password", null);
 
