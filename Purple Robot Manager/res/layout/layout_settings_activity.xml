@@ -20,16 +20,29 @@
             holo:defaultValue="60" />
    	</PreferenceCategory>
     <PreferenceCategory
-        holo:title="TODO: Data Settings">
-      	<CheckBoxPreference
-       	    holo:title="TODO: Send sensor data to server?"
+        holo:title="@string/title_http_upload_section">
+        <CheckBoxPreference
+       	    holo:title="@string/title_http_upload_enabled"
             holo:key="config_enable_data_server"
             holo:defaultValue="true"/>
+        <EditTextPreference
+            holo:key="config_data_server_uri"
+            holo:title="@string/title_http_upload_uri"
+            holo:dialogTitle="@string/title_http_upload_uri"
+            holo:dialogMessage="@string/summary_http_upload_uri"
+            holo:summary="@string/summary_http_upload_uri"
+            holo:defaultValue="@string/sensor_upload_url" />
       	<CheckBoxPreference
-       	    holo:title="TODO: WiFi Only?"
+       	    holo:title="@string/title_http_upload_wifi_only"
+       	    holo:summary="@string/summary_http_upload_wifi_only"
             holo:key="config_restrict_data_wifi"
             holo:defaultValue="false"/>
-	</PreferenceCategory>
+      	<CheckBoxPreference
+       	    holo:title="@string/title_http_encrypt"
+       	    holo:summary="@string/summary_http_encrypt"
+            holo:key="config_http_encrypt"
+            holo:defaultValue="true"/>
+   		</PreferenceCategory>
     <PreferenceCategory
         holo:title="@string/config_settings_category">
         <EditTextPreference
