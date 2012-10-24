@@ -2,17 +2,20 @@ package edu.northwestern.cbits.purple_robot_manager.probes.funf;
 
 import java.util.ArrayList;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
-
-import com.WazaBe.HoloEverywhere.preference.PreferenceActivity;
-import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
-import com.WazaBe.HoloEverywhere.preference.PreferenceScreen;
-import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
-
+import android.preference.CheckBoxPreference;
+import android.preference.ListPreference;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
-import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 
 public class ContactProbe extends Probe
 {
@@ -28,10 +31,40 @@ public class ContactProbe extends Probe
 	{
 		PreferenceManager manager = activity.getPreferenceManager();
 
-		PreferenceScreen screen = ProbeManager.inflatePreferenceScreenFromResource(activity, R.layout.layout_settings_probe_contact, manager);
+		PreferenceScreen screen = manager.createPreferenceScreen(activity);
+		screen.setTitle(R.string.title_contact_probe);
+		screen.setSummary(R.string.summary_contact_probe_desc);
+
+		CheckBoxPreference enabled = new CheckBoxPreference(activity);
+		enabled.setTitle(R.string.title_enable_probe);
+		enabled.setKey("config_probe_contact_enabled");
+		enabled.setDefaultValue(true);
+
+		screen.addPreference(enabled);
+
+		ListPreference period = new ListPreference(activity);
+		period.setKey("config_probe_contact_period");
+		period.setDefaultValue("1200");
+		period.setEntryValues(R.array.probe_period_values);
+		period.setEntries(R.array.probe_period_labels);
+		period.setTitle(R.string.probe_period_label);
+		period.setSummary(R.string.probe_period_summary);
+
+		screen.addPreference(period);
+
+		ListPreference full = new ListPreference(activity);
+		full.setKey("config_probe_contact_full_list");
+		full.setDefaultValue("false");
+		full.setEntryValues(R.array.probe_boolean_values);
+		full.setEntries(R.array.probe_boolean_labels);
+		full.setTitle(R.string.probe_contact_full_label);
+		full.setSummary(R.string.probe_contact_full_summary);
+
+		screen.addPreference(full);
 
 		return screen;
 	}
+
 
 	public Bundle[] dataRequestBundles(Context context)
 	{
@@ -42,6 +75,23 @@ public class ContactProbe extends Probe
 		bundle.putBoolean(ContactProbe.USE_FULL, "true".equals(prefs.getString("config_probe_contact_full_list", "false")));
 
 		return new Bundle[] { bundle };
+	}
+
+	public void updateFromJSON(Context context, JSONObject json) throws JSONException
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		Editor editor = prefs.edit();
+
+		if (json.has("period"))
+			editor.putString("config_probe_contact_period", json.getString("period"));
+
+		if (json.has("full_list"))
+			editor.putString("config_probe_contact_full_list", json.getString("full_list"));
+
+		if (json.has("enabled"))
+			editor.putBoolean("config_probe_contact_enabled", json.getBoolean("enabled"));
+
+		editor.commit();
 	}
 
 	public boolean isEnabled(Context context)

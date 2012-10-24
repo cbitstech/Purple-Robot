@@ -1,19 +1,22 @@
 package edu.northwestern.cbits.purple_robot_manager.probes;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.content.Context;
 import android.os.Bundle;
-
-import com.WazaBe.HoloEverywhere.preference.PreferenceActivity;
-import com.WazaBe.HoloEverywhere.preference.PreferenceCategory;
-import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
-import com.WazaBe.HoloEverywhere.preference.PreferenceScreen;
-
+import android.preference.CheckBoxPreference;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceCategory;
+import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.probes.funf.BasicFunfProbe;
@@ -22,6 +25,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.funf.PeriodFunfProbe;
 
 public class ProbeManager
 {
+	private static final String PROBE_NAME = "name";
 	private static Map<String, Probe> _cachedProbes = new HashMap<String, Probe>();
 	private static List<Probe> _probeInstances = null;
 
@@ -72,7 +76,7 @@ public class ProbeManager
 		return probesMap;
 	}
 
-	public static PreferenceScreen inflatePreferenceScreenFromResource(PreferenceActivity settingsActivity, int resId, PreferenceManager manager)
+/*	public static PreferenceScreen inflatePreferenceScreenFromResource(PreferenceActivity settingsActivity, int resId, PreferenceManager manager)
     {
     	try
     	{
@@ -86,7 +90,7 @@ public class ProbeManager
         }
 
         return null;
-    }
+    } */
 
 	public static Probe probeForName(String name)
 	{
@@ -134,20 +138,65 @@ public class ProbeManager
 		@SuppressWarnings("deprecation")
 		PreferenceManager manager = settingsActivity.getPreferenceManager();
 
-		PreferenceScreen screen = ProbeManager.inflatePreferenceScreenFromResource(settingsActivity, R.layout.layout_settings_probes_screen, manager);
+		PreferenceScreen screen = manager.createPreferenceScreen(settingsActivity);
 		screen.setOrder(0);
 		screen.setTitle(R.string.title_preference_probes_screen);
 		screen.setKey(SettingsActivity.PROBES_SCREEN_KEY);
 
-		PreferenceCategory probesCategory = (PreferenceCategory) screen.findPreference("key_available_probes");
+		PreferenceCategory globalCategory = new PreferenceCategory(settingsActivity);
+		globalCategory.setTitle(R.string.title_preference_probes_global_category);
+		globalCategory.setKey("key_available_probes");
+
+		screen.addPreference(globalCategory);
+
+		CheckBoxPreference enabled = new CheckBoxPreference(settingsActivity);
+		enabled.setTitle(R.string.title_enable_probe);
+		enabled.setKey("config_probe_enabled");
+		enabled.setDefaultValue(true);
+
+		globalCategory.addPreference(enabled);
+
+		PreferenceCategory probesCategory = new PreferenceCategory(settingsActivity);
+		probesCategory.setTitle(R.string.title_preference_probes_available_category);
+		probesCategory.setKey("key_available_probes");
+
+		screen.addPreference(probesCategory);
 
 		for (Probe probe : ProbeManager.allProbes())
 		{
 			PreferenceScreen probeScreen = probe.preferenceScreen(settingsActivity);
 
-			probesCategory.addPreference(probeScreen);
+			if (probeScreen != null)
+				screen.addPreference(probeScreen);
 		}
 
+
 		return screen;
+	}
+
+	public static void updateProbesFromJSON(Context context, JSONArray probeSettings)
+	{
+		for (int i = 0; i < probeSettings.length(); i++)
+		{
+			try
+			{
+				JSONObject json = probeSettings.getJSONObject(i);
+
+				if (json.has(ProbeManager.PROBE_NAME))
+				{
+					String name = json.getString(ProbeManager.PROBE_NAME);
+
+					for (Probe p : ProbeManager.allProbes())
+					{
+						if (name.equalsIgnoreCase(p.title(context)))
+							p.updateFromJSON(context, json);
+					}
+				}
+			}
+			catch (JSONException e)
+			{
+				e.printStackTrace();
+			}
+		}
 	}
 }

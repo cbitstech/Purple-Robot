@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Editable;
 import android.util.Log;
@@ -28,7 +29,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.WazaBe.HoloEverywhere.app.AlertDialog;
-import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
 import com.WazaBe.HoloEverywhere.widget.Toast;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
@@ -235,7 +235,7 @@ public class StartActivity extends SherlockActivity
 			jsonConfigUri = b.build();
 		}
 
-		JSONConfigFile.updateFromOnline(this, jsonConfigUri);
+		JSONConfigFile.updateFromOnline(this, jsonConfigUri, true);
 	}
 
 	protected void onResume()

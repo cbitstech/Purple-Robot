@@ -18,16 +18,19 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
-import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
-import com.WazaBe.HoloEverywhere.preference.SharedPreferences.Editor;
 import com.WazaBe.HoloEverywhere.widget.Toast;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.net.Uri;
+import android.preference.PreferenceManager;
+import android.util.Log;
+//import android.util.Log;
+import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 
 public class JSONConfigFile
@@ -35,10 +38,9 @@ public class JSONConfigFile
 	public static final String USER_ID = "user_id";
 	public static final String USER_HASH = "user_hash";
 	public static final String JSON_CONFIGURATION = "json_configuration_contents";
+	public static final String JSON_PROBE_SETTINGS = "probe_settings";
 	public static final String JSON_CONFIGURATION_URL = "config_json_url";
 	public static final String JSON_LAST_UPDATE = "json_configuration_last_update";
-
-	private SharedPreferences prefs = null;
 
 	private JSONObject parameters = null;
 	private List<Trigger> _triggerList = null;
@@ -46,12 +48,14 @@ public class JSONConfigFile
 	private static JSONConfigFile _sharedFile = null;
 	private static Uri _configUri = null;
 
-	public static void updateFromOnline(final Context context, final Uri uri)
+	public static void updateFromOnline(final Context context, final Uri uri, boolean force)
 	{
+		Log.e("PRM", "IN updateFromOnline(Context, Uri)...");
+
 		if (!uri.equals(JSONConfigFile._configUri))
 			JSONConfigFile._sharedFile = null;
 
-		if (JSONConfigFile._sharedFile == null)
+		if (JSONConfigFile._sharedFile == null || force)
 		{
 			Runnable r = new Runnable()
 			{
@@ -152,7 +156,7 @@ public class JSONConfigFile
 
 	private JSONConfigFile(Context context)
 	{
-		prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
 		try
 		{
@@ -234,6 +238,24 @@ public class JSONConfigFile
 		if (userHash != null)
 			editor.putString("config_user_hash", userHash);
 
+		Log.e("PRM", "LOOKING FOR " + JSONConfigFile.JSON_PROBE_SETTINGS);
+
+		if (this.parameters.has(JSONConfigFile.JSON_PROBE_SETTINGS))
+		{
+			try
+			{
+				Log.e("PRM", "UPDATING PROBES");
+
+				JSONArray probeSettings = this.parameters.getJSONArray(JSONConfigFile.JSON_PROBE_SETTINGS);
+
+				ProbeManager.updateProbesFromJSON(context, probeSettings);
+			}
+			catch (JSONException e)
+			{
+				e.printStackTrace();
+			}
+		}
+
 		editor.commit();
 	}
 
@@ -251,10 +273,14 @@ public class JSONConfigFile
 		{
 			Editor edit = prefs.edit();
 
+			boolean force = false;
+
+			force = (lastUpdate == 0);
+
 			String uriString = prefs.getString(JSONConfigFile.JSON_CONFIGURATION_URL, null);
 
 			if (uriString != null)
-				JSONConfigFile.updateFromOnline(context, Uri.parse(uriString));
+				JSONConfigFile.updateFromOnline(context, Uri.parse(uriString), force);
 
 			edit.putLong(JSONConfigFile.JSON_LAST_UPDATE, now);
 			edit.commit();

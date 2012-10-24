@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" xmlns:holo="http://schemas.android.com/apk/res-auto"
-    holo:title=""
-    holo:summary="">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title=""
+    android:summary="">
    	<CheckBoxPreference
-		holo:title="@string/title_enable_probe"
-		holo:key="config_probe_funf_enabled"
-		holo:defaultValue="true"/>
+		android:title="@string/title_enable_probe"
+		android:key="config_probe_funf_enabled"
+		android:defaultValue="true"/>
     <ListPreference
-        holo:key="config_probe_funf_period"
-        holo:entries="@array/probe_period_labels"
-        holo:entryValues="@array/probe_period_values"
-        holo:title="@string/probe_period_label"
-        holo:summary="@string/probe_period_summary"
-        holo:defaultValue="1800" />
+        android:key="config_probe_funf_period"
+        android:entries="@array/probe_period_labels"
+        android:entryValues="@array/probe_period_values"
+        android:title="@string/probe_period_label"
+        android:summary="@string/probe_period_summary"
+        android:defaultValue="1800" />
 </PreferenceScreen>

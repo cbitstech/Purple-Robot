@@ -19,10 +19,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
-
-import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
-import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
-import com.WazaBe.HoloEverywhere.preference.SharedPreferences.Editor;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.preference.PreferenceManager;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 
