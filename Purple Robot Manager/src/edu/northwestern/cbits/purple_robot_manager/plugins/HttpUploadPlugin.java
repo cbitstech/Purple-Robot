@@ -49,17 +49,16 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.http.AndroidHttpClient;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
-
-import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
-import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
-import com.WazaBe.HoloEverywhere.preference.SharedPreferences.Editor;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -193,13 +192,16 @@ public class HttpUploadPlugin extends OutputPlugin
 
 	private String getUserHash()
 	{
-		String userHash = this.preferences.getString("config_user_hash", null);
+		Context context = this.getContext();
+
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+		String userHash = prefs.getString("config_user_hash", null);
 
 		if (userHash == null)
 		{
 			String userId = "unknown-user";
 
-			Context context = this.getContext();
 
 			AccountManager manager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
 			Account[] list = manager.getAccountsByType("com.google");
@@ -231,7 +233,7 @@ public class HttpUploadPlugin extends OutputPlugin
 				e.printStackTrace();
 			}
 
-			Editor e = this.preferences.edit();
+			Editor e = prefs.edit();
 
 			if (userId != null)
 				e.putString("config_user_id", userId);

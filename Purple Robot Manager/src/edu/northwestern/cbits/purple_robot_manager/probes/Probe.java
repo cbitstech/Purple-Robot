@@ -3,11 +3,13 @@ package edu.northwestern.cbits.purple_robot_manager.probes;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.content.Context;
 import android.os.Bundle;
-
-import com.WazaBe.HoloEverywhere.preference.PreferenceActivity;
-import com.WazaBe.HoloEverywhere.preference.PreferenceScreen;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceScreen;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 
@@ -65,5 +67,5 @@ public abstract class Probe
 	{
 		return bundle.toString();
 	}
-
+	public abstract void updateFromJSON(Context context, JSONObject json) throws JSONException;
 }

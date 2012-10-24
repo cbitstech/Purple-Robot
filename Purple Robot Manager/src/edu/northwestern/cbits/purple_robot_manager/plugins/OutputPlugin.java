@@ -8,9 +8,6 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
-import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -32,15 +29,11 @@ public abstract class OutputPlugin
 	public abstract String[] respondsTo();
 	public abstract void processIntent(Intent intent);
 
-	protected SharedPreferences preferences = null;
-
 	private Context _context = null;
 
 	public void setContext(Context context)
 	{
 		this._context = context;
-
-		this.preferences = PreferenceManager.getDefaultSharedPreferences(context);
 	}
 
 	public Context getContext()
