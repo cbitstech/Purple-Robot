@@ -227,7 +227,7 @@
 
     <string name="notify_running">Purple Robot is collecting data&#8230;</string>
 
-    <string name="title_http_upload_section">Data Upload Settings</string>
+    <string name="title_http_upload_section">Data Settings</string>
     <string name="title_http_upload_uri">HTTP Upload Endpoint</string>
     <string name="summary_http_upload_uri">URL of the HTTP endpoint where sensor data will be logged.</string>
     <string name="title_http_upload_enabled">Enable HTTP Upload</string>
@@ -237,4 +237,6 @@
     <string name="title_http_encrypt">Encrypt Sensor Data</string>
     <string name="summary_http_encrypt">Encrypt the collected sensor data on the local device and in transmissions.</string>
 
+    <string name="title_external_storage_enabled">Use External Storage</string>
+    <string name="summary_external_storage_enabled">Persist data prior to transmission in an publicly-accessible location on the device.</string>
 </resources>

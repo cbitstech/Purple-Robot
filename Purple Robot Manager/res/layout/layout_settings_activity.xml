@@ -22,6 +22,16 @@
     <PreferenceCategory
         android:title="@string/title_http_upload_section">
         <CheckBoxPreference
+       	    android:title="@string/title_external_storage_enabled"
+            android:summary="@string/summary_external_storage_enabled"
+            android:key="config_external_storage"
+            android:defaultValue="false"/>
+      	<CheckBoxPreference
+       	    android:title="@string/title_http_encrypt"
+       	    android:summary="@string/summary_http_encrypt"
+            android:key="config_http_encrypt"
+            android:defaultValue="true"/>
+        <CheckBoxPreference
        	    android:title="@string/title_http_upload_enabled"
             android:key="config_enable_data_server"
             android:defaultValue="true"/>
@@ -37,11 +47,6 @@
        	    android:summary="@string/summary_http_upload_wifi_only"
             android:key="config_restrict_data_wifi"
             android:defaultValue="false"/>
-      	<CheckBoxPreference
-       	    android:title="@string/title_http_encrypt"
-       	    android:summary="@string/summary_http_encrypt"
-            android:key="config_http_encrypt"
-            android:defaultValue="true"/>
    		</PreferenceCategory>
     <PreferenceCategory
         android:title="@string/config_settings_category">
