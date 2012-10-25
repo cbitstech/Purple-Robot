@@ -158,7 +158,7 @@ public class FunfService extends CustomizedIntentService
 		return true;
 	}
 
-	public static class BundleToJson implements BundleSerializer
+/*	public static class BundleToJson implements BundleSerializer
 	{
 		public String serialize(Bundle bundle)
 		{
@@ -170,7 +170,7 @@ public class FunfService extends CustomizedIntentService
 	{
 		return new BundleToJson();
 	}
-
+*/
 	public void onDataReceived(Bundle data)
 	{
 		UUID uuid = UUID.randomUUID();

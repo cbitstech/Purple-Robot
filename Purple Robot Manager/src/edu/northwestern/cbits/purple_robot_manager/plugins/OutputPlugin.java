@@ -4,18 +4,23 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.ActivityManager.RunningTaskInfo;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ApplicationInfo;
+import android.location.Location;
+import android.net.wifi.ScanResult;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-
+import android.util.Log;
 import edu.mit.media.funf.Utils;
-import edu.northwestern.cbits.purple_robot_manager.JsonUtils;
 import edu.northwestern.cbits.purple_robot_manager.R;
 
 public abstract class OutputPlugin
@@ -150,8 +155,183 @@ public abstract class OutputPlugin
 
 	public static JSONObject jsonForBundle(Bundle bundle) throws JSONException
 	{
-		String jsonString = JsonUtils.getGson().toJson(Utils.getValues(bundle));
+		JSONObject json = new JSONObject();
 
-		return new JSONObject(jsonString);
+		Map<String, Object> values = Utils.getValues(bundle);
+
+		for (String key : values.keySet())
+		{
+			Object value = values.get(key);
+
+			if (value instanceof String)
+				json.put(key, value);
+			else if (value instanceof Bundle)
+			{
+				value = OutputPlugin.jsonForBundle((Bundle) value);
+
+				json.put(key, value);
+			}
+			else if (value instanceof float[])
+			{
+				float[] floats = (float[]) value;
+
+				JSONArray floatArray = new JSONArray();
+
+				for (float f : floats)
+				{
+					floatArray.put((double) f);
+				}
+
+				json.put(key, floatArray);
+			}
+			else if (value instanceof int[])
+			{
+				int[] ints = (int[]) value;
+
+				JSONArray intArray = new JSONArray();
+
+				for (int i : ints)
+				{
+					intArray.put(i);
+				}
+
+				json.put(key, intArray);
+			}
+			else if (value instanceof long[])
+			{
+				long[] longs = (long[]) value;
+
+				JSONArray longArray = new JSONArray();
+
+				for (long l : longs)
+				{
+					longArray.put(l);
+				}
+
+				json.put(key, longArray);
+			}
+			else if (value instanceof Float)
+			{
+				Float f = (Float) value;
+
+				json.put(key, f.doubleValue());
+			}
+			else if (value instanceof Integer)
+			{
+				Integer i = (Integer) value;
+
+				json.put(key, i.intValue());
+			}
+			else if (value instanceof Long)
+			{
+				Long l = (Long) value;
+
+				json.put(key, l.longValue());
+			}
+			else if (value instanceof Boolean)
+			{
+				Boolean b = (Boolean) value;
+
+				json.put(key, b.booleanValue());
+			}
+			else if (value instanceof Short)
+			{
+				Short s = (Short) value;
+
+				json.put(key, s.intValue());
+			}
+			else if (value instanceof Double)
+			{
+				Double d = (Double) value;
+
+				json.put(key, d.doubleValue());
+			}
+			else if (value instanceof List)
+			{
+				@SuppressWarnings("unchecked")
+				List<Object> list = (List<Object>) value;
+
+				JSONArray objectArray = new JSONArray();
+
+				for (Object o : list)
+				{
+					if (o instanceof Bundle)
+						objectArray.put(OutputPlugin.jsonForBundle((Bundle) o));
+					else if (o instanceof ScanResult)
+					{
+						ScanResult s = (ScanResult) o;
+
+						JSONObject scanObject = new JSONObject();
+
+						if (s.BSSID != null)
+							scanObject.put("BSSID", s.BSSID);
+
+						if (s.SSID != null)
+							scanObject.put("SSID", s.SSID);
+
+						if (s.capabilities != null)
+							scanObject.put("Capabilities", s.capabilities);
+
+						scanObject.put("Frequency", s.frequency);
+						scanObject.put("Level dBm", s.level);
+
+						objectArray.put(scanObject);
+					}
+					else if (o instanceof RunningTaskInfo)
+					{
+						RunningTaskInfo r = (RunningTaskInfo) o;
+
+						JSONObject taskObject = new JSONObject();
+
+						if (r.baseActivity != null)
+							taskObject.put("Base Activity", r.baseActivity.getPackageName());
+
+						if (r.description != null)
+							taskObject.put("Description", r.description.toString());
+
+						taskObject.put("Activity Count", r.numActivities);
+						taskObject.put("Running Activity Count", r.numRunning);
+
+						objectArray.put(taskObject);
+					}
+					else if (o instanceof ApplicationInfo)
+					{
+						ApplicationInfo a = (ApplicationInfo) o;
+
+						objectArray.put(a.packageName);
+					}
+					else if (o instanceof Location)
+					{
+						Location l = (Location) o;
+
+						JSONObject locObject = new JSONObject();
+
+						locObject.put("Accuracy", l.getAccuracy());
+						locObject.put("Altitude", l.getAltitude());
+						locObject.put("Bearing", l.getBearing());
+						locObject.put("Latitude", l.getLatitude());
+						locObject.put("Longitude", l.getLongitude());
+
+						if (l.getProvider() != null)
+							locObject.put("Provider", l.getProvider());
+						else
+							locObject.put("Provider", "Unknown");
+
+						locObject.put("Speed", l.getSpeed());
+						locObject.put("Timestamp", l.getTime());
+
+						objectArray.put(locObject);
+					}
+					else
+						Log.e("PRM", "LIST OBJ: " + o.getClass().getCanonicalName() + " IN " + key);
+				}
+			}
+			else
+				Log.e("PRM", "GOT TYPE " + value.getClass().getCanonicalName() + " FOR " + key);
+		}
+
+//		String jsonString = JsonUtils.getGson().toJson(values);
+
+		return json;
 	}
 }

@@ -249,6 +249,11 @@ public class HttpUploadPlugin extends OutputPlugin
 
 	private void uploadPendingObjects()
 	{
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getContext());
+
+		if (prefs.getBoolean("config_enable_data_server", true) == false)
+			return;
+
 		if (this._uploadThread != null)
 			return;
 
@@ -260,7 +265,6 @@ public class HttpUploadPlugin extends OutputPlugin
 		{
 			final List<String> uploadCount = new ArrayList<String>();
 			final Resources resources = this.getContext().getResources();
-			final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getContext());
 
 			final Runnable r = new Runnable()
 			{
@@ -690,7 +694,12 @@ public class HttpUploadPlugin extends OutputPlugin
 
 	private File getPendingFolder()
 	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getContext());
+
 		File internalStorage = this.getContext().getFilesDir();
+
+		if (prefs.getBoolean("config_external_storage", false))
+			internalStorage = this.getContext().getExternalFilesDir(null);
 
 		if (!internalStorage.exists())
 			internalStorage.mkdirs();
@@ -706,9 +715,6 @@ public class HttpUploadPlugin extends OutputPlugin
 	private void persistJSONObject(JSONObject jsonObject)
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getContext());
-
-		if (prefs.getBoolean("config_enable_data_server", true) == false)
-			return;
 
 		long now = System.currentTimeMillis();
 
