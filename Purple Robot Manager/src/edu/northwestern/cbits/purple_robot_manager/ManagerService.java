@@ -40,6 +40,8 @@ public class ManagerService extends IntentService
 
 	public static String REFRESH_CONFIGURATION = "purple_robot_manager_refresh_configuration";
 
+	private static boolean _checkSetup = false;
+
 	public ManagerService()
 	{
 		super("ManagerService");
@@ -227,6 +229,9 @@ public class ManagerService extends IntentService
 
 	public static void setupPeriodicCheck(final Context context)
 	{
+		if (ManagerService._checkSetup)
+			return;
+
 		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
 		PendingIntent pi = PendingIntent.getService(context, 0, new Intent(ManagerService.PERIODIC_CHECK_INTENT), PendingIntent.FLAG_UPDATE_CURRENT);
@@ -250,5 +255,7 @@ public class ManagerService extends IntentService
 	        	context.startService(reloadIntent);
 	        }
 	    });
+
+		ManagerService._checkSetup = true;
 	}
 }

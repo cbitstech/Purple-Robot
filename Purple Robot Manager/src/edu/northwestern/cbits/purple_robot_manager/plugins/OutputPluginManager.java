@@ -9,6 +9,8 @@ import android.content.Intent;
 
 public class OutputPluginManager extends BroadcastReceiver
 {
+	public static OutputPluginManager sharedInstance = new OutputPluginManager();
+
 	private Map<Class<OutputPlugin>, OutputPlugin> _plugins = new HashMap<Class<OutputPlugin>, OutputPlugin>();
 
 	public void onReceive(Context context, Intent intent)

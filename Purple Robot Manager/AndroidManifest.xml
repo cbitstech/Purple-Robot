@@ -89,7 +89,6 @@
         <service android:name="edu.mit.media.funf.probe.builtin.ProximitySensorProbe"></service>
         <service android:name="edu.mit.media.funf.probe.builtin.RotationVectorSensorProbe"></service>
         <service android:name="edu.mit.media.funf.probe.builtin.TemperatureSensorProbe"></service>
-
         <service android:name="edu.mit.media.funf.probe.builtin.AudioFeaturesProbe"></service>
         <service android:name="edu.mit.media.funf.probe.builtin.AccelerometerFeaturesProbe"></service>
 		<activity android:name=".StartActivity" android:label="@string/app_name" android:theme="@style/Holo.Theme.Sherlock" android:launchMode="singleTask">
