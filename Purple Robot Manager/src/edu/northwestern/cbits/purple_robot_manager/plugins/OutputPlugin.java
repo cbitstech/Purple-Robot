@@ -131,7 +131,7 @@ public abstract class OutputPlugin
 		intentFilter.addAction(OutputPlugin.OUTPUT_EVENT);
 
 		LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(context);
-		localManager.registerReceiver(new OutputPluginManager(), intentFilter);
+		localManager.registerReceiver(OutputPluginManager.sharedInstance, intentFilter);
 	}
 
 	@SuppressWarnings("rawtypes")
