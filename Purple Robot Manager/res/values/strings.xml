@@ -237,6 +237,9 @@
     <string name="title_http_encrypt">Encrypt Sensor Data</string>
     <string name="summary_http_encrypt">Encrypt the collected sensor data on the local device and in transmissions.</string>
 
+    <string name="title_archive_enabled">Archive Transmitted Data</string>
+    <string name="summary_archive_enabled">Save data transmitted to the server on the local device for later review.</string>
+
     <string name="title_external_storage_enabled">Use External Storage</string>
     <string name="summary_external_storage_enabled">Persist data prior to transmission in an publicly-accessible location on the device.</string>
 </resources>

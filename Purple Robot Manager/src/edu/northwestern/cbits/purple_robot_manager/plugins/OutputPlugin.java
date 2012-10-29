@@ -11,6 +11,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.ActivityManager.RunningTaskInfo;
+import android.bluetooth.BluetoothClass;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -163,7 +165,11 @@ public abstract class OutputPlugin
 		{
 			Object value = values.get(key);
 
-			if (value instanceof String)
+			if (value == null || key == null)
+			{
+				// Skip
+			}
+			else if (value instanceof String)
 				json.put(key, value);
 			else if (value instanceof Bundle)
 			{
@@ -325,6 +331,32 @@ public abstract class OutputPlugin
 					else
 						Log.e("PRM", "LIST OBJ: " + o.getClass().getCanonicalName() + " IN " + key);
 				}
+
+				json.put(key, objectArray);
+			}
+			else if (value instanceof BluetoothClass)
+			{
+				BluetoothClass btClass = (BluetoothClass) value;
+
+				json.put(key, btClass.toString());
+			}
+			else if (value instanceof BluetoothDevice)
+			{
+				BluetoothDevice device = (BluetoothDevice) value;
+
+				JSONObject deviceObject = new JSONObject();
+
+				if (device.getBondState() == BluetoothDevice.BOND_BONDED)
+					deviceObject.put("Bond State", "Bonded");
+				if (device.getBondState() == BluetoothDevice.BOND_BONDING)
+					deviceObject.put("Bond State", "Bonding");
+				else
+					deviceObject.put("Bond State", "None");
+
+				deviceObject.put("Device Address", device.getAddress());
+				deviceObject.put("Device Class", device.getBluetoothClass().toString());
+
+				json.put(key, deviceObject);
 			}
 			else
 				Log.e("PRM", "GOT TYPE " + value.getClass().getCanonicalName() + " FOR " + key);

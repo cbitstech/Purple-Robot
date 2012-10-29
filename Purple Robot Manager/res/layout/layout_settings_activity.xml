@@ -26,7 +26,12 @@
             android:summary="@string/summary_external_storage_enabled"
             android:key="config_external_storage"
             android:defaultValue="false"/>
-      	<CheckBoxPreference
+        <CheckBoxPreference
+       	    android:title="@string/title_archive_enabled"
+            android:summary="@string/summary_archive_enabled"
+            android:key="config_http_archive"
+            android:defaultValue="false"/>
+       	<CheckBoxPreference
        	    android:title="@string/title_http_encrypt"
        	    android:summary="@string/summary_http_encrypt"
             android:key="config_http_encrypt"
