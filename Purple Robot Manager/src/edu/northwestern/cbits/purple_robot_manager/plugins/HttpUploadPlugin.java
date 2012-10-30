@@ -19,8 +19,11 @@ import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -42,8 +45,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.WazaBe.HoloEverywhere.widget.Toast;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -54,6 +60,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.net.http.AndroidHttpClient;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -78,7 +85,7 @@ public class HttpUploadPlugin extends OutputPlugin
 	private final static long MAX_UPLOAD_PERIOD = 3600000;
 	private final static long MIN_UPLOAD_PERIOD = 300000;
 
-	private final static long MAX_UPLOAD_SIZE = 1048576; // 1MB
+	private final static long MAX_UPLOAD_SIZE = 524288; // 512KB
 	private final static long MIN_UPLOAD_SIZE = 16384; // 16KB
 
 	private static final String CRYPTO_ALGORITHM = "AES/CBC/PKCS5Padding";
@@ -89,6 +96,8 @@ public class HttpUploadPlugin extends OutputPlugin
 
 	private long _uploadSize = MIN_UPLOAD_SIZE;
 	private long _uploadPeriod = MIN_UPLOAD_SIZE;
+
+	private boolean _uploading = false;
 
 	private void logSuccess(boolean success)
 	{
@@ -162,7 +171,8 @@ public class HttpUploadPlugin extends OutputPlugin
 		}
 	}
 
-	private SecretKeySpec keyForCipher(String cipherName) throws UnsupportedEncodingException {
+	private SecretKeySpec keyForCipher(String cipherName) throws UnsupportedEncodingException
+	{
 		String userHash = this.getUserHash();
 		String keyString = (new StringBuffer(userHash)).reverse().toString();
 
@@ -244,6 +254,9 @@ public class HttpUploadPlugin extends OutputPlugin
 
 	private void uploadPendingObjects()
 	{
+		if (this._uploading)
+			return;
+
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getContext());
 
 		if (prefs.getBoolean("config_enable_data_server", true) == false)
@@ -251,11 +264,41 @@ public class HttpUploadPlugin extends OutputPlugin
 
 		final long now = System.currentTimeMillis();
 
+		boolean keepGoing = true;
+
+		if (prefs.getBoolean("config_restrict_data_wifi", false))
+		{
+			WifiManager wifi = (WifiManager) this.getContext().getSystemService(Context.WIFI_SERVICE);
+
+			if (wifi.isWifiEnabled())
+			{
+				ConnectivityManager connection = (ConnectivityManager) this.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+				NetworkInfo netInfo = connection.getActiveNetworkInfo();
+
+				if (netInfo != null	&& netInfo.getType() != ConnectivityManager.TYPE_WIFI
+						&& netInfo.getState() != NetworkInfo.State.CONNECTED && netInfo.getState() != NetworkInfo.State.CONNECTING)
+					keepGoing = false;
+			}
+			else
+				keepGoing = false;
+
+			if (keepGoing == false)
+			{
+				this.broadcastMessage(R.string.message_wifi_pending);
+
+				this._lastUpload = now;
+
+				return;
+			}
+		}
+
 		final HttpUploadPlugin me = this;
 
 		if (now - me._lastUpload > me.uploadPeriod())
 		{
-			final List<String> uploadCount = new ArrayList<String>();
+			this._uploading = true;
+
 			final Resources resources = this.getContext().getResources();
 
 			final Runnable r = new Runnable()
@@ -322,11 +365,21 @@ public class HttpUploadPlugin extends OutputPlugin
 							}
 						});
 
+						Arrays.sort(pendingFiles, new Comparator<File>()
+						{
+							public int compare(File lhs, File rhs)
+							{
+								return (int) (lhs.lastModified() - rhs.lastModified());
+							}
+						});
+
 						ArrayList<JSONObject> pendingObjects = new ArrayList<JSONObject>();
+
+						int totalRead = 0;
 
 						for (File f : pendingFiles)
 						{
-							if (pendingObjects.size() < 1024)
+							if (totalRead < me.maxUploadSize())
 							{
 								try
 								{
@@ -341,6 +394,8 @@ public class HttpUploadPlugin extends OutputPlugin
 									{
 										baos.write(buffer, 0, read);
 									}
+
+									totalRead += baos.size();
 
 									cin.close();
 
@@ -603,16 +658,19 @@ public class HttpUploadPlugin extends OutputPlugin
 
 									File f = new File(pendingFolder, "pending_" + k + ".json");
 
-									CipherOutputStream cout = new CipherOutputStream(new FileOutputStream(f), encrypt);
+									if (f.exists() == false)
+									{
+										CipherOutputStream cout = new CipherOutputStream(new FileOutputStream(f), encrypt);
 
-									byte[] jsonBytes = toSave.toString().getBytes("UTF-8");
+										byte[] jsonBytes = toSave.toString().getBytes("UTF-8");
 
-									cout.write(jsonBytes);
+										cout.write(jsonBytes);
 
-									cout.flush();
-									cout.close();
+										cout.flush();
+										cout.close();
 
-									pendingObjects.removeAll(toRemove);
+										pendingObjects.removeAll(toRemove);
+									}
 								}
 
 								me.logSuccess(wasSuccessful);
@@ -639,50 +697,16 @@ public class HttpUploadPlugin extends OutputPlugin
 							}
 						}
 
-						if (continueUpload && uploadCount.size() < 16)
-						{
-							uploadCount.add("");
-
+						if (continueUpload)
 							me._lastUpload = 0;
-							this.run();
-						}
 					}
+
+					me._uploading = false;
 				}
 			};
 
-			boolean doUpload = true;
-
-			if (prefs.getBoolean("config_restrict_data_wifi", false))
-			{
-				WifiManager wifi = (WifiManager) this.getContext().getSystemService(Context.WIFI_SERVICE);
-
-				if (wifi.isWifiEnabled())
-				{
-					ConnectivityManager connection = (ConnectivityManager) this.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-
-					NetworkInfo netInfo = connection.getActiveNetworkInfo();
-
-					if (netInfo != null	&& netInfo.getType() != ConnectivityManager.TYPE_WIFI
-							&& netInfo.getState() != NetworkInfo.State.CONNECTED && netInfo.getState() != NetworkInfo.State.CONNECTING)
-						doUpload = false;
-				}
-				else
-					doUpload = false;
-			}
-
-			if (doUpload)
-			{
-				Thread _uploadThread = new Thread(r);
-				_uploadThread.start();
-			}
-			else
-			{
-				// Skip this cycle...
-
-				this.broadcastMessage(R.string.message_wifi_pending);
-
-				this._lastUpload = now;
-			}
+			Thread t = new Thread(r);
+			t.start();
 		}
 	}
 
@@ -737,7 +761,7 @@ public class HttpUploadPlugin extends OutputPlugin
 					if (jsonObject != null)
 						me._pendingSaves.add(jsonObject.toString());
 
-					if (now - me._lastSave > me.savePeriod() || me._pendingSaves.size() > 128)
+					if (now - me._lastSave > me.savePeriod() || me._pendingSaves.size() > 512)
 					{
 						me._lastSave = now;
 
@@ -834,6 +858,177 @@ public class HttpUploadPlugin extends OutputPlugin
 							me.persistJSONObject(null);
 						}
 					}
+				}
+			}
+		};
+
+		Thread t = new Thread(r);
+		t.start();
+	}
+
+	public void mailArchiveFiles(final Activity activity)
+	{
+		activity.runOnUiThread(new Runnable()
+		{
+			public void run()
+			{
+				Toast.makeText(activity, "Packaging archive files for mailing...", Toast.LENGTH_LONG).show();
+			}
+		});
+
+		final HttpUploadPlugin me = this;
+
+		Runnable r = new Runnable()
+		{
+			public void run()
+			{
+				File storage = activity.getExternalCacheDir();
+
+				if (!storage.exists())
+					storage.mkdirs();
+
+				File pendingFolder = me.getPendingFolder();
+
+				final File[] pendingFiles = pendingFolder.listFiles(new FileFilter()
+				{
+					public boolean accept(File file)
+					{
+						if (file.getName().toLowerCase().endsWith(".archive"))
+							return true;
+
+						return false;
+					}
+				});
+
+				final File zipfile = new File(storage, "archives.zip");
+
+				final ArrayList<File> toDelete = new ArrayList<File>();
+
+				try
+				{
+					ZipOutputStream zout = new ZipOutputStream(new FileOutputStream(zipfile));
+
+					int totalWritten = 0;
+
+					for (int i = 0; i < pendingFiles.length && totalWritten < (MAX_UPLOAD_SIZE * 5 * 4); i++)
+					{
+						File f = pendingFiles[i];
+
+						String filename = f.getName();
+						FileInputStream fin = new FileInputStream(f);
+
+						ZipEntry entry = new ZipEntry(filename);
+						zout.putNextEntry(entry);
+
+						byte[] buffer = new byte[2048];
+						int read = 0;
+
+						while ((read = fin.read(buffer, 0, buffer.length)) != -1)
+						{
+							zout.write(buffer, 0, read);
+							totalWritten += read;
+						}
+
+						fin.close();
+
+						zout.closeEntry();
+
+						toDelete.add(f);
+					}
+
+					zout.close();
+				}
+				catch (FileNotFoundException e)
+				{
+					e.printStackTrace();
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace();
+				}
+
+				activity.runOnUiThread(new Runnable()
+				{
+					public void run()
+					{
+					    AccountManager accountManager = AccountManager.get(activity);
+
+					    String email = null;
+
+					    Account[] accounts = accountManager.getAccountsByType("com.google");
+
+					    for (int i = 0; i < accounts.length && email == null; i++)
+					    {
+					    	Account account = accounts[i];
+
+					    	email = account.name;
+					    }
+
+						Uri fileUri = Uri.fromFile(zipfile);
+
+						Intent sendIntent = new Intent(Intent.ACTION_SEND);
+				        sendIntent.setType("application/zip");
+				        sendIntent.putExtra(Intent.EXTRA_SUBJECT, "Purple Robot Archives");
+				        sendIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
+
+				        if (email != null)
+				        {
+				        	String[] emails = { email };
+				        	sendIntent.putExtra(Intent.EXTRA_EMAIL, emails);
+				        }
+
+				        activity.startActivity(sendIntent);
+
+				        int remaining = pendingFiles.length - toDelete.size();
+
+				        Toast.makeText(activity, toDelete.size() + " archives packaged, " + remaining + " left in the device.", Toast.LENGTH_LONG).show();
+
+				        for (File f : toDelete)
+				        {
+				        	f.delete();
+				        }
+					}
+				});
+
+			}
+		};
+
+		Thread t = new Thread(r);
+		t.start();
+	}
+
+	public void deleteArchiveFiles(final Activity activity)
+	{
+		final HttpUploadPlugin me = this;
+
+		Runnable r = new Runnable()
+		{
+			public void run()
+			{
+				File pendingFolder = me.getPendingFolder();
+
+				final File[] pendingFiles = pendingFolder.listFiles(new FileFilter()
+				{
+					public boolean accept(File file)
+					{
+						if (file.getName().toLowerCase().endsWith(".archive"))
+							return true;
+
+						return false;
+					}
+				});
+
+				activity.runOnUiThread(new Runnable()
+				{
+					public void run()
+					{
+				        Toast.makeText(activity, "Deleting " + pendingFiles.length + " archive files...", Toast.LENGTH_LONG).show();
+					}
+				});
+
+				for (File f : pendingFiles)
+				{
+					f.delete();
 				}
 			}
 		};

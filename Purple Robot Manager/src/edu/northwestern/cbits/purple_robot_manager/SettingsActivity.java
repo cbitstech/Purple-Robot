@@ -14,6 +14,8 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.util.Log;
 
+import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
+import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 
 public class SettingsActivity extends PreferenceActivity implements OnPreferenceClickListener
@@ -22,6 +24,8 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 	private static final String MANUAL_REFRESH_KEY = "config_json_refresh_manually";
 	private static final String HAPTIC_PATTERN_KEY = "config_json_haptic_pattern";
 	public static final String RINGTONE_KEY = "config_default_notification_sound";
+	public static final String ZIP_ARCHIVES_KEY = "config_mail_archives";
+	public static final String DELETE_ARCHIVES_KEY = "config_delete_archives";
 
 	@SuppressWarnings("deprecation")
 	public void onCreate(Bundle savedInstanceState)
@@ -57,10 +61,18 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 
         PreferenceCategory category = (PreferenceCategory) prefs.findPreference("config_settings_probe_category");
         category.addPreference(probesScreen);
+
+        Preference archive = prefs.findPreference(ZIP_ARCHIVES_KEY);
+        archive.setOnPreferenceClickListener(this);
+
+        Preference delete = prefs.findPreference(DELETE_ARCHIVES_KEY);
+        delete.setOnPreferenceClickListener(this);
     }
 
 	public boolean onPreferenceClick(Preference preference)
 	{
+		Log.e("PRM", "CLICKED " + preference.getKey());
+
         if (HAPTIC_PATTERN_KEY.equals(preference.getKey()))
         {
         	ListPreference listPref = (ListPreference) preference;
@@ -85,8 +97,6 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
 			Editor editor = prefs.edit();
 
-			Log.e("PRM", "PREFS: " + prefs.getClass().getCanonicalName() + " " + prefs.hashCode());
-
 			editor.putLong(JSONConfigFile.JSON_LAST_UPDATE, 0);
 			editor.commit();
 			JSONConfigFile.update(this);
@@ -95,6 +105,22 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 			this.startService(funfIntent);
 
             return true;
+        }
+        else if (ZIP_ARCHIVES_KEY.equals(preference.getKey()))
+        {
+        	HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance.pluginForClass(HttpUploadPlugin.class);
+
+        	plugin.mailArchiveFiles(this);
+
+        	return true;
+        }
+        else if (DELETE_ARCHIVES_KEY.equals(preference.getKey()))
+        {
+        	HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance.pluginForClass(HttpUploadPlugin.class);
+
+        	plugin.deleteArchiveFiles(this);
+
+        	return true;
         }
 
         return false;
