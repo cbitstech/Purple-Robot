@@ -53,6 +53,17 @@
             android:key="config_restrict_data_wifi"
             android:defaultValue="false"/>
    		</PreferenceCategory>
+		<PreferenceScreen android:title="Beidh ceol, caint agus craic againn!"
+		    android:summary="Tho' lovely and fair as the rose of the summer, Yet 'twas not her beauty alone that won me, Oh, no, 'twas the truth in her eyes ever beaming That made me love Mary, the Rose of Tralee.">
+    		<PreferenceCategory android:title="John G.'s Extra Special Settings">
+   				<Preference android:title="Zip &amp; E-Mail Archived Files"
+            		android:key="config_mail_archives"
+            		android:defaultValue="0" />
+   				<Preference android:title="Delete Archived Files"
+            		android:key="config_delete_archives"
+            		android:defaultValue="0" />
+			</PreferenceCategory>
+   		</PreferenceScreen>
     <PreferenceCategory
         android:title="@string/config_settings_category">
         <EditTextPreference
@@ -82,5 +93,5 @@
    		<Preference android:title="@string/config_refresh_json_label"
             android:key="config_json_refresh_manually"
             android:defaultValue="0" />
-	    </PreferenceCategory>
+    </PreferenceCategory>
 </PreferenceScreen>

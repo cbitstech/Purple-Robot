@@ -13,6 +13,11 @@ public class OutputPluginManager extends BroadcastReceiver
 
 	private Map<Class<OutputPlugin>, OutputPlugin> _plugins = new HashMap<Class<OutputPlugin>, OutputPlugin>();
 
+	public OutputPlugin pluginForClass(Class<?> c)
+	{
+		return this._plugins.get(c);
+	}
+
 	public void onReceive(Context context, Intent intent)
 	{
 		for (Class<OutputPlugin> pluginClass : OutputPlugin.availablePluginClasses())

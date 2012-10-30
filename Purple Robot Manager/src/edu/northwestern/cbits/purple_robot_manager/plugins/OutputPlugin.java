@@ -334,6 +334,28 @@ public abstract class OutputPlugin
 
 				json.put(key, objectArray);
 			}
+			else if (value instanceof Location)
+			{
+				Location l = (Location) value;
+
+				JSONObject locObject = new JSONObject();
+
+				locObject.put("Accuracy", l.getAccuracy());
+				locObject.put("Altitude", l.getAltitude());
+				locObject.put("Bearing", l.getBearing());
+				locObject.put("Latitude", l.getLatitude());
+				locObject.put("Longitude", l.getLongitude());
+
+				if (l.getProvider() != null)
+					locObject.put("Provider", l.getProvider());
+				else
+					locObject.put("Provider", "Unknown");
+
+				locObject.put("Speed", l.getSpeed());
+				locObject.put("Timestamp", l.getTime());
+
+				json.put(key, l);
+			}
 			else if (value instanceof BluetoothClass)
 			{
 				BluetoothClass btClass = (BluetoothClass) value;
