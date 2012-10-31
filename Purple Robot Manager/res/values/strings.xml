@@ -211,12 +211,12 @@
     <string name="notify_upload_data">Uploading data to server&#8230;</string>
 
     <string name="message_package_upload">Preparing upload&#8230;</string>
-    <string name="message_upload_successful">Upload successful.</string>
+    <string name="message_upload_successful" formatted="false">Sent %d kB.</string>
     <string name="message_checksum_failed">Checksum error.</string>
     <string name="message_http_connection_error">HTTP connection failure.</string>
     <string name="message_socket_timeout_error">Socket timeout.</string>
 
-    <string name="message_transmit_bytes" formatted="false">Sending %d bytes&#8230;</string>
+    <string name="message_transmit_bytes" formatted="false">Sending %d kB&#8230;</string>
     <string name="message_server_error" formatted="false">Application error: %s</string>
     <string name="message_socket_error" formatted="false">Socket error: %s</string>
     <string name="message_unreachable_error">Upload unavailable.</string>
