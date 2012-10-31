@@ -276,8 +276,14 @@ public class HttpUploadPlugin extends OutputPlugin
 
 				NetworkInfo netInfo = connection.getActiveNetworkInfo();
 
-				if (netInfo != null	&& netInfo.getType() != ConnectivityManager.TYPE_WIFI
-						&& netInfo.getState() != NetworkInfo.State.CONNECTED && netInfo.getState() != NetworkInfo.State.CONNECTING)
+				if (netInfo != null)
+				{
+					if (netInfo.getType() != ConnectivityManager.TYPE_WIFI)
+						keepGoing = false;
+					else if (netInfo.getState() != NetworkInfo.State.CONNECTED && netInfo.getState() != NetworkInfo.State.CONNECTING)
+						keepGoing = false;
+				}
+				else
 					keepGoing = false;
 			}
 			else
