@@ -39,6 +39,7 @@
         <!-- <item>LogCatOutputPlugin</item> -->
         <item>TriggerOutputPlugin</item>
         <item>AppDisplayPlugin</item>
+        <!-- <item>DiagnosticAppDisplayPlugin</item> -->
         <item>HttpUploadPlugin</item>
     </array>
 
