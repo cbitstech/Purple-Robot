@@ -13,9 +13,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import edu.mit.media.funf.CustomizedIntentService;
-import edu.mit.media.funf.Utils;
 import edu.mit.media.funf.probe.Probe;
-import edu.mit.media.funf.storage.BundleSerializer;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 
 public class FunfService extends CustomizedIntentService

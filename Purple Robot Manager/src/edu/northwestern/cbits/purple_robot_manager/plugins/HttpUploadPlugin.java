@@ -257,52 +257,52 @@ public class HttpUploadPlugin extends OutputPlugin
 		if (this._uploading)
 			return;
 
-		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getContext());
-
-		if (prefs.getBoolean("config_enable_data_server", true) == false)
-			return;
+		final HttpUploadPlugin me = this;
 
 		final long now = System.currentTimeMillis();
 
-		boolean keepGoing = true;
-
-		if (prefs.getBoolean("config_restrict_data_wifi", false))
+		if (now - me._lastUpload > me.uploadPeriod())
 		{
-			WifiManager wifi = (WifiManager) this.getContext().getSystemService(Context.WIFI_SERVICE);
+			final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getContext());
 
-			if (wifi.isWifiEnabled())
+			if (prefs.getBoolean("config_enable_data_server", true) == false)
+				return;
+
+			boolean keepGoing = true;
+
+			if (prefs.getBoolean("config_restrict_data_wifi", false))
 			{
-				ConnectivityManager connection = (ConnectivityManager) this.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+				WifiManager wifi = (WifiManager) this.getContext().getSystemService(Context.WIFI_SERVICE);
 
-				NetworkInfo netInfo = connection.getActiveNetworkInfo();
-
-				if (netInfo != null)
+				if (wifi.isWifiEnabled())
 				{
-					if (netInfo.getType() != ConnectivityManager.TYPE_WIFI)
-						keepGoing = false;
-					else if (netInfo.getState() != NetworkInfo.State.CONNECTED && netInfo.getState() != NetworkInfo.State.CONNECTING)
+					ConnectivityManager connection = (ConnectivityManager) this.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+					NetworkInfo netInfo = connection.getActiveNetworkInfo();
+
+					if (netInfo != null)
+					{
+						if (netInfo.getType() != ConnectivityManager.TYPE_WIFI)
+							keepGoing = false;
+						else if (netInfo.getState() != NetworkInfo.State.CONNECTED && netInfo.getState() != NetworkInfo.State.CONNECTING)
+							keepGoing = false;
+					}
+					else
 						keepGoing = false;
 				}
 				else
 					keepGoing = false;
+
+				if (keepGoing == false)
+				{
+					this.broadcastMessage(R.string.message_wifi_pending);
+
+					this._lastUpload = now;
+
+					return;
+				}
 			}
-			else
-				keepGoing = false;
 
-			if (keepGoing == false)
-			{
-				this.broadcastMessage(R.string.message_wifi_pending);
-
-				this._lastUpload = now;
-
-				return;
-			}
-		}
-
-		final HttpUploadPlugin me = this;
-
-		if (now - me._lastUpload > me.uploadPeriod())
-		{
 			this._uploading = true;
 
 			final Resources resources = this.getContext().getResources();
@@ -539,10 +539,10 @@ public class HttpUploadPlugin extends OutputPlugin
 									httpPost.setEntity(entity);
 
 									String uploadMessage = String.format(resources.getString(R.string.message_transmit_bytes),
-											httpPost.getEntity().getContentLength());
+											(httpPost.getEntity().getContentLength() / 1024));
 									me.broadcastMessage(uploadMessage);
 
-									noteManager.notify(999, note);
+									noteManager.notify(12345, note);
 
 									AndroidHttpClient.modifyRequestToAcceptGzipResponse(httpPost);
 
@@ -600,8 +600,10 @@ public class HttpUploadPlugin extends OutputPlugin
 
 											wasSuccessful = true;
 
-											me.broadcastMessage(R.string.message_upload_successful);
+											String uploadedMessage = String.format(resources.getString(R.string.message_upload_successful),
+													(httpPost.getEntity().getContentLength() / 1024));
 
+											me.broadcastMessage(uploadedMessage);
 										}
 										else
 											me.broadcastMessage(R.string.message_checksum_failed);
@@ -647,7 +649,11 @@ public class HttpUploadPlugin extends OutputPlugin
 								{
 									httpClient.close();
 
-									noteManager.cancel(999);
+									String message = me.getContext().getString(R.string.notify_running);
+
+									note.setLatestEventInfo(me.getContext(), message, message, contentIntent);
+
+									noteManager.notify(12345, note);
 								}
 
 								for (int k = 0; pendingObjects.size() > 0; k++)
