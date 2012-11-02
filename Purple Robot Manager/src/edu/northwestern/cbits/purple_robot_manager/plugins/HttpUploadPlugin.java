@@ -528,7 +528,9 @@ public class HttpUploadPlugin extends OutputPlugin
 
 								try
 								{
-									URI siteUri = new URI(me.getContext().getResources().getString(R.string.sensor_upload_url));
+									String uriString = prefs.getString("config_data_server_uri", me.getContext().getResources().getString(R.string.sensor_upload_url));
+
+									URI siteUri = new URI(uriString);
 
 									HttpPost httpPost = new HttpPost(siteUri);
 
@@ -550,7 +552,10 @@ public class HttpUploadPlugin extends OutputPlugin
 
 									HttpEntity httpEntity = response.getEntity();
 
-									String contentHeader = response.getFirstHeader("Content-Encoding").getValue();
+									String contentHeader = null;
+
+									if (response.containsHeader("Content-Encoding"))
+										contentHeader = response.getFirstHeader("Content-Encoding").getValue();
 
 									if (contentHeader != null && contentHeader.endsWith("gzip"))
 									{
