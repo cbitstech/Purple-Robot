@@ -60,13 +60,15 @@ public class JavaScriptEngine
 
 		this._scope = _jsContext.initStandardObjects();
 
-/*		if (extras instanceof JSONObject)
+		Log.e("PRM", "RUN SCRIPT: " + script);
+
+		/* if (extras instanceof JSONObject)
 		{
 			JSONObject json = (JSONObject) extras;
 
 			extras = new JsonParser().parse(json.toString());
-		}
-*/
+		} */
+
 		Object thisWrapper = Context.javaToJS(this, this._scope);
 		ScriptableObject.putProperty(this._scope, "PurpleRobot", thisWrapper);
 
@@ -78,21 +80,26 @@ public class JavaScriptEngine
 
 	private Intent constructDirectLaunchIntent(final String applicationName, final NativeObject launchParams)
 	{
-		String packageName = this.packageForApplicationName(applicationName);
-
-		if (packageName != null)
+		if (applicationName.toLowerCase().startsWith("http://") || applicationName.toLowerCase().startsWith("https://"))
+			return new Intent(Intent.ACTION_VIEW, Uri.parse(applicationName));
+		else
 		{
-			Intent intent = this._context.getPackageManager().getLaunchIntentForPackage(packageName);
+			String packageName = this.packageForApplicationName(applicationName);
 
-			if (launchParams != null)
+			if (packageName != null)
 			{
-				for (Entry<Object, Object> e : launchParams.entrySet())
-				{
-					intent.putExtra(e.getKey().toString(), e.getValue().toString());
-				}
-			}
+				Intent intent = this._context.getPackageManager().getLaunchIntentForPackage(packageName);
 
-			return intent;
+				if (launchParams != null)
+				{
+					for (Entry<Object, Object> e : launchParams.entrySet())
+					{
+						intent.putExtra(e.getKey().toString(), e.getValue().toString());
+					}
+				}
+
+				return intent;
+			}
 		}
 
 		return null;
@@ -100,6 +107,9 @@ public class JavaScriptEngine
 
 	private Intent constructLaunchIntent(final String applicationName, final NativeObject launchParams, final String script)
 	{
+		if (applicationName == null)
+			return null;
+
 		String packageName = this.packageForApplicationName(applicationName);
 
 		if (packageName != null)
@@ -129,6 +139,33 @@ public class JavaScriptEngine
 			return intent;
 		}
 
+		if (applicationName.toLowerCase().startsWith("http://") || applicationName.toLowerCase().startsWith("https://"))
+		{
+			Intent intent = new Intent(ManagerService.APPLICATION_LAUNCH_INTENT);
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+			intent.putExtra(ManagerService.APPLICATION_LAUNCH_INTENT_URL, applicationName);
+
+			if (script != null)
+				intent.putExtra(ManagerService.APPLICATION_LAUNCH_INTENT_POSTSCRIPT, script);
+
+			if (launchParams != null)
+			{
+				HashMap<String, String> launchMap = new HashMap<String, String>();
+
+				for (Entry<Object, Object> e : launchParams.entrySet())
+				{
+					launchMap.put(e.getKey().toString(), e.getValue().toString());
+				}
+
+				JSONObject jsonMap = new JSONObject(launchMap);
+
+				intent.putExtra(ManagerService.APPLICATION_LAUNCH_INTENT_PARAMETERS, jsonMap.toString());
+			}
+
+			return intent;
+		}
+
 		return null;
 	}
 
@@ -136,7 +173,6 @@ public class JavaScriptEngine
 	{
 		return this.updateWidget(title, message, applicationName, new NativeObject(), null);
 	}
-
 
 	public boolean updateWidget(final String title, final String message, final String applicationName, final NativeObject launchParams, final String script)
 	{
@@ -153,11 +189,22 @@ public class JavaScriptEngine
 
 		Intent intent = this.constructLaunchIntent(applicationName, launchParams, script);
 
+		Log.e("PRM", "GOT INTENT: " + intent);
+
 		if (intent != null)
 		{
-			PendingIntent pi = PendingIntent.getService(this._context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+			Log.e("PRM", "SETTING LAUNCH INTENT");
 
-			views.setOnClickPendingIntent(R.id.widget_root_layout, pi);
+			if (intent.getAction().equals(ManagerService.APPLICATION_LAUNCH_INTENT))
+			{
+				PendingIntent pi = PendingIntent.getService(this._context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+				views.setOnClickPendingIntent(R.id.widget_root_layout, pi);
+			}
+			else
+			{
+				PendingIntent pi = PendingIntent.getActivity(this._context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+				views.setOnClickPendingIntent(R.id.widget_root_layout, pi);
+			}
 		}
 
 		widgetManager.updateAppWidget(widgetIds, views);
@@ -280,7 +327,11 @@ public class JavaScriptEngine
 
 			Notification note = new Notification(R.drawable.ic_launcher, message, displayWhen);
 
+			Log.e("PRM", "MAKING LAUNCH INTENT FOR " + applicationName);
+
 			Intent intent = this.constructDirectLaunchIntent(applicationName, launchParams);
+
+			Log.e("PRM", "NOTE LAUNCH INTENT: " + intent);
 
 			if (intent != null)
 			{

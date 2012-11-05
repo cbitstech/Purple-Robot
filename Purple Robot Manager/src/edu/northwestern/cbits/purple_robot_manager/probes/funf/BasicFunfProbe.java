@@ -3,20 +3,17 @@ package edu.northwestern.cbits.purple_robot_manager.probes.funf;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
-import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
-import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
+import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public abstract class BasicFunfProbe extends Probe
 {
@@ -100,8 +97,6 @@ public abstract class BasicFunfProbe extends Probe
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
 		Editor editor = prefs.edit();
 
-		Log.e("PRM", "UPDATE PREFS: " + prefs.getClass().getCanonicalName() + " " + prefs.hashCode());
-
 		if (json.has("period"))
 			editor.putString("config_probe_" + this.key() + "_period", json.getString("period"));
 
@@ -114,12 +109,7 @@ public abstract class BasicFunfProbe extends Probe
 		editor.commit();
 
 		prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-
-		Log.e("PRM", "config_probe_" + this.key() + "_period => " + prefs.getString("config_probe_" + this.key() + "_period", "none"));
-		Log.e("PRM", "config_probe_" + this.key() + "_duration => " + prefs.getString("config_probe_" + this.key() + "_duration", "none"));
-		Log.e("PRM", "config_probe_" + this.key() + "_enabled => " + prefs.getBoolean("config_probe_" + this.key() + "_enabled", true));
 	}
-
 
 	public Bundle[] dataRequestBundles(Context context)
 	{

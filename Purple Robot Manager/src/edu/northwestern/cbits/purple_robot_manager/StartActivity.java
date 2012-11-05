@@ -72,10 +72,17 @@ public class StartActivity extends SherlockActivity
     {
         super.onCreate(savedInstanceState);
 
-        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-        .detectAll()   // or .detectAll() for all detectable problems
-        .penaltyLog()
-        .build());
+        try
+        {
+        	StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+        	.detectAll()   // or .detectAll() for all detectable problems
+        	.penaltyLog()
+        	.build());
+        }
+        catch (NoClassDefFoundError e)
+        {
+        	// Older devices...
+        }
 
         this.getSupportActionBar().setTitle(R.string.title_probe_readings);
         this.setContentView(R.layout.layout_startup_activity);

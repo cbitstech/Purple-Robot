@@ -30,6 +30,7 @@ public class ManagerService extends IntentService
 	public static String INCOMING_DATA_INTENT = "purple_robot_manager_incoming_data";
 	public static String APPLICATION_LAUNCH_INTENT = "purple_robot_manager_application_launch";
 	public static String APPLICATION_LAUNCH_INTENT_PACKAGE = "purple_robot_manager_widget_launch_package";
+	public static String APPLICATION_LAUNCH_INTENT_URL = "purple_robot_manager_widget_launch_url";
 	public static String APPLICATION_LAUNCH_INTENT_PARAMETERS = "purple_robot_manager_widget_launch_parameters";
 	public static String APPLICATION_LAUNCH_INTENT_POSTSCRIPT = "purple_robot_manager_widget_launch_postscript";
 
@@ -143,48 +144,72 @@ public class ManagerService extends IntentService
 		}
 		else if (APPLICATION_LAUNCH_INTENT.equalsIgnoreCase(intent.getAction()))
 		{
-			String packageName = intent.getStringExtra(APPLICATION_LAUNCH_INTENT_PACKAGE);
-
-			if (packageName != null)
+			if (intent.hasExtra(APPLICATION_LAUNCH_INTENT_PACKAGE))
 			{
-				Intent launchIntent = this.getPackageManager().getLaunchIntentForPackage(packageName);
+				String packageName = intent.getStringExtra(APPLICATION_LAUNCH_INTENT_PACKAGE);
 
-				if (launchIntent != null)
+				if (packageName != null)
 				{
-					String launchParams = intent.getStringExtra(APPLICATION_LAUNCH_INTENT_PARAMETERS);
+					Intent launchIntent = this.getPackageManager().getLaunchIntentForPackage(packageName);
 
-					if (launchParams != null)
+					if (launchIntent != null)
 					{
-						try
+						String launchParams = intent.getStringExtra(APPLICATION_LAUNCH_INTENT_PARAMETERS);
+
+						if (launchParams != null)
 						{
-							JSONObject paramsObj = new JSONObject(launchParams);
-
-							@SuppressWarnings("unchecked")
-							Iterator<String> keys = paramsObj.keys();
-
-							while (keys.hasNext())
+							try
 							{
-								String key = keys.next();
+								JSONObject paramsObj = new JSONObject(launchParams);
 
-								launchIntent.putExtra(key, paramsObj.getString(key));
+								@SuppressWarnings("unchecked")
+								Iterator<String> keys = paramsObj.keys();
+
+								while (keys.hasNext())
+								{
+									String key = keys.next();
+
+									launchIntent.putExtra(key, paramsObj.getString(key));
+								}
+							}
+							catch (JSONException e)
+							{
+								e.printStackTrace();
 							}
 						}
-						catch (JSONException e)
-						{
-							e.printStackTrace();
-						}
+
+						this.startActivity(launchIntent);
 					}
 
-					this.startActivity(launchIntent);
+					String script = intent.getStringExtra(APPLICATION_LAUNCH_INTENT_POSTSCRIPT);
+
+					if (script != null)
+					{
+						JavaScriptEngine jsEngine = new JavaScriptEngine(this);
+
+						jsEngine.runScript(script);
+					}
 				}
+			}
+			else if (intent.hasExtra(APPLICATION_LAUNCH_INTENT_URL))
+			{
+				String url = intent.getStringExtra(APPLICATION_LAUNCH_INTENT_URL);
 
-				String script = intent.getStringExtra(APPLICATION_LAUNCH_INTENT_POSTSCRIPT);
-
-				if (script != null)
+				if (url != null)
 				{
-					JavaScriptEngine jsEngine = new JavaScriptEngine(this);
+					Intent launchIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+					launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-					jsEngine.runScript(script);
+					this.startActivity(launchIntent);
+
+					String script = intent.getStringExtra(APPLICATION_LAUNCH_INTENT_POSTSCRIPT);
+
+					if (script != null)
+					{
+						JavaScriptEngine jsEngine = new JavaScriptEngine(this);
+
+						jsEngine.runScript(script);
+					}
 				}
 			}
 		}

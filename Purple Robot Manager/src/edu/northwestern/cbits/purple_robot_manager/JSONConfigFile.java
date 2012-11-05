@@ -28,8 +28,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.util.Log;
-//import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 
@@ -50,8 +48,6 @@ public class JSONConfigFile
 
 	public static void updateFromOnline(final Context context, final Uri uri, boolean force)
 	{
-		Log.e("PRM", "IN updateFromOnline(Context, Uri)...");
-
 		if (!uri.equals(JSONConfigFile._configUri))
 			JSONConfigFile._sharedFile = null;
 
@@ -238,14 +234,10 @@ public class JSONConfigFile
 		if (userHash != null)
 			editor.putString("config_user_hash", userHash);
 
-		Log.e("PRM", "LOOKING FOR " + JSONConfigFile.JSON_PROBE_SETTINGS);
-
 		if (this.parameters.has(JSONConfigFile.JSON_PROBE_SETTINGS))
 		{
 			try
 			{
-				Log.e("PRM", "UPDATING PROBES");
-
 				JSONArray probeSettings = this.parameters.getJSONArray(JSONConfigFile.JSON_PROBE_SETTINGS);
 
 				ProbeManager.updateProbesFromJSON(context, probeSettings);

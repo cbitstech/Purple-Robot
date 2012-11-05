@@ -2,6 +2,7 @@ package edu.northwestern.cbits.purple_robot_manager.probes.funf;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import android.content.Context;
+import android.os.Bundle;
 
 public class TemperatureProbe extends BasicFunfProbe
 {
@@ -29,4 +30,12 @@ public class TemperatureProbe extends BasicFunfProbe
 	{
 		return context.getResources().getString(R.string.probe_environment_category);
 	}
+
+	public String summarizeValue(Context context, Bundle bundle)
+	{
+		float pressure = bundle.getFloatArray("TEMPERATURE")[0];
+
+		return String.format(context.getResources().getString(R.string.summary_pressure_probe), pressure);
+	}
+
 }

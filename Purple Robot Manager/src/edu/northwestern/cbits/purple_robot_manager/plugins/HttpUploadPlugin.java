@@ -382,10 +382,11 @@ public class HttpUploadPlugin extends OutputPlugin
 						ArrayList<JSONObject> pendingObjects = new ArrayList<JSONObject>();
 
 						int totalRead = 0;
+						int filesRead = 0;
 
 						for (File f : pendingFiles)
 						{
-							if (totalRead < me.maxUploadSize())
+							if (totalRead < me.maxUploadSize() && filesRead < 10)
 							{
 								try
 								{
@@ -437,6 +438,8 @@ public class HttpUploadPlugin extends OutputPlugin
 								}
 								else
 									f.delete();
+
+								filesRead += 1;
 							}
 						}
 
@@ -622,28 +625,31 @@ public class HttpUploadPlugin extends OutputPlugin
 								catch (HttpHostConnectException e)
 								{
 									me.broadcastMessage(R.string.message_http_connection_error);
+									e.printStackTrace();
 								}
 								catch (SocketTimeoutException e)
 								{
 									me.broadcastMessage(R.string.message_socket_timeout_error);
+									e.printStackTrace();
 								}
 								catch (SocketException e)
 								{
 									String errorMessage = String.format(resources.getString(R.string.message_socket_error),	e.getMessage());
 									me.broadcastMessage(errorMessage);
+									e.printStackTrace();
 								}
 								catch (UnknownHostException e)
 								{
 									me.broadcastMessage(R.string.message_unreachable_error);
+									e.printStackTrace();
 								}
 								catch (JSONException e)
 								{
 									me.broadcastMessage(R.string.message_response_error);
+									e.printStackTrace();
 								}
 								catch (Exception e)
 								{
-									e.printStackTrace();
-
 									e.printStackTrace();
 									String errorMessage = String.format(resources.getString(R.string.message_general_error), e.toString());
 									me.broadcastMessage(errorMessage);
@@ -660,6 +666,8 @@ public class HttpUploadPlugin extends OutputPlugin
 
 									noteManager.notify(12345, note);
 								}
+
+								Log.e("PRM", pendingObjects.size() + " ITEMS REMAINING...");
 
 								for (int k = 0; pendingObjects.size() > 0; k++)
 								{
