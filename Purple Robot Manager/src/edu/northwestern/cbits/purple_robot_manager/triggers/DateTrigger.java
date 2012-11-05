@@ -36,6 +36,9 @@ public class DateTrigger extends Trigger
 
 	private static SecureRandom random = null;
 
+	private PeriodList periodList = null;
+	private long lastUpdate = 0;
+
 	static
 	{
 		try
@@ -97,21 +100,35 @@ public class DateTrigger extends Trigger
 
 	public Period getPeriod(long timestamp)
 	{
-		DateTime from = new DateTime(new Date(timestamp - 5000));
-		DateTime to = new DateTime(new Date(timestamp + 5000));
+		if (timestamp - this.lastUpdate > 300000)
+		{
+			periodList = null;
+			this.lastUpdate = timestamp;
+		}
 
 		Date date = new Date(timestamp);
 
-		Period period = new Period(from, to);
-
-		// For each VEVENT in the ICS
-		for (Object o : this._calendar.getComponents("VEVENT"))
+		if (periodList == null)
 		{
-			Component c = (Component) o;
+			DateTime from = new DateTime(new Date(timestamp - 5000));
+			DateTime to = new DateTime(new Date(timestamp + 600000));
 
-			PeriodList list = c.calculateRecurrenceSet(period);
+			Period period = new Period(from, to);
 
-			for (Object po : list)
+			for (Object o : this._calendar.getComponents("VEVENT"))
+			{
+				Component c = (Component) o;
+
+				PeriodList l = c.calculateRecurrenceSet(period);
+
+				if (l != null && l.size() > 0)
+					periodList = l;
+			}
+		}
+
+		if (periodList != null)
+		{
+			for (Object po : periodList)
 			{
 				if (po instanceof Period)
 				{

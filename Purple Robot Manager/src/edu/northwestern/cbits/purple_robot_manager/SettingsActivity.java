@@ -12,7 +12,6 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
@@ -71,8 +70,6 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 
 	public boolean onPreferenceClick(Preference preference)
 	{
-		Log.e("PRM", "CLICKED " + preference.getKey());
-
         if (HAPTIC_PATTERN_KEY.equals(preference.getKey()))
         {
         	ListPreference listPref = (ListPreference) preference;
@@ -87,11 +84,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 			return true;
         }
         else if (PROBES_SCREEN_KEY.equals(preference.getKey()))
-        {
-        	Log.e("PRM", "START PROBES KEY");
-
 			return true;
-        }
         else if (MANUAL_REFRESH_KEY.equals(preference.getKey()))
         {
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());

@@ -11,12 +11,10 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.probes.funf.BasicFunfProbe;
@@ -143,7 +141,7 @@ public class ProbeManager
 		screen.setTitle(R.string.title_preference_probes_screen);
 		screen.setKey(SettingsActivity.PROBES_SCREEN_KEY);
 
-		PreferenceCategory globalCategory = new PreferenceCategory(settingsActivity);
+/*		PreferenceCategory globalCategory = new PreferenceCategory(settingsActivity);
 		globalCategory.setTitle(R.string.title_preference_probes_global_category);
 		globalCategory.setKey("key_available_probes");
 
@@ -155,7 +153,7 @@ public class ProbeManager
 		enabled.setDefaultValue(true);
 
 		globalCategory.addPreference(enabled);
-
+*/
 		PreferenceCategory probesCategory = new PreferenceCategory(settingsActivity);
 		probesCategory.setTitle(R.string.title_preference_probes_available_category);
 		probesCategory.setKey("key_available_probes");

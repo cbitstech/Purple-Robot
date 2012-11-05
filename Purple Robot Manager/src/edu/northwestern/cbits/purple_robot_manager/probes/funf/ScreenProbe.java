@@ -11,7 +11,6 @@ import android.preference.CheckBoxPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
@@ -46,13 +45,8 @@ public class ScreenProbe extends Probe
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		Editor editor = prefs.edit();
 
-		Log.e("PRM", "SCREEN");
-
 		if (json.has("enabled"))
-		{
-			Log.e("PRM", "SETTING ENABLED FOR SCREEN: " + json.getBoolean("enabled"));
 			editor.putBoolean("config_probe_screen_enabled", json.getBoolean("enabled"));
-		}
 
 		editor.commit();
 	}
