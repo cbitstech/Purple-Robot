@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<array name="probe_classes">
-        <item>funf.AccelerometerProbe</item>
+        <!-- <item>builtin.ContinuousAccelerometerProbe</item> -->
+        <!-- <item>builtin.ContinuousPressureProbe</item> -->
+        <!-- <item>builtin.BluetoothReceiverProbe</item> -->
+
+   	    <item>funf.AccelerometerProbe</item>
         <item>funf.AndroidInfoProbe</item>
         <item>funf.ActivityProbe</item>
         <item>funf.AudioFilesProbe</item>
@@ -33,7 +37,7 @@
         <item>funf.TimeOffsetProbe</item>
         <item>funf.VideoFilesProbe</item>
         <item>funf.WifiProbe</item>
-  	</array>
+   	</array>
 
 	<array name="output_plugin_classes">
         <!-- <item>LogCatOutputPlugin</item> -->
