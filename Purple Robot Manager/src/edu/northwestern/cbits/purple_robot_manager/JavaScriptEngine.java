@@ -189,12 +189,8 @@ public class JavaScriptEngine
 
 		Intent intent = this.constructLaunchIntent(applicationName, launchParams, script);
 
-		Log.e("PRM", "GOT INTENT: " + intent);
-
 		if (intent != null)
 		{
-			Log.e("PRM", "SETTING LAUNCH INTENT");
-
 			if (intent.getAction().equals(ManagerService.APPLICATION_LAUNCH_INTENT))
 			{
 				PendingIntent pi = PendingIntent.getService(this._context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -327,11 +323,7 @@ public class JavaScriptEngine
 
 			Notification note = new Notification(R.drawable.ic_launcher, message, displayWhen);
 
-			Log.e("PRM", "MAKING LAUNCH INTENT FOR " + applicationName);
-
 			Intent intent = this.constructDirectLaunchIntent(applicationName, launchParams);
-
-			Log.e("PRM", "NOTE LAUNCH INTENT: " + intent);
 
 			if (intent != null)
 			{

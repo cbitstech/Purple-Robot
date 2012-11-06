@@ -175,6 +175,12 @@
 
     <string name="title_probe_readings">Status</string>
 
+    <string name="title_builtin_pressure_probe">Pressure Probe (Built-in)</string>
+    <string name="summary_builtin_pressure_probe_desc">Uses a native sensor to record pressure readings continuously.</string>
+
+    <string name="title_builtin_accelerometer_probe">Accelerometer Probe (Built-in)</string>
+    <string name="summary_builtin_accelerometer_probe_desc">Uses a native acceletmeter to record acceleration vector continuously.</string>
+
     <string name="summary_accelerator_probe" formatted="false">%.2f X, %.2f Y, %.2f Z</string>
     <string name="summary_gyroscope_probe" formatted="false">%.2f X, %.2f Y, %.2f Z</string>
     <string name="summary_magnetic_probe" formatted="false">%.1f X, %.1f Y, %.1f Z</string>
