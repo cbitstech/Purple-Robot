@@ -16,7 +16,6 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Editable;
 import android.util.Log;
@@ -26,11 +25,14 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.WazaBe.HoloEverywhere.app.AlertDialog;
+import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
+import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
 import com.WazaBe.HoloEverywhere.widget.Toast;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
@@ -201,27 +203,34 @@ public class StartActivity extends SherlockActivity
 
 	public void refreshList()
 	{
-		long now = System.currentTimeMillis();
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-		if (this._isPaused == false && now - 1000 > this._lastUpdate)
-		{
-	        ListView listView = (ListView) this.findViewById(R.id.list_probes);
+        boolean probesEnabled = prefs.getBoolean("config_probes_enabled", false);
 
-	        ListAdapter adapter = listView.getAdapter();
+        if (probesEnabled)
+        {
+    		long now = System.currentTimeMillis();
 
-	        if (adapter instanceof BaseAdapter)
-			{
-	        	BaseAdapter baseAdapter = (BaseAdapter) adapter;
+    		if (this._isPaused == false && now - 1000 > this._lastUpdate)
+    		{
+    	        ListView listView = (ListView) this.findViewById(R.id.list_probes);
 
-	        	baseAdapter.notifyDataSetChanged();
-	        }
+    	        ListAdapter adapter = listView.getAdapter();
 
-	        listView.invalidateViews();
+    	        if (adapter instanceof BaseAdapter)
+    			{
+    	        	BaseAdapter baseAdapter = (BaseAdapter) adapter;
 
-	        this.getSupportActionBar().setTitle(String.format(this.getResources().getString(R.string.title_probes_count), StartActivity._probeNames.size()));
+    	        	baseAdapter.notifyDataSetChanged();
+    	        }
 
-	        this._lastUpdate = now;
-		}
+    	        listView.invalidateViews();
+
+    	        this.getSupportActionBar().setTitle(String.format(this.getResources().getString(R.string.title_probes_count), StartActivity._probeNames.size()));
+
+    	        this._lastUpdate = now;
+    		}
+        }
 	}
 
 	protected void onDestroy()
@@ -259,7 +268,9 @@ public class StartActivity extends SherlockActivity
 
 		Uri jsonConfigUri = this.getIntent().getData();
 
-        final String savedPassword = PreferenceManager.getDefaultSharedPreferences(this).getString("config_password", null);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        final String savedPassword = prefs.getString("config_password", null);
 
         if (jsonConfigUri != null)
         {
@@ -270,6 +281,24 @@ public class StartActivity extends SherlockActivity
         }
 
         this._isPaused = false;
+
+        ListView listView = (ListView) this.findViewById(R.id.list_probes);
+        ImageView logoView = (ImageView) this.findViewById(R.id.logo_view);
+
+        boolean probesEnabled = prefs.getBoolean("config_probes_enabled", false);
+
+        this.getSupportActionBar().setTitle(R.string.app_name);
+
+        if (probesEnabled)
+        {
+        	listView.setVisibility(View.VISIBLE);
+        	logoView.setVisibility(View.GONE);
+        }
+        else
+        {
+        	listView.setVisibility(View.GONE);
+        	logoView.setVisibility(View.VISIBLE);
+        }
 
         this.refreshList();
 	}

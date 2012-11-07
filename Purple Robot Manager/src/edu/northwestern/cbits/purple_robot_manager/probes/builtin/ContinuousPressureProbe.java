@@ -7,7 +7,6 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.SystemClock;
-import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 
 public class ContinuousPressureProbe extends ContinuousProbe implements SensorEventListener
@@ -38,15 +37,14 @@ public class ContinuousPressureProbe extends ContinuousProbe implements SensorEv
 
 	}
 
-	@SuppressLint("NewApi")
 	public void onSensorChanged(SensorEvent event)
 	{
 		long now = System.currentTimeMillis();
 		long elapsed = SystemClock.elapsedRealtime();
 
-		long boot = (now - elapsed) * 1000 * 1000;
+//		long boot = (now - elapsed) * 1000 * 1000;
 
-		long timestamp = event.timestamp + boot;
+//		long timestamp = event.timestamp + boot;
 
 //		Log.e("PRM", "GOT SENSOR READING FOR " + event.sensor.getName());
 //		Log.e("PRM", "GOT TIMESTAMP: " + timestamp);

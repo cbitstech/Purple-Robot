@@ -5,9 +5,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
-import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.StartActivity;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 

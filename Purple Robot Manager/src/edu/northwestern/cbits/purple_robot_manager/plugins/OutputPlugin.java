@@ -354,7 +354,7 @@ public abstract class OutputPlugin
 				locObject.put("Speed", l.getSpeed());
 				locObject.put("Timestamp", l.getTime());
 
-				json.put(key, l);
+				json.put(key, locObject);
 			}
 			else if (value instanceof BluetoothClass)
 			{
