@@ -9,12 +9,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.WazaBe.HoloEverywhere.preference.CheckBoxPreference;
+import com.WazaBe.HoloEverywhere.preference.PreferenceCategory;
+import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
+import com.WazaBe.HoloEverywhere.preference.PreferenceScreen;
+import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
+import com.WazaBe.HoloEverywhere.sherlock.SPreferenceActivity;
+
 import android.content.Context;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
-import android.preference.PreferenceCategory;
-import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.probes.funf.BasicFunfProbe;
@@ -57,38 +60,29 @@ public class ProbeManager
 
 	public static Map<String, Bundle[]> getDataRequests(Context context)
 	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+		boolean isEnabled = prefs.getBoolean("config_probes_enabled", false);
+
 		HashMap<String, Bundle[]> probesMap = new HashMap<String, Bundle[]>();
 
-		for (Probe probe : ProbeManager.allProbes())
+		if (isEnabled)
 		{
-			String name = probe.name(context);
+			for (Probe probe : ProbeManager.allProbes())
+			{
+				String name = probe.name(context);
 
-			Bundle[] bundles = new Bundle[0];
+				Bundle[] bundles = new Bundle[0];
 
-			if (probe.isEnabled(context))
-				bundles = probe.dataRequestBundles(context);
+				if (probe.isEnabled(context))
+					bundles = probe.dataRequestBundles(context);
 
-			probesMap.put(name, bundles);
+				probesMap.put(name, bundles);
+			}
 		}
 
 		return probesMap;
 	}
-
-/*	public static PreferenceScreen inflatePreferenceScreenFromResource(PreferenceActivity settingsActivity, int resId, PreferenceManager manager)
-    {
-    	try
-    	{
-            Class<PreferenceManager> cls = PreferenceManager.class;
-            Method method = cls.getDeclaredMethod("inflateFromResource", Context.class, int.class, PreferenceScreen.class);
-            return (PreferenceScreen) method.invoke(manager, settingsActivity, resId, null);
-        }
-    	catch(Exception e)
-    	{
-    		e.printStackTrace();
-        }
-
-        return null;
-    } */
 
 	public static Probe probeForName(String name)
 	{
@@ -131,7 +125,7 @@ public class ProbeManager
 		return null;
 	}
 
-	public static PreferenceScreen buildPreferenceScreen(PreferenceActivity settingsActivity)
+	public static PreferenceScreen buildPreferenceScreen(SPreferenceActivity settingsActivity)
 	{
 		@SuppressWarnings("deprecation")
 		PreferenceManager manager = settingsActivity.getPreferenceManager();
@@ -141,19 +135,19 @@ public class ProbeManager
 		screen.setTitle(R.string.title_preference_probes_screen);
 		screen.setKey(SettingsActivity.PROBES_SCREEN_KEY);
 
-/*		PreferenceCategory globalCategory = new PreferenceCategory(settingsActivity);
+		PreferenceCategory globalCategory = new PreferenceCategory(settingsActivity);
 		globalCategory.setTitle(R.string.title_preference_probes_global_category);
 		globalCategory.setKey("key_available_probes");
 
 		screen.addPreference(globalCategory);
 
 		CheckBoxPreference enabled = new CheckBoxPreference(settingsActivity);
-		enabled.setTitle(R.string.title_enable_probe);
-		enabled.setKey("config_probe_enabled");
-		enabled.setDefaultValue(true);
+		enabled.setTitle(R.string.title_preference_probes_enable_probes);
+		enabled.setKey("config_probes_enabled");
+		enabled.setDefaultValue(false);
 
 		globalCategory.addPreference(enabled);
-*/
+
 		PreferenceCategory probesCategory = new PreferenceCategory(settingsActivity);
 		probesCategory.setTitle(R.string.title_preference_probes_available_category);
 		probesCategory.setKey("key_available_probes");

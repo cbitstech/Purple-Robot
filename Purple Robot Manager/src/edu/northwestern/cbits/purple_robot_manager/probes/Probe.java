@@ -6,10 +6,11 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.WazaBe.HoloEverywhere.preference.PreferenceScreen;
+import com.WazaBe.HoloEverywhere.sherlock.SPreferenceActivity;
+
 import android.content.Context;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
-import android.preference.PreferenceScreen;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 
@@ -24,7 +25,7 @@ public abstract class Probe
 	public abstract String title(Context context);
 	public abstract String probeCategory(Context context);
 	public abstract Bundle[] dataRequestBundles(Context context);
-	public abstract PreferenceScreen preferenceScreen(PreferenceActivity settingsActivity);
+	public abstract PreferenceScreen preferenceScreen(SPreferenceActivity settingsActivity);
 
 	@SuppressWarnings("rawtypes")
 	private static List<Class> _probeClasses = new ArrayList<Class>();

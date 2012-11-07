@@ -3,15 +3,16 @@ package edu.northwestern.cbits.purple_robot_manager.probes.funf;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.WazaBe.HoloEverywhere.preference.CheckBoxPreference;
+import com.WazaBe.HoloEverywhere.preference.ListPreference;
+import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
+import com.WazaBe.HoloEverywhere.preference.PreferenceScreen;
+import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
+import com.WazaBe.HoloEverywhere.preference.SharedPreferences.Editor;
+import com.WazaBe.HoloEverywhere.sherlock.SPreferenceActivity;
+
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
-import android.preference.ListPreference;
-import android.preference.PreferenceActivity;
-import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
@@ -32,7 +33,7 @@ public abstract class BasicFunfProbe extends Probe
 	}
 
 	@SuppressWarnings("deprecation")
-	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+	public PreferenceScreen preferenceScreen(SPreferenceActivity activity)
 	{
 		PreferenceManager manager = activity.getPreferenceManager();
 
