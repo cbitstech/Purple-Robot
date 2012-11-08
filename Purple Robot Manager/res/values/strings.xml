@@ -181,6 +181,12 @@
     <string name="title_builtin_accelerometer_probe">Accelerometer Probe (Built-in)</string>
     <string name="summary_builtin_accelerometer_probe_desc">Uses a native acceletmeter to record acceleration vector continuously.</string>
 
+    <string name="title_builtin_gyroscope_probe">Gyroscope Probe (Built-in)</string>
+    <string name="summary_builtin_gyroscope_probe_desc">Measures angular speed around each axis.</string>
+
+    <string name="title_builtin_magnetic_probe">Magnetic Field Probe (Built-in)</string>
+    <string name="summary_builtin_magnetic_field_probe_desc">Detect the local magnetic field. Can be used as to detect the earth\'s magnetic field, but may be distorted by metal objects around device.</string>
+
     <string name="summary_accelerator_probe" formatted="false">%.2f X, %.2f Y, %.2f Z</string>
     <string name="summary_gyroscope_probe" formatted="false">%.2f X, %.2f Y, %.2f Z</string>
     <string name="summary_magnetic_probe" formatted="false">%.1f X, %.1f Y, %.1f Z</string>
@@ -195,7 +201,7 @@
     <string name="summary_cell_probe" formatted="false">Cell Tower ID: %s</string>
     <string name="summary_light_probe" formatted="false">%.4f lux units</string>
     <string name="summary_bookmarks_probe" formatted="false">%d bookmarks</string>
-    <string name="summary_pressure_probe" formatted="false">%.2f pressure units</string>
+    <string name="summary_pressure_probe" formatted="false">%.2f pressure units (Alt: %.2f m)</string>
     <string name="summary_searches_probe" formatted="false">%d searches</string>
     <string name="summary_files_probe" formatted="false">%d files</string>
     <string name="summary_proximity_value_probe" formatted="false">Distance: %.1f</string>
@@ -249,4 +255,6 @@
 
     <string name="title_external_storage_enabled">Use External Storage</string>
     <string name="summary_external_storage_enabled">Persist data prior to transmission in an publicly-accessible location on the device.</string>
+
+    <string name="probe_frequency_label">Sampling Rate</string>
 </resources>

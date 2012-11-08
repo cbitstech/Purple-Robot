@@ -251,32 +251,41 @@ public class JSONConfigFile
 		editor.commit();
 	}
 
-	public static void update(Context context)
+	public static void update(final Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-
-		long lastUpdate = prefs.getLong(JSONConfigFile.JSON_LAST_UPDATE, 0);
-
-		long now = System.currentTimeMillis();
-
-		int interval = Integer.parseInt(prefs.getString("config_json_refresh_interval", "60"));
-
-		if (now - lastUpdate > 1000 * 60 * interval)
+		Runnable r = new Runnable()
 		{
-			Editor edit = prefs.edit();
+			public void run()
+			{
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-			boolean force = false;
+				long lastUpdate = prefs.getLong(JSONConfigFile.JSON_LAST_UPDATE, 0);
 
-			force = (lastUpdate == 0);
+				long now = System.currentTimeMillis();
 
-			String uriString = prefs.getString(JSONConfigFile.JSON_CONFIGURATION_URL, null);
+				int interval = Integer.parseInt(prefs.getString("config_json_refresh_interval", "60"));
 
-			if (uriString != null)
-				JSONConfigFile.updateFromOnline(context, Uri.parse(uriString), force);
+				if (now - lastUpdate > 1000 * 60 * interval)
+				{
+					Editor edit = prefs.edit();
 
-			edit.putLong(JSONConfigFile.JSON_LAST_UPDATE, now);
-			edit.commit();
-		}
+					boolean force = false;
+
+					force = (lastUpdate == 0);
+
+					String uriString = prefs.getString(JSONConfigFile.JSON_CONFIGURATION_URL, null);
+
+					if (uriString != null)
+						JSONConfigFile.updateFromOnline(context, Uri.parse(uriString), force);
+
+					edit.putLong(JSONConfigFile.JSON_LAST_UPDATE, now);
+					edit.commit();
+				}
+			}
+		};
+
+		Thread t = new Thread(r);
+		t.start();
 	}
 
 	protected String content()

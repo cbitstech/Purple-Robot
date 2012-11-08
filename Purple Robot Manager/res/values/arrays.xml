@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<array name="probe_classes">
-        <!-- <item>builtin.ContinuousAccelerometerProbe</item> -->
-        <!-- <item>builtin.ContinuousPressureProbe</item> -->
+        <item>builtin.ContinuousAccelerometerProbe</item>
+        <item>builtin.ContinuousPressureProbe</item>
+        <item>builtin.ContinuousGyroscopeProbe</item>
+        <item>builtin.ContinuousMagneticFieldProbe</item>
         <!-- <item>builtin.BluetoothReceiverProbe</item> -->
 
-   	    <item>funf.AccelerometerProbe</item>
+   	    <!--  <item>funf.AccelerometerProbe</item> -->
         <item>funf.AndroidInfoProbe</item>
-        <item>funf.ActivityProbe</item>
+        <!-- <item>funf.ActivityProbe</item> -->
         <item>funf.AudioFilesProbe</item>
         <item>funf.BatteryProbe</item>
         <item>funf.BluetoothProbe</item>
@@ -16,19 +18,19 @@
         <item>funf.CallLogProbe</item>
         <item>funf.CellTowerProbe</item>
         <item>funf.ContactProbe</item>
- 		<item>funf.GravityProbe</item>
-        <item>funf.GyroscopeProbe</item>
+ 		<!-- <item>funf.GravityProbe</item> -->
+        <!-- <item>funf.GyroscopeProbe</item> -->
         <item>funf.HardwareInfoProbe</item>
         <item>funf.ImageFilesProbe</item>
 		<item>funf.InstalledApplicationsProbe</item>
         <item>funf.LightProbe</item>
-        <item>funf.LinearAccelerationProbe</item>
+        <!-- <item>funf.LinearAccelerationProbe</item> -->
 	    <item>funf.LocationProbe</item>
-		<item>funf.MagneticFieldProbe</item>
-	    <item>funf.OrientationProbe</item>
-	    <item>funf.PressureProbe</item>
+		<!-- <item>funf.MagneticFieldProbe</item> -->
+	    <!-- <item>funf.OrientationProbe</item> -->
+	    <!-- <item>funf.PressureProbe</item> -->
 	    <item>funf.ProximityProbe</item>
-        <item>funf.RotationVectorProbe</item>
+        <!-- <item>funf.RotationVectorProbe</item> -->
 	    <item>funf.RunningApplicationsProbe</item>
 	    <item>funf.ScreenProbe</item>
         <item>funf.SmsProbe</item>
@@ -174,4 +176,51 @@
         <item>200</item>
         <item>1000</item>
 	</integer-array>
+
+	<string-array name="probe_acceleration_frequency_values">
+        <item>5</item>
+        <item>10</item>
+        <item>20</item>
+        <item>30</item>
+        <item>50</item>
+        <item>100</item>
+        <item>200</item>
+        <item>5000</item>
+        <item>1000</item>
+        <item>5000</item>
+        <item>10000</item>
+   	</string-array>
+
+	<string-array name="probe_acceleration_frequency_labels">
+        <item>200 per second</item>
+        <item>100 per second</item>
+        <item>50 per second</item>
+        <item>30 per second</item>
+        <item>20 per second</item>
+        <item>10 per second</item>
+        <item>5 per second</item>
+        <item>2 per second</item>
+        <item>1 per second</item>
+        <item>Every 5 seconds</item>
+        <item>Every 10 seconds</item>
+	</string-array>
+
+	<string-array name="probe_builtin_frequency_values">
+        <item>100</item>
+        <item>200</item>
+        <item>5000</item>
+        <item>1000</item>
+        <item>5000</item>
+        <item>10000</item>
+   	</string-array>
+
+	<string-array name="probe_builtin_frequency_labels">
+        <item>10 per second</item>
+        <item>5 per second</item>
+        <item>2 per second</item>
+        <item>1 per second</item>
+        <item>Every 5 seconds</item>
+        <item>Every 10 seconds</item>
+	</string-array>
+
 </resources>

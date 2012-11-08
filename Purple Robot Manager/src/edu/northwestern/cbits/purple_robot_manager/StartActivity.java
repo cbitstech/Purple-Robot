@@ -15,7 +15,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Editable;
 import android.util.Log;
@@ -74,7 +73,7 @@ public class StartActivity extends SherlockActivity
     {
         super.onCreate(savedInstanceState);
 
-        try
+/*        try
         {
         	StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
         	.detectAll()   // or .detectAll() for all detectable problems
@@ -84,7 +83,7 @@ public class StartActivity extends SherlockActivity
         catch (NoClassDefFoundError e)
         {
         	// Older devices...
-        }
+        } */
 
         this.getSupportActionBar().setTitle(R.string.title_probe_readings);
         this.setContentView(R.layout.layout_startup_activity);
@@ -160,7 +159,7 @@ public class StartActivity extends SherlockActivity
         		Bundle value = StartActivity._probeValues.get(sensorName);
         		Date sensorDate = StartActivity._probeDates.get(sensorName);
 
-        		Probe probe = ProbeManager.probeForName(sensorName);
+        		Probe probe = ProbeManager.probeForName(sensorName, me);
 
         		String formattedValue = sensorName;
 
@@ -203,34 +202,52 @@ public class StartActivity extends SherlockActivity
 
 	public void refreshList()
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		final StartActivity me = this;
+		final long now = System.currentTimeMillis();
 
-        boolean probesEnabled = prefs.getBoolean("config_probes_enabled", false);
+		Runnable r = new Runnable()
+		{
+			public void run()
+			{
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(me);
 
-        if (probesEnabled)
-        {
-    		long now = System.currentTimeMillis();
+		        boolean probesEnabled = prefs.getBoolean("config_probes_enabled", false);
 
-    		if (this._isPaused == false && now - 1000 > this._lastUpdate)
-    		{
-    	        ListView listView = (ListView) this.findViewById(R.id.list_probes);
+		        if (probesEnabled)
+		        {
+		    		if (me._isPaused == false && now - 1000 > me._lastUpdate)
+		    		{
+		    			Runnable rr = new Runnable()
+		    			{
+							public void run()
+							{
+				    	        ListView listView = (ListView) me.findViewById(R.id.list_probes);
 
-    	        ListAdapter adapter = listView.getAdapter();
+				    	        ListAdapter adapter = listView.getAdapter();
 
-    	        if (adapter instanceof BaseAdapter)
-    			{
-    	        	BaseAdapter baseAdapter = (BaseAdapter) adapter;
+				    	        if (adapter instanceof BaseAdapter)
+				    			{
+				    	        	BaseAdapter baseAdapter = (BaseAdapter) adapter;
 
-    	        	baseAdapter.notifyDataSetChanged();
-    	        }
+				    	        	baseAdapter.notifyDataSetChanged();
+				    	        }
 
-    	        listView.invalidateViews();
+				    	        listView.invalidateViews();
 
-    	        this.getSupportActionBar().setTitle(String.format(this.getResources().getString(R.string.title_probes_count), StartActivity._probeNames.size()));
+				    	        me.getSupportActionBar().setTitle(String.format(me.getResources().getString(R.string.title_probes_count), StartActivity._probeNames.size()));
 
-    	        this._lastUpdate = now;
-    		}
-        }
+				    	        me._lastUpdate = now;
+							}
+		    			};
+
+		    			me.runOnUiThread(rr);
+		    		}
+		        }
+			}
+		};
+
+		Thread t = new Thread(r);
+		t.start();
 	}
 
 	protected void onDestroy()

@@ -13,7 +13,7 @@ import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 
-public class ContinuousAccelerometerProbe extends ContinuousProbe implements SensorEventListener
+public class ContinuousMagneticFieldProbe extends ContinuousProbe implements SensorEventListener
 {
 	private static int BUFFER_SIZE = 40;
 
@@ -37,7 +37,7 @@ public class ContinuousAccelerometerProbe extends ContinuousProbe implements Sen
 		{
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
 
-			frequency = Long.parseLong(prefs.getString("config_probe_accelerometer_built_in_frequency", "1000"));
+			frequency = Long.parseLong(prefs.getString("config_probe_magnetic_built_in_frequency", "1000"));
 
 			int bufferSize = 1000 / (int) frequency;
 
@@ -64,12 +64,12 @@ public class ContinuousAccelerometerProbe extends ContinuousProbe implements Sen
 
 	public String name(Context context)
 	{
-		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousAccelerometerProbe";
+		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousMagneticFieldProbe";
 	}
 
 	public int getTitleResource()
 	{
-		return R.string.title_builtin_accelerometer_probe;
+		return R.string.title_builtin_magnetic_probe;
 	}
 
 	public int getCategoryResource()
@@ -87,9 +87,9 @@ public class ContinuousAccelerometerProbe extends ContinuousProbe implements Sen
 
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-		if (prefs.getBoolean("config_probe_accelerometer_built_in_enabled", true))
+		if (prefs.getBoolean("config_probe_magnetic_built_in_enabled", true))
 		{
-			sensors.registerListener(this, sensors.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_FASTEST, null);
+			sensors.registerListener(this, sensors.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_FASTEST, null);
 
 			return true;
 		}
@@ -99,7 +99,7 @@ public class ContinuousAccelerometerProbe extends ContinuousProbe implements Sen
 
 	public void onSensorChanged(SensorEvent event)
 	{
-		final long now = System.currentTimeMillis();
+		long now = System.currentTimeMillis();
 
 		if (now - this.lastSeen > this.getFrequency() && bufferIndex <= timeBuffer.length)
 		{
@@ -111,7 +111,6 @@ public class ContinuousAccelerometerProbe extends ContinuousProbe implements Sen
 				long timestamp = event.timestamp + boot;
 
 				timeBuffer[bufferIndex] = timestamp;
-
 				accuracyBuffer[bufferIndex] = event.accuracy;
 
 				for (int i = 0; i < event.values.length; i++)
@@ -136,11 +135,10 @@ public class ContinuousAccelerometerProbe extends ContinuousProbe implements Sen
 					sensorBundle.putString("VENDOR", sensor.getVendor());
 					sensorBundle.putInt("VERSION", sensor.getVersion());
 
-					data.putLong("TIMESTAMP", now / 1000);
-
 					data.putString("PROBE", this.name(this._context));
 
 					data.putBundle("SENSOR", sensorBundle);
+					data.putLong("TIMESTAMP", now / 1000);
 
 					data.putLongArray("EVENT_TIMESTAMP", timeBuffer);
 					data.putIntArray("ACCURACY", accuracyBuffer);
@@ -162,7 +160,7 @@ public class ContinuousAccelerometerProbe extends ContinuousProbe implements Sen
 
 	public String getPreferenceKey()
 	{
-		return "accelerometer_built_in";
+		return "magnetic_built_in";
 	}
 
 	public int getResourceFrequencyLabels()
@@ -181,6 +179,6 @@ public class ContinuousAccelerometerProbe extends ContinuousProbe implements Sen
 		float yReading = bundle.getFloatArray("Y")[0];
 		float zReading = bundle.getFloatArray("Z")[0];
 
-		return String.format(context.getResources().getString(R.string.summary_accelerator_probe), xReading, yReading, zReading);
+		return String.format(context.getResources().getString(R.string.summary_magnetic_probe), xReading, yReading, zReading);
 	}
 }

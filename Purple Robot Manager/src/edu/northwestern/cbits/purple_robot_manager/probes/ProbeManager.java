@@ -20,6 +20,7 @@ import android.content.Context;
 import android.os.Bundle;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.funf.BasicFunfProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.funf.ContactProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.funf.PeriodFunfProbe;
@@ -84,7 +85,7 @@ public class ProbeManager
 		return probesMap;
 	}
 
-	public static Probe probeForName(String name)
+	public static Probe probeForName(String name, Context context)
 	{
 		if (ProbeManager._cachedProbes.containsKey(name))
 			return ProbeManager._cachedProbes.get(name);
@@ -112,6 +113,13 @@ public class ProbeManager
 				ContactProbe contact = (ContactProbe) probe;
 
 				if (contact.funfName().equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof ContinuousProbe)
+			{
+				ContinuousProbe continuous = (ContinuousProbe) probe;
+
+				if (continuous.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 
