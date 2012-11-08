@@ -68,5 +68,6 @@ public abstract class Probe
 	{
 		return bundle.toString();
 	}
+
 	public abstract void updateFromJSON(Context context, JSONObject json) throws JSONException;
 }

@@ -1,26 +1,27 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
+import java.util.UUID;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.WazaBe.HoloEverywhere.preference.CheckBoxPreference;
+import com.WazaBe.HoloEverywhere.preference.ListPreference;
 import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
 import com.WazaBe.HoloEverywhere.preference.PreferenceScreen;
 import com.WazaBe.HoloEverywhere.sherlock.SPreferenceActivity;
 
 import android.content.Context;
+import android.content.Intent;
+import android.hardware.Sensor;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
+import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public abstract class ContinuousProbe extends Probe
 {
-	public abstract String name(Context context);
-
-	public String title(Context context)
-	{
-		return this.name(context);
-	}
-
-	public abstract String probeCategory(Context context);
+	protected Context _context = null;
 
 	public Bundle[] dataRequestBundles(Context context)
 	{
@@ -35,16 +36,74 @@ public abstract class ContinuousProbe extends Probe
 		PreferenceScreen screen = manager.createPreferenceScreen(activity);
 		screen.setTitle(this.title(activity));
 
+		String key = this.getPreferenceKey();
+
+		CheckBoxPreference enabled = new CheckBoxPreference(activity);
+		enabled.setTitle(R.string.title_enable_probe);
+		enabled.setKey("config_probe_" + key + "_enabled");
+		enabled.setDefaultValue(true);
+
+		screen.addPreference(enabled);
+
+		ListPreference duration = new ListPreference(activity);
+		duration.setKey("config_probe_" + key + "_frequency");
+		duration.setDefaultValue("1000");
+		duration.setEntryValues(this.getResourceFrequencyValues());
+		duration.setEntries(this.getResourceFrequencyLabels());
+		duration.setTitle(R.string.probe_frequency_label);
+
+		screen.addPreference(duration);
+
 		return screen;
 	}
 
 	public boolean isEnabled(Context context)
 	{
+		this._context = context.getApplicationContext();
+
 		return true;
 	}
 
 	public void updateFromJSON(Context context, JSONObject json) throws JSONException
 	{
+		// TODO...
+	}
 
+	public abstract int getResourceFrequencyLabels();
+	public abstract int getResourceFrequencyValues();
+
+	public abstract int getTitleResource();
+	public abstract int getCategoryResource();
+	public abstract long getFrequency();
+	public abstract String getPreferenceKey();
+
+	public void onAccuracyChanged(Sensor sensor, int accuracy)
+	{
+
+	}
+
+	public String title(Context context)
+	{
+		return context.getString(this.getTitleResource());
+	}
+
+	public String probeCategory(Context context)
+	{
+		return context.getResources().getString(this.getCategoryResource());
+	}
+
+	protected void transmitData(Bundle data)
+	{
+		if (this._context != null)
+		{
+			UUID uuid = UUID.randomUUID();
+			data.putString("GUID", uuid.toString());
+
+			LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(this._context);
+			Intent intent = new Intent(edu.northwestern.cbits.purple_robot_manager.probes.Probe.PROBE_READING);
+			intent.putExtras(data);
+
+			localManager.sendBroadcast(intent);
+		}
 	}
 }
