@@ -85,7 +85,7 @@ public class HttpUploadPlugin extends OutputPlugin
 	private final static long MAX_UPLOAD_PERIOD = 3600000;
 	private final static long MIN_UPLOAD_PERIOD = 300000;
 
-	private final static long MAX_UPLOAD_SIZE = 524288; // 512KB
+	private final static long MAX_UPLOAD_SIZE = 262144; // 512KB
 	private final static long MIN_UPLOAD_SIZE = 16384; // 16KB
 
 	private static final String CRYPTO_ALGORITHM = "AES/CBC/PKCS5Padding";
@@ -591,6 +591,8 @@ public class HttpUploadPlugin extends OutputPlugin
 									}
 									else
 										body = EntityUtils.toString(httpEntity);
+
+									Log.e("PRM", "GOT RESPONSE: " + body);
 
 									JSONObject json = new JSONObject(body);
 

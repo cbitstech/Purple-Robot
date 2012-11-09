@@ -19,13 +19,13 @@ public class ContinuousAccelerometerProbe extends ContinuousProbe implements Sen
 
 	private static String[] fieldNames = { "X", "Y", "Z" };
 
-	private long lastSeen = 0;
+	private double lastSeen = 0;
 	private long lastFrequencyLookup = 0;
 	private long frequency = 1000;
 
 	private float valueBuffer[][] = new float[3][BUFFER_SIZE];
 	private int accuracyBuffer[] = new int[BUFFER_SIZE];
-	private long timeBuffer[] = new long[BUFFER_SIZE];
+	private double timeBuffer[] = new double[BUFFER_SIZE];
 
 	private int bufferIndex  = 0;
 
@@ -52,7 +52,7 @@ public class ContinuousAccelerometerProbe extends ContinuousProbe implements Sen
 
 					valueBuffer = new float[3][bufferSize];
 					accuracyBuffer = new int[bufferSize];
-					timeBuffer = new long[bufferSize];
+					timeBuffer = new double[bufferSize];
 				}
 			}
 
@@ -99,18 +99,18 @@ public class ContinuousAccelerometerProbe extends ContinuousProbe implements Sen
 
 	public void onSensorChanged(SensorEvent event)
 	{
-		final long now = System.currentTimeMillis();
+		final double now = (double) System.currentTimeMillis();
 
 		if (now - this.lastSeen > this.getFrequency() && bufferIndex <= timeBuffer.length)
 		{
 			synchronized(this)
 			{
-				long elapsed = SystemClock.elapsedRealtime();
-				long boot = (now - elapsed) * 1000 * 1000;
+				double elapsed = (double) SystemClock.elapsedRealtime();
+				double boot = (now - elapsed) * 1000 * 1000;
 
-				long timestamp = event.timestamp + boot;
+				double timestamp = event.timestamp + boot;
 
-				timeBuffer[bufferIndex] = timestamp;
+				timeBuffer[bufferIndex] = timestamp / 1000000;
 
 				accuracyBuffer[bufferIndex] = event.accuracy;
 
@@ -136,13 +136,13 @@ public class ContinuousAccelerometerProbe extends ContinuousProbe implements Sen
 					sensorBundle.putString("VENDOR", sensor.getVendor());
 					sensorBundle.putInt("VERSION", sensor.getVersion());
 
-					data.putLong("TIMESTAMP", now / 1000);
+					data.putDouble("TIMESTAMP", now / 1000);
 
 					data.putString("PROBE", this.name(this._context));
 
 					data.putBundle("SENSOR", sensorBundle);
 
-					data.putLongArray("EVENT_TIMESTAMP", timeBuffer);
+					data.putDoubleArray("EVENT_TIMESTAMP", timeBuffer);
 					data.putIntArray("ACCURACY", accuracyBuffer);
 
 					for (int i = 0; i < fieldNames.length; i++)
