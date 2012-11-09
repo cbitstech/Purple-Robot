@@ -216,6 +216,19 @@ public abstract class OutputPlugin
 
 				json.put(key, longArray);
 			}
+			else if (value instanceof double[])
+			{
+				double[] doubles = (double[]) value;
+
+				JSONArray doubleArray = new JSONArray();
+
+				for (double d : doubles)
+				{
+					doubleArray.put(d);
+				}
+
+				json.put(key, doubleArray);
+			}
 			else if (value instanceof Float)
 			{
 				Float f = (Float) value;
