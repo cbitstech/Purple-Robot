@@ -5,6 +5,7 @@
         <item>builtin.ContinuousPressureProbe</item>
         <item>builtin.ContinuousGyroscopeProbe</item>
         <item>builtin.ContinuousMagneticFieldProbe</item>
+        <item>builtin.VisibleSatelliteProbe</item>
         <!-- <item>builtin.BluetoothReceiverProbe</item> -->
 
    	    <!--  <item>funf.AccelerometerProbe</item> -->

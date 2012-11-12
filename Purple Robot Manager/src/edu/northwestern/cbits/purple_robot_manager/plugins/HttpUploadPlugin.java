@@ -125,7 +125,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 	private long savePeriod()
 	{
-		return 30000;
+		return 10000;
 	}
 
 	private long uploadPeriod()
@@ -804,7 +804,7 @@ public class HttpUploadPlugin extends OutputPlugin
 			if (jsonObject != null)
 				this._pendingSaves.add(jsonObject.toString());
 
-			if (now - this._lastSave > this.savePeriod() || this._pendingSaves.size() > 512)
+			if (now - this._lastSave > this.savePeriod() || this._pendingSaves.size() > 128)
 			{
 				this._lastSave = now;
 
