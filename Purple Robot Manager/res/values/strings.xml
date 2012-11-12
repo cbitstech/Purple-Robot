@@ -187,6 +187,8 @@
     <string name="title_builtin_magnetic_probe">Magnetic Field Probe (Built-in)</string>
     <string name="summary_builtin_magnetic_field_probe_desc">Detect the local magnetic field. Can be used as to detect the earth\'s magnetic field, but may be distorted by metal objects around device.</string>
 
+	<string name="title_builtin_satellite_probe">Visible Satellite Probe</string>
+
     <string name="summary_accelerator_probe" formatted="false">%.2f X, %.2f Y, %.2f Z</string>
     <string name="summary_gyroscope_probe" formatted="false">%.2f X, %.2f Y, %.2f Z</string>
     <string name="summary_magnetic_probe" formatted="false">%.1f X, %.1f Y, %.1f Z</string>
