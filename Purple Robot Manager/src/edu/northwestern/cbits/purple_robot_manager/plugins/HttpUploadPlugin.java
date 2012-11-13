@@ -503,8 +503,6 @@ public class HttpUploadPlugin extends OutputPlugin
 								}
 							}
 
-							Log.e("PRM", "UPLOADING " + toUpload.size()	+ "/" + pendingObjects.size() + " ITEMS...");
-
 							JSONArray uploadArray = new JSONArray();
 
 							for (int i = 0; i < toUpload.size(); i++)
@@ -692,8 +690,6 @@ public class HttpUploadPlugin extends OutputPlugin
 
 									noteManager.notify(12345, note);
 								}
-
-								Log.e("PRM", pendingObjects.size() + " ITEMS REMAINING...");
 
 								while(pendingObjects.size() > 0)
 								{

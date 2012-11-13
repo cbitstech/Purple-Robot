@@ -224,4 +224,19 @@
         <item>Every 10 seconds</item>
 	</string-array>
 
+
+	<string-array name="probe_satellite_frequency_values">
+        <item>60000</item>
+        <item>300000</item>
+        <item>600000</item>
+        <item>1800000</item>
+ 	</string-array>
+
+	<string-array name="probe_satellite_frequency_labels">
+        <item>Every minute</item>
+        <item>Every 5 minutes</item>
+        <item>Every 10 minutes</item>
+        <item>Every 30 minutes</item>
+	</string-array>
+
 </resources>

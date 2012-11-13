@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -68,22 +67,9 @@ public class StartActivity extends SherlockActivity
 		this.startActivity(intent);
 	}
 
-	@SuppressLint("NewApi")
 	protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
-/*        try
-        {
-        	StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-        	.detectAll()   // or .detectAll() for all detectable problems
-        	.penaltyLog()
-        	.build());
-        }
-        catch (NoClassDefFoundError e)
-        {
-        	// Older devices...
-        } */
 
         this.getSupportActionBar().setTitle(R.string.title_probe_readings);
         this.setContentView(R.layout.layout_startup_activity);
@@ -156,6 +142,7 @@ public class StartActivity extends SherlockActivity
         		TextView valueField = (TextView) convertView.findViewById(R.id.text_sensor_value);
 
         		String sensorName = StartActivity._probeNames.get(position);
+
         		Bundle value = StartActivity._probeValues.get(sensorName);
         		Date sensorDate = StartActivity._probeDates.get(sensorName);
 
