@@ -56,7 +56,7 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 		CheckBoxPreference enabled = new CheckBoxPreference(activity);
 		enabled.setTitle(R.string.title_enable_probe);
 		enabled.setKey("config_probe_" + key + "_enabled");
-		enabled.setDefaultValue(true);
+		enabled.setDefaultValue(false);
 
 		screen.addPreference(enabled);
 
