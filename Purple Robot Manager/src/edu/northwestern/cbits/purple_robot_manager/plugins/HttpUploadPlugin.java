@@ -7,6 +7,7 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
@@ -19,7 +20,6 @@ import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -45,11 +45,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
-import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
-import com.WazaBe.HoloEverywhere.preference.SharedPreferences.Editor;
-import com.WazaBe.HoloEverywhere.widget.Toast;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
@@ -67,6 +62,11 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
+import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
+import com.WazaBe.HoloEverywhere.preference.SharedPreferences.Editor;
+import com.WazaBe.HoloEverywhere.widget.Toast;
+
 import edu.emory.mathcs.backport.java.util.Arrays;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.StartActivity;
@@ -82,6 +82,8 @@ public class HttpUploadPlugin extends OutputPlugin
 	private final static String CHECKSUM_KEY = "Checksum";
 	private final static String STATUS_KEY = "Status";
 
+	private final static int WIFI_MULTIPLIER = 3;
+
 	private final static long MAX_UPLOAD_PERIOD = 3600000;
 	private final static long MIN_UPLOAD_PERIOD = 300000;
 
@@ -95,7 +97,7 @@ public class HttpUploadPlugin extends OutputPlugin
 	private long _lastUpload = 0;
 
 	private long _uploadSize = MIN_UPLOAD_SIZE;
-	private long _uploadPeriod = MIN_UPLOAD_SIZE;
+	private long _uploadPeriod = MIN_UPLOAD_PERIOD;
 
 	private boolean _uploading = false;
 
@@ -135,7 +137,12 @@ public class HttpUploadPlugin extends OutputPlugin
 
 	private long maxUploadSize()
 	{
-		return this._uploadSize; // 128KB
+		int multiplier = 1;
+
+		if (this.wifiAvailable())
+			multiplier = WIFI_MULTIPLIER;
+
+		return this._uploadSize * multiplier; // 128KB
 	}
 
 	public String[] respondsTo()
@@ -150,8 +157,21 @@ public class HttpUploadPlugin extends OutputPlugin
 		if (OutputPlugin.FORCE_UPLOAD.equals(intent.getAction()))
 		{
 			this._lastUpload = 0;
+			this._lastSave = 0;
 
-			this.uploadPendingObjects();
+			final HttpUploadPlugin me = this;
+
+			Runnable r = new Runnable()
+			{
+				public void run()
+				{
+					me.persistJSONObject(null);
+					me.uploadPendingObjects();
+				}
+			};
+
+			Thread t = new Thread(r);
+			t.start();
 		}
 		else
 		{
@@ -263,6 +283,32 @@ public class HttpUploadPlugin extends OutputPlugin
 		return userHash;
 	}
 
+	private boolean wifiAvailable()
+	{
+		WifiManager wifi = (WifiManager) this.getContext().getSystemService(Context.WIFI_SERVICE);
+
+		if (wifi.isWifiEnabled())
+		{
+			ConnectivityManager connection = (ConnectivityManager) this.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+			NetworkInfo netInfo = connection.getActiveNetworkInfo();
+
+			if (netInfo != null)
+			{
+				if (netInfo.getType() != ConnectivityManager.TYPE_WIFI)
+					return false;
+				else if (netInfo.getState() != NetworkInfo.State.CONNECTED && netInfo.getState() != NetworkInfo.State.CONNECTING)
+					return false;
+			}
+			else
+				return false;
+
+			return true;
+		}
+
+		return false;
+	}
+
 	private void uploadPendingObjects()
 	{
 		if (this._uploading)
@@ -279,32 +325,9 @@ public class HttpUploadPlugin extends OutputPlugin
 			if (prefs.getBoolean("config_enable_data_server", false) == false)
 				return;
 
-			boolean keepGoing = true;
-
 			if (prefs.getBoolean("config_restrict_data_wifi", true))
 			{
-				WifiManager wifi = (WifiManager) this.getContext().getSystemService(Context.WIFI_SERVICE);
-
-				if (wifi.isWifiEnabled())
-				{
-					ConnectivityManager connection = (ConnectivityManager) this.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-
-					NetworkInfo netInfo = connection.getActiveNetworkInfo();
-
-					if (netInfo != null)
-					{
-						if (netInfo.getType() != ConnectivityManager.TYPE_WIFI)
-							keepGoing = false;
-						else if (netInfo.getState() != NetworkInfo.State.CONNECTED && netInfo.getState() != NetworkInfo.State.CONNECTING)
-							keepGoing = false;
-					}
-					else
-						keepGoing = false;
-				}
-				else
-					keepGoing = false;
-
-				if (keepGoing == false)
+				if (this.wifiAvailable() == false)
 				{
 					this.broadcastMessage(R.string.message_wifi_pending);
 
@@ -371,33 +394,25 @@ public class HttpUploadPlugin extends OutputPlugin
 
 						File pendingFolder = me.getPendingFolder();
 
-						File[] pendingFiles = pendingFolder.listFiles(new FileFilter()
+						String[] filenames = pendingFolder.list(new FilenameFilter()
 						{
-							public boolean accept(File file)
+							public boolean accept(File dir, String filename)
 							{
-								if (file.getName().toLowerCase().endsWith(".json"))
-									return true;
-
-								return false;
+								return filename.toLowerCase().endsWith(".json");
 							}
 						});
 
-						Arrays.sort(pendingFiles, new Comparator<File>()
-						{
-							public int compare(File lhs, File rhs)
-							{
-								return (int) (lhs.lastModified() - rhs.lastModified());
-							}
-						});
+						Arrays.sort(filenames);
 
 						ArrayList<JSONObject> pendingObjects = new ArrayList<JSONObject>();
 
 						int totalRead = 0;
-						int filesRead = 0;
 
-						for (File f : pendingFiles)
+						for (String filename : filenames)
 						{
-							if (totalRead < me.maxUploadSize() && filesRead < 10)
+							File f = new File(pendingFolder, filename);
+
+							if (totalRead == 0 || totalRead + f.length() < me.maxUploadSize())
 							{
 								try
 								{
@@ -449,8 +464,6 @@ public class HttpUploadPlugin extends OutputPlugin
 								}
 								else
 									f.delete();
-
-								filesRead += 1;
 							}
 						}
 
@@ -490,7 +503,7 @@ public class HttpUploadPlugin extends OutputPlugin
 								}
 							}
 
-							Log.e("PRM", "UPLOADING " + toUpload.size()	+ " ITEMS...");
+							Log.e("PRM", "UPLOADING " + toUpload.size()	+ "/" + pendingObjects.size() + " ITEMS...");
 
 							JSONArray uploadArray = new JSONArray();
 
@@ -682,7 +695,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 								Log.e("PRM", pendingObjects.size() + " ITEMS REMAINING...");
 
-								for (int k = 0; pendingObjects.size() > 0; k++)
+								while(pendingObjects.size() > 0)
 								{
 									JSONArray toSave = new JSONArray();
 
@@ -694,21 +707,27 @@ public class HttpUploadPlugin extends OutputPlugin
 										toRemove.add(pendingObjects.get(i));
 									}
 
-									File f = new File(pendingFolder, "pending_" + k + ".json");
+									int l = 0;
 
-									if (f.exists() == false)
+									File f = new File(pendingFolder, "pending_" + l + ".json");
+
+									while (f.exists())
 									{
-										CipherOutputStream cout = new CipherOutputStream(new FileOutputStream(f), encrypt);
+										l += 1;
 
-										byte[] jsonBytes = toSave.toString().getBytes("UTF-8");
-
-										cout.write(jsonBytes);
-
-										cout.flush();
-										cout.close();
-
-										pendingObjects.removeAll(toRemove);
+										f = new File(pendingFolder, "pending_" + l + ".json");
 									}
+
+									CipherOutputStream cout = new CipherOutputStream(new FileOutputStream(f), encrypt);
+
+									byte[] jsonBytes = toSave.toString().getBytes("UTF-8");
+
+									cout.write(jsonBytes);
+
+									cout.flush();
+									cout.close();
+
+									pendingObjects.removeAll(toRemove);
 								}
 
 								me.logSuccess(wasSuccessful);
