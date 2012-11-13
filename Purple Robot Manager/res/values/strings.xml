@@ -211,6 +211,7 @@
     <string name="summary_installed_apps_probe" formatted="false">%d installed apps</string>
     <string name="summary_telephony_probe" formatted="false">Network Operator: %s</string>
     <string name="summary_temperature_probe" formatted="false">%.4f degrees</string>
+    <string name="summary_satellite_probe" formatted="false">Visible Satellites: %d</string>
 
     <string name="summary_sms_probe" formatted="false">%d messages</string>
     <string name="summary_tasks_probe" formatted="false">%d running tasks</string>
