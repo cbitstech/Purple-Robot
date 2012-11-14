@@ -125,7 +125,6 @@ public abstract class OutputPlugin
 			}
 			catch (InstantiationException e)
 			{
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
