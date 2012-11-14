@@ -8,7 +8,6 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.SystemClock;
 
-import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
 import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -35,7 +34,7 @@ public class ContinuousAccelerometerProbe extends ContinuousProbe implements Sen
 
 		if (now - this.lastFrequencyLookup > 5000 && this._context != null)
 		{
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+			SharedPreferences prefs = this.getPreferences(this._context);
 
 			frequency = Long.parseLong(prefs.getString("config_probe_accelerometer_built_in_frequency", "1000"));
 
@@ -85,7 +84,7 @@ public class ContinuousAccelerometerProbe extends ContinuousProbe implements Sen
 
         this._context = context.getApplicationContext();
 
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = this.getPreferences(context);
 
 		if (prefs.getBoolean("config_probe_accelerometer_built_in_enabled", true))
 		{

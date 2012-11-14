@@ -5,22 +5,34 @@ import java.util.UUID;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.WazaBe.HoloEverywhere.preference.CheckBoxPreference;
-import com.WazaBe.HoloEverywhere.preference.ListPreference;
-import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
-import com.WazaBe.HoloEverywhere.preference.PreferenceScreen;
-import com.WazaBe.HoloEverywhere.sherlock.SPreferenceActivity;
-
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+
+import com.WazaBe.HoloEverywhere.preference.CheckBoxPreference;
+import com.WazaBe.HoloEverywhere.preference.ListPreference;
+import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
+import com.WazaBe.HoloEverywhere.preference.PreferenceScreen;
+import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
+import com.WazaBe.HoloEverywhere.sherlock.SPreferenceActivity;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public abstract class ContinuousProbe extends Probe
 {
+	private static SharedPreferences prefs = null;
+
+	protected static SharedPreferences getPreferences(Context context)
+	{
+		if (ContinuousProbe.prefs == null)
+			ContinuousProbe.prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+
+		return ContinuousProbe.prefs;
+	}
+
 	protected Context _context = null;
 
 	public Bundle[] dataRequestBundles(Context context)
