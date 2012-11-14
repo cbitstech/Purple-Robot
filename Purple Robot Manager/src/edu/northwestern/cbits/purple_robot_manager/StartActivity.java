@@ -59,6 +59,16 @@ public class StartActivity extends SherlockActivity
 	private boolean _isPaused = true;
 	private long _lastUpdate = 0;
 
+	private SharedPreferences prefs = null;
+
+	private SharedPreferences getPreferences(Context context)
+	{
+		if (this.prefs == null)
+			this.prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
+
+		return this.prefs;
+	}
+
 	private void launchPreferences()
 	{
 		Intent intent = new Intent();
@@ -196,7 +206,7 @@ public class StartActivity extends SherlockActivity
 		{
 			public void run()
 			{
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(me);
+				SharedPreferences prefs = me.getPreferences(me);
 
 		        boolean probesEnabled = prefs.getBoolean("config_probes_enabled", false);
 
@@ -233,8 +243,17 @@ public class StartActivity extends SherlockActivity
 			}
 		};
 
-		Thread t = new Thread(r);
-		t.start();
+		try
+		{
+			Thread t = new Thread(r);
+			t.start();
+		}
+		catch (OutOfMemoryError e)
+		{
+			Log.e("PRM", "OOM IN START ACTIVITY");
+
+			System.gc();
+		}
 	}
 
 	protected void onDestroy()
@@ -272,7 +291,7 @@ public class StartActivity extends SherlockActivity
 
 		Uri jsonConfigUri = this.getIntent().getData();
 
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		SharedPreferences prefs = this.getPreferences(this);
 
         final String savedPassword = prefs.getString("config_password", null);
 
@@ -327,7 +346,7 @@ public class StartActivity extends SherlockActivity
 
     			break;
     		case R.id.menu_settings_item:
-    	        final String savedPassword = PreferenceManager.getDefaultSharedPreferences(this).getString("config_password", null);
+    	        final String savedPassword = this.getPreferences(this).getString("config_password", null);
 
     	        final StartActivity me = this;
 

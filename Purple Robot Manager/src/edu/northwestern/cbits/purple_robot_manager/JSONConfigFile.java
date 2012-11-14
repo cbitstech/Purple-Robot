@@ -28,6 +28,7 @@ import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 
@@ -39,6 +40,8 @@ public class JSONConfigFile
 	public static final String JSON_PROBE_SETTINGS = "probe_settings";
 	public static final String JSON_CONFIGURATION_URL = "config_json_url";
 	public static final String JSON_LAST_UPDATE = "json_configuration_last_update";
+
+	private static SharedPreferences prefs = null;
 
 	private JSONObject parameters = null;
 	private List<Trigger> _triggerList = null;
@@ -82,7 +85,7 @@ public class JSONConfigFile
 
 						JSONObject json = new JSONObject(jsonString);
 
-						SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+						SharedPreferences prefs = JSONConfigFile.getPreferences(context);
 						Editor edit = prefs.edit();
 
 						edit.putString(JSONConfigFile.JSON_CONFIGURATION, json.toString());
@@ -120,8 +123,17 @@ public class JSONConfigFile
 				}
 			};
 
-			Thread t = new Thread(r);
-			t.start();
+			try
+			{
+				Thread t = new Thread(r);
+				t.start();
+			}
+			catch (OutOfMemoryError e)
+			{
+				Log.e("PRM", "OOM IN JSON (1)");
+
+				System.gc();
+			}
 		}
 	}
 
@@ -150,9 +162,17 @@ public class JSONConfigFile
 		return null;
 	}
 
+	private static SharedPreferences getPreferences(Context context)
+	{
+		if (JSONConfigFile.prefs == null)
+			JSONConfigFile.prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+
+		return JSONConfigFile.prefs;
+	}
+
 	private JSONConfigFile(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = JSONConfigFile.getPreferences(context);
 
 		try
 		{
@@ -184,7 +204,7 @@ public class JSONConfigFile
 			e.printStackTrace();
 		}
 
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = JSONConfigFile.getPreferences(context);
 		Editor editor = prefs.edit();
 
 		if (userId == null)
@@ -257,7 +277,7 @@ public class JSONConfigFile
 		{
 			public void run()
 			{
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				SharedPreferences prefs = JSONConfigFile.getPreferences(context);
 
 				long lastUpdate = prefs.getLong(JSONConfigFile.JSON_LAST_UPDATE, 0);
 
@@ -284,8 +304,17 @@ public class JSONConfigFile
 			}
 		};
 
-		Thread t = new Thread(r);
-		t.start();
+		try
+		{
+			Thread t = new Thread(r);
+			t.start();
+		}
+		catch (OutOfMemoryError e)
+		{
+			Log.e("PRM", "OOM IN JSON (2)");
+
+			System.gc();
+		}
 	}
 
 	protected String content()

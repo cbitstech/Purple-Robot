@@ -227,6 +227,7 @@
     <string name="notify_upload_data">Uploading data to server&#8230;</string>
 
     <string name="message_package_upload">Preparing upload&#8230;</string>
+    <string name="message_reading_files">Scanning for upload&#8230;</string>
     <string name="message_upload_successful" formatted="false">Sent %d kB.</string>
     <string name="message_checksum_failed">Checksum error.</string>
     <string name="message_http_connection_error">HTTP connection failure.</string>
