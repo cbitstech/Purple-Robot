@@ -819,7 +819,7 @@ public class HttpUploadPlugin extends OutputPlugin
 			if (jsonObject != null)
 				this._pendingSaves.add(jsonObject.toString());
 
-			if (now - this._lastSave > this.savePeriod() || this._pendingSaves.size() > 128)
+			if (now - this._lastSave > this.savePeriod() || this._pendingSaves.size() > 64)
 			{
 				this._lastSave = now;
 
