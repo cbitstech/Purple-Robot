@@ -642,7 +642,7 @@ public class HttpUploadPlugin extends OutputPlugin
 								else
 									body = EntityUtils.toString(httpEntity);
 
-								Log.e("PRM", "GOT RESPONSE: " + body);
+								Log.e("PRM", "GOT RESPONSE: " + body.substring(0, 256));
 
 								JSONObject json = new JSONObject(body);
 
