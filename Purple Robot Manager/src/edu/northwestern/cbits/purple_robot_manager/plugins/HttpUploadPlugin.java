@@ -358,7 +358,7 @@ public class HttpUploadPlugin extends OutputPlugin
 				{
 					this.broadcastMessage(R.string.message_wifi_pending);
 
-					this._lastUpload = 0;
+					this._lastUpload = now;
 					this._uploading = false;
 
 					return;
@@ -633,9 +633,9 @@ public class HttpUploadPlugin extends OutputPlugin
 								else
 									body = EntityUtils.toString(httpEntity);
 
-								Log.e("PRM", "GOT RESPONSE: " + body.substring(0, 256));
-
 								JSONObject json = new JSONObject(body);
+
+								Log.e("PRM", "GOT RESPONSE: " + json.getString("Status"));
 
 								String status = json.getString(STATUS_KEY);
 
@@ -841,7 +841,12 @@ public class HttpUploadPlugin extends OutputPlugin
 	{
 		File f = this.getPendingFolder();
 
-		return new File(f, "Archives");
+		File archiveFolder = new File(f, "Archives");
+
+		if (!archiveFolder.exists())
+			archiveFolder.mkdirs();
+
+		return archiveFolder;
 	}
 
 	private void persistJSONObject(final JSONObject jsonObject)

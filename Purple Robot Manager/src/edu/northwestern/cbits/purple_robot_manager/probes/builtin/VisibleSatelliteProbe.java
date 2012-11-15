@@ -24,7 +24,6 @@ import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
 import com.WazaBe.HoloEverywhere.sherlock.SPreferenceActivity;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, GpsStatus.NmeaListener, LocationListener
@@ -134,17 +133,6 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 		{
 			UUID uuid = UUID.randomUUID();
 			data.putString("GUID", uuid.toString());
-
-			try
-			{
-				JSONObject json = OutputPlugin.jsonForBundle(data);
-
-				// Log.e("PRM", "SAT JSON: " + json.toString(2));
-			}
-			catch (JSONException e)
-			{
-				e.printStackTrace();
-			}
 
 			LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(this._context);
 			Intent intent = new Intent(edu.northwestern.cbits.purple_robot_manager.probes.Probe.PROBE_READING);

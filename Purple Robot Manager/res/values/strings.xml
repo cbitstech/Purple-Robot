@@ -210,7 +210,7 @@
     <string name="summary_call_log_probe" formatted="false">%d logged calls</string>
     <string name="summary_installed_apps_probe" formatted="false">%d installed apps</string>
     <string name="summary_telephony_probe" formatted="false">Network Operator: %s</string>
-    <string name="summary_temperature_probe" formatted="false">%.4f degrees</string>
+    <string name="summary_temperature_probe" formatted="false">%.2f degrees</string>
     <string name="summary_satellite_probe" formatted="false">Visible Satellites: %d</string>
 
     <string name="summary_sms_probe" formatted="false">%d messages</string>

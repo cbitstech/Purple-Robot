@@ -35,7 +35,6 @@ public class TemperatureProbe extends BasicFunfProbe
 	{
 		float pressure = bundle.getFloatArray("TEMPERATURE")[0];
 
-		return String.format(context.getResources().getString(R.string.summary_pressure_probe), pressure);
+		return String.format(context.getResources().getString(R.string.summary_temperature_probe), pressure);
 	}
-
 }

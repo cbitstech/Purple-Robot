@@ -35,7 +35,7 @@ public class ContinuousGyroscopeProbe extends ContinuousProbe implements SensorE
 
 		if (now - this.lastFrequencyLookup > 5000 && this._context != null)
 		{
-			SharedPreferences prefs = this.getPreferences(this._context);
+			SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
 
 			frequency = Long.parseLong(prefs.getString("config_probe_gyroscope_built_in_frequency", "1000"));
 
