@@ -82,7 +82,7 @@ public class HttpUploadPlugin extends OutputPlugin
 	private final static String CHECKSUM_KEY = "Checksum";
 	private final static String STATUS_KEY = "Status";
 
-	private final static int WIFI_MULTIPLIER = 3;
+	private final static int WIFI_MULTIPLIER = 2;
 
 	private final static long MAX_UPLOAD_PERIOD = 3600000;
 	private final static long MIN_UPLOAD_PERIOD = 300000;
@@ -113,7 +113,6 @@ public class HttpUploadPlugin extends OutputPlugin
 
 		return HttpUploadPlugin.prefs;
 	}
-
 
 	private void logSuccess(boolean success)
 	{
@@ -184,15 +183,8 @@ public class HttpUploadPlugin extends OutputPlugin
 				}
 			};
 
-			try
-			{
-				Thread t = new Thread(r);
-				t.start();
-			}
-			catch (OutOfMemoryError e)
-			{
-				System.gc();
-			}
+			Thread t = new Thread(r);
+			t.start();
 		}
 		else
 		{
@@ -213,15 +205,8 @@ public class HttpUploadPlugin extends OutputPlugin
 					}
 				};
 
-				try
-				{
-					Thread t = new Thread(r);
-					t.start();
-				}
-				catch (OutOfMemoryError e)
-				{
-					System.gc();
-				}
+				Thread t = new Thread(r);
+				t.start();
 			}
 			catch (JSONException e)
 			{
@@ -351,18 +336,21 @@ public class HttpUploadPlugin extends OutputPlugin
 		if (this._uploading)
 			return;
 
-		this._uploading = true;
-
 		final HttpUploadPlugin me = this;
 
 		final long now = System.currentTimeMillis();
 
 		if (now - me._lastUpload > me.uploadPeriod())
 		{
+			this._uploading = true;
+
 			final SharedPreferences prefs = HttpUploadPlugin.getPreferences(this.getContext());
 
 			if (prefs.getBoolean("config_enable_data_server", false) == false)
+			{
+				this._uploading = false;
 				return;
+			}
 
 			if (prefs.getBoolean("config_restrict_data_wifi", true))
 			{
@@ -370,13 +358,15 @@ public class HttpUploadPlugin extends OutputPlugin
 				{
 					this.broadcastMessage(R.string.message_wifi_pending);
 
-					this._lastUpload = now;
+					this._lastUpload = 0;
+					this._uploading = false;
 
 					return;
 				}
 			}
 
 			final Resources resources = this.getContext().getResources();
+			final long maxUploadSize = me.maxUploadSize();
 
 			final Runnable r = new Runnable()
 			{
@@ -449,7 +439,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 					for (String filename : filenames)
 					{
-						if (totalRead < me.maxUploadSize())
+						if (totalRead < maxUploadSize)
 						{
 							File f = new File(pendingFolder, filename);
 
@@ -506,11 +496,12 @@ public class HttpUploadPlugin extends OutputPlugin
 						}
 					}
 
+					me.broadcastMessage(R.string.message_reading_complete);
+
 					if (pendingObjects.size() > 0)
 					{
 						me.broadcastMessage(R.string.message_package_upload);
 
-						long maxUploadSize = me.maxUploadSize();
 						long tally = 0;
 
 						List<JSONObject> toUpload = new ArrayList<JSONObject>();
@@ -789,6 +780,8 @@ public class HttpUploadPlugin extends OutputPlugin
 						}
 					}
 
+					me._uploading = false;
+
 					if (continueUpload)
 					{
 						try
@@ -802,20 +795,11 @@ public class HttpUploadPlugin extends OutputPlugin
 
 						me._lastUpload = 0;
 					}
-
-					me._uploading = false;
 				}
 			};
 
-			try
-			{
-				Thread t = new Thread(r);
-				t.start();
-			}
-			catch (OutOfMemoryError e)
-			{
-				System.gc();
-			}
+			Thread t = new Thread(r);
+			t.start();
 		}
 	}
 
@@ -1106,15 +1090,8 @@ public class HttpUploadPlugin extends OutputPlugin
 			}
 		};
 
-		try
-		{
-			Thread t = new Thread(r);
-			t.start();
-		}
-		catch (OutOfMemoryError e)
-		{
-			System.gc();
-		}
+		Thread t = new Thread(r);
+		t.start();
 	}
 
 	public void deleteArchiveFiles(final Activity activity)
@@ -1153,14 +1130,7 @@ public class HttpUploadPlugin extends OutputPlugin
 			}
 		};
 
-		try
-		{
-			Thread t = new Thread(r);
-			t.start();
-		}
-		catch (OutOfMemoryError e)
-		{
-			System.gc();
-		}
+		Thread t = new Thread(r);
+		t.start();
 	}
 }
