@@ -9,7 +9,6 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.SystemClock;
 
-import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
 import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -36,7 +35,7 @@ public class ContinuousPressureProbe extends ContinuousProbe implements SensorEv
 
 		if (now - this.lastFrequencyLookup > 5000 && this._context != null)
 		{
-			SharedPreferences prefs = this.getPreferences(this._context);
+			SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
 
 			frequency = Long.parseLong(prefs.getString("config_probe_pressure_built_in_frequency", "1000"));
 
