@@ -123,17 +123,8 @@ public class JSONConfigFile
 				}
 			};
 
-			try
-			{
-				Thread t = new Thread(r);
-				t.start();
-			}
-			catch (OutOfMemoryError e)
-			{
-				Log.e("PRM", "OOM IN JSON (1)");
-
-				System.gc();
-			}
+			Thread t = new Thread(r);
+			t.start();
 		}
 	}
 
@@ -304,17 +295,8 @@ public class JSONConfigFile
 			}
 		};
 
-		try
-		{
-			Thread t = new Thread(r);
-			t.start();
-		}
-		catch (OutOfMemoryError e)
-		{
-			Log.e("PRM", "OOM IN JSON (2)");
-
-			System.gc();
-		}
+		Thread t = new Thread(r);
+		t.start();
 	}
 
 	protected String content()
