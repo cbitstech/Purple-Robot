@@ -243,17 +243,8 @@ public class StartActivity extends SherlockActivity
 			}
 		};
 
-		try
-		{
-			Thread t = new Thread(r);
-			t.start();
-		}
-		catch (OutOfMemoryError e)
-		{
-			Log.e("PRM", "OOM IN START ACTIVITY");
-
-			System.gc();
-		}
+		Thread t = new Thread(r);
+		t.start();
 	}
 
 	protected void onDestroy()
