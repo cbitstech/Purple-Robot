@@ -78,11 +78,25 @@ public abstract class Probe
 
 		if (bundle.containsKey("TIMESTAMP"))
 		{
-			double time = bundle.getDouble("TIMESTAMP");
+			try
+			{
+				double time = bundle.getDouble("TIMESTAMP");
 
-			Date d = new Date(((long) time) * 1000);
+				if (time == 0)
+					throw new ClassCastException("Catch me.");
 
-			formatted.putString("dATE rECORDED", d.toString());
+				Date d = new Date(((long) time) * 1000);
+
+				formatted.putString(context.getString(R.string.display_date_recorded), d.toString());
+			}
+			catch (ClassCastException e)
+			{
+				long time = bundle.getLong("TIMESTAMP");
+
+				Date d = new Date(time * 1000);
+
+				formatted.putString(context.getString(R.string.display_date_recorded), d.toString());
+			}
 		}
 
 		return formatted;

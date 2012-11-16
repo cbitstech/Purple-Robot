@@ -638,7 +638,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 								JSONObject json = new JSONObject(body);
 
-								Log.e("PRM", "GOT RESPONSE: " + json.getString("Status"));
+								Log.e("PRM", "GOT RESPONSE (" + json.getString("Status") + "): " + body);
 
 								String status = json.getString(STATUS_KEY);
 
