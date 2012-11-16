@@ -84,7 +84,7 @@ public class ContinuousMagneticFieldProbe extends ContinuousProbe implements Sen
 
         this._context = context.getApplicationContext();
 
-		SharedPreferences prefs = this.getPreferences(context);
+		SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
 		if (prefs.getBoolean("config_probe_magnetic_built_in_enabled", true))
 		{

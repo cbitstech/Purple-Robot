@@ -29,6 +29,34 @@ public class ContinuousPressureProbe extends ContinuousProbe implements SensorEv
 
 	private int bufferIndex  = 0;
 
+	public Bundle formattedBundle(Context context, Bundle bundle)
+	{
+		Bundle formatted = super.formattedBundle(context, bundle);
+
+		double[] eventTimes = bundle.getDoubleArray("EVENT_TIMESTAMP");
+		float[] altitudes = bundle.getFloatArray("ALTITUDE");
+		float[] pressures = bundle.getFloatArray("PRESSURE");
+		int[] accuracys = bundle.getIntArray("ACCURACY");
+
+		if (eventTimes.length > 1)
+		{
+			Bundle readings = new Bundle();
+
+			for (int i = 0; i < eventTimes.length; i++)
+			{
+				readings.putString("" + eventTimes[i], "pRESSURE: " + pressures[i] + ", aLTITUDE: " + altitudes[i] + " (" + accuracys[i] + ")");
+			}
+
+			formatted.putBundle("pRESSURE & aLTITUDE rEADINGS", readings);
+		}
+		else if (eventTimes.length > 0)
+			formatted.putString("" + eventTimes[0], "pRESSURE: " + pressures[0] + ", aLTITUDE: " + altitudes[0] + " (" + accuracys[0] + ")");
+
+
+		return formatted;
+	};
+
+
 	public long getFrequency()
 	{
 		long now = System.currentTimeMillis();
@@ -85,7 +113,7 @@ public class ContinuousPressureProbe extends ContinuousProbe implements SensorEv
 
         this._context = context.getApplicationContext();
 
-		SharedPreferences prefs = this.getPreferences(context);
+		SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
 		if (prefs.getBoolean("config_probe_pressure_built_in_enabled", true))
 		{

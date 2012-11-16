@@ -84,7 +84,7 @@ public class ContinuousAccelerometerProbe extends ContinuousProbe implements Sen
 
         this._context = context.getApplicationContext();
 
-		SharedPreferences prefs = this.getPreferences(context);
+		SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
 		if (prefs.getBoolean("config_probe_accelerometer_built_in_enabled", true))
 		{
