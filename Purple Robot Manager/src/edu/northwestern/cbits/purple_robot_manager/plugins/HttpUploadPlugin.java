@@ -431,6 +431,9 @@ public class HttpUploadPlugin extends OutputPlugin
 						}
 					});
 
+					if (filenames == null)
+						filenames = new String[0];
+
 					Arrays.sort(filenames);
 
 					ArrayList<JSONObject> pendingObjects = new ArrayList<JSONObject>();
