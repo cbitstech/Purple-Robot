@@ -1,5 +1,8 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.hardware.Sensor;
@@ -8,6 +11,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.util.Log;
 
 import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
 
@@ -36,7 +40,8 @@ public class ContinuousPressureProbe extends ContinuousProbe implements SensorEv
 		double[] eventTimes = bundle.getDoubleArray("EVENT_TIMESTAMP");
 		float[] altitudes = bundle.getFloatArray("ALTITUDE");
 		float[] pressures = bundle.getFloatArray("PRESSURE");
-		int[] accuracys = bundle.getIntArray("ACCURACY");
+
+		SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.display_date_format));
 
 		if (eventTimes.length > 1)
 		{
@@ -44,18 +49,32 @@ public class ContinuousPressureProbe extends ContinuousProbe implements SensorEv
 
 			for (int i = 0; i < eventTimes.length; i++)
 			{
-				readings.putString("" + eventTimes[i], "pRESSURE: " + pressures[i] + ", aLTITUDE: " + altitudes[i] + " (" + accuracys[i] + ")");
+				String formatString = String.format(context.getString(R.string.display_pressure_reading), pressures[i], altitudes[i]);
+
+				double time = eventTimes[i];
+
+				Date d = new Date((long) time);
+
+				readings.putString(sdf.format(d), formatString);
 			}
 
-			formatted.putBundle("pRESSURE & aLTITUDE rEADINGS", readings);
+			formatted.putBundle(context.getString(R.string.display_pressure_readings), readings);
 		}
 		else if (eventTimes.length > 0)
-			formatted.putString("" + eventTimes[0], "pRESSURE: " + pressures[0] + ", aLTITUDE: " + altitudes[0] + " (" + accuracys[0] + ")");
+		{
+			Log.e("PRM", "PRES FORMAT: " + context.getString(R.string.display_pressure_reading) + " " + pressures[0] + " " + altitudes[0]);
 
+			String formatString = String.format(context.getString(R.string.display_pressure_reading), pressures[0], altitudes[0]);
+
+			double time = eventTimes[0];
+
+			Date d = new Date((long) time);
+
+			formatted.putString(sdf.format(d), formatString);
+		}
 
 		return formatted;
 	};
-
 
 	public long getFrequency()
 	{

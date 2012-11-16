@@ -203,7 +203,7 @@
     <string name="summary_cell_probe" formatted="false">Cell Tower ID: %s</string>
     <string name="summary_light_probe" formatted="false">%.4f lux units</string>
     <string name="summary_bookmarks_probe" formatted="false">%d bookmarks</string>
-    <string name="summary_pressure_probe" formatted="false">%.2f pressure units (Alt: %.2f m)</string>
+    <string name="summary_pressure_probe" formatted="false">%.2f mb (Alt: %.2f m)</string>
     <string name="summary_searches_probe" formatted="false">%d searches</string>
     <string name="summary_files_probe" formatted="false">%d files</string>
     <string name="summary_proximity_value_probe" formatted="false">Distance: %.1f</string>
@@ -262,4 +262,28 @@
     <string name="summary_external_storage_enabled">Persist data prior to transmission in an publicly-accessible location on the device.</string>
 
     <string name="probe_frequency_label">Sampling Rate</string>
+
+    <string name="display_date_format">HH:mm:ss.SSS, MMM d, yyyy</string>
+    <string name="display_raw_data">Raw Values</string>
+    <string name="display_date_recorded">Date Recorded</string>
+
+    <string name="display_pressure_readings">Pressure &amp; Altitude Measurements</string>
+    <string name="display_pressure_reading" formatted="false">Pressure: %.1f mb, Altitude: %.1f m</string>
+
+    <string name="display_gyroscope_readings">Gyroscope Measurements</string>
+    <string name="display_gyroscope_reading" formatted="false">X %.3f, Y %.3f, Z %.3f</string>
+    <string name="display_accelerometer_readings">Accelerometer Measurements</string>
+
+    <string name="display_light_readings">Light Measurements</string>
+    <string name="display_light_reading" formatted="false">%.3f lux</string>
+
+    <string name="display_battery_health_label">Battery Health</string>
+    <string name="display_battery_health_cold">Cold</string>
+	<string name="display_battery_health_dead">Dead</string>
+	<string name="display_battery_health_good">Good</string>
+	<string name="display_battery_health_overheat">Overheated</string>
+    <string name="display_battery_health_over_voltage">Over Voltage</string>
+    <string name="display_battery_health_failure">Unknown Failure</string>
+    <string name="display_battery_health_tech_label">Technology</string>
+
 </resources>

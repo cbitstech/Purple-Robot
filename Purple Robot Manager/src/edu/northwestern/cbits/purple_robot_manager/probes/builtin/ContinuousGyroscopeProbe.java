@@ -1,5 +1,8 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -8,7 +11,6 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.SystemClock;
 
-import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
 import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -28,6 +30,48 @@ public class ContinuousGyroscopeProbe extends ContinuousProbe implements SensorE
 	private double timeBuffer[] = new double[BUFFER_SIZE];
 
 	private int bufferIndex  = 0;
+
+	public Bundle formattedBundle(Context context, Bundle bundle)
+	{
+		Bundle formatted = super.formattedBundle(context, bundle);
+
+		double[] eventTimes = bundle.getDoubleArray("EVENT_TIMESTAMP");
+		float[] x = bundle.getFloatArray("X");
+		float[] y = bundle.getFloatArray("Y");
+		float[] z = bundle.getFloatArray("Z");
+
+		SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.display_date_format));
+
+		if (eventTimes.length > 1)
+		{
+			Bundle readings = new Bundle();
+
+			for (int i = 0; i < eventTimes.length; i++)
+			{
+				String formatString = String.format(context.getString(R.string.display_gyroscope_reading), x[i], y[i], z[i]);
+
+				double time = eventTimes[i];
+
+				Date d = new Date((long) time);
+
+				readings.putString(sdf.format(d), formatString);
+			}
+
+			formatted.putBundle(context.getString(R.string.display_gyroscope_readings), readings);
+		}
+		else if (eventTimes.length > 0)
+		{
+			String formatString = String.format(context.getString(R.string.display_gyroscope_reading), x[0], y[0], z[0]);
+
+			double time = eventTimes[0];
+
+			Date d = new Date((long) time);
+
+			formatted.putString(sdf.format(d), formatString);
+		}
+
+		return formatted;
+	};
 
 	public long getFrequency()
 	{
