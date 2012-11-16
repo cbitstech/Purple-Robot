@@ -85,7 +85,7 @@ public class ContinuousGyroscopeProbe extends ContinuousProbe implements SensorE
 
         this._context = context.getApplicationContext();
 
-		SharedPreferences prefs = this.getPreferences(context);
+		SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
 		if (prefs.getBoolean("config_probe_gyroscope_built_in_enabled", true))
 		{

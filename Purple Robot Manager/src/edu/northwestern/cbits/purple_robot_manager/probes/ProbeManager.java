@@ -178,7 +178,6 @@ public class ProbeManager
 				screen.addPreference(probeScreen);
 		}
 
-
 		return screen;
 	}
 

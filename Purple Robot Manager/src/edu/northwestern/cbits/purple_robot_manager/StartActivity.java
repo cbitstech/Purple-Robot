@@ -19,6 +19,7 @@ import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
@@ -94,23 +95,30 @@ public class StartActivity extends SherlockActivity
     	{
     		public void onReceive(Context context, final Intent intent)
     		{
+    			final long now = System.currentTimeMillis();
+
     			me.runOnUiThread(new Runnable()
     			{
     				public void run()
     				{
 		    			if (StartActivity.UPDATE_DISPLAY.equals(intent.getAction()))
 		    			{
-		    				String name = intent.getStringExtra(DISPLAY_PROBE_NAME);
-		    				Bundle value = intent.getBundleExtra(DISPLAY_PROBE_VALUE);
+				    		if (me._isPaused == false && now - 2500 > me._lastUpdate)
+				    		{
+				    			String name = intent.getStringExtra(DISPLAY_PROBE_NAME);
+				    			Bundle value = intent.getBundleExtra(DISPLAY_PROBE_VALUE);
 
-		    				if (StartActivity._probeNames.contains(name))
-		    					StartActivity._probeNames.remove(name);
+				    			if (StartActivity._probeNames.contains(name))
+				    				StartActivity._probeNames.remove(name);
 
-		    				StartActivity._probeNames.add(0, name);
-		    				StartActivity._probeValues.put(name, value);
-		    				StartActivity._probeDates.put(name, new Date());
+				    			StartActivity._probeNames.add(0, name);
+				    			StartActivity._probeValues.put(name, value);
+				    			StartActivity._probeDates.put(name, new Date());
 
-		    				me.refreshList();
+				    			me.refreshList();
+
+				    			me._lastUpdate = now;
+				    		}
 		    			}
 		    			else if (StartActivity.UPDATE_MESSAGE.equals(intent.getAction()))
 		    			{
@@ -148,15 +156,28 @@ public class StartActivity extends SherlockActivity
         			convertView = inflater.inflate(R.layout.layout_probe_row, null);
         		}
 
-        		TextView nameField = (TextView) convertView.findViewById(R.id.text_sensor_name);
-        		TextView valueField = (TextView) convertView.findViewById(R.id.text_sensor_value);
-
         		String sensorName = StartActivity._probeNames.get(position);
 
-        		Bundle value = StartActivity._probeValues.get(sensorName);
+        		final Probe probe = ProbeManager.probeForName(sensorName, me);
+
+        		final Bundle value = StartActivity._probeValues.get(sensorName);
         		Date sensorDate = StartActivity._probeDates.get(sensorName);
 
-        		Probe probe = ProbeManager.probeForName(sensorName, me);
+        		convertView.setOnClickListener(new OnClickListener()
+    			{
+					public void onClick(View v)
+					{
+						Intent intent = new Intent(me, ProbeViewerActivity.class);
+
+						intent.putExtra("probe_name", StartActivity._probeNames.get(position));
+						intent.putExtra("probe_bundle", value);
+
+						me.startActivity(intent);
+					}
+    			});
+
+        		TextView nameField = (TextView) convertView.findViewById(R.id.text_sensor_name);
+        		TextView valueField = (TextView) convertView.findViewById(R.id.text_sensor_value);
 
         		String formattedValue = sensorName;
 
@@ -200,7 +221,6 @@ public class StartActivity extends SherlockActivity
 	public void refreshList()
 	{
 		final StartActivity me = this;
-		final long now = System.currentTimeMillis();
 
 		Runnable r = new Runnable()
 		{
@@ -212,34 +232,29 @@ public class StartActivity extends SherlockActivity
 
 		        if (probesEnabled)
 		        {
-		    		if (me._isPaused == false && now - 1000 > me._lastUpdate)
-		    		{
-		    			Runnable rr = new Runnable()
-		    			{
-							public void run()
-							{
-				    	        ListView listView = (ListView) me.findViewById(R.id.list_probes);
+	    			Runnable rr = new Runnable()
+	    			{
+						public void run()
+						{
+			    	        ListView listView = (ListView) me.findViewById(R.id.list_probes);
 
-				    	        ListAdapter adapter = listView.getAdapter();
+			    	        ListAdapter adapter = listView.getAdapter();
 
-				    	        if (adapter instanceof BaseAdapter)
-				    			{
-				    	        	BaseAdapter baseAdapter = (BaseAdapter) adapter;
+			    	        if (adapter instanceof BaseAdapter)
+			    			{
+			    	        	BaseAdapter baseAdapter = (BaseAdapter) adapter;
 
-				    	        	baseAdapter.notifyDataSetChanged();
-				    	        }
+			    	        	baseAdapter.notifyDataSetChanged();
+			    	        }
 
-				    	        listView.invalidateViews();
+			    	        listView.invalidateViews();
 
-				    	        me.getSupportActionBar().setTitle(String.format(me.getResources().getString(R.string.title_probes_count), StartActivity._probeNames.size()));
+			    	        me.getSupportActionBar().setTitle(String.format(me.getResources().getString(R.string.title_probes_count), StartActivity._probeNames.size()));
+						}
+	    			};
 
-				    	        me._lastUpdate = now;
-							}
-		    			};
-
-		    			me.runOnUiThread(rr);
-		    		}
-		        }
+	    			me.runOnUiThread(rr);
+	        }
 			}
 		};
 

@@ -69,6 +69,14 @@ public abstract class ContinuousProbe extends Probe
 		return screen;
 	}
 
+	public Bundle formattedBundle(Context context, Bundle bundle)
+	{
+		Bundle formatted = super.formattedBundle(context, bundle);
+
+		return formatted;
+	};
+
+
 	public boolean isEnabled(Context context)
 	{
 		this._context = context.getApplicationContext();

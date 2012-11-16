@@ -34,7 +34,7 @@ public class SettingsActivity extends SPreferenceActivity implements OnPreferenc
 
         this.addPreferencesFromResource(R.layout.layout_settings_activity);
 
-        PreferenceScreen prefs = getPreferenceScreen();
+        PreferenceScreen prefs = this.getPreferenceScreen();
 
         Preference refresh = prefs.findPreference(MANUAL_REFRESH_KEY);
         refresh.setOnPreferenceClickListener(this);

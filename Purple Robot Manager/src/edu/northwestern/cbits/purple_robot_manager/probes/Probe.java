@@ -1,6 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager.probes;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.json.JSONException;
@@ -70,4 +71,20 @@ public abstract class Probe
 	}
 
 	public abstract void updateFromJSON(Context context, JSONObject json) throws JSONException;
+
+	public Bundle formattedBundle(Context context, Bundle bundle)
+	{
+		Bundle formatted = new Bundle();
+
+		if (bundle.containsKey("TIMESTAMP"))
+		{
+			double time = bundle.getDouble("TIMESTAMP");
+
+			Date d = new Date(((long) time) * 1000);
+
+			formatted.putString("dATE rECORDED", d.toString());
+		}
+
+		return formatted;
+	};
 }
