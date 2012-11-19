@@ -1,6 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import android.annotation.SuppressLint;
@@ -11,7 +12,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.util.Log;
 
 import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
 
@@ -41,6 +41,8 @@ public class ContinuousPressureProbe extends ContinuousProbe implements SensorEv
 		float[] altitudes = bundle.getFloatArray("ALTITUDE");
 		float[] pressures = bundle.getFloatArray("PRESSURE");
 
+		ArrayList<String> keys = new ArrayList<String>();
+
 		if (altitudes != null && pressures != null && eventTimes != null)
 		{
 			SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.display_date_format));
@@ -57,15 +59,20 @@ public class ContinuousPressureProbe extends ContinuousProbe implements SensorEv
 
 					Date d = new Date((long) time);
 
-					readings.putString(sdf.format(d), formatString);
+					String key = sdf.format(d);
+
+					readings.putString(key, formatString);
+
+					keys.add(key);
 				}
+
+				if (keys.size() > 0)
+					readings.putStringArrayList("KEY_ORDER", keys);
 
 				formatted.putBundle(context.getString(R.string.display_pressure_readings), readings);
 			}
 			else if (eventTimes.length > 0)
 			{
-				Log.e("PRM", "PRES FORMAT: " + context.getString(R.string.display_pressure_reading) + " " + pressures[0] + " " + altitudes[0]);
-
 				String formatString = String.format(context.getString(R.string.display_pressure_reading), pressures[0], altitudes[0]);
 
 				double time = eventTimes[0];

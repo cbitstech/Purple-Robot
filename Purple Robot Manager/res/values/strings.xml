@@ -192,7 +192,7 @@
     <string name="summary_accelerator_probe" formatted="false">%.2f X, %.2f Y, %.2f Z</string>
     <string name="summary_gyroscope_probe" formatted="false">%.2f X, %.2f Y, %.2f Z</string>
     <string name="summary_magnetic_probe" formatted="false">%.1f X, %.1f Y, %.1f Z</string>
-    <string name="summary_wifi_probe" formatted="false">%d visible networks</string>
+    <string name="summary_wifi_probe" formatted="false">%d visible access points</string>
     <string name="summary_battery_probe" formatted="false">%d%% charged</string>
     <string name="summary_bluetooth_probe" formatted="false">%d visible devices</string>
     <string name="summary_contact_probe" formatted="false">%d contacts in address book</string>
@@ -270,6 +270,8 @@
     <string name="display_pressure_readings">Pressure &amp; Altitude Measurements</string>
     <string name="display_pressure_reading" formatted="false">Pressure: %.1f mb, Altitude: %.1f m</string>
 
+    <string name="display_magnetic_readings">Magnetic Field Measurements</string>
+
     <string name="display_gyroscope_readings">Gyroscope Measurements</string>
     <string name="display_gyroscope_reading" formatted="false">X %.3f, Y %.3f, Z %.3f</string>
     <string name="display_accelerometer_readings">Accelerometer Measurements</string>
@@ -286,4 +288,9 @@
     <string name="display_battery_health_failure">Unknown Failure</string>
     <string name="display_battery_health_tech_label">Technology</string>
 
+    <string name="display_probe_values" formatted="false">%d values</string>
+
+    <string name="display_wifi_scan_result_title" formatted="false">%s %s</string>
+    <string name="display_wifi_scan_result_summary" formatted="false">%s (%d MHz, %d dBm)</string>
+    <string name="display_wifi_scan_results_title">Wireless Scan Results</string>
 </resources>

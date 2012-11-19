@@ -1,6 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import android.content.Context;
@@ -40,6 +41,8 @@ public class ContinuousGyroscopeProbe extends ContinuousProbe implements SensorE
 		float[] y = bundle.getFloatArray("Y");
 		float[] z = bundle.getFloatArray("Z");
 
+		ArrayList<String> keys = new ArrayList<String>();
+
 		SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.display_date_format));
 
 		if (eventTimes.length > 1)
@@ -54,8 +57,15 @@ public class ContinuousGyroscopeProbe extends ContinuousProbe implements SensorE
 
 				Date d = new Date((long) time);
 
-				readings.putString(sdf.format(d), formatString);
+				String key = sdf.format(d);
+
+				readings.putString(key, formatString);
+
+				keys.add(key);
 			}
+
+			if (keys.size() > 0)
+				readings.putStringArrayList("KEY_ORDER", keys);
 
 			formatted.putBundle(context.getString(R.string.display_gyroscope_readings), readings);
 		}

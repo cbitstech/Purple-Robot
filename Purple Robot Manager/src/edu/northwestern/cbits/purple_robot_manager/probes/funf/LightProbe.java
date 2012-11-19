@@ -1,6 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.funf;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import android.content.Context;
@@ -52,6 +53,8 @@ public class LightProbe extends BasicFunfProbe
 
 		if (eventTimes.length > 1)
 		{
+			ArrayList<String> keys = new ArrayList<String>();
+
 			Bundle readings = new Bundle();
 
 			for (int i = 0; i < eventTimes.length; i++)
@@ -61,8 +64,15 @@ public class LightProbe extends BasicFunfProbe
 
 				Date d = new Date(time / 1000000);
 
-				readings.putString(sdf.format(d), formatString);
+				String key = sdf.format(d);
+
+				readings.putString(key, formatString);
+
+				keys.add(key);
 			}
+
+			if (keys.size() > 0)
+				readings.putStringArrayList("KEY_ORDER", keys);
 
 			formatted.putBundle(context.getString(R.string.display_light_readings), readings);
 		}
