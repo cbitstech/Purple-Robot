@@ -7,9 +7,6 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
-import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
-
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.PendingIntent;
@@ -20,6 +17,10 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
+
+import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
+import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
+
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.triggers.DateTrigger;

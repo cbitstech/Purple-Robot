@@ -18,8 +18,10 @@ import com.WazaBe.HoloEverywhere.sherlock.SPreferenceActivity;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.BluetoothDevicesProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.VisibleSatelliteProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.funf.BasicFunfProbe;
@@ -66,6 +68,8 @@ public class ProbeManager
 
 		if (context != null)
 		{
+			Log.e("PRM", "GETTING DATA REQUESTS");
+
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
 			boolean isEnabled = prefs.getBoolean("config_probes_enabled", false);
@@ -131,6 +135,13 @@ public class ProbeManager
 				VisibleSatelliteProbe satellite = (VisibleSatelliteProbe) probe;
 
 				if (satellite.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof BluetoothDevicesProbe)
+			{
+				BluetoothDevicesProbe bluetooth = (BluetoothDevicesProbe) probe;
+
+				if (bluetooth.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 

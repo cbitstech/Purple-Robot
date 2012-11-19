@@ -189,6 +189,8 @@
 
 	<string name="title_builtin_satellite_probe">Visible Satellite Probe</string>
 
+	<string name="title_builtin_bluetooth_probe">Visible Bluetooth Probe</string>
+
     <string name="summary_accelerator_probe" formatted="false">%.2f X, %.2f Y, %.2f Z</string>
     <string name="summary_gyroscope_probe" formatted="false">%.2f X, %.2f Y, %.2f Z</string>
     <string name="summary_magnetic_probe" formatted="false">%.1f X, %.1f Y, %.1f Z</string>

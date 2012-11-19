@@ -5,13 +5,16 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import edu.mit.media.funf.CustomizedIntentService;
 import edu.mit.media.funf.probe.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
@@ -28,7 +31,7 @@ public class FunfService extends CustomizedIntentService
 //	public static final String ACTION_DISABLE = PREFIX + "disable";
 	public static final String EXTRA_FORCE_UPLOAD = "FORCE";
 	public static final String ACTION_DISABLE = "PROBE_INTERNAL_DISABLE";
-
+	public static final String ACTION_SEND_REQUEST = "ACTION_SEND_REQUEST";
 
 	private final IBinder mBinder = new LocalBinder();
 
@@ -55,6 +58,11 @@ public class FunfService extends CustomizedIntentService
 		note.flags = Notification.FLAG_ONGOING_EVENT;
 
 		this.startForeground(12345, note);
+
+		AlarmManager am = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+
+		PendingIntent pi = PendingIntent.getService(this, 0, new Intent(ACTION_SEND_REQUEST), PendingIntent.FLAG_UPDATE_CURRENT);
+		am.setInexactRepeating(AlarmManager.RTC, System.currentTimeMillis(), 60000, pi);
 	}
 
 	public int onStartCommand(Intent intent, int flags, int startId)
@@ -83,10 +91,18 @@ public class FunfService extends CustomizedIntentService
 			this.onStatusReceived(new Probe.Status(intent.getExtras()));
 		else if (Probe.ACTION_DETAILS.equals(action))
 			this.onDetailsReceived(new Probe.Details(intent.getExtras()));
+		else if (ACTION_SEND_REQUEST.equals(action))
+		{
+			Log.e("PRM", "SEND PROBE REQUESTS");
+
+			this.sendProbeRequests();
+		}
 	}
 
 	public void reload()
 	{
+		Log.e("PRM", "RELOADING");
+
 		this.removeProbeRequests();
 
 		if (isEnabled())
@@ -108,7 +124,6 @@ public class FunfService extends CustomizedIntentService
 	{
 		Map<String,Bundle[]> dataRequests = ProbeManager.getDataRequests(this);
 
-		// ACTION_DISABLE
 		for (String probeName : dataRequests.keySet())
 		{
 			this.sendProbeRequest(probeName, dataRequests.get(probeName));

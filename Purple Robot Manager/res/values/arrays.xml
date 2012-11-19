@@ -6,6 +6,7 @@
         <item>builtin.ContinuousGyroscopeProbe</item>
         <item>builtin.ContinuousMagneticFieldProbe</item>
         <item>builtin.VisibleSatelliteProbe</item>
+        <item>builtin.BluetoothDevicesProbe</item>
         <!-- <item>builtin.BluetoothReceiverProbe</item> -->
 
    	    <!--  <item>funf.AccelerometerProbe</item> -->
@@ -13,7 +14,7 @@
         <!-- <item>funf.ActivityProbe</item> -->
         <item>funf.AudioFilesProbe</item>
         <item>funf.BatteryProbe</item>
-        <item>funf.BluetoothProbe</item>
+        <!-- <item>funf.BluetoothProbe</item> -->
         <item>funf.BrowserBookmarksProbe</item>
         <item>funf.BrowserSearchesProbe</item>
         <item>funf.CallLogProbe</item>
