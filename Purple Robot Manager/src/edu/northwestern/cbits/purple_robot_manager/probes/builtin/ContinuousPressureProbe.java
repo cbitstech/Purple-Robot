@@ -41,36 +41,39 @@ public class ContinuousPressureProbe extends ContinuousProbe implements SensorEv
 		float[] altitudes = bundle.getFloatArray("ALTITUDE");
 		float[] pressures = bundle.getFloatArray("PRESSURE");
 
-		SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.display_date_format));
-
-		if (eventTimes.length > 1)
+		if (altitudes != null && pressures != null && eventTimes != null)
 		{
-			Bundle readings = new Bundle();
+			SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.display_date_format));
 
-			for (int i = 0; i < eventTimes.length; i++)
+			if (eventTimes.length > 1)
 			{
-				String formatString = String.format(context.getString(R.string.display_pressure_reading), pressures[i], altitudes[i]);
+				Bundle readings = new Bundle();
 
-				double time = eventTimes[i];
+				for (int i = 0; i < eventTimes.length; i++)
+				{
+					String formatString = String.format(context.getString(R.string.display_pressure_reading), pressures[i], altitudes[i]);
+
+					double time = eventTimes[i];
+
+					Date d = new Date((long) time);
+
+					readings.putString(sdf.format(d), formatString);
+				}
+
+				formatted.putBundle(context.getString(R.string.display_pressure_readings), readings);
+			}
+			else if (eventTimes.length > 0)
+			{
+				Log.e("PRM", "PRES FORMAT: " + context.getString(R.string.display_pressure_reading) + " " + pressures[0] + " " + altitudes[0]);
+
+				String formatString = String.format(context.getString(R.string.display_pressure_reading), pressures[0], altitudes[0]);
+
+				double time = eventTimes[0];
 
 				Date d = new Date((long) time);
 
-				readings.putString(sdf.format(d), formatString);
+				formatted.putString(sdf.format(d), formatString);
 			}
-
-			formatted.putBundle(context.getString(R.string.display_pressure_readings), readings);
-		}
-		else if (eventTimes.length > 0)
-		{
-			Log.e("PRM", "PRES FORMAT: " + context.getString(R.string.display_pressure_reading) + " " + pressures[0] + " " + altitudes[0]);
-
-			String formatString = String.format(context.getString(R.string.display_pressure_reading), pressures[0], altitudes[0]);
-
-			double time = eventTimes[0];
-
-			Date d = new Date((long) time);
-
-			formatted.putString(sdf.format(d), formatString);
 		}
 
 		return formatted;

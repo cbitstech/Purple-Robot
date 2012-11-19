@@ -1,6 +1,11 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
+import java.util.ArrayList;
+
+import android.location.Location;
+import android.net.wifi.ScanResult;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.WazaBe.HoloEverywhere.preference.Preference;
 import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
@@ -149,7 +154,7 @@ public class ProbeViewerActivity extends SPreferenceActivity
 		return screen;
 	}
 
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings({ "deprecation", "rawtypes", "unchecked" })
 	private PreferenceScreen screenForBundle(String title, Bundle bundle)
 	{
 		PreferenceManager manager = this.getPreferenceManager();
@@ -197,6 +202,56 @@ public class ProbeViewerActivity extends SPreferenceActivity
 				if (array.length > 1)
 				{
 					PreferenceScreen subscreen = this.screenForDoubleArray(key, array);
+					subscreen.setSummary(array.length + " vALUES");
+
+					screen.addPreference(subscreen);
+				}
+				else
+				{
+					Preference pref = new Preference(this);
+					pref.setTitle("" + array[0]);
+					pref.setSummary(key);
+
+					screen.addPreference(pref);
+				}
+			}
+			else if (o instanceof Location[])
+			{
+				Location[] array = (Location[]) o;
+
+				if (array.length > 1)
+				{
+					PreferenceScreen subscreen = this.screenForLocationArray(key, array);
+					subscreen.setSummary(array.length + " vALUES");
+
+					screen.addPreference(subscreen);
+				}
+				else
+				{
+					Preference pref = new Preference(this);
+					pref.setTitle(array[0].getProvider() + ": " + array[0].getLatitude() + "," + array[0].getLongitude());
+					pref.setSummary(key);
+
+					screen.addPreference(pref);
+				}
+			}
+			else if (o instanceof Location)
+			{
+				Location location = (Location) o;
+
+				Preference pref = new Preference(this);
+				pref.setTitle(location.getProvider() + ": " + location.getLatitude() + "," + location.getLongitude());
+				pref.setSummary(key);
+
+				screen.addPreference(pref);
+			}
+			else if (o instanceof Bundle[])
+			{
+				Bundle[] array = (Bundle[]) o;
+
+				if (array.length > 1)
+				{
+					PreferenceScreen subscreen = this.screenForBundleArray(key, array);
 					subscreen.setSummary(array.length + " vALUES");
 
 					screen.addPreference(subscreen);
@@ -270,8 +325,58 @@ public class ProbeViewerActivity extends SPreferenceActivity
 					screen.addPreference(pref);
 				}
 			}
+			else if (o instanceof ArrayList)
+			{
+				ArrayList array = (ArrayList) o;
+
+				if (array.size() > 0)
+				{
+					Object oo = array.get(0);
+
+					if (oo instanceof ScanResult)
+					{
+						if (array.size() > 1)
+						{
+							PreferenceScreen subscreen = this.screenForScanResultArray(key, (ScanResult[]) array.toArray(new ScanResult[0]));
+							subscreen.setSummary(array.size() + " vALUES");
+
+							screen.addPreference(subscreen);
+						}
+						else
+						{
+							ScanResult scan = (ScanResult) oo;
+
+							Preference pref = new Preference(this);
+							pref.setTitle(scan.SSID + "/" + scan.BSSID + " (" + scan.frequency + " MHz, " + scan.level + " dBm)");
+							pref.setSummary(key);
+
+							screen.addPreference(pref);
+						}
+					}
+					else if (oo instanceof Bundle)
+					{
+						if (array.size() > 1)
+						{
+							PreferenceScreen subscreen = this.screenForBundleArray(key, (Bundle[]) array.toArray(new Bundle[0]));
+							subscreen.setSummary(array.size() + " vALUES");
+
+							screen.addPreference(subscreen);
+						}
+						else
+						{
+							Preference pref = new Preference(this);
+							pref.setTitle("" + oo);
+							pref.setSummary(key);
+
+							screen.addPreference(pref);
+						}
+					}
+				}
+			}
 			else
 			{
+				Log.e("PRM", key + ": " + o.getClass().getCanonicalName());
+
 				String desc = o.toString();
 
 				Preference pref = new Preference(this);
@@ -280,6 +385,70 @@ public class ProbeViewerActivity extends SPreferenceActivity
 
 				screen.addPreference(pref);
 			}
+		}
+
+		return screen;
+	}
+
+	@SuppressWarnings("deprecation")
+	private PreferenceScreen screenForLocationArray(String title, Location[] values)
+	{
+		PreferenceManager manager = this.getPreferenceManager();
+
+		PreferenceScreen screen = manager.createPreferenceScreen(this);
+
+		screen.setTitle(title);
+
+		for (Location value : values)
+		{
+			Preference pref = new Preference(this);
+
+			pref.setTitle(value.getProvider() + ": " + value.getLatitude() + "," + value.getLongitude());
+
+			screen.addPreference(pref);
+		}
+
+		return screen;
+	}
+
+	@SuppressWarnings("deprecation")
+	private PreferenceScreen screenForBundleArray(String title, Bundle[] values)
+	{
+		PreferenceManager manager = this.getPreferenceManager();
+
+		PreferenceScreen screen = manager.createPreferenceScreen(this);
+
+		screen.setTitle(title);
+
+		for (Bundle value : values)
+		{
+			Preference pref = this.screenForBundle(title, value);
+
+			pref.setTitle("bUNDLE");
+
+			screen.addPreference(pref);
+		}
+
+		return screen;
+	}
+
+	@SuppressWarnings("deprecation")
+	private PreferenceScreen screenForScanResultArray(String title, ScanResult[] objects)
+	{
+		PreferenceManager manager = this.getPreferenceManager();
+
+		PreferenceScreen screen = manager.createPreferenceScreen(this);
+
+		screen.setTitle(title);
+
+		for (ScanResult value : objects)
+		{
+			Preference pref = new Preference(this);
+
+			pref.setTitle(value.SSID + "/" + value.BSSID + " (" + value.frequency + " MHz, " + value.level + " dBm)");
+			pref.setSummary(value.capabilities);
+
+			screen.addPreference(pref);
 		}
 
 		return screen;

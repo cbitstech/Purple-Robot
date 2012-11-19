@@ -62,24 +62,27 @@ public class ProbeManager
 
 	public static Map<String, Bundle[]> getDataRequests(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-
-		boolean isEnabled = prefs.getBoolean("config_probes_enabled", false);
-
 		HashMap<String, Bundle[]> probesMap = new HashMap<String, Bundle[]>();
 
-		if (isEnabled)
+		if (context != null)
 		{
-			for (Probe probe : ProbeManager.allProbes())
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+			boolean isEnabled = prefs.getBoolean("config_probes_enabled", false);
+
+			if (isEnabled)
 			{
-				String name = probe.name(context);
+				for (Probe probe : ProbeManager.allProbes())
+				{
+					String name = probe.name(context);
 
-				Bundle[] bundles = new Bundle[0];
+					Bundle[] bundles = new Bundle[0];
 
-				if (probe.isEnabled(context))
-					bundles = probe.dataRequestBundles(context);
+					if (probe.isEnabled(context))
+						bundles = probe.dataRequestBundles(context);
 
-				probesMap.put(name, bundles);
+					probesMap.put(name, bundles);
+				}
 			}
 		}
 
