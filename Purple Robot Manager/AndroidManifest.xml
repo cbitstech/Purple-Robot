@@ -57,6 +57,7 @@
 		<service android:enabled="true" android:exported="false" android:name=".FunfService">
 			<intent-filter>
 				<action android:name="edu.mit.media.funf.reload" />
+				<action android:name="ACTION_SEND_REQUEST" />
 			</intent-filter>
 		</service>
 		<!-- Probe Services -->
