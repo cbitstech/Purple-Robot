@@ -7,6 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.hockeyapp.android.CrashManager;
+import net.hockeyapp.android.CrashManagerListener;
+import net.hockeyapp.android.UpdateManager;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -81,6 +85,8 @@ public class StartActivity extends SherlockActivity
 	protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        UpdateManager.register(this, "7550093e020b1a4a6df90f1e9dde68b6");
 
         this.getSupportActionBar().setTitle(R.string.title_probe_readings);
         this.setContentView(R.layout.layout_startup_activity);
@@ -294,6 +300,14 @@ public class StartActivity extends SherlockActivity
 	protected void onResume()
 	{
 		super.onResume();
+
+		CrashManager.register(this, "7550093e020b1a4a6df90f1e9dde68b6", new CrashManagerListener()
+		{
+			  public Boolean onCrashesFound()
+			  {
+				    return true;
+			  }
+		});
 
 		Uri jsonConfigUri = this.getIntent().getData();
 

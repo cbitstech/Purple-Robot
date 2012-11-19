@@ -942,6 +942,10 @@ public class HttpUploadPlugin extends OutputPlugin
 			{
 				throw new RuntimeException(e);
 			}
+			catch (OutOfMemoryError e)
+			{
+				e.printStackTrace();
+			}
 			catch (IOException e)
 			{
 				e.printStackTrace();
