@@ -3,7 +3,6 @@ package edu.northwestern.cbits.purple_robot_manager;
 import java.util.ArrayList;
 
 import android.location.Location;
-import android.net.wifi.ScanResult;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -163,11 +162,22 @@ public class ProbeViewerActivity extends SPreferenceActivity
 
 		screen.setTitle(title);
 
-		for (String key : bundle.keySet())
+		ArrayList<String> keys = new ArrayList<String>();
+
+		if (bundle.containsKey("KEY_ORDER"))
+			keys.addAll(bundle.getStringArrayList("KEY_ORDER"));
+		else
+			keys.addAll(bundle.keySet());
+
+		for (String key : keys)
 		{
 			Object o = bundle.get(key);
 
-			if (o instanceof Bundle)
+			if (o == null)
+			{
+				Log.e("PRM", "NULL KEY: " + key);
+			}
+			else if (o instanceof Bundle)
 			{
 				Bundle b = (Bundle) o;
 
@@ -182,7 +192,7 @@ public class ProbeViewerActivity extends SPreferenceActivity
 				if (array.length > 1)
 				{
 					PreferenceScreen subscreen = this.screenForFloatArray(key, array);
-					subscreen.setSummary(array.length + " vALUES");
+					subscreen.setSummary(String.format(this.getString(R.string.display_probe_values), array.length));
 
 					screen.addPreference(subscreen);
 				}
@@ -202,7 +212,7 @@ public class ProbeViewerActivity extends SPreferenceActivity
 				if (array.length > 1)
 				{
 					PreferenceScreen subscreen = this.screenForDoubleArray(key, array);
-					subscreen.setSummary(array.length + " vALUES");
+					subscreen.setSummary(String.format(this.getString(R.string.display_probe_values), array.length));
 
 					screen.addPreference(subscreen);
 				}
@@ -222,7 +232,7 @@ public class ProbeViewerActivity extends SPreferenceActivity
 				if (array.length > 1)
 				{
 					PreferenceScreen subscreen = this.screenForLocationArray(key, array);
-					subscreen.setSummary(array.length + " vALUES");
+					subscreen.setSummary(String.format(this.getString(R.string.display_probe_values), array.length));
 
 					screen.addPreference(subscreen);
 				}
@@ -252,7 +262,7 @@ public class ProbeViewerActivity extends SPreferenceActivity
 				if (array.length > 1)
 				{
 					PreferenceScreen subscreen = this.screenForBundleArray(key, array);
-					subscreen.setSummary(array.length + " vALUES");
+					subscreen.setSummary(String.format(this.getString(R.string.display_probe_values), array.length));
 
 					screen.addPreference(subscreen);
 				}
@@ -272,7 +282,7 @@ public class ProbeViewerActivity extends SPreferenceActivity
 				if (array.length > 1)
 				{
 					PreferenceScreen subscreen = this.screenForIntArray(key, array);
-					subscreen.setSummary(array.length + " vALUES");
+					subscreen.setSummary(String.format(this.getString(R.string.display_probe_values), array.length));
 
 					screen.addPreference(subscreen);
 				}
@@ -292,7 +302,7 @@ public class ProbeViewerActivity extends SPreferenceActivity
 				if (array.length > 1)
 				{
 					PreferenceScreen subscreen = this.screenForLongArray(key, array);
-					subscreen.setSummary(array.length + " vALUES");
+					subscreen.setSummary(String.format(this.getString(R.string.display_probe_values), array.length));
 
 					screen.addPreference(subscreen);
 				}
@@ -312,7 +322,7 @@ public class ProbeViewerActivity extends SPreferenceActivity
 				if (array.length > 1)
 				{
 					PreferenceScreen subscreen = this.screenForStringArray(key, array);
-					subscreen.setSummary(array.length + " vALUES");
+					subscreen.setSummary(String.format(this.getString(R.string.display_probe_values), array.length));
 
 					screen.addPreference(subscreen);
 				}
@@ -333,32 +343,12 @@ public class ProbeViewerActivity extends SPreferenceActivity
 				{
 					Object oo = array.get(0);
 
-					if (oo instanceof ScanResult)
-					{
-						if (array.size() > 1)
-						{
-							PreferenceScreen subscreen = this.screenForScanResultArray(key, (ScanResult[]) array.toArray(new ScanResult[0]));
-							subscreen.setSummary(array.size() + " vALUES");
-
-							screen.addPreference(subscreen);
-						}
-						else
-						{
-							ScanResult scan = (ScanResult) oo;
-
-							Preference pref = new Preference(this);
-							pref.setTitle(scan.SSID + "/" + scan.BSSID + " (" + scan.frequency + " MHz, " + scan.level + " dBm)");
-							pref.setSummary(key);
-
-							screen.addPreference(pref);
-						}
-					}
-					else if (oo instanceof Bundle)
+					if (oo instanceof Bundle)
 					{
 						if (array.size() > 1)
 						{
 							PreferenceScreen subscreen = this.screenForBundleArray(key, (Bundle[]) array.toArray(new Bundle[0]));
-							subscreen.setSummary(array.size() + " vALUES");
+							subscreen.setSummary(String.format(this.getString(R.string.display_probe_values), array.size()));
 
 							screen.addPreference(subscreen);
 						}
@@ -425,28 +415,6 @@ public class ProbeViewerActivity extends SPreferenceActivity
 			Preference pref = this.screenForBundle(title, value);
 
 			pref.setTitle("bUNDLE");
-
-			screen.addPreference(pref);
-		}
-
-		return screen;
-	}
-
-	@SuppressWarnings("deprecation")
-	private PreferenceScreen screenForScanResultArray(String title, ScanResult[] objects)
-	{
-		PreferenceManager manager = this.getPreferenceManager();
-
-		PreferenceScreen screen = manager.createPreferenceScreen(this);
-
-		screen.setTitle(title);
-
-		for (ScanResult value : objects)
-		{
-			Preference pref = new Preference(this);
-
-			pref.setTitle(value.SSID + "/" + value.BSSID + " (" + value.frequency + " MHz, " + value.level + " dBm)");
-			pref.setSummary(value.capabilities);
 
 			screen.addPreference(pref);
 		}

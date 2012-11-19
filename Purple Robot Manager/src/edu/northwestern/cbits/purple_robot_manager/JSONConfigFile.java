@@ -23,6 +23,7 @@ import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 
 import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
 import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
@@ -60,66 +61,71 @@ public class JSONConfigFile
 			{
 				public void run()
 				{
-					try
+					if (uri != null)
 					{
-						JSONConfigFile._configUri = uri;
+						Log.e("PRM", "CONFIG URI: " + uri);
 
-						URL u = new URL(JSONConfigFile._configUri.toString());
-
-						HttpURLConnection conn = (HttpURLConnection) u.openConnection();
-
-						BufferedInputStream bin = new BufferedInputStream(conn.getInputStream());
-						ByteArrayOutputStream bout = new ByteArrayOutputStream();
-
-						byte[] buffer = new byte[4096];
-						int read = 0;
-
-						while ((read = bin.read(buffer, 0, buffer.length)) != -1)
+						try
 						{
-							bout.write(buffer, 0, read);
-						}
+							JSONConfigFile._configUri = uri;
 
-						bin.close();
+							URL u = new URL(JSONConfigFile._configUri.toString());
 
-						String jsonString = new String(bout.toByteArray(), "UTF-8");
+							HttpURLConnection conn = (HttpURLConnection) u.openConnection();
 
-						JSONObject json = new JSONObject(jsonString);
+							BufferedInputStream bin = new BufferedInputStream(conn.getInputStream());
+							ByteArrayOutputStream bout = new ByteArrayOutputStream();
 
-						SharedPreferences prefs = JSONConfigFile.getPreferences(context);
-						Editor edit = prefs.edit();
+							byte[] buffer = new byte[4096];
+							int read = 0;
 
-						edit.putString(JSONConfigFile.JSON_CONFIGURATION, json.toString());
-						edit.putString(JSONConfigFile.JSON_CONFIGURATION_URL, u.toString());
-
-						edit.commit();
-
-						if (context instanceof Activity)
-						{
-							final Activity activity = (Activity) context;
-
-							activity.runOnUiThread(new Runnable()
+							while ((read = bin.read(buffer, 0, buffer.length)) != -1)
 							{
-								public void run()
-								{
-									Toast.makeText(activity, R.string.success_json_set_uri, Toast.LENGTH_LONG).show();
-								}
-							});
-						}
-					}
-					catch (MalformedURLException e)
-					{
-						e.printStackTrace();
-					}
-					catch (IOException e)
-					{
-						e.printStackTrace();
-					}
-					catch (JSONException e)
-					{
-						e.printStackTrace();
-					}
+								bout.write(buffer, 0, read);
+							}
 
-					JSONConfigFile._sharedFile = new JSONConfigFile(context);
+							bin.close();
+
+							String jsonString = new String(bout.toByteArray(), "UTF-8");
+
+							JSONObject json = new JSONObject(jsonString);
+
+							SharedPreferences prefs = JSONConfigFile.getPreferences(context);
+							Editor edit = prefs.edit();
+
+							edit.putString(JSONConfigFile.JSON_CONFIGURATION, json.toString());
+							edit.putString(JSONConfigFile.JSON_CONFIGURATION_URL, u.toString());
+
+							edit.commit();
+
+							if (context instanceof Activity)
+							{
+								final Activity activity = (Activity) context;
+
+								activity.runOnUiThread(new Runnable()
+								{
+									public void run()
+									{
+										Toast.makeText(activity, R.string.success_json_set_uri, Toast.LENGTH_LONG).show();
+									}
+								});
+							}
+						}
+						catch (MalformedURLException e)
+						{
+							e.printStackTrace();
+						}
+						catch (IOException e)
+						{
+							e.printStackTrace();
+						}
+						catch (JSONException e)
+						{
+							e.printStackTrace();
+						}
+
+						JSONConfigFile._sharedFile = new JSONConfigFile(context);
+					}
 				}
 			};
 

@@ -460,11 +460,11 @@ public class HttpUploadPlugin extends OutputPlugin
 									baos.write(buffer, 0, read);
 								}
 
-								totalRead += baos.size();
-
 								cin.close();
 
 								JSONArray jsonArray = new JSONArray(baos.toString("UTF-8"));
+
+								totalRead += baos.size();
 
 								for (int i = 0; i < jsonArray.length(); i++)
 								{
@@ -592,8 +592,10 @@ public class HttpUploadPlugin extends OutputPlugin
 
 								HttpPost httpPost = new HttpPost(siteUri);
 
+								String jsonString = jsonMessage.toString();
+
 								List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-								nameValuePairs.add(new BasicNameValuePair("json", jsonMessage.toString()));
+								nameValuePairs.add(new BasicNameValuePair("json", jsonString));
 								HttpEntity entity = new UrlEncodedFormEntity(nameValuePairs);
 
 								httpPost.setEntity(entity);
@@ -675,6 +677,8 @@ public class HttpUploadPlugin extends OutputPlugin
 								}
 								else
 								{
+//									Log.e("PRM", "SENT " + jsonString);
+
 									String errorMessage = String.format(resources.getString(R.string.message_server_error),	status);
 									me.broadcastMessage(errorMessage);
 								}

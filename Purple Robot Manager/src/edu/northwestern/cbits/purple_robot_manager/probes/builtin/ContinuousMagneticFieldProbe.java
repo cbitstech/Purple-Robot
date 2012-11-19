@@ -1,5 +1,9 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -180,4 +184,57 @@ public class ContinuousMagneticFieldProbe extends ContinuousProbe implements Sen
 
 		return String.format(context.getResources().getString(R.string.summary_magnetic_probe), xReading, yReading, zReading);
 	}
+
+	public Bundle formattedBundle(Context context, Bundle bundle)
+	{
+		Bundle formatted = super.formattedBundle(context, bundle);
+
+		double[] eventTimes = bundle.getDoubleArray("EVENT_TIMESTAMP");
+		float[] x = bundle.getFloatArray("X");
+		float[] y = bundle.getFloatArray("Y");
+		float[] z = bundle.getFloatArray("Z");
+
+		ArrayList<String> keys = new ArrayList<String>();
+
+		SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.display_date_format));
+
+		if (eventTimes.length > 1)
+		{
+			Bundle readings = new Bundle();
+
+			for (int i = 0; i < eventTimes.length; i++)
+			{
+				String formatString = String.format(context.getString(R.string.display_gyroscope_reading), x[i], y[i], z[i]);
+
+				double time = eventTimes[i];
+
+				Date d = new Date((long) time);
+
+				readings.putString(sdf.format(d), formatString);
+
+				String key = sdf.format(d);
+
+				readings.putString(key, formatString);
+
+				keys.add(key);
+			}
+
+			if (keys.size() > 0)
+				readings.putStringArrayList("KEY_ORDER", keys);
+
+			formatted.putBundle(context.getString(R.string.display_magnetic_readings), readings);
+		}
+		else if (eventTimes.length > 0)
+		{
+			String formatString = String.format(context.getString(R.string.display_gyroscope_reading), x[0], y[0], z[0]);
+
+			double time = eventTimes[0];
+
+			Date d = new Date((long) time);
+
+			formatted.putString(sdf.format(d), formatString);
+		}
+
+		return formatted;
+	};
 }
