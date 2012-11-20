@@ -65,6 +65,7 @@ public class StartActivity extends SherlockActivity
 	private long _lastUpdate = 0;
 
 	private SharedPreferences prefs = null;
+	protected String _lastProbe = "";
 
 	private SharedPreferences getPreferences(Context context)
 	{
@@ -109,9 +110,10 @@ public class StartActivity extends SherlockActivity
     				{
 		    			if (StartActivity.UPDATE_DISPLAY.equals(intent.getAction()))
 		    			{
-				    		if (me._isPaused == false && now - 2500 > me._lastUpdate)
+			    			String name = intent.getStringExtra(DISPLAY_PROBE_NAME);
+
+			    			if (!me._lastProbe.equals(name))
 				    		{
-				    			String name = intent.getStringExtra(DISPLAY_PROBE_NAME);
 				    			Bundle value = intent.getBundleExtra(DISPLAY_PROBE_VALUE);
 
 				    			if (StartActivity._probeNames.contains(name))
@@ -121,9 +123,13 @@ public class StartActivity extends SherlockActivity
 				    			StartActivity._probeValues.put(name, value);
 				    			StartActivity._probeDates.put(name, new Date());
 
-				    			me.refreshList();
+				    			if (me._isPaused == false && now - 2500 > me._lastUpdate)
+				    			{
+					    			me._lastUpdate = now;
+			    					me.refreshList();
+				    			}
 
-				    			me._lastUpdate = now;
+				    			me._lastProbe = name;
 				    		}
 		    			}
 		    			else if (StartActivity.UPDATE_MESSAGE.equals(intent.getAction()))
@@ -142,7 +148,7 @@ public class StartActivity extends SherlockActivity
 								}
 		    				});
 
-		    				Log.e("PRM", "UPDATE MESSAGE: " + intent.getStringExtra(StartActivity.DISPLAY_MESSAGE));
+		    				Log.i("PRM", "UPDATE MESSAGE: " + intent.getStringExtra(StartActivity.DISPLAY_MESSAGE));
 		    			}
     				}
     			});

@@ -414,7 +414,7 @@ public class ProbeViewerActivity extends SPreferenceActivity
 		{
 			Preference pref = this.screenForBundle(title, value);
 
-			pref.setTitle("bUNDLE");
+			pref.setTitle(this.getString(R.string.display_data_bundle));
 
 			screen.addPreference(pref);
 		}

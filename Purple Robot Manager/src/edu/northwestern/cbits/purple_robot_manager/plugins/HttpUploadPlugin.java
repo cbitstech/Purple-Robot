@@ -640,7 +640,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 								JSONObject json = new JSONObject(body);
 
-								Log.e("PRM", "GOT RESPONSE (" + json.getString("Status") + "): " + body);
+								Log.i("PRM", "GOT RESPONSE (" + json.getString("Status") + "): " + body);
 
 								String status = json.getString(STATUS_KEY);
 
@@ -677,8 +677,6 @@ public class HttpUploadPlugin extends OutputPlugin
 								}
 								else
 								{
-//									Log.e("PRM", "SENT " + jsonString);
-
 									String errorMessage = String.format(resources.getString(R.string.message_server_error),	status);
 									me.broadcastMessage(errorMessage);
 								}
@@ -715,7 +713,7 @@ public class HttpUploadPlugin extends OutputPlugin
 								String errorMessage = String.format(resources.getString(R.string.message_general_error), e.toString());
 								me.broadcastMessage(errorMessage);
 
-								Log.e("PRM", "GENERAL ERROR BODY: " + body);
+								Log.i("PRM", "GENERAL ERROR BODY: " + body);
 							}
 							finally
 							{

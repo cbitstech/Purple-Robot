@@ -126,7 +126,10 @@ public class FunfService extends CustomizedIntentService
 
 		for (String probeName : dataRequests.keySet())
 		{
-			this.sendProbeRequest(probeName, dataRequests.get(probeName));
+			Bundle[] requests = dataRequests.get(probeName);
+
+			if (requests.length > 0)
+				this.sendProbeRequest(probeName, requests);
 		}
 	}
 
