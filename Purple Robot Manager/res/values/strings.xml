@@ -194,7 +194,7 @@
     <string name="summary_accelerator_probe" formatted="false">%.2f X, %.2f Y, %.2f Z</string>
     <string name="summary_gyroscope_probe" formatted="false">%.2f X, %.2f Y, %.2f Z</string>
     <string name="summary_magnetic_probe" formatted="false">%.1f X, %.1f Y, %.1f Z</string>
-    <string name="summary_wifi_probe" formatted="false">%d visible access points</string>
+    <string name="summary_wifi_probe" formatted="false">Visible Access Points: %d</string>
     <string name="summary_battery_probe" formatted="false">%d%% charged</string>
     <string name="summary_bluetooth_probe" formatted="false">%d visible devices</string>
     <string name="summary_contact_probe" formatted="false">%d contacts in address book</string>
@@ -213,7 +213,9 @@
     <string name="summary_installed_apps_probe" formatted="false">%d installed apps</string>
     <string name="summary_telephony_probe" formatted="false">Network Operator: %s</string>
     <string name="summary_temperature_probe" formatted="false">%.2f degrees</string>
-    <string name="summary_satellite_probe" formatted="false">Visible Satellites: %d</string>
+    <string name="summary_satellite_probe" formatted="false">Visible Satellites: %d (%.2f Avg. SNR)</string>
+
+    <string name="summary_bluetooth_probe" formatted="false">Visible Bluetooth Devices: %d</string>
 
     <string name="summary_sms_probe" formatted="false">%d messages</string>
     <string name="summary_tasks_probe" formatted="false">%d running tasks</string>
@@ -247,7 +249,7 @@
 
     <string name="notify_running">Purple Robot is collecting data&#8230;</string>
 
-    <string name="title_http_upload_section">Data Settings</string>
+    <string name="title_http_upload_section">HTTP Upload Settings</string>
     <string name="title_http_upload_uri">HTTP Upload Endpoint</string>
     <string name="summary_http_upload_uri">URL of the HTTP endpoint where sensor data will be logged.</string>
     <string name="title_http_upload_enabled">Enable HTTP Upload</string>
@@ -295,4 +297,15 @@
     <string name="display_wifi_scan_result_title" formatted="false">%s %s</string>
     <string name="display_wifi_scan_result_summary" formatted="false">%s (%d MHz, %d dBm)</string>
     <string name="display_wifi_scan_results_title">Wireless Scan Results</string>
+
+    <string name="display_bluetooth_devices_title" formatted="false">Visible Devices (%d)</string>
+    <string name="display_bluetooth_device_title" formatted="false">%s: %s</string>
+    <string name="display_bluetooth_device_summary" formatted="false">Status: %s; %s: %s</string>
+
+    <string name="display_bluetooth_device_pair">Pairing Status</string>
+    <string name="display_bluetooth_device_major">Major Device Class</string>
+    <string name="display_bluetooth_device_minor">Minor Device Class</string>
+
+    <string name="display_data_bundle">Data Bundle</string>
+
 </resources>

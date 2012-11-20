@@ -18,28 +18,27 @@
             holo:title="@string/config_vibrator_pattern_label"
             holo:summary="@string/config_vibrator_pattern_message"
             holo:defaultValue="60" />
-   	</PreferenceCategory>
-    <PreferenceCategory
-        holo:title="@string/title_http_upload_section">
+	</PreferenceCategory>
+	<PreferenceScreen holo:title="@string/title_http_upload_section">
         <CheckBoxPreference
-       	    holo:title="@string/title_external_storage_enabled"
-            holo:summary="@string/summary_external_storage_enabled"
-            holo:key="config_external_storage"
+       	    holo:title="@string/title_http_upload_enabled"
+            holo:key="config_enable_data_server"
             holo:defaultValue="false"/>
-        <CheckBoxPreference
+  	        <CheckBoxPreference
+   	   	    holo:title="@string/title_external_storage_enabled"
+       	    holo:summary="@string/summary_external_storage_enabled"
+           	holo:key="config_external_storage"
+           	holo:defaultValue="false"/>
+   	    <CheckBoxPreference
        	    holo:title="@string/title_archive_enabled"
-            holo:summary="@string/summary_archive_enabled"
-            holo:key="config_http_archive"
-            holo:defaultValue="false"/>
+       	    holo:summary="@string/summary_archive_enabled"
+           	holo:key="config_http_archive"
+           	holo:defaultValue="false"/>
        	<CheckBoxPreference
        	    holo:title="@string/title_http_encrypt"
        	    holo:summary="@string/summary_http_encrypt"
             holo:key="config_http_encrypt"
             holo:defaultValue="true"/>
-        <CheckBoxPreference
-       	    holo:title="@string/title_http_upload_enabled"
-            holo:key="config_enable_data_server"
-            holo:defaultValue="false"/>
         <EditTextPreference
             holo:key="config_data_server_uri"
             holo:title="@string/title_http_upload_uri"
@@ -52,18 +51,11 @@
        	    holo:summary="@string/summary_http_upload_wifi_only"
             holo:key="config_restrict_data_wifi"
             holo:defaultValue="true"/>
-   		</PreferenceCategory>
-		<PreferenceScreen holo:title="Beidh ceol, caint agus craic againn!"
-		    holo:summary="Tho' lovely and fair as the rose of the summer, Yet 'twas not her beauty alone that won me, Oh, no, 'twas the truth in her eyes ever beaming That made me love Mary, the Rose of Tralee.">
-    		<PreferenceCategory holo:title="John G.'s Extra Special Settings">
-   				<Preference holo:title="Zip &amp; E-Mail Archived Files"
-            		holo:key="config_mail_archives"
-            		holo:defaultValue="0" />
-   				<Preference holo:title="Delete Archived Files"
-            		holo:key="config_delete_archives"
-            		holo:defaultValue="0" />
-			</PreferenceCategory>
-   		</PreferenceScreen>
+		<PreferenceScreen holo:title="aDVANCED sETTINGS">
+			<Preference holo:title="Zip &amp; E-Mail Archived Files" holo:key="config_mail_archives" holo:defaultValue="0" />
+			<Preference holo:title="Delete Archived Files" holo:key="config_delete_archives" holo:defaultValue="0" />
+  			</PreferenceScreen>
+	</PreferenceScreen>
     <PreferenceCategory
         holo:title="@string/config_settings_category">
         <EditTextPreference

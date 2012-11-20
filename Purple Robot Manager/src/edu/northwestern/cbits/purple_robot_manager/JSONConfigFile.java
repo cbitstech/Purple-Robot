@@ -63,7 +63,7 @@ public class JSONConfigFile
 				{
 					if (uri != null)
 					{
-						Log.e("PRM", "CONFIG URI: " + uri);
+						Log.i("PRM", "CONFIG URI: " + uri);
 
 						try
 						{

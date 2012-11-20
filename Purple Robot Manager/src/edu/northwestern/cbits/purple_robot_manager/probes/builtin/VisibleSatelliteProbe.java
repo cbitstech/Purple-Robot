@@ -1,20 +1,17 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
-import android.content.Intent;
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
 
 import com.WazaBe.HoloEverywhere.preference.CheckBoxPreference;
 import com.WazaBe.HoloEverywhere.preference.ListPreference;
@@ -36,11 +33,6 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 	private long _lastTransmit = 0;
 
 	private boolean _listening = false;
-
-	public Bundle[] dataRequestBundles(Context context)
-	{
-		return new Bundle[0];
-	}
 
 	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(SPreferenceActivity activity)
@@ -127,20 +119,6 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 		return context.getResources().getString(R.string.probe_environment_category);
 	}
 
-	protected void transmitData(Bundle data)
-	{
-		if (this._context != null)
-		{
-			UUID uuid = UUID.randomUUID();
-			data.putString("GUID", uuid.toString());
-
-			LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(this._context);
-			Intent intent = new Intent(edu.northwestern.cbits.purple_robot_manager.probes.Probe.PROBE_READING);
-			intent.putExtras(data);
-
-			localManager.sendBroadcast(intent);
-		}
-	}
 
 	@SuppressWarnings("unchecked")
 	public void onGpsStatusChanged(int event)
@@ -184,6 +162,9 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 
 				this._satellites.clear();
 
+				float snrSum = 0;
+				int snrCount = 0;
+
 				for (GpsSatellite sat : sats)
 				{
 					Bundle satBundle = new Bundle();
@@ -196,6 +177,9 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 					satBundle.putBoolean("HAS_EPHEMERIS", sat.hasEphemeris());
 					satBundle.putBoolean("USED_IN_FIX", sat.usedInFix());
 
+					snrSum += sat.getSnr();
+					snrCount += 1;
+
 					this._satellites.add(satBundle);
 				}
 
@@ -206,9 +190,14 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 				bundle.putParcelableArrayList("SATELLITES", (ArrayList<Bundle>) this._satellites.clone());
 				bundle.putInt("SATELLITE_COUNT", this._satellites.size());
 
+				if (snrSum > 0)
+					snrSum = snrSum / snrCount;
+
+				bundle.putFloat("AVERAGE_SIGNAL_RATIO", snrSum);
+
 				synchronized(this)
 				{
-					this.transmitData(bundle);
+					this.transmitData(this._context, bundle);
 				}
 
 				break;
@@ -255,8 +244,9 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
 		int count = bundle.getInt("SATELLITE_COUNT");
+		float snr = bundle.getFloat("AVERAGE_SIGNAL_RATIO");
 
-		return String.format(context.getResources().getString(R.string.summary_satellite_probe), count);
+		return String.format(context.getResources().getString(R.string.summary_satellite_probe), count, snr);
 	}
 
 

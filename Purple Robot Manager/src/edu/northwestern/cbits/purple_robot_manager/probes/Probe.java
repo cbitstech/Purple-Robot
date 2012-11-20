@@ -3,15 +3,18 @@ package edu.northwestern.cbits.purple_robot_manager.probes;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
+
 import com.WazaBe.HoloEverywhere.preference.PreferenceScreen;
 import com.WazaBe.HoloEverywhere.sherlock.SPreferenceActivity;
-
-import android.content.Context;
-import android.os.Bundle;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 
@@ -25,8 +28,12 @@ public abstract class Probe
 	public abstract String name(Context context);
 	public abstract String title(Context context);
 	public abstract String probeCategory(Context context);
-	public abstract Bundle[] dataRequestBundles(Context context);
 	public abstract PreferenceScreen preferenceScreen(SPreferenceActivity settingsActivity);
+
+	public Bundle[] dataRequestBundles(Context context)
+	{
+		return new Bundle[0];
+	}
 
 	@SuppressWarnings("rawtypes")
 	private static List<Class> _probeClasses = new ArrayList<Class>();
@@ -101,4 +108,19 @@ public abstract class Probe
 
 		return formatted;
 	};
+
+	protected void transmitData(Context context, Bundle data)
+	{
+		if (context != null)
+		{
+			UUID uuid = UUID.randomUUID();
+			data.putString("GUID", uuid.toString());
+
+			LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(context);
+			Intent intent = new Intent(edu.northwestern.cbits.purple_robot_manager.probes.Probe.PROBE_READING);
+			intent.putExtras(data);
+
+			localManager.sendBroadcast(intent);
+		}
+	}
 }
