@@ -7,21 +7,19 @@
         <item>builtin.ContinuousMagneticFieldProbe</item>
         <item>builtin.VisibleSatelliteProbe</item>
         <item>builtin.BluetoothDevicesProbe</item>
+        <item>builtin.HardwareInformationProbe</item>
+        <item>builtin.SoftwareInformationProbe</item>
         <!-- <item>builtin.BluetoothReceiverProbe</item> -->
 
-        <item>funf.AndroidInfoProbe</item>
         <item>funf.BatteryProbe</item>
         <item>funf.BrowserBookmarksProbe</item>
         <item>funf.BrowserSearchesProbe</item>
         <item>funf.CallLogProbe</item>
         <item>funf.CellTowerProbe</item>
         <item>funf.ContactProbe</item>
-        <item>funf.HardwareInfoProbe</item>
-		<item>funf.InstalledApplicationsProbe</item>
         <item>funf.LightProbe</item>
 	    <item>funf.LocationProbe</item>
 	    <item>funf.ProximityProbe</item>
-	    <item>funf.RunningApplicationsProbe</item>
 	    <item>funf.ScreenProbe</item>
         <item>funf.SmsProbe</item>
         <item>funf.TelephonyProbe</item>

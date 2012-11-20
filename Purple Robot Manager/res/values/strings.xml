@@ -200,6 +200,7 @@
     <string name="summary_contact_probe" formatted="false">%d contacts in address book</string>
     <string name="summary_location_probe" formatted="false">%.4f, %.4f</string>
     <string name="summary_hardware_info_probe" formatted="false">%s: %s</string>
+    <string name="summary_software_info_probe" formatted="false">Android %s: %d packages</string>
     <string name="summary_orientation_probe" formatted="false">Azimuth: %.1f, Pitch: %.1f, Roll: %.1f</string>
     <string name="summary_activity_probe" formatted="false">High Activity: %d, Low Activity: %d</string>
     <string name="summary_cell_probe" formatted="false">Cell Tower ID: %s</string>
@@ -307,5 +308,8 @@
     <string name="display_bluetooth_device_minor">Minor Device Class</string>
 
     <string name="display_data_bundle">Data Bundle</string>
+
+    <string name="title_builtin_software_probe">Software Information</string>
+    <string name="title_builtin_hardware_probe">Hardware Information</string>
 
 </resources>

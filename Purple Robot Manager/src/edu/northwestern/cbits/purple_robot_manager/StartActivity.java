@@ -112,7 +112,7 @@ public class StartActivity extends SherlockActivity
 		    			{
 			    			String name = intent.getStringExtra(DISPLAY_PROBE_NAME);
 
-			    			if (!me._lastProbe.equals(name))
+			    			if (name != null || !me._lastProbe.equals(name))
 				    		{
 				    			Bundle value = intent.getBundleExtra(DISPLAY_PROBE_VALUE);
 
