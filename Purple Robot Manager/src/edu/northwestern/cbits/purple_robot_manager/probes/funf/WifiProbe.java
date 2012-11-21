@@ -51,12 +51,15 @@ public class WifiProbe extends PeriodFunfProbe
 	{
 		Bundle bundle = new Bundle();
 
-		for (ScanResult value : objects)
+		if (objects != null)
 		{
-			String key = String.format(context.getString(R.string.display_wifi_scan_result_title), value.BSSID, value.capabilities);
-			String keyValue = String.format(context.getString(R.string.display_wifi_scan_result_summary), value.SSID, value.frequency, value.level);
+			for (ScanResult value : objects)
+			{
+				String key = String.format(context.getString(R.string.display_wifi_scan_result_title), value.BSSID, value.capabilities);
+				String keyValue = String.format(context.getString(R.string.display_wifi_scan_result_summary), value.SSID, value.frequency, value.level);
 
-			bundle.putString(key, keyValue);
+				bundle.putString(key, keyValue);
+			}
 		}
 
 		return bundle;

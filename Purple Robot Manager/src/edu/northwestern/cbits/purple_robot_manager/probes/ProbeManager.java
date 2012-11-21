@@ -25,6 +25,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.BluetoothDevic
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.HardwareInformationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.SoftwareInformationProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TelephonyProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.VisibleSatelliteProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.funf.BasicFunfProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.funf.ContactProbe;
@@ -158,6 +159,13 @@ public class ProbeManager
 				HardwareInformationProbe hardware = (HardwareInformationProbe) probe;
 
 				if (hardware.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof TelephonyProbe)
+			{
+				TelephonyProbe telephony = (TelephonyProbe) probe;
+
+				if (telephony.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 

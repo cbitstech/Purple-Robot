@@ -212,7 +212,7 @@
     <string name="summary_proximity_value_probe" formatted="false">Distance: %.1f</string>
     <string name="summary_call_log_probe" formatted="false">%d logged calls</string>
     <string name="summary_installed_apps_probe" formatted="false">%d installed apps</string>
-    <string name="summary_telephony_probe" formatted="false">Network Operator: %s</string>
+    <string name="summary_telephony_probe" formatted="false">Network Operator: %s (%s)</string>
     <string name="summary_temperature_probe" formatted="false">%.2f degrees</string>
     <string name="summary_satellite_probe" formatted="false">Visible Satellites: %d (%.2f Avg. SNR)</string>
 
@@ -288,7 +288,7 @@
     <string name="display_battery_health_cold">Cold</string>
 	<string name="display_battery_health_dead">Dead</string>
 	<string name="display_battery_health_good">Good</string>
-	<string name="display_battery_health_overheat">Overheated</string>
+		<string name="display_battery_health_overheat">Overheated</string>
     <string name="display_battery_health_over_voltage">Over Voltage</string>
     <string name="display_battery_health_failure">Unknown Failure</string>
     <string name="display_battery_health_tech_label">Technology</string>
@@ -311,5 +311,5 @@
 
     <string name="title_builtin_software_probe">Software Information</string>
     <string name="title_builtin_hardware_probe">Hardware Information</string>
-
+    <string name="title_builtin_telephony_probe">Telephony Information</string>
 </resources>
