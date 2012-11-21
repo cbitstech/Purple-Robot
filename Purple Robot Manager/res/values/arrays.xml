@@ -9,20 +9,19 @@
         <item>builtin.BluetoothDevicesProbe</item>
         <item>builtin.HardwareInformationProbe</item>
         <item>builtin.SoftwareInformationProbe</item>
+        <item>builtin.TelephonyProbe</item>
         <!-- <item>builtin.BluetoothReceiverProbe</item> -->
 
         <item>funf.BatteryProbe</item>
         <item>funf.BrowserBookmarksProbe</item>
         <item>funf.BrowserSearchesProbe</item>
         <item>funf.CallLogProbe</item>
-        <item>funf.CellTowerProbe</item>
         <item>funf.ContactProbe</item>
         <item>funf.LightProbe</item>
 	    <item>funf.LocationProbe</item>
 	    <item>funf.ProximityProbe</item>
 	    <item>funf.ScreenProbe</item>
         <item>funf.SmsProbe</item>
-        <item>funf.TelephonyProbe</item>
         <item>funf.TemperatureProbe</item>
         <item>funf.TimeOffsetProbe</item>
         <item>funf.WifiProbe</item>
