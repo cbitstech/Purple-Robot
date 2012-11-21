@@ -198,7 +198,7 @@ public class ContinuousMagneticFieldProbe extends ContinuousProbe implements Sen
 
 		SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.display_date_format));
 
-		if (eventTimes.length > 1)
+		if (eventTimes != null && eventTimes.length > 1)
 		{
 			Bundle readings = new Bundle();
 
