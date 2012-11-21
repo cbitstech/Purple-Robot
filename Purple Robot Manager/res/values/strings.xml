@@ -222,6 +222,7 @@
     <string name="summary_tasks_probe" formatted="false">%d running tasks</string>
     <string name="summary_android_version_probe" formatted="false">Android version %s</string>
     <string name="summary_time_offset_probe" formatted="false">%.2f second offset from time servers.</string>
+    <string name="summary_robot_probe" formatted="false">%d Files Pending (%.2f MB, %ds)</string>
 
     <string name="menu_pause_toggle_label">Pause</string>
     <string name="menu_resume_toggle_label">Resume</string>
@@ -284,6 +285,9 @@
     <string name="display_light_readings">Light Measurements</string>
     <string name="display_light_reading" formatted="false">%.3f lux</string>
 
+    <string name="display_temperature_readings">Temperature Measurements</string>
+    <string name="display_temperature_reading" formatted="false">%.3f degrees</string>
+
     <string name="display_battery_health_label">Battery Health</string>
     <string name="display_battery_health_cold">Cold</string>
 	<string name="display_battery_health_dead">Dead</string>
@@ -312,4 +316,5 @@
     <string name="title_builtin_software_probe">Software Information</string>
     <string name="title_builtin_hardware_probe">Hardware Information</string>
     <string name="title_builtin_telephony_probe">Telephony Information</string>
+    <string name="title_builtin_robot_probe">Purple Robot Health</string>
 </resources>

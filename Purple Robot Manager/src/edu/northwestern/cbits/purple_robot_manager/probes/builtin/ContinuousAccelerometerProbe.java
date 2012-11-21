@@ -45,7 +45,11 @@ public class ContinuousAccelerometerProbe extends ContinuousProbe implements Sen
 
 		SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.display_date_format));
 
-		if (eventTimes.length > 1)
+		if (x == null || y == null || z == null)
+		{
+
+		}
+		else if (eventTimes.length > 1)
 		{
 			Bundle readings = new Bundle();
 
