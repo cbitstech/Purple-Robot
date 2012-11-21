@@ -24,6 +24,7 @@ import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.BluetoothDevicesProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.HardwareInformationProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RobotHealthProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.SoftwareInformationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TelephonyProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.VisibleSatelliteProbe;
@@ -166,6 +167,13 @@ public class ProbeManager
 				TelephonyProbe telephony = (TelephonyProbe) probe;
 
 				if (telephony.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof RobotHealthProbe)
+			{
+				RobotHealthProbe robot = (RobotHealthProbe) probe;
+
+				if (robot.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 

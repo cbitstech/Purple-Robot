@@ -68,6 +68,7 @@ import com.WazaBe.HoloEverywhere.preference.SharedPreferences.Editor;
 import com.WazaBe.HoloEverywhere.widget.Toast;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
+import edu.emory.mathcs.backport.java.util.Collections;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.StartActivity;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -82,7 +83,7 @@ public class HttpUploadPlugin extends OutputPlugin
 	private final static String CHECKSUM_KEY = "Checksum";
 	private final static String STATUS_KEY = "Status";
 
-	private final static int WIFI_MULTIPLIER = 2;
+	private final static int WIFI_MULTIPLIER = 3;
 
 	private final static long MAX_UPLOAD_PERIOD = 3600000;
 	private final static long MIN_UPLOAD_PERIOD = 300000;
@@ -98,6 +99,8 @@ public class HttpUploadPlugin extends OutputPlugin
 	private long _lastSave = 0;
 	private long _lastUpload = 0;
 
+	private double _throughput = 0.0;
+
 	private boolean _wifiAvailable = false;
 	private long _lastWifiCheck = 0;
 
@@ -106,12 +109,19 @@ public class HttpUploadPlugin extends OutputPlugin
 
 	private boolean _uploading = false;
 
+	private int _failCount = 0;
+
 	protected static SharedPreferences getPreferences(Context context)
 	{
 		if (HttpUploadPlugin.prefs  == null)
 			HttpUploadPlugin.prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
 
 		return HttpUploadPlugin.prefs;
+	}
+
+	public double getRecentThroughput()
+	{
+		return this._throughput;
 	}
 
 	private void logSuccess(boolean success)
@@ -171,6 +181,7 @@ public class HttpUploadPlugin extends OutputPlugin
 		{
 			this._lastUpload = 0;
 			this._lastSave = 0;
+			this._failCount = 0;
 
 			final HttpUploadPlugin me = this;
 
@@ -373,6 +384,8 @@ public class HttpUploadPlugin extends OutputPlugin
 				@SuppressWarnings("deprecation")
 				public void run()
 				{
+					long start = System.currentTimeMillis();
+
 					boolean continueUpload = false;
 					boolean wasSuccessful = false;
 
@@ -434,7 +447,8 @@ public class HttpUploadPlugin extends OutputPlugin
 					if (filenames == null)
 						filenames = new String[0];
 
-					Arrays.sort(filenames);
+//					Arrays.sort(filenames);
+					Collections.shuffle(Arrays.asList(filenames));
 
 					ArrayList<JSONObject> pendingObjects = new ArrayList<JSONObject>();
 
@@ -483,6 +497,8 @@ public class HttpUploadPlugin extends OutputPlugin
 							}
 							catch (JSONException e)
 							{
+								Log.e("PRM", "JSON ERROR: " + f.getAbsolutePath() + f.length());
+
 								e.printStackTrace();
 							}
 
@@ -494,8 +510,8 @@ public class HttpUploadPlugin extends OutputPlugin
 
 								f.renameTo(archive);
 							}
-							else
-								f.delete();
+//							else
+//								f.delete();
 						}
 					}
 
@@ -670,15 +686,30 @@ public class HttpUploadPlugin extends OutputPlugin
 										String uploadedMessage = String.format(resources.getString(R.string.message_upload_successful),
 												(httpPost.getEntity().getContentLength() / 1024));
 
+										me._failCount = 0;
+
 										me.broadcastMessage(uploadedMessage);
+
+										long elapsed = (System.currentTimeMillis() - start) / 1000;
+
+										me._throughput = ((double) httpPost.getEntity().getContentLength()) / elapsed;
 									}
 									else
+									{
 										me.broadcastMessage(R.string.message_checksum_failed);
+										me._failCount += 1;
+
+										me._throughput = 0.0;
+									}
 								}
 								else
 								{
 									String errorMessage = String.format(resources.getString(R.string.message_server_error),	status);
 									me.broadcastMessage(errorMessage);
+
+									me._failCount += 1;
+
+									me._throughput = 0.0;
 								}
 							}
 							catch (HttpHostConnectException e)
@@ -787,7 +818,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 					me._uploading = false;
 
-					if (continueUpload)
+					if (continueUpload || me._failCount < 8)
 					{
 						try
 						{
@@ -822,7 +853,7 @@ public class HttpUploadPlugin extends OutputPlugin
 		this.broadcastMessage(this.getContext().getResources().getString(stringId));
 	}
 
-	private File getPendingFolder()
+	public File getPendingFolder()
 	{
 		SharedPreferences prefs = HttpUploadPlugin.getPreferences(this.getContext());
 
@@ -842,7 +873,7 @@ public class HttpUploadPlugin extends OutputPlugin
 		return pendingFolder;
 	}
 
-	private File getArchiveFolder()
+	public File getArchiveFolder()
 	{
 		File f = this.getPendingFolder();
 
@@ -868,7 +899,7 @@ public class HttpUploadPlugin extends OutputPlugin
 			}
 		}
 
-		if (now - this._lastSave > this.savePeriod() || this._pendingSaves.size() > 64)
+		if (now - this._lastSave > this.savePeriod() || this._pendingSaves.size() > 1024)
 		{
 			this._lastSave = now;
 
@@ -969,9 +1000,10 @@ public class HttpUploadPlugin extends OutputPlugin
 				throw new RuntimeException(e);
 			}
 
-			if (this._pendingSaves.size() > 0)
+			if (this._pendingSaves.size() > 512)
 			{
 				this._lastSave = 0;
+				this._failCount = 0;
 				this.persistJSONObject(null);
 			}
 		}

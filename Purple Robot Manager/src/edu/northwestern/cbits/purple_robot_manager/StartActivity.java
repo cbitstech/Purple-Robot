@@ -168,7 +168,7 @@ public class StartActivity extends SherlockActivity
         			convertView = inflater.inflate(R.layout.layout_probe_row, null);
         		}
 
-        		String sensorName = StartActivity._probeNames.get(position);
+        		final String sensorName = StartActivity._probeNames.get(position);
 
         		final Probe probe = ProbeManager.probeForName(sensorName, me);
 
@@ -181,7 +181,7 @@ public class StartActivity extends SherlockActivity
 					{
 						Intent intent = new Intent(me, ProbeViewerActivity.class);
 
-						intent.putExtra("probe_name", StartActivity._probeNames.get(position));
+						intent.putExtra("probe_name", sensorName);
 						intent.putExtra("probe_bundle", value);
 
 						me.startActivity(intent);
@@ -193,11 +193,13 @@ public class StartActivity extends SherlockActivity
 
         		String formattedValue = sensorName;
 
+        		String displayName = sensorName;
+
         		if (probe != null && value != null)
         		{
         			try
         			{
-        				sensorName = probe.title(me);
+        				displayName = probe.title(me);
         				formattedValue = probe.summarizeValue(me, value);
         			}
         			catch (Exception e)
@@ -211,7 +213,7 @@ public class StartActivity extends SherlockActivity
         				formattedValue += " (" + sensor.getFloat("POWER") + " mA)";
         		}
 
-        		nameField.setText(sensorName + " (" + sdf.format(sensorDate) + ")");
+        		nameField.setText(displayName + " (" + sdf.format(sensorDate) + ")");
         		valueField.setText(formattedValue);
 
         		return convertView;
