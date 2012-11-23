@@ -14,7 +14,6 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
@@ -91,8 +90,6 @@ public class RobotHealthProbe extends Probe
 									long pendingSize = 0;
 									long archiveSize = 0;
 
-									Log.e("PRM", "COUNTING ARCHIVES");
-
 									for (File f : archiveFolder.listFiles())
 									{
 										if (f.isFile())
@@ -101,8 +98,6 @@ public class RobotHealthProbe extends Probe
 											archiveSize += f.length();
 										}
 									}
-
-									Log.e("PRM", "COUNTING PENDING");
 
 									FilenameFilter jsonFilter =  new FilenameFilter()
 									{
@@ -128,8 +123,6 @@ public class RobotHealthProbe extends Probe
 									}
 									else
 										pendingSize = Integer.MAX_VALUE;
-
-									Log.e("PRM", "DONE COUNTING");
 
 									Bundle bundle = new Bundle();
 									bundle.putString("PROBE", me.name(context));

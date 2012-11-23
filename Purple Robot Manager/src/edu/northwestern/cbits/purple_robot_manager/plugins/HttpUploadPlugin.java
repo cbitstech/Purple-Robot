@@ -64,6 +64,7 @@ import android.net.http.AndroidHttpClient;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+
 import android.util.Log;
 import android.widget.Toast;
 
@@ -720,38 +721,32 @@ public class HttpUploadPlugin extends OutputPlugin
 							}
 							catch (HttpHostConnectException e)
 							{
-								Log.e("PRM", "a");
 								me.broadcastMessage(R.string.message_http_connection_error);
 								e.printStackTrace();
 							}
 							catch (SocketTimeoutException e)
 							{
-								Log.e("PRM", "b");
 								me.broadcastMessage(R.string.message_socket_timeout_error);
 								e.printStackTrace();
 							}
 							catch (SocketException e)
 							{
-								Log.e("PRM", "c");
 								String errorMessage = String.format(resources.getString(R.string.message_socket_error),	e.getMessage());
 								me.broadcastMessage(errorMessage);
 								e.printStackTrace();
 							}
 							catch (UnknownHostException e)
 							{
-								Log.e("PRM", "d");
 								me.broadcastMessage(R.string.message_unreachable_error);
 								e.printStackTrace();
 							}
 							catch (JSONException e)
 							{
-								Log.e("PRM", "e");
 								me.broadcastMessage(R.string.message_response_error);
 								e.printStackTrace();
 							}
 							catch (Exception e)
 							{
-								Log.e("PRM", "f");
 								e.printStackTrace();
 								String errorMessage = String.format(resources.getString(R.string.message_general_error), e.toString());
 								me.broadcastMessage(errorMessage);
@@ -760,8 +755,6 @@ public class HttpUploadPlugin extends OutputPlugin
 							}
 							finally
 							{
-								Log.e("PRM", "g");
-
 								httpClient.close();
 
 								String message = me.getContext().getString(R.string.notify_running);
@@ -776,13 +769,9 @@ public class HttpUploadPlugin extends OutputPlugin
 
 							while(pendingObjects.size() > 0)
 							{
-								Log.e("PRM", "h1");
-
 								JSONArray toSave = new JSONArray();
 
 								List<JSONObject> toRemove = new ArrayList<JSONObject>();
-
-								Log.e("PRM", "h2");
 
 								for (int i = 0; i < pendingObjects.size() && i < 100; i++)
 								{
@@ -790,11 +779,7 @@ public class HttpUploadPlugin extends OutputPlugin
 									toRemove.add(pendingObjects.get(i));
 								}
 
-								Log.e("PRM", "h3");
-
 								File f = new File(pendingFolder, "pending_" + l + ".json");
-
-								Log.e("PRM", "h4");
 
 								while (f.exists())
 								{
@@ -803,24 +788,16 @@ public class HttpUploadPlugin extends OutputPlugin
 									f = new File(pendingFolder, "pending_" + l + ".json");
 								}
 
-								Log.e("PRM", "h5");
-
 								CipherOutputStream cout = new CipherOutputStream(new FileOutputStream(f), encrypt);
 
 								byte[] jsonBytes = toSave.toString().getBytes("UTF-8");
 
-								Log.e("PRM", "h6");
-
 								cout.write(jsonBytes);
-
-								Log.e("PRM", "h7");
 
 								cout.flush();
 								cout.close();
 
 								pendingObjects.removeAll(toRemove);
-
-								Log.e("PRM", "h8");
 							}
 
 							if (wasSuccessful == false && me._failCount < MAX_RETRIES)
@@ -853,8 +830,6 @@ public class HttpUploadPlugin extends OutputPlugin
 					}
 
 					me._uploading = false;
-
-					Log.e("PRM", "TRY AGAIN " + continueUpload + " (" + me._failCount + " < " + MAX_RETRIES + ")");
 
 					if (continueUpload || (me._failCount > 1 && me._failCount < MAX_RETRIES))
 					{
