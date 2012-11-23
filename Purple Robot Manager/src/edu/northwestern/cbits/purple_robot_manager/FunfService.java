@@ -80,7 +80,7 @@ public class FunfService extends CustomizedIntentService
 		String action = intent.getAction();
 
 		if (ACTION_RELOAD.equals(action))
-			reload();
+			this.reload();
 		else if(ACTION_ENABLE.equals(action))
 			setEnabled(true);
 		else if(ACTION_DISABLE.equals(action))
@@ -101,12 +101,10 @@ public class FunfService extends CustomizedIntentService
 
 	public void reload()
 	{
-		Log.e("PRM", "RELOADING");
-
 		this.removeProbeRequests();
 
-		if (isEnabled())
-			ensureServicesAreRunning();
+		if (this.isEnabled())
+			this.ensureServicesAreRunning();
 	}
 
 	public void ensureServicesAreRunning()

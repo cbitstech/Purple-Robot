@@ -56,59 +56,62 @@ public class TelephonyProbe extends Probe
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-		long now = System.currentTimeMillis();
-
-		if (prefs.getBoolean("config_probe_telephony_enabled", true))
+		if (super.isEnabled(context))
 		{
-			synchronized(this)
+			long now = System.currentTimeMillis();
+
+			if (prefs.getBoolean("config_probe_telephony_enabled", true))
 			{
-				long freq = Long.parseLong(prefs.getString("config_probe_telephony_frequency", "300000"));
-
-				if (now - this._lastCheck  > freq)
+				synchronized(this)
 				{
-					Bundle bundle = new Bundle();
-					bundle.putString("PROBE", this.name(context));
-					bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+					long freq = Long.parseLong(prefs.getString("config_probe_telephony_frequency", "300000"));
 
-					TelephonyManager manager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-
-					bundle.putInt(TelephonyProbe.CALL_STATE, manager.getCallState());
-					bundle.putString(TelephonyProbe.NETWORK_COUNTRY_ISO, manager.getNetworkCountryIso());
-					bundle.putString(TelephonyProbe.NETWORK_OPERATOR, manager.getNetworkOperator());
-					bundle.putString(TelephonyProbe.NETWORK_OPERATOR_NAME, manager.getNetworkOperatorName());
-					bundle.putString(TelephonyProbe.SIM_COUNTRY_ISO, manager.getSimCountryIso());
-					bundle.putString(TelephonyProbe.SIM_OPERATOR, manager.getSimOperator());
-					bundle.putString(TelephonyProbe.SIM_OPERATOR_NAME, manager.getSimOperatorName());
-					bundle.putBoolean(TelephonyProbe.HAS_ICC_CARD, manager.hasIccCard());
-					bundle.putString(TelephonyProbe.NETWORK_TYPE, this.networkType(manager.getNetworkType()));
-					bundle.putString(TelephonyProbe.PHONE_TYPE, this.phoneType(manager.getPhoneType()));
-					bundle.putString(TelephonyProbe.SIM_STATE, this.simState(manager.getSimState()));
-					bundle.putString(TelephonyProbe.DEVICE_SOFTWARE_VERSION, manager.getDeviceSoftwareVersion());
-
-					CellLocation location = manager.getCellLocation();
-
-					if (location instanceof GsmCellLocation)
+					if (now - this._lastCheck  > freq)
 					{
-						GsmCellLocation gsmLocation = (GsmCellLocation) location;
-						gsmLocation.fillInNotifierBundle(bundle);
-						bundle.putString(TelephonyProbe.NETWORK_TYPE, "GSM");
-					}
-					else if (location instanceof CdmaCellLocation)
-					{
-						CdmaCellLocation cdmaLocation = (CdmaCellLocation) location;
-						cdmaLocation.fillInNotifierBundle(bundle);
-						bundle.putString(TelephonyProbe.NETWORK_TYPE, "CDMA");
-					}
-					else
-						bundle.putString(TelephonyProbe.NETWORK_TYPE, "None");
+						Bundle bundle = new Bundle();
+						bundle.putString("PROBE", this.name(context));
+						bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
 
-					this.transmitData(context, bundle);
+						TelephonyManager manager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 
-					this._lastCheck = now;
+						bundle.putInt(TelephonyProbe.CALL_STATE, manager.getCallState());
+						bundle.putString(TelephonyProbe.NETWORK_COUNTRY_ISO, manager.getNetworkCountryIso());
+						bundle.putString(TelephonyProbe.NETWORK_OPERATOR, manager.getNetworkOperator());
+						bundle.putString(TelephonyProbe.NETWORK_OPERATOR_NAME, manager.getNetworkOperatorName());
+						bundle.putString(TelephonyProbe.SIM_COUNTRY_ISO, manager.getSimCountryIso());
+						bundle.putString(TelephonyProbe.SIM_OPERATOR, manager.getSimOperator());
+						bundle.putString(TelephonyProbe.SIM_OPERATOR_NAME, manager.getSimOperatorName());
+						bundle.putBoolean(TelephonyProbe.HAS_ICC_CARD, manager.hasIccCard());
+						bundle.putString(TelephonyProbe.NETWORK_TYPE, this.networkType(manager.getNetworkType()));
+						bundle.putString(TelephonyProbe.PHONE_TYPE, this.phoneType(manager.getPhoneType()));
+						bundle.putString(TelephonyProbe.SIM_STATE, this.simState(manager.getSimState()));
+						bundle.putString(TelephonyProbe.DEVICE_SOFTWARE_VERSION, manager.getDeviceSoftwareVersion());
+
+						CellLocation location = manager.getCellLocation();
+
+						if (location instanceof GsmCellLocation)
+						{
+							GsmCellLocation gsmLocation = (GsmCellLocation) location;
+							gsmLocation.fillInNotifierBundle(bundle);
+							bundle.putString(TelephonyProbe.NETWORK_TYPE, "GSM");
+						}
+						else if (location instanceof CdmaCellLocation)
+						{
+							CdmaCellLocation cdmaLocation = (CdmaCellLocation) location;
+							cdmaLocation.fillInNotifierBundle(bundle);
+							bundle.putString(TelephonyProbe.NETWORK_TYPE, "CDMA");
+						}
+						else
+							bundle.putString(TelephonyProbe.NETWORK_TYPE, "None");
+
+						this.transmitData(context, bundle);
+
+						this._lastCheck = now;
+					}
 				}
-			}
 
-			return true;
+				return true;
+			}
 		}
 
 		return false;

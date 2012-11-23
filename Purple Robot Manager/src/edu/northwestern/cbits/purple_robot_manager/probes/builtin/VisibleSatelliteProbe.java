@@ -70,33 +70,36 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 		locationManager.removeGpsStatusListener(this);
 		locationManager.removeNmeaListener(this);
 
-        this._context = context.getApplicationContext();
-
-		long now = System.currentTimeMillis();
-
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-
-		if (prefs.getBoolean("config_probe_satellites_enabled", false))
+		if (super.isEnabled(context))
 		{
-			locationManager.addGpsStatusListener(this);
-			locationManager.addNmeaListener(this);
+	        this._context = context.getApplicationContext();
 
-			synchronized(this)
+			long now = System.currentTimeMillis();
+
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+			if (prefs.getBoolean("config_probe_satellites_enabled", false))
 			{
-				long freq = Long.parseLong(prefs.getString("config_probe_satellite_frequency", "300000"));
+				locationManager.addGpsStatusListener(this);
+				locationManager.addNmeaListener(this);
 
-				if (now - this._lastCheck > freq)
+				synchronized(this)
 				{
-					locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
+					long freq = Long.parseLong(prefs.getString("config_probe_satellite_frequency", "300000"));
 
-					this._lastCheck = now;
-					this._startCheck = now;
+					if (now - this._lastCheck > freq)
+					{
+						locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
 
-					this._listening = true;
+						this._lastCheck = now;
+						this._startCheck = now;
+
+						this._listening = true;
+					}
 				}
-			}
 
-			return true;
+				return true;
+			}
 		}
 
 		locationManager.removeUpdates(this);

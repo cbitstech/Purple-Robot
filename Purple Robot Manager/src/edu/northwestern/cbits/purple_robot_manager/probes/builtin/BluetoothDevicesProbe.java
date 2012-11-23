@@ -266,7 +266,12 @@ public class BluetoothDevicesProbe extends Probe
 
 		long now = System.currentTimeMillis();
 
-		if (prefs.getBoolean("config_probe_bluetooth_enabled", true))
+		boolean enabled = super.isEnabled(context);
+
+		if (enabled)
+			enabled = prefs.getBoolean("config_probe_bluetooth_enabled", true);
+
+		if (enabled)
 		{
 			synchronized(this)
 			{
@@ -344,6 +349,15 @@ public class BluetoothDevicesProbe extends Probe
 			}
 
 			return true;
+		}
+		else
+		{
+			if (this._adapter != null && this._adapter.isEnabled())
+			{
+				this._adapter.cancelDiscovery();
+
+				this._adapter = null;
+			}
 		}
 
 		return false;

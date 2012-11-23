@@ -58,69 +58,72 @@ public class SoftwareInformationProbe extends Probe
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-		long now = System.currentTimeMillis();
-
-		if (prefs.getBoolean("config_probe_software_enabled", true))
+		if (super.isEnabled(context))
 		{
-			synchronized(this)
+			long now = System.currentTimeMillis();
+
+			if (prefs.getBoolean("config_probe_software_enabled", true))
 			{
-				long freq = Long.parseLong(prefs.getString("config_probe_software_frequency", "300000"));
-
-				if (now - this._lastCheck  > freq)
+				synchronized(this)
 				{
-					Bundle bundle = new Bundle();
-					bundle.putString("PROBE", this.name(context));
-					bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+					long freq = Long.parseLong(prefs.getString("config_probe_software_frequency", "300000"));
 
-					bundle.putString(SoftwareInformationProbe.CODENAME, Build.VERSION.CODENAME);
-					bundle.putString(SoftwareInformationProbe.INCREMENTAL, Build.VERSION.INCREMENTAL);
-					bundle.putString(SoftwareInformationProbe.RELEASE, Build.VERSION.RELEASE);
-					bundle.putInt(SoftwareInformationProbe.SDK_INT, Build.VERSION.SDK_INT);
-
-					PackageManager pm = context.getApplicationContext().getPackageManager();
-
-					List<ApplicationInfo> infos = pm.getInstalledApplications(0);
-
-					ArrayList<Bundle> installed = new ArrayList<Bundle>();
-
-					for (ApplicationInfo info : infos)
+					if (now - this._lastCheck  > freq)
 					{
-						Bundle appBundle = new Bundle();
+						Bundle bundle = new Bundle();
+						bundle.putString("PROBE", this.name(context));
+						bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
 
-						appBundle.putString(SoftwareInformationProbe.APP_NAME, info.loadLabel(pm).toString());
-						appBundle.putString(SoftwareInformationProbe.PACKAGE_NAME, info.packageName);
+						bundle.putString(SoftwareInformationProbe.CODENAME, Build.VERSION.CODENAME);
+						bundle.putString(SoftwareInformationProbe.INCREMENTAL, Build.VERSION.INCREMENTAL);
+						bundle.putString(SoftwareInformationProbe.RELEASE, Build.VERSION.RELEASE);
+						bundle.putInt(SoftwareInformationProbe.SDK_INT, Build.VERSION.SDK_INT);
 
-						installed.add(appBundle);
+						PackageManager pm = context.getApplicationContext().getPackageManager();
+
+						List<ApplicationInfo> infos = pm.getInstalledApplications(0);
+
+						ArrayList<Bundle> installed = new ArrayList<Bundle>();
+
+						for (ApplicationInfo info : infos)
+						{
+							Bundle appBundle = new Bundle();
+
+							appBundle.putString(SoftwareInformationProbe.APP_NAME, info.loadLabel(pm).toString());
+							appBundle.putString(SoftwareInformationProbe.PACKAGE_NAME, info.packageName);
+
+							installed.add(appBundle);
+						}
+
+						bundle.putParcelableArrayList(SoftwareInformationProbe.INSTALLED_APPS, installed);
+
+						bundle.putInt(SoftwareInformationProbe.INSTALLED_APP_COUNT, installed.size());
+
+						ActivityManager am = (ActivityManager) context.getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
+						ArrayList<RunningTaskInfo> tasks = new ArrayList<RunningTaskInfo>(am.getRunningTasks(9999));
+
+						ArrayList<Bundle> running = new ArrayList<Bundle>();
+
+						for (RunningTaskInfo info : tasks)
+						{
+							Bundle taskBundle = new Bundle();
+
+							taskBundle.putString(SoftwareInformationProbe.PACKAGE_NAME, info.baseActivity.getPackageName());
+
+							running.add(taskBundle);
+						}
+
+						bundle.putParcelableArrayList(SoftwareInformationProbe.RUNNING_TASKS, running);
+						bundle.putInt(SoftwareInformationProbe.RUNNING_TASK_COUNT, running.size());
+
+						this.transmitData(context, bundle);
+
+						this._lastCheck = now;
 					}
-
-					bundle.putParcelableArrayList(SoftwareInformationProbe.INSTALLED_APPS, installed);
-
-					bundle.putInt(SoftwareInformationProbe.INSTALLED_APP_COUNT, installed.size());
-
-					ActivityManager am = (ActivityManager) context.getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
-					ArrayList<RunningTaskInfo> tasks = new ArrayList<RunningTaskInfo>(am.getRunningTasks(9999));
-
-					ArrayList<Bundle> running = new ArrayList<Bundle>();
-
-					for (RunningTaskInfo info : tasks)
-					{
-						Bundle taskBundle = new Bundle();
-
-						taskBundle.putString(SoftwareInformationProbe.PACKAGE_NAME, info.baseActivity.getPackageName());
-
-						running.add(taskBundle);
-					}
-
-					bundle.putParcelableArrayList(SoftwareInformationProbe.RUNNING_TASKS, running);
-					bundle.putInt(SoftwareInformationProbe.RUNNING_TASK_COUNT, running.size());
-
-					this.transmitData(context, bundle);
-
-					this._lastCheck = now;
 				}
-			}
 
-			return true;
+				return true;
+			}
 		}
 
 		return false;

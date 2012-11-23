@@ -76,14 +76,6 @@ public abstract class ContinuousProbe extends Probe
 		return formatted;
 	};
 
-
-	public boolean isEnabled(Context context)
-	{
-		this._context = context.getApplicationContext();
-
-		return true;
-	}
-
 	public void updateFromJSON(Context context, JSONObject json) throws JSONException
 	{
 		// TODO...
