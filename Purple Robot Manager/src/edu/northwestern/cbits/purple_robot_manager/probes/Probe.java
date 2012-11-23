@@ -10,14 +10,13 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-
-import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
-import com.WazaBe.HoloEverywhere.preference.PreferenceScreen;
-import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
-import com.WazaBe.HoloEverywhere.sherlock.SPreferenceActivity;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 
@@ -31,7 +30,7 @@ public abstract class Probe
 	public abstract String name(Context context);
 	public abstract String title(Context context);
 	public abstract String probeCategory(Context context);
-	public abstract PreferenceScreen preferenceScreen(SPreferenceActivity settingsActivity);
+	public abstract PreferenceScreen preferenceScreen(PreferenceActivity settingsActivity);
 
 	public Bundle[] dataRequestBundles(Context context)
 	{

@@ -12,14 +12,13 @@ import android.app.IntentService;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
-
-import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
-import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;

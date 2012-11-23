@@ -22,6 +22,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -53,6 +54,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -60,12 +63,9 @@ import android.net.Uri;
 import android.net.http.AndroidHttpClient;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
-
-import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
-import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
-import com.WazaBe.HoloEverywhere.preference.SharedPreferences.Editor;
-import com.WazaBe.HoloEverywhere.widget.Toast;
+import android.widget.Toast;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 import edu.emory.mathcs.backport.java.util.Collections;
@@ -87,6 +87,8 @@ public class HttpUploadPlugin extends OutputPlugin
 
 	private final static long MAX_UPLOAD_PERIOD = 3600000;
 	private final static long MIN_UPLOAD_PERIOD = 300000;
+
+	private final static long MAX_RETRIES = 16;
 
 	private final static long MAX_UPLOAD_SIZE = 262144; // 512KB
 	private final static long MIN_UPLOAD_SIZE = 16384; // 16KB
@@ -447,7 +449,6 @@ public class HttpUploadPlugin extends OutputPlugin
 					if (filenames == null)
 						filenames = new String[0];
 
-//					Arrays.sort(filenames);
 					Collections.shuffle(Arrays.asList(filenames));
 
 					ArrayList<JSONObject> pendingObjects = new ArrayList<JSONObject>();
@@ -462,29 +463,32 @@ public class HttpUploadPlugin extends OutputPlugin
 
 							try
 							{
-								CipherInputStream cin = new CipherInputStream(new FileInputStream(f), decrypt);
-
-								ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-								byte[] buffer = new byte[1024];
-								int read = 0;
-
-								while ((read = cin.read(buffer, 0, buffer.length)) != -1)
+								if (f.length() > 32)
 								{
-									baos.write(buffer, 0, read);
-								}
+									CipherInputStream cin = new CipherInputStream(new FileInputStream(f), decrypt);
 
-								cin.close();
+									ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-								JSONArray jsonArray = new JSONArray(baos.toString("UTF-8"));
+									byte[] buffer = new byte[1024];
+									int read = 0;
 
-								totalRead += baos.size();
+									while ((read = cin.read(buffer, 0, buffer.length)) != -1)
+									{
+										baos.write(buffer, 0, read);
+									}
 
-								for (int i = 0; i < jsonArray.length(); i++)
-								{
-									JSONObject jsonObject = jsonArray.getJSONObject(i);
+									cin.close();
 
-									pendingObjects.add(jsonObject);
+									JSONArray jsonArray = new JSONArray(baos.toString("UTF-8"));
+
+									totalRead += baos.size();
+
+									for (int i = 0; i < jsonArray.length(); i++)
+									{
+										JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+										pendingObjects.add(jsonObject);
+									}
 								}
 							}
 							catch (FileNotFoundException e)
@@ -497,7 +501,7 @@ public class HttpUploadPlugin extends OutputPlugin
 							}
 							catch (JSONException e)
 							{
-								Log.e("PRM", "JSON ERROR: " + f.getAbsolutePath() + f.length());
+								Log.e("PRM", "JSON ERROR: " + f.getAbsolutePath() + " " + f.length());
 
 								e.printStackTrace();
 							}
@@ -510,8 +514,8 @@ public class HttpUploadPlugin extends OutputPlugin
 
 								f.renameTo(archive);
 							}
-//							else
-//								f.delete();
+							else
+								f.delete();
 						}
 					}
 
@@ -716,32 +720,38 @@ public class HttpUploadPlugin extends OutputPlugin
 							}
 							catch (HttpHostConnectException e)
 							{
+								Log.e("PRM", "a");
 								me.broadcastMessage(R.string.message_http_connection_error);
 								e.printStackTrace();
 							}
 							catch (SocketTimeoutException e)
 							{
+								Log.e("PRM", "b");
 								me.broadcastMessage(R.string.message_socket_timeout_error);
 								e.printStackTrace();
 							}
 							catch (SocketException e)
 							{
+								Log.e("PRM", "c");
 								String errorMessage = String.format(resources.getString(R.string.message_socket_error),	e.getMessage());
 								me.broadcastMessage(errorMessage);
 								e.printStackTrace();
 							}
 							catch (UnknownHostException e)
 							{
+								Log.e("PRM", "d");
 								me.broadcastMessage(R.string.message_unreachable_error);
 								e.printStackTrace();
 							}
 							catch (JSONException e)
 							{
+								Log.e("PRM", "e");
 								me.broadcastMessage(R.string.message_response_error);
 								e.printStackTrace();
 							}
 							catch (Exception e)
 							{
+								Log.e("PRM", "f");
 								e.printStackTrace();
 								String errorMessage = String.format(resources.getString(R.string.message_general_error), e.toString());
 								me.broadcastMessage(errorMessage);
@@ -750,6 +760,8 @@ public class HttpUploadPlugin extends OutputPlugin
 							}
 							finally
 							{
+								Log.e("PRM", "g");
+
 								httpClient.close();
 
 								String message = me.getContext().getString(R.string.notify_running);
@@ -759,11 +771,18 @@ public class HttpUploadPlugin extends OutputPlugin
 								noteManager.notify(12345, note);
 							}
 
+							int l = 0;
+							Random r = new Random(System.currentTimeMillis());
+
 							while(pendingObjects.size() > 0)
 							{
+								Log.e("PRM", "h1");
+
 								JSONArray toSave = new JSONArray();
 
 								List<JSONObject> toRemove = new ArrayList<JSONObject>();
+
+								Log.e("PRM", "h2");
 
 								for (int i = 0; i < pendingObjects.size() && i < 100; i++)
 								{
@@ -771,30 +790,45 @@ public class HttpUploadPlugin extends OutputPlugin
 									toRemove.add(pendingObjects.get(i));
 								}
 
-								int l = 0;
+								Log.e("PRM", "h3");
 
 								File f = new File(pendingFolder, "pending_" + l + ".json");
 
+								Log.e("PRM", "h4");
+
 								while (f.exists())
 								{
-									l += 1;
+									l += r.nextInt(10);
 
 									f = new File(pendingFolder, "pending_" + l + ".json");
 								}
+
+								Log.e("PRM", "h5");
 
 								CipherOutputStream cout = new CipherOutputStream(new FileOutputStream(f), encrypt);
 
 								byte[] jsonBytes = toSave.toString().getBytes("UTF-8");
 
+								Log.e("PRM", "h6");
+
 								cout.write(jsonBytes);
+
+								Log.e("PRM", "h7");
 
 								cout.flush();
 								cout.close();
 
 								pendingObjects.removeAll(toRemove);
+
+								Log.e("PRM", "h8");
 							}
 
-							me.logSuccess(wasSuccessful);
+							if (wasSuccessful == false && me._failCount < MAX_RETRIES)
+							{
+
+							}
+							else
+								me.logSuccess(wasSuccessful);
 						}
 						catch (JSONException e)
 						{
@@ -820,7 +854,9 @@ public class HttpUploadPlugin extends OutputPlugin
 
 					me._uploading = false;
 
-					if (continueUpload || me._failCount < 8)
+					Log.e("PRM", "TRY AGAIN " + continueUpload + " (" + me._failCount + " < " + MAX_RETRIES + ")");
+
+					if (continueUpload || (me._failCount > 1 && me._failCount < MAX_RETRIES))
 					{
 						try
 						{

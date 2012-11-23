@@ -4,17 +4,16 @@ import java.util.ArrayList;
 
 import android.location.Location;
 import android.os.Bundle;
+import android.preference.Preference;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 import android.util.Log;
-
-import com.WazaBe.HoloEverywhere.preference.Preference;
-import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
-import com.WazaBe.HoloEverywhere.preference.PreferenceScreen;
-import com.WazaBe.HoloEverywhere.sherlock.SPreferenceActivity;
 
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 
-public class ProbeViewerActivity extends SPreferenceActivity
+public class ProbeViewerActivity extends PreferenceActivity
 {
 	private String _probeName = null;
 	private Bundle _probeBundle = null;

@@ -7,16 +7,15 @@ import java.util.UUID;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
-import com.WazaBe.HoloEverywhere.preference.PreferenceScreen;
-import com.WazaBe.HoloEverywhere.sherlock.SPreferenceActivity;
-
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.os.Bundle;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
@@ -46,7 +45,7 @@ public class BluetoothReceiverProbe extends Probe
 	}
 
 	@SuppressWarnings("deprecation")
-	public PreferenceScreen preferenceScreen(SPreferenceActivity activity)
+	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{
 		PreferenceManager manager = activity.getPreferenceManager();
 

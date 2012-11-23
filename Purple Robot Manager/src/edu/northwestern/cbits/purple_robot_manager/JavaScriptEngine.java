@@ -11,11 +11,6 @@ import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
-import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
-import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
-import com.WazaBe.HoloEverywhere.preference.SharedPreferences.Editor;
-import com.WazaBe.HoloEverywhere.widget.Toast;
-
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -23,12 +18,16 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 public class JavaScriptEngine
 {

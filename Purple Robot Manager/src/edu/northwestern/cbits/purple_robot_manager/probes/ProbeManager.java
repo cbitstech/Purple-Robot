@@ -9,15 +9,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.WazaBe.HoloEverywhere.preference.CheckBoxPreference;
-import com.WazaBe.HoloEverywhere.preference.PreferenceCategory;
-import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
-import com.WazaBe.HoloEverywhere.preference.PreferenceScreen;
-import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
-import com.WazaBe.HoloEverywhere.sherlock.SPreferenceActivity;
-
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceCategory;
+import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
@@ -184,7 +183,7 @@ public class ProbeManager
 		return null;
 	}
 
-	public static PreferenceScreen buildPreferenceScreen(SPreferenceActivity settingsActivity)
+	public static PreferenceScreen buildPreferenceScreen(PreferenceActivity settingsActivity)
 	{
 		@SuppressWarnings("deprecation")
 		PreferenceManager manager = settingsActivity.getPreferenceManager();
