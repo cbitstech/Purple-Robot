@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
@@ -12,22 +13,20 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 
-public class ContinuousAccelerometerProbe extends ContinuousProbe implements SensorEventListener
+public class TemperatureProbe extends ContinuousProbe implements SensorEventListener
 {
 	private static int BUFFER_SIZE = 40;
 
-	private static String[] fieldNames = { "X", "Y", "Z" };
+	private static String[] fieldNames = { "TEMPERATURE" };
 
 	private double lastSeen = 0;
 	private long lastFrequencyLookup = 0;
 	private long frequency = 1000;
 
-	private float valueBuffer[][] = new float[3][BUFFER_SIZE];
-	private int accuracyBuffer[] = new int[BUFFER_SIZE];
+	private float valueBuffer[][] = new float[1][BUFFER_SIZE];
 	private double timeBuffer[] = new double[BUFFER_SIZE];
 
 	private int bufferIndex  = 0;
@@ -37,52 +36,48 @@ public class ContinuousAccelerometerProbe extends ContinuousProbe implements Sen
 		Bundle formatted = super.formattedBundle(context, bundle);
 
 		double[] eventTimes = bundle.getDoubleArray("EVENT_TIMESTAMP");
-		float[] x = bundle.getFloatArray("X");
-		float[] y = bundle.getFloatArray("Y");
-		float[] z = bundle.getFloatArray("Z");
+		float[] temp = bundle.getFloatArray("TEMPERATURE");
 
 		ArrayList<String> keys = new ArrayList<String>();
 
-		SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.display_date_format));
-
-		if (x == null || y == null || z == null)
+		if (temp != null && eventTimes != null)
 		{
+			SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.display_date_format));
 
-		}
-		else if (eventTimes.length > 1)
-		{
-			Bundle readings = new Bundle();
-
-			for (int i = 0; i < eventTimes.length; i++)
+			if (eventTimes.length > 1)
 			{
-				String formatString = String.format(context.getString(R.string.display_gyroscope_reading), x[i], y[i], z[i]);
+				Bundle readings = new Bundle();
 
-				double time = eventTimes[i];
+				for (int i = 0; i < eventTimes.length; i++)
+				{
+					String formatString = String.format(context.getString(R.string.display_temperature_reading), temp[i]);
+
+					double time = eventTimes[i];
+
+					Date d = new Date((long) time);
+
+					String key = sdf.format(d);
+
+					readings.putString(key, formatString);
+
+					keys.add(key);
+				}
+
+				if (keys.size() > 0)
+					readings.putStringArrayList("KEY_ORDER", keys);
+
+				formatted.putBundle(context.getString(R.string.display_temperature_readings), readings);
+			}
+			else if (eventTimes.length > 0)
+			{
+				String formatString = String.format(context.getString(R.string.display_temperature_reading), temp[0]);
+
+				double time = eventTimes[0];
 
 				Date d = new Date((long) time);
 
-				String key = sdf.format(d);
-
-				readings.putString(key, formatString);
-
-				keys.add(key);
+				formatted.putString(sdf.format(d), formatString);
 			}
-
-			if (keys.size() > 0)
-				readings.putStringArrayList("KEY_ORDER", keys);
-
-
-			formatted.putBundle(context.getString(R.string.display_accelerometer_readings), readings);
-		}
-		else if (eventTimes.length > 0)
-		{
-			String formatString = String.format(context.getString(R.string.display_gyroscope_reading), x[0], y[0], z[0]);
-
-			double time = eventTimes[0];
-
-			Date d = new Date((long) time);
-
-			formatted.putString(sdf.format(d), formatString);
 		}
 
 		return formatted;
@@ -96,7 +91,7 @@ public class ContinuousAccelerometerProbe extends ContinuousProbe implements Sen
 		{
 			SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
 
-			frequency = Long.parseLong(prefs.getString("config_probe_accelerometer_built_in_frequency", "1000"));
+			frequency = Long.parseLong(prefs.getString("config_probe_temperature_built_in_frequency", "1000"));
 
 			int bufferSize = 1000 / (int) frequency;
 
@@ -109,8 +104,7 @@ public class ContinuousAccelerometerProbe extends ContinuousProbe implements Sen
 				{
 					bufferIndex = 0;
 
-					valueBuffer = new float[3][bufferSize];
-					accuracyBuffer = new int[bufferSize];
+					valueBuffer = new float[1][bufferSize];
 					timeBuffer = new double[bufferSize];
 				}
 			}
@@ -123,12 +117,12 @@ public class ContinuousAccelerometerProbe extends ContinuousProbe implements Sen
 
 	public String name(Context context)
 	{
-		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousAccelerometerProbe";
+		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.TemperatureProbe";
 	}
 
 	public int getTitleResource()
 	{
-		return R.string.title_builtin_accelerometer_probe;
+		return R.string.title_temperature_probe;
 	}
 
 	public int getCategoryResource()
@@ -142,52 +136,39 @@ public class ContinuousAccelerometerProbe extends ContinuousProbe implements Sen
 
         sensors.unregisterListener(this);
 
-    	Log.e("PRM", "CHECK ENABLE");
-
         if (super.isEnabled(context))
         {
-        	Log.e("PRM", "ENBLING SUPER");
+	        this._context = context.getApplicationContext();
 
-        	this._context = context.getApplicationContext();
+			SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
-        	SharedPreferences prefs = ContinuousProbe.getPreferences(context);
+			if (prefs.getBoolean("config_probe_temperature_built_in_enabled", true))
+			{
+				sensors.registerListener(this, sensors.getDefaultSensor(Sensor.TYPE_LIGHT), SensorManager.SENSOR_DELAY_FASTEST, null);
 
-        	if (prefs.getBoolean("config_probe_accelerometer_built_in_enabled", true))
-        	{
-            	Log.e("PRM", "ENBLING ACCELEROMETER");
-
-            	sensors.registerListener(this, sensors.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_FASTEST, null);
-
-        		return true;
-        	}
+				return true;
+			}
         }
 
-        Log.e("PRM", "ENABLE OFF");
-
-        return false;
+		return false;
 	}
 
+	@SuppressLint("NewApi")
 	public void onSensorChanged(SensorEvent event)
 	{
-		final double now = (double) System.currentTimeMillis();
+		double now = System.currentTimeMillis();
 
 		if (now - this.lastSeen > this.getFrequency() && bufferIndex <= timeBuffer.length)
 		{
 			synchronized(this)
 			{
-				double elapsed = (double) SystemClock.elapsedRealtime();
+				double elapsed = SystemClock.elapsedRealtime();
 				double boot = (now - elapsed) * 1000 * 1000;
 
 				double timestamp = event.timestamp + boot;
 
 				timeBuffer[bufferIndex] = timestamp / 1000000;
-
-				accuracyBuffer[bufferIndex] = event.accuracy;
-
-				for (int i = 0; i < event.values.length; i++)
-				{
-					valueBuffer[i][bufferIndex] = event.values[i];
-				}
+				valueBuffer[0][bufferIndex] = event.values[0];
 
 				bufferIndex += 1;
 
@@ -206,14 +187,12 @@ public class ContinuousAccelerometerProbe extends ContinuousProbe implements Sen
 					sensorBundle.putString("VENDOR", sensor.getVendor());
 					sensorBundle.putInt("VERSION", sensor.getVersion());
 
-					data.putDouble("TIMESTAMP", now / 1000);
-
 					data.putString("PROBE", this.name(this._context));
 
 					data.putBundle("SENSOR", sensorBundle);
+					data.putDouble("TIMESTAMP", now / 1000);
 
 					data.putDoubleArray("EVENT_TIMESTAMP", timeBuffer);
-					data.putIntArray("ACCURACY", accuracyBuffer);
 
 					for (int i = 0; i < fieldNames.length; i++)
 					{
@@ -232,25 +211,23 @@ public class ContinuousAccelerometerProbe extends ContinuousProbe implements Sen
 
 	public String getPreferenceKey()
 	{
-		return "accelerometer_built_in";
+		return "temperature_built_in";
 	}
 
 	public int getResourceFrequencyLabels()
 	{
-		return R.array.probe_acceleration_frequency_labels;
+		return R.array.probe_builtin_frequency_labels;
 	}
 
 	public int getResourceFrequencyValues()
 	{
-		return R.array.probe_acceleration_frequency_values;
+		return R.array.probe_builtin_frequency_values;
 	}
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
-		float xReading = bundle.getFloatArray("X")[0];
-		float yReading = bundle.getFloatArray("Y")[0];
-		float zReading = bundle.getFloatArray("Z")[0];
+		float lux = bundle.getFloatArray("TEMPERATURE")[0];
 
-		return String.format(context.getResources().getString(R.string.summary_accelerator_probe), xReading, yReading, zReading);
+		return String.format(context.getResources().getString(R.string.summary_temperature_probe), lux);
 	}
 }

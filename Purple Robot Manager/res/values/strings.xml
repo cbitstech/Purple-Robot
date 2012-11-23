@@ -317,4 +317,10 @@
     <string name="title_builtin_hardware_probe">Hardware Information</string>
     <string name="title_builtin_telephony_probe">Telephony Information</string>
     <string name="title_builtin_robot_probe">Purple Robot Health</string>
+    <string name="title_builtin_screen_probe">Screen State</string>
+
+    <string name="summary_screen_probe_active">Screen State: Active</string>
+    <string name="summary_screen_probe_inactive">Screen State: Inactive</string>
+
+
 </resources>

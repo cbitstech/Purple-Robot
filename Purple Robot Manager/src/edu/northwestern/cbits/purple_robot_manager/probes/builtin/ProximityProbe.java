@@ -16,18 +16,17 @@ import android.os.SystemClock;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 
-public class ContinuousPressureProbe extends ContinuousProbe implements SensorEventListener
+public class ProximityProbe extends ContinuousProbe implements SensorEventListener
 {
 	private static int BUFFER_SIZE = 40;
 
-	private static String[] fieldNames = { "PRESSURE", "ALTITUDE" };
+	private static String[] fieldNames = { "DISTANCE" };
 
 	private double lastSeen = 0;
 	private long lastFrequencyLookup = 0;
 	private long frequency = 1000;
 
-	private float valueBuffer[][] = new float[2][BUFFER_SIZE];
-	private int accuracyBuffer[] = new int[BUFFER_SIZE];
+	private float valueBuffer[][] = new float[1][BUFFER_SIZE];
 	private double timeBuffer[] = new double[BUFFER_SIZE];
 
 	private int bufferIndex  = 0;
@@ -37,12 +36,11 @@ public class ContinuousPressureProbe extends ContinuousProbe implements SensorEv
 		Bundle formatted = super.formattedBundle(context, bundle);
 
 		double[] eventTimes = bundle.getDoubleArray("EVENT_TIMESTAMP");
-		float[] altitudes = bundle.getFloatArray("ALTITUDE");
-		float[] pressures = bundle.getFloatArray("PRESSURE");
+		float[] distance = bundle.getFloatArray("DISTANCE");
 
 		ArrayList<String> keys = new ArrayList<String>();
 
-		if (altitudes != null && pressures != null && eventTimes != null)
+		if (distance != null && eventTimes != null)
 		{
 			SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.display_date_format));
 
@@ -52,7 +50,7 @@ public class ContinuousPressureProbe extends ContinuousProbe implements SensorEv
 
 				for (int i = 0; i < eventTimes.length; i++)
 				{
-					String formatString = String.format(context.getString(R.string.display_pressure_reading), pressures[i], altitudes[i]);
+					String formatString = "fORMATTED " + distance[i];
 
 					double time = eventTimes[i];
 
@@ -68,11 +66,11 @@ public class ContinuousPressureProbe extends ContinuousProbe implements SensorEv
 				if (keys.size() > 0)
 					readings.putStringArrayList("KEY_ORDER", keys);
 
-				formatted.putBundle(context.getString(R.string.display_pressure_readings), readings);
+				formatted.putBundle(context.getString(R.string.display_light_readings), readings);
 			}
 			else if (eventTimes.length > 0)
 			{
-				String formatString = String.format(context.getString(R.string.display_pressure_reading), pressures[0], altitudes[0]);
+				String formatString = "fORMATTED " + distance[0];
 
 				double time = eventTimes[0];
 
@@ -93,7 +91,7 @@ public class ContinuousPressureProbe extends ContinuousProbe implements SensorEv
 		{
 			SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
 
-			frequency = Long.parseLong(prefs.getString("config_probe_pressure_built_in_frequency", "1000"));
+			frequency = Long.parseLong(prefs.getString("config_probe_proximity_built_in_frequency", "1000"));
 
 			int bufferSize = 1000 / (int) frequency;
 
@@ -106,8 +104,7 @@ public class ContinuousPressureProbe extends ContinuousProbe implements SensorEv
 				{
 					bufferIndex = 0;
 
-					valueBuffer = new float[2][bufferSize];
-					accuracyBuffer = new int[bufferSize];
+					valueBuffer = new float[1][bufferSize];
 					timeBuffer = new double[bufferSize];
 				}
 			}
@@ -120,12 +117,12 @@ public class ContinuousPressureProbe extends ContinuousProbe implements SensorEv
 
 	public String name(Context context)
 	{
-		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousPressureProbe";
+		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.ProximityProbe";
 	}
 
 	public int getTitleResource()
 	{
-		return R.string.title_builtin_pressure_probe;
+		return R.string.title_proximity_probe;
 	}
 
 	public int getCategoryResource()
@@ -141,19 +138,19 @@ public class ContinuousPressureProbe extends ContinuousProbe implements SensorEv
 
         if (super.isEnabled(context))
         {
-        	this._context = context.getApplicationContext();
+	        this._context = context.getApplicationContext();
 
-        	SharedPreferences prefs = ContinuousProbe.getPreferences(context);
+			SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
-        	if (prefs.getBoolean("config_probe_pressure_built_in_enabled", true))
-        	{
-        		sensors.registerListener(this, sensors.getDefaultSensor(Sensor.TYPE_PRESSURE), SensorManager.SENSOR_DELAY_FASTEST, null);
+			if (prefs.getBoolean("config_probe_proximity_built_in_enabled", true))
+			{
+				sensors.registerListener(this, sensors.getDefaultSensor(Sensor.TYPE_PROXIMITY), SensorManager.SENSOR_DELAY_FASTEST, null);
 
-        		return true;
-        	}
+				return true;
+			}
         }
 
-    	return false;
+		return false;
 	}
 
 	@SuppressLint("NewApi")
@@ -171,18 +168,7 @@ public class ContinuousPressureProbe extends ContinuousProbe implements SensorEv
 				double timestamp = event.timestamp + boot;
 
 				timeBuffer[bufferIndex] = timestamp / 1000000;
-				accuracyBuffer[bufferIndex] = event.accuracy;
-
 				valueBuffer[0][bufferIndex] = event.values[0];
-
-				try
-				{
-					valueBuffer[1][bufferIndex] = SensorManager.getAltitude(SensorManager.PRESSURE_STANDARD_ATMOSPHERE, event.values[0]);
-				}
-				catch (Exception e)
-				{
-					valueBuffer[1][bufferIndex] = 0;
-				}
 
 				bufferIndex += 1;
 
@@ -207,7 +193,6 @@ public class ContinuousPressureProbe extends ContinuousProbe implements SensorEv
 					data.putDouble("TIMESTAMP", now / 1000);
 
 					data.putDoubleArray("EVENT_TIMESTAMP", timeBuffer);
-					data.putIntArray("ACCURACY", accuracyBuffer);
 
 					for (int i = 0; i < fieldNames.length; i++)
 					{
@@ -226,7 +211,7 @@ public class ContinuousPressureProbe extends ContinuousProbe implements SensorEv
 
 	public String getPreferenceKey()
 	{
-		return "pressure_built_in";
+		return "proximity_built_in";
 	}
 
 	public int getResourceFrequencyLabels()
@@ -241,9 +226,8 @@ public class ContinuousPressureProbe extends ContinuousProbe implements SensorEv
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
-		float pressure = bundle.getFloatArray("PRESSURE")[0];
-		float altitude = bundle.getFloatArray("ALTITUDE")[0];
+		float distance = bundle.getFloatArray("DISTANCE")[0];
 
-		return String.format(context.getResources().getString(R.string.summary_pressure_probe), pressure, altitude);
+		return String.format(context.getResources().getString(R.string.summary_proximity_value_probe), distance);
 	}
 }
