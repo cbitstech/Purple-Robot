@@ -86,16 +86,19 @@ public class ContinuousMagneticFieldProbe extends ContinuousProbe implements Sen
 
         sensors.unregisterListener(this);
 
-        this._context = context.getApplicationContext();
+        if (super.isEnabled(context))
+        {
+	        this._context = context.getApplicationContext();
 
-		SharedPreferences prefs = ContinuousProbe.getPreferences(context);
+			SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
-		if (prefs.getBoolean("config_probe_magnetic_built_in_enabled", true))
-		{
-			sensors.registerListener(this, sensors.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_FASTEST, null);
+			if (prefs.getBoolean("config_probe_magnetic_built_in_enabled", true))
+			{
+				sensors.registerListener(this, sensors.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_FASTEST, null);
 
-			return true;
-		}
+				return true;
+			}
+        }
 
 		return false;
 	}

@@ -79,9 +79,14 @@ public abstract class PeriodFunfProbe extends Probe
 
 	public boolean isEnabled(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		if (super.isEnabled(context))
+		{
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-		return prefs.getBoolean("config_probe_" + this.key() + "_enabled", true);
+			return prefs.getBoolean("config_probe_" + this.key() + "_enabled", true);
+		}
+
+		return false;
 	}
 
 	protected abstract int funfTitle();

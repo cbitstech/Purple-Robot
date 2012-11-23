@@ -54,9 +54,14 @@ public class ScreenProbe extends Probe
 
 	public boolean isEnabled(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		if (super.isEnabled(context))
+		{
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-		return prefs.getBoolean("config_probe_screen_enabled", true);
+			return prefs.getBoolean("config_probe_screen_enabled", true);
+		}
+
+		return false;
 	}
 
 	public Bundle[] dataRequestBundles(Context context)
@@ -67,7 +72,7 @@ public class ScreenProbe extends Probe
 
 	public String name(Context context)
 	{
-		return "edu.mit.media.funf.probe.builtin.WifiProbe";
+		return "edu.mit.media.funf.probe.builtin.ScreenProbe";
 	}
 
 	public String title(Context context)

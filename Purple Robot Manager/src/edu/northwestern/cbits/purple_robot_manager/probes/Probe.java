@@ -12,8 +12,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
+import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
 import com.WazaBe.HoloEverywhere.preference.PreferenceScreen;
+import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
 import com.WazaBe.HoloEverywhere.sherlock.SPreferenceActivity;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -70,7 +73,14 @@ public abstract class Probe
 		}
 	}
 
-	public abstract boolean isEnabled(Context context);
+	public boolean isEnabled(Context context)
+	{
+		Log.e("PRM", "CHECK IS ENABLED");
+
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+		return prefs.getBoolean("config_probes_enabled", false);
+	}
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{

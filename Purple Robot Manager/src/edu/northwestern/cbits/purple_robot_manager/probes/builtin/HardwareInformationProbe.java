@@ -70,52 +70,55 @@ public class HardwareInformationProbe extends Probe
 
 		long now = System.currentTimeMillis();
 
-		if (prefs.getBoolean("config_probe_hardware_enabled", true))
+		if (super.isEnabled(context))
 		{
-			synchronized(this)
+			if (prefs.getBoolean("config_probe_hardware_enabled", true))
 			{
-				long freq = Long.parseLong(prefs.getString("config_probe_hardware_frequency", "300000"));
-
-				if (now - this._lastCheck  > freq)
+				synchronized(this)
 				{
-					Bundle bundle = new Bundle();
-					bundle.putString("PROBE", this.name(context));
-					bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+					long freq = Long.parseLong(prefs.getString("config_probe_hardware_frequency", "300000"));
 
-					bundle.putString(HardwareInformationProbe.BOARD, Build.BOARD);
-					bundle.putString(HardwareInformationProbe.BOOTLOADER, Build.BOOTLOADER);
-					bundle.putString(HardwareInformationProbe.BRAND, Build.BRAND);
-					bundle.putString(HardwareInformationProbe.DEVICE, Build.DEVICE);
-					bundle.putString(HardwareInformationProbe.DISPLAY, Build.DISPLAY);
-					bundle.putString(HardwareInformationProbe.FINGERPRINT, Build.FINGERPRINT);
-					bundle.putString(HardwareInformationProbe.HARDWARE, Build.HARDWARE);
-					bundle.putString(HardwareInformationProbe.HOST, Build.HOST);
-					bundle.putString(HardwareInformationProbe.ID, Build.ID);
-					bundle.putString(HardwareInformationProbe.MANUFACTURER, Build.MANUFACTURER);
-					bundle.putString(HardwareInformationProbe.MODEL, Build.MODEL);
-					bundle.putString(HardwareInformationProbe.PRODUCT, Build.PRODUCT);
-					bundle.putString(HardwareInformationProbe.SERIAL, Build.SERIAL);
+					if (now - this._lastCheck  > freq)
+					{
+						Bundle bundle = new Bundle();
+						bundle.putString("PROBE", this.name(context));
+						bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
 
-					WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-					bundle.putString(HardwareInformationProbe.WIFI_MAC, wifi.getConnectionInfo().getMacAddress());
+						bundle.putString(HardwareInformationProbe.BOARD, Build.BOARD);
+						bundle.putString(HardwareInformationProbe.BOOTLOADER, Build.BOOTLOADER);
+						bundle.putString(HardwareInformationProbe.BRAND, Build.BRAND);
+						bundle.putString(HardwareInformationProbe.DEVICE, Build.DEVICE);
+						bundle.putString(HardwareInformationProbe.DISPLAY, Build.DISPLAY);
+						bundle.putString(HardwareInformationProbe.FINGERPRINT, Build.FINGERPRINT);
+						bundle.putString(HardwareInformationProbe.HARDWARE, Build.HARDWARE);
+						bundle.putString(HardwareInformationProbe.HOST, Build.HOST);
+						bundle.putString(HardwareInformationProbe.ID, Build.ID);
+						bundle.putString(HardwareInformationProbe.MANUFACTURER, Build.MANUFACTURER);
+						bundle.putString(HardwareInformationProbe.MODEL, Build.MODEL);
+						bundle.putString(HardwareInformationProbe.PRODUCT, Build.PRODUCT);
+						bundle.putString(HardwareInformationProbe.SERIAL, Build.SERIAL);
 
-					TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-					bundle.putString(HardwareInformationProbe.MOBILE_ID, tm.getDeviceId());
+						WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+						bundle.putString(HardwareInformationProbe.WIFI_MAC, wifi.getConnectionInfo().getMacAddress());
 
-					BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+						TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+						bundle.putString(HardwareInformationProbe.MOBILE_ID, tm.getDeviceId());
 
-					if (adapter != null)
-						bundle.putString(HardwareInformationProbe.BLUETOOTH_MAC, adapter.getAddress());
-					else
-						bundle.putString(HardwareInformationProbe.BLUETOOTH_MAC, "");
+						BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 
-					this.transmitData(context, bundle);
+						if (adapter != null)
+							bundle.putString(HardwareInformationProbe.BLUETOOTH_MAC, adapter.getAddress());
+						else
+							bundle.putString(HardwareInformationProbe.BLUETOOTH_MAC, "");
 
-					this._lastCheck = now;
+						this.transmitData(context, bundle);
+
+						this._lastCheck = now;
+					}
 				}
-			}
 
-			return true;
+				return true;
+			}
 		}
 
 		return false;

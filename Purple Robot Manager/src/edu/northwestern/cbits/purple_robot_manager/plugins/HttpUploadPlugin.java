@@ -707,6 +707,8 @@ public class HttpUploadPlugin extends OutputPlugin
 									String errorMessage = String.format(resources.getString(R.string.message_server_error),	status);
 									me.broadcastMessage(errorMessage);
 
+									Log.e("PRM", "XMITTED " + httpPost.getEntity().getContentLength() + " BYTES");
+
 									me._failCount += 1;
 
 									me._throughput = 0.0;

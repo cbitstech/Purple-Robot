@@ -53,72 +53,75 @@ public class RobotHealthProbe extends Probe
 
 		long now = System.currentTimeMillis();
 
-		if (prefs.getBoolean("config_probe_robot_enabled", true))
+		if (super.isEnabled(context))
 		{
-			synchronized(this)
+			if (prefs.getBoolean("config_probe_robot_enabled", true))
 			{
-				long freq = Long.parseLong(prefs.getString("config_probe_robot_frequency", "60000"));
-
-				if (now - this._lastCheck  > freq)
+				synchronized(this)
 				{
-					OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(HttpUploadPlugin.class);
+					long freq = Long.parseLong(prefs.getString("config_probe_robot_frequency", "60000"));
 
-					if (plugin != null && plugin instanceof HttpUploadPlugin)
+					if (now - this._lastCheck  > freq)
 					{
-						HttpUploadPlugin httpPlugin = (HttpUploadPlugin) plugin;
+						OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(HttpUploadPlugin.class);
 
-						File archiveFolder = httpPlugin.getArchiveFolder();
-						File pendingFolder = httpPlugin.getPendingFolder();
-
-						int pendingCount = 0;
-						int archiveCount = 0;
-
-						long pendingSize = 0;
-						long archiveSize = 0;
-
-						for (File f : archiveFolder.listFiles())
+						if (plugin != null && plugin instanceof HttpUploadPlugin)
 						{
-							if (f.isFile())
+							HttpUploadPlugin httpPlugin = (HttpUploadPlugin) plugin;
+
+							File archiveFolder = httpPlugin.getArchiveFolder();
+							File pendingFolder = httpPlugin.getPendingFolder();
+
+							int pendingCount = 0;
+							int archiveCount = 0;
+
+							long pendingSize = 0;
+							long archiveSize = 0;
+
+							for (File f : archiveFolder.listFiles())
 							{
-								archiveCount += 1;
-								archiveSize += f.length();
+								if (f.isFile())
+								{
+									archiveCount += 1;
+									archiveSize += f.length();
+								}
 							}
+
+							for (File f : pendingFolder.listFiles())
+							{
+								if (f.isFile())
+								{
+									pendingCount += 1;
+									pendingSize += f.length();
+								}
+							}
+
+							Bundle bundle = new Bundle();
+							bundle.putString("PROBE", this.name(context));
+							bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+
+							bundle.putInt(RobotHealthProbe.PENDING_COUNT, pendingCount);
+							bundle.putLong(RobotHealthProbe.PENDING_SIZE, pendingSize);
+
+							bundle.putInt(RobotHealthProbe.ARCHIVE_COUNT, archiveCount);
+							bundle.putLong(RobotHealthProbe.ARCHIVE_SIZE, archiveSize);
+
+							double throughput = httpPlugin.getRecentThroughput();
+
+							bundle.putDouble(RobotHealthProbe.THROUGHPUT, throughput);
+
+							long cleartime = -1;
+
+							if (throughput > 0.0)
+								cleartime = pendingSize / ((long) throughput);
+
+							bundle.putLong(RobotHealthProbe.CLEAR_TIME, cleartime);
+
+							this.transmitData(context, bundle);
 						}
 
-						for (File f : pendingFolder.listFiles())
-						{
-							if (f.isFile())
-							{
-								pendingCount += 1;
-								pendingSize += f.length();
-							}
-						}
-
-						Bundle bundle = new Bundle();
-						bundle.putString("PROBE", this.name(context));
-						bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
-
-						bundle.putInt(RobotHealthProbe.PENDING_COUNT, pendingCount);
-						bundle.putLong(RobotHealthProbe.PENDING_SIZE, pendingSize);
-
-						bundle.putInt(RobotHealthProbe.ARCHIVE_COUNT, archiveCount);
-						bundle.putLong(RobotHealthProbe.ARCHIVE_SIZE, archiveSize);
-
-						double throughput = httpPlugin.getRecentThroughput();
-
-						bundle.putDouble(RobotHealthProbe.THROUGHPUT, throughput);
-
-						long cleartime = -1;
-
-						if (throughput > 0.0)
-							cleartime = pendingSize / ((long) throughput);
-
-						bundle.putLong(RobotHealthProbe.CLEAR_TIME, cleartime);
-
-						this.transmitData(context, bundle);
+						this._lastCheck = now;
 					}
-
-					this._lastCheck = now;
 				}
 			}
 

@@ -78,19 +78,16 @@ public class ProbeManager
 
 			boolean isEnabled = prefs.getBoolean("config_probes_enabled", false);
 
-			if (isEnabled)
+			for (Probe probe : ProbeManager.allProbes())
 			{
-				for (Probe probe : ProbeManager.allProbes())
-				{
-					String name = probe.name(context);
+				String name = probe.name(context);
 
-					Bundle[] bundles = new Bundle[0];
+				Bundle[] bundles = new Bundle[0];
 
-					if (probe.isEnabled(context))
-						bundles = probe.dataRequestBundles(context);
+				if (probe.isEnabled(context) && isEnabled)
+					bundles = probe.dataRequestBundles(context);
 
-					probesMap.put(name, bundles);
-				}
+				probesMap.put(name, bundles);
 			}
 		}
 

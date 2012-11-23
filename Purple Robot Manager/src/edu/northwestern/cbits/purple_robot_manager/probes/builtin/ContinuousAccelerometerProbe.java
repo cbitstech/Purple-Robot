@@ -11,6 +11,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.util.Log;
 
 import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
 
@@ -142,18 +143,29 @@ public class ContinuousAccelerometerProbe extends ContinuousProbe implements Sen
 
         sensors.unregisterListener(this);
 
-        this._context = context.getApplicationContext();
+    	Log.e("PRM", "CHECK ENABLE");
 
-		SharedPreferences prefs = ContinuousProbe.getPreferences(context);
+        if (super.isEnabled(context))
+        {
+        	Log.e("PRM", "ENBLING SUPER");
 
-		if (prefs.getBoolean("config_probe_accelerometer_built_in_enabled", true))
-		{
-			sensors.registerListener(this, sensors.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_FASTEST, null);
+        	this._context = context.getApplicationContext();
 
-			return true;
-		}
+        	SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
-		return false;
+        	if (prefs.getBoolean("config_probe_accelerometer_built_in_enabled", true))
+        	{
+            	Log.e("PRM", "ENBLING ACCELEROMETER");
+
+            	sensors.registerListener(this, sensors.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_FASTEST, null);
+
+        		return true;
+        	}
+        }
+
+        Log.e("PRM", "ENABLE OFF");
+
+        return false;
 	}
 
 	public void onSensorChanged(SensorEvent event)
