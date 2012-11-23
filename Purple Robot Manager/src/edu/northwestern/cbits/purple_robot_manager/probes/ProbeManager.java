@@ -17,7 +17,6 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.BatteryProbe;
@@ -73,8 +72,6 @@ public class ProbeManager
 
 		if (context != null)
 		{
-			Log.e("PRM", "GETTING DATA REQUESTS");
-
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
 			boolean isEnabled = prefs.getBoolean("config_probes_enabled", false);

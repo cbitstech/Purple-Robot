@@ -16,7 +16,6 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 
@@ -74,8 +73,6 @@ public abstract class Probe
 
 	public boolean isEnabled(Context context)
 	{
-		Log.e("PRM", "CHECK IS ENABLED");
-
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
 		return prefs.getBoolean("config_probes_enabled", false);

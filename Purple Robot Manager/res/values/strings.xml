@@ -195,7 +195,7 @@
     <string name="summary_gyroscope_probe" formatted="false">%.2f X, %.2f Y, %.2f Z</string>
     <string name="summary_magnetic_probe" formatted="false">%.1f X, %.1f Y, %.1f Z</string>
     <string name="summary_wifi_probe" formatted="false">Visible Access Points: %d</string>
-    <string name="summary_battery_probe" formatted="false">%d%% charged</string>
+    <string name="summary_battery_probe" formatted="false">%d%% charged (%s)</string>
     <string name="summary_bluetooth_probe" formatted="false">%d visible devices</string>
     <string name="summary_contact_probe" formatted="false">%d contacts in address book</string>
     <string name="summary_location_probe" formatted="false">%.4f, %.4f</string>
@@ -321,6 +321,12 @@
 
     <string name="summary_screen_probe_active">Screen State: Active</string>
     <string name="summary_screen_probe_inactive">Screen State: Inactive</string>
+
+    <string name="label_unknown">Unknown</string>
+    <string name="label_battery_charging">Charging</string>
+    <string name="label_battery_discharging">Discharging</string>
+    <string name="label_battery_full">Full</string>
+    <string name="label_battery_not_charging">Not Charging</string>
 
 
 </resources>

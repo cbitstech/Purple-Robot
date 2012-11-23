@@ -14,7 +14,6 @@ import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import edu.mit.media.funf.CustomizedIntentService;
 import edu.mit.media.funf.probe.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
@@ -92,11 +91,7 @@ public class FunfService extends CustomizedIntentService
 		else if (Probe.ACTION_DETAILS.equals(action))
 			this.onDetailsReceived(new Probe.Details(intent.getExtras()));
 		else if (ACTION_SEND_REQUEST.equals(action))
-		{
-			Log.e("PRM", "SEND PROBE REQUESTS");
-
 			this.sendProbeRequests();
-		}
 	}
 
 	public void reload()

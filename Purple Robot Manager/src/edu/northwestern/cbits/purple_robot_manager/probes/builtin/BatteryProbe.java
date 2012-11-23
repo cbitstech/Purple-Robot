@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceActivity;
@@ -79,16 +80,33 @@ public class BatteryProbe extends Probe
 		return this._isEnabled;
 	}
 
-	/*
 	public String summarizeValue(Context context, Bundle bundle)
 	{
-		boolean active = bundle.getBoolean(BatteryProbe.SCREEN_ACTIVE, false);
+		String status = this.getStatus(context, bundle.getInt(BatteryManager.EXTRA_STATUS));
 
-		if (active)
-			return context.getResources().getString(R.string.summary_screen_probe_active);
+		int level = bundle.getInt(BatteryManager.EXTRA_LEVEL);
 
-		return context.getResources().getString(R.string.summary_screen_probe_inactive);
+		return String.format(context.getResources().getString(R.string.summary_battery_probe), level, status);
 	}
+
+	private String getStatus(Context context, int statusInt)
+	{
+		switch (statusInt)
+		{
+			case BatteryManager.BATTERY_STATUS_CHARGING:
+				return context.getString(R.string.label_battery_charging);
+			case BatteryManager.BATTERY_STATUS_DISCHARGING:
+				return context.getString(R.string.label_battery_discharging);
+			case BatteryManager.BATTERY_STATUS_FULL:
+				return context.getString(R.string.label_battery_full);
+			case BatteryManager.BATTERY_STATUS_NOT_CHARGING:
+				return context.getString(R.string.label_battery_not_charging);
+		}
+
+		return context.getString(R.string.label_unknown);
+	}
+
+	/*
 
 	public Bundle formattedBundle(Context context, Bundle bundle)
 	{

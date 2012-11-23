@@ -12,7 +12,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 
@@ -142,27 +141,19 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 
         sensors.unregisterListener(this);
 
-    	Log.e("PRM", "CHECK ENABLE");
-
         if (super.isEnabled(context))
         {
-        	Log.e("PRM", "ENBLING SUPER");
-
         	this._context = context.getApplicationContext();
 
         	SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
         	if (prefs.getBoolean("config_probe_accelerometer_built_in_enabled", true))
         	{
-            	Log.e("PRM", "ENBLING ACCELEROMETER");
-
             	sensors.registerListener(this, sensors.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_FASTEST, null);
 
         		return true;
         	}
         }
-
-        Log.e("PRM", "ENABLE OFF");
 
         return false;
 	}
