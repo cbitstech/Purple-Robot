@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
@@ -15,21 +16,72 @@ import android.os.SystemClock;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 
-public class ContinuousMagneticFieldProbe extends ContinuousProbe implements SensorEventListener
+public class LightProbe extends ContinuousProbe implements SensorEventListener
 {
 	private static int BUFFER_SIZE = 40;
 
-	private static String[] fieldNames = { "X", "Y", "Z" };
+	private static String[] fieldNames = { "LUX" };
 
 	private double lastSeen = 0;
 	private long lastFrequencyLookup = 0;
 	private long frequency = 1000;
 
-	private float valueBuffer[][] = new float[3][BUFFER_SIZE];
-	private int accuracyBuffer[] = new int[BUFFER_SIZE];
+	private float valueBuffer[][] = new float[1][BUFFER_SIZE];
 	private double timeBuffer[] = new double[BUFFER_SIZE];
 
 	private int bufferIndex  = 0;
+
+	public Bundle formattedBundle(Context context, Bundle bundle)
+	{
+		Bundle formatted = super.formattedBundle(context, bundle);
+
+		double[] eventTimes = bundle.getDoubleArray("EVENT_TIMESTAMP");
+		float[] lux = bundle.getFloatArray("LUX");
+
+		ArrayList<String> keys = new ArrayList<String>();
+
+		if (lux != null && eventTimes != null)
+		{
+			SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.display_date_format));
+
+			if (eventTimes.length > 1)
+			{
+				Bundle readings = new Bundle();
+
+				for (int i = 0; i < eventTimes.length; i++)
+				{
+					String formatString = String.format(context.getString(R.string.display_light_reading), lux[i]);
+
+					double time = eventTimes[i];
+
+					Date d = new Date((long) time);
+
+					String key = sdf.format(d);
+
+					readings.putString(key, formatString);
+
+					keys.add(key);
+				}
+
+				if (keys.size() > 0)
+					readings.putStringArrayList("KEY_ORDER", keys);
+
+				formatted.putBundle(context.getString(R.string.display_light_readings), readings);
+			}
+			else if (eventTimes.length > 0)
+			{
+				String formatString = String.format(context.getString(R.string.display_light_reading), lux[0]);
+
+				double time = eventTimes[0];
+
+				Date d = new Date((long) time);
+
+				formatted.putString(sdf.format(d), formatString);
+			}
+		}
+
+		return formatted;
+	};
 
 	public long getFrequency()
 	{
@@ -39,7 +91,7 @@ public class ContinuousMagneticFieldProbe extends ContinuousProbe implements Sen
 		{
 			SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
 
-			frequency = Long.parseLong(prefs.getString("config_probe_magnetic_built_in_frequency", "1000"));
+			frequency = Long.parseLong(prefs.getString("config_probe_light_built_in_frequency", "1000"));
 
 			int bufferSize = 1000 / (int) frequency;
 
@@ -52,8 +104,7 @@ public class ContinuousMagneticFieldProbe extends ContinuousProbe implements Sen
 				{
 					bufferIndex = 0;
 
-					valueBuffer = new float[3][bufferSize];
-					accuracyBuffer = new int[bufferSize];
+					valueBuffer = new float[1][bufferSize];
 					timeBuffer = new double[bufferSize];
 				}
 			}
@@ -66,12 +117,12 @@ public class ContinuousMagneticFieldProbe extends ContinuousProbe implements Sen
 
 	public String name(Context context)
 	{
-		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousMagneticFieldProbe";
+		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.LightProbe";
 	}
 
 	public int getTitleResource()
 	{
-		return R.string.title_builtin_magnetic_probe;
+		return R.string.title_light_probe;
 	}
 
 	public int getCategoryResource()
@@ -91,9 +142,9 @@ public class ContinuousMagneticFieldProbe extends ContinuousProbe implements Sen
 
 			SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
-			if (prefs.getBoolean("config_probe_magnetic_built_in_enabled", true))
+			if (prefs.getBoolean("config_probe_light_built_in_enabled", true))
 			{
-				sensors.registerListener(this, sensors.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_FASTEST, null);
+				sensors.registerListener(this, sensors.getDefaultSensor(Sensor.TYPE_LIGHT), SensorManager.SENSOR_DELAY_FASTEST, null);
 
 				return true;
 			}
@@ -102,9 +153,10 @@ public class ContinuousMagneticFieldProbe extends ContinuousProbe implements Sen
 		return false;
 	}
 
+	@SuppressLint("NewApi")
 	public void onSensorChanged(SensorEvent event)
 	{
-		double now = (double) System.currentTimeMillis();
+		double now = System.currentTimeMillis();
 
 		if (now - this.lastSeen > this.getFrequency() && bufferIndex <= timeBuffer.length)
 		{
@@ -116,12 +168,7 @@ public class ContinuousMagneticFieldProbe extends ContinuousProbe implements Sen
 				double timestamp = event.timestamp + boot;
 
 				timeBuffer[bufferIndex] = timestamp / 1000000;
-				accuracyBuffer[bufferIndex] = event.accuracy;
-
-				for (int i = 0; i < event.values.length; i++)
-				{
-					valueBuffer[i][bufferIndex] = event.values[i];
-				}
+				valueBuffer[0][bufferIndex] = event.values[0];
 
 				bufferIndex += 1;
 
@@ -146,7 +193,6 @@ public class ContinuousMagneticFieldProbe extends ContinuousProbe implements Sen
 					data.putDouble("TIMESTAMP", now / 1000);
 
 					data.putDoubleArray("EVENT_TIMESTAMP", timeBuffer);
-					data.putIntArray("ACCURACY", accuracyBuffer);
 
 					for (int i = 0; i < fieldNames.length; i++)
 					{
@@ -165,78 +211,23 @@ public class ContinuousMagneticFieldProbe extends ContinuousProbe implements Sen
 
 	public String getPreferenceKey()
 	{
-		return "magnetic_built_in";
+		return "light_built_in";
 	}
 
 	public int getResourceFrequencyLabels()
 	{
-		return R.array.probe_acceleration_frequency_labels;
+		return R.array.probe_builtin_frequency_labels;
 	}
 
 	public int getResourceFrequencyValues()
 	{
-		return R.array.probe_acceleration_frequency_values;
+		return R.array.probe_builtin_frequency_values;
 	}
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
-		float xReading = bundle.getFloatArray("X")[0];
-		float yReading = bundle.getFloatArray("Y")[0];
-		float zReading = bundle.getFloatArray("Z")[0];
+		float lux = bundle.getFloatArray("LUX")[0];
 
-		return String.format(context.getResources().getString(R.string.summary_magnetic_probe), xReading, yReading, zReading);
+		return String.format(context.getResources().getString(R.string.summary_light_probe), lux);
 	}
-
-	public Bundle formattedBundle(Context context, Bundle bundle)
-	{
-		Bundle formatted = super.formattedBundle(context, bundle);
-
-		double[] eventTimes = bundle.getDoubleArray("EVENT_TIMESTAMP");
-		float[] x = bundle.getFloatArray("X");
-		float[] y = bundle.getFloatArray("Y");
-		float[] z = bundle.getFloatArray("Z");
-
-		ArrayList<String> keys = new ArrayList<String>();
-
-		SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.display_date_format));
-
-		if (eventTimes != null && x != null && y != null && z != null && eventTimes.length > 1)
-		{
-			Bundle readings = new Bundle();
-
-			for (int i = 0; i < eventTimes.length; i++)
-			{
-				String formatString = String.format(context.getString(R.string.display_gyroscope_reading), x[i], y[i], z[i]);
-
-				double time = eventTimes[i];
-
-				Date d = new Date((long) time);
-
-				readings.putString(sdf.format(d), formatString);
-
-				String key = sdf.format(d);
-
-				readings.putString(key, formatString);
-
-				keys.add(key);
-			}
-
-			if (keys.size() > 0)
-				readings.putStringArrayList("KEY_ORDER", keys);
-
-			formatted.putBundle(context.getString(R.string.display_magnetic_readings), readings);
-		}
-		else if (eventTimes.length > 0)
-		{
-			String formatString = String.format(context.getString(R.string.display_gyroscope_reading), x[0], y[0], z[0]);
-
-			double time = eventTimes[0];
-
-			Date d = new Date((long) time);
-
-			formatted.putString(sdf.format(d), formatString);
-		}
-
-		return formatted;
-	};
 }

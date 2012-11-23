@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
@@ -16,17 +15,18 @@ import android.os.SystemClock;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 
-public class ContinuousLightProbe extends ContinuousProbe implements SensorEventListener
+public class GyroscopeProbe extends ContinuousProbe implements SensorEventListener
 {
 	private static int BUFFER_SIZE = 40;
 
-	private static String[] fieldNames = { "LUX" };
+	private static String[] fieldNames = { "X", "Y", "Z" };
 
 	private double lastSeen = 0;
 	private long lastFrequencyLookup = 0;
 	private long frequency = 1000;
 
-	private float valueBuffer[][] = new float[1][BUFFER_SIZE];
+	private float valueBuffer[][] = new float[3][BUFFER_SIZE];
+	private int accuracyBuffer[] = new int[BUFFER_SIZE];
 	private double timeBuffer[] = new double[BUFFER_SIZE];
 
 	private int bufferIndex  = 0;
@@ -36,48 +36,47 @@ public class ContinuousLightProbe extends ContinuousProbe implements SensorEvent
 		Bundle formatted = super.formattedBundle(context, bundle);
 
 		double[] eventTimes = bundle.getDoubleArray("EVENT_TIMESTAMP");
-		float[] lux = bundle.getFloatArray("LUX");
+		float[] x = bundle.getFloatArray("X");
+		float[] y = bundle.getFloatArray("Y");
+		float[] z = bundle.getFloatArray("Z");
 
 		ArrayList<String> keys = new ArrayList<String>();
 
-		if (lux != null && eventTimes != null)
+		SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.display_date_format));
+
+		if (eventTimes.length > 1)
 		{
-			SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.display_date_format));
+			Bundle readings = new Bundle();
 
-			if (eventTimes.length > 1)
+			for (int i = 0; i < eventTimes.length; i++)
 			{
-				Bundle readings = new Bundle();
+				String formatString = String.format(context.getString(R.string.display_gyroscope_reading), x[i], y[i], z[i]);
 
-				for (int i = 0; i < eventTimes.length; i++)
-				{
-					String formatString = String.format(context.getString(R.string.display_light_reading), lux[i]);
-
-					double time = eventTimes[i];
-
-					Date d = new Date((long) time);
-
-					String key = sdf.format(d);
-
-					readings.putString(key, formatString);
-
-					keys.add(key);
-				}
-
-				if (keys.size() > 0)
-					readings.putStringArrayList("KEY_ORDER", keys);
-
-				formatted.putBundle(context.getString(R.string.display_light_readings), readings);
-			}
-			else if (eventTimes.length > 0)
-			{
-				String formatString = String.format(context.getString(R.string.display_light_reading), lux[0]);
-
-				double time = eventTimes[0];
+				double time = eventTimes[i];
 
 				Date d = new Date((long) time);
 
-				formatted.putString(sdf.format(d), formatString);
+				String key = sdf.format(d);
+
+				readings.putString(key, formatString);
+
+				keys.add(key);
 			}
+
+			if (keys.size() > 0)
+				readings.putStringArrayList("KEY_ORDER", keys);
+
+			formatted.putBundle(context.getString(R.string.display_gyroscope_readings), readings);
+		}
+		else if (eventTimes.length > 0)
+		{
+			String formatString = String.format(context.getString(R.string.display_gyroscope_reading), x[0], y[0], z[0]);
+
+			double time = eventTimes[0];
+
+			Date d = new Date((long) time);
+
+			formatted.putString(sdf.format(d), formatString);
 		}
 
 		return formatted;
@@ -91,7 +90,7 @@ public class ContinuousLightProbe extends ContinuousProbe implements SensorEvent
 		{
 			SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
 
-			frequency = Long.parseLong(prefs.getString("config_probe_light_built_in_frequency", "1000"));
+			frequency = Long.parseLong(prefs.getString("config_probe_gyroscope_built_in_frequency", "1000"));
 
 			int bufferSize = 1000 / (int) frequency;
 
@@ -104,7 +103,8 @@ public class ContinuousLightProbe extends ContinuousProbe implements SensorEvent
 				{
 					bufferIndex = 0;
 
-					valueBuffer = new float[1][bufferSize];
+					valueBuffer = new float[3][bufferSize];
+					accuracyBuffer = new int[bufferSize];
 					timeBuffer = new double[bufferSize];
 				}
 			}
@@ -117,12 +117,12 @@ public class ContinuousLightProbe extends ContinuousProbe implements SensorEvent
 
 	public String name(Context context)
 	{
-		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousLightProbe";
+		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.GyroscopeProbe";
 	}
 
 	public int getTitleResource()
 	{
-		return R.string.title_light_probe;
+		return R.string.title_builtin_gyroscope_probe;
 	}
 
 	public int getCategoryResource()
@@ -138,37 +138,41 @@ public class ContinuousLightProbe extends ContinuousProbe implements SensorEvent
 
         if (super.isEnabled(context))
         {
-	        this._context = context.getApplicationContext();
+        	this._context = context.getApplicationContext();
 
-			SharedPreferences prefs = ContinuousProbe.getPreferences(context);
+        	SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
-			if (prefs.getBoolean("config_probe_light_built_in_enabled", true))
-			{
-				sensors.registerListener(this, sensors.getDefaultSensor(Sensor.TYPE_LIGHT), SensorManager.SENSOR_DELAY_FASTEST, null);
+        	if (prefs.getBoolean("config_probe_gyroscope_built_in_enabled", true))
+        	{
+        		sensors.registerListener(this, sensors.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_FASTEST, null);
 
-				return true;
-			}
+        		return true;
+        	}
         }
 
 		return false;
 	}
 
-	@SuppressLint("NewApi")
 	public void onSensorChanged(SensorEvent event)
 	{
-		double now = System.currentTimeMillis();
+		double now = (double) System.currentTimeMillis();
 
 		if (now - this.lastSeen > this.getFrequency() && bufferIndex <= timeBuffer.length)
 		{
 			synchronized(this)
 			{
-				double elapsed = SystemClock.elapsedRealtime();
+				double elapsed = (double) SystemClock.elapsedRealtime();
 				double boot = (now - elapsed) * 1000 * 1000;
 
 				double timestamp = event.timestamp + boot;
 
 				timeBuffer[bufferIndex] = timestamp / 1000000;
-				valueBuffer[0][bufferIndex] = event.values[0];
+				accuracyBuffer[bufferIndex] = event.accuracy;
+
+				for (int i = 0; i < event.values.length; i++)
+				{
+					valueBuffer[i][bufferIndex] = event.values[i];
+				}
 
 				bufferIndex += 1;
 
@@ -193,6 +197,7 @@ public class ContinuousLightProbe extends ContinuousProbe implements SensorEvent
 					data.putDouble("TIMESTAMP", now / 1000);
 
 					data.putDoubleArray("EVENT_TIMESTAMP", timeBuffer);
+					data.putIntArray("ACCURACY", accuracyBuffer);
 
 					for (int i = 0; i < fieldNames.length; i++)
 					{
@@ -211,23 +216,25 @@ public class ContinuousLightProbe extends ContinuousProbe implements SensorEvent
 
 	public String getPreferenceKey()
 	{
-		return "light_built_in";
+		return "gyroscope_built_in";
 	}
 
 	public int getResourceFrequencyLabels()
 	{
-		return R.array.probe_builtin_frequency_labels;
+		return R.array.probe_acceleration_frequency_labels;
 	}
 
 	public int getResourceFrequencyValues()
 	{
-		return R.array.probe_builtin_frequency_values;
+		return R.array.probe_acceleration_frequency_values;
 	}
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
-		float lux = bundle.getFloatArray("LUX")[0];
+		float xReading = bundle.getFloatArray("X")[0];
+		float yReading = bundle.getFloatArray("Y")[0];
+		float zReading = bundle.getFloatArray("Z")[0];
 
-		return String.format(context.getResources().getString(R.string.summary_light_probe), lux);
+		return String.format(context.getResources().getString(R.string.summary_gyroscope_probe), xReading, yReading, zReading);
 	}
 }

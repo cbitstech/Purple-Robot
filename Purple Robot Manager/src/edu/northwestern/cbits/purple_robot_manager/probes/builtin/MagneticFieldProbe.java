@@ -15,7 +15,7 @@ import android.os.SystemClock;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 
-public class ContinuousGyroscopeProbe extends ContinuousProbe implements SensorEventListener
+public class MagneticFieldProbe extends ContinuousProbe implements SensorEventListener
 {
 	private static int BUFFER_SIZE = 40;
 
@@ -31,57 +31,6 @@ public class ContinuousGyroscopeProbe extends ContinuousProbe implements SensorE
 
 	private int bufferIndex  = 0;
 
-	public Bundle formattedBundle(Context context, Bundle bundle)
-	{
-		Bundle formatted = super.formattedBundle(context, bundle);
-
-		double[] eventTimes = bundle.getDoubleArray("EVENT_TIMESTAMP");
-		float[] x = bundle.getFloatArray("X");
-		float[] y = bundle.getFloatArray("Y");
-		float[] z = bundle.getFloatArray("Z");
-
-		ArrayList<String> keys = new ArrayList<String>();
-
-		SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.display_date_format));
-
-		if (eventTimes.length > 1)
-		{
-			Bundle readings = new Bundle();
-
-			for (int i = 0; i < eventTimes.length; i++)
-			{
-				String formatString = String.format(context.getString(R.string.display_gyroscope_reading), x[i], y[i], z[i]);
-
-				double time = eventTimes[i];
-
-				Date d = new Date((long) time);
-
-				String key = sdf.format(d);
-
-				readings.putString(key, formatString);
-
-				keys.add(key);
-			}
-
-			if (keys.size() > 0)
-				readings.putStringArrayList("KEY_ORDER", keys);
-
-			formatted.putBundle(context.getString(R.string.display_gyroscope_readings), readings);
-		}
-		else if (eventTimes.length > 0)
-		{
-			String formatString = String.format(context.getString(R.string.display_gyroscope_reading), x[0], y[0], z[0]);
-
-			double time = eventTimes[0];
-
-			Date d = new Date((long) time);
-
-			formatted.putString(sdf.format(d), formatString);
-		}
-
-		return formatted;
-	};
-
 	public long getFrequency()
 	{
 		long now = System.currentTimeMillis();
@@ -90,7 +39,7 @@ public class ContinuousGyroscopeProbe extends ContinuousProbe implements SensorE
 		{
 			SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
 
-			frequency = Long.parseLong(prefs.getString("config_probe_gyroscope_built_in_frequency", "1000"));
+			frequency = Long.parseLong(prefs.getString("config_probe_magnetic_built_in_frequency", "1000"));
 
 			int bufferSize = 1000 / (int) frequency;
 
@@ -117,12 +66,12 @@ public class ContinuousGyroscopeProbe extends ContinuousProbe implements SensorE
 
 	public String name(Context context)
 	{
-		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousGyroscopeProbe";
+		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.MagneticFieldProbe";
 	}
 
 	public int getTitleResource()
 	{
-		return R.string.title_builtin_gyroscope_probe;
+		return R.string.title_builtin_magnetic_probe;
 	}
 
 	public int getCategoryResource()
@@ -138,16 +87,16 @@ public class ContinuousGyroscopeProbe extends ContinuousProbe implements SensorE
 
         if (super.isEnabled(context))
         {
-        	this._context = context.getApplicationContext();
+	        this._context = context.getApplicationContext();
 
-        	SharedPreferences prefs = ContinuousProbe.getPreferences(context);
+			SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
-        	if (prefs.getBoolean("config_probe_gyroscope_built_in_enabled", true))
-        	{
-        		sensors.registerListener(this, sensors.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_FASTEST, null);
+			if (prefs.getBoolean("config_probe_magnetic_built_in_enabled", true))
+			{
+				sensors.registerListener(this, sensors.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_FASTEST, null);
 
-        		return true;
-        	}
+				return true;
+			}
         }
 
 		return false;
@@ -161,7 +110,7 @@ public class ContinuousGyroscopeProbe extends ContinuousProbe implements SensorE
 		{
 			synchronized(this)
 			{
-				double elapsed = (double) SystemClock.elapsedRealtime();
+				double elapsed = SystemClock.elapsedRealtime();
 				double boot = (now - elapsed) * 1000 * 1000;
 
 				double timestamp = event.timestamp + boot;
@@ -216,7 +165,7 @@ public class ContinuousGyroscopeProbe extends ContinuousProbe implements SensorE
 
 	public String getPreferenceKey()
 	{
-		return "gyroscope_built_in";
+		return "magnetic_built_in";
 	}
 
 	public int getResourceFrequencyLabels()
@@ -235,6 +184,59 @@ public class ContinuousGyroscopeProbe extends ContinuousProbe implements SensorE
 		float yReading = bundle.getFloatArray("Y")[0];
 		float zReading = bundle.getFloatArray("Z")[0];
 
-		return String.format(context.getResources().getString(R.string.summary_gyroscope_probe), xReading, yReading, zReading);
+		return String.format(context.getResources().getString(R.string.summary_magnetic_probe), xReading, yReading, zReading);
 	}
+
+	public Bundle formattedBundle(Context context, Bundle bundle)
+	{
+		Bundle formatted = super.formattedBundle(context, bundle);
+
+		double[] eventTimes = bundle.getDoubleArray("EVENT_TIMESTAMP");
+		float[] x = bundle.getFloatArray("X");
+		float[] y = bundle.getFloatArray("Y");
+		float[] z = bundle.getFloatArray("Z");
+
+		ArrayList<String> keys = new ArrayList<String>();
+
+		SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.display_date_format));
+
+		if (eventTimes != null && x != null && y != null && z != null && eventTimes.length > 1)
+		{
+			Bundle readings = new Bundle();
+
+			for (int i = 0; i < eventTimes.length; i++)
+			{
+				String formatString = String.format(context.getString(R.string.display_gyroscope_reading), x[i], y[i], z[i]);
+
+				double time = eventTimes[i];
+
+				Date d = new Date((long) time);
+
+				readings.putString(sdf.format(d), formatString);
+
+				String key = sdf.format(d);
+
+				readings.putString(key, formatString);
+
+				keys.add(key);
+			}
+
+			if (keys.size() > 0)
+				readings.putStringArrayList("KEY_ORDER", keys);
+
+			formatted.putBundle(context.getString(R.string.display_magnetic_readings), readings);
+		}
+		else if (eventTimes.length > 0)
+		{
+			String formatString = String.format(context.getString(R.string.display_gyroscope_reading), x[0], y[0], z[0]);
+
+			double time = eventTimes[0];
+
+			Date d = new Date((long) time);
+
+			formatted.putString(sdf.format(d), formatString);
+		}
+
+		return formatted;
+	};
 }

@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<array name="probe_classes">
-        <item>builtin.ContinuousAccelerometerProbe</item>
-        <item>builtin.ContinuousPressureProbe</item>
-        <item>builtin.ContinuousGyroscopeProbe</item>
-        <item>builtin.ContinuousMagneticFieldProbe</item>
-        <item>builtin.ContinuousLightProbe</item>
-        <item>builtin.ContinuousTemperatureProbe</item>
-        <item>builtin.VisibleSatelliteProbe</item>
+        <item>builtin.AccelerometerProbe</item>
+        <item>builtin.BatteryProbe</item>
         <item>builtin.BluetoothDevicesProbe</item>
+        <item>builtin.GyroscopeProbe</item>
         <item>builtin.HardwareInformationProbe</item>
+        <item>builtin.LightProbe</item>
+        <item>builtin.MagneticFieldProbe</item>
+        <item>builtin.PressureProbe</item>
+        <item>builtin.ProximityProbe</item>
+        <item>builtin.RobotHealthProbe</item>
+        <item>builtin.ScreenProbe</item>
         <item>builtin.SoftwareInformationProbe</item>
         <item>builtin.TelephonyProbe</item>
-        <item>builtin.RobotHealthProbe</item>
+        <item>builtin.TemperatureProbe</item>
+        <item>builtin.VisibleSatelliteProbe</item>
         <!-- <item>builtin.BluetoothReceiverProbe</item> -->
 
         <item>funf.BatteryProbe</item>
@@ -21,8 +24,6 @@
         <item>funf.CallLogProbe</item>
         <item>funf.ContactProbe</item>
 	    <item>funf.LocationProbe</item>
-	    <item>funf.ProximityProbe</item>
-	    <item>funf.ScreenProbe</item>
         <item>funf.SmsProbe</item>
         <item>funf.TimeOffsetProbe</item>
         <item>funf.WifiProbe</item>

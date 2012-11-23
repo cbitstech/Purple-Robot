@@ -20,10 +20,12 @@ import android.preference.PreferenceScreen;
 import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.BatteryProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.BluetoothDevicesProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.HardwareInformationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RobotHealthProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ScreenProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.SoftwareInformationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TelephonyProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.VisibleSatelliteProbe;
@@ -170,6 +172,20 @@ public class ProbeManager
 				RobotHealthProbe robot = (RobotHealthProbe) probe;
 
 				if (robot.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof ScreenProbe)
+			{
+				ScreenProbe screen = (ScreenProbe) probe;
+
+				if (screen.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof BatteryProbe)
+			{
+				BatteryProbe battery = (BatteryProbe) probe;
+
+				if (battery.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 
