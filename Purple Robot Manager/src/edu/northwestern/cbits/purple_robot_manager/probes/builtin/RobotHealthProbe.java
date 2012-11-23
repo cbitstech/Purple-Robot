@@ -1,19 +1,20 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
 import java.io.File;
+import java.io.FilenameFilter;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import com.WazaBe.HoloEverywhere.preference.CheckBoxPreference;
-import com.WazaBe.HoloEverywhere.preference.ListPreference;
-import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
-import com.WazaBe.HoloEverywhere.preference.PreferenceScreen;
-import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
-import com.WazaBe.HoloEverywhere.sherlock.SPreferenceActivity;
+import android.preference.CheckBoxPreference;
+import android.preference.ListPreference;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
+import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
@@ -31,6 +32,7 @@ public class RobotHealthProbe extends Probe
 	private static final String CLEAR_TIME = "CLEAR_TIME";
 
 	private long _lastCheck = 0;
+	private boolean _checking = false;
 
 	public String name(Context context)
 	{
@@ -47,7 +49,7 @@ public class RobotHealthProbe extends Probe
 		return context.getResources().getString(R.string.probe_environment_category);
 	}
 
-	public boolean isEnabled(Context context)
+	public boolean isEnabled(final Context context)
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -67,57 +69,97 @@ public class RobotHealthProbe extends Probe
 
 						if (plugin != null && plugin instanceof HttpUploadPlugin)
 						{
-							HttpUploadPlugin httpPlugin = (HttpUploadPlugin) plugin;
+							final HttpUploadPlugin httpPlugin = (HttpUploadPlugin) plugin;
 
-							File archiveFolder = httpPlugin.getArchiveFolder();
-							File pendingFolder = httpPlugin.getPendingFolder();
+							final RobotHealthProbe me = this;
 
-							int pendingCount = 0;
-							int archiveCount = 0;
-
-							long pendingSize = 0;
-							long archiveSize = 0;
-
-							for (File f : archiveFolder.listFiles())
+							Runnable r = new Runnable()
 							{
-								if (f.isFile())
+								public void run()
 								{
-									archiveCount += 1;
-									archiveSize += f.length();
+									if (me._checking)
+										return;
+
+									me._checking = true;
+
+									File archiveFolder = httpPlugin.getArchiveFolder();
+									File pendingFolder = httpPlugin.getPendingFolder();
+
+									int pendingCount = 0;
+									int archiveCount = 0;
+
+									long pendingSize = 0;
+									long archiveSize = 0;
+
+									Log.e("PRM", "COUNTING ARCHIVES");
+
+									for (File f : archiveFolder.listFiles())
+									{
+										if (f.isFile())
+										{
+											archiveCount += 1;
+											archiveSize += f.length();
+										}
+									}
+
+									Log.e("PRM", "COUNTING PENDING");
+
+									FilenameFilter jsonFilter =  new FilenameFilter()
+									{
+										public boolean accept(File dir, String filename)
+										{
+											return filename.endsWith(".json");
+										}
+									};
+
+									String[] filenames = pendingFolder.list(jsonFilter);
+
+									if (filenames == null)
+										filenames = new String[0];
+
+									pendingCount = filenames.length;
+
+									if (pendingCount < 2048)
+									{
+										for (File f : pendingFolder.listFiles(jsonFilter))
+										{
+											pendingSize += f.length();
+										}
+									}
+									else
+										pendingSize = Integer.MAX_VALUE;
+
+									Log.e("PRM", "DONE COUNTING");
+
+									Bundle bundle = new Bundle();
+									bundle.putString("PROBE", me.name(context));
+									bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+
+									bundle.putInt(RobotHealthProbe.PENDING_COUNT, pendingCount);
+									bundle.putLong(RobotHealthProbe.PENDING_SIZE, pendingSize);
+
+									bundle.putInt(RobotHealthProbe.ARCHIVE_COUNT, archiveCount);
+									bundle.putLong(RobotHealthProbe.ARCHIVE_SIZE, archiveSize);
+
+									double throughput = httpPlugin.getRecentThroughput();
+
+									bundle.putDouble(RobotHealthProbe.THROUGHPUT, throughput);
+
+									long cleartime = -1;
+
+									if (throughput > 0.0)
+										cleartime = pendingSize / ((long) throughput);
+
+									bundle.putLong(RobotHealthProbe.CLEAR_TIME, cleartime);
+
+									me.transmitData(context, bundle);
+
+									me._checking = false;
 								}
-							}
+							};
 
-							for (File f : pendingFolder.listFiles())
-							{
-								if (f.isFile())
-								{
-									pendingCount += 1;
-									pendingSize += f.length();
-								}
-							}
-
-							Bundle bundle = new Bundle();
-							bundle.putString("PROBE", this.name(context));
-							bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
-
-							bundle.putInt(RobotHealthProbe.PENDING_COUNT, pendingCount);
-							bundle.putLong(RobotHealthProbe.PENDING_SIZE, pendingSize);
-
-							bundle.putInt(RobotHealthProbe.ARCHIVE_COUNT, archiveCount);
-							bundle.putLong(RobotHealthProbe.ARCHIVE_SIZE, archiveSize);
-
-							double throughput = httpPlugin.getRecentThroughput();
-
-							bundle.putDouble(RobotHealthProbe.THROUGHPUT, throughput);
-
-							long cleartime = -1;
-
-							if (throughput > 0.0)
-								cleartime = pendingSize / ((long) throughput);
-
-							bundle.putLong(RobotHealthProbe.CLEAR_TIME, cleartime);
-
-							this.transmitData(context, bundle);
+							Thread t = new Thread(r);
+							t.start();
 						}
 
 						this._lastCheck = now;
@@ -164,7 +206,7 @@ public class RobotHealthProbe extends Probe
 */
 
 	@SuppressWarnings("deprecation")
-	public PreferenceScreen preferenceScreen(SPreferenceActivity activity)
+	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{
 		PreferenceManager manager = activity.getPreferenceManager();
 

@@ -1,24 +1,23 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
-import com.WazaBe.HoloEverywhere.preference.ListPreference;
-import com.WazaBe.HoloEverywhere.preference.Preference;
-import com.WazaBe.HoloEverywhere.preference.Preference.OnPreferenceChangeListener;
-import com.WazaBe.HoloEverywhere.preference.Preference.OnPreferenceClickListener;
-import com.WazaBe.HoloEverywhere.preference.PreferenceCategory;
-import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
-import com.WazaBe.HoloEverywhere.preference.PreferenceScreen;
-import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
-import com.WazaBe.HoloEverywhere.preference.SharedPreferences.Editor;
-import com.WazaBe.HoloEverywhere.sherlock.SPreferenceActivity;
-
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.preference.ListPreference;
+import android.preference.Preference;
+import android.preference.Preference.OnPreferenceChangeListener;
+import android.preference.Preference.OnPreferenceClickListener;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceCategory;
+import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 
-public class SettingsActivity extends SPreferenceActivity implements OnPreferenceClickListener
+public class SettingsActivity extends PreferenceActivity implements OnPreferenceClickListener
 {
 	public static final String PROBES_SCREEN_KEY = "config_probes_screen";
 	private static final String MANUAL_REFRESH_KEY = "config_json_refresh_manually";

@@ -11,13 +11,17 @@ import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.CrashManagerListener;
 import net.hockeyapp.android.UpdateManager;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.StrictMode;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Editable;
 import android.util.Log;
@@ -32,11 +36,8 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.WazaBe.HoloEverywhere.app.AlertDialog;
-import com.WazaBe.HoloEverywhere.preference.PreferenceManager;
-import com.WazaBe.HoloEverywhere.preference.SharedPreferences;
-import com.WazaBe.HoloEverywhere.widget.Toast;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
@@ -85,7 +86,14 @@ public class StartActivity extends SherlockActivity
 
 	protected void onCreate(Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
+	    StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+	    	.detectAll()
+	    	.penaltyLog()
+	    	.penaltyDeath()
+	    	.build());
+
+
+		super.onCreate(savedInstanceState);
 
         UpdateManager.register(this, "7550093e020b1a4a6df90f1e9dde68b6");
 
