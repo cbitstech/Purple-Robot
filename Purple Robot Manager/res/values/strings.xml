@@ -187,6 +187,8 @@
     <string name="title_builtin_magnetic_probe">Magnetic Field Probe (Built-in)</string>
     <string name="summary_builtin_magnetic_field_probe_desc">Detect the local magnetic field. Can be used as to detect the earth\'s magnetic field, but may be distorted by metal objects around device.</string>
 
+  	<string name="title_communication_probe">Call &amp; Message Info</string>
+
 	<string name="title_builtin_satellite_probe">Visible Satellite Probe</string>
 
 	<string name="title_builtin_bluetooth_probe">Visible Bluetooth Probe</string>
