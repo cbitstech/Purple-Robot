@@ -32,7 +32,6 @@ public class HardwareInformationProbe extends Probe
 	private static final String MANUFACTURER = "MANUFACTURER";
 	private static final String MODEL = "MODEL";
 	private static final String PRODUCT = "PRODUCT";
-	private static final String SERIAL = "SERIAL";
 	private static final String WIFI_MAC = "WIFI_MAC";
 	private static final String BLUETOOTH_MAC = "BLUETOOTH_MAC";
 	private static final String MOBILE_ID = "MOBILE_ID";
@@ -86,7 +85,6 @@ public class HardwareInformationProbe extends Probe
 						bundle.putString(HardwareInformationProbe.MANUFACTURER, Build.MANUFACTURER);
 						bundle.putString(HardwareInformationProbe.MODEL, Build.MODEL);
 						bundle.putString(HardwareInformationProbe.PRODUCT, Build.PRODUCT);
-						bundle.putString(HardwareInformationProbe.SERIAL, Build.SERIAL);
 
 						WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 						bundle.putString(HardwareInformationProbe.WIFI_MAC, wifi.getConnectionInfo().getMacAddress());
