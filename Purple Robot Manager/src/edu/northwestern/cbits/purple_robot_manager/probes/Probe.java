@@ -31,9 +31,9 @@ public abstract class Probe
 	public abstract String probeCategory(Context context);
 	public abstract PreferenceScreen preferenceScreen(PreferenceActivity settingsActivity);
 
-	public Bundle[] dataRequestBundles(Context context)
+	public void nudge(Context context)
 	{
-		return new Bundle[0];
+		this.isEnabled(context);
 	}
 
 	@SuppressWarnings("rawtypes")

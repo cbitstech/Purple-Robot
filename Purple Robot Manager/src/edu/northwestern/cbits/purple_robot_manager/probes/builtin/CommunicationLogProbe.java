@@ -17,12 +17,7 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.provider.CallLog;
 import android.provider.CallLog.Calls;
-import android.telephony.CellLocation;
 import android.telephony.PhoneNumberUtils;
-import android.telephony.TelephonyManager;
-import android.telephony.cdma.CdmaCellLocation;
-import android.telephony.gsm.GsmCellLocation;
-
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
@@ -39,6 +34,8 @@ public class CommunicationLogProbe extends Probe
 	private static final String CALL_MISSED_COUNT = "CALL_MISSED_COUNT";
 	private static final String PHONE_CALLS = "PHONE_CALLS";
 	private static final String CALL_TOTAL_COUNT = "CALL_TOTAL_COUNT";
+	private static final String SMS_OUTGOING_COUNT = "SMS_OUTGOING_COUNT";
+	private static final String SMS_INCOMING_COUNT = "SMS_INCOMING_COUNT";
 
 	private long _lastCheck = 0;
 
@@ -116,6 +113,22 @@ public class CommunicationLogProbe extends Probe
 						bundle.putInt(CommunicationLogProbe.CALL_INCOMING_COUNT, receivedCount);
 						bundle.putInt(CommunicationLogProbe.CALL_MISSED_COUNT, missedCount);
 						bundle.putInt(CommunicationLogProbe.CALL_TOTAL_COUNT, missedCount + receivedCount + sentCount);
+
+						sentCount = 0;
+						receivedCount = 0;
+
+						Uri smsInboxUri = Uri.parse("content://sms/inbox");
+						c = context.getContentResolver().query(smsInboxUri, null, null, null, null);
+						receivedCount = c.getCount();
+						c.close();
+
+						Uri smsOutboxUri = Uri.parse("content://sms/sent");
+						c = context.getContentResolver().query(smsOutboxUri, null, null, null, null);
+						sentCount = c.getCount();
+						c.close();
+
+						bundle.putInt(CommunicationLogProbe.SMS_OUTGOING_COUNT, sentCount);
+						bundle.putInt(CommunicationLogProbe.SMS_INCOMING_COUNT, receivedCount);
 
 						this.transmitData(context, bundle);
 

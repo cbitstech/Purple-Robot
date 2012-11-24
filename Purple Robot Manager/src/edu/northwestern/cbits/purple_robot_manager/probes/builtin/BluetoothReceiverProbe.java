@@ -39,11 +39,6 @@ public class BluetoothReceiverProbe extends Probe
 		return "PIZZA PIE";
 	}
 
-	public Bundle[] dataRequestBundles(Context context)
-	{
-		return new Bundle[0];
-	}
-
 	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{

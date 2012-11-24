@@ -54,16 +54,13 @@
 				<action android:name="purple_robot_manager_ringtone" />
 			</intent-filter>
 	    </service>
-		<service android:enabled="true" android:exported="false" android:name=".FunfService">
+		<!-- <service android:enabled="true" android:exported="false" android:name=".FunfService">
 			<intent-filter>
 				<action android:name="edu.mit.media.funf.reload" />
 				<action android:name="ACTION_SEND_REQUEST" />
 			</intent-filter>
-		</service>
+		</service>  -->
 		<!-- Probe Services -->
-        <service android:name="edu.mit.media.funf.probe.builtin.CallLogProbe"></service>
-        <service android:name="edu.mit.media.funf.probe.builtin.ContactProbe"></service>
-        <service android:name="edu.mit.media.funf.probe.builtin.SMSProbe"></service>
 		<activity android:name=".StartActivity" android:label="@string/app_name" android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
