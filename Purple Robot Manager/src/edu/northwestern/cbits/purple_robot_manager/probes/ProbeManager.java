@@ -23,6 +23,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.BatteryProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.BluetoothDevicesProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.HardwareInformationProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RobotHealthProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ScreenProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.SoftwareInformationProbe;
@@ -183,6 +184,13 @@ public class ProbeManager
 				BatteryProbe battery = (BatteryProbe) probe;
 
 				if (battery.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof LocationProbe)
+			{
+				LocationProbe location = (LocationProbe) probe;
+
+				if (location.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 

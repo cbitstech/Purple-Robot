@@ -7,6 +7,7 @@
         <item>builtin.GyroscopeProbe</item>
         <item>builtin.HardwareInformationProbe</item>
         <item>builtin.LightProbe</item>
+        <item>builtin.LocationProbe</item>
         <item>builtin.MagneticFieldProbe</item>
         <item>builtin.PressureProbe</item>
         <item>builtin.ProximityProbe</item>
@@ -20,7 +21,6 @@
 
         <item>funf.CallLogProbe</item>
         <item>funf.ContactProbe</item>
-	    <item>funf.LocationProbe</item>
         <item>funf.SmsProbe</item>
         <item>funf.WifiProbe</item>
         <!-- <item>funf.AudioFilesProbe</item> -->

@@ -66,9 +66,6 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 	{
 		LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
-		locationManager.removeGpsStatusListener(this);
-		locationManager.removeNmeaListener(this);
-
 		if (super.isEnabled(context))
 		{
 	        this._context = context.getApplicationContext();
@@ -79,27 +76,40 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 
 			if (prefs.getBoolean("config_probe_satellites_enabled", false))
 			{
-				locationManager.addGpsStatusListener(this);
-				locationManager.addNmeaListener(this);
-
-				synchronized(this)
+				if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
 				{
-					long freq = Long.parseLong(prefs.getString("config_probe_satellite_frequency", "300000"));
+					locationManager.addGpsStatusListener(this);
+					locationManager.addNmeaListener(this);
 
-					if (now - this._lastCheck > freq)
+					synchronized(this)
 					{
-						locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
+						long freq = Long.parseLong(prefs.getString("config_probe_satellite_frequency", "300000"));
 
-						this._lastCheck = now;
-						this._startCheck = now;
+						if (now - this._lastCheck > 60000 && now - this._lastCheck < freq) // Try to get satellites in 60 seconds...
+						{
+							locationManager.removeGpsStatusListener(this);
+							locationManager.removeNmeaListener(this);
 
-						this._listening = true;
+							locationManager.removeUpdates(this);
+						}
+						if (now - this._lastCheck > freq)
+						{
+							locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
+
+							this._lastCheck = now;
+							this._startCheck = now;
+
+							this._listening = true;
+						}
 					}
 				}
 
 				return true;
 			}
 		}
+
+		locationManager.removeGpsStatusListener(this);
+		locationManager.removeNmeaListener(this);
 
 		locationManager.removeUpdates(this);
 
