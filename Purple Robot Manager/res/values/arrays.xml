@@ -17,12 +17,12 @@
         <item>builtin.TelephonyProbe</item>
         <item>builtin.TemperatureProbe</item>
         <item>builtin.VisibleSatelliteProbe</item>
+        <item>builtin.WifiAccessPointsProbe</item>
         <!-- <item>builtin.BluetoothReceiverProbe</item> -->
 
         <item>funf.CallLogProbe</item>
         <item>funf.ContactProbe</item>
         <item>funf.SmsProbe</item>
-        <item>funf.WifiProbe</item>
         <!-- <item>funf.AudioFilesProbe</item> -->
         <!-- <item>funf.VideoFilesProbe</item> -->
         <!-- <item>funf.ImageFilesProbe</item> -->
