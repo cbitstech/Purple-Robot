@@ -3,6 +3,7 @@ package edu.northwestern.cbits.purple_robot_manager.plugins;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +23,6 @@ import android.net.wifi.ScanResult;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import edu.mit.media.funf.Utils;
 import edu.northwestern.cbits.purple_robot_manager.R;
 
 public abstract class OutputPlugin
@@ -154,11 +154,25 @@ public abstract class OutputPlugin
 			this.processIntent(intent);
 	}
 
+	public static Map<String,Object> getValues(final Bundle bundle)
+	{
+		HashMap<String, Object> values = new HashMap<String, Object>();
+
+		if (bundle == null)
+			return values;
+		for (String key : bundle.keySet())
+		{
+			values.put(key, bundle.get(key));
+		}
+
+		return values;
+	}
+
 	public static JSONObject jsonForBundle(Bundle bundle) throws JSONException
 	{
 		JSONObject json = new JSONObject();
 
-		Map<String, Object> values = Utils.getValues(bundle);
+		Map<String, Object> values = OutputPlugin.getValues(bundle);
 
 		for (String key : values.keySet())
 		{

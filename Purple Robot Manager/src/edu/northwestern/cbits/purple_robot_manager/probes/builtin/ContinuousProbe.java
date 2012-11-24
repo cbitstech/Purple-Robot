@@ -34,11 +34,6 @@ public abstract class ContinuousProbe extends Probe
 
 	protected Context _context = null;
 
-	public Bundle[] dataRequestBundles(Context context)
-	{
-		return new Bundle[0];
-	}
-
 	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{

@@ -31,9 +31,6 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.SoftwareInform
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TelephonyProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.VisibleSatelliteProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.WifiAccessPointsProbe;
-import edu.northwestern.cbits.purple_robot_manager.probes.funf.BasicFunfProbe;
-import edu.northwestern.cbits.purple_robot_manager.probes.funf.ContactProbe;
-import edu.northwestern.cbits.purple_robot_manager.probes.funf.PeriodFunfProbe;
 
 public class ProbeManager
 {
@@ -69,30 +66,15 @@ public class ProbeManager
 		return ProbeManager._probeInstances;
 	}
 
-	public static Map<String, Bundle[]> getDataRequests(Context context)
+	public static void nudgeProbes(Context context)
 	{
-		HashMap<String, Bundle[]> probesMap = new HashMap<String, Bundle[]>();
-
 		if (context != null)
 		{
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-
-			boolean isEnabled = prefs.getBoolean("config_probes_enabled", false);
-
 			for (Probe probe : ProbeManager.allProbes())
 			{
-				String name = probe.name(context);
-
-				Bundle[] bundles = new Bundle[0];
-
-				if (probe.isEnabled(context) && isEnabled)
-					bundles = probe.dataRequestBundles(context);
-
-				probesMap.put(name, bundles);
+				probe.nudge(context);
 			}
 		}
-
-		return probesMap;
 	}
 
 	public static Probe probeForName(String name, Context context)
@@ -104,28 +86,7 @@ public class ProbeManager
 		{
 			boolean found = false;
 
-			if (probe instanceof BasicFunfProbe)
-			{
-				BasicFunfProbe funf = (BasicFunfProbe) probe;
-
-				if (funf.funfName().equalsIgnoreCase(name))
-					found = true;
-			}
-			else if (probe instanceof PeriodFunfProbe)
-			{
-				PeriodFunfProbe funf = (PeriodFunfProbe) probe;
-
-				if (funf.funfName().equalsIgnoreCase(name))
-					found = true;
-			}
-			else if (probe instanceof ContactProbe)
-			{
-				ContactProbe contact = (ContactProbe) probe;
-
-				if (contact.funfName().equalsIgnoreCase(name))
-					found = true;
-			}
-			else if (probe instanceof ContinuousProbe)
+			if (probe instanceof ContinuousProbe)
 			{
 				ContinuousProbe continuous = (ContinuousProbe) probe;
 

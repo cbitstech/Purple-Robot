@@ -22,6 +22,7 @@ import android.preference.PreferenceManager;
 
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
+import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.triggers.DateTrigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 
@@ -215,11 +216,7 @@ public class ManagerService extends IntentService
 			}
 		}
 		else if (REFRESH_CONFIGURATION.equalsIgnoreCase(intent.getAction()))
-		{
-			Intent funfReloadIntent = new Intent(FunfService.ACTION_RELOAD);
-
-			this.startService(funfReloadIntent);
-		}
+			ProbeManager.nudgeProbes(this);
 		else
 		{
 			JSONConfigFile jsonConfig = JSONConfigFile.getSharedFile(this);
@@ -266,9 +263,7 @@ public class ManagerService extends IntentService
 
 		Probe.loadProbeClasses(context);
 		OutputPlugin.loadPluginClasses(context);
-
-		Intent funfIntent = new Intent(FunfService.ACTION_RELOAD);
-		context.startService(funfIntent);
+		ProbeManager.nudgeProbes(context);
 
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 

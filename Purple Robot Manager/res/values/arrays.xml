@@ -20,12 +20,6 @@
         <item>builtin.VisibleSatelliteProbe</item>
         <item>builtin.WifiAccessPointsProbe</item>
         <!-- <item>builtin.BluetoothReceiverProbe</item> -->
-
-        <item>funf.ContactProbe</item>
-        <item>funf.SmsProbe</item>
-        <!-- <item>funf.AudioFilesProbe</item> -->
-        <!-- <item>funf.VideoFilesProbe</item> -->
-        <!-- <item>funf.ImageFilesProbe</item> -->
    	</array>
 
 	<array name="output_plugin_classes">

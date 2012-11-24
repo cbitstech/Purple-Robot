@@ -94,8 +94,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 			editor.commit();
 			JSONConfigFile.update(this);
 
-			Intent funfIntent = new Intent(FunfService.ACTION_RELOAD);
-			this.startService(funfIntent);
+			ProbeManager.nudgeProbes(this);
 
             return true;
         }
