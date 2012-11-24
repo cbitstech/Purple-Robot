@@ -29,6 +29,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ScreenProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.SoftwareInformationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TelephonyProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.VisibleSatelliteProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.WifiAccessPointsProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.funf.BasicFunfProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.funf.ContactProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.funf.PeriodFunfProbe;
@@ -191,6 +192,13 @@ public class ProbeManager
 				LocationProbe location = (LocationProbe) probe;
 
 				if (location.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof WifiAccessPointsProbe)
+			{
+				WifiAccessPointsProbe wifi = (WifiAccessPointsProbe) probe;
+
+				if (wifi.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 
