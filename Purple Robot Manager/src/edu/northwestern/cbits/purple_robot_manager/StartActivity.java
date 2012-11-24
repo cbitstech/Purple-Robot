@@ -89,9 +89,8 @@ public class StartActivity extends SherlockActivity
 	    StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
 	    	.detectAll()
 	    	.penaltyLog()
-	    	.penaltyDeath()
+//	    	.penaltyDeath()
 	    	.build());
-
 
 		super.onCreate(savedInstanceState);
 

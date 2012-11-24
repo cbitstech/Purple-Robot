@@ -20,7 +20,6 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
@@ -112,8 +111,6 @@ public class WifiAccessPointsProbe extends Probe
 							bundle.putInt(WifiAccessPointsProbe.CURRENT_RSSI, wifiInfo.getRssi());
 						}
 
-						Log.e("PRM", "RESULTS: " + bundle);
-
 						me.transmitData(context, bundle);
 					}
 				}
@@ -141,8 +138,6 @@ public class WifiAccessPointsProbe extends Probe
 
 					if (wifi.isWifiEnabled())
 					{
-						Log.e("PRM", "START SCAN!!!! ");
-
 						context.registerReceiver(this._receiver, filter);
 
 						this._lastCheck = now;

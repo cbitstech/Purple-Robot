@@ -4,6 +4,7 @@
         <item>builtin.AccelerometerProbe</item>
         <item>builtin.BatteryProbe</item>
         <item>builtin.BluetoothDevicesProbe</item>
+        <item>builtin.CommunicationLogProbe</item>
         <item>builtin.GyroscopeProbe</item>
         <item>builtin.HardwareInformationProbe</item>
         <item>builtin.LightProbe</item>
@@ -20,7 +21,6 @@
         <item>builtin.WifiAccessPointsProbe</item>
         <!-- <item>builtin.BluetoothReceiverProbe</item> -->
 
-        <item>funf.CallLogProbe</item>
         <item>funf.ContactProbe</item>
         <item>funf.SmsProbe</item>
         <!-- <item>funf.AudioFilesProbe</item> -->
