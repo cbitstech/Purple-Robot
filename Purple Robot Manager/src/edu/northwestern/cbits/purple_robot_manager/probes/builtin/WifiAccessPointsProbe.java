@@ -40,6 +40,7 @@ public class WifiAccessPointsProbe extends Probe
 	private long _lastCheck = 0;
 
 	private BroadcastReceiver _receiver = null;
+	private boolean _registered = false;
 
 	private ArrayList<Bundle> _foundNetworks = new ArrayList<Bundle>();
 
@@ -139,21 +140,29 @@ public class WifiAccessPointsProbe extends Probe
 					if (wifi.isWifiEnabled())
 					{
 						context.registerReceiver(this._receiver, filter);
+						this._registered = true;
 
 						this._lastCheck = now;
 						this._foundNetworks.clear();
 
 						wifi.startScan();
 					}
-					else
+					else if (this._registered)
+					{
 						context.unregisterReceiver(this._receiver);
+						this._registered = false;
+					}
 				}
 			}
 
 			return true;
 		}
 
-		context.unregisterReceiver(this._receiver);
+		if (this._registered)
+		{
+			context.unregisterReceiver(this._receiver);
+			this._registered = false;
+		}
 
 		return false;
 	}

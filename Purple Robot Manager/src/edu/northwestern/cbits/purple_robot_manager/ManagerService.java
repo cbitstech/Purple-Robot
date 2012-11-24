@@ -19,7 +19,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
-
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
@@ -276,6 +275,8 @@ public class ManagerService extends IntentService
 	        	context.startService(reloadIntent);
 	        }
 	    });
+
+		context.startService(new Intent(context, PersistentService.class));
 
 		ManagerService._checkSetup = true;
 	}

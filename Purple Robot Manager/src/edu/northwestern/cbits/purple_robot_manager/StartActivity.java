@@ -20,7 +20,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Editable;
@@ -86,11 +85,11 @@ public class StartActivity extends SherlockActivity
 
 	protected void onCreate(Bundle savedInstanceState)
     {
-	    StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-	    	.detectAll()
-	    	.penaltyLog()
+//	    StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+//	    	.detectAll()
+//	    	.penaltyLog()
 //	    	.penaltyDeath()
-	    	.build());
+//	    	.build());
 
 		super.onCreate(savedInstanceState);
 
