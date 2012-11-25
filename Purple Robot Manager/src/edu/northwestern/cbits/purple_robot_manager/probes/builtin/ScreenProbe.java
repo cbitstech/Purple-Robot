@@ -76,7 +76,7 @@ public class ScreenProbe extends Probe
 
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-		 this._isEnabled = false;
+		this._isEnabled = false;
 
 		if (super.isEnabled(context))
 		{

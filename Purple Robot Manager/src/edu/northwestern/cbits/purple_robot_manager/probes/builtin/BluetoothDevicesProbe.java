@@ -34,6 +34,7 @@ public class BluetoothDevicesProbe extends Probe
 	protected static final String DEVICES = "DEVICES";
 
 	private long _lastCheck = 0;
+	private BroadcastReceiver _receiver = null;
 
 	private BluetoothAdapter _adapter = null;
 
@@ -263,6 +264,58 @@ public class BluetoothDevicesProbe extends Probe
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
+		final BluetoothDevicesProbe me = this;
+
+		if (this._receiver == null)
+		{
+			this._receiver = new BroadcastReceiver()
+			{
+				@SuppressWarnings("unchecked")
+				public void onReceive(Context context, Intent intent)
+				{
+					if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction()))
+					{
+						BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+
+						Bundle deviceBundle = new Bundle();
+
+						deviceBundle.putString(BluetoothDevicesProbe.NAME, device.getName());
+						deviceBundle.putString(BluetoothDevicesProbe.ADDRESS, device.getAddress());
+						deviceBundle.putString(BluetoothDevicesProbe.BOND_STATE, BluetoothDevicesProbe.bondState(device.getBondState()));
+
+						BluetoothClass deviceClass = device.getBluetoothClass();
+
+						deviceBundle.putString(BluetoothDevicesProbe.MAJOR_CLASS, BluetoothDevicesProbe.majorDeviceClass(deviceClass.getMajorDeviceClass()));
+						deviceBundle.putString(BluetoothDevicesProbe.MINOR_CLASS, BluetoothDevicesProbe.minorDeviceClass(deviceClass.getDeviceClass()));
+
+						me._foundDevices.add(deviceBundle);
+					}
+					else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction()))
+					{
+						context.unregisterReceiver(this);
+
+						Bundle bundle = new Bundle();
+
+						bundle.putString("PROBE", me.name(context));
+						bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+						bundle.putParcelableArrayList(BluetoothDevicesProbe.DEVICES, (ArrayList<Bundle>) me._foundDevices.clone());
+						bundle.putInt(BluetoothDevicesProbe.DEVICES_COUNT, me._foundDevices.size());
+
+						synchronized(me)
+						{
+							me.transmitData(context, bundle);
+						}
+
+						me._adapter = null;
+					}
+				}
+			};
+
+			IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+			filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+			context.registerReceiver(this._receiver, filter);
+		}
+
 		long now = System.currentTimeMillis();
 
 		boolean enabled = super.isEnabled(context);
@@ -284,58 +337,7 @@ public class BluetoothDevicesProbe extends Probe
 
 						if (this._adapter != null && this._adapter.isEnabled())
 						{
-							final BluetoothDevicesProbe me = this;
-
 							this._foundDevices.clear();
-
-							BroadcastReceiver bluetoothReceiver = new BroadcastReceiver()
-							{
-								@SuppressWarnings("unchecked")
-								public void onReceive(Context context, Intent intent)
-								{
-									if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction()))
-									{
-										BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-
-										Bundle deviceBundle = new Bundle();
-
-										deviceBundle.putString(BluetoothDevicesProbe.NAME, device.getName());
-										deviceBundle.putString(BluetoothDevicesProbe.ADDRESS, device.getAddress());
-										deviceBundle.putString(BluetoothDevicesProbe.BOND_STATE, BluetoothDevicesProbe.bondState(device.getBondState()));
-
-										BluetoothClass deviceClass = device.getBluetoothClass();
-
-										deviceBundle.putString(BluetoothDevicesProbe.MAJOR_CLASS, BluetoothDevicesProbe.majorDeviceClass(deviceClass.getMajorDeviceClass()));
-										deviceBundle.putString(BluetoothDevicesProbe.MINOR_CLASS, BluetoothDevicesProbe.minorDeviceClass(deviceClass.getDeviceClass()));
-
-										me._foundDevices.add(deviceBundle);
-									}
-									else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction()))
-									{
-										context.unregisterReceiver(this);
-
-										Bundle bundle = new Bundle();
-
-										bundle.putString("PROBE", me.name(context));
-										bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
-										bundle.putParcelableArrayList(BluetoothDevicesProbe.DEVICES, (ArrayList<Bundle>) me._foundDevices.clone());
-										bundle.putInt(BluetoothDevicesProbe.DEVICES_COUNT, me._foundDevices.size());
-
-										synchronized(me)
-										{
-											me.transmitData(context, bundle);
-										}
-
-										me._adapter = null;
-									}
-								}
-							};
-
-							IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-							context.registerReceiver(bluetoothReceiver, filter);
-
-							filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-							context.registerReceiver(bluetoothReceiver, filter);
 
 							this._adapter.startDiscovery();
 						}
