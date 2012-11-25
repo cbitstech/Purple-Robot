@@ -33,6 +33,7 @@ public class LocationProbe extends Probe implements LocationListener
 
 	private long _lastCheck = 0;
 	private long _lastTransmit = 0;
+	private boolean _listening = false;
 
 	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
@@ -81,9 +82,12 @@ public class LocationProbe extends Probe implements LocationListener
 				{
 					long freq = Long.parseLong(prefs.getString("config_probe_location_frequency", "300000"));
 
-					if (now - this._lastCheck > 30000 && now - this._lastCheck < freq) // Try to get position in 30 seconds...
+					if (now - this._lastCheck > 30000 && now - this._lastCheck < freq && this._listening) // Try to get position in 30 seconds...
+					{
 						locationManager.removeUpdates(this);
-					else if (now - this._lastCheck > freq)
+						this._listening = false;
+					}
+					else if (now - this._lastCheck > freq && this._listening == false)
 					{
 						if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
 							locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
@@ -91,6 +95,7 @@ public class LocationProbe extends Probe implements LocationListener
 							locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, this);
 
 						this._lastCheck = now;
+						this._listening = true;
 					}
 				}
 
@@ -99,6 +104,7 @@ public class LocationProbe extends Probe implements LocationListener
 		}
 
 		locationManager.removeUpdates(this);
+		this._listening = false;
 
 		return false;
 	}

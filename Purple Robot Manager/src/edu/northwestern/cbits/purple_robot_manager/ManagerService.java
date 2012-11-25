@@ -7,6 +7,9 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import edu.northwestern.cbits.purple_robot_manager.triggers.DateTrigger;
+import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
+
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.PendingIntent;
@@ -19,11 +22,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
-import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
-import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
-import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
-import edu.northwestern.cbits.purple_robot_manager.triggers.DateTrigger;
-import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 
 public class ManagerService extends IntentService
 {
@@ -214,8 +212,6 @@ public class ManagerService extends IntentService
 				}
 			}
 		}
-		else if (REFRESH_CONFIGURATION.equalsIgnoreCase(intent.getAction()))
-			ProbeManager.nudgeProbes(this);
 		else
 		{
 			JSONConfigFile jsonConfig = JSONConfigFile.getSharedFile(this);
@@ -260,10 +256,6 @@ public class ManagerService extends IntentService
 
 		alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 15000, pi);
 
-		Probe.loadProbeClasses(context);
-		OutputPlugin.loadPluginClasses(context);
-		ProbeManager.nudgeProbes(context);
-
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
 		prefs.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener()
@@ -276,7 +268,7 @@ public class ManagerService extends IntentService
 	        }
 	    });
 
-		context.startService(new Intent(context, PersistentService.class));
+		context.startService(new Intent(PersistentService.NUDGE_PROBES));
 
 		ManagerService._checkSetup = true;
 	}
