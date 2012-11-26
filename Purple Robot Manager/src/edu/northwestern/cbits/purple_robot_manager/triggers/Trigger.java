@@ -7,6 +7,7 @@ import org.mozilla.javascript.EvaluatorException;
 import edu.northwestern.cbits.purple_robot_manager.JavaScriptEngine;
 
 import android.content.Context;
+import android.util.Log;
 
 public abstract class Trigger
 {
@@ -40,20 +41,33 @@ public abstract class Trigger
 
 	public abstract boolean matches(Context context, Object obj);
 
-	public void execute(Context context)
+	public void execute(final Context context)
 	{
+		Log.e("PRM", "EXCECUTING " + this.name() + " -- " + this._action);
+
 		if (this._action != null)
 		{
-			try
-			{
-				JavaScriptEngine engine = new JavaScriptEngine(context);
+			final Trigger me = this;
 
-				engine.runScript(this._action);
-			}
-			catch (EvaluatorException e)
+			Runnable r = new Runnable()
 			{
-				e.printStackTrace();
-			}
+				public void run()
+				{
+					try
+					{
+						JavaScriptEngine engine = new JavaScriptEngine(context);
+
+						engine.runScript(me._action);
+					}
+					catch (EvaluatorException e)
+					{
+						e.printStackTrace();
+					}
+				}
+			};
+
+			Thread t = new Thread(new ThreadGroup("Triggers"), r, this.name(), 32768);
+			t.start();
 		}
 	}
 

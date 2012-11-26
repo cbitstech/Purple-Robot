@@ -1,8 +1,11 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Scanner;
 
 import org.json.JSONObject;
 import org.mozilla.javascript.Context;
@@ -23,6 +26,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.AssetManager;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -75,6 +79,59 @@ public class JavaScriptEngine
 			script = "var " + extrasName + " = " + extras.toString() + "; " + script;
 
 		return this._jsContext.evaluateString(this._scope, script, "<engine>", 1, null);
+	}
+
+	public boolean loadLibrary(String libraryName)
+	{
+		Log.e("PRM", "IMPORTING " + libraryName + "...");
+
+		if (this._jsContext != null && this._scope != null)
+		{
+			Log.e("PRM", "1");
+
+			try
+			{
+				Log.e("PRM", "2");
+				if (libraryName.endsWith(".js") == false)
+					libraryName += ".js";
+
+				Log.e("PRM", "3");
+
+				AssetManager am = this._context.getAssets();
+
+				InputStream jsStream = am.open("js/" + libraryName);
+
+				Log.e("PRM", "4");
+
+				// http://stackoverflow.com/questions/309424/read-convert-an-inputstream-to-a-string
+			    Scanner s = new Scanner(jsStream).useDelimiter("\\A");
+
+			    String script = "";
+
+			    if (s.hasNext())
+			    	script = s.next();
+			    else
+			    	return false;
+
+				Log.e("PRM", "5 LENGTH: " + script.length());
+
+				this._jsContext.evaluateString(this._scope, script, "<engine>", 1, null);
+
+				Log.e("PRM", "6");
+
+				return true;
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+
+			Log.e("PRM", "7");
+		}
+
+		Log.e("PRM", "8");
+
+		return false;
 	}
 
 	private Intent constructDirectLaunchIntent(final String applicationName, final NativeObject launchParams)
