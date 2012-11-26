@@ -83,25 +83,16 @@ public class JavaScriptEngine
 
 	public boolean loadLibrary(String libraryName)
 	{
-		Log.e("PRM", "IMPORTING " + libraryName + "...");
-
 		if (this._jsContext != null && this._scope != null)
 		{
-			Log.e("PRM", "1");
-
 			try
 			{
-				Log.e("PRM", "2");
 				if (libraryName.endsWith(".js") == false)
 					libraryName += ".js";
-
-				Log.e("PRM", "3");
 
 				AssetManager am = this._context.getAssets();
 
 				InputStream jsStream = am.open("js/" + libraryName);
-
-				Log.e("PRM", "4");
 
 				// http://stackoverflow.com/questions/309424/read-convert-an-inputstream-to-a-string
 			    Scanner s = new Scanner(jsStream).useDelimiter("\\A");
@@ -113,11 +104,7 @@ public class JavaScriptEngine
 			    else
 			    	return false;
 
-				Log.e("PRM", "5 LENGTH: " + script.length());
-
 				this._jsContext.evaluateString(this._scope, script, "<engine>", 1, null);
-
-				Log.e("PRM", "6");
 
 				return true;
 			}
@@ -125,11 +112,7 @@ public class JavaScriptEngine
 			{
 				e.printStackTrace();
 			}
-
-			Log.e("PRM", "7");
 		}
-
-		Log.e("PRM", "8");
 
 		return false;
 	}
