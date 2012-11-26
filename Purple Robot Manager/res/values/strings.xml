@@ -103,6 +103,7 @@
     <string name="probe_device_interaction_category">Device Interaction</string>
     <string name="probe_device_category">Device</string>
     <string name="probe_environment_category">Device</string>
+    <string name="probe_features_category">Features</string>
 
     <string name="title_contact_probe">Contact Probe</string>
     <string name="summary_contact_probe_desc">Detailed information about the contacts available to the device. Sensitive information is one way hashed to ensure user privacy.</string>

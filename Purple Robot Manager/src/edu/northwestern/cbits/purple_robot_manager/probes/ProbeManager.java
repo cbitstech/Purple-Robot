@@ -15,6 +15,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.BatteryProbe;
@@ -29,6 +30,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.SoftwareInform
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TelephonyProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.VisibleSatelliteProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.WifiAccessPointsProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.features.JavascriptFeature;
 
 public class ProbeManager
 {
@@ -58,6 +60,23 @@ public class ProbeManager
 				{
 					e.printStackTrace();
 				}
+			}
+
+			Context appContext = PurpleRobotApplication.getAppContext();
+
+			String[] featureFiles = JavascriptFeature.availableFeatures(appContext);
+			String[] featureNames = JavascriptFeature.availableFeatureNames(appContext);
+
+			for (int i = 0; i < featureFiles.length && i < featureNames.length; i++)
+			{
+				String title = featureNames[i];
+				String filename = featureFiles[i];
+
+				String script = JavascriptFeature.scriptForFeature(appContext, filename);
+
+				JavascriptFeature feature = new JavascriptFeature(title, filename, script);
+
+				ProbeManager._probeInstances.add(feature);
 			}
 		}
 
@@ -166,6 +185,13 @@ public class ProbeManager
 				CommunicationLogProbe comms = (CommunicationLogProbe) probe;
 
 				if (comms.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof JavascriptFeature)
+			{
+				JavascriptFeature jsFeature = (JavascriptFeature) probe;
+
+				if (jsFeature.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 
