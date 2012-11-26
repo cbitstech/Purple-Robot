@@ -198,7 +198,6 @@
     <string name="summary_magnetic_probe" formatted="false">%.1f X, %.1f Y, %.1f Z</string>
     <string name="summary_wifi_probe" formatted="false">Visible Access Points: %d</string>
     <string name="summary_battery_probe" formatted="false">%d%% charged (%s)</string>
-    <string name="summary_bluetooth_probe" formatted="false">%d visible devices</string>
     <string name="summary_contact_probe" formatted="false">%d contacts in address book</string>
     <string name="summary_location_probe" formatted="false">%.4f, %.4f</string>
     <string name="summary_hardware_info_probe" formatted="false">%s: %s</string>
@@ -206,7 +205,7 @@
     <string name="summary_orientation_probe" formatted="false">Azimuth: %.1f, Pitch: %.1f, Roll: %.1f</string>
     <string name="summary_activity_probe" formatted="false">High Activity: %d, Low Activity: %d</string>
     <string name="summary_cell_probe" formatted="false">Cell Tower ID: %s</string>
-    <string name="summary_light_probe" formatted="false">%.4f lux units</string>
+    <string name="summary_light_probe" formatted="false">%.2f lux units</string>
     <string name="summary_bookmarks_probe" formatted="false">%d bookmarks</string>
     <string name="summary_pressure_probe" formatted="false">%.2f mb (Alt: %.2f m)</string>
     <string name="summary_searches_probe" formatted="false">%d searches</string>

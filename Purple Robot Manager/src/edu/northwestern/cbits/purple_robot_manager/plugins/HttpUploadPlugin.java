@@ -914,6 +914,8 @@ public class HttpUploadPlugin extends OutputPlugin
 
 		if (now - this._lastSave > this.savePeriod() || this._pendingSaves.size() > 1024)
 		{
+			Log.e("PRM", "PERSISTING " + this._pendingSaves.size());
+
 			this._lastSave = now;
 
 			File pendingFolder = this.getPendingFolder();
@@ -1017,7 +1019,19 @@ public class HttpUploadPlugin extends OutputPlugin
 			{
 				this._lastSave = 0;
 				this._failCount = 0;
-				this.persistJSONObject(null);
+
+				final HttpUploadPlugin me = this;
+
+				Runnable r = new Runnable()
+				{
+					public void run()
+					{
+						me.persistJSONObject(null);
+					}
+				};
+
+				Thread t = new Thread(r);
+				t.start();
 			}
 		}
 	}

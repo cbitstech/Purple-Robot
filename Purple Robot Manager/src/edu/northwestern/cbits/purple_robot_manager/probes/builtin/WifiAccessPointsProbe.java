@@ -81,23 +81,29 @@ public class WifiAccessPointsProbe extends Probe
 						bundle.putString("PROBE", me.name(context));
 						bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
 
-						bundle.putInt(WifiAccessPointsProbe.ACCESS_POINT_COUNT, results.size());
-
 						ArrayList<Bundle> accessPoints = new ArrayList<Bundle>();
 
-						for (ScanResult result : results)
+						if (results != null)
 						{
-							Bundle pointBundle = new Bundle();
+							bundle.putInt(WifiAccessPointsProbe.ACCESS_POINT_COUNT, results.size());
 
-							pointBundle.putString(WifiAccessPointsProbe.BSSID, result.BSSID);
-							pointBundle.putString(WifiAccessPointsProbe.SSID, result.SSID);
-							pointBundle.putString(WifiAccessPointsProbe.CAPABILITIES, result.capabilities);
+							for (ScanResult result : results)
+							{
+								Bundle pointBundle = new Bundle();
 
-							pointBundle.putInt(WifiAccessPointsProbe.FREQUENCY, result.frequency);
-							pointBundle.putInt(WifiAccessPointsProbe.LEVEL, result.level);
+								pointBundle.putString(WifiAccessPointsProbe.BSSID, result.BSSID);
+								pointBundle.putString(WifiAccessPointsProbe.SSID, result.SSID);
+								pointBundle.putString(WifiAccessPointsProbe.CAPABILITIES, result.capabilities);
 
-							accessPoints.add(pointBundle);
+								pointBundle.putInt(WifiAccessPointsProbe.FREQUENCY, result.frequency);
+								pointBundle.putInt(WifiAccessPointsProbe.LEVEL, result.level);
+
+								accessPoints.add(pointBundle);
+							}
+
 						}
+						else
+							bundle.putInt(WifiAccessPointsProbe.ACCESS_POINT_COUNT, 0);
 
 						bundle.putParcelableArrayList(WifiAccessPointsProbe.ACCESS_POINTS, accessPoints);
 
