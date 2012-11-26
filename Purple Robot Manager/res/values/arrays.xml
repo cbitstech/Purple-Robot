@@ -36,7 +36,7 @@
         <item>AppDisplayPlugin</item>
         <!-- <item>DiagnosticAppDisplayPlugin</item> -->
         <item>HttpUploadPlugin</item>
-        <item>JavascriptFeaturePlugin</item>
+        <!-- <item>JavascriptFeaturePlugin</item> -->
     </array>
 
 	<string-array name="probe_boolean_labels">
