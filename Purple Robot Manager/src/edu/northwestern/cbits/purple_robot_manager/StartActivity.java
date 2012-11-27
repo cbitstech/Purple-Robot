@@ -32,6 +32,7 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -353,6 +354,10 @@ public class StartActivity extends SherlockActivity
         }
         else
         {
+        	logoView.setImageResource(R.drawable.gift);
+
+        	logoView.setScaleType(ScaleType.CENTER);
+
         	listView.setVisibility(View.GONE);
         	logoView.setVisibility(View.VISIBLE);
         }
