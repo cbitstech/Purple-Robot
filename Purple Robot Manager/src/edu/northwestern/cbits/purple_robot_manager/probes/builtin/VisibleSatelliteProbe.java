@@ -40,6 +40,7 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 
 		PreferenceScreen screen = manager.createPreferenceScreen(activity);
 		screen.setTitle(this.title(activity));
+		screen.setSummary(R.string.summary_visible_satellite_probe_desc);
 
 		String key = "satellites";
 
@@ -123,7 +124,7 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 
 	public String title(Context context)
 	{
-		return context.getString(R.string.title_builtin_satellite_probe);
+		return context.getString(R.string.title_visible_satellite_probe);
 	}
 
 	public String probeCategory(Context context)

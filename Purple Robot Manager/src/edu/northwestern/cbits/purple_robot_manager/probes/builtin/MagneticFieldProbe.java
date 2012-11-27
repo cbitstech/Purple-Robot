@@ -71,7 +71,7 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 
 	public int getTitleResource()
 	{
-		return R.string.title_builtin_magnetic_probe;
+		return R.string.title_magnetic_field_probe;
 	}
 
 	public int getCategoryResource()
@@ -238,5 +238,10 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 		}
 
 		return formatted;
+	}
+
+	public int getSummaryResource()
+	{
+		return R.string.summary_magnetic_field_probe_desc;
 	};
 }

@@ -128,32 +128,30 @@ public class WifiAccessPointsProbe extends Probe
 
 		long now = System.currentTimeMillis();
 
-		boolean enabled = super.isEnabled(context);
-
-		if (enabled)
-			enabled = prefs.getBoolean("config_probe_wifi_enabled", true);
-
-		if (enabled)
+		if (super.isEnabled(context))
 		{
-			synchronized(this)
+			if (prefs.getBoolean("config_probe_wifi_enabled", true))
 			{
-				long freq = Long.parseLong(prefs.getString("config_probe_wifi_frequency", "300000"));
-
-				if (now - this._lastCheck > freq)
+				synchronized(this)
 				{
-					WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+					long freq = Long.parseLong(prefs.getString("config_probe_wifi_frequency", "300000"));
 
-					if (wifi.isWifiEnabled())
+					if (now - this._lastCheck > freq)
 					{
-						this._lastCheck = now;
-						this._foundNetworks.clear();
+						WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 
-						wifi.startScan();
+						if (wifi.isWifiEnabled())
+						{
+							this._lastCheck = now;
+							this._foundNetworks.clear();
+
+							wifi.startScan();
+						}
 					}
 				}
-			}
 
-			return true;
+				return true;
+			}
 		}
 
 		return false;
@@ -211,6 +209,7 @@ public class WifiAccessPointsProbe extends Probe
 
 		PreferenceScreen screen = manager.createPreferenceScreen(activity);
 		screen.setTitle(this.title(activity));
+		screen.setSummary(R.string.summary_wifi_probe_desc);
 
 		CheckBoxPreference enabled = new CheckBoxPreference(activity);
 		enabled.setTitle(R.string.title_enable_probe);

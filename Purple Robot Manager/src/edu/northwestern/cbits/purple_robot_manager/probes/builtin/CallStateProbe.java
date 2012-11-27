@@ -13,24 +13,24 @@ import android.preference.CheckBoxPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.telephony.TelephonyManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
-public class ScreenProbe extends Probe
+public class CallStateProbe extends Probe
 {
-	protected static final String SCREEN_ACTIVE = "SCREEN_ACTIVE";
-
+	protected static final String CALL_STATE = "CALL_STATE";
 	private boolean _isInited = false;
 	private boolean _isEnabled = false;
 
 	public String name(Context context)
 	{
-		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.ScreenProbe";
+		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.CallStateProbe";
 	}
 
 	public String title(Context context)
 	{
-		return context.getString(R.string.title_screen_probe);
+		return context.getString(R.string.title_call_state_probe);
 	}
 
 	public String probeCategory(Context context)
@@ -42,10 +42,9 @@ public class ScreenProbe extends Probe
 	{
 		if (!this._isInited)
 		{
-			IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
-			filter.addAction(Intent.ACTION_SCREEN_OFF);
+			IntentFilter filter = new IntentFilter(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
 
-			final ScreenProbe me = this;
+			final CallStateProbe me = this;
 
 			BroadcastReceiver receiver = new BroadcastReceiver()
 			{
@@ -53,16 +52,13 @@ public class ScreenProbe extends Probe
 				{
 					if (me._isEnabled)
 					{
+						TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+
 						Bundle bundle = new Bundle();
 						bundle.putString("PROBE", me.name(context));
 						bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
 
-						final String action = intent.getAction();
-
-						if (Intent.ACTION_SCREEN_OFF.equals(action))
-							bundle.putBoolean(ScreenProbe.SCREEN_ACTIVE, false);
-						else if (Intent.ACTION_SCREEN_ON.equals(action))
-							bundle.putBoolean(ScreenProbe.SCREEN_ACTIVE, true);
+						bundle.putString(CallStateProbe.CALL_STATE, me.getCallState(tm.getCallState()));
 
 						me.transmitData(context, bundle);
 					}
@@ -76,43 +72,55 @@ public class ScreenProbe extends Probe
 
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-		this._isEnabled = false;
+		 this._isEnabled = false;
 
 		if (super.isEnabled(context))
 		{
-			if (prefs.getBoolean("config_probe_screen_enabled", true))
+			if (prefs.getBoolean("config_probe_call_state_enabled", true))
+			{
+				TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+
+				Bundle bundle = new Bundle();
+				bundle.putString("PROBE", this.name(context));
+				bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+
+				bundle.putString(CallStateProbe.CALL_STATE, this.getCallState(tm.getCallState()));
+
+				this.transmitData(context, bundle);
+
 				this._isEnabled = true;
+			}
 		}
 
 		return this._isEnabled;
 	}
 
-	public String summarizeValue(Context context, Bundle bundle)
+	protected String getCallState(int callState)
 	{
-		boolean active = bundle.getBoolean(ScreenProbe.SCREEN_ACTIVE, false);
+		String state = "Unknown";
 
-		if (active)
-			return context.getResources().getString(R.string.summary_screen_probe_active);
+		switch(callState)
+		{
+			case TelephonyManager.CALL_STATE_IDLE:
+				state = "Idle";
+				break;
+			case TelephonyManager.CALL_STATE_OFFHOOK:
+				state = "Off-Hook";
+				break;
+			case TelephonyManager.CALL_STATE_RINGING:
+				state = "Ringing";
+				break;
+		}
 
-		return context.getResources().getString(R.string.summary_screen_probe_inactive);
+		return state;
 	}
 
-/*
-	public Bundle formattedBundle(Context context, Bundle bundle)
+	public String summarizeValue(Context context, Bundle bundle)
 	{
-		Bundle formatted = super.formattedBundle(context, bundle);
+		String state = bundle.getString(CallStateProbe.CALL_STATE);
 
-		@SuppressWarnings("unchecked")
-		ArrayList<Bundle> array = (ArrayList<Bundle>) bundle.get(HardwareInformationProbe.DEVICES);
-		int count = bundle.getInt(HardwareInformationProbe.DEVICES_COUNT);
-
-		Bundle devicesBundle = this.bundleForDevicesArray(context, array);
-
-		formatted.putBundle(String.format(context.getString(R.string.display_bluetooth_devices_title), count), devicesBundle);
-
-		return formatted;
-	};
-*/
+		return String.format(context.getResources().getString(R.string.summary_call_state_probe), state);
+	}
 
 	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
@@ -121,11 +129,11 @@ public class ScreenProbe extends Probe
 
 		PreferenceScreen screen = manager.createPreferenceScreen(activity);
 		screen.setTitle(this.title(activity));
-		screen.setSummary(R.string.summary_screen_probe_desc);
+		screen.setSummary(R.string.summary_call_state_probe_desc);
 
 		CheckBoxPreference enabled = new CheckBoxPreference(activity);
 		enabled.setTitle(R.string.title_enable_probe);
-		enabled.setKey("config_probe_screen_enabled");
+		enabled.setKey("config_probe_call_state_enabled");
 		enabled.setDefaultValue(true);
 
 		screen.addPreference(enabled);

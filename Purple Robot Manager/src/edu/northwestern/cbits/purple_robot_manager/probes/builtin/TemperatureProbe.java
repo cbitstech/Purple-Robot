@@ -130,6 +130,7 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 		return R.string.probe_environment_category;
 	}
 
+	@SuppressWarnings("deprecation")
 	public boolean isEnabled(Context context)
 	{
         SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
@@ -229,5 +230,10 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 		float lux = bundle.getFloatArray("TEMPERATURE")[0];
 
 		return String.format(context.getResources().getString(R.string.summary_temperature_probe), lux);
+	}
+
+	public int getSummaryResource()
+	{
+		return R.string.summary_temperature_probe_desc;
 	}
 }

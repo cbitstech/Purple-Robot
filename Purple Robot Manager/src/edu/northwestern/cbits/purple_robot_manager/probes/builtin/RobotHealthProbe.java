@@ -40,7 +40,7 @@ public class RobotHealthProbe extends Probe
 
 	public String title(Context context)
 	{
-		return context.getString(R.string.title_builtin_robot_probe);
+		return context.getString(R.string.title_robot_probe);
 	}
 
 	public String probeCategory(Context context)
@@ -205,16 +205,17 @@ public class RobotHealthProbe extends Probe
 
 		PreferenceScreen screen = manager.createPreferenceScreen(activity);
 		screen.setTitle(this.title(activity));
+		screen.setSummary(R.string.summary_robot_probe_desc);
 
 		CheckBoxPreference enabled = new CheckBoxPreference(activity);
 		enabled.setTitle(R.string.title_enable_probe);
-		enabled.setKey("config_probe_software_enabled");
+		enabled.setKey("config_probe_robot_enabled");
 		enabled.setDefaultValue(true);
 
 		screen.addPreference(enabled);
 
 		ListPreference duration = new ListPreference(activity);
-		duration.setKey("config_probe_software_frequency");
+		duration.setKey("config_probe_robot_frequency");
 		duration.setDefaultValue("300000");
 		duration.setEntryValues(R.array.probe_satellite_frequency_values);
 		duration.setEntries(R.array.probe_satellite_frequency_labels);

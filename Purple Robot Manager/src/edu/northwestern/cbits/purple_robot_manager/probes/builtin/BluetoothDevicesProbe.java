@@ -47,7 +47,7 @@ public class BluetoothDevicesProbe extends Probe
 
 	public String title(Context context)
 	{
-		return context.getString(R.string.title_builtin_bluetooth_probe);
+		return context.getString(R.string.title_bluetooth_probe);
 	}
 
 	public String probeCategory(Context context)
@@ -436,6 +436,7 @@ public class BluetoothDevicesProbe extends Probe
 
 		PreferenceScreen screen = manager.createPreferenceScreen(activity);
 		screen.setTitle(this.title(activity));
+		screen.setSummary(R.string.summary_bluetooth_probe_desc);
 
 		CheckBoxPreference enabled = new CheckBoxPreference(activity);
 		enabled.setTitle(R.string.title_enable_probe);

@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.util.Scanner;
 
 import org.json.JSONObject;
-import org.mozilla.javascript.Scriptable;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -13,6 +12,7 @@ import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import edu.northwestern.cbits.purple_robot_manager.JavaScriptEngine;
 import edu.northwestern.cbits.purple_robot_manager.R;
 
 public class JavascriptFeature extends Feature
@@ -112,18 +112,13 @@ public class JavascriptFeature extends Feature
 		if (this._script == null)
 			this._script = JavascriptFeature.scriptForFeature(context, this._name);
 
-		org.mozilla.javascript.Context jsContext = org.mozilla.javascript.Context.enter();
-		jsContext.setOptimizationLevel(-1);
-
-		Scriptable scope = jsContext.initStandardObjects();
-
 		String script = this._script;
 
 		script = "var probe = " + json.toString() + "; " + script;
 
-		Object o =  jsContext.evaluateString(scope, script, "<engine>", 1, null);
+		JavaScriptEngine engine = new JavaScriptEngine(context);
 
-		Log.e("PRM", "GOT VALUE " + o + " " + o.getClass());
+		Object o =  engine.runScript(script);
 
 		Bundle bundle = new Bundle();
 		bundle.putString("PROBE", this.name(context));
@@ -137,8 +132,10 @@ public class JavascriptFeature extends Feature
 
 			bundle.putDouble(Feature.FEATURE_VALUE, d.doubleValue());
 		}
-
-		Log.e("PRM", "XMITING " + bundle);
+		else
+		{
+			Log.e("PRM", "JS PLUGIN GOT UNKNOWN VALUE " + o + " " + o.getClass());
+		}
 
 		this.transmitData(context, bundle);
 	}

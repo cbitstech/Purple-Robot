@@ -41,6 +41,7 @@ public abstract class ContinuousProbe extends Probe
 
 		PreferenceScreen screen = manager.createPreferenceScreen(activity);
 		screen.setTitle(this.title(activity));
+		screen.setSummary(this.summary(activity));
 
 		String key = this.getPreferenceKey();
 
@@ -79,6 +80,8 @@ public abstract class ContinuousProbe extends Probe
 	public abstract int getResourceFrequencyValues();
 
 	public abstract int getTitleResource();
+	public abstract int getSummaryResource();
+
 	public abstract int getCategoryResource();
 	public abstract long getFrequency();
 	public abstract String getPreferenceKey();
@@ -91,6 +94,11 @@ public abstract class ContinuousProbe extends Probe
 	public String title(Context context)
 	{
 		return context.getString(this.getTitleResource());
+	}
+
+	public String summary(Context context)
+	{
+		return context.getString(this.getSummaryResource());
 	}
 
 	public String probeCategory(Context context)

@@ -45,7 +45,7 @@ public class HardwareInformationProbe extends Probe
 
 	public String title(Context context)
 	{
-		return context.getString(R.string.title_builtin_hardware_probe);
+		return context.getString(R.string.title_hardware_info_probe);
 	}
 
 	public String probeCategory(Context context)
@@ -143,6 +143,7 @@ public class HardwareInformationProbe extends Probe
 
 		PreferenceScreen screen = manager.createPreferenceScreen(activity);
 		screen.setTitle(this.title(activity));
+		screen.setSummary(R.string.summary_hardware_info_probe_desc);
 
 		CheckBoxPreference enabled = new CheckBoxPreference(activity);
 		enabled.setTitle(R.string.title_enable_probe);

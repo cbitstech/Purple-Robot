@@ -122,7 +122,7 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 
 	public int getTitleResource()
 	{
-		return R.string.title_builtin_gyroscope_probe;
+		return R.string.title_gyroscope_probe;
 	}
 
 	public int getCategoryResource()
@@ -236,5 +236,10 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 		float zReading = bundle.getFloatArray("Z")[0];
 
 		return String.format(context.getResources().getString(R.string.summary_gyroscope_probe), xReading, yReading, zReading);
+	}
+
+	public int getSummaryResource()
+	{
+		return R.string.summary_gyroscope_probe_desc;
 	}
 }

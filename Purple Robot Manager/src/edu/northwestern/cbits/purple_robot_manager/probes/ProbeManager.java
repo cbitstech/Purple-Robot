@@ -20,6 +20,7 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.BatteryProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.BluetoothDevicesProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CallStateProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CommunicationLogProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.HardwareInformationProbe;
@@ -185,6 +186,13 @@ public class ProbeManager
 				CommunicationLogProbe comms = (CommunicationLogProbe) probe;
 
 				if (comms.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof CallStateProbe)
+			{
+				CallStateProbe callState = (CallStateProbe) probe;
+
+				if (callState.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 			else if (probe instanceof JavascriptFeature)

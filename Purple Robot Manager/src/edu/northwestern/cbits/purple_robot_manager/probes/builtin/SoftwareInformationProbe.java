@@ -45,7 +45,7 @@ public class SoftwareInformationProbe extends Probe
 
 	public String title(Context context)
 	{
-		return context.getString(R.string.title_builtin_software_probe);
+		return context.getString(R.string.title_software_info_probe);
 	}
 
 	public String probeCategory(Context context)
@@ -159,6 +159,7 @@ public class SoftwareInformationProbe extends Probe
 
 		PreferenceScreen screen = manager.createPreferenceScreen(activity);
 		screen.setTitle(this.title(activity));
+		screen.setSummary(R.string.summary_software_info_probe_desc);
 
 		CheckBoxPreference enabled = new CheckBoxPreference(activity);
 		enabled.setTitle(R.string.title_enable_probe);

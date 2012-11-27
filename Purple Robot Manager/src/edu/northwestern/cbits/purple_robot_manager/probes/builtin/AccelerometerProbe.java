@@ -127,7 +127,7 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 
 	public int getTitleResource()
 	{
-		return R.string.title_builtin_accelerometer_probe;
+		return R.string.title_accelerometer_probe;
 	}
 
 	public int getCategoryResource()
@@ -243,5 +243,10 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 		float zReading = bundle.getFloatArray("Z")[0];
 
 		return String.format(context.getResources().getString(R.string.summary_accelerator_probe), xReading, yReading, zReading);
+	}
+
+	public int getSummaryResource()
+	{
+		return R.string.summary_accelerometer_probe_desc;
 	}
 }

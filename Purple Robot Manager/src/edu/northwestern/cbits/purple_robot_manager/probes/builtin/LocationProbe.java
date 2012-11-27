@@ -42,6 +42,7 @@ public class LocationProbe extends Probe implements LocationListener
 
 		PreferenceScreen screen = manager.createPreferenceScreen(activity);
 		screen.setTitle(this.title(activity));
+		screen.setSummary(R.string.summary_location_probe_desc);
 
 		String key = "location";
 
