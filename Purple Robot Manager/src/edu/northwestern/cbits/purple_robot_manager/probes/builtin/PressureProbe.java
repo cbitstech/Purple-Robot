@@ -125,7 +125,7 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 
 	public int getTitleResource()
 	{
-		return R.string.title_builtin_pressure_probe;
+		return R.string.title_pressure_probe;
 	}
 
 	public int getCategoryResource()
@@ -245,5 +245,10 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 		float altitude = bundle.getFloatArray("ALTITUDE")[0];
 
 		return String.format(context.getResources().getString(R.string.summary_pressure_probe), pressure, altitude);
+	}
+
+	public int getSummaryResource()
+	{
+		return R.string.summary_pressure_probe_desc;
 	}
 }

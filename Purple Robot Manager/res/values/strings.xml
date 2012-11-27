@@ -51,9 +51,6 @@
 
     <string name="title_preference_probes_available_category">Available Probes</string>
 
-    <string name="title_location_probe">Location Probe</string>
-    <string name="summary_location_probe_desc">Records the most accurate location available for the device, given device limitations and respecting battery life.</string>
-
     <string name="title_enable_probe">Enable Probe</string>
     <string name="config_notifications_category_label">Sensors &amp; Probes</string>
 
@@ -72,26 +69,14 @@
     <string name="title_orientation_probe">Device Orientation Probe</string>
     <string name="summary_orientation_probe_desc">Measures orientation of device.</string>
 
-    <string name="title_bluetooth_probe">Bluetooth Probe</string>
-    <string name="summary_bluetooth_probe_desc">Detects Bluetooth devices within range.</string>
-
-    <string name="title_wifi_probe">WiFi Probe</string>
-    <string name="summary_wifi_probe_desc">Records available wireless (WiFi) access points.</string>
-
     <string name="title_cell_probe">Cell Tower Probe</string>
     <string name="summary_cell_probe_desc">Records identifiers for the current cell tower that the device is connected to.</string>
-
-    <string name="title_accelerometer_probe">Accelerometer Probe</string>
-    <string name="summary_accelerometer_probe_desc">Measures the acceleration applied to the device. All values are in SI units (m/s^2).</string>
 
     <string name="title_gravity_probe">Gravity Probe</string>
     <string name="summary_gravity_probe_desc">A three dimensional vector indicating the direction and magnitude of gravity. Units are m/s^2. The coordinate system is the same as is used by the acceleration sensor.</string>
 
     <string name="title_linear_acceleration_probe">Linear Acceleration Probe</string>
     <string name="summary_linear_acceleration_probe_desc">Records a three dimensional vector indicating acceleration along each device axis, not including gravity. All values have units of m/s^2. The coordinate system is the same as is used by the acceleration sensor.</string>
-
-    <string name="title_gyroscope_probe">Gyroscope Probe</string>
-    <string name="summary_gyroscope_probe_desc">Measures angular speed around each axis.</string>
 
     <string name="title_rotation_vector_probe">Rotation Vector Probe</string>
     <string name="summary_rotation_vector_probe_desc">The rotation vector represents the orientation of the device as a combination of an angle and an axis, in which the device has rotated through an angle θ around an axis &lt;x, y, z&gt;.</string>
@@ -111,17 +96,11 @@
     <string name="probe_contact_full_label">Use Full Contact List</string>
     <string name="probe_contact_full_summary">If \'yes\', return all contacts, otherwise return contacts that have changed since the most recent scan.</string>
 
-    <string name="title_call_log_probe">Call Log Probe</string>
-    <string name="summary_call_log_probe_desc">Records the calls that are made by the device. Sensitive information is normalized and hashed consistently and can be compared to contacts on this device, or with other devices.</string>
-
     <string name="title_sms_probe">SMS Probe</string>
     <string name="summary_sms_probe_desc">Messages sent and received by this device using SMS. Sensitive data is hashed for user privacy.</string>
 
     <string name="title_activity_probe">Activity Probe</string>
     <string name="summary_activity_probe_desc">Records how active the person is. Uses the AccelerometerProbe data to calculate how many intervals the variance of a device\'s acceleration is above a certain threshold.</string>
-
-    <string name="title_screen_probe">Screen Probe</string>
-    <string name="summary_screen_probe_desc">Records when the screen turns off and on.</string>
 
     <string name="title_videos_probe">Videos Probe</string>
     <string name="summary_videos_probe_desc">Information about video files on the device.</string>
@@ -141,58 +120,16 @@
     <string name="title_android_info_probe">Android Information Probe</string>
     <string name="summary_android_info_probe_desc">Information about the version of Android the device is running.</string>
 
-    <string name="title_battery_probe">Battery Probe</string>
-    <string name="summary_battery_probe_desc">Information about the type and current state of the battery in the device.</string>
-
-    <string name="title_hardware_info_probe">Hardware Information Probe</string>
-    <string name="summary_hardware_info_probe_desc">Details about the specific hardware the device is running, including component identifiers.</string>
-
     <string name="title_installed_applications_probe">Installed Applications Probe</string>
     <string name="summary_installed_applications_probe_desc">What applications are installed on the device. Also specifies applications that were uninstalled.</string>
 
     <string name="title_running_applications_probe">Running Applications Probe</string>
     <string name="summary_running_applications_probe_desc">The current running stack of applications.</string>
 
-    <string name="title_light_probe">Light Probe</string>
-    <string name="summary_light_probe_desc">Detects the ambient light level in SI lux units.</string>
-
-    <string name="title_magnetic_field_probe">Magnetic Field Probe</string>
-    <string name="summary_magnetic_field_probe_desc">Detect the local magnetic field. Can be used as to detect the earth\'s magnetic field, but may be distorted by metal objects around device.</string>
-
-    <string name="title_pressure_probe">Pressure Probe</string>
-    <string name="summary_pressure_probe_desc">Records the pressure on the touch screen of the devices.</string>
-
-    <string name="title_proximity_probe">Proximity Probe</string>
-    <string name="summary_proximity_probe_desc">How far the front of the device is from an object.</string>
-
-    <string name="title_telephony_probe">Telephony Probe</string>
-    <string name="summary_telephony_probe_desc">Records telephony hardware, software, and account information.</string>
-
-    <string name="title_temperature_probe">Temperature Probe</string>
-    <string name="summary_temperature_probe_desc">Used to record temperature. Implementation depends on the device and does not exist on all devices. Some will record temperature of battery, others temperature of CPU or environment.</string>
-
     <string name="title_time_offset_probe">Time Offset Probe</string>
     <string name="summary_time_offset_probe_desc">Checks NTP servers to determine the devices current offset from the time servers.</string>
 
     <string name="title_probe_readings">Status</string>
-
-    <string name="title_builtin_pressure_probe">Pressure Probe (Built-in)</string>
-    <string name="summary_builtin_pressure_probe_desc">Uses a native sensor to record pressure readings continuously.</string>
-
-    <string name="title_builtin_accelerometer_probe">Accelerometer Probe (Built-in)</string>
-    <string name="summary_builtin_accelerometer_probe_desc">Uses a native acceletmeter to record acceleration vector continuously.</string>
-
-    <string name="title_builtin_gyroscope_probe">Gyroscope Probe (Built-in)</string>
-    <string name="summary_builtin_gyroscope_probe_desc">Measures angular speed around each axis.</string>
-
-    <string name="title_builtin_magnetic_probe">Magnetic Field Probe (Built-in)</string>
-    <string name="summary_builtin_magnetic_field_probe_desc">Detect the local magnetic field. Can be used as to detect the earth\'s magnetic field, but may be distorted by metal objects around device.</string>
-
-  	<string name="title_communication_probe">Call &amp; Message Info</string>
-
-	<string name="title_builtin_satellite_probe">Visible Satellite Probe</string>
-
-	<string name="title_builtin_bluetooth_probe">Visible Bluetooth Probe</string>
 
     <string name="summary_accelerator_probe" formatted="false">%.2f X, %.2f Y, %.2f Z</string>
     <string name="summary_gyroscope_probe" formatted="false">%.2f X, %.2f Y, %.2f Z</string>
@@ -219,6 +156,7 @@
     <string name="summary_satellite_probe" formatted="false">Visible Satellites: %d (%.2f Avg. SNR)</string>
 
     <string name="summary_bluetooth_probe" formatted="false">Visible Bluetooth Devices: %d</string>
+    <string name="summary_call_state_probe" formatted="false">Current Call State: %s</string>
 
     <string name="summary_sms_probe" formatted="false">%d messages</string>
     <string name="summary_tasks_probe" formatted="false">%d running tasks</string>
@@ -294,7 +232,7 @@
     <string name="display_battery_health_cold">Cold</string>
 	<string name="display_battery_health_dead">Dead</string>
 	<string name="display_battery_health_good">Good</string>
-		<string name="display_battery_health_overheat">Overheated</string>
+	<string name="display_battery_health_overheat">Overheated</string>
     <string name="display_battery_health_over_voltage">Over Voltage</string>
     <string name="display_battery_health_failure">Unknown Failure</string>
     <string name="display_battery_health_tech_label">Technology</string>
@@ -315,12 +253,6 @@
 
     <string name="display_data_bundle">Data Bundle</string>
 
-    <string name="title_builtin_software_probe">Software Information</string>
-    <string name="title_builtin_hardware_probe">Hardware Information</string>
-    <string name="title_builtin_telephony_probe">Telephony Information</string>
-    <string name="title_builtin_robot_probe">Purple Robot Health</string>
-    <string name="title_builtin_screen_probe">Screen State</string>
-
     <string name="summary_screen_probe_active">Screen State: Active</string>
     <string name="summary_screen_probe_inactive">Screen State: Inactive</string>
 
@@ -331,4 +263,79 @@
     <string name="label_battery_not_charging">Not Charging</string>
 
 
+    <!-- Visible Satellite Probe -->
+    <string name="title_visible_satellite_probe">Visible Satellites</string>
+    <string name="summary_visible_satellite_probe_desc">Observes visible GPS satellites to help determine location, cloud cover, and other information.</string>
+
+    <!-- Software Information Probe -->
+    <string name="title_software_info_probe">Software Information</string>
+    <string name="summary_software_info_probe_desc">Collects information about software installed and running on the current device.</string>
+
+    <!-- Accelerometer Probe -->
+    <string name="title_accelerometer_probe">Accelerometer Probe</string>
+    <string name="summary_accelerometer_probe_desc">Measures the acceleration applied to the device. All values are in SI units (m/s^2).</string>
+
+    <!-- Gyroscope Probe -->
+    <string name="title_gyroscope_probe">Gyroscope Probe</string>
+    <string name="summary_gyroscope_probe_desc">Measures angular speed around each axis.</string>
+
+    <!-- Light Probe -->
+    <string name="title_light_probe">Light Probe</string>
+    <string name="summary_light_probe_desc">Detects the ambient light level in SI lux units.</string>
+
+    <!-- Magnetic Probe -->
+    <string name="title_magnetic_field_probe">Magnetic Field Probe</string>
+    <string name="summary_magnetic_field_probe_desc">Detect the local magnetic field. Can be used as to detect the earth\'s magnetic field, but may be distorted by metal objects around device.</string>
+
+    <!-- Pressure Probe -->
+    <string name="title_pressure_probe">Pressure Probe</string>
+    <string name="summary_pressure_probe_desc">Records the pressure on the touch screen of the devices.</string>
+
+    <!-- Proximity Probe -->
+    <string name="title_proximity_probe">Proximity Probe</string>
+    <string name="summary_proximity_probe_desc">How far the front of the device is from an object.</string>
+
+    <!-- Temperature Probe -->
+    <string name="title_temperature_probe">Temperature Probe</string>
+    <string name="summary_temperature_probe_desc">Used to record temperature. Implementation depends on the device and does not exist on all devices. Some will record temperature of battery, others temperature of CPU or environment.</string>
+
+    <!-- Battery Probe -->
+    <string name="title_battery_probe">Battery Probe</string>
+    <string name="summary_battery_probe_desc">Information about the type and current state of the battery in the device.</string>
+
+    <!-- Bluetooth Devices Probe -->
+    <string name="title_bluetooth_probe">Visible Bluetooth Probe</string>
+    <string name="summary_bluetooth_probe_desc">Detects Bluetooth devices within range.</string>
+
+    <!-- Call State Probe -->
+  	<string name="title_call_state_probe">Current Call State</string>
+    <string name="summary_call_state_probe_desc">Observes whether the mobile phone is idle or in use.</string>
+
+    <!-- Communication Log Probe -->
+  	<string name="title_communication_probe">Call &amp; Message Info</string>
+    <string name="summary_communication_probe_desc">Generates statistics and counts about phone, SMS, and other communication uses.</string>
+
+    <!-- Hardware Info Probe -->
+    <string name="title_hardware_info_probe">Hardware Information Probe</string>
+    <string name="summary_hardware_info_probe_desc">Details about the specific hardware the device is running, including component identifiers.</string>
+
+    <!-- Location Probe -->
+    <string name="title_location_probe">Location Probe</string>
+    <string name="summary_location_probe_desc">Records the most accurate location available for the device, given device limitations and respecting battery life.</string>
+
+    <!-- Purple Robot Health Probe -->
+    <string name="title_robot_probe">Purple Robot Health</string>
+    <string name="summary_robot_probe_desc">Summarizes the current state of the Purple Robot app, including the amount of data to be transmitted to the server.</string>
+
+    <!-- Screen Probe -->
+    <string name="title_screen_probe">Screen Probe</string>
+    <string name="summary_screen_probe_desc">Records when the screen turns off and on.</string>
+
+    <!-- Wifi Probe -->
+    <string name="title_wifi_probe">WiFi Probe</string>
+    <string name="summary_wifi_probe_desc">Records available wireless (WiFi) access points and relevant connection information.</string>
+
+    <!-- Telephony Probe -->
+    <string name="title_telephony_probe">Telephony Probe</string>
+    <string name="summary_telephony_probe_desc">Records telephony hardware, software, and account information.</string>
 </resources>

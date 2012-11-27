@@ -12,6 +12,7 @@
         <item>builtin.AccelerometerProbe</item>
         <item>builtin.BatteryProbe</item>
         <item>builtin.BluetoothDevicesProbe</item>
+        <item>builtin.CallStateProbe</item>
         <item>builtin.CommunicationLogProbe</item>
         <item>builtin.GyroscopeProbe</item>
         <item>builtin.HardwareInformationProbe</item>
@@ -36,7 +37,7 @@
         <item>AppDisplayPlugin</item>
         <!-- <item>DiagnosticAppDisplayPlugin</item> -->
         <item>HttpUploadPlugin</item>
-        <!-- <item>JavascriptFeaturePlugin</item> -->
+        <item>JavascriptFeaturePlugin</item>
     </array>
 
 	<string-array name="probe_boolean_labels">

@@ -230,4 +230,9 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 
 		return String.format(context.getResources().getString(R.string.summary_proximity_value_probe), distance);
 	}
+
+	public int getSummaryResource()
+	{
+		return R.string.summary_proximity_probe_desc;
+	}
 }

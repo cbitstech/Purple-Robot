@@ -230,4 +230,9 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 
 		return String.format(context.getResources().getString(R.string.summary_light_probe), lux);
 	}
+
+	public int getSummaryResource()
+	{
+		return R.string.summary_light_probe_desc;
+	}
 }
