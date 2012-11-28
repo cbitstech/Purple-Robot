@@ -26,6 +26,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProb
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.HardwareInformationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RobotHealthProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RunningSoftwareProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ScreenProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.SoftwareInformationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TelephonyProbe;
@@ -208,6 +209,13 @@ public class ProbeManager
 				DeviceInUseFeature device = (DeviceInUseFeature) probe;
 
 				if (device.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof RunningSoftwareProbe)
+			{
+				RunningSoftwareProbe software = (RunningSoftwareProbe) probe;
+
+				if (software.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 
