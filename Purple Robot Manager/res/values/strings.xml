@@ -338,4 +338,8 @@
     <!-- Telephony Probe -->
     <string name="title_telephony_probe">Telephony Probe</string>
     <string name="summary_telephony_probe_desc">Records telephony hardware, software, and account information.</string>
+
+    <!-- Device In Use Feature -->
+    <string name="title_device_use_feature">Device In Use</string>
+    <string name="summary_device_use_feature_desc">Indicates whether the device is in use.</string>
 </resources>
