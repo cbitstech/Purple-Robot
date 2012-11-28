@@ -19,13 +19,19 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class CallStateProbe extends Probe
 {
-	protected static final String CALL_STATE = "CALL_STATE";
+	public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.CallStateProbe";
+
+	public static final String STATE_IDLE = "Idle";
+	public static final String STATE_OFF_HOOK = "Off-Hook";
+	public static final String STATE_RINGING = "Ringing";
+
+	public static final String CALL_STATE = "CALL_STATE";
 	private boolean _isInited = false;
 	private boolean _isEnabled = false;
 
 	public String name(Context context)
 	{
-		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.CallStateProbe";
+		return CallStateProbe.NAME;
 	}
 
 	public String title(Context context)
@@ -102,13 +108,13 @@ public class CallStateProbe extends Probe
 		switch(callState)
 		{
 			case TelephonyManager.CALL_STATE_IDLE:
-				state = "Idle";
+				state = CallStateProbe.STATE_IDLE;
 				break;
 			case TelephonyManager.CALL_STATE_OFFHOOK:
-				state = "Off-Hook";
+				state = CallStateProbe.STATE_OFF_HOOK;
 				break;
 			case TelephonyManager.CALL_STATE_RINGING:
-				state = "Ringing";
+				state = CallStateProbe.STATE_RINGING;
 				break;
 		}
 

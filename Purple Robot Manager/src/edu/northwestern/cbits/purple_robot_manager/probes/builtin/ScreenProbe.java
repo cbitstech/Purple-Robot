@@ -18,14 +18,16 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class ScreenProbe extends Probe
 {
-	protected static final String SCREEN_ACTIVE = "SCREEN_ACTIVE";
+	public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.ScreenProbe";
+
+	public static final String SCREEN_ACTIVE = "SCREEN_ACTIVE";
 
 	private boolean _isInited = false;
 	private boolean _isEnabled = false;
 
 	public String name(Context context)
 	{
-		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.ScreenProbe";
+		return ScreenProbe.NAME;
 	}
 
 	public String title(Context context)

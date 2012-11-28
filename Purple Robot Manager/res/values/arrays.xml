@@ -28,6 +28,9 @@
         <item>builtin.TemperatureProbe</item>
         <item>builtin.VisibleSatelliteProbe</item>
         <item>builtin.WifiAccessPointsProbe</item>
+
+        <item>features.DeviceInUseFeature</item>
+
         <!-- <item>builtin.BluetoothReceiverProbe</item> -->
    	</array>
 

@@ -831,18 +831,21 @@ public class HttpUploadPlugin extends OutputPlugin
 
 					me._uploading = false;
 
-					if (continueUpload || (me._failCount > 1 && me._failCount < MAX_RETRIES))
+					Log.e("PRM", "FAIL COUNT: " + me._failCount);
+
+					if (continueUpload || (me._failCount > 0 && me._failCount < MAX_RETRIES))
 					{
+						me._lastUpload = 0;
+
 						try
 						{
 							Thread.sleep(1000);
+							me.uploadPendingObjects();
 						}
 						catch (InterruptedException e)
 						{
 
 						}
-
-						me._lastUpload = 0;
 					}
 				}
 			};
@@ -914,8 +917,6 @@ public class HttpUploadPlugin extends OutputPlugin
 
 		if (now - this._lastSave > this.savePeriod() || this._pendingSaves.size() > 1024)
 		{
-			Log.e("PRM", "PERSISTING " + this._pendingSaves.size());
-
 			this._lastSave = now;
 
 			File pendingFolder = this.getPendingFolder();
