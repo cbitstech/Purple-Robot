@@ -43,8 +43,6 @@ public abstract class Trigger
 
 	public void execute(final Context context)
 	{
-		Log.e("PRM", "EXCECUTING " + this.name() + " -- " + this._action);
-
 		if (this._action != null)
 		{
 			final Trigger me = this;

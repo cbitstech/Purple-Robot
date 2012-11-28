@@ -89,7 +89,7 @@ public class HttpUploadPlugin extends OutputPlugin
 	private final static long MAX_UPLOAD_PERIOD = 3600000;
 	private final static long MIN_UPLOAD_PERIOD = 300000;
 
-	private final static long MAX_RETRIES = 16;
+	private final static long MAX_RETRIES = 4;
 
 	private final static long MAX_UPLOAD_SIZE = 262144; // 512KB
 	private final static long MIN_UPLOAD_SIZE = 16384; // 16KB
@@ -712,8 +712,6 @@ public class HttpUploadPlugin extends OutputPlugin
 									String errorMessage = String.format(resources.getString(R.string.message_server_error),	status);
 									me.broadcastMessage(errorMessage);
 
-									Log.e("PRM", "XMITTED " + httpPost.getEntity().getContentLength() + " BYTES");
-
 									me._failCount += 1;
 
 									me._throughput = 0.0;
@@ -830,8 +828,6 @@ public class HttpUploadPlugin extends OutputPlugin
 					}
 
 					me._uploading = false;
-
-					Log.e("PRM", "FAIL COUNT: " + me._failCount);
 
 					if (continueUpload || (me._failCount > 0 && me._failCount < MAX_RETRIES))
 					{

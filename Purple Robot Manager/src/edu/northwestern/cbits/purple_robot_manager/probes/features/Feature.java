@@ -29,6 +29,7 @@ public abstract class Feature extends Probe
 
 		PreferenceScreen screen = manager.createPreferenceScreen(activity);
 		screen.setTitle(this.title(activity));
+		screen.setSummary(this.summary(activity));
 
 		CheckBoxPreference enabled = new CheckBoxPreference(activity);
 		enabled.setTitle(R.string.title_enable_probe);
@@ -39,6 +40,8 @@ public abstract class Feature extends Probe
 
 		return screen;
 	}
+
+	protected abstract String summary(Context context);
 
 	public void updateFromJSON(Context context, JSONObject json) throws JSONException
 	{

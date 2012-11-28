@@ -39,6 +39,11 @@ public class DeviceInUseFeature extends Feature
 		return context.getString(R.string.title_device_use_feature);
 	}
 
+	public String summary(Context context)
+	{
+		return context.getString(R.string.summary_device_use_feature_desc);
+	}
+
 	public boolean isEnabled(Context context)
 	{
 		if (!this._isInited)
