@@ -62,6 +62,8 @@ public class StartActivity extends SherlockActivity
 	private static Map<String, Bundle> _probeValues = new HashMap<String, Bundle>();
 	private static Map<String, Date> _probeDates = new HashMap<String, Date>();
 
+	private static String _statusMessage = null;
+
 	private boolean _isPaused = true;
 	private long _lastUpdate = 0;
 
@@ -151,7 +153,8 @@ public class StartActivity extends SherlockActivity
 
 									SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
 
-									bar.setSubtitle(sdf.format(new Date())+ ": " + message);
+									StartActivity._statusMessage = sdf.format(new Date())+ ": " + message;
+									bar.setSubtitle(StartActivity._statusMessage);
 								}
 		    				});
 
@@ -323,6 +326,10 @@ public class StartActivity extends SherlockActivity
 				    return true;
 			  }
 		});
+
+
+		if (StartActivity._statusMessage != null)
+			this.getSupportActionBar().setSubtitle(StartActivity._statusMessage);
 
 		Uri jsonConfigUri = this.getIntent().getData();
 
