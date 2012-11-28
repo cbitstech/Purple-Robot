@@ -158,6 +158,8 @@
     <string name="summary_bluetooth_probe" formatted="false">Visible Bluetooth Devices: %d</string>
     <string name="summary_call_state_probe" formatted="false">Current Call State: %s</string>
 
+    <string name="summary_javascript_feature" formatted="false">%s: %s</string>
+
     <string name="summary_sms_probe" formatted="false">%d messages</string>
     <string name="summary_tasks_probe" formatted="false">%d running tasks</string>
     <string name="summary_android_version_probe" formatted="false">Android version %s</string>
@@ -262,6 +264,9 @@
     <string name="label_battery_full">Full</string>
     <string name="label_battery_not_charging">Not Charging</string>
 
+    <string name="title_advanced_settings">Advanced Options</string>
+    <string name="title_email_files">Compress &amp; E-Mail Archived Files</string>
+    <string name="title_delete_files">Delete Archived Files</string>
 
     <!-- Visible Satellite Probe -->
     <string name="title_visible_satellite_probe">Visible Satellites</string>

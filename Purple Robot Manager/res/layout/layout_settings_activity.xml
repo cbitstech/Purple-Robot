@@ -51,9 +51,9 @@
        	    android:summary="@string/summary_http_upload_wifi_only"
             android:key="config_restrict_data_wifi"
             android:defaultValue="true"/>
-		<PreferenceScreen android:title="aDVANCED sETTINGS">
-			<Preference android:title="Zip &amp; E-Mail Archived Files" android:key="config_mail_archives" android:defaultValue="0" />
-			<Preference android:title="Delete Archived Files" android:key="config_delete_archives" android:defaultValue="0" />
+		<PreferenceScreen android:title="@string/title_advanced_settings">
+			<Preference android:title="@string/title_email_files" android:key="config_mail_archives" android:defaultValue="0" />
+			<Preference android:title="@string/title_delete_files" android:key="config_delete_archives" android:defaultValue="0" />
   			</PreferenceScreen>
 	</PreferenceScreen>
     <PreferenceCategory

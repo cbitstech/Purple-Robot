@@ -139,4 +139,14 @@ public class JavascriptFeature extends Feature
 
 		this.transmitData(context, bundle);
 	}
+
+	protected String summary(Context context)
+	{
+		return null;
+	}
+
+	public String summarizeValue(Context context, Bundle bundle)
+	{
+		return String.format(context.getString(R.string.summary_javascript_feature), this._name, bundle.get(Feature.FEATURE_VALUE).toString());
+	}
 }

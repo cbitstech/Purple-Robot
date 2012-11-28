@@ -63,8 +63,6 @@ public class JavaScriptEngine
 
 		this._scope = _jsContext.initStandardObjects();
 
-		Log.e("PRM", "RUN SCRIPT: " + script);
-
 		/* if (extras instanceof JSONObject)
 		{
 			JSONObject json = (JSONObject) extras;
