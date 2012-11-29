@@ -18,8 +18,12 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 public class JavascriptFeature extends Feature
 {
 	private String _name = null;
-	private String _script = null;
 	private String _title = null;
+
+	private String _script = null;
+	private String _formatter = null;
+
+	private boolean _embedded = false;
 
 	private long _lastRun = 0;
 
@@ -28,11 +32,20 @@ public class JavascriptFeature extends Feature
 		throw new RuntimeException("Invalid constructor. Please use JavascriptFeature(scriptName) instead...");
 	}
 
-	public JavascriptFeature(String title, String name, String script)
+	public JavascriptFeature(String title, String name, String script, String formatter, boolean embedded)
 	{
 		this._name = name;
-		this._script = script;
 		this._title = title;
+
+		this._script = script;
+		this._formatter = formatter;
+
+		this._embedded = embedded;
+	}
+
+	public boolean embedded()
+	{
+		return this._embedded;
 	}
 
 	protected String featureKey()
@@ -147,6 +160,19 @@ public class JavascriptFeature extends Feature
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
-		return String.format(context.getString(R.string.summary_javascript_feature), this._name, bundle.get(Feature.FEATURE_VALUE).toString());
+		String value = bundle.get(Feature.FEATURE_VALUE).toString();
+
+		if (this._formatter == null)
+			return String.format(context.getString(R.string.summary_javascript_feature), this._name, value);
+
+		String script = this._formatter;
+
+		script = "var result = '" + value + "'; " + script;
+
+		JavaScriptEngine engine = new JavaScriptEngine(context);
+
+		Object o =  engine.runScript(script);
+
+		return o.toString();
 	}
 }

@@ -90,12 +90,17 @@ public class RobotHealthProbe extends Probe
 									long pendingSize = 0;
 									long archiveSize = 0;
 
-									for (File f : archiveFolder.listFiles())
+									File[] archives = archiveFolder.listFiles();
+
+									if (archives != null)
 									{
-										if (f.isFile())
+										for (File f : archives)
 										{
-											archiveCount += 1;
-											archiveSize += f.length();
+											if (f.isFile())
+											{
+												archiveCount += 1;
+												archiveSize += f.length();
+											}
 										}
 									}
 
@@ -116,9 +121,14 @@ public class RobotHealthProbe extends Probe
 
 									if (pendingCount < 2048)
 									{
-										for (File f : pendingFolder.listFiles(jsonFilter))
+										File[] fs = pendingFolder.listFiles(jsonFilter);
+
+										if (fs != null)
 										{
-											pendingSize += f.length();
+											for (File f : fs)
+											{
+												pendingSize += f.length();
+											}
 										}
 									}
 									else

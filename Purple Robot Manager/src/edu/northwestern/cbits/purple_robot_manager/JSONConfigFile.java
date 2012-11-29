@@ -40,6 +40,7 @@ public class JSONConfigFile
 	public static final String JSON_PROBE_SETTINGS = "probe_settings";
 	public static final String JSON_CONFIGURATION_URL = "config_json_url";
 	public static final String JSON_LAST_UPDATE = "json_configuration_last_update";
+	public static final String FEATURES = "features";
 
 	private static SharedPreferences prefs = null;
 
@@ -62,10 +63,10 @@ public class JSONConfigFile
 				{
 					if (uri != null)
 					{
-						Log.i("PRM", "CONFIG URI: " + uri);
-
 						try
 						{
+							Log.i("PRM", "CONFIG URI: " + uri);
+
 							JSONConfigFile._configUri = uri;
 
 							URL u = new URL(JSONConfigFile._configUri.toString());
@@ -257,6 +258,40 @@ public class JSONConfigFile
 				JSONArray probeSettings = this.parameters.getJSONArray(JSONConfigFile.JSON_PROBE_SETTINGS);
 
 				ProbeManager.updateProbesFromJSON(context, probeSettings);
+			}
+			catch (JSONException e)
+			{
+				e.printStackTrace();
+			}
+		}
+
+		if (this.parameters.has(JSONConfigFile.FEATURES))
+		{
+			ProbeManager.clearFeatures();
+
+			try
+			{
+				JSONArray features = this.parameters.getJSONArray(JSONConfigFile.FEATURES);
+
+				for (int i = 0; i < features.length(); i++)
+				{
+					JSONObject feature = features.getJSONObject(i);
+
+					String name = context.getString(R.string.label_unknown_feature);
+					String script = "";
+					String formatter = "";
+
+					if (feature.has("name"))
+						name = feature.getString("name");
+
+					if (feature.has("feature"))
+						script = feature.getString("feature");
+
+					if (feature.has("formatter"))
+						formatter = feature.getString("formatter");
+
+					ProbeManager.addFeature(name, "javascript:" + name, script, formatter, false);
+				}
 			}
 			catch (JSONException e)
 			{
