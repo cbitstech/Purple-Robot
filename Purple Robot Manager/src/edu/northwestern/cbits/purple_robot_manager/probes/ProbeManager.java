@@ -77,18 +77,18 @@ public class ProbeManager
 
 				String script = JavascriptFeature.scriptForFeature(appContext, filename);
 
-				JavascriptFeature feature = new JavascriptFeature(title, filename, script);
+				JavascriptFeature feature = new JavascriptFeature(title, filename, script, null, true);
 
 				ProbeManager._probeInstances.add(feature);
 			}
 		}
 
-		return ProbeManager._probeInstances;
+		return new ArrayList<Probe>(ProbeManager._probeInstances);
 	}
 
 	public static void nudgeProbes(Context context)
 	{
-		if (context != null)
+		if (context != null && ProbeManager._probeInstances != null)
 		{
 			for (Probe probe : ProbeManager.allProbes())
 			{
@@ -101,6 +101,8 @@ public class ProbeManager
 	{
 		if (ProbeManager._cachedProbes.containsKey(name))
 			return ProbeManager._cachedProbes.get(name);
+
+		Probe match = null;
 
 		for (Probe probe : ProbeManager.allProbes())
 		{
@@ -222,11 +224,11 @@ public class ProbeManager
 			if (found)
 			{
 				ProbeManager._cachedProbes.put(name, probe);
-				return probe;
+				match = probe;
 			}
 		}
 
-		return null;
+		return match;
 	}
 
 	public static PreferenceScreen buildPreferenceScreen(PreferenceActivity settingsActivity)
@@ -257,6 +259,9 @@ public class ProbeManager
 		probesCategory.setKey("key_available_probes");
 
 		screen.addPreference(probesCategory);
+
+		if (ProbeManager._probeInstances == null)
+			ProbeManager.allProbes();
 
 		for (Probe probe : ProbeManager.allProbes())
 		{
@@ -292,6 +297,42 @@ public class ProbeManager
 			{
 				e.printStackTrace();
 			}
+		}
+	}
+
+	public static void clearFeatures()
+	{
+		if (ProbeManager._probeInstances == null)
+			ProbeManager.allProbes();
+
+		ArrayList<Probe> toRemove = new ArrayList<Probe>();
+
+		for (Probe p : ProbeManager._probeInstances)
+		{
+			if (p instanceof JavascriptFeature)
+			{
+				JavascriptFeature js = (JavascriptFeature) p;
+
+				if (js.embedded() == false)
+					toRemove.add(js);
+			}
+		}
+
+		ProbeManager._probeInstances.removeAll(toRemove);
+
+		ProbeManager._cachedProbes.clear();
+	}
+
+	public static void addFeature(String title, String name, String script, String formatter, boolean b)
+	{
+		if (ProbeManager._probeInstances == null)
+			ProbeManager.allProbes();
+
+		synchronized(ProbeManager._probeInstances)
+		{
+			JavascriptFeature feature = new JavascriptFeature(title, name, script, formatter, false);
+
+			ProbeManager._probeInstances.add(feature);
 		}
 	}
 }

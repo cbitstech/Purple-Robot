@@ -269,6 +269,8 @@
     <string name="title_email_files">Compress &amp; E-Mail Archived Files</string>
     <string name="title_delete_files">Delete Archived Files</string>
 
+    <string name="label_unknown_feature">Unknown Feature</string>
+
     <!-- Visible Satellite Probe -->
     <string name="title_visible_satellite_probe">Visible Satellites</string>
     <string name="summary_visible_satellite_probe_desc">Observes visible GPS satellites to help determine location, cloud cover, and other information.</string>
@@ -352,6 +354,4 @@
     <!-- Running Software Probe -->
     <string name="title_running_software_probe">Running Apps Probe</string>
     <string name="summary_running_software_probe_desc">Details about the apps the device is currently running.</string>
-
-
 </resources>
