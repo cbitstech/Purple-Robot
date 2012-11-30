@@ -4,10 +4,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.mozilla.javascript.EvaluatorException;
 
-import edu.northwestern.cbits.purple_robot_manager.JavaScriptEngine;
-
 import android.content.Context;
-import android.util.Log;
+import edu.northwestern.cbits.purple_robot_manager.JavaScriptEngine;
 
 public abstract class Trigger
 {

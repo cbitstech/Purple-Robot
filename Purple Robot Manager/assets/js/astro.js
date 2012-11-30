@@ -74,3 +74,23 @@ var sunsetForLocation = function (latitude, longitude) {
 
 	return sunsetForCoordinate(latitude, longitude) + now.getTimezoneOffset();
 };
+
+var solarObjectForLocation = function(latitude, longitude) {
+	var sunrise = sunriseForLocation(latitude, longitude) ;
+	var sunset = sunsetForLocation(latitude, longitude);
+	var equationTime = eqTime();
+	var solarDecl = degreesForRadians(solarDeclination());
+	var dayLength = sunset - sunrise;
+
+	var riseString = Math.floor(sunrise / 60) + ":" + Math.floor(sunrise % 60);
+	var setString = Math.floor(sunset / 60) + ":" + Math.floor(sunset % 60);
+
+	return {
+			"sunrise_minutes": sunrise,
+			"sunset_minutes": sunset,
+			"equation_of_time": equationTime,
+			"solar_declination": solarDecl,
+			"sunrise_desc": riseString,
+			"sunset_desc": setString
+	};
+}

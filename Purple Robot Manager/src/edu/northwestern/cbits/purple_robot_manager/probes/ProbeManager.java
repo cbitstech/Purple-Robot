@@ -15,7 +15,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.BatteryProbe;
@@ -39,13 +39,18 @@ public class ProbeManager
 {
 	private static final String PROBE_NAME = "name";
 	private static Map<String, Probe> _cachedProbes = new HashMap<String, Probe>();
-	private static List<Probe> _probeInstances = null;
+	private static List<Probe> _probeInstances = new ArrayList<Probe>();
 
-	public static List<Probe> allProbes()
+	private static boolean _initing = false;
+	private static boolean _inited = false;
+
+	public static List<Probe> allProbes(Context context)
 	{
-		if (ProbeManager._probeInstances == null)
+		if (ProbeManager._inited == false && ProbeManager._initing == false)
 		{
-			ProbeManager._probeInstances = new ArrayList<Probe>();
+			Probe.loadProbeClasses(context);
+
+			ProbeManager._initing = true;
 
 			for (Class<Probe> probeClass : Probe.availableProbeClasses())
 			{
@@ -65,22 +70,8 @@ public class ProbeManager
 				}
 			}
 
-			Context appContext = PurpleRobotApplication.getAppContext();
-
-			String[] featureFiles = JavascriptFeature.availableFeatures(appContext);
-			String[] featureNames = JavascriptFeature.availableFeatureNames(appContext);
-
-			for (int i = 0; i < featureFiles.length && i < featureNames.length; i++)
-			{
-				String title = featureNames[i];
-				String filename = featureFiles[i];
-
-				String script = JavascriptFeature.scriptForFeature(appContext, filename);
-
-				JavascriptFeature feature = new JavascriptFeature(title, filename, script, null, true);
-
-				ProbeManager._probeInstances.add(feature);
-			}
+			ProbeManager._inited = true;
+			ProbeManager._initing = false;
 		}
 
 		return new ArrayList<Probe>(ProbeManager._probeInstances);
@@ -88,9 +79,12 @@ public class ProbeManager
 
 	public static void nudgeProbes(Context context)
 	{
+		if (ProbeManager._inited == false)
+			return;
+
 		if (context != null && ProbeManager._probeInstances != null)
 		{
-			for (Probe probe : ProbeManager.allProbes())
+			for (Probe probe : ProbeManager.allProbes(context))
 			{
 				probe.nudge(context);
 			}
@@ -99,12 +93,15 @@ public class ProbeManager
 
 	public static Probe probeForName(String name, Context context)
 	{
+		if (ProbeManager._inited == false)
+			return null;
+
 		if (ProbeManager._cachedProbes.containsKey(name))
 			return ProbeManager._cachedProbes.get(name);
 
 		Probe match = null;
 
-		for (Probe probe : ProbeManager.allProbes())
+		for (Probe probe : ProbeManager.allProbes(context))
 		{
 			boolean found = false;
 
@@ -260,10 +257,7 @@ public class ProbeManager
 
 		screen.addPreference(probesCategory);
 
-		if (ProbeManager._probeInstances == null)
-			ProbeManager.allProbes();
-
-		for (Probe probe : ProbeManager.allProbes())
+		for (Probe probe : ProbeManager.allProbes(settingsActivity))
 		{
 			PreferenceScreen probeScreen = probe.preferenceScreen(settingsActivity);
 
@@ -276,6 +270,9 @@ public class ProbeManager
 
 	public static void updateProbesFromJSON(Context context, JSONArray probeSettings)
 	{
+		if (ProbeManager._inited == false)
+			return;
+
 		for (int i = 0; i < probeSettings.length(); i++)
 		{
 			try
@@ -286,7 +283,7 @@ public class ProbeManager
 				{
 					String name = json.getString(ProbeManager.PROBE_NAME);
 
-					for (Probe p : ProbeManager.allProbes())
+					for (Probe p : ProbeManager.allProbes(context))
 					{
 						if (name.equalsIgnoreCase(p.title(context)))
 							p.updateFromJSON(context, json);
@@ -302,8 +299,8 @@ public class ProbeManager
 
 	public static void clearFeatures()
 	{
-		if (ProbeManager._probeInstances == null)
-			ProbeManager.allProbes();
+		if (ProbeManager._inited == false)
+			return;
 
 		ArrayList<Probe> toRemove = new ArrayList<Probe>();
 
@@ -323,16 +320,13 @@ public class ProbeManager
 		ProbeManager._cachedProbes.clear();
 	}
 
-	public static void addFeature(String title, String name, String script, String formatter, boolean b)
+	public static void addFeature(String title, String name, String script, String formatter, List<String> sources, boolean b)
 	{
-		if (ProbeManager._probeInstances == null)
-			ProbeManager.allProbes();
+		if (ProbeManager._inited == false)
+			return;
 
-		synchronized(ProbeManager._probeInstances)
-		{
-			JavascriptFeature feature = new JavascriptFeature(title, name, script, formatter, false);
+		JavascriptFeature feature = new JavascriptFeature(title, name, script, formatter, sources, false);
 
-			ProbeManager._probeInstances.add(feature);
-		}
+		ProbeManager._probeInstances.add(feature);
 	}
 }

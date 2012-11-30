@@ -65,8 +65,6 @@ public class JSONConfigFile
 					{
 						try
 						{
-							Log.i("PRM", "CONFIG URI: " + uri);
-
 							JSONConfigFile._configUri = uri;
 
 							URL u = new URL(JSONConfigFile._configUri.toString());
@@ -136,6 +134,8 @@ public class JSONConfigFile
 
 	public static JSONConfigFile getSharedFile(Context context)
 	{
+		ProbeManager.allProbes(context);
+
 		if (JSONConfigFile._sharedFile == null)
 			JSONConfigFile._sharedFile = new JSONConfigFile(context);
 
@@ -290,7 +290,21 @@ public class JSONConfigFile
 					if (feature.has("formatter"))
 						formatter = feature.getString("formatter");
 
-					ProbeManager.addFeature(name, "javascript:" + name, script, formatter, false);
+					ArrayList<String> sources = new ArrayList<String>();
+
+					if (feature.has("sources"))
+					{
+						JSONArray sourceArray = feature.getJSONArray("sources");
+
+						for (int j = 0; j < sourceArray.length(); j++)
+						{
+							String source = sourceArray.getString(j);
+
+							sources.add(source);
+						}
+					}
+
+					ProbeManager.addFeature(name, name, script, formatter, sources, false);
 				}
 			}
 			catch (JSONException e)

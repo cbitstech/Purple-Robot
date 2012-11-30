@@ -39,7 +39,6 @@ public class PersistentService extends Service
 		PendingIntent pi = PendingIntent.getService(this, 0, new Intent(PersistentService.NUDGE_PROBES), PendingIntent.FLAG_UPDATE_CURRENT);
 		alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 15000, pi);
 
-		Probe.loadProbeClasses(this);
 		OutputPlugin.loadPluginClasses(this);
 	}
 

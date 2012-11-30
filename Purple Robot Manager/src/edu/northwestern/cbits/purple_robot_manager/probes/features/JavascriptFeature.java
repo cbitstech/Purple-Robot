@@ -2,9 +2,13 @@ package edu.northwestern.cbits.purple_robot_manager.probes.features;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
+import org.json.JSONException;
 import org.json.JSONObject;
+import org.mozilla.javascript.NativeObject;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -14,6 +18,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.JavaScriptEngine;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 
 public class JavascriptFeature extends Feature
 {
@@ -24,15 +29,14 @@ public class JavascriptFeature extends Feature
 	private String _formatter = null;
 
 	private boolean _embedded = false;
-
-	private long _lastRun = 0;
+	private List<String> _sources = new ArrayList<String>();
 
 	public JavascriptFeature()
 	{
 		throw new RuntimeException("Invalid constructor. Please use JavascriptFeature(scriptName) instead...");
 	}
 
-	public JavascriptFeature(String title, String name, String script, String formatter, boolean embedded)
+	public JavascriptFeature(String title, String name, String script, String formatter, List<String> sources, boolean embedded)
 	{
 		this._name = name;
 		this._title = title;
@@ -41,6 +45,8 @@ public class JavascriptFeature extends Feature
 		this._formatter = formatter;
 
 		this._embedded = embedded;
+
+		this._sources.addAll(sources);
 	}
 
 	public boolean embedded()
@@ -112,15 +118,30 @@ public class JavascriptFeature extends Feature
 
 	public void processData(Context context, JSONObject json)
 	{
-		long now = System.currentTimeMillis();
-
-		if (now - this._lastRun < 5000)
-			return;
-
-		this._lastRun = now;
-
 		if (this.isEnabled(context) == false)
 			return;
+
+		boolean sourceMatches = false;
+
+		try
+		{
+			String source = json.getString("PROBE");
+
+			for (int i = 0; i < this._sources.size() && sourceMatches == false; i++)
+			{
+				String probeSource = this._sources.get(i);
+
+				if (source != null && source.toLowerCase().equals(probeSource.toLowerCase()))
+					sourceMatches = true;
+			}
+
+			if (sourceMatches == false)
+				return;
+		}
+		catch (JSONException e)
+		{
+
+		}
 
 		if (this._script == null)
 			this._script = JavascriptFeature.scriptForFeature(context, this._name);
@@ -145,12 +166,43 @@ public class JavascriptFeature extends Feature
 
 			bundle.putDouble(Feature.FEATURE_VALUE, d.doubleValue());
 		}
+		else if (o instanceof NativeObject)
+		{
+			NativeObject nativeObj = (NativeObject) o;
+
+			Bundle b = JavascriptFeature.bundleForNativeObject(nativeObj);
+
+			bundle.putParcelable(Feature.FEATURE_VALUE, b);
+		}
 		else
 		{
-			Log.e("PRM", "JS PLUGIN GOT UNKNOWN VALUE " + o + " " + o.getClass());
+			Log.e("PRM", "JS PLUGIN GOT UNKNOWN VALUE CLASS " + o + " " + o.getClass());
 		}
 
 		this.transmitData(context, bundle);
+	}
+
+	private static Bundle bundleForNativeObject(NativeObject obj)
+	{
+		Bundle b = new Bundle();
+
+		for (Object key : obj.keySet())
+		{
+			String keyString = key.toString();
+
+			Object value = obj.get(key);
+
+			if (value instanceof NativeObject)
+				b.putParcelable(keyString, JavascriptFeature.bundleForNativeObject((NativeObject) value));
+			else if (value instanceof Double)
+				b.putDouble(keyString, ((Double) value).doubleValue());
+			else if (value instanceof Integer)
+				b.putInt(keyString, ((Integer) value).intValue());
+			else
+				b.putString(keyString, value.toString());
+		}
+
+		return b;
 	}
 
 	protected String summary(Context context)
@@ -160,14 +212,28 @@ public class JavascriptFeature extends Feature
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
-		String value = bundle.get(Feature.FEATURE_VALUE).toString();
+		Object value = bundle.get(Feature.FEATURE_VALUE);
 
 		if (this._formatter == null)
 			return String.format(context.getString(R.string.summary_javascript_feature), this._name, value);
 
 		String script = this._formatter;
 
-		script = "var result = '" + value + "'; " + script;
+		if (value instanceof Double || value instanceof Integer)
+			script = "var result = " + value + "; " + script;
+		else if (value instanceof Bundle)
+		{
+			try
+			{
+				script = "var result = " + OutputPlugin.jsonForBundle((Bundle) value).toString() + "; " + script;
+			}
+			catch (JSONException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		else
+			script = "var result = '" + value.toString() + "'; " + script;
 
 		JavaScriptEngine engine = new JavaScriptEngine(context);
 
