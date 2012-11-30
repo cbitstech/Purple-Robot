@@ -23,7 +23,7 @@ public class JavascriptFeaturePlugin extends OutputPlugin
 
 		if (Probe.PROBE_READING.equals(intent.getAction()))
 		{
-			for (Probe probe : ProbeManager.allProbes())
+			for (Probe probe : ProbeManager.allProbes(this.getContext()))
 			{
 				if (probe instanceof JavascriptFeature)
 				{

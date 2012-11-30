@@ -97,6 +97,8 @@ public class LocationProbe extends Probe implements LocationListener
 
 						this._lastCheck = now;
 						this._listening = true;
+
+						this.onLocationChanged(locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER));
 					}
 				}
 
