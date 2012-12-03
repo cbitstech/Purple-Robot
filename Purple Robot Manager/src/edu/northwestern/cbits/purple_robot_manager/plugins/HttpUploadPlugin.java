@@ -41,6 +41,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -617,7 +618,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 								List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 								nameValuePairs.add(new BasicNameValuePair("json", jsonString));
-								HttpEntity entity = new UrlEncodedFormEntity(nameValuePairs);
+								HttpEntity entity = new UrlEncodedFormEntity(nameValuePairs, HTTP.US_ASCII);
 
 								httpPost.setEntity(entity);
 
@@ -874,12 +875,12 @@ public class HttpUploadPlugin extends OutputPlugin
 		if (prefs.getBoolean("config_external_storage", false))
 			internalStorage = this.getContext().getExternalFilesDir(null);
 
-		if (!internalStorage.exists())
+		if (internalStorage != null && !internalStorage.exists())
 			internalStorage.mkdirs();
 
 		File pendingFolder = new File(internalStorage, CACHE_DIR);
 
-		if (!pendingFolder.exists())
+		if (pendingFolder != null && !pendingFolder.exists())
 			pendingFolder.mkdirs();
 
 		return pendingFolder;
@@ -891,7 +892,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 		File archiveFolder = new File(f, "Archives");
 
-		if (!archiveFolder.exists())
+		if (archiveFolder != null && !archiveFolder.exists())
 			archiveFolder.mkdirs();
 
 		return archiveFolder;
