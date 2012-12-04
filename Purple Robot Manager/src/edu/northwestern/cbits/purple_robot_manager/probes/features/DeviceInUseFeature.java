@@ -44,6 +44,17 @@ public class DeviceInUseFeature extends Feature
 		return context.getString(R.string.summary_device_use_feature_desc);
 	}
 
+	public String summarizeValue(Context context, Bundle bundle)
+	{
+		boolean inUse = bundle.getBoolean(DeviceInUseFeature.DEVICE_ACTIVE);
+
+		if (inUse)
+			return context.getResources().getString(R.string.summary_device_active);
+		else
+			return context.getResources().getString(R.string.summary_device_inactive);
+
+	}
+
 	public boolean isEnabled(Context context)
 	{
 		if (!this._isInited)

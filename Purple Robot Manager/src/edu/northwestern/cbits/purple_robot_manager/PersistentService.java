@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
-import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 
 public class PersistentService extends Service
@@ -20,7 +19,6 @@ public class PersistentService extends Service
 		return null;
 	}
 
-	@SuppressWarnings("deprecation")
 	public void onCreate()
 	{
 		super.onCreate();

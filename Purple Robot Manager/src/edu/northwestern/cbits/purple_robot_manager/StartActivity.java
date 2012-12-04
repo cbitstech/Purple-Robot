@@ -189,12 +189,24 @@ public class StartActivity extends SherlockActivity
     			{
 					public void onClick(View v)
 					{
-						Intent intent = new Intent(me, ProbeViewerActivity.class);
+						Intent intent = probe.viewIntent(me);
 
-						intent.putExtra("probe_name", sensorName);
-						intent.putExtra("probe_bundle", value);
+						if (intent == null)
+						{
+							Intent dataIntent = new Intent(me, ProbeViewerActivity.class);
 
-						me.startActivity(intent);
+							dataIntent.putExtra("probe_name", sensorName);
+							dataIntent.putExtra("probe_bundle", value);
+
+							me.startActivity(dataIntent);
+						}
+						else
+						{
+							intent.putExtra("probe_name", sensorName);
+							intent.putExtra("probe_bundle", value);
+
+							me.startActivity(intent);
+						}
 					}
     			});
 

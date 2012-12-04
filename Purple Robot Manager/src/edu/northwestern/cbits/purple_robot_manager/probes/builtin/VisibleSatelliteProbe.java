@@ -33,7 +33,6 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 
 	private boolean _listening = false;
 
-	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{
 		PreferenceManager manager = activity.getPreferenceManager();
@@ -253,7 +252,6 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 //		Log.e("PRM", "LOCATION CHANGED: " + location);
 	}
 
-
 	public String summarizeValue(Context context, Bundle bundle)
 	{
 		int count = bundle.getInt("SATELLITE_COUNT");
@@ -261,7 +259,6 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 
 		return String.format(context.getResources().getString(R.string.summary_satellite_probe), count, snr);
 	}
-
 
 	public void onProviderDisabled(String provider)
 	{

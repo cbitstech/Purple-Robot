@@ -15,7 +15,6 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.BatteryProbe;
@@ -230,7 +229,6 @@ public class ProbeManager
 
 	public static PreferenceScreen buildPreferenceScreen(PreferenceActivity settingsActivity)
 	{
-		@SuppressWarnings("deprecation")
 		PreferenceManager manager = settingsActivity.getPreferenceManager();
 
 		PreferenceScreen screen = manager.createPreferenceScreen(settingsActivity);

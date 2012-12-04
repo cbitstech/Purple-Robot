@@ -1,9 +1,13 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
@@ -11,11 +15,12 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.LocationProbeActivity;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class LocationProbe extends Probe implements LocationListener
@@ -29,13 +34,16 @@ public class LocationProbe extends Probe implements LocationListener
 	private static final String SPEED = "SPEED";
 	private static final String TIME_FIX = "TIME_FIX";
 
+	private static final ArrayList<Location> _lastLocations = new ArrayList<Location>();
+
 	protected Context _context = null;
 
 	private long _lastCheck = 0;
 	private long _lastTransmit = 0;
 	private boolean _listening = false;
+	private long _lastCache = 0;
+	private Location _lastLocation = null;
 
-	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{
 		PreferenceManager manager = activity.getPreferenceManager();
@@ -62,7 +70,21 @@ public class LocationProbe extends Probe implements LocationListener
 
 		screen.addPreference(duration);
 
+		Preference showMap = new Preference(activity);
+		showMap.setKey("config_probe_" + key + "_show_map");
+		showMap.setTitle(R.string.probe_location_show_map_label);
+		showMap.setSummary(R.string.probe_location_show_map_summary);
+
+		screen.addPreference(showMap);
+
 		return screen;
+	}
+
+	public Intent viewIntent(Context context)
+	{
+		Intent i = new Intent(context, LocationProbeActivity.class);
+
+		return i;
 	}
 
 	public boolean isEnabled(Context context)
@@ -166,6 +188,27 @@ public class LocationProbe extends Probe implements LocationListener
 
 		synchronized(this)
 		{
+			long time = location.getTime();
+
+			if (time - this._lastCache > 30000 || this._lastLocation == null)
+			{
+				while (LocationProbe._lastLocations.size() > 1 && time - LocationProbe._lastLocations.get(0).getTime() > 86400000)
+					LocationProbe._lastLocations.remove(0);
+
+				boolean include = true;
+
+				if (this._lastLocation != null && this._lastLocation.distanceTo(location) < 50.0)
+					include = false;
+
+				if (include)
+				{
+					LocationProbe._lastLocations.add(new Location(location));
+
+					this._lastCache = time;
+					this._lastLocation = new Location(location);
+				}
+			}
+
 			this.transmitData(this._context, bundle);
 		}
 	}
@@ -194,5 +237,10 @@ public class LocationProbe extends Probe implements LocationListener
 		double longitude = bundle.getDouble(LocationProbe.LONGITUDE);
 
 		return String.format(context.getResources().getString(R.string.summary_location_probe), latitude, longitude);
+	}
+
+	public static List<Location> cachedLocations()
+	{
+		return new ArrayList<Location>(LocationProbe._lastLocations);
 	}
 }

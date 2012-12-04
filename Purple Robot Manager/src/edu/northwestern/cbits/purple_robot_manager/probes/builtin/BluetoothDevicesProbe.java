@@ -429,7 +429,6 @@ public class BluetoothDevicesProbe extends Probe
 		return formatted;
 	};
 
-	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{
 		PreferenceManager manager = activity.getPreferenceManager();

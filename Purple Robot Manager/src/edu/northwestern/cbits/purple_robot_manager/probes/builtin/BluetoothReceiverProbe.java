@@ -38,7 +38,6 @@ public class BluetoothReceiverProbe extends Probe
 		return "PIZZA PIE";
 	}
 
-	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{
 		PreferenceManager manager = activity.getPreferenceManager();

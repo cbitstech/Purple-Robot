@@ -246,7 +246,6 @@ public class TelephonyProbe extends Probe
 		return type;
 	}
 
-	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{
 		PreferenceManager manager = activity.getPreferenceManager();
