@@ -128,7 +128,6 @@ public class CallStateProbe extends Probe
 		return String.format(context.getResources().getString(R.string.summary_call_state_probe), state);
 	}
 
-	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{
 		PreferenceManager manager = activity.getPreferenceManager();

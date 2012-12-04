@@ -129,4 +129,9 @@ public abstract class Probe
 			localManager.sendBroadcast(intent);
 		}
 	}
+
+	public Intent viewIntent(Context context)
+	{
+		return null;
+	}
 }

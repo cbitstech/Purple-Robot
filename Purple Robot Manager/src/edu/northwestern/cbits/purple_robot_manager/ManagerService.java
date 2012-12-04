@@ -52,7 +52,6 @@ public class ManagerService extends IntentService
 		super(name);
 	}
 
-	@SuppressWarnings("deprecation")
 	protected void onHandleIntent(Intent intent)
 	{
 		if (HAPTIC_PATTERN_INTENT.equalsIgnoreCase(intent.getAction()))

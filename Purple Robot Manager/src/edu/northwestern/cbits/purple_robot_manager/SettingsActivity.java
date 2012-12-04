@@ -26,7 +26,6 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 	public static final String ZIP_ARCHIVES_KEY = "config_mail_archives";
 	public static final String DELETE_ARCHIVES_KEY = "config_delete_archives";
 
-	@SuppressWarnings("deprecation")
 	public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);

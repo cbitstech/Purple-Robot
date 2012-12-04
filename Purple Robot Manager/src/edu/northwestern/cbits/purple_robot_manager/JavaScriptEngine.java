@@ -348,7 +348,6 @@ public class JavaScriptEngine
 		return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen, new NativeObject(), null);
 	}
 
-	@SuppressWarnings("deprecation")
 	public boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen, final NativeObject launchParams, final String script)
 	{
 		try

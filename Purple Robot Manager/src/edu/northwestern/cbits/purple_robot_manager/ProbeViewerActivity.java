@@ -19,7 +19,6 @@ public class ProbeViewerActivity extends PreferenceActivity
 	private Bundle _probeBundle = null;
 	private Probe _probe = null;
 
-	@SuppressWarnings("deprecation")
 	protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
@@ -52,7 +51,6 @@ public class ProbeViewerActivity extends PreferenceActivity
         }
     }
 
-	@SuppressWarnings("deprecation")
 	private PreferenceScreen screenForFloatArray(String title, float[] values)
 	{
 		PreferenceManager manager = this.getPreferenceManager();
@@ -72,7 +70,6 @@ public class ProbeViewerActivity extends PreferenceActivity
 		return screen;
 	}
 
-	@SuppressWarnings("deprecation")
 	private PreferenceScreen screenForIntArray(String title, int[] values)
 	{
 		PreferenceManager manager = this.getPreferenceManager();
@@ -92,7 +89,6 @@ public class ProbeViewerActivity extends PreferenceActivity
 		return screen;
 	}
 
-	@SuppressWarnings("deprecation")
 	private PreferenceScreen screenForDoubleArray(String title, double[] values)
 	{
 		PreferenceManager manager = this.getPreferenceManager();
@@ -112,7 +108,6 @@ public class ProbeViewerActivity extends PreferenceActivity
 		return screen;
 	}
 
-	@SuppressWarnings("deprecation")
 	private PreferenceScreen screenForLongArray(String title, long[] values)
 	{
 		PreferenceManager manager = this.getPreferenceManager();
@@ -132,7 +127,6 @@ public class ProbeViewerActivity extends PreferenceActivity
 		return screen;
 	}
 
-	@SuppressWarnings("deprecation")
 	private PreferenceScreen screenForStringArray(String title, String[] values)
 	{
 		PreferenceManager manager = this.getPreferenceManager();
@@ -152,7 +146,7 @@ public class ProbeViewerActivity extends PreferenceActivity
 		return screen;
 	}
 
-	@SuppressWarnings({ "deprecation", "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private PreferenceScreen screenForBundle(String title, Bundle bundle)
 	{
 		PreferenceManager manager = this.getPreferenceManager();
@@ -379,7 +373,6 @@ public class ProbeViewerActivity extends PreferenceActivity
 		return screen;
 	}
 
-	@SuppressWarnings("deprecation")
 	private PreferenceScreen screenForLocationArray(String title, Location[] values)
 	{
 		PreferenceManager manager = this.getPreferenceManager();
@@ -400,7 +393,6 @@ public class ProbeViewerActivity extends PreferenceActivity
 		return screen;
 	}
 
-	@SuppressWarnings("deprecation")
 	private PreferenceScreen screenForBundleArray(String title, Bundle[] values)
 	{
 		PreferenceManager manager = this.getPreferenceManager();

@@ -385,7 +385,6 @@ public class HttpUploadPlugin extends OutputPlugin
 
 			final Runnable r = new Runnable()
 			{
-				@SuppressWarnings("deprecation")
 				public void run()
 				{
 					long start = System.currentTimeMillis();

@@ -130,7 +130,6 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 		return R.string.probe_environment_category;
 	}
 
-	@SuppressWarnings("deprecation")
 	public boolean isEnabled(Context context)
 	{
         SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);

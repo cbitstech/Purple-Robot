@@ -270,6 +270,7 @@
     <string name="title_delete_files">Delete Archived Files</string>
 
     <string name="label_unknown_feature">Unknown Feature</string>
+    <string name="menu_data_label">Show Readings</string>
 
     <!-- Visible Satellite Probe -->
     <string name="title_visible_satellite_probe">Visible Satellites</string>
@@ -330,8 +331,10 @@
     <!-- Location Probe -->
     <string name="title_location_probe">Location Probe</string>
     <string name="summary_location_probe_desc">Records the most accurate location available for the device, given device limitations and respecting battery life.</string>
+	<string name="probe_location_show_map_label">View Map</string>
+	<string name="probe_location_show_map_summary">Display recent location fixes on a map.</string>
 
-    <!-- Purple Robot Health Probe -->
+	<!-- Purple Robot Health Probe -->
     <string name="title_robot_probe">Purple Robot Health</string>
     <string name="summary_robot_probe_desc">Summarizes the current state of the Purple Robot app, including the amount of data to be transmitted to the server.</string>
 
@@ -350,8 +353,13 @@
     <!-- Device In Use Feature -->
     <string name="title_device_use_feature">Device In Use</string>
     <string name="summary_device_use_feature_desc">Indicates whether the device is in use.</string>
+    <string name="summary_device_active">Device currently active</string>
+    <string name="summary_device_inactive">Device curently inactive</string>
 
     <!-- Running Software Probe -->
     <string name="title_running_software_probe">Running Apps Probe</string>
     <string name="summary_running_software_probe_desc">Details about the apps the device is currently running.</string>
+
+    <!-- Location Probe -->
+    <string name="title_location_history">Location History</string>
 </resources>

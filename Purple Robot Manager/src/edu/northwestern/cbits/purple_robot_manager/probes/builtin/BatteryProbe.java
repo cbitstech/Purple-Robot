@@ -124,7 +124,6 @@ public class BatteryProbe extends Probe
 	};
 */
 
-	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{
 		PreferenceManager manager = activity.getPreferenceManager();
