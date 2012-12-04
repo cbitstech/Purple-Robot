@@ -1,11 +1,24 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.github.mustachejava.DefaultMustacheFactory;
+import com.github.mustachejava.Mustache;
+import com.github.mustachejava.MustacheFactory;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -13,8 +26,11 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.SystemClock;
-
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
+import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
+import edu.northwestern.cbits.purple_robot_manager.charts.Chart;
 
 public class PressureProbe extends ContinuousProbe implements SensorEventListener
 {
@@ -31,6 +47,49 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 	private double timeBuffer[] = new double[BUFFER_SIZE];
 
 	private int bufferIndex  = 0;
+
+	public Intent viewIntent(Context context)
+	{
+		Intent i = new Intent(context, WebkitLandscapeActivity.class);
+
+		return i;
+	}
+
+	public String getDisplayContent(Activity activity)
+	{
+		try
+		{
+			String template = WebkitActivity.stringForAsset(activity, "webkit/highcharts_full.html");
+
+			Chart c = new Chart();
+			JSONObject json = c.highchartsJson(activity);
+
+			HashMap<String, Object> scope = new HashMap<String, Object>();
+			scope.put("highchart_json", json.toString());
+
+			StringWriter writer = new StringWriter();
+
+		    MustacheFactory mf = new DefaultMustacheFactory();
+		    Mustache mustache = mf.compile(template);
+		    mustache.execute(writer, scope);
+		    writer.flush();
+
+		    Log.e("PRM", "CONTENT: " + writer.toString());
+
+		    return writer.toString();
+
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		catch (JSONException e)
+		{
+			e.printStackTrace();
+		}
+
+		return null;
+	}
 
 	public Bundle formattedBundle(Context context, Bundle bundle)
 	{

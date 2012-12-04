@@ -49,8 +49,7 @@ public class LocationProbeActivity extends SherlockMapActivity
 	    	if (shadow)
 	    		return;
 
-
-	        Paint paint = new Paint();
+	    	Paint paint = new Paint();
 
 	        paint.setDither(true);
 	        paint.setColor(Color.RED);
@@ -99,7 +98,6 @@ public class LocationProbeActivity extends SherlockMapActivity
     {
 		super.onCreate(savedInstanceState);
 
-        this.getSupportActionBar().setTitle("lOCATION dISPLAY");
         this.setContentView(R.layout.layout_location_activity);
     }
 

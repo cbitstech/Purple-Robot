@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -131,6 +132,11 @@ public abstract class Probe
 	}
 
 	public Intent viewIntent(Context context)
+	{
+		return null;
+	}
+
+	public String getDisplayContent(Activity activity)
 	{
 		return null;
 	}

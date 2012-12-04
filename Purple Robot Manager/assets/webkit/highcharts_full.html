@@ -1,0 +1,19 @@
+<html>
+	<head>
+		<script src="js/jquery.min.js"></script>
+		<script src="js/highcharts.js"></script>
+		<link rel="stylesheet" type="text/css" href="css/webview.css" />
+		<script type="text/javascript">
+		    $(document).ready(function()
+		    {
+		        chart = new Highcharts.Chart({{ highchart_json }});
+		    });
+		});
+		</script>
+	</head>
+	<body>
+		<div id="container">
+			Loading...
+		</div>
+	</body>
+</html>
