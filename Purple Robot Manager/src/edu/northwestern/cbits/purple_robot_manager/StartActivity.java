@@ -132,7 +132,7 @@ public class StartActivity extends SherlockActivity
 				    			StartActivity._probeValues.put(name, value);
 				    			StartActivity._probeDates.put(name, new Date());
 
-				    			if (me._isPaused == false && now - 2500 > me._lastUpdate)
+				    			if (me._isPaused == false && now - 5000 > me._lastUpdate)
 				    			{
 					    			me._lastUpdate = now;
 			    					me.refreshList();

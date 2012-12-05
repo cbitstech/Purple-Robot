@@ -140,4 +140,9 @@ public abstract class Probe
 	{
 		return null;
 	}
+
+	public String contentSubtitle(Context context)
+	{
+		return null;
+	}
 }

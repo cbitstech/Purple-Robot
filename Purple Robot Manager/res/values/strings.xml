@@ -228,6 +228,8 @@
     <string name="display_light_readings">Light Measurements</string>
     <string name="display_light_reading" formatted="false">%.3f lux</string>
 
+    <string name="display_item_count" formatted="false">%d measurements</string>
+
     <string name="display_temperature_readings">Temperature Measurements</string>
     <string name="display_temperature_reading" formatted="false">%.3f degrees</string>
 

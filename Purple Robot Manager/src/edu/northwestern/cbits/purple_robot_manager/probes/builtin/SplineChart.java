@@ -1,9 +1,7 @@
-package edu.northwestern.cbits.purple_robot_manager.charts;
+package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -12,19 +10,13 @@ import org.json.JSONTokener;
 
 import android.app.Activity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
+import edu.northwestern.cbits.purple_robot_manager.charts.LineChart;
 
-public class LineChart extends Chart
+public class SplineChart extends LineChart
 {
-	protected Map<String, List<Double>> _series = new HashMap<String, List<Double>>();
-
-	public void addSeries(String key, List<Double> series)
-	{
-		this._series.put(key, series);
-	}
-
 	public JSONObject highchartsJson(Activity activity) throws JSONException, IOException
 	{
-		JSONObject chartJson = (JSONObject) new JSONTokener(WebkitActivity.stringForAsset(activity, "webkit/js/highcharts_line.js")).nextValue();
+		JSONObject chartJson = (JSONObject) new JSONTokener(WebkitActivity.stringForAsset(activity, "webkit/js/highcharts_spline.js")).nextValue();
 
 		JSONArray series = chartJson.getJSONArray("series");
 

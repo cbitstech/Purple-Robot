@@ -1,10 +1,23 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.github.mustachejava.DefaultMustacheFactory;
+import com.github.mustachejava.Mustache;
+import com.github.mustachejava.MustacheFactory;
+
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -14,6 +27,8 @@ import android.os.Bundle;
 import android.os.SystemClock;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
+import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
 
 public class AccelerometerProbe extends ContinuousProbe implements SensorEventListener
 {
@@ -30,6 +45,60 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 	private double timeBuffer[] = new double[BUFFER_SIZE];
 
 	private int bufferIndex  = 0;
+
+	private ArrayList<Double> _xCache = new ArrayList<Double>();
+	private ArrayList<Double> _yCache = new ArrayList<Double>();
+	private ArrayList<Double> _zCache = new ArrayList<Double>();
+
+	public Intent viewIntent(Context context)
+	{
+		Intent i = new Intent(context, WebkitLandscapeActivity.class);
+
+		return i;
+	}
+
+	public String contentSubtitle(Context context)
+	{
+		return String.format(context.getString(R.string.display_item_count), this._xCache.size());
+	}
+
+	public String getDisplayContent(Activity activity)
+	{
+		try
+		{
+			String template = WebkitActivity.stringForAsset(activity, "webkit/highcharts_full.html");
+
+			SplineChart c = new SplineChart();
+			c.addSeries("X", new ArrayList<Double>(this._xCache));
+			c.addSeries("Y", new ArrayList<Double>(this._yCache));
+			c.addSeries("Z", new ArrayList<Double>(this._zCache));
+
+			JSONObject json = c.highchartsJson(activity);
+
+			HashMap<String, Object> scope = new HashMap<String, Object>();
+			scope.put("highchart_json", json.toString());
+
+			StringWriter writer = new StringWriter();
+
+		    MustacheFactory mf = new DefaultMustacheFactory();
+		    Mustache mustache = mf.compile(new StringReader(template), "template");
+		    mustache.execute(writer, scope);
+		    writer.flush();
+
+		    return writer.toString();
+
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		catch (JSONException e)
+		{
+			e.printStackTrace();
+		}
+
+		return null;
+	}
 
 	public Bundle formattedBundle(Context context, Bundle bundle)
 	{
@@ -209,6 +278,37 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 					for (int i = 0; i < fieldNames.length; i++)
 					{
 						data.putFloatArray(fieldNames[i], valueBuffer[i]);
+
+						if (fieldNames[i].equals("X"))
+						{
+							while (this._xCache.size() > 128)
+								this._xCache.remove(0);
+
+							for (int j = 0; j < valueBuffer[i].length; j++)
+							{
+								this._xCache.add(Double.valueOf(valueBuffer[i][j]));
+							}
+						}
+						else if (fieldNames[i].equals("Y"))
+						{
+							while (this._yCache.size() > 128)
+								this._yCache.remove(0);
+
+							for (int j = 0; j < valueBuffer[i].length; j++)
+							{
+								this._yCache.add(Double.valueOf(valueBuffer[i][j]));
+							}
+						}
+						else if (fieldNames[i].equals("Z"))
+						{
+							while (this._zCache.size() > 128)
+								this._zCache.remove(0);
+
+							for (int j = 0; j < valueBuffer[i].length; j++)
+							{
+								this._zCache.add(Double.valueOf(valueBuffer[i][j]));
+							}
+						}
 					}
 
 					this.transmitData(data);
