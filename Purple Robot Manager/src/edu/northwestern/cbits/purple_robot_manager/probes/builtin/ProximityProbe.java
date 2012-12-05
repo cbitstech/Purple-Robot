@@ -30,6 +30,7 @@ import android.os.SystemClock;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
+import edu.northwestern.cbits.purple_robot_manager.charts.SplineChart;
 
 public class ProximityProbe extends ContinuousProbe implements SensorEventListener
 {
@@ -47,6 +48,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 	private int bufferIndex  = 0;
 
 	private ArrayList<Double> _distanceCache = new ArrayList<Double>();
+	private ArrayList<Double> _timeCache = new ArrayList<Double>();
 
 	public Intent viewIntent(Context context)
 	{
@@ -67,7 +69,9 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 			String template = WebkitActivity.stringForAsset(activity, "webkit/highcharts_full.html");
 
 			SplineChart c = new SplineChart();
-			c.addSeries("lIGHT", new ArrayList<Double>(this._distanceCache));
+			c.addSeries("pROXIMITY", new ArrayList<Double>(this._distanceCache));
+
+			c.addTime("tIME", this._timeCache);
 
 			JSONObject json = c.highchartsJson(activity);
 
@@ -227,7 +231,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 		{
 			synchronized(this)
 			{
-				double elapsed = SystemClock.elapsedRealtime();
+				double elapsed = SystemClock.uptimeMillis();
 				double boot = (now - elapsed) * 1000 * 1000;
 
 				double timestamp = event.timestamp + boot;
@@ -258,6 +262,14 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 					data.putDouble("TIMESTAMP", now / 1000);
 
 					data.putDoubleArray("EVENT_TIMESTAMP", timeBuffer);
+
+					while (this._timeCache.size() > 128)
+						this._timeCache.remove(0);
+
+					for (int j = 0; j < timeBuffer.length; j++)
+					{
+						this._timeCache.add(Double.valueOf(timeBuffer[j] / 1000));
+					}
 
 					for (int i = 0; i < fieldNames.length; i++)
 					{

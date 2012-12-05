@@ -6,7 +6,28 @@
 		<script type="text/javascript">
 		    $(document).ready(function()
 		    {
-		        var chart = new Highcharts.Chart({{{highchart_json}}});
+				Highcharts.setOptions(
+				{
+					global:
+					{
+				        useUTC: false
+				    }
+				});
+
+		    	var chartJson = {{{highchart_json}}};
+
+				var i = 0;
+		    	for (i = 0; i < chartJson.series.length; i++)
+		    	{
+			    	var data = chartJson.series[i].data;
+
+			    	if (data.length > 0 && $.isArray(data[0]))
+			    	{
+			    		chartJson.xAxis = { type: 'datetime' };
+			    	}
+		    	}
+
+		        var chart = new Highcharts.Chart(chartJson);
 		    });
 		</script>
 	</head>

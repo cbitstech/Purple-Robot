@@ -2,7 +2,12 @@
 	chart:
 	{
 		renderTo: "container",
-		type: "spline"
+		type: "spline",
+		zoomType: "x"
+	},
+	scrollbar:
+	{
+		enabled: true
 	},
 	title:
 	{

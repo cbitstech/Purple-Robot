@@ -10,6 +10,9 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.webkit.ConsoleMessage;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -82,6 +85,18 @@ public class WebkitActivity extends SherlockActivity
 		super.onResume();
 
 		WebView webview = (WebView) this.findViewById(R.id.webview);
+
+		webview.setWebChromeClient(new WebChromeClient()
+		{
+			  public boolean onConsoleMessage(ConsoleMessage cm)
+			  {
+				    Log.e("PRM", cm.message() + " -- From line "
+				                         + cm.lineNumber() + " of "
+				                         + cm.sourceId() );
+				    return true;
+			  }
+
+		});
 
 		String contentString = this.contentString();
 
