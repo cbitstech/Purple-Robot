@@ -1,8 +1,19 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.github.mustachejava.DefaultMustacheFactory;
+import com.github.mustachejava.Mustache;
+import com.github.mustachejava.MustacheFactory;
+
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -15,12 +26,64 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
+import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class BatteryProbe extends Probe
 {
 	private boolean _isInited = false;
 	private boolean _isEnabled = false;
+
+	private ArrayList<Double> _batteryCache = new ArrayList<Double>();
+
+	public Intent viewIntent(Context context)
+	{
+		Intent i = new Intent(context, WebkitLandscapeActivity.class);
+
+		return i;
+	}
+
+	public String contentSubtitle(Context context)
+	{
+		return String.format(context.getString(R.string.display_item_count), this._batteryCache.size());
+	}
+
+	public String getDisplayContent(Activity activity)
+	{
+		try
+		{
+			String template = WebkitActivity.stringForAsset(activity, "webkit/highcharts_full.html");
+
+			SplineChart c = new SplineChart();
+			c.addSeries("bATTERY", new ArrayList<Double>(this._batteryCache));
+
+			JSONObject json = c.highchartsJson(activity);
+
+			HashMap<String, Object> scope = new HashMap<String, Object>();
+			scope.put("highchart_json", json.toString());
+
+			StringWriter writer = new StringWriter();
+
+		    MustacheFactory mf = new DefaultMustacheFactory();
+		    Mustache mustache = mf.compile(new StringReader(template), "template");
+		    mustache.execute(writer, scope);
+		    writer.flush();
+
+		    return writer.toString();
+
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		catch (JSONException e)
+		{
+			e.printStackTrace();
+		}
+
+		return null;
+	}
 
 	public String name(Context context)
 	{
@@ -56,6 +119,11 @@ public class BatteryProbe extends Probe
 						bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
 
 						bundle.putAll(intent.getExtras());
+
+						while (me._batteryCache.size() > 128)
+							me._batteryCache.remove(0);
+
+						me._batteryCache.add(Double.valueOf(bundle.getInt(BatteryManager.EXTRA_LEVEL)));
 
 						me.transmitData(context, bundle);
 					}

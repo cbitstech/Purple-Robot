@@ -12,7 +12,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.webkit.WebView;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 
 import edu.northwestern.cbits.purple_robot_manager.ProbeViewerActivity;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -85,6 +89,14 @@ public class WebkitActivity extends SherlockActivity
 		{
 			webview.getSettings().setJavaScriptEnabled(true);
 			webview.loadDataWithBaseURL("file:///android_asset/webkit/", contentString, "text/html", "UTF-8", null);
+
+			String title = this.contentTitle();
+			String subtitle = this.contentSubtitle();
+
+			ActionBar actionBar = this.getSupportActionBar();
+
+			actionBar.setTitle(title);
+			actionBar.setSubtitle(subtitle);
 		}
 		else
 		{
@@ -98,4 +110,59 @@ public class WebkitActivity extends SherlockActivity
 			this.finish();
 		}
 	}
+
+
+	private String contentSubtitle()
+	{
+		String name = this.getIntent().getStringExtra("probe_name");
+
+		if (name != null)
+		{
+			Probe p = ProbeManager.probeForName(name, this);
+
+			return p.contentSubtitle(this);
+		}
+
+		return null;
+	}
+
+	private String contentTitle()
+	{
+		String name = this.getIntent().getStringExtra("probe_name");
+
+		if (name != null)
+		{
+			Probe p = ProbeManager.probeForName(name, this);
+
+			return p.title(this);
+		}
+
+		return this.getString(R.string.app_name);
+	}
+
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+        MenuInflater inflater = this.getSupportMenuInflater();
+        inflater.inflate(R.menu.menu_probe_activity, menu);
+
+        return true;
+	}
+
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+    	{
+    		case R.id.menu_data_item:
+				Intent dataIntent = new Intent(this, ProbeViewerActivity.class);
+
+				dataIntent.putExtra("probe_name", this.getIntent().getStringExtra("probe_name"));
+				dataIntent.putExtra("probe_bundle", this.getIntent().getParcelableExtra("probe_bundle"));
+
+				this.startActivity(dataIntent);
+
+    			break;
+		}
+
+    	return true;
+    }
 }

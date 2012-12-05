@@ -14,7 +14,7 @@ public class Chart
 {
 	public JSONObject highchartsJson(Activity activity) throws JSONException, IOException
 	{
-		JSONObject chartJson = (JSONObject) new JSONTokener(WebkitActivity.stringForAsset(activity, "js/highcharts_placeholder.js")).nextValue();
+		JSONObject chartJson = (JSONObject) new JSONTokener(WebkitActivity.stringForAsset(activity, "webkit/js/highcharts_placeholder.js")).nextValue();
 		return chartJson;
 	}
 }

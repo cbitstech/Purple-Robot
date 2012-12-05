@@ -11,10 +11,6 @@ import java.util.HashMap;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.github.mustachejava.DefaultMustacheFactory;
-import com.github.mustachejava.Mustache;
-import com.github.mustachejava.MustacheFactory;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -26,11 +22,14 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.util.Log;
+
+import com.github.mustachejava.DefaultMustacheFactory;
+import com.github.mustachejava.Mustache;
+import com.github.mustachejava.MustacheFactory;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
-import edu.northwestern.cbits.purple_robot_manager.charts.Chart;
 
 public class PressureProbe extends ContinuousProbe implements SensorEventListener
 {
@@ -48,11 +47,19 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 
 	private int bufferIndex  = 0;
 
+	private ArrayList<Double> _pressureCache = new ArrayList<Double>();
+	private ArrayList<Double> _altitudeCache = new ArrayList<Double>();
+
 	public Intent viewIntent(Context context)
 	{
 		Intent i = new Intent(context, WebkitLandscapeActivity.class);
 
 		return i;
+	}
+
+	public String contentSubtitle(Context context)
+	{
+		return String.format(context.getString(R.string.display_item_count), this._pressureCache.size());
 	}
 
 	public String getDisplayContent(Activity activity)
@@ -61,7 +68,9 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 		{
 			String template = WebkitActivity.stringForAsset(activity, "webkit/highcharts_full.html");
 
-			Chart c = new Chart();
+			SplineChart c = new SplineChart();
+			c.addSeries("pRESSURE", new ArrayList<Double>(this._pressureCache));
+
 			JSONObject json = c.highchartsJson(activity);
 
 			HashMap<String, Object> scope = new HashMap<String, Object>();
@@ -70,11 +79,9 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 			StringWriter writer = new StringWriter();
 
 		    MustacheFactory mf = new DefaultMustacheFactory();
-		    Mustache mustache = mf.compile(template);
+		    Mustache mustache = mf.compile(new StringReader(template), "template");
 		    mustache.execute(writer, scope);
 		    writer.flush();
-
-		    Log.e("PRM", "CONTENT: " + writer.toString());
 
 		    return writer.toString();
 
@@ -271,6 +278,27 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 					for (int i = 0; i < fieldNames.length; i++)
 					{
 						data.putFloatArray(fieldNames[i], valueBuffer[i]);
+
+						if (fieldNames[i].equals("PRESSURE"))
+						{
+							while (this._pressureCache.size() > 128)
+								this._pressureCache.remove(0);
+
+							for (int j = 0; j < valueBuffer[i].length; j++)
+							{
+								this._pressureCache.add(Double.valueOf(valueBuffer[i][j]));
+							}
+						}
+						else if (fieldNames[i].equals("ALTITUDE"))
+						{
+							while (this._altitudeCache.size() > 128)
+								this._altitudeCache.remove(0);
+
+							for (int j = 0; j < valueBuffer[i].length; j++)
+							{
+								this._altitudeCache.add(Double.valueOf(valueBuffer[i][j]));
+							}
+						}
 					}
 
 					this.transmitData(data);

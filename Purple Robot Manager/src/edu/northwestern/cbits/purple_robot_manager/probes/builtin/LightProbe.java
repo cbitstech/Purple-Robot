@@ -1,11 +1,24 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.github.mustachejava.DefaultMustacheFactory;
+import com.github.mustachejava.Mustache;
+import com.github.mustachejava.MustacheFactory;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -15,6 +28,8 @@ import android.os.Bundle;
 import android.os.SystemClock;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
+import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
 
 public class LightProbe extends ContinuousProbe implements SensorEventListener
 {
@@ -30,6 +45,56 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 	private double timeBuffer[] = new double[BUFFER_SIZE];
 
 	private int bufferIndex  = 0;
+
+	private ArrayList<Double> _lightCache = new ArrayList<Double>();
+
+	public Intent viewIntent(Context context)
+	{
+		Intent i = new Intent(context, WebkitLandscapeActivity.class);
+
+		return i;
+	}
+
+	public String contentSubtitle(Context context)
+	{
+		return String.format(context.getString(R.string.display_item_count), this._lightCache.size());
+	}
+
+	public String getDisplayContent(Activity activity)
+	{
+		try
+		{
+			String template = WebkitActivity.stringForAsset(activity, "webkit/highcharts_full.html");
+
+			SplineChart c = new SplineChart();
+			c.addSeries("lIGHT", new ArrayList<Double>(this._lightCache));
+
+			JSONObject json = c.highchartsJson(activity);
+
+			HashMap<String, Object> scope = new HashMap<String, Object>();
+			scope.put("highchart_json", json.toString());
+
+			StringWriter writer = new StringWriter();
+
+		    MustacheFactory mf = new DefaultMustacheFactory();
+		    Mustache mustache = mf.compile(new StringReader(template), "template");
+		    mustache.execute(writer, scope);
+		    writer.flush();
+
+		    return writer.toString();
+
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		catch (JSONException e)
+		{
+			e.printStackTrace();
+		}
+
+		return null;
+	}
 
 	public Bundle formattedBundle(Context context, Bundle bundle)
 	{
@@ -196,6 +261,17 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 
 					for (int i = 0; i < fieldNames.length; i++)
 					{
+						if (fieldNames[i].equals("LUX"))
+						{
+							while (this._lightCache.size() > 128)
+								this._lightCache.remove(0);
+
+							for (int j = 0; j < valueBuffer[i].length; j++)
+							{
+								this._lightCache.add(Double.valueOf(valueBuffer[i][j]));
+							}
+						}
+
 						data.putFloatArray(fieldNames[i], valueBuffer[i]);
 					}
 
