@@ -28,6 +28,7 @@ import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
+import edu.northwestern.cbits.purple_robot_manager.charts.SplineChart;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class BatteryProbe extends Probe
@@ -36,6 +37,7 @@ public class BatteryProbe extends Probe
 	private boolean _isEnabled = false;
 
 	private ArrayList<Double> _batteryCache = new ArrayList<Double>();
+	private ArrayList<Double> _timeCache = new ArrayList<Double>();
 
 	public Intent viewIntent(Context context)
 	{
@@ -57,6 +59,7 @@ public class BatteryProbe extends Probe
 
 			SplineChart c = new SplineChart();
 			c.addSeries("bATTERY", new ArrayList<Double>(this._batteryCache));
+			c.addTime("tIME", new ArrayList<Double>(this._timeCache));
 
 			JSONObject json = c.highchartsJson(activity);
 
@@ -123,7 +126,11 @@ public class BatteryProbe extends Probe
 						while (me._batteryCache.size() > 128)
 							me._batteryCache.remove(0);
 
+						while (me._timeCache.size() > 128)
+							me._timeCache.remove(0);
+
 						me._batteryCache.add(Double.valueOf(bundle.getInt(BatteryManager.EXTRA_LEVEL)));
+						me._timeCache.add(Double.valueOf(bundle.getLong("TIMESTAMP")));
 
 						me.transmitData(context, bundle);
 					}

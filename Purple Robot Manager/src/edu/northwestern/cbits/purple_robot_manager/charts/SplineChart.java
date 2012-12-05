@@ -1,4 +1,4 @@
-package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
+package edu.northwestern.cbits.purple_robot_manager.charts;
 
 import java.io.IOException;
 import java.util.List;
@@ -10,7 +10,6 @@ import org.json.JSONTokener;
 
 import android.app.Activity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
-import edu.northwestern.cbits.purple_robot_manager.charts.LineChart;
 
 public class SplineChart extends LineChart
 {
@@ -30,9 +29,24 @@ public class SplineChart extends LineChart
 
 			List<Double> list = this._series.get(key);
 
-			for (Double d : list)
+			if (this._times.size() == 0)
 			{
-				array.put(d.doubleValue());
+				for (Double d : list)
+				{
+					array.put(d.doubleValue());
+				}
+			}
+			else
+			{
+				for (int i = 0; i < list.size() && i < this._times.size(); i++)
+				{
+					JSONArray sample = new JSONArray();
+
+					sample.put(this._times.get(i) * 1000);
+					sample.put(list.get(i));
+
+					array.put(sample);
+				}
 			}
 
 			seriesObject.put("data", array);

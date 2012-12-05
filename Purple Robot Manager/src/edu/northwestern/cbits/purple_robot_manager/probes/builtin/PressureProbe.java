@@ -30,6 +30,7 @@ import com.github.mustachejava.MustacheFactory;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
+import edu.northwestern.cbits.purple_robot_manager.charts.SplineChart;
 
 public class PressureProbe extends ContinuousProbe implements SensorEventListener
 {
@@ -48,7 +49,7 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 	private int bufferIndex  = 0;
 
 	private ArrayList<Double> _pressureCache = new ArrayList<Double>();
-	private ArrayList<Double> _altitudeCache = new ArrayList<Double>();
+	private ArrayList<Double> _timeCache = new ArrayList<Double>();
 
 	public Intent viewIntent(Context context)
 	{
@@ -70,6 +71,7 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 
 			SplineChart c = new SplineChart();
 			c.addSeries("pRESSURE", new ArrayList<Double>(this._pressureCache));
+			c.addTime("tIME", new ArrayList<Double>(this._timeCache));
 
 			JSONObject json = c.highchartsJson(activity);
 
@@ -231,7 +233,7 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 		{
 			synchronized(this)
 			{
-				double elapsed = SystemClock.elapsedRealtime();
+				double elapsed = SystemClock.uptimeMillis();
 				double boot = (now - elapsed) * 1000 * 1000;
 
 				double timestamp = event.timestamp + boot;
@@ -275,6 +277,14 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 					data.putDoubleArray("EVENT_TIMESTAMP", timeBuffer);
 					data.putIntArray("ACCURACY", accuracyBuffer);
 
+					while (this._timeCache.size() > 128)
+						this._timeCache.remove(0);
+
+					for (int j = 0; j < timeBuffer.length; j++)
+					{
+						this._timeCache.add(Double.valueOf(timeBuffer[j] / 1000));
+					}
+
 					for (int i = 0; i < fieldNames.length; i++)
 					{
 						data.putFloatArray(fieldNames[i], valueBuffer[i]);
@@ -287,16 +297,6 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 							for (int j = 0; j < valueBuffer[i].length; j++)
 							{
 								this._pressureCache.add(Double.valueOf(valueBuffer[i][j]));
-							}
-						}
-						else if (fieldNames[i].equals("ALTITUDE"))
-						{
-							while (this._altitudeCache.size() > 128)
-								this._altitudeCache.remove(0);
-
-							for (int j = 0; j < valueBuffer[i].length; j++)
-							{
-								this._altitudeCache.add(Double.valueOf(valueBuffer[i][j]));
 							}
 						}
 					}

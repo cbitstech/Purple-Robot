@@ -44,6 +44,13 @@ public class LocationProbe extends Probe implements LocationListener
 	private long _lastCache = 0;
 	private Location _lastLocation = null;
 
+	public Intent viewIntent(Context context)
+	{
+		Intent i = new Intent(context, LocationProbeActivity.class);
+
+		return i;
+	}
+
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{
 		PreferenceManager manager = activity.getPreferenceManager();
@@ -80,12 +87,6 @@ public class LocationProbe extends Probe implements LocationListener
 		return screen;
 	}
 
-	public Intent viewIntent(Context context)
-	{
-		Intent i = new Intent(context, LocationProbeActivity.class);
-
-		return i;
-	}
 
 	public boolean isEnabled(Context context)
 	{

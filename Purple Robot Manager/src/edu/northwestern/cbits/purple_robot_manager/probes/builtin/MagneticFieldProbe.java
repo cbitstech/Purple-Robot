@@ -29,6 +29,7 @@ import android.os.SystemClock;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
+import edu.northwestern.cbits.purple_robot_manager.charts.SplineChart;
 
 public class MagneticFieldProbe extends ContinuousProbe implements SensorEventListener
 {
@@ -47,6 +48,8 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 	private ArrayList<Double> _xCache = new ArrayList<Double>();
 	private ArrayList<Double> _yCache = new ArrayList<Double>();
 	private ArrayList<Double> _zCache = new ArrayList<Double>();
+
+	private ArrayList<Double> _timeCache = new ArrayList<Double>();
 
 	private int bufferIndex  = 0;
 
@@ -72,6 +75,8 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 			c.addSeries("X", new ArrayList<Double>(this._xCache));
 			c.addSeries("Y", new ArrayList<Double>(this._yCache));
 			c.addSeries("Z", new ArrayList<Double>(this._zCache));
+
+			c.addTime("tIME", this._timeCache);
 
 			JSONObject json = c.highchartsJson(activity);
 
@@ -179,7 +184,7 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 		{
 			synchronized(this)
 			{
-				double elapsed = SystemClock.elapsedRealtime();
+				double elapsed = SystemClock.uptimeMillis();
 				double boot = (now - elapsed) * 1000 * 1000;
 
 				double timestamp = event.timestamp + boot;
@@ -216,6 +221,14 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 
 					data.putDoubleArray("EVENT_TIMESTAMP", timeBuffer);
 					data.putIntArray("ACCURACY", accuracyBuffer);
+
+					while (this._timeCache.size() > 128)
+						this._timeCache.remove(0);
+
+					for (int j = 0; j < timeBuffer.length; j++)
+					{
+						this._timeCache.add(Double.valueOf(timeBuffer[j] / 1000));
+					}
 
 					for (int i = 0; i < fieldNames.length; i++)
 					{

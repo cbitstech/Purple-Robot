@@ -1,6 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager.charts;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,10 +17,16 @@ import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 public class LineChart extends Chart
 {
 	protected Map<String, List<Double>> _series = new HashMap<String, List<Double>>();
+	protected List<Double> _times = new ArrayList<Double>();
 
 	public void addSeries(String key, List<Double> series)
 	{
 		this._series.put(key, series);
+	}
+
+	public void addTime(String string, ArrayList<Double> times)
+	{
+		this._times = times;
 	}
 
 	public JSONObject highchartsJson(Activity activity) throws JSONException, IOException
@@ -32,15 +39,28 @@ public class LineChart extends Chart
 		{
 			JSONObject seriesObject = new JSONObject();
 
-			seriesObject.put("name", key);
-
 			JSONArray array = new JSONArray();
 
 			List<Double> list = this._series.get(key);
 
-			for (Double d : list)
+			if (this._times.size() == 0)
 			{
-				array.put(d.doubleValue());
+				for (Double d : list)
+				{
+					array.put(d.doubleValue());
+				}
+			}
+			else
+			{
+				for (int i = 0; i < list.size() && i < this._times.size(); i++)
+				{
+					JSONArray sample = new JSONArray();
+
+					sample.put(this._times.get(i));
+					sample.put(list.get(i));
+
+					array.put(sample);
+				}
 			}
 
 			seriesObject.put("data", array);

@@ -30,6 +30,7 @@ import android.os.SystemClock;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
+import edu.northwestern.cbits.purple_robot_manager.charts.SplineChart;
 
 public class LightProbe extends ContinuousProbe implements SensorEventListener
 {
@@ -47,6 +48,7 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 	private int bufferIndex  = 0;
 
 	private ArrayList<Double> _lightCache = new ArrayList<Double>();
+	private ArrayList<Double> _timeCache = new ArrayList<Double>();
 
 	public Intent viewIntent(Context context)
 	{
@@ -68,6 +70,7 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 
 			SplineChart c = new SplineChart();
 			c.addSeries("lIGHT", new ArrayList<Double>(this._lightCache));
+			c.addTime("tIME", new ArrayList<Double>(this._timeCache));
 
 			JSONObject json = c.highchartsJson(activity);
 
@@ -227,7 +230,7 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 		{
 			synchronized(this)
 			{
-				double elapsed = SystemClock.elapsedRealtime();
+				double elapsed = SystemClock.uptimeMillis();
 				double boot = (now - elapsed) * 1000 * 1000;
 
 				double timestamp = event.timestamp + boot;
@@ -258,6 +261,14 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 					data.putDouble("TIMESTAMP", now / 1000);
 
 					data.putDoubleArray("EVENT_TIMESTAMP", timeBuffer);
+
+					while (this._timeCache.size() > 128)
+						this._timeCache.remove(0);
+
+					for (int j = 0; j < timeBuffer.length; j++)
+					{
+						this._timeCache.add(Double.valueOf(timeBuffer[j] / 1000));
+					}
 
 					for (int i = 0; i < fieldNames.length; i++)
 					{

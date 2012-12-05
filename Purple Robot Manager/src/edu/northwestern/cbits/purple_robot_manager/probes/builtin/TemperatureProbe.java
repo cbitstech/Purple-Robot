@@ -162,7 +162,7 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 		{
 			synchronized(this)
 			{
-				double elapsed = SystemClock.elapsedRealtime();
+				double elapsed = SystemClock.uptimeMillis();
 				double boot = (now - elapsed) * 1000 * 1000;
 
 				double timestamp = event.timestamp + boot;
