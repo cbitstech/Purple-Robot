@@ -5,6 +5,7 @@
     <string name="startup_loading_message">Starting up&#8230;</string>
     <string name="crash_toast_text">Whoops - the app has crashed. Sending a report to the developer.</string>
     <string name="toast_incorrect_password">Incorrect password. Please try again.</string>
+	<string name="error_js" formatted="false">Javascript Error: %s...</string>
 
     <string name="config_settings_category">Configuration Options</string>
     <string name="config_notifications_category">Notification Options</string>
