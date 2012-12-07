@@ -2,8 +2,7 @@
 	chart:
 	{
 		renderTo: "container",
-		type: "spline",
-		zoomType: "x"
+		type: "spline"
 	},
 	scrollbar:
 	{

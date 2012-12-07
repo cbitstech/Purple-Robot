@@ -1,6 +1,6 @@
 body
 {
-	background-color: silver;
+	background-color: #ffffff;
 	margin: 0;
 	padding: 0;
 }
@@ -11,7 +11,7 @@ div#container
 	padding: 0;
 	position: absolute;
 	top: 0px;
-	bottom: 0px;
+	bottom: 48px;
 	left: 0px;
-	right: 0px;
+	width: 1024px;
 }
