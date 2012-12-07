@@ -6,6 +6,9 @@
 		<script type="text/javascript">
 		    $(document).ready(function()
 		    {
+			    var chart = null;
+			    var shape = null;
+
 				Highcharts.setOptions(
 				{
 					global:
@@ -15,6 +18,34 @@
 				});
 
 		    	var chartJson = {{{highchart_json}}};
+
+		    	chartJson.chart.events = {};
+		    	chartJson.chart.events.click = function(e)
+		    	{
+		    		PurpleRobot.setValue("timestamp", "" + e.xAxis[0].value);
+
+					var pixel = this.xAxis[0].translate(e.xAxis[0].value);
+
+					var extremes = this.yAxis[0].getExtremes();
+
+					var minY = this.yAxis[0].translate(extremes.min);
+					var maxY = this.yAxis[0].translate(extremes.max);
+
+				    console.log("X: " + pixel + " -- " + maxY + " - " + minY);
+					console.log("1");
+
+					$("#myPath").remove();
+
+				    this.renderer.rect(pixel, 5, 3, (maxY - minY), 1).attr(
+				    {
+						"fill": "#808080",
+					    "stroke": "black",
+					    "stroke-width": 1,
+					    "id": "myPath"
+				    }).add();
+
+					console.log("2");
+				};
 
 				var i = 0;
 		    	for (i = 0; i < chartJson.series.length; i++)
@@ -27,7 +58,7 @@
 			    	}
 		    	}
 
-		        var chart = new Highcharts.Chart(chartJson);
+		        chart = new Highcharts.Chart(chartJson);
 		    });
 		</script>
 	</head>

@@ -42,7 +42,7 @@ public class PersistentService extends Service
 
 	public int onStartCommand(Intent intent, int flags, int startId)
 	{
-		if (NUDGE_PROBES.equals(intent.getAction()))
+		if (intent != null && NUDGE_PROBES.equals(intent.getAction()))
 			ProbeManager.nudgeProbes(this);
 
 		return Service.START_STICKY;

@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -28,6 +30,8 @@ import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 
 public class WebkitActivity extends SherlockActivity
 {
+	private double _selectedTimestamp = 0;
+
 	public static String stringForAsset(Activity activity, String assetName) throws IOException
 	{
 		InputStream is = activity.getAssets().open(assetName);
@@ -79,6 +83,32 @@ public class WebkitActivity extends SherlockActivity
 		return null;
 	}
 
+	public void setValue(String key, String value)
+	{
+		Log.e("PR", "GOT TIMESTAMP " + value + " (" + key + ")");
+
+		if (key.equals("timestamp"))
+		{
+			this._selectedTimestamp = Double.parseDouble(value);
+
+			final Date d = new Date((long) this._selectedTimestamp);
+
+			final SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss, MMM d");
+
+			final WebkitActivity me = this;
+
+			this.runOnUiThread(new Runnable()
+			{
+				public void run()
+				{
+					ActionBar actionBar = me.getSupportActionBar();
+
+					actionBar.setSubtitle(String.format(me.getString(R.string.display_date_item_count), sdf.format(d), me.contentSubtitle()));
+				}
+			});
+		}
+	}
+
 	@SuppressLint("SetJavaScriptEnabled")
 	protected void onResume()
 	{
@@ -95,8 +125,10 @@ public class WebkitActivity extends SherlockActivity
 				                         + cm.sourceId() );
 				    return true;
 			  }
-
 		});
+
+		webview.removeJavascriptInterface("PurpleRobot");
+		webview.addJavascriptInterface(this, "PurpleRobot");
 
 		String contentString = this.contentString();
 
@@ -174,6 +206,15 @@ public class WebkitActivity extends SherlockActivity
 				dataIntent.putExtra("probe_bundle", this.getIntent().getParcelableExtra("probe_bundle"));
 
 				this.startActivity(dataIntent);
+
+    			break;
+
+    		case R.id.menu_new_label:
+    			Intent labelIntent = new Intent(this, LabelActivity.class);
+    			labelIntent.putExtra(LabelActivity.TIMESTAMP, this._selectedTimestamp);
+    			labelIntent.putExtra(LabelActivity.LABEL_CONTEXT, this.getIntent().getStringExtra("probe_name"));
+
+    			this.startActivity(labelIntent);
 
     			break;
 		}
