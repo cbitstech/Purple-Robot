@@ -9,6 +9,7 @@ import java.util.Scanner;
 
 import org.json.JSONObject;
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
@@ -76,7 +77,20 @@ public class JavaScriptEngine
 		if (extras != null && extrasName != null)
 			script = "var " + extrasName + " = " + extras.toString() + "; " + script;
 
-		return this._jsContext.evaluateString(this._scope, script, "<engine>", 1, null);
+		try
+		{
+			return this._jsContext.evaluateString(this._scope, script, "<engine>", 1, null);
+		}
+		catch (EvaluatorException e)
+		{
+			Toast.makeText(this._context, e.getMessage(), Toast.LENGTH_LONG).show();
+		}
+		catch (EcmaError e)
+		{
+			Toast.makeText(this._context, e.getMessage(), Toast.LENGTH_LONG).show();
+		}
+
+		return null;
 	}
 
 	public boolean loadLibrary(String libraryName)
