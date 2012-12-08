@@ -80,57 +80,66 @@ public class CommunicationLogProbe extends Probe
 						int receivedCount = 0;
 						int missedCount = 0;
 
-						Cursor c = context.getContentResolver().query(CallLog.Calls.CONTENT_URI, null, null, null, null);
-
-						while (c.moveToNext())
+						try
 						{
-							Bundle contactBundle = new Bundle();
+							Cursor c = context.getContentResolver().query(CallLog.Calls.CONTENT_URI, null, null, null, null);
 
-							contactBundle.putString(CommunicationLogProbe.NUMBER_NAME, c.getString(c.getColumnIndex(Calls.CACHED_NAME)));
-							contactBundle.putString(CommunicationLogProbe.NUMBER_LABEL, c.getString(c.getColumnIndex(Calls.CACHED_NUMBER_LABEL)));
-							contactBundle.putLong(CommunicationLogProbe.CALL_TIMESTAMP, c.getLong(c.getColumnIndex(Calls.DATE)));
-							contactBundle.putLong(CommunicationLogProbe.CALL_DURATION, c.getLong(c.getColumnIndex(Calls.DURATION)));
-							contactBundle.putString(CommunicationLogProbe.NUMBER, PhoneNumberUtils.formatNumber(c.getString(c.getColumnIndex(Calls.NUMBER))));
+							while (c.moveToNext())
+							{
+								Bundle contactBundle = new Bundle();
 
-							int callType = c.getInt(c.getColumnIndex(Calls.CACHED_NUMBER_TYPE));
+								contactBundle.putString(CommunicationLogProbe.NUMBER_NAME, c.getString(c.getColumnIndex(Calls.CACHED_NAME)));
+								contactBundle.putString(CommunicationLogProbe.NUMBER_LABEL, c.getString(c.getColumnIndex(Calls.CACHED_NUMBER_LABEL)));
+								contactBundle.putLong(CommunicationLogProbe.CALL_TIMESTAMP, c.getLong(c.getColumnIndex(Calls.DATE)));
+								contactBundle.putLong(CommunicationLogProbe.CALL_DURATION, c.getLong(c.getColumnIndex(Calls.DURATION)));
+								contactBundle.putString(CommunicationLogProbe.NUMBER, PhoneNumberUtils.formatNumber(c.getString(c.getColumnIndex(Calls.NUMBER))));
 
-							contactBundle.putInt(CommunicationLogProbe.NUMBER_TYPE, callType);
+								int callType = c.getInt(c.getColumnIndex(Calls.CACHED_NUMBER_TYPE));
 
-							if (callType == Calls.OUTGOING_TYPE)
-								sentCount += 1;
-							else if (callType == Calls.INCOMING_TYPE)
-								receivedCount += 1;
-							if (callType == Calls.MISSED_TYPE)
-								missedCount += 1;
+								contactBundle.putInt(CommunicationLogProbe.NUMBER_TYPE, callType);
 
-							calls.add(contactBundle);
+								if (callType == Calls.OUTGOING_TYPE)
+									sentCount += 1;
+								else if (callType == Calls.INCOMING_TYPE)
+									receivedCount += 1;
+								if (callType == Calls.MISSED_TYPE)
+									missedCount += 1;
+
+								calls.add(contactBundle);
+							}
+
+							c.close();
+
+							bundle.putParcelableArrayList(CommunicationLogProbe.PHONE_CALLS, calls);
+							bundle.putInt(CommunicationLogProbe.CALL_OUTGOING_COUNT, sentCount);
+							bundle.putInt(CommunicationLogProbe.CALL_INCOMING_COUNT, receivedCount);
+							bundle.putInt(CommunicationLogProbe.CALL_MISSED_COUNT, missedCount);
+							bundle.putInt(CommunicationLogProbe.CALL_TOTAL_COUNT, missedCount + receivedCount + sentCount);
+
+							sentCount = 0;
+							receivedCount = 0;
+
+							Uri smsInboxUri = Uri.parse("content://sms/inbox");
+							c = context.getContentResolver().query(smsInboxUri, null, null, null, null);
+							receivedCount = c.getCount();
+							c.close();
+
+							Uri smsOutboxUri = Uri.parse("content://sms/sent");
+							c = context.getContentResolver().query(smsOutboxUri, null, null, null, null);
+							sentCount = c.getCount();
+							c.close();
+
+							bundle.putInt(CommunicationLogProbe.SMS_OUTGOING_COUNT, sentCount);
+							bundle.putInt(CommunicationLogProbe.SMS_INCOMING_COUNT, receivedCount);
+
+							this.transmitData(context, bundle);
 						}
+						catch (Exception e)
+						{
+							// Broken call & SMS databases on several devices... Ignoring.
 
-						c.close();
-
-						bundle.putParcelableArrayList(CommunicationLogProbe.PHONE_CALLS, calls);
-						bundle.putInt(CommunicationLogProbe.CALL_OUTGOING_COUNT, sentCount);
-						bundle.putInt(CommunicationLogProbe.CALL_INCOMING_COUNT, receivedCount);
-						bundle.putInt(CommunicationLogProbe.CALL_MISSED_COUNT, missedCount);
-						bundle.putInt(CommunicationLogProbe.CALL_TOTAL_COUNT, missedCount + receivedCount + sentCount);
-
-						sentCount = 0;
-						receivedCount = 0;
-
-						Uri smsInboxUri = Uri.parse("content://sms/inbox");
-						c = context.getContentResolver().query(smsInboxUri, null, null, null, null);
-						receivedCount = c.getCount();
-						c.close();
-
-						Uri smsOutboxUri = Uri.parse("content://sms/sent");
-						c = context.getContentResolver().query(smsOutboxUri, null, null, null, null);
-						sentCount = c.getCount();
-						c.close();
-
-						bundle.putInt(CommunicationLogProbe.SMS_OUTGOING_COUNT, sentCount);
-						bundle.putInt(CommunicationLogProbe.SMS_INCOMING_COUNT, receivedCount);
-
-						this.transmitData(context, bundle);
+							e.printStackTrace();
+						}
 
 						this._lastCheck = now;
 					}
