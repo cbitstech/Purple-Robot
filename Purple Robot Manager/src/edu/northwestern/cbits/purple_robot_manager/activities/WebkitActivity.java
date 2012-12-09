@@ -10,15 +10,21 @@ import java.util.Date;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -28,7 +34,7 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 
-public class WebkitActivity extends SherlockActivity
+public class WebkitActivity extends SherlockFragmentActivity
 {
 	private double _selectedTimestamp = 0;
 
@@ -85,8 +91,6 @@ public class WebkitActivity extends SherlockActivity
 
 	public void setValue(String key, String value)
 	{
-		Log.e("PR", "GOT TIMESTAMP " + value + " (" + key + ")");
-
 		if (key.equals("timestamp"))
 		{
 			this._selectedTimestamp = Double.parseDouble(value);
@@ -109,11 +113,16 @@ public class WebkitActivity extends SherlockActivity
 		}
 	}
 
-	@SuppressLint("SetJavaScriptEnabled")
 	protected void onResume()
 	{
 		super.onResume();
 
+		this.refresh();
+	}
+
+	@SuppressLint("SetJavaScriptEnabled")
+	private void refresh()
+	{
 		WebView webview = (WebView) this.findViewById(R.id.webview);
 
 		webview.setWebChromeClient(new WebChromeClient()
@@ -210,14 +219,50 @@ public class WebkitActivity extends SherlockActivity
     			break;
 
     		case R.id.menu_new_label:
-    			Intent labelIntent = new Intent(this, LabelActivity.class);
-    			labelIntent.putExtra(LabelActivity.TIMESTAMP, this._selectedTimestamp);
-    			labelIntent.putExtra(LabelActivity.LABEL_CONTEXT, this.getIntent().getStringExtra("probe_name"));
+    			if (this._selectedTimestamp == 0)
+    			{
+    				FragmentManager manager = this.getSupportFragmentManager();
 
-    			this.startActivity(labelIntent);
+    				final WebkitActivity me = this;
+
+    				DialogFragment dialog = new DialogFragment()
+    				{
+    					public Dialog onCreateDialog(Bundle savedInstanceState)
+    					{
+    	    				AlertDialog.Builder builder = new AlertDialog.Builder(me);
+    	    				builder.setTitle(R.string.title_missing_timestamp);
+    	    				builder.setMessage(R.string.message_missing_timestamp);
+    	    				builder.setPositiveButton(R.string.button_ok, new OnClickListener()
+    	    				{
+    							public void onClick(DialogInterface dialog, int arg)
+    							{
+
+    							}
+    	    				});
+
+    	    				return builder.create();
+    					}
+    				};
+
+    				dialog.show(manager, "label_missing");
+    			}
+    			else
+    			{
+
+        			Intent labelIntent = new Intent(this, LabelActivity.class);
+        			labelIntent.putExtra(LabelActivity.TIMESTAMP, this._selectedTimestamp);
+        			labelIntent.putExtra(LabelActivity.LABEL_CONTEXT, this.getIntent().getStringExtra("probe_name"));
+
+        			this.startActivity(labelIntent);
+    			}
 
     			break;
-		}
+
+    		case R.id.menu_refresh:
+    			this.refresh();
+
+    			break;
+    	}
 
     	return true;
     }

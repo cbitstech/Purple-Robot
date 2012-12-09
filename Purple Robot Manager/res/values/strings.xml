@@ -132,6 +132,14 @@
 
     <string name="title_probe_readings">Status</string>
 
+    <string name="title_confirm_label">Confirm Label</string>
+    <string name="button_ok">OK</string>
+    <string name="title_missing_label">Missing Label</string>
+    <string name="message_missing_label">Please enter a label name and value before proceeding.</string>
+
+    <string name="title_missing_timestamp">Select a Time</string>
+    <string name="message_missing_timestamp">Please select a timestamp from the timeline to proceed.</string>
+
     <string name="summary_accelerator_probe" formatted="false">%.2f X, %.2f Y, %.2f Z</string>
     <string name="summary_gyroscope_probe" formatted="false">%.2f X, %.2f Y, %.2f Z</string>
     <string name="summary_magnetic_probe" formatted="false">%.1f X, %.1f Y, %.1f Z</string>
@@ -172,6 +180,10 @@
     <string name="menu_resume_toggle_label">Resume</string>
     <string name="menu_refresh_label">Refresh</string>
     <string name="menu_new_label">New Label</string>
+    <string name="menu_accept_label">Save New Label</string>
+    <string name="menu_cancel">Cancel</string>
+
+    <string name="label_context" formatted="false">Context: %s</string>
 
     <string name="toast_refresh_probes">Refreshing probes&#8230;</string>
     <string name="title_probes_count" formatted="false">%d Sensors</string>

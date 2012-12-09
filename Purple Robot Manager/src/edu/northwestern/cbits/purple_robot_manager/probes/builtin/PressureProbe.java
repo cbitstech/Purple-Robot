@@ -77,6 +77,7 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 
 			HashMap<String, Object> scope = new HashMap<String, Object>();
 			scope.put("highchart_json", json.toString());
+			scope.put("highchart_count", this._pressureCache.size());
 
 			StringWriter writer = new StringWriter();
 

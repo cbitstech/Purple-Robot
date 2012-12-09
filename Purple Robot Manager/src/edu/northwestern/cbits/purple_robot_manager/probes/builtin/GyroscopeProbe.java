@@ -82,6 +82,7 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 
 			HashMap<String, Object> scope = new HashMap<String, Object>();
 			scope.put("highchart_json", json.toString());
+			scope.put("highchart_count", this._xCache.size());
 
 			StringWriter writer = new StringWriter();
 

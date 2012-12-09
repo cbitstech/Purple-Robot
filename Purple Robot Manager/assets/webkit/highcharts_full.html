@@ -17,7 +17,26 @@
 				    }
 				});
 
-		    	var chartJson = {{{highchart_json}}};
+		    	var chartJson = {{{ highchart_json }}};
+		    	var plotCount = {{{ highchart_count }}};
+
+				var plotWidth = plotCount * 10;
+				var chartWidth = $("div#container").width();
+
+				console.log("PLOT WIDTH: " + plotWidth + " -- " + chartWidth);
+
+				if (plotWidth > chartWidth)
+				{
+					console.log("EXPAND: " + plotWidth);
+					$("div#container").css("width", plotWidth + "px");
+					$("div#container").css("right", "");
+				}
+				else
+				{
+					console.log("RETAIN: " + plotWidth);
+					$("div#container").css("width", "");
+					$("div#container").css("right", "0px");
+				}
 
 		    	chartJson.chart.events = {};
 		    	chartJson.chart.events.click = function(e)
@@ -36,10 +55,10 @@
 
 					$("#myPath").remove();
 
-				    this.renderer.rect(pixel, 5, 3, (maxY - minY), 1).attr(
+				    this.renderer.rect(pixel, 5, 1, (maxY - minY), 1).attr(
 				    {
-						"fill": "#808080",
-					    "stroke": "black",
+						"fill": "white",
+					    "stroke": "#808080",
 					    "stroke-width": 1,
 					    "id": "myPath"
 				    }).add();

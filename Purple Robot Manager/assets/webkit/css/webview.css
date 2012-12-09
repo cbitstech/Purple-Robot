@@ -3,6 +3,7 @@ body
 	background-color: #ffffff;
 	margin: 0;
 	padding: 0;
+	background-image:url("../graphics/white_texture.png");
 }
 
 div#container
@@ -13,5 +14,5 @@ div#container
 	top: 0px;
 	bottom: 48px;
 	left: 0px;
-	width: 1024px;
+	right: 0px;
 }
