@@ -31,6 +31,7 @@
 	{
 		spline:
 		{
+			shadow: false,
 			marker:
 			{
 				enabled: false,
