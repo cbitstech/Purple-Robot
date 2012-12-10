@@ -6,6 +6,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import android.content.ContentValues;
@@ -25,6 +26,9 @@ public class ProbeValuesProvider
 
 	private SQLiteDatabase _database = null;
 	private ProbeValuesSqlHelper _dbHelper = null;
+
+	private HashMap<String, Long> _lastSaves = new HashMap<String, Long>();
+
 	private long _lastCleanup = 0;
 
 	private static ProbeValuesProvider _instance = null;
@@ -156,6 +160,16 @@ public class ProbeValuesProvider
 	{
 		long now = System.currentTimeMillis();
 
+		Long lastSave = this._lastSaves.get(name);
+
+		if (lastSave == null)
+			lastSave = Long.valueOf(0);
+
+		if (now - lastSave.longValue() < 500)
+			return false;
+
+		this._lastSaves.put(name, Long.valueOf(now));
+
 		if (now - this._lastCleanup > 300000) // FLush old entries every 5 minutes...
 			this.cleanup();
 
@@ -202,7 +216,7 @@ public class ProbeValuesProvider
 
 		while (c.moveToNext())
 		{
-			String tableName = c.getString(c.getColumnIndex("name"));
+//			String tableName = c.getString(c.getColumnIndex("name"));
 
 			try
 			{
