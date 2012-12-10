@@ -189,7 +189,10 @@ public class StartActivity extends SherlockActivity
     			{
 					public void onClick(View v)
 					{
-						Intent intent = probe.viewIntent(me);
+						Intent intent = null;
+
+						if (probe != null)
+							intent = probe.viewIntent(me);
 
 						if (intent == null)
 						{

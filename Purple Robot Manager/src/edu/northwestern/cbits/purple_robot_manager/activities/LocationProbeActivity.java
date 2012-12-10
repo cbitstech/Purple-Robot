@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
@@ -35,6 +36,7 @@ import com.google.android.maps.Projection;
 
 import edu.northwestern.cbits.purple_robot_manager.ProbeViewerActivity;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
 
 public class LocationProbeActivity extends SherlockMapActivity
@@ -132,7 +134,7 @@ public class LocationProbeActivity extends SherlockMapActivity
 	    	Paint paint = new Paint();
 
 	        paint.setDither(true);
-	        paint.setColor(Color.RED);
+	        paint.setColor(0xFF800000);
 	        paint.setStyle(Paint.Style.STROKE);
 	        paint.setStrokeJoin(Paint.Join.ROUND);
 	        paint.setStrokeCap(Paint.Cap.ROUND);
@@ -196,7 +198,23 @@ public class LocationProbeActivity extends SherlockMapActivity
 
 		overlays.clear();
 
-		List<Location> locations = LocationProbe.cachedLocations();
+		List<Location> locations = new ArrayList<Location>();
+
+		Cursor cursor = ProbeValuesProvider.getProvider(this).retrieveValues(LocationProbe.DB_TABLE, LocationProbe.databaseSchema());
+
+		while (cursor.moveToNext())
+		{
+			Location l = new Location(this.getLocalClassName());
+
+			l.setLatitude(cursor.getDouble(cursor.getColumnIndex(LocationProbe.LATITUDE_KEY)));
+			l.setLongitude(cursor.getDouble(cursor.getColumnIndex(LocationProbe.LONGITUDE_KEY)));
+
+			l.setTime(((long) cursor.getDouble(cursor.getColumnIndex(ProbeValuesProvider.TIMESTAMP))) * 1000);
+
+			locations.add(l);
+		}
+
+		cursor.close();
 
 		double minLat = 90;
 		double maxLat = -90;
@@ -258,20 +276,13 @@ public class LocationProbeActivity extends SherlockMapActivity
 		    	Paint paint = new Paint();
 
 		        paint.setDither(true);
-		        paint.setColor(Color.DKGRAY);
+		        paint.setColor(Color.BLACK);
 		        paint.setStyle(Paint.Style.STROKE);
 		        paint.setStrokeJoin(Paint.Join.ROUND);
 		        paint.setStrokeCap(Paint.Cap.ROUND);
-		        paint.setStrokeWidth(metrics.density * 15);
+		        paint.setStrokeWidth(metrics.density * 5);
 
-		        Path path = new Path();
-
-		        path.moveTo(0, 0);
-		        path.lineTo(1.0f, 0.0f);
-		        path.lineTo(1.0f, 1.0f);
-		        path.lineTo(0.0f, 1.0f);
-
-		        canvas.drawPath(path, paint);
+		        canvas.drawCircle(0, 0, metrics.density * 2, paint);
 			}
 
 			public int getOpacity()

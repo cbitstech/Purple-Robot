@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,6 +21,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -31,12 +33,17 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
 import edu.northwestern.cbits.purple_robot_manager.charts.SplineChart;
+import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 
 public class LightProbe extends ContinuousProbe implements SensorEventListener
 {
+	private static final String DB_TABLE = "light_probe";
+
+	private static final String LIGHT_KEY = "LUX";
+
 	private static int BUFFER_SIZE = 40;
 
-	private static String[] fieldNames = { "LUX" };
+	private static String[] fieldNames = { LIGHT_KEY };
 
 	private double lastSeen = 0;
 	private long lastFrequencyLookup = 0;
@@ -47,9 +54,6 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 
 	private int bufferIndex  = 0;
 
-	private ArrayList<Double> _lightCache = new ArrayList<Double>();
-	private ArrayList<Double> _timeCache = new ArrayList<Double>();
-
 	public Intent viewIntent(Context context)
 	{
 		Intent i = new Intent(context, WebkitLandscapeActivity.class);
@@ -59,7 +63,26 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 
 	public String contentSubtitle(Context context)
 	{
-		return String.format(context.getString(R.string.display_item_count), this._lightCache.size());
+		Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(LightProbe.DB_TABLE, this.databaseSchema());
+
+		int count = -1;
+
+		if (c != null)
+		{
+			count = c.getCount();
+			c.close();
+		}
+
+		return String.format(context.getString(R.string.display_item_count), count);
+	}
+
+	public Map<String, String> databaseSchema()
+	{
+		HashMap<String, String> schema = new HashMap<String, String>();
+
+		schema.put(LightProbe.LIGHT_KEY, ProbeValuesProvider.REAL_TYPE);
+
+		return schema;
 	}
 
 	public String getDisplayContent(Activity activity)
@@ -68,15 +91,39 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 		{
 			String template = WebkitActivity.stringForAsset(activity, "webkit/highcharts_full.html");
 
+			ArrayList<Double> light = new ArrayList<Double>();
+			ArrayList<Double> time = new ArrayList<Double>();
+
+			Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(LightProbe.DB_TABLE, this.databaseSchema());
+
+			int count = -1;
+
+			if (cursor != null)
+			{
+				count = cursor.getCount();
+
+				while (cursor.moveToNext())
+				{
+					double d = cursor.getDouble(cursor.getColumnIndex(LightProbe.LIGHT_KEY));
+					double t = cursor.getDouble(cursor.getColumnIndex(ProbeValuesProvider.TIMESTAMP));
+
+					light.add(d);
+					time.add(t);
+				}
+
+				cursor.close();
+			}
+
+
 			SplineChart c = new SplineChart();
-			c.addSeries("lIGHT", new ArrayList<Double>(this._lightCache));
-			c.addTime("tIME", new ArrayList<Double>(this._timeCache));
+			c.addSeries("lIGHT", light);
+			c.addTime("tIME", time);
 
 			JSONObject json = c.highchartsJson(activity);
 
 			HashMap<String, Object> scope = new HashMap<String, Object>();
 			scope.put("highchart_json", json.toString());
-			scope.put("highchart_count", this._lightCache.size());
+			scope.put("highchart_count", count);
 
 			StringWriter writer = new StringWriter();
 
@@ -263,31 +310,34 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 
 					data.putDoubleArray("EVENT_TIMESTAMP", timeBuffer);
 
-					while (this._timeCache.size() > 128)
-						this._timeCache.remove(0);
-
-					for (int j = 0; j < timeBuffer.length; j++)
-					{
-						this._timeCache.add(Double.valueOf(timeBuffer[j] / 1000));
-					}
-
 					for (int i = 0; i < fieldNames.length; i++)
 					{
-						if (fieldNames[i].equals("LUX"))
-						{
-							while (this._lightCache.size() > 128)
-								this._lightCache.remove(0);
-
-							for (int j = 0; j < valueBuffer[i].length; j++)
-							{
-								this._lightCache.add(Double.valueOf(valueBuffer[i][j]));
-							}
-						}
-
 						data.putFloatArray(fieldNames[i], valueBuffer[i]);
 					}
 
 					this.transmitData(data);
+
+					for (int j = 0; j < timeBuffer.length; j++)
+					{
+						Double light = null;
+
+						for (int i = 0; i < fieldNames.length; i++)
+						{
+							if (fieldNames[i].equals(LightProbe.LIGHT_KEY))
+								light = Double.valueOf(valueBuffer[i][j]);
+						}
+
+						if (light != null)
+						{
+							Map<String, Object> values = new HashMap<String, Object>();
+
+							values.put(LightProbe.LIGHT_KEY, light);
+
+							values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[j] / 1000));
+
+							ProbeValuesProvider.getProvider(this._context).insertValue(LightProbe.DB_TABLE, this.databaseSchema(), values);
+						}
+					}
 
 					bufferIndex = 0;
 				}
