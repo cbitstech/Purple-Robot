@@ -1,7 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,6 +21,7 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.LocationProbeActivity;
+import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class LocationProbe extends Probe implements LocationListener
@@ -33,8 +34,9 @@ public class LocationProbe extends Probe implements LocationListener
 	private static final String BEARING = "BEARING";
 	private static final String SPEED = "SPEED";
 	private static final String TIME_FIX = "TIME_FIX";
-
-	private static final ArrayList<Location> _lastLocations = new ArrayList<Location>();
+	public static final String LONGITUDE_KEY = LONGITUDE;
+	public static final String LATITUDE_KEY = LATITUDE;
+	public static final String DB_TABLE = "location_probe";
 
 	protected Context _context = null;
 
@@ -193,9 +195,6 @@ public class LocationProbe extends Probe implements LocationListener
 
 			if (time - this._lastCache > 30000 || this._lastLocation == null)
 			{
-				while (LocationProbe._lastLocations.size() > 1 && time - LocationProbe._lastLocations.get(0).getTime() > 86400000)
-					LocationProbe._lastLocations.remove(0);
-
 				boolean include = true;
 
 				if (this._lastLocation != null && this._lastLocation.distanceTo(location) < 50.0)
@@ -203,7 +202,13 @@ public class LocationProbe extends Probe implements LocationListener
 
 				if (include)
 				{
-					LocationProbe._lastLocations.add(new Location(location));
+					Map<String, Object> values = new HashMap<String, Object>();
+
+					values.put(LocationProbe.LONGITUDE_KEY, Double.valueOf(location.getLongitude()));
+					values.put(LocationProbe.LATITUDE_KEY, Double.valueOf(location.getLatitude()));
+					values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(location.getTime() / 1000));
+
+					ProbeValuesProvider.getProvider(this._context).insertValue(LocationProbe.DB_TABLE, LocationProbe.databaseSchema(), values);
 
 					this._lastCache = time;
 					this._lastLocation = new Location(location);
@@ -212,6 +217,16 @@ public class LocationProbe extends Probe implements LocationListener
 
 			this.transmitData(this._context, bundle);
 		}
+	}
+
+	public static Map<String, String> databaseSchema()
+	{
+		HashMap<String, String> schema = new HashMap<String, String>();
+
+		schema.put(LocationProbe.LATITUDE_KEY, ProbeValuesProvider.REAL_TYPE);
+		schema.put(LocationProbe.LONGITUDE_KEY, ProbeValuesProvider.REAL_TYPE);
+
+		return schema;
 	}
 
 	public void onProviderDisabled(String provider)
@@ -238,10 +253,5 @@ public class LocationProbe extends Probe implements LocationListener
 		double longitude = bundle.getDouble(LocationProbe.LONGITUDE);
 
 		return String.format(context.getResources().getString(R.string.summary_location_probe), latitude, longitude);
-	}
-
-	public static List<Location> cachedLocations()
-	{
-		return new ArrayList<Location>(LocationProbe._lastLocations);
 	}
 }

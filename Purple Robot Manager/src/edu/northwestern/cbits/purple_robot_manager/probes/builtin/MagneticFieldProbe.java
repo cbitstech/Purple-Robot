@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,6 +20,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -30,12 +32,19 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
 import edu.northwestern.cbits.purple_robot_manager.charts.SplineChart;
+import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 
 public class MagneticFieldProbe extends ContinuousProbe implements SensorEventListener
 {
 	private static int BUFFER_SIZE = 40;
 
-	private static String[] fieldNames = { "X", "Y", "Z" };
+	private static final String DB_TABLE = "magnetic_probe";
+
+	private static String X_KEY = "X";
+	private static String Y_KEY = "Y";
+	private static String Z_KEY = "Z";
+
+	private static String[] fieldNames = { X_KEY, Y_KEY, Z_KEY };
 
 	private double lastSeen = 0;
 	private long lastFrequencyLookup = 0;
@@ -44,12 +53,6 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 	private float valueBuffer[][] = new float[3][BUFFER_SIZE];
 	private int accuracyBuffer[] = new int[BUFFER_SIZE];
 	private double timeBuffer[] = new double[BUFFER_SIZE];
-
-	private ArrayList<Double> _xCache = new ArrayList<Double>();
-	private ArrayList<Double> _yCache = new ArrayList<Double>();
-	private ArrayList<Double> _zCache = new ArrayList<Double>();
-
-	private ArrayList<Double> _timeCache = new ArrayList<Double>();
 
 	private int bufferIndex  = 0;
 
@@ -62,7 +65,28 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 
 	public String contentSubtitle(Context context)
 	{
-		return String.format(context.getString(R.string.display_item_count), this._xCache.size());
+		Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(MagneticFieldProbe.DB_TABLE, this.databaseSchema());
+
+		int count = -1;
+
+		if (c != null)
+		{
+			count = c.getCount();
+			c.close();
+		}
+
+		return String.format(context.getString(R.string.display_item_count), count);
+	}
+
+	public Map<String, String> databaseSchema()
+	{
+		HashMap<String, String> schema = new HashMap<String, String>();
+
+		schema.put(MagneticFieldProbe.X_KEY, ProbeValuesProvider.REAL_TYPE);
+		schema.put(MagneticFieldProbe.Y_KEY, ProbeValuesProvider.REAL_TYPE);
+		schema.put(MagneticFieldProbe.Z_KEY, ProbeValuesProvider.REAL_TYPE);
+
+		return schema;
 	}
 
 	public String getDisplayContent(Activity activity)
@@ -71,18 +95,48 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 		{
 			String template = WebkitActivity.stringForAsset(activity, "webkit/highcharts_full.html");
 
-			SplineChart c = new SplineChart();
-			c.addSeries("X", new ArrayList<Double>(this._xCache));
-			c.addSeries("Y", new ArrayList<Double>(this._yCache));
-			c.addSeries("Z", new ArrayList<Double>(this._zCache));
+			ArrayList<Double> x = new ArrayList<Double>();
+			ArrayList<Double> y = new ArrayList<Double>();
+			ArrayList<Double> z = new ArrayList<Double>();
+			ArrayList<Double> time = new ArrayList<Double>();
 
-			c.addTime("tIME", this._timeCache);
+			Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(MagneticFieldProbe.DB_TABLE, this.databaseSchema());
+
+			int count = -1;
+
+			if (cursor != null)
+			{
+				count = cursor.getCount();
+
+				while (cursor.moveToNext())
+				{
+					double xd = cursor.getDouble(cursor.getColumnIndex(MagneticFieldProbe.X_KEY));
+					double yd = cursor.getDouble(cursor.getColumnIndex(MagneticFieldProbe.Y_KEY));
+					double zd = cursor.getDouble(cursor.getColumnIndex(MagneticFieldProbe.Z_KEY));
+
+					double t = cursor.getDouble(cursor.getColumnIndex(ProbeValuesProvider.TIMESTAMP));
+
+					x.add(xd);
+					y.add(yd);
+					z.add(zd);
+					time.add(t);
+				}
+
+				cursor.close();
+			}
+
+			SplineChart c = new SplineChart();
+			c.addSeries("X", x);
+			c.addSeries("Y", y);
+			c.addSeries("Z", z);
+
+			c.addTime("tIME", time);
 
 			JSONObject json = c.highchartsJson(activity);
 
 			HashMap<String, Object> scope = new HashMap<String, Object>();
 			scope.put("highchart_json", json.toString());
-			scope.put("highchart_count", this._xCache.size());
+			scope.put("highchart_count", count);
 
 			StringWriter writer = new StringWriter();
 
@@ -223,51 +277,42 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 					data.putDoubleArray("EVENT_TIMESTAMP", timeBuffer);
 					data.putIntArray("ACCURACY", accuracyBuffer);
 
-					while (this._timeCache.size() > 128)
-						this._timeCache.remove(0);
-
-					for (int j = 0; j < timeBuffer.length; j++)
-					{
-						this._timeCache.add(Double.valueOf(timeBuffer[j] / 1000));
-					}
-
 					for (int i = 0; i < fieldNames.length; i++)
 					{
 						data.putFloatArray(fieldNames[i], valueBuffer[i]);
-
-						if (fieldNames[i].equals("X"))
-						{
-							while (this._xCache.size() > 128)
-								this._xCache.remove(0);
-
-							for (int j = 0; j < valueBuffer[i].length; j++)
-							{
-								this._xCache.add(Double.valueOf(valueBuffer[i][j]));
-							}
-						}
-						else if (fieldNames[i].equals("Y"))
-						{
-							while (this._yCache.size() > 128)
-								this._yCache.remove(0);
-
-							for (int j = 0; j < valueBuffer[i].length; j++)
-							{
-								this._yCache.add(Double.valueOf(valueBuffer[i][j]));
-							}
-						}
-						else if (fieldNames[i].equals("Z"))
-						{
-							while (this._zCache.size() > 128)
-								this._zCache.remove(0);
-
-							for (int j = 0; j < valueBuffer[i].length; j++)
-							{
-								this._zCache.add(Double.valueOf(valueBuffer[i][j]));
-							}
-						}
 					}
 
 					this.transmitData(data);
+
+					for (int j = 0; j < timeBuffer.length; j++)
+					{
+						Double x = null;
+						Double y = null;
+						Double z = null;
+
+						for (int i = 0; i < fieldNames.length; i++)
+						{
+							if (fieldNames[i].equals(MagneticFieldProbe.X_KEY))
+								x = Double.valueOf(valueBuffer[i][j]);
+							else if (fieldNames[i].equals(MagneticFieldProbe.Y_KEY))
+								y = Double.valueOf(valueBuffer[i][j]);
+							else if (fieldNames[i].equals(MagneticFieldProbe.Z_KEY))
+								z = Double.valueOf(valueBuffer[i][j]);
+						}
+
+						if (x != null && y != null && z != null)
+						{
+							Map<String, Object> values = new HashMap<String, Object>();
+
+							values.put(MagneticFieldProbe.X_KEY, x);
+							values.put(MagneticFieldProbe.Y_KEY, y);
+							values.put(MagneticFieldProbe.Z_KEY, z);
+
+							values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[j] / 1000));
+
+							ProbeValuesProvider.getProvider(this._context).insertValue(MagneticFieldProbe.DB_TABLE, this.databaseSchema(), values);
+						}
+					}
 
 					bufferIndex = 0;
 				}

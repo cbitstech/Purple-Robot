@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,6 +17,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -31,12 +33,18 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
 import edu.northwestern.cbits.purple_robot_manager.charts.SplineChart;
+import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 
 public class PressureProbe extends ContinuousProbe implements SensorEventListener
 {
+	private static final String DB_TABLE = "pressure_probe";
+
 	private static int BUFFER_SIZE = 40;
 
-	private static String[] fieldNames = { "PRESSURE", "ALTITUDE" };
+	private static String PRESSURE_KEY = "PRESSURE";
+	private static String ALTITUDE_KEY = "ALTITUDE";
+
+	private static String[] fieldNames = { PRESSURE_KEY, ALTITUDE_KEY };
 
 	private double lastSeen = 0;
 	private long lastFrequencyLookup = 0;
@@ -48,9 +56,6 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 
 	private int bufferIndex  = 0;
 
-	private ArrayList<Double> _pressureCache = new ArrayList<Double>();
-	private ArrayList<Double> _timeCache = new ArrayList<Double>();
-
 	public Intent viewIntent(Context context)
 	{
 		Intent i = new Intent(context, WebkitLandscapeActivity.class);
@@ -60,7 +65,17 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 
 	public String contentSubtitle(Context context)
 	{
-		return String.format(context.getString(R.string.display_item_count), this._pressureCache.size());
+		Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(PressureProbe.DB_TABLE, this.databaseSchema());
+
+		int count = -1;
+
+		if (c != null)
+		{
+			count = c.getCount();
+			c.close();
+		}
+
+		return String.format(context.getString(R.string.display_item_count), count);
 	}
 
 	public String getDisplayContent(Activity activity)
@@ -70,14 +85,39 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 			String template = WebkitActivity.stringForAsset(activity, "webkit/highcharts_full.html");
 
 			SplineChart c = new SplineChart();
-			c.addSeries("pRESSURE", new ArrayList<Double>(this._pressureCache));
-			c.addTime("tIME", new ArrayList<Double>(this._timeCache));
+
+			ArrayList<Double> pressure = new ArrayList<Double>();
+			ArrayList<Double> time = new ArrayList<Double>();
+
+			Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(PressureProbe.DB_TABLE, this.databaseSchema());
+
+			int count = -1;
+
+			if (cursor != null)
+			{
+				count = cursor.getCount();
+
+				while (cursor.moveToNext())
+				{
+					double d = cursor.getDouble(cursor.getColumnIndex(PressureProbe.PRESSURE_KEY));
+					double t = cursor.getDouble(cursor.getColumnIndex(ProbeValuesProvider.TIMESTAMP));
+
+					pressure.add(d);
+					time.add(t);
+				}
+
+				cursor.close();
+			}
+
+			c.addSeries("pRESSURE", pressure);
+			c.addTime("tIME", time);
 
 			JSONObject json = c.highchartsJson(activity);
 
 			HashMap<String, Object> scope = new HashMap<String, Object>();
 			scope.put("highchart_json", json.toString());
-			scope.put("highchart_count", this._pressureCache.size());
+
+			scope.put("highchart_count", count);
 
 			StringWriter writer = new StringWriter();
 
@@ -106,8 +146,8 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 		Bundle formatted = super.formattedBundle(context, bundle);
 
 		double[] eventTimes = bundle.getDoubleArray("EVENT_TIMESTAMP");
-		float[] altitudes = bundle.getFloatArray("ALTITUDE");
-		float[] pressures = bundle.getFloatArray("PRESSURE");
+		float[] altitudes = bundle.getFloatArray(ALTITUDE_KEY);
+		float[] pressures = bundle.getFloatArray(PRESSURE_KEY);
 
 		ArrayList<String> keys = new ArrayList<String>();
 
@@ -278,31 +318,38 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 					data.putDoubleArray("EVENT_TIMESTAMP", timeBuffer);
 					data.putIntArray("ACCURACY", accuracyBuffer);
 
-					while (this._timeCache.size() > 128)
-						this._timeCache.remove(0);
-
-					for (int j = 0; j < timeBuffer.length; j++)
-					{
-						this._timeCache.add(Double.valueOf(timeBuffer[j] / 1000));
-					}
-
 					for (int i = 0; i < fieldNames.length; i++)
 					{
 						data.putFloatArray(fieldNames[i], valueBuffer[i]);
-
-						if (fieldNames[i].equals("PRESSURE"))
-						{
-							while (this._pressureCache.size() > 128)
-								this._pressureCache.remove(0);
-
-							for (int j = 0; j < valueBuffer[i].length; j++)
-							{
-								this._pressureCache.add(Double.valueOf(valueBuffer[i][j]));
-							}
-						}
 					}
 
 					this.transmitData(data);
+
+					for (int j = 0; j < timeBuffer.length; j++)
+					{
+						Double pressure = null;
+						Double altitude = null;
+
+						for (int i = 0; i < fieldNames.length; i++)
+						{
+							if (fieldNames[i].equals(PressureProbe.PRESSURE_KEY))
+								pressure = Double.valueOf(valueBuffer[i][j]);
+							else if (fieldNames[i].equals(PressureProbe.ALTITUDE_KEY))
+								altitude = Double.valueOf(valueBuffer[i][j]);
+						}
+
+						if (pressure != null && altitude != null)
+						{
+							Map<String, Object> values = new HashMap<String, Object>();
+
+							values.put(PressureProbe.PRESSURE_KEY, pressure);
+							values.put(PressureProbe.ALTITUDE_KEY, altitude);
+
+							values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[j] / 1000));
+
+							ProbeValuesProvider.getProvider(this._context).insertValue(PressureProbe.DB_TABLE, this.databaseSchema(), values);
+						}
+					}
 
 					bufferIndex = 0;
 				}
@@ -310,6 +357,16 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 				this.lastSeen = now;
 			}
 		}
+	}
+
+	public Map<String, String> databaseSchema()
+	{
+		HashMap<String, String> schema = new HashMap<String, String>();
+
+		schema.put(PressureProbe.PRESSURE_KEY, ProbeValuesProvider.REAL_TYPE);
+		schema.put(PressureProbe.ALTITUDE_KEY, ProbeValuesProvider.REAL_TYPE);
+
+		return schema;
 	}
 
 	public String getPreferenceKey()
@@ -329,8 +386,8 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
-		float pressure = bundle.getFloatArray("PRESSURE")[0];
-		float altitude = bundle.getFloatArray("ALTITUDE")[0];
+		float pressure = bundle.getFloatArray(PressureProbe.PRESSURE_KEY)[0];
+		float altitude = bundle.getFloatArray(PressureProbe.ALTITUDE_KEY)[0];
 
 		return String.format(context.getResources().getString(R.string.summary_pressure_probe), pressure, altitude);
 	}

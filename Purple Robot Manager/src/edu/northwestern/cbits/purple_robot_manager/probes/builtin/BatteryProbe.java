@@ -5,6 +5,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,6 +20,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -29,15 +31,17 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
 import edu.northwestern.cbits.purple_robot_manager.charts.SplineChart;
+import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class BatteryProbe extends Probe
 {
+	private static final String DB_TABLE = "battery_probe";
+
+	private static final String BATTERY_KEY = "BATTERY_LEVEL";
+
 	private boolean _isInited = false;
 	private boolean _isEnabled = false;
-
-	private ArrayList<Double> _batteryCache = new ArrayList<Double>();
-	private ArrayList<Double> _timeCache = new ArrayList<Double>();
 
 	public Intent viewIntent(Context context)
 	{
@@ -48,7 +52,26 @@ public class BatteryProbe extends Probe
 
 	public String contentSubtitle(Context context)
 	{
-		return String.format(context.getString(R.string.display_item_count), this._batteryCache.size());
+		Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(BatteryProbe.DB_TABLE, this.databaseSchema());
+
+		int count = -1;
+
+		if (c != null)
+		{
+			count = c.getCount();
+			c.close();
+		}
+
+		return String.format(context.getString(R.string.display_item_count), count);
+	}
+
+	public Map<String, String> databaseSchema()
+	{
+		HashMap<String, String> schema = new HashMap<String, String>();
+
+		schema.put(BatteryProbe.BATTERY_KEY, ProbeValuesProvider.REAL_TYPE);
+
+		return schema;
 	}
 
 	public String getDisplayContent(Activity activity)
@@ -58,14 +81,38 @@ public class BatteryProbe extends Probe
 			String template = WebkitActivity.stringForAsset(activity, "webkit/highcharts_full.html");
 
 			SplineChart c = new SplineChart();
-			c.addSeries("bATTERY", new ArrayList<Double>(this._batteryCache));
-			c.addTime("tIME", new ArrayList<Double>(this._timeCache));
+
+			ArrayList<Double> battery = new ArrayList<Double>();
+			ArrayList<Double> time = new ArrayList<Double>();
+
+			Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(BatteryProbe.DB_TABLE, this.databaseSchema());
+
+			int count = -1;
+
+			if (cursor != null)
+			{
+				count = cursor.getCount();
+
+				while (cursor.moveToNext())
+				{
+					double d = cursor.getDouble(cursor.getColumnIndex(BatteryProbe.BATTERY_KEY));
+					double t = cursor.getDouble(cursor.getColumnIndex(ProbeValuesProvider.TIMESTAMP));
+
+					battery.add(d);
+					time.add(t);
+				}
+
+				cursor.close();
+			}
+
+			c.addSeries("bATTERY", battery);
+			c.addTime("tIME", time);
 
 			JSONObject json = c.highchartsJson(activity);
 
 			HashMap<String, Object> scope = new HashMap<String, Object>();
 			scope.put("highchart_json", json.toString());
-			scope.put("highchart_count", this._batteryCache.size());
+			scope.put("highchart_count", count);
 
 			StringWriter writer = new StringWriter();
 
@@ -124,16 +171,14 @@ public class BatteryProbe extends Probe
 
 						bundle.putAll(intent.getExtras());
 
-						while (me._batteryCache.size() > 128)
-							me._batteryCache.remove(0);
-
-						while (me._timeCache.size() > 128)
-							me._timeCache.remove(0);
-
-						me._batteryCache.add(Double.valueOf(bundle.getInt(BatteryManager.EXTRA_LEVEL)));
-						me._timeCache.add(Double.valueOf(bundle.getLong("TIMESTAMP")));
-
 						me.transmitData(context, bundle);
+
+						Map<String, Object> values = new HashMap<String, Object>();
+
+						values.put(BatteryProbe.BATTERY_KEY, Double.valueOf(bundle.getInt(BatteryManager.EXTRA_LEVEL)));
+						values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(Double.valueOf(bundle.getLong("TIMESTAMP"))));
+
+						ProbeValuesProvider.getProvider(context).insertValue(BatteryProbe.DB_TABLE, me.databaseSchema(), values);
 					}
 				}
 			};
