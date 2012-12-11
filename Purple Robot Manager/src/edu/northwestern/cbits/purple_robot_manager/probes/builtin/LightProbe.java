@@ -37,7 +37,7 @@ import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 
 public class LightProbe extends ContinuousProbe implements SensorEventListener
 {
-	private static final String DB_TABLE = "light_probe";
+	public static final String DB_TABLE = "light_probe";
 
 	private static final String LIGHT_KEY = "LUX";
 

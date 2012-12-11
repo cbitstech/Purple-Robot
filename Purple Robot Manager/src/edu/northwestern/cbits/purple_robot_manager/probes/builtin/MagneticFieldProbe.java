@@ -38,7 +38,7 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 {
 	private static int BUFFER_SIZE = 40;
 
-	private static final String DB_TABLE = "magnetic_probe";
+	public static final String DB_TABLE = "magnetic_probe";
 
 	private static String X_KEY = "X";
 	private static String Y_KEY = "Y";

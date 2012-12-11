@@ -37,6 +37,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 public class WebkitActivity extends SherlockFragmentActivity
 {
 	private double _selectedTimestamp = 0;
+	private boolean _inited = false;
 
 	public static String stringForAsset(Activity activity, String assetName) throws IOException
 	{
@@ -136,8 +137,12 @@ public class WebkitActivity extends SherlockFragmentActivity
 			  }
 		});
 
-		webview.removeJavascriptInterface("PurpleRobot");
-		webview.addJavascriptInterface(this, "PurpleRobot");
+		if (this._inited == false)
+		{
+			webview.addJavascriptInterface(this, "PurpleRobot");
+			
+			this._inited = true;
+		}
 
 		String contentString = this.contentString();
 
