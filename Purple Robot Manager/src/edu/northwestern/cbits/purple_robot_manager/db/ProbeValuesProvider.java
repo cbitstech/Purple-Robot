@@ -6,7 +6,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import android.content.ContentValues;
@@ -14,6 +14,15 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
+import edu.northwestern.cbits.purple_robot_manager.db.filters.Filter;
+import edu.northwestern.cbits.purple_robot_manager.db.filters.FrequencyThrottleFilter;
+import edu.northwestern.cbits.purple_robot_manager.db.filters.ValueDeltaFilter;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.AccelerometerProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.GyroscopeProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LightProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.MagneticFieldProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.PressureProbe;
 
 public class ProbeValuesProvider
 {
@@ -27,7 +36,7 @@ public class ProbeValuesProvider
 	private SQLiteDatabase _database = null;
 	private ProbeValuesSqlHelper _dbHelper = null;
 
-	private HashMap<String, Long> _lastSaves = new HashMap<String, Long>();
+	private ArrayList<Filter> _filters = new ArrayList<Filter>();
 
 	private long _lastCleanup = 0;
 
@@ -53,6 +62,33 @@ public class ProbeValuesProvider
 		{
 			e.printStackTrace();
 		}
+
+		HashSet<String> highFreq = new HashSet<String>();
+		highFreq.add(AccelerometerProbe.DB_TABLE);
+		highFreq.add(GyroscopeProbe.DB_TABLE);
+		highFreq.add(MagneticFieldProbe.DB_TABLE);
+
+		this._filters.add(new FrequencyThrottleFilter(1000, null, highFreq)); // Don't save any readings at a larger than 1 second interval for most sensors...
+		this._filters.add(new FrequencyThrottleFilter(100, highFreq, null)); // Only save high-frequency data at 0.1s intervals...
+
+		// Proximity: Identical values
+
+		HashSet<String> quarterDelta = new HashSet<String>();
+		quarterDelta.add(AccelerometerProbe.DB_TABLE);
+		quarterDelta.add(PressureProbe.DB_TABLE);
+		quarterDelta.add(GyroscopeProbe.DB_TABLE);
+
+		this._filters.add(new ValueDeltaFilter(0.25, quarterDelta));
+
+		HashSet<String> fullDelta = new HashSet<String>();
+		fullDelta.add(MagneticFieldProbe.DB_TABLE);
+
+		this._filters.add(new ValueDeltaFilter(1.0, fullDelta));
+
+		HashSet<String> fiveDelta = new HashSet<String>();
+		fiveDelta.add(LightProbe.DB_TABLE);
+
+		this._filters.add(new ValueDeltaFilter(5.0, fiveDelta));
 	}
 
 	public void close()
@@ -156,55 +192,64 @@ public class ProbeValuesProvider
 		return false;
 	}
 
-	public boolean insertValue(String name, Map<String, String> schema, Map<String, Object> values)
+	public void insertValue(final String name, final Map<String, String> schema, final Map<String, Object> values)
 	{
-		long now = System.currentTimeMillis();
+		final ProbeValuesProvider me = this;
 
-		Long lastSave = this._lastSaves.get(name);
-
-		if (lastSave == null)
-			lastSave = Long.valueOf(0);
-
-		if (now - lastSave.longValue() < 500)
-			return false;
-
-		this._lastSaves.put(name, Long.valueOf(now));
-
-		if (now - this._lastCleanup > 300000) // FLush old entries every 5 minutes...
-			this.cleanup();
-
-		String localName = this.tableName(name, schema);
-
-		if (this.tableExists(localName) == false)
-			this.createTable(localName, schema);
-
-		ContentValues toInsert = new ContentValues();
-
-		for (String key : schema.keySet())
+		Runnable r = new Runnable()
 		{
-			String type = schema.get(key);
-
-			if (ProbeValuesProvider.REAL_TYPE.equals(type))
+			public void run()
 			{
-				Double d = (Double) values.get(key);
+				synchronized(me._database)
+				{
+					for (Filter f : me._filters)
+					{
+						if (f.allow(name, values) == false)
+							return;
+					}
 
-				toInsert.put(key, d);
+					long now = System.currentTimeMillis();
+
+					if (now - me._lastCleanup > 300000) // Flush old entries every 5 minutes...
+						me.cleanup();
+
+					String localName = me.tableName(name, schema);
+
+					if (me.tableExists(localName) == false)
+						me.createTable(localName, schema);
+
+					ContentValues toInsert = new ContentValues();
+
+					for (String key : schema.keySet())
+					{
+						String type = schema.get(key);
+
+						if (ProbeValuesProvider.REAL_TYPE.equals(type))
+						{
+							Double d = (Double) values.get(key);
+
+							toInsert.put(key, d);
+						}
+						else if (ProbeValuesProvider.INTEGER_TYPE.equals(type))
+						{
+							Integer i = (Integer) values.get(key);
+
+							toInsert.put(key, i);
+						}
+						else if (ProbeValuesProvider.TEXT_TYPE.equals(type))
+							toInsert.put(key, values.get(key).toString());
+					}
+
+					toInsert.put(ProbeValuesProvider.TIMESTAMP, (Double) values.get(ProbeValuesProvider.TIMESTAMP));
+
+					me._database.insert(localName, null, toInsert);
+				}
 			}
-			else if (ProbeValuesProvider.INTEGER_TYPE.equals(type))
-			{
-				Integer i = (Integer) values.get(key);
+		};
 
-				toInsert.put(key, i);
-			}
-			else if (ProbeValuesProvider.TEXT_TYPE.equals(type))
-				toInsert.put(key, values.get(key).toString());
-		}
-
-		toInsert.put(ProbeValuesProvider.TIMESTAMP, (Double) values.get(ProbeValuesProvider.TIMESTAMP));
-
-		return (this._database.insert(localName, null, toInsert) != -1);
+		Thread t = new Thread(r);
+		t.start();
 	}
-
 
 	private void cleanup()
 	{
@@ -216,19 +261,24 @@ public class ProbeValuesProvider
 
 		while (c.moveToNext())
 		{
-//			String tableName = c.getString(c.getColumnIndex("name"));
+			String tableName = c.getString(c.getColumnIndex("name"));
 
 			try
 			{
-				// TODO: calculate timestamp or get params from probe...
+				Cursor cursor = this._database.query(tableName, null, null, null, null, null, null);
 
-//				int deleted = this._database.delete(tableName, ProbeValuesProvider.TIMESTAMP + " < 1.0", null);
+				cursor.close();
 
-//				Log.e("PRM", "DELETED " + deleted);
+				SQLiteStatement delete = this._database.compileStatement("delete from " + tableName + " where " + ProbeValuesProvider.ID + " not in (select " + ProbeValuesProvider.ID + " from " + tableName + " order by " + ProbeValuesProvider.TIMESTAMP + " desc limit 500);");
+				delete.executeUpdateDelete();
+
+				cursor = this._database.query(tableName, null, null, null, null, null, null);
+
+				cursor.close();
 			}
 			catch (SQLException e)
 			{
-
+				e.printStackTrace();
 			}
 		}
 
@@ -237,24 +287,25 @@ public class ProbeValuesProvider
 
 	public Cursor retrieveValues(String name, Map<String, String> schema)
 	{
-		String localName = this.tableName(name, schema);
-
-		if (this.tableExists(localName) == false)
-			this.createTable(localName, schema);
-
 		Cursor c = null;
 
-		try
+		synchronized(this._database)
 		{
-		    c = this._database.query(localName, null, null, null, null, null, ProbeValuesProvider.TIMESTAMP);
+			String localName = this.tableName(name, schema);
 
-		    return c;
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
+			if (this.tableExists(localName) == false)
+				this.createTable(localName, schema);
+
+			try
+			{
+			    c = this._database.query(localName, null, null, null, null, null, ProbeValuesProvider.TIMESTAMP);
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
 		}
 
-		return null;
+		return c;
 	}
 }

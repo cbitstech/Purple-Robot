@@ -38,8 +38,7 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 {
 	private static int BUFFER_SIZE = 40;
 
-
-	private static final String DB_TABLE = "gyroscope_probe";
+	public static final String DB_TABLE = "gyroscope_probe";
 
 	private static String X_KEY = "X";
 	private static String Y_KEY = "Y";

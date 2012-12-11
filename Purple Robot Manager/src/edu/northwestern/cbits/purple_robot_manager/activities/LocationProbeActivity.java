@@ -18,7 +18,6 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -66,13 +65,9 @@ public class LocationProbeActivity extends SherlockMapActivity
 
 		protected boolean onTap(int index)
 		{
-			Log.e("PRM", "TAPPED: " + index);
-
 			Location l = this._locations.get(index);
 
 			final long timestamp = l.getTime();
-
-			Log.e("PRM", "TIMESTAMP: " + timestamp);
 
 			final Date d = new Date((long) timestamp);
 

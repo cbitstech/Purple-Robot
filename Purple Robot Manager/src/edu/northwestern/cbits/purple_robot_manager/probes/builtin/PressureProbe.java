@@ -37,7 +37,7 @@ import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 
 public class PressureProbe extends ContinuousProbe implements SensorEventListener
 {
-	private static final String DB_TABLE = "pressure_probe";
+	public static final String DB_TABLE = "pressure_probe";
 
 	private static int BUFFER_SIZE = 40;
 
