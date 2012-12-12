@@ -265,20 +265,23 @@ public class ProbeValuesProvider
 
 			try
 			{
-				Cursor cursor = this._database.query(tableName, null, null, null, null, null, null);
-
-				cursor.close();
-
-				SQLiteStatement delete = this._database.compileStatement("delete from " + tableName + " where " + ProbeValuesProvider.ID + " not in (select " + ProbeValuesProvider.ID + " from " + tableName + " order by " + ProbeValuesProvider.TIMESTAMP + " desc limit 500);");
-				delete.executeUpdateDelete();
-
-				cursor = this._database.query(tableName, null, null, null, null, null, null);
-
-				cursor.close();
+				if (tableName.startsWith("table_"))
+				{
+					Cursor cursor = this._database.query(tableName, null, null, null, null, null, null);
+	
+					cursor.close();
+	
+					SQLiteStatement delete = this._database.compileStatement("delete from " + tableName + " where " + ProbeValuesProvider.ID + " not in (select " + ProbeValuesProvider.ID + " from " + tableName + " order by " + ProbeValuesProvider.TIMESTAMP + " desc limit 500);");
+					delete.execute();
+	
+					cursor = this._database.query(tableName, null, null, null, null, null, null);
+	
+					cursor.close();
+				}
 			}
 			catch (SQLException e)
 			{
-				e.printStackTrace();
+				// e.printStackTrace();
 			}
 		}
 

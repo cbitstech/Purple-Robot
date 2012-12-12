@@ -1,7 +1,11 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,6 +19,7 @@ import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -55,6 +60,35 @@ public class JavaScriptEngine
 	public Object runScript(String script) throws EvaluatorException
 	{
 		return this.runScript(script, null, null);
+	}
+
+	public String readUrl(String urlString)
+	{
+		try 
+		{
+			URL url = new URL(urlString);
+
+	        URLConnection connection = url.openConnection();
+
+	        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+	        StringBuilder response = new StringBuilder();
+
+	        String inputLine;
+
+	        while ((inputLine = in.readLine()) != null) 
+	            response.append(inputLine);
+
+	        in.close();
+
+	        return response.toString();
+		}
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		} 
+			
+		return null;
 	}
 
 	public Object runScript(String script, String extrasName, Object extras) throws EvaluatorException
@@ -129,6 +163,7 @@ public class JavaScriptEngine
 		return false;
 	}
 
+	@SuppressLint("DefaultLocale")
 	private Intent constructDirectLaunchIntent(final String applicationName, final NativeObject launchParams)
 	{
 		if (applicationName.toLowerCase().startsWith("http://") || applicationName.toLowerCase().startsWith("https://"))
@@ -500,6 +535,6 @@ public class JavaScriptEngine
 
 	public void log(String message)
 	{
-		Log.i("PRM.JavaScript", message);
+		Log.e("PRM.JavaScript", message);
 	}
 }

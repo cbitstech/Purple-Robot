@@ -8,18 +8,22 @@ import java.util.Scanner;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeObject;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.os.Bundle;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.JavaScriptEngine;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 
+@SuppressLint("DefaultLocale")
 public class JavascriptFeature extends Feature
 {
 	private String _name = null;
@@ -116,7 +120,8 @@ public class JavascriptFeature extends Feature
 	    return script;
 	}
 
-	public void processData(Context context, JSONObject json)
+	@SuppressLint("DefaultLocale")
+	public void processData(final Context context, final JSONObject json)
 	{
 		if (this.isEnabled(context) == false)
 			return;
@@ -146,40 +151,56 @@ public class JavascriptFeature extends Feature
 		if (this._script == null)
 			this._script = JavascriptFeature.scriptForFeature(context, this._name);
 
-		String script = this._script;
-
-		script = "var probe = " + json.toString() + "; " + script;
-
-		JavaScriptEngine engine = new JavaScriptEngine(context);
-
-		Object o =  engine.runScript(script);
-
-		Bundle bundle = new Bundle();
-		bundle.putString("PROBE", this.name(context));
-		bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
-
-		if (o instanceof String)
-			bundle.putString(Feature.FEATURE_VALUE, o.toString());
-		else if (o instanceof Double)
+		final JavascriptFeature me = this;
+		
+		Runnable r = new Runnable()
 		{
-			Double d = (Double) o;
+			public void run() 
+			{
+				Looper.prepare();
+				
+				String script = me._script;
 
-			bundle.putDouble(Feature.FEATURE_VALUE, d.doubleValue());
-		}
-		else if (o instanceof NativeObject)
-		{
-			NativeObject nativeObj = (NativeObject) o;
+				script = "var probe = " + json.toString() + "; " + script;
 
-			Bundle b = JavascriptFeature.bundleForNativeObject(nativeObj);
+				JavaScriptEngine engine = new JavaScriptEngine(context);
 
-			bundle.putParcelable(Feature.FEATURE_VALUE, b);
-		}
-		else
-		{
-			Log.e("PRM", "JS PLUGIN GOT UNKNOWN VALUE CLASS " + o + " " + o.getClass());
-		}
+				Object o = engine.runScript(script);
 
-		this.transmitData(context, bundle);
+				Bundle bundle = new Bundle();
+				bundle.putString("PROBE", me.name(context));
+				bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+
+				if (o instanceof String)
+					bundle.putString(Feature.FEATURE_VALUE, o.toString());
+				else if (o instanceof Double)
+				{
+					Double d = (Double) o;
+
+					bundle.putDouble(Feature.FEATURE_VALUE, d.doubleValue());
+				}
+				else if (o instanceof NativeObject)
+				{
+					NativeObject nativeObj = (NativeObject) o;
+
+					Bundle b = JavascriptFeature.bundleForNativeObject(nativeObj);
+
+					bundle.putParcelable(Feature.FEATURE_VALUE, b);
+				}
+				else
+				{
+					Log.e("PRM", "JS PLUGIN GOT UNKNOWN VALUE " + o);
+
+					if (o != null)
+						Log.e("PRM", "JS PLUGIN GOT UNKNOWN CLASS " + o.getClass());
+				}
+
+				me.transmitData(context, bundle);
+			}
+		};
+		
+		Thread t = new Thread(r);
+		t.start();
 	}
 
 	private static Bundle bundleForNativeObject(NativeObject obj)
@@ -194,10 +215,30 @@ public class JavascriptFeature extends Feature
 
 			if (value instanceof NativeObject)
 				b.putParcelable(keyString, JavascriptFeature.bundleForNativeObject((NativeObject) value));
+			else if (value instanceof NativeArray)
+			{
+				NativeArray array = (NativeArray) value;
+				
+				ArrayList<Bundle> items = new ArrayList<Bundle>();
+				
+				for (Object o : array.getIds()) 
+				{
+				    int index = (Integer) o;
+				    
+				    Object item = array.get(index);
+				    
+				    if (item instanceof NativeObject)
+				    	items.add(JavascriptFeature.bundleForNativeObject((NativeObject) item));
+				}
+				
+				b.putParcelableArrayList(keyString, items);
+			}
 			else if (value instanceof Double)
 				b.putDouble(keyString, ((Double) value).doubleValue());
 			else if (value instanceof Integer)
 				b.putInt(keyString, ((Integer) value).intValue());
+			else if (value == null)
+				b.putString(keyString, "(null)");
 			else
 				b.putString(keyString, value.toString());
 		}
@@ -237,7 +278,7 @@ public class JavascriptFeature extends Feature
 
 		JavaScriptEngine engine = new JavaScriptEngine(context);
 
-		Object o =  engine.runScript(script);
+		Object o = engine.runScript(script);
 
 		return o.toString();
 	}
