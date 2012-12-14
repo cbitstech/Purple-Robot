@@ -386,4 +386,9 @@
 
     <!-- Location Probe -->
     <string name="title_location_history">Location History</string>
+
+    <!-- Zeroconf Probe -->
+    <string name="title_zeroconf_probe">Zeroconf Services Probe</string>
+    <string name="summary_zeroconf_probe_desc">Visible services on the local network.</string>
+    <string name="summary_zeroconf_probe" formatted="false">Visible Access Points: %d</string>
 </resources>
