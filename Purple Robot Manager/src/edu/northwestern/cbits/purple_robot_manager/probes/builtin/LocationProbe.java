@@ -159,6 +159,9 @@ public class LocationProbe extends Probe implements LocationListener
 
 	public void onLocationChanged(Location location)
 	{
+		if (location == null)
+			return;
+		
 		long now = System.currentTimeMillis();
 
 		if (now - this._lastTransmit < 1000) // 1s
