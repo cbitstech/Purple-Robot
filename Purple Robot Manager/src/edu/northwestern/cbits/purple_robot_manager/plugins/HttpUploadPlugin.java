@@ -935,9 +935,11 @@ public class HttpUploadPlugin extends OutputPlugin
 						JSONObject json = new JSONObject(jsonString);
 
 						if (saveArray.length() < 256)
+						{
 							saveArray.put(json);
-
-						toRemove.add(jsonString);
+							
+							toRemove.add(jsonString);
+						}
 					}
 					catch (JSONException e)
 					{

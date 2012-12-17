@@ -3,7 +3,11 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.jmdns.JmDNS;
 import javax.jmdns.JmmDNS;
+import javax.jmdns.ServiceEvent;
+import javax.jmdns.ServiceInfo;
+import javax.jmdns.ServiceListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,17 +22,39 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
-public class ZeroconfProbe extends Probe
+public class ZeroconfProbe extends Probe implements ServiceListener
 {
 	private static final String SERVICES = null;
 	private static final String SERVICES_COUNT = null;
 
-	private long _lastCheck = 0;
-	private static long DURATION = 60000;
+	private boolean _inited = false;
 	
+	private JmmDNS jmdns = null;
+	private MulticastLock _lock = null;
+
+    public void serviceResolved(ServiceEvent ev) 
+    {
+        Log.e("PRM", "Service resolved: "
+                 + ev.getInfo().getQualifiedName()
+                 + " port:" + ev.getInfo().getPort());
+    }
+    
+    public void serviceRemoved(ServiceEvent ev) 
+    {
+    	Log.e("PRM", "Service removed: " + ev.getName());
+    }
+    
+    public void serviceAdded(ServiceEvent event) 
+    {
+        // Required to force serviceResolved to be called again
+        // (after the first search)
+        jmdns.requestServiceInfo(event.getType(), event.getName(), 1);
+    }
+
 	public String name(Context context)
 	{
 		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.ZeroconfProbe";
@@ -48,25 +74,51 @@ public class ZeroconfProbe extends Probe
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-		long now = System.currentTimeMillis();
-
 		boolean enabled = super.isEnabled(context);
 
+		Log.e("PR", "1");
+		
 		if (enabled)
 			enabled = prefs.getBoolean("config_probe_zeroconf_enabled", true);
 
+		Log.e("PR", "2");
+
 		if (enabled)
 		{
-			synchronized(this)
+//			long freq = Long.parseLong(prefs.getString("config_probe_zeroconf_frequency", "300000"));
+
+			Log.e("PR", "3");
+			
+			if (this._inited == false)
 			{
-				long freq = Long.parseLong(prefs.getString("config_probe_zeroconf_frequency", "300000"));
+				Log.e("PR", "4");
+				this.jmdns = JmmDNS.Factory.getInstance();
+				WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+				
+				this._lock = wifi.createMulticastLock("ZeroconfProbeLock");
+				this._lock.setReferenceCounted(true);
+				this._lock.acquire();
 
-				if (now - this._lastCheck > freq + DURATION)
-				{
-					this.scan(context);
-				}
+			    jmdns.addServiceListener("_services._dns-sd._udp.", this);
+			    
+			    this._inited = true;
+				Log.e("PR", "5");
 			}
+			else
+			{
+				Log.e("PR", "6");
+				jmdns.removeServiceListener("_workstation._tcp.local.", this);
+				
+				this._lock.release();
+				this._lock = null;
+				
+				this._inited = false;
 
+				Log.e("PR", "7");
+			}
+				
+			Log.e("PR", "8");
+			
 			return true;
 		}
 		else
@@ -75,33 +127,6 @@ public class ZeroconfProbe extends Probe
 		}
 
 		return false;
-	}
-
-	private void scan(final Context context) 
-	{
-		Runnable r = new Runnable()
-		{
-			public void run() 
-			{
-				WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-				
-				MulticastLock lock = wifi.createMulticastLock("ZeroconfProbeLock");
-				lock.setReferenceCounted(true);
-				lock.acquire();
-				
-				try 
-				{
-					JmmDNS jmmdns = JmmDNS.Factory.getInstance();
-					
-					jmmdns.close();
-				} 
-				catch (IOException e) 
-				{
-				}	
-				
-				lock.release();
-			}
-		};
 	}
 	
 	public String summarizeValue(Context context, Bundle bundle)
