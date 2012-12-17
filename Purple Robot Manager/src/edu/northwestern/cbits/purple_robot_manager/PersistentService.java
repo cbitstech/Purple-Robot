@@ -6,13 +6,17 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 
 public class PersistentService extends Service
 {
 	public static final String NUDGE_PROBES = "purple_robot_manager_nudge_probe";
+	
+	private LocalHttpServer _httpServer = new LocalHttpServer();
 
 	public IBinder onBind(Intent intent)
 	{
@@ -38,6 +42,11 @@ public class PersistentService extends Service
 		alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 15000, pi);
 
 		OutputPlugin.loadPluginClasses(this);
+		
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+		if (prefs.getBoolean("config_http_server_enabled", true))
+			this._httpServer.start(this);
 	}
 
 	public int onStartCommand(Intent intent, int flags, int startId)
