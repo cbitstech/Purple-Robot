@@ -1,10 +1,8 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -14,6 +12,7 @@ import java.net.Socket;
 import android.content.Context;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.text.format.Formatter;
 import android.util.Log;
 
 public class LocalHttpServer 
@@ -49,7 +48,7 @@ public class LocalHttpServer
 					{
 						int ip = wifiInfo.getIpAddress();
 
-						String ipString = String.format("%d.%d.%d.%d", (ip & 0xff), (ip >> 8 & 0xff), (ip >> 16 & 0xff), (ip >> 24 & 0xff));
+						String ipString = Formatter.formatIpAddress(ip);
 					   
 						Log.e("PRM", "WIFI IP: " + ipString);
 					   

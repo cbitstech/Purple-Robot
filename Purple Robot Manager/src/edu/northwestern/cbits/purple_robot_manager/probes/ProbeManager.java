@@ -24,6 +24,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CommunicationL
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.HardwareInformationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.NetworkProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RobotHealthProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RunningSoftwareProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ScreenProbe;
@@ -123,6 +124,13 @@ public class ProbeManager
 				BluetoothDevicesProbe bluetooth = (BluetoothDevicesProbe) probe;
 
 				if (bluetooth.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof NetworkProbe)
+			{
+				NetworkProbe network = (NetworkProbe) probe;
+
+				if (network.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 			else if (probe instanceof SoftwareInformationProbe)
