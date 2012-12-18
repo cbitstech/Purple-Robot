@@ -21,6 +21,7 @@
         <item>builtin.MagneticFieldProbe</item>
         <item>builtin.PressureProbe</item>
         <item>builtin.ProximityProbe</item>
+        <item>builtin.NetworkProbe</item>
         <item>builtin.RobotHealthProbe</item>
         <item>builtin.RunningSoftwareProbe</item>
         <item>builtin.ScreenProbe</item>
@@ -29,11 +30,10 @@
         <item>builtin.TemperatureProbe</item>
         <item>builtin.VisibleSatelliteProbe</item>
         <item>builtin.WifiAccessPointsProbe</item>
-        <!-- <item>builtin.ZeroconfProbe</item> -->
-        
         <item>features.DeviceInUseFeature</item>
 
         <!-- <item>builtin.BluetoothReceiverProbe</item> -->
+        <!-- <item>builtin.ZeroconfProbe</item> -->
    	</array>
 
 	<array name="output_plugin_classes">

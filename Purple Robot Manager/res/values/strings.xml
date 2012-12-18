@@ -391,4 +391,9 @@
     <string name="title_zeroconf_probe">Zeroconf Services Probe</string>
     <string name="summary_zeroconf_probe_desc">Visible services on the local network.</string>
     <string name="summary_zeroconf_probe" formatted="false">Visible Access Points: %d</string>
+
+    <!-- Network Probe -->
+    <string name="title_network_probe">Network Configuration Probe</string>
+    <string name="summary_network_probe_desc">Current network configuration of the active interface.</string>
+    <string name="summary_network_probe" formatted="false">Current IP Address: %s</string>
 </resources>
