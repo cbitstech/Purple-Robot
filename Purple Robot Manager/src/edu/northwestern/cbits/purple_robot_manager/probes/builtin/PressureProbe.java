@@ -39,7 +39,7 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 {
 	public static final String DB_TABLE = "pressure_probe";
 
-	private static int BUFFER_SIZE = 40;
+	private static int BUFFER_SIZE = 512;
 
 	private static String PRESSURE_KEY = "PRESSURE";
 	private static String ALTITUDE_KEY = "ALTITUDE";
@@ -55,6 +55,8 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 	private double timeBuffer[] = new double[BUFFER_SIZE];
 
 	private int bufferIndex  = 0;
+
+	private Map<String, String> _schema = null;
 
 	public Intent viewIntent(Context context)
 	{
@@ -361,12 +363,15 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 
 	public Map<String, String> databaseSchema()
 	{
-		HashMap<String, String> schema = new HashMap<String, String>();
+		if (this._schema == null)
+		{
+			this._schema = new HashMap<String, String>();
 
-		schema.put(PressureProbe.PRESSURE_KEY, ProbeValuesProvider.REAL_TYPE);
-		schema.put(PressureProbe.ALTITUDE_KEY, ProbeValuesProvider.REAL_TYPE);
+			this._schema.put(PressureProbe.PRESSURE_KEY, ProbeValuesProvider.REAL_TYPE);
+			this._schema.put(PressureProbe.ALTITUDE_KEY, ProbeValuesProvider.REAL_TYPE);
+		}
 
-		return schema;
+		return this._schema;
 	}
 
 	public String getPreferenceKey()

@@ -205,23 +205,41 @@ public class HttpUploadPlugin extends OutputPlugin
 		{
 			try
 			{
+
 				Bundle extras = intent.getExtras();
 
 				final JSONObject jsonObject = OutputPlugin.jsonForBundle(extras);
 
-				final HttpUploadPlugin me = this;
+				Log.e("PRM", "PROCESS INTENT " + jsonObject.getString("PROBE"));
 
-				Runnable r = new Runnable()
+				if (jsonObject != null)
 				{
-					public void run()
+					synchronized (this._pendingSaves)
 					{
-						me.persistJSONObject(jsonObject);
-						me.uploadPendingObjects();
+						this._pendingSaves.add(jsonObject.toString());
 					}
-				};
+				}
 
-				Thread t = new Thread(r);
-				t.start();
+				long now = System.currentTimeMillis();
+
+				if (now - this._lastSave > this.savePeriod() || this._pendingSaves.size() > 512)
+				{
+					Log.e("PRM", "CONTINUING");
+
+					final HttpUploadPlugin me = this;
+
+					Runnable r = new Runnable()
+					{
+						public void run()
+						{
+							me.persistJSONObject(jsonObject);
+							me.uploadPendingObjects();
+						}
+					};
+
+					Thread t = new Thread(r);
+					t.start();
+				}
 			}
 			catch (JSONException e)
 			{
@@ -348,6 +366,8 @@ public class HttpUploadPlugin extends OutputPlugin
 
 	private void uploadPendingObjects()
 	{
+		Log.e("PRM", "UPLOADPENDINGOBJECTS");
+
 		if (this._uploading)
 			return;
 
@@ -835,7 +855,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 						try
 						{
-							Thread.sleep(1000);
+							Thread.sleep(500);
 							me.uploadPendingObjects();
 						}
 						catch (InterruptedException e)
@@ -899,139 +919,128 @@ public class HttpUploadPlugin extends OutputPlugin
 
 	private void persistJSONObject(final JSONObject jsonObject)
 	{
-		final SharedPreferences prefs = HttpUploadPlugin.getPreferences(this.getContext());
+		Log.e("PRM", "PERSISTJSONOBJECT");
 
 		long now = System.currentTimeMillis();
 
-		if (jsonObject != null)
+		this._lastSave = now;
+
+		File pendingFolder = this.getPendingFolder();
+
+		String filename = now + ".json";
+
+		File f = new File(pendingFolder, filename);
+
+		HashSet<String> toRemove = new HashSet<String>();
+		HashSet<String> invalidRemove = new HashSet<String>();
+
+		JSONArray saveArray = new JSONArray();
+
+		synchronized (this._pendingSaves)
 		{
-			synchronized (this._pendingSaves)
+			for (String jsonString : this._pendingSaves)
 			{
-				this._pendingSaves.add(jsonObject.toString());
+				try
+				{
+					JSONObject json = new JSONObject(jsonString);
+
+					if (saveArray.length() < 256)
+					{
+						saveArray.put(json);
+
+						toRemove.add(jsonString);
+					}
+				}
+				catch (JSONException e)
+				{
+					invalidRemove.add(jsonString);
+				}
+				catch (OutOfMemoryError e)
+				{
+					invalidRemove.add(jsonString);
+				}
 			}
+
+			this._pendingSaves.removeAll(invalidRemove);
 		}
 
-		if (now - this._lastSave > this.savePeriod() || this._pendingSaves.size() > 1024)
+		try
 		{
-			this._lastSave = now;
+			SecretKeySpec secretKey = this.keyForCipher(HttpUploadPlugin.CRYPTO_ALGORITHM);
+			IvParameterSpec ivParameterSpec = new IvParameterSpec(this.getIVBytes());
 
-			File pendingFolder = this.getPendingFolder();
+			Cipher cipher = new NullCipher();
 
-			String filename = now + ".json";
+			if (prefs.getBoolean("config_http_encrypt", true))
+			{
+				cipher = Cipher.getInstance(HttpUploadPlugin.CRYPTO_ALGORITHM);
+				cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec);
+			}
 
-			File f = new File(pendingFolder, filename);
+			CipherOutputStream cout = new CipherOutputStream(new FileOutputStream(f), cipher);
 
-			HashSet<String> toRemove = new HashSet<String>();
-			HashSet<String> invalidRemove = new HashSet<String>();
+			byte[] jsonBytes = saveArray.toString().getBytes("UTF-8");
 
-			JSONArray saveArray = new JSONArray();
+			cout.write(jsonBytes);
+
+			cout.flush();
+			cout.close();
 
 			synchronized (this._pendingSaves)
 			{
-				for (String jsonString : this._pendingSaves)
-				{
-					try
-					{
-						JSONObject json = new JSONObject(jsonString);
+				this._pendingSaves.removeAll(toRemove);
+			}
+		}
+		catch (FileNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		catch (UnsupportedEncodingException e)
+		{
+			throw new RuntimeException(e);
+		}
+		catch (OutOfMemoryError e)
+		{
+			e.printStackTrace();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		catch (InvalidKeyException e)
+		{
+			throw new RuntimeException(e);
+		}
+		catch (NoSuchAlgorithmException e)
+		{
+			throw new RuntimeException(e);
+		}
+		catch (NoSuchPaddingException e)
+		{
+			throw new RuntimeException(e);
+		}
+		catch (InvalidAlgorithmParameterException e)
+		{
+			throw new RuntimeException(e);
+		}
 
-						if (saveArray.length() < 256)
-						{
-							saveArray.put(json);
-							
-							toRemove.add(jsonString);
-						}
-					}
-					catch (JSONException e)
-					{
-						invalidRemove.add(jsonString);
-					}
-					catch (OutOfMemoryError e)
-					{
-						invalidRemove.add(jsonString);
-					}
+		if (this._pendingSaves.size() > 512)
+		{
+			this._lastSave = 0;
+			this._failCount = 0;
+
+			final HttpUploadPlugin me = this;
+
+			Runnable r = new Runnable()
+			{
+				public void run()
+				{
+					me.persistJSONObject(null);
 				}
+			};
 
-				this._pendingSaves.removeAll(invalidRemove);
-			}
-
-			try
-			{
-				SecretKeySpec secretKey = this.keyForCipher(HttpUploadPlugin.CRYPTO_ALGORITHM);
-				IvParameterSpec ivParameterSpec = new IvParameterSpec(this.getIVBytes());
-
-				Cipher cipher = new NullCipher();
-
-				if (prefs.getBoolean("config_http_encrypt", true))
-				{
-					cipher = Cipher.getInstance(HttpUploadPlugin.CRYPTO_ALGORITHM);
-					cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec);
-				}
-
-				CipherOutputStream cout = new CipherOutputStream(new FileOutputStream(f), cipher);
-
-				byte[] jsonBytes = saveArray.toString().getBytes("UTF-8");
-
-				cout.write(jsonBytes);
-
-				cout.flush();
-				cout.close();
-
-				synchronized (this._pendingSaves)
-				{
-					this._pendingSaves.removeAll(toRemove);
-				}
-			}
-			catch (FileNotFoundException e)
-			{
-				e.printStackTrace();
-			}
-			catch (UnsupportedEncodingException e)
-			{
-				throw new RuntimeException(e);
-			}
-			catch (OutOfMemoryError e)
-			{
-				e.printStackTrace();
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-			}
-			catch (InvalidKeyException e)
-			{
-				throw new RuntimeException(e);
-			}
-			catch (NoSuchAlgorithmException e)
-			{
-				throw new RuntimeException(e);
-			}
-			catch (NoSuchPaddingException e)
-			{
-				throw new RuntimeException(e);
-			}
-			catch (InvalidAlgorithmParameterException e)
-			{
-				throw new RuntimeException(e);
-			}
-
-			if (this._pendingSaves.size() > 512)
-			{
-				this._lastSave = 0;
-				this._failCount = 0;
-
-				final HttpUploadPlugin me = this;
-
-				Runnable r = new Runnable()
-				{
-					public void run()
-					{
-						me.persistJSONObject(null);
-					}
-				};
-
-				Thread t = new Thread(r);
-				t.start();
-			}
+			Thread t = new Thread(r);
+			t.start();
 		}
 	}
 

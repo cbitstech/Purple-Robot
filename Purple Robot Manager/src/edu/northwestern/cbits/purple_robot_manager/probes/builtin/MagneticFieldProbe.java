@@ -36,15 +36,15 @@ import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 
 public class MagneticFieldProbe extends ContinuousProbe implements SensorEventListener
 {
-	private static int BUFFER_SIZE = 40;
+	private static int BUFFER_SIZE = 512;
 
 	public static final String DB_TABLE = "magnetic_probe";
 
-	private static String X_KEY = "X";
-	private static String Y_KEY = "Y";
-	private static String Z_KEY = "Z";
+	private static final String X_KEY = "X";
+	private static final String Y_KEY = "Y";
+	private static final String Z_KEY = "Z";
 
-	private static String[] fieldNames = { X_KEY, Y_KEY, Z_KEY };
+	private static final String[] fieldNames = { X_KEY, Y_KEY, Z_KEY };
 
 	private double lastSeen = 0;
 	private long lastFrequencyLookup = 0;
@@ -53,6 +53,8 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 	private float valueBuffer[][] = new float[3][BUFFER_SIZE];
 	private int accuracyBuffer[] = new int[BUFFER_SIZE];
 	private double timeBuffer[] = new double[BUFFER_SIZE];
+
+	private Map<String, String> _schema = null;
 
 	private int bufferIndex  = 0;
 
@@ -80,13 +82,16 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 
 	public Map<String, String> databaseSchema()
 	{
-		HashMap<String, String> schema = new HashMap<String, String>();
+		if (this._schema == null)
+		{
+			this._schema = new HashMap<String, String>();
 
-		schema.put(MagneticFieldProbe.X_KEY, ProbeValuesProvider.REAL_TYPE);
-		schema.put(MagneticFieldProbe.Y_KEY, ProbeValuesProvider.REAL_TYPE);
-		schema.put(MagneticFieldProbe.Z_KEY, ProbeValuesProvider.REAL_TYPE);
+			this._schema.put(MagneticFieldProbe.X_KEY, ProbeValuesProvider.REAL_TYPE);
+			this._schema.put(MagneticFieldProbe.Y_KEY, ProbeValuesProvider.REAL_TYPE);
+			this._schema.put(MagneticFieldProbe.Z_KEY, ProbeValuesProvider.REAL_TYPE);
+		}
 
-		return schema;
+		return this._schema;
 	}
 
 	public String getDisplayContent(Activity activity)
