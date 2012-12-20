@@ -36,7 +36,7 @@ import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 
 public class GyroscopeProbe extends ContinuousProbe implements SensorEventListener
 {
-	private static int BUFFER_SIZE = 40;
+	private static int BUFFER_SIZE = 512;
 
 	public static final String DB_TABLE = "gyroscope_probe";
 
@@ -53,6 +53,8 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 	private float valueBuffer[][] = new float[3][BUFFER_SIZE];
 	private int accuracyBuffer[] = new int[BUFFER_SIZE];
 	private double timeBuffer[] = new double[BUFFER_SIZE];
+
+	private Map<String, String> _schema = null;
 
 	private int bufferIndex  = 0;
 
@@ -80,13 +82,16 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 
 	public Map<String, String> databaseSchema()
 	{
-		HashMap<String, String> schema = new HashMap<String, String>();
+		if (this._schema == null)
+		{
+			this._schema = new HashMap<String, String>();
 
-		schema.put(GyroscopeProbe.X_KEY, ProbeValuesProvider.REAL_TYPE);
-		schema.put(GyroscopeProbe.Y_KEY, ProbeValuesProvider.REAL_TYPE);
-		schema.put(GyroscopeProbe.Z_KEY, ProbeValuesProvider.REAL_TYPE);
+			this._schema.put(GyroscopeProbe.X_KEY, ProbeValuesProvider.REAL_TYPE);
+			this._schema.put(GyroscopeProbe.Y_KEY, ProbeValuesProvider.REAL_TYPE);
+			this._schema.put(GyroscopeProbe.Z_KEY, ProbeValuesProvider.REAL_TYPE);
+		}
 
-		return schema;
+		return this._schema;
 	}
 
 	public String getDisplayContent(Activity activity)
