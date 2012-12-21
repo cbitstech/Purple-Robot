@@ -11,6 +11,7 @@ import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.CrashManagerListener;
 import net.hockeyapp.android.UpdateManager;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -86,6 +87,7 @@ public class StartActivity extends SherlockActivity
 		this.startActivity(intent);
 	}
 
+	@SuppressLint("SimpleDateFormat")
 	protected void onCreate(Bundle savedInstanceState)
     {
 //	    StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
@@ -318,7 +320,7 @@ public class StartActivity extends SherlockActivity
 
 	private void setJsonUri(Uri jsonConfigUri)
 	{
-		if (jsonConfigUri.getScheme().equals("cbits-prm"))
+		if (jsonConfigUri.getScheme().equals("cbits-prm") || jsonConfigUri.getScheme().equals("cbits-pr"))
 		{
 			Uri.Builder b = jsonConfigUri.buildUpon();
 
