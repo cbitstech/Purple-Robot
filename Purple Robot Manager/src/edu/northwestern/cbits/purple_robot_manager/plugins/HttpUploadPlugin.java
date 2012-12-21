@@ -97,8 +97,6 @@ public class HttpUploadPlugin extends OutputPlugin
 
 	private static final String CRYPTO_ALGORITHM = "AES/CBC/PKCS5Padding";
 
-	private static SharedPreferences prefs = null;
-
 	private List<String> _pendingSaves = new ArrayList<String>();
 	private long _lastSave = 0;
 	private long _lastUpload = 0;
@@ -117,10 +115,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 	protected static SharedPreferences getPreferences(Context context)
 	{
-		if (HttpUploadPlugin.prefs  == null)
-			HttpUploadPlugin.prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-
-		return HttpUploadPlugin.prefs;
+		return PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
 	}
 
 	public double getRecentThroughput()
@@ -279,16 +274,21 @@ public class HttpUploadPlugin extends OutputPlugin
 
 		if (userHash == null)
 		{
-			String userId = "unknown-user";
+			String userId = prefs.getString("config_user_id", null);
 
-			AccountManager manager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
-			Account[] list = manager.getAccountsByType("com.google");
+			if (userId == null)
+			{
+				userId = "unknown-user";
 
-			if (list.length == 0)
-				list = manager.getAccounts();
+				AccountManager manager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
+				Account[] list = manager.getAccountsByType("com.google");
 
-			if (list.length > 0)
-				userId = list[0].name;
+				if (list.length == 0)
+					list = manager.getAccounts();
+
+				if (list.length > 0)
+					userId = list[0].name;
+			}
 
 			try
 			{
@@ -960,6 +960,8 @@ public class HttpUploadPlugin extends OutputPlugin
 			IvParameterSpec ivParameterSpec = new IvParameterSpec(this.getIVBytes());
 
 			Cipher cipher = new NullCipher();
+			
+			SharedPreferences prefs = HttpUploadPlugin.getPreferences(this.getContext());
 
 			if (prefs.getBoolean("config_http_encrypt", true))
 			{

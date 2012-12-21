@@ -275,8 +275,11 @@ public abstract class OutputPlugin
 			else if (value instanceof Double)
 			{
 				Double d = (Double) value;
-
-				json.put(key, d.doubleValue());
+				
+				if (d.isInfinite())
+					json.put(key, Double.MAX_VALUE);
+				else
+					json.put(key, d.doubleValue());
 			}
 			else if (value instanceof List)
 			{

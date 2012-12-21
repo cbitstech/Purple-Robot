@@ -62,7 +62,7 @@ public class CommunicationLogProbe extends Probe
 		{
 			long now = System.currentTimeMillis();
 
-			if (prefs.getBoolean("config_probe_communication_enabled", true))
+			if (prefs.getBoolean("config_probe_communication_enabled", false))
 			{
 				synchronized(this)
 				{
@@ -187,7 +187,7 @@ public class CommunicationLogProbe extends Probe
 		CheckBoxPreference enabled = new CheckBoxPreference(activity);
 		enabled.setTitle(R.string.title_enable_probe);
 		enabled.setKey("config_probe_communication_enabled");
-		enabled.setDefaultValue(true);
+		enabled.setDefaultValue(false);
 
 		screen.addPreference(enabled);
 

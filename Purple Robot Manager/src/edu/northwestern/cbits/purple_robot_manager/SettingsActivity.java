@@ -12,7 +12,6 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
@@ -25,6 +24,8 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 	public static final String RINGTONE_KEY = "config_default_notification_sound";
 	public static final String ZIP_ARCHIVES_KEY = "config_mail_archives";
 	public static final String DELETE_ARCHIVES_KEY = "config_delete_archives";
+	static final CharSequence USER_ID_KEY = "config_user_id";
+	protected static final String USER_HASH_KEY = "config_user_hash";
 
 	public void onCreate(Bundle savedInstanceState)
     {
@@ -54,7 +55,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 				return true;
 			}
         });
-
+        
         PreferenceScreen probesScreen = ProbeManager.buildPreferenceScreen(this);
 
         PreferenceCategory category = (PreferenceCategory) prefs.findPreference("config_settings_probe_category");

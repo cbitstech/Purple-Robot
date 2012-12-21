@@ -44,53 +44,47 @@ public class LocalHttpServer
         private ServerSocket serversocket;
         private final HttpParams params = new BasicHttpParams(); 
         private HttpService httpService;
+        private int _port = 0;
         
         public RequestListenerThread(final Context context, final int port) 
         {
-        	final RequestListenerThread me = this;
+        	this._port = port;
         	
-        	Runnable r = new Runnable()
-        	{
-				public void run() 
-				{
-					try
-					{
-						me.serversocket = new ServerSocket(port, 1, InetAddress.getLocalHost());
-			            
-			            me.params.setIntParameter(CoreConnectionPNames.SO_TIMEOUT, 5000);
-			            me.params.setIntParameter(CoreConnectionPNames.SOCKET_BUFFER_SIZE, 8 * 1024);
-			            me.params.setBooleanParameter(CoreConnectionPNames.STALE_CONNECTION_CHECK, false);
-			            me.params.setBooleanParameter(CoreConnectionPNames.TCP_NODELAY, true);
-			            me.params.setParameter(CoreProtocolPNames.ORIGIN_SERVER, "HttpComponents/1.1");
-	
-			            BasicHttpProcessor httpproc = new BasicHttpProcessor();
-			            httpproc.addInterceptor(new ResponseDate());
-			            httpproc.addInterceptor(new ResponseServer());
-			            httpproc.addInterceptor(new ResponseContent());
-			            httpproc.addInterceptor(new ResponseConnControl());
-			            
-			            HttpRequestHandlerRegistry reqistry = new HttpRequestHandlerRegistry();
-			            reqistry.register("/json/submit", new JsonScriptRequestHandler(context));
-			            reqistry.register("*", new StaticContentRequestHandler(context));
-			            
-			            me.httpService = new HttpService(httpproc, new DefaultConnectionReuseStrategy(), new DefaultHttpResponseFactory());
-			            me.httpService.setParams(me.params);
-			            me.httpService.setHandlerResolver(reqistry);
-					}
-					catch (IOException e)
-					{
-						e.printStackTrace();
-					}
-				}
-        	};
-        	
-        	Thread t = new Thread(r);
-        	t.start();
+        	this.params.setIntParameter(CoreConnectionPNames.SO_TIMEOUT, 5000);
+            this.params.setIntParameter(CoreConnectionPNames.SOCKET_BUFFER_SIZE, 8 * 1024);
+            this.params.setBooleanParameter(CoreConnectionPNames.STALE_CONNECTION_CHECK, false);
+            this.params.setBooleanParameter(CoreConnectionPNames.TCP_NODELAY, true);
+            this.params.setParameter(CoreProtocolPNames.ORIGIN_SERVER, "HttpComponents/1.1");
+
+            BasicHttpProcessor httpproc = new BasicHttpProcessor();
+            httpproc.addInterceptor(new ResponseDate());
+            httpproc.addInterceptor(new ResponseServer());
+            httpproc.addInterceptor(new ResponseContent());
+            httpproc.addInterceptor(new ResponseConnControl());
+            
+            HttpRequestHandlerRegistry reqistry = new HttpRequestHandlerRegistry();
+            reqistry.register("/json/submit", new JsonScriptRequestHandler(context));
+            reqistry.register("*", new StaticContentRequestHandler(context));
+            
+            this.httpService = new HttpService(httpproc, new DefaultConnectionReuseStrategy(), new DefaultHttpResponseFactory());
+            this.httpService.setParams(this.params);
+            this.httpService.setHandlerResolver(reqistry);
         }
         
         public void run() 
         {
-            while (!Thread.interrupted()) 
+			try 
+			{
+				this.serversocket = new ServerSocket(this._port, 8, InetAddress.getLocalHost());
+//				this.serversocket = new ServerSocket(this._port, 1);
+			}
+			catch (IOException e) 
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			while (!Thread.interrupted()) 
             {
                 try 
                 {
