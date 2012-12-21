@@ -210,8 +210,6 @@ public class HttpUploadPlugin extends OutputPlugin
 
 				final JSONObject jsonObject = OutputPlugin.jsonForBundle(extras);
 
-				Log.e("PRM", "PROCESS INTENT " + jsonObject.getString("PROBE"));
-
 				if (jsonObject != null)
 				{
 					synchronized (this._pendingSaves)
@@ -224,8 +222,6 @@ public class HttpUploadPlugin extends OutputPlugin
 
 				if (now - this._lastSave > this.savePeriod() || this._pendingSaves.size() > 512)
 				{
-					Log.e("PRM", "CONTINUING");
-
 					final HttpUploadPlugin me = this;
 
 					Runnable r = new Runnable()
@@ -366,8 +362,6 @@ public class HttpUploadPlugin extends OutputPlugin
 
 	private void uploadPendingObjects()
 	{
-		Log.e("PRM", "UPLOADPENDINGOBJECTS");
-
 		if (this._uploading)
 			return;
 
@@ -522,8 +516,6 @@ public class HttpUploadPlugin extends OutputPlugin
 							}
 							catch (JSONException e)
 							{
-								Log.e("PRM", "JSON ERROR: " + f.getAbsolutePath() + " " + f.length());
-
 								e.printStackTrace();
 							}
 
@@ -919,8 +911,6 @@ public class HttpUploadPlugin extends OutputPlugin
 
 	private void persistJSONObject(final JSONObject jsonObject)
 	{
-		Log.e("PRM", "PERSISTJSONOBJECT");
-
 		long now = System.currentTimeMillis();
 
 		this._lastSave = now;
