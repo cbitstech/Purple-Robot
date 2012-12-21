@@ -19,6 +19,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -71,6 +73,20 @@ public class StartActivity extends SherlockActivity
 	private SharedPreferences prefs = null;
 	protected String _lastProbe = "";
 
+	private static OnSharedPreferenceChangeListener _prefListener = new OnSharedPreferenceChangeListener()
+    {
+		public void onSharedPreferenceChanged(SharedPreferences prefs, String key) 
+		{
+			if (SettingsActivity.USER_ID_KEY.equals(key))
+			{
+				Editor e = prefs.edit();
+
+				e.remove(SettingsActivity.USER_HASH_KEY);
+				e.commit();
+			}
+		}
+    };
+
 	private SharedPreferences getPreferences(Context context)
 	{
 		if (this.prefs == null)
@@ -105,6 +121,10 @@ public class StartActivity extends SherlockActivity
 
         ManagerService.setupPeriodicCheck(this);
 
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPrefs.registerOnSharedPreferenceChangeListener(StartActivity._prefListener);
+        
+        
         final StartActivity me = this;
 
         ListView listView = (ListView) this.findViewById(R.id.list_probes);
