@@ -21,6 +21,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -123,7 +124,6 @@ public class StartActivity extends SherlockActivity
 
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPrefs.registerOnSharedPreferenceChangeListener(StartActivity._prefListener);
-        
         
         final StartActivity me = this;
 
@@ -386,7 +386,8 @@ public class StartActivity extends SherlockActivity
 
         ListView listView = (ListView) this.findViewById(R.id.list_probes);
         ImageView logoView = (ImageView) this.findViewById(R.id.logo_view);
-
+        logoView.setBackgroundColor(Color.WHITE);
+        
         boolean probesEnabled = prefs.getBoolean("config_probes_enabled", false);
 
         this.getSupportActionBar().setTitle(R.string.app_name);
@@ -398,7 +399,7 @@ public class StartActivity extends SherlockActivity
         }
         else
         {
-        	logoView.setImageResource(R.drawable.gift);
+        	logoView.setImageResource(R.drawable.laptop);
 
         	logoView.setScaleType(ScaleType.CENTER);
 
