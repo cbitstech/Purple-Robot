@@ -19,6 +19,8 @@ import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
+import edu.northwestern.cbits.purple_robot_manager.widget.PurpleRobotAppWidgetProvider;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Notification;
