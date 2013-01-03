@@ -2,11 +2,11 @@ package edu.northwestern.cbits.purple_robot_manager.http.commands;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.Undefined;
 
-import edu.northwestern.cbits.purple_robot_manager.JavaScriptEngine;
-
 import android.content.Context;
+import edu.northwestern.cbits.purple_robot_manager.JavaScriptEngine;
 
 public class ExecuteScriptCommand extends JSONCommand 
 {
@@ -32,9 +32,18 @@ public class ExecuteScriptCommand extends JSONCommand
 				JavaScriptEngine engine = new JavaScriptEngine(this._context);
 				
 				Object o = engine.runScript(script);
-				
+
 				if ((o instanceof Undefined) == false)
+				{
+					if (o instanceof NativeJavaObject)
+					{
+						NativeJavaObject nativeObj = (NativeJavaObject) o;
+						
+						o = nativeObj.unwrap();
+					}
+
 					result.put(JSONCommand.PAYLOAD, o);
+				}
 			}
 		}
 		catch (JSONException e) 
