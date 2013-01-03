@@ -11,9 +11,11 @@ import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.NullCipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -25,6 +27,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
+import android.util.Base64;
 import edu.emory.mathcs.backport.java.util.Arrays;
 
 public class EncryptionManager 
@@ -49,13 +52,11 @@ public class EncryptionManager
 		return PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
 	}
 	
-	public Cipher encryptCipher(Context context)
+	public Cipher encryptCipher(Context context, boolean functional)
 	{
 		Cipher cipher = new NullCipher();
 		
-		SharedPreferences prefs = EncryptionManager.getPreferences(context);
-
-		if (prefs.getBoolean("config_http_encrypt", true))
+		if (functional)
 		{
 			try
 			{
@@ -91,13 +92,11 @@ public class EncryptionManager
 		return cipher;
 	}
 
-	public Cipher decryptCipher(Context context)
+	public Cipher decryptCipher(Context context, boolean functional)
 	{
 		Cipher cipher = new NullCipher();
 		
-		SharedPreferences prefs = EncryptionManager.getPreferences(context);
-
-		if (prefs.getBoolean("config_http_encrypt", true))
+		if (functional)
 		{
 			try
 			{
@@ -132,6 +131,34 @@ public class EncryptionManager
 		
 		return cipher;
 	}
+	
+	public String createHash(String string)
+	{
+		String hash = null;
+		
+		try
+		{
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			byte[] digest = md.digest(string.getBytes("UTF-8"));
+
+			hash = (new BigInteger(1, digest)).toString(16);
+
+			while (hash.length() < 32)
+			{
+				hash = "0" + hash;
+			}
+		}
+		catch (NoSuchAlgorithmException e)
+		{
+			e.printStackTrace();
+		}
+		catch (UnsupportedEncodingException e)
+		{
+			e.printStackTrace();
+		}
+		
+		return hash;
+	}
 
 	public String getUserHash(Context context)
 	{
@@ -157,26 +184,7 @@ public class EncryptionManager
 					userId = list[0].name;
 			}
 
-			try
-			{
-				MessageDigest md = MessageDigest.getInstance("MD5");
-				byte[] digest = md.digest(userId.getBytes("UTF-8"));
-
-				userHash = (new BigInteger(1, digest)).toString(16);
-
-				while (userHash.length() < 32)
-				{
-					userHash = "0" + userHash;
-				}
-			}
-			catch (NoSuchAlgorithmException e)
-			{
-				e.printStackTrace();
-			}
-			catch (UnsupportedEncodingException e)
-			{
-				e.printStackTrace();
-			}
+			userHash = this.createHash(userId);
 
 			Editor e = prefs.edit();
 
@@ -226,9 +234,9 @@ public class EncryptionManager
 		return bytes;
 	}
 
-	public void writeToEncryptedStream(Context context, OutputStream out, byte[] bytes) throws IOException 
+	public void writeToEncryptedStream(Context context, OutputStream out, byte[] bytes, boolean functional) throws IOException 
 	{
-		CipherOutputStream cout = new CipherOutputStream(out, this.encryptCipher(context));
+		CipherOutputStream cout = new CipherOutputStream(out, this.encryptCipher(context, functional));
 
 		cout.write(bytes);
 
@@ -236,9 +244,9 @@ public class EncryptionManager
 		cout.close();
 	}
 
-	public byte[] readFromEncryptedStream(Context context, InputStream in) throws IOException 
+	public byte[] readFromEncryptedStream(Context context, InputStream in, boolean functional) throws IOException 
 	{
-		CipherInputStream cin = new CipherInputStream(in, this.decryptCipher(context));
+		CipherInputStream cin = new CipherInputStream(in, this.decryptCipher(context, functional));
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -253,5 +261,76 @@ public class EncryptionManager
 		cin.close();
 		
 		return baos.toByteArray();
+	}
+	
+	public String fetchEncryptedString(Context context, String key)
+	{
+		key = this.createHash(key);
+		
+		SharedPreferences prefs = EncryptionManager.getPreferences(context);
+
+		String encoded = prefs.getString(key, null);
+		
+		if (encoded != null)
+		{
+			try 
+			{
+				byte[] baseDecoded = Base64.decode(encoded, Base64.DEFAULT);
+			
+				byte[] decoded = this.decryptCipher(context, true).doFinal(baseDecoded);
+				
+				return new String(decoded, "UTF-8");
+			} 
+			catch (IllegalBlockSizeException e) 
+			{
+				e.printStackTrace();
+			} 
+			catch (BadPaddingException e) 
+			{
+				e.printStackTrace();
+			} 
+			catch (UnsupportedEncodingException e) 
+			{
+				e.printStackTrace();
+			}
+		}
+		
+		return null;
+	}
+	
+	public boolean persistEncryptedString(Context context, String key, String value)
+	{
+		if (value != null)
+		{
+			try 
+			{
+				byte[] encoded = this.encryptCipher(context, true).doFinal(value.getBytes("UTF-8"));
+				
+				String baseEncoded = Base64.encodeToString(encoded, Base64.DEFAULT);
+				
+				key = this.createHash(key);
+
+				SharedPreferences prefs = EncryptionManager.getPreferences(context);
+				Editor edit = prefs.edit();
+
+				edit.putString(key, baseEncoded);
+				
+				return edit.commit();
+			}
+			catch (IllegalBlockSizeException e) 
+			{
+				e.printStackTrace();
+			} 
+			catch (BadPaddingException e) 
+			{
+				e.printStackTrace();
+			} 
+			catch (UnsupportedEncodingException e) 
+			{
+				e.printStackTrace();
+			}
+		}
+		
+		return false;
 	}
 }

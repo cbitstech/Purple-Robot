@@ -341,7 +341,7 @@ public class HttpUploadPlugin extends OutputPlugin
 							{
 								if (f.length() > 32)
 								{
-									byte[] bytes = EncryptionManager.getInstance().readFromEncryptedStream(me.getContext(), new FileInputStream(f));
+									byte[] bytes = EncryptionManager.getInstance().readFromEncryptedStream(me.getContext(), new FileInputStream(f), prefs.getBoolean("config_http_encrypt", true));
 
 									JSONArray jsonArray = new JSONArray(new String(bytes, "UTF-8"));
 
@@ -649,7 +649,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 								byte[] jsonBytes = toSave.toString().getBytes("UTF-8");
 
-								EncryptionManager.getInstance().writeToEncryptedStream(me.getContext(), new FileOutputStream(f), jsonBytes);
+								EncryptionManager.getInstance().writeToEncryptedStream(me.getContext(), new FileOutputStream(f), jsonBytes, prefs.getBoolean("config_http_encrypt", true));
 
 								pendingObjects.removeAll(toRemove);
 							}
@@ -792,8 +792,10 @@ public class HttpUploadPlugin extends OutputPlugin
 		try
 		{
 			byte[] jsonBytes = saveArray.toString().getBytes("UTF-8");
+			
+			SharedPreferences prefs = HttpUploadPlugin.getPreferences(this.getContext());
 
-			EncryptionManager.getInstance().writeToEncryptedStream(this.getContext(), new FileOutputStream(f), jsonBytes);
+			EncryptionManager.getInstance().writeToEncryptedStream(this.getContext(), new FileOutputStream(f), jsonBytes, prefs.getBoolean("config_http_encrypt", true));
 			
 			synchronized (this._pendingSaves)
 			{

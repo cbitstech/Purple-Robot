@@ -512,6 +512,20 @@ public class JavaScriptEngine
 		return prefs.getString(key, null);
 	}
 
+	public boolean persistEncryptedString(String key, String value)
+	{
+		key = JS_ENGINE_PERSISTENCE_PREFIX + key;
+
+		return EncryptionManager.getInstance().persistEncryptedString(this._context, key, value);
+	}
+
+	public String fetchEncryptedString(String key)
+	{
+		key = JS_ENGINE_PERSISTENCE_PREFIX + key;
+		
+		return EncryptionManager.getInstance().fetchEncryptedString(this._context, key);
+	}
+	
 	public void vibrate(String pattern)
 	{
 		Intent intent = new Intent(ManagerService.HAPTIC_PATTERN_INTENT);
