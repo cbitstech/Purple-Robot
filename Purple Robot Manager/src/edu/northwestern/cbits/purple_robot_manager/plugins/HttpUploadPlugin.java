@@ -15,8 +15,6 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.UnknownHostException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -25,14 +23,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import javax.crypto.Cipher;
-import javax.crypto.CipherInputStream;
-import javax.crypto.CipherOutputStream;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.NullCipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -56,7 +46,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -65,12 +54,11 @@ import android.net.http.AndroidHttpClient;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-
 import android.util.Log;
 import android.widget.Toast;
-
 import edu.emory.mathcs.backport.java.util.Arrays;
 import edu.emory.mathcs.backport.java.util.Collections;
+import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.StartActivity;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -94,8 +82,6 @@ public class HttpUploadPlugin extends OutputPlugin
 
 	private final static long MAX_UPLOAD_SIZE = 262144; // 512KB
 	private final static long MIN_UPLOAD_SIZE = 16384; // 16KB
-
-	private static final String CRYPTO_ALGORITHM = "AES/CBC/PKCS5Padding";
 
 	private List<String> _pendingSaves = new ArrayList<String>();
 	private long _lastSave = 0;
@@ -239,92 +225,6 @@ public class HttpUploadPlugin extends OutputPlugin
 		}
 	}
 
-	private SecretKeySpec keyForCipher(String cipherName) throws UnsupportedEncodingException
-	{
-		String userHash = this.getUserHash();
-		String keyString = (new StringBuffer(userHash)).reverse().toString();
-
-		if (cipherName != null && cipherName.startsWith("AES"))
-		{
-			byte[] stringBytes = keyString.getBytes("UTF-8");
-
-			byte[] keyBytes = new byte[32];
-			Arrays.fill(keyBytes, (byte) 0x00);
-
-			for (int i = 0; i < keyBytes.length && i < stringBytes.length; i++)
-			{
-				keyBytes[i] = stringBytes[i];
-			}
-
-			SecretKeySpec key = new SecretKeySpec(keyBytes, cipherName);
-
-			return key;
-		}
-
-		return keyForCipher(HttpUploadPlugin.CRYPTO_ALGORITHM);
-	}
-
-	private String getUserHash()
-	{
-		Context context = this.getContext();
-
-		SharedPreferences prefs = HttpUploadPlugin.getPreferences(context);
-
-		String userHash = prefs.getString("config_user_hash", null);
-
-		if (userHash == null)
-		{
-			String userId = prefs.getString("config_user_id", null);
-
-			if (userId == null)
-			{
-				userId = "unknown-user";
-
-				AccountManager manager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
-				Account[] list = manager.getAccountsByType("com.google");
-
-				if (list.length == 0)
-					list = manager.getAccounts();
-
-				if (list.length > 0)
-					userId = list[0].name;
-			}
-
-			try
-			{
-				MessageDigest md = MessageDigest.getInstance("MD5");
-				byte[] digest = md.digest(userId.getBytes("UTF-8"));
-
-				userHash = (new BigInteger(1, digest)).toString(16);
-
-				while (userHash.length() < 32)
-				{
-					userHash = "0" + userHash;
-				}
-			}
-			catch (NoSuchAlgorithmException e)
-			{
-				e.printStackTrace();
-			}
-			catch (UnsupportedEncodingException e)
-			{
-				e.printStackTrace();
-			}
-
-			Editor e = prefs.edit();
-
-			if (userId != null)
-				e.putString("config_user_id", userId);
-
-			if (userHash != null)
-				e.putString("config_user_hash", userHash);
-
-			e.commit();
-		}
-
-		return userHash;
-	}
-
 	private boolean wifiAvailable()
 	{
 		long now = System.currentTimeMillis();
@@ -406,45 +306,6 @@ public class HttpUploadPlugin extends OutputPlugin
 					boolean continueUpload = false;
 					boolean wasSuccessful = false;
 
-					Cipher encrypt = new NullCipher();
-					Cipher decrypt = new NullCipher();
-
-					if (prefs.getBoolean("config_http_encrypt", true))
-					{
-						try
-						{
-							SecretKeySpec secretKey = me.keyForCipher(HttpUploadPlugin.CRYPTO_ALGORITHM);
-
-							IvParameterSpec ivParameterSpec = new IvParameterSpec(me.getIVBytes());
-
-							encrypt = Cipher.getInstance(HttpUploadPlugin.CRYPTO_ALGORITHM);
-							encrypt.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec);
-
-							decrypt = Cipher.getInstance(HttpUploadPlugin.CRYPTO_ALGORITHM);
-							decrypt.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec);
-						}
-						catch (UnsupportedEncodingException e)
-						{
-							throw new RuntimeException(e);
-						}
-						catch (NoSuchAlgorithmException e)
-						{
-							throw new RuntimeException(e);
-						}
-						catch (NoSuchPaddingException e)
-						{
-							throw new RuntimeException(e);
-						}
-						catch (InvalidKeyException e)
-						{
-							throw new RuntimeException(e);
-						}
-						catch (InvalidAlgorithmParameterException e)
-						{
-							throw new RuntimeException(e);
-						}
-					}
-
 					me._lastUpload = now;
 
 					File pendingFolder = me.getPendingFolder();
@@ -480,23 +341,11 @@ public class HttpUploadPlugin extends OutputPlugin
 							{
 								if (f.length() > 32)
 								{
-									CipherInputStream cin = new CipherInputStream(new FileInputStream(f), decrypt);
+									byte[] bytes = EncryptionManager.getInstance().readFromEncryptedStream(me.getContext(), new FileInputStream(f));
 
-									ByteArrayOutputStream baos = new ByteArrayOutputStream();
+									JSONArray jsonArray = new JSONArray(new String(bytes, "UTF-8"));
 
-									byte[] buffer = new byte[1024];
-									int read = 0;
-
-									while ((read = cin.read(buffer, 0, buffer.length)) != -1)
-									{
-										baos.write(buffer, 0, read);
-									}
-
-									cin.close();
-
-									JSONArray jsonArray = new JSONArray(baos.toString("UTF-8"));
-
-									totalRead += baos.size();
+									totalRead += bytes.length;
 
 									for (int i = 0; i < jsonArray.length(); i++)
 									{
@@ -583,7 +432,7 @@ public class HttpUploadPlugin extends OutputPlugin
 							jsonMessage.put(OPERATION_KEY, "SubmitProbes");
 							jsonMessage.put(PAYLOAD_KEY, uploadArray.toString());
 
-							String userHash = me.getUserHash();
+							String userHash = EncryptionManager.getInstance().getUserHash(me.getContext());
 
 							jsonMessage.put(USER_HASH_KEY, userHash);
 
@@ -798,14 +647,9 @@ public class HttpUploadPlugin extends OutputPlugin
 									f = new File(pendingFolder, "pending_" + l + ".json");
 								}
 
-								CipherOutputStream cout = new CipherOutputStream(new FileOutputStream(f), encrypt);
-
 								byte[] jsonBytes = toSave.toString().getBytes("UTF-8");
 
-								cout.write(jsonBytes);
-
-								cout.flush();
-								cout.close();
+								EncryptionManager.getInstance().writeToEncryptedStream(me.getContext(), new FileOutputStream(f), jsonBytes);
 
 								pendingObjects.removeAll(toRemove);
 							}
@@ -861,15 +705,6 @@ public class HttpUploadPlugin extends OutputPlugin
 			Thread t = new Thread(r);
 			t.start();
 		}
-	}
-
-	protected byte[] getIVBytes()
-	{
-		byte[] bytes = {(byte) 0xff, 0x00, 0x11, (byte) 0xee, 0x22,
-						(byte) 0xdd, 0x33, (byte) 0xcc, 0x44, (byte) 0xbb, 0x55,
-						(byte) 0xaa, 0x66, (byte) 0x99, 0x77, (byte) 0x88 };
-
-		return bytes;
 	}
 
 	protected void broadcastMessage(int stringId)
@@ -956,28 +791,10 @@ public class HttpUploadPlugin extends OutputPlugin
 
 		try
 		{
-			SecretKeySpec secretKey = this.keyForCipher(HttpUploadPlugin.CRYPTO_ALGORITHM);
-			IvParameterSpec ivParameterSpec = new IvParameterSpec(this.getIVBytes());
-
-			Cipher cipher = new NullCipher();
-			
-			SharedPreferences prefs = HttpUploadPlugin.getPreferences(this.getContext());
-
-			if (prefs.getBoolean("config_http_encrypt", true))
-			{
-				cipher = Cipher.getInstance(HttpUploadPlugin.CRYPTO_ALGORITHM);
-				cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec);
-			}
-
-			CipherOutputStream cout = new CipherOutputStream(new FileOutputStream(f), cipher);
-
 			byte[] jsonBytes = saveArray.toString().getBytes("UTF-8");
 
-			cout.write(jsonBytes);
-
-			cout.flush();
-			cout.close();
-
+			EncryptionManager.getInstance().writeToEncryptedStream(this.getContext(), new FileOutputStream(f), jsonBytes);
+			
 			synchronized (this._pendingSaves)
 			{
 				this._pendingSaves.removeAll(toRemove);
@@ -995,25 +812,9 @@ public class HttpUploadPlugin extends OutputPlugin
 		{
 			e.printStackTrace();
 		}
-		catch (IOException e)
+		catch (IOException e) 
 		{
 			e.printStackTrace();
-		}
-		catch (InvalidKeyException e)
-		{
-			throw new RuntimeException(e);
-		}
-		catch (NoSuchAlgorithmException e)
-		{
-			throw new RuntimeException(e);
-		}
-		catch (NoSuchPaddingException e)
-		{
-			throw new RuntimeException(e);
-		}
-		catch (InvalidAlgorithmParameterException e)
-		{
-			throw new RuntimeException(e);
 		}
 
 		if (this._pendingSaves.size() > 512)
