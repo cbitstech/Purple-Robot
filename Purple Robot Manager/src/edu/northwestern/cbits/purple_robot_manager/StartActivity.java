@@ -277,6 +277,8 @@ public class StartActivity extends SherlockActivity
     	filter.addAction(StartActivity.UPDATE_MESSAGE);
 
     	broadcastManager.registerReceiver(this._receiver, filter);
+    	
+    	JSONConfigFile.getSharedFile(this.getApplicationContext());
     }
 
 	public void refreshList()
@@ -315,7 +317,7 @@ public class StartActivity extends SherlockActivity
 	    			};
 
 	    			me.runOnUiThread(rr);
-	        }
+		        }
 			}
 		};
 
@@ -363,7 +365,6 @@ public class StartActivity extends SherlockActivity
 				    return true;
 			  }
 		});
-
 
 		if (StartActivity._statusMessage != null)
 			this.getSupportActionBar().setSubtitle(StartActivity._statusMessage);

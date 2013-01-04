@@ -26,6 +26,42 @@ public class ProbeTrigger extends Trigger
 		this._frequency = object.getLong(ProbeTrigger.TRIGGER_FREQUENCY);
 	}
 
+	public boolean updateFromJson(Context context, JSONObject json) 
+	{
+		if (super.updateFromJson(context, json))
+		{
+			try
+			{
+				if (json.has(ProbeTrigger.TRIGGER_TEST))
+					this._test = json.getString(ProbeTrigger.TRIGGER_TEST);
+				
+				if (json.has(ProbeTrigger.TRIGGER_FREQUENCY))
+					this._frequency = json.getLong(ProbeTrigger.TRIGGER_FREQUENCY);
+
+				return true;
+			} 
+			catch (JSONException e) 
+			{
+				e.printStackTrace();
+			}
+		}
+		
+		return false;
+	}
+
+	public void merge(Trigger trigger) 
+	{
+		if (trigger instanceof ProbeTrigger)
+		{
+			super.merge(trigger);
+			
+			ProbeTrigger probeTrigger = (ProbeTrigger) trigger;
+		
+			this._test = probeTrigger._test;
+			this._frequency = probeTrigger._frequency;
+		}
+	}
+	
 	public boolean matches(Context context, Object object)
 	{
 		if (this._test == null)
@@ -53,7 +89,7 @@ public class ProbeTrigger extends Trigger
 		}
 		catch (EcmaError e)
 		{
-//			e.printStackTrace();
+
 		}
 
 		return false;

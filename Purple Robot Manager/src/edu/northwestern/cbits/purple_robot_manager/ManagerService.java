@@ -1,14 +1,11 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
-import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import edu.northwestern.cbits.purple_robot_manager.triggers.DateTrigger;
-import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
+import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
 import android.app.AlarmManager;
 import android.app.IntentService;
@@ -211,37 +208,8 @@ public class ManagerService extends IntentService
 				}
 			}
 		}
-		else
-		{
-			JSONConfigFile jsonConfig = JSONConfigFile.getSharedFile(this);
-
-			if (jsonConfig == null)
-				return;
-
-			List<Trigger> triggers = jsonConfig.getTriggers(this);
-
-			Date now = new Date();
-
-			for (Trigger trigger : triggers)
-			{
-				boolean execute = false;
-
-				if (PERIODIC_CHECK_INTENT.equals(intent.getAction()) && trigger instanceof DateTrigger)
-				{
-					if (trigger.matches(this, now))
-						execute = true;
-				}
-				else if (INCOMING_DATA_INTENT.equals(intent.getAction()))
-				{
-
-				}
-
-				if (execute)
-				{
-					trigger.execute(this);
-				}
-			}
-		}
+		else if (PERIODIC_CHECK_INTENT.equals(intent.getAction()))
+			TriggerManager.getInstance().nudgeTriggers(this);
 	}
 
 	public static void setupPeriodicCheck(final Context context)
