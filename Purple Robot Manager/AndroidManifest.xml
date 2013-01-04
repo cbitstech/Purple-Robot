@@ -44,15 +44,15 @@
 			<intent-filter>
 				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
 			</intent-filter>
-			<meta-data android:name="android.appwidget.provider" android:resource="@xml/wide_appwidget_info" />
+			<meta-data android:name="android.appwidget.provider" android:resource="@xml/appwidget_info" />
 		</receiver>
 		<receiver android:name=".widget.PurpleRobotAppWideWidgetProvider" android:exported="false" android:label="@string/wide_widget_title">
 			<intent-filter>
 				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
 			</intent-filter>
-			<meta-data android:name="android.appwidget.provider" android:resource="@xml/appwidget_info" />
+			<meta-data android:name="android.appwidget.provider" android:resource="@xml/wide_appwidget_info" />
 		</receiver>
-				<service android:enabled="true" android:name=".ManagerService" android:exported="false">
+		<service android:enabled="true" android:name=".ManagerService" android:exported="false">
 			<intent-filter>
 				<action android:name="purple_robot_manager_periodic_check" />
 				<action android:name="purple_robot_manager_incoming_data" />

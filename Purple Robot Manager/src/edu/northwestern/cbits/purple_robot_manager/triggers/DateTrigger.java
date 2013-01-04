@@ -51,36 +51,44 @@ public class DateTrigger extends Trigger
 		}
 	}
 
-	private String _start = null;
-	private String _end = null;
-	private String _repeats = null;
 	private boolean _random = false;
 	private Calendar _calendar = null;
+	
+	private String _icalString = null;
 
-	public DateTrigger(Context context, JSONObject object) throws JSONException
+	public void reset(Context context) 
 	{
-		super(context, object);
+		super.reset(context);
+		
+		this.lastUpdate = 0;
 
-		this._start = object.getString(DateTrigger.DATETIME_START);
-		this._end = object.getString(DateTrigger.DATETIME_END);
+		String key = "last_fired_" + this.identifier();
 
-		if (object.has(DateTrigger.DATETIME_REPEATS))
-			this._repeats = object.getString(DateTrigger.DATETIME_REPEATS);
+		SharedPreferences prefs =  PreferenceManager.getDefaultSharedPreferences(context);
 
-		if (object.has(DateTrigger.DATETIME_RANDOM))
-			this._random = object.getBoolean(DateTrigger.DATETIME_RANDOM);
+		Editor edit = prefs.edit();
+		edit.remove(key);
+		edit.commit();
+	}
 
-		if ("null".equals(this._repeats))
-			this._repeats = null;
+	public void merge(Trigger trigger) 
+	{
+		if (trigger instanceof DateTrigger)
+		{
+			super.merge(trigger);
+			
+			DateTrigger dateTrigger = (DateTrigger) trigger;
+		
+			this._icalString = dateTrigger._icalString;
+			this._random = dateTrigger._random;
+			
+			this.refreshCalendar();
+		}
+	}
 
-		String repeatString = "";
-
-		if (this._repeats != null)
-			repeatString = "\nRRULE:" + this._repeats;
-
-		String icalString = String.format(context.getString(R.string.ical_template), this._start, this._end, this.name(), repeatString);
-
-		StringReader sin = new StringReader(icalString);
+	private void refreshCalendar()
+	{
+		StringReader sin = new StringReader(this._icalString);
 
 		CalendarBuilder builder = new CalendarBuilder();
 
@@ -96,6 +104,81 @@ public class DateTrigger extends Trigger
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	public boolean updateFromJson(Context context, JSONObject json) 
+	{
+		if (super.updateFromJson(context, json))
+		{
+			try
+			{
+				String start = null;
+				
+				if (json.has(DateTrigger.DATETIME_START))
+					start = json.getString(DateTrigger.DATETIME_START);
+				
+				String end = null;
+	
+				if (json.has(DateTrigger.DATETIME_END))
+					end = json.getString(DateTrigger.DATETIME_END);
+	
+				String repeats = "null";
+	
+				if (json.has(DateTrigger.DATETIME_REPEATS))
+					repeats = json.getString(DateTrigger.DATETIME_REPEATS);
+	
+				if (json.has(DateTrigger.DATETIME_RANDOM))
+					this._random = json.getBoolean(DateTrigger.DATETIME_RANDOM);
+	
+				if ("null".equals(repeats))
+					repeats = null;
+				
+				String repeatString = "";
+
+				if (repeats != null)
+					repeatString = "\nRRULE:" + repeats;
+
+				this._icalString = String.format(context.getString(R.string.ical_template), start, end, this.name(), repeatString);
+				
+				this.refreshCalendar();
+	
+				return true;
+			} 
+			catch (JSONException e) 
+			{
+				e.printStackTrace();
+			}
+		}
+		
+		return false;
+	}
+	
+	public DateTrigger(Context context, JSONObject object) throws JSONException
+	{
+		super(context, object);
+
+		String start = object.getString(DateTrigger.DATETIME_START);
+		String end = object.getString(DateTrigger.DATETIME_END);
+		
+		String repeats = "null";
+
+		if (object.has(DateTrigger.DATETIME_REPEATS))
+			repeats = object.getString(DateTrigger.DATETIME_REPEATS);
+
+		if (object.has(DateTrigger.DATETIME_RANDOM))
+			this._random = object.getBoolean(DateTrigger.DATETIME_RANDOM);
+
+		if ("null".equals(repeats))
+			repeats = null;
+
+		String repeatString = "";
+
+		if (repeats != null)
+			repeatString = "\nRRULE:" + repeats;
+
+		this._icalString = String.format(context.getString(R.string.ical_template), start, end, this.name(), repeatString);
+		
+		this.refreshCalendar();
 	}
 
 	public Period getPeriod(long timestamp)
@@ -153,7 +236,7 @@ public class DateTrigger extends Trigger
 
 		SharedPreferences prefs =  PreferenceManager.getDefaultSharedPreferences(context);
 
-		String key = "last_fired_" + this.name();
+		String key = "last_fired_" + this.identifier();
 
 		if (p != null)
 		{

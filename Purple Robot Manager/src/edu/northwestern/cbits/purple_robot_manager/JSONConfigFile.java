@@ -29,6 +29,7 @@ import android.preference.PreferenceManager;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
+import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
 public class JSONConfigFile
 {
@@ -43,7 +44,6 @@ public class JSONConfigFile
 	private static SharedPreferences prefs = null;
 
 	private JSONObject parameters = null;
-	private List<Trigger> _triggerList = null;
 
 	private static JSONConfigFile _sharedFile = null;
 	private static Uri _configUri = null;
@@ -93,7 +93,7 @@ public class JSONConfigFile
 							edit.putString(JSONConfigFile.JSON_CONFIGURATION_URL, u.toString());
 
 							edit.commit();
-
+							
 							if (context instanceof Activity)
 							{
 								final Activity activity = (Activity) context;
@@ -128,6 +128,30 @@ public class JSONConfigFile
 			Thread t = new Thread(r);
 			t.start();
 		}
+	}
+
+	protected void updateTriggers(Context context) 
+	{
+		List<Trigger> triggerList = new ArrayList<Trigger>();
+
+		try
+		{
+			JSONArray triggers = this.parameters.getJSONArray("triggers");
+
+			for (int i = 0; triggers != null && i < triggers.length(); i++)
+			{
+				Trigger t = Trigger.parse(context, triggers.getJSONObject(i));
+
+				if (t != null)
+					triggerList.add(t);
+			}
+		}
+		catch (JSONException e)
+		{
+
+		}
+		
+		TriggerManager.getInstance().updateTriggers(triggerList);
 	}
 
 	public static JSONConfigFile getSharedFile(Context context)
@@ -174,6 +198,8 @@ public class JSONConfigFile
 			this.parameters = new JSONObject(prefs.getString(JSONConfigFile.JSON_CONFIGURATION, "{}"));
 
 			this.updateSharedPreferences(context);
+			
+			this.updateTriggers(context);
 		}
 		catch (JSONException e)
 		{
@@ -343,6 +369,9 @@ public class JSONConfigFile
 
 					edit.putLong(JSONConfigFile.JSON_LAST_UPDATE, now);
 					edit.commit();
+					
+					if (JSONConfigFile._sharedFile != null)
+						JSONConfigFile._sharedFile.updateTriggers(context);
 				}
 			}
 		};
@@ -362,32 +391,5 @@ public class JSONConfigFile
 			return false;
 
 		return true;
-	}
-
-	public List<Trigger> getTriggers(Context context)
-	{
-		if (this._triggerList == null)
-		{
-			this._triggerList = new ArrayList<Trigger>();
-
-			try
-			{
-				JSONArray triggers = this.parameters.getJSONArray("triggers");
-
-				for (int i = 0; triggers != null && i < triggers.length(); i++)
-				{
-					Trigger t = Trigger.parse(context, triggers.getJSONObject(i));
-
-					if (t != null)
-						this._triggerList.add(t);
-				}
-			}
-			catch (JSONException e)
-			{
-
-			}
-		}
-
-		return this._triggerList;
 	}
 }

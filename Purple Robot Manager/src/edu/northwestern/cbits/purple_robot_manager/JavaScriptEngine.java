@@ -11,15 +11,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.EvaluatorException;
+import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
-
-import edu.northwestern.cbits.purple_robot_manager.widget.PurpleRobotAppWidgetProvider;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -40,6 +41,10 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
+import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
+import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
+import edu.northwestern.cbits.purple_robot_manager.widget.PurpleRobotAppWideWidgetProvider;
+import edu.northwestern.cbits.purple_robot_manager.widget.PurpleRobotAppWidgetProvider;
 
 public class JavaScriptEngine
 {
@@ -119,14 +124,34 @@ public class JavaScriptEngine
 		}
 		catch (EvaluatorException e)
 		{
-			Toast.makeText(this._context, e.getMessage(), Toast.LENGTH_LONG).show();
+			e.printStackTrace();
+
+			try
+			{
+				Toast.makeText(this._context, e.getMessage(), Toast.LENGTH_LONG).show();
+			}
+			catch (RuntimeException ee)
+			{
+
+			}
+			
+			throw e;
 		}
 		catch (EcmaError e)
 		{
-			Toast.makeText(this._context, e.getMessage(), Toast.LENGTH_LONG).show();
-		}
+			e.printStackTrace();
 
-		return null;
+			try
+			{
+				Toast.makeText(this._context, e.getMessage(), Toast.LENGTH_LONG).show();
+			}
+			catch (RuntimeException ee)
+			{
+
+			}
+			
+			throw e;
+		}
 	}
 
 	public boolean loadLibrary(String libraryName)
@@ -270,10 +295,19 @@ public class JavaScriptEngine
 
 		int[] widgetIds = widgetManager.getAppWidgetIds(provider);
 
+		ComponentName wideProvider = new ComponentName(this._context.getPackageName(), PurpleRobotAppWideWidgetProvider.class.getName());
+
+		int[] wideWidgetIds = widgetManager.getAppWidgetIds(wideProvider);
+
 		RemoteViews views = new RemoteViews(this._context.getPackageName(), R.layout.layout_widget);
 
 		views.setCharSequence(R.id.widget_title_text, "setText", title);
 		views.setCharSequence(R.id.widget_message_text, "setText", message);
+
+		RemoteViews wideViews = new RemoteViews(this._context.getPackageName(), R.layout.layout_wide_widget);
+
+		wideViews.setCharSequence(R.id.widget_wide_title_text, "setText", title);
+		wideViews.setCharSequence(R.id.widget_wide_message_text, "setText", message);
 
 		Intent intent = this.constructLaunchIntent(applicationName, launchParams, script);
 
@@ -282,16 +316,21 @@ public class JavaScriptEngine
 			if (intent.getAction().equals(ManagerService.APPLICATION_LAUNCH_INTENT))
 			{
 				PendingIntent pi = PendingIntent.getService(this._context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
 				views.setOnClickPendingIntent(R.id.widget_root_layout, pi);
+				wideViews.setOnClickPendingIntent(R.id.widget_root_layout, pi);
 			}
 			else
 			{
 				PendingIntent pi = PendingIntent.getActivity(this._context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+				
 				views.setOnClickPendingIntent(R.id.widget_root_layout, pi);
+				wideViews.setOnClickPendingIntent(R.id.widget_root_layout, pi);
 			}
 		}
 
 		widgetManager.updateAppWidget(widgetIds, views);
+		widgetManager.updateAppWidget(wideWidgetIds, wideViews);
 
 		return true;
 	}
@@ -552,5 +591,124 @@ public class JavaScriptEngine
 	public void log(String message)
 	{
 		Log.e("PRM.JavaScript", message);
+	}
+	
+	public boolean updateTrigger(String triggerId, NativeObject nativeJson)
+	{
+		boolean found = false;
+
+		try 
+		{
+			JSONObject json = JavaScriptEngine.nativeToJson(nativeJson);
+
+			for (Trigger trigger : TriggerManager.getInstance().triggersForId(triggerId))
+			{
+				trigger.updateFromJson(this._context, json);
+				
+				found = true;
+			}
+		}
+		catch (JSONException e) 
+		{
+			e.printStackTrace();
+		}
+		
+		return found;
+	}
+	
+	private static JSONArray nativeToJson(NativeArray nativeArray) throws JSONException
+	{
+		JSONArray array = new JSONArray();
+		
+		for (int i = 0; i < nativeArray.getLength(); i++)
+		{
+			Object value = nativeArray.get(i);
+			
+			if (value instanceof String)
+				array.put(value);
+			else if (value instanceof Double)
+				array.put(value);
+			else if (value instanceof NativeObject)
+			{
+				NativeObject obj = (NativeObject) value;
+				
+				array.put(JavaScriptEngine.nativeToJson(obj));
+			}
+			else if (value instanceof NativeArray)
+			{
+				NativeArray arr = (NativeArray) value;
+				
+				array.put(JavaScriptEngine.nativeToJson(arr));
+			}
+		}
+
+		return array;
+	}
+	
+	private static JSONObject nativeToJson(NativeObject nativeObj) throws JSONException 
+	{
+		if (nativeObj == null)
+			return null;
+		
+		JSONObject json = new JSONObject();
+		
+		for (Entry<Object, Object> e : nativeObj.entrySet())
+		{
+			String key = e.getKey().toString();
+			Object value = e.getValue();
+			
+			if (value instanceof String)
+				json.put(key, value);
+			else if (value instanceof Double)
+				json.put(key, value);
+			else if (value instanceof NativeObject)
+			{
+				NativeObject obj = (NativeObject) value;
+				
+				json.put(key, JavaScriptEngine.nativeToJson(obj));
+			}
+			else if (value instanceof NativeArray)
+			{
+				NativeArray arr = (NativeArray) value;
+				
+				json.put(key, JavaScriptEngine.nativeToJson(arr));
+			}
+		}
+					
+		return json;
+	}
+
+	public void resetTrigger(String triggerId)
+	{
+		for (Trigger trigger : TriggerManager.getInstance().triggersForId(triggerId))
+		{
+			trigger.reset(this._context);
+		}
+	}
+
+	public void enableTrigger(String triggerId)
+	{
+		for (Trigger trigger : TriggerManager.getInstance().triggersForId(triggerId))
+		{
+			trigger.setEnabled(true);
+		}
+	}
+
+	public void disableTrigger(String triggerId)
+	{
+		for (Trigger trigger : TriggerManager.getInstance().triggersForId(triggerId))
+		{
+			trigger.setEnabled(false);
+		}
+	}
+
+	public void disableAutoConfigUpdates(String triggerId)
+	{
+		// TODO
+	}
+
+	public void enableAutoConfigUpdates(String triggerId)
+	{
+		// TODO
 	}
 }

@@ -10,6 +10,7 @@ import edu.northwestern.cbits.purple_robot_manager.JSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.triggers.ProbeTrigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
+import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
 public class TriggerOutputPlugin extends OutputPlugin
 {
@@ -29,7 +30,7 @@ public class TriggerOutputPlugin extends OutputPlugin
 		if (jsonConfig == null)
 			return;
 
-		List<Trigger> triggers = jsonConfig.getTriggers(context);
+		List<Trigger> triggers = TriggerManager.getInstance().allTriggers();
 
 		for (Trigger trigger : triggers)
 		{

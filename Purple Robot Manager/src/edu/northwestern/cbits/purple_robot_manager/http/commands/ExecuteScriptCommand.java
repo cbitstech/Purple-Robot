@@ -46,7 +46,7 @@ public class ExecuteScriptCommand extends JSONCommand
 				}
 			}
 		}
-		catch (JSONException e) 
+		catch (Exception e) 
 		{
 			try 
 			{

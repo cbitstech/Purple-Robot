@@ -12,7 +12,7 @@
     android:paddingRight="24dp"
 	android:background="@drawable/appwidget_dark_bg">
     <TextView
-        android:id="@+id/widget_title_text"
+        android:id="@+id/widget_wide_title_text"
         android:text="@string/widget_test_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -20,15 +20,17 @@
         android:textSize="48sp"
         android:textStyle="bold"
         android:lines="1"
+        android:gravity="top|center"
         android:singleLine="true"
 	    android:paddingBottom="4dp"
         android:ellipsize="end"
         android:typeface="sans" />
     <TextView
-        android:id="@+id/widget_message_text"
+        android:id="@+id/widget_wide_message_text"
         android:text="@string/widget_test_message"
    	    android:layout_width="match_parent"
        	android:layout_height="wrap_content"
+        android:gravity="top|center"
        	android:textSize="32sp"
         android:ellipsize="end"
        	android:singleLine="false"
