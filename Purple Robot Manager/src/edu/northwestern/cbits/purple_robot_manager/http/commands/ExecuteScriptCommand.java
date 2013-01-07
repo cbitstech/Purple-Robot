@@ -22,7 +22,7 @@ public class ExecuteScriptCommand extends JSONCommand
 	public JSONObject execute() 
 	{
 		JSONObject result = super.execute();
-		
+
 		try 
 		{
 			if (JSONCommand.STATUS_OK.equals(result.get(JSONCommand.STATUS)))
@@ -58,7 +58,7 @@ public class ExecuteScriptCommand extends JSONCommand
 				ee.printStackTrace();
 			}
 		}
-		
+
 		return result;
 	}
 }

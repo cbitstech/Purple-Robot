@@ -132,7 +132,7 @@ public class JavaScriptEngine
 			}
 			catch (RuntimeException ee)
 			{
-
+				ee.printStackTrace();
 			}
 			
 			throw e;
@@ -147,7 +147,7 @@ public class JavaScriptEngine
 			}
 			catch (RuntimeException ee)
 			{
-
+				ee.printStackTrace();
 			}
 			
 			throw e;
@@ -604,6 +604,15 @@ public class JavaScriptEngine
 			for (Trigger trigger : TriggerManager.getInstance().triggersForId(triggerId))
 			{
 				trigger.updateFromJson(this._context, json);
+				
+				found = true;
+			}
+			
+			if (found == false)
+			{
+				Trigger t = Trigger.parse(this._context, json);
+
+				TriggerManager.getInstance().addTrigger(t);
 				
 				found = true;
 			}
