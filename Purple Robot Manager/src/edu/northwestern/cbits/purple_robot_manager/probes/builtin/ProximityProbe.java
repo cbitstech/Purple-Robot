@@ -258,7 +258,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 
 			SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
-			if (prefs.getBoolean("config_probe_proximity_built_in_enabled", true))
+			if (prefs.getBoolean("config_probe_proximity_built_in_enabled", false))
 			{
 				sensors.registerListener(this, sensors.getDefaultSensor(Sensor.TYPE_PROXIMITY), SensorManager.SENSOR_DELAY_FASTEST, null);
 

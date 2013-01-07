@@ -263,7 +263,7 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 
 			SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
-			if (prefs.getBoolean("config_probe_light_built_in_enabled", true))
+			if (prefs.getBoolean("config_probe_light_built_in_enabled", false))
 			{
 				sensors.registerListener(this, sensors.getDefaultSensor(Sensor.TYPE_LIGHT), SensorManager.SENSOR_DELAY_FASTEST, null);
 
