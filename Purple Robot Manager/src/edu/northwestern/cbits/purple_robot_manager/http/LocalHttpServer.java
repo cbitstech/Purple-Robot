@@ -151,7 +151,7 @@ public class LocalHttpServer
                 } 
                 catch (IOException ignore) 
                 {
-                	
+                	ignore.printStackTrace();
                 }
             }
         }

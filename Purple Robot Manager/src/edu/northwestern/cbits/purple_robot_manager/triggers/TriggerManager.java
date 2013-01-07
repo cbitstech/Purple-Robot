@@ -84,4 +84,13 @@ public class TriggerManager
 	{
 		return this._triggers;
 	}
+
+	public void addTrigger(Trigger t) 
+	{
+		ArrayList<Trigger> ts = new ArrayList<Trigger>();
+		
+		ts.add(t);
+		
+		this.updateTriggers(ts);
+	}
 }

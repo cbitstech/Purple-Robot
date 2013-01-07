@@ -1,7 +1,6 @@
 package edu.northwestern.cbits.purple_robot_manager.http;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
@@ -9,15 +8,15 @@ import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestHandler;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.net.Uri;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.ExecuteScriptCommand;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.JSONCommand;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.PingCommand;
@@ -36,36 +35,36 @@ public class JsonScriptRequestHandler implements HttpRequestHandler
 
 	public void handle(HttpRequest request, HttpResponse response, HttpContext argument) throws HttpException, IOException 
 	{
-        response.setStatusCode(HttpStatus.SC_OK);
-
+		response.setStatusCode(HttpStatus.SC_OK);
+		
         if (request instanceof HttpEntityEnclosingRequest) 
         { 
-            HttpEntity entity = ((HttpEntityEnclosingRequest) request).getEntity();
-
-            List<NameValuePair> pairs = URLEncodedUtils.parse(entity);
+        	HttpEntityEnclosingRequest enclosingRequest = (HttpEntityEnclosingRequest) request;
+    		
+            HttpEntity entity = enclosingRequest.getEntity();
+            
+            String entityString = EntityUtils.toString(entity);
+            
+            Uri u = Uri.parse("http://localhost/?" + entityString);
 
             JSONObject arguments = null;
-            
-            for (NameValuePair pair : pairs)
-            {
-                if ("json".equals(pair.getName()))
-                {
-					try 
-					{
-						arguments = new JSONObject(pair.getValue());
-					}
-					catch (JSONException e) 
-					{
-		                response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-		                
-		                StringEntity body = new StringEntity(e.toString());
-		                body.setContentType("text/plain");
 
-		                response.setEntity(body);
-		                
-		                return;
-					}
-                }
+            try 
+            {
+				arguments = new JSONObject(u.getQueryParameter("json"));
+			} 
+            catch (JSONException e) 
+            {
+				e.printStackTrace();
+
+                response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+                
+                StringEntity body = new StringEntity(e.toString());
+                body.setContentType("text/plain");
+
+                response.setEntity(body);
+                
+                return;
             }
 
             if (arguments != null)
@@ -89,17 +88,8 @@ public class JsonScriptRequestHandler implements HttpRequestHandler
 	                body.setContentType("text/plain");
 
 	                response.setEntity(body);
-	    		}
+	            }
             }
-            else
-            {
-                response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-                
-                StringEntity body = new StringEntity("No \"json\" argument provided.");
-                body.setContentType("text/plain");
-
-                response.setEntity(body);
-    		}
         }
 	}
 

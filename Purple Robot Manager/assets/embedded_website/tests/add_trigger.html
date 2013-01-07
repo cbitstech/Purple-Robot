@@ -1,0 +1,59 @@
+<html>
+	<head>
+		<title>Add Trigger Test</title>
+		<script type="text/javascript" src="/js/date.js"></script>
+		<script type="text/javascript" src="/js/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function ()
+			{
+				var date_format = "yyyyMMddTHHmmss"; // See date.js...
+				
+				var now = new Date();
+				
+				var fire_date = new Date();
+				fire_date.addMinutes(2);
+
+				var end_date = new Date();
+				end_date.addMinutes(5);
+				
+				var new_trigger = {};
+				new_trigger.type = "datetime";
+				new_trigger.name = "JS API Test Trigger";
+				new_trigger.identifier = "js_test_" + now.getTime();
+				new_trigger.action = "PurpleRobot.launchUrl('http://cbits.northwestern.edu/');";
+				new_trigger.datetime_start = fire_date.toString(date_format);
+				new_trigger.datetime_end = end_date.toString(date_format);
+				
+				var json = {};
+				json.command = "execute_script";
+				json.script = "PurpleRobot.updateTrigger(\"" + new_trigger.identifier + "\", " + JSON.stringify(new_trigger) + ");";
+				
+				var post_data = {};
+				post_data.json = JSON.stringify(json);
+
+				$.ajax("/json/submit", {
+					type: "POST",
+					contentType: "application/x-www-form-urlencoded; charset=UTF-8", 
+					data: post_data,
+					success: function(data)
+					{
+						alert("Trigger created. It will launch shortly after " + fire_date + "...");
+//						alert("GOT DATA: " + JSON.stringify(data));
+					},
+					error: function(jqXHR, textStatus, errorThrown) 
+					{ 
+						alert("Error creating trigger: " + errorThrown);
+//						alert("error " + textStatus + " --- " + errorThrown); 
+					}
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<h1>Add Trigger Test</h1>
+		
+		<p>Each time this page is loaded, it creates a new trigger in Purple Robot that will launch the CBITs webpage in 2 minutes.</p>
+	</body>
+</html>
+	
+	
