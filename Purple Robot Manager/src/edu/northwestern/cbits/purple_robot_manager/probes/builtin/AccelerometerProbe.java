@@ -281,7 +281,7 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 
         	SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
-        	if (prefs.getBoolean("config_probe_accelerometer_built_in_enabled", true))
+        	if (prefs.getBoolean("config_probe_accelerometer_built_in_enabled", false))
         	{
             	sensors.registerListener(this, sensors.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_FASTEST, null);
 
