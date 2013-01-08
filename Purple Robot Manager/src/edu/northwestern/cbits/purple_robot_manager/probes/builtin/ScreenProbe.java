@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceActivity;
@@ -87,6 +88,26 @@ public class ScreenProbe extends Probe
 		}
 
 		return this._isEnabled;
+	}
+
+	public void enable(Context context)
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		
+		Editor e = prefs.edit();
+		e.putBoolean("config_probe_screen_enabled", true);
+		
+		e.commit();
+	}
+
+	public void disable(Context context)
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		
+		Editor e = prefs.edit();
+		e.putBoolean("config_probe_screen_enabled", false);
+		
+		e.commit();
 	}
 
 	public String summarizeValue(Context context, Bundle bundle)

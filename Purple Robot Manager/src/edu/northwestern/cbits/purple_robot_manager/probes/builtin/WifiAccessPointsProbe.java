@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -157,6 +158,25 @@ public class WifiAccessPointsProbe extends Probe
 		return false;
 	}
 
+	public void enable(Context context)
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		
+		Editor e = prefs.edit();
+		e.putBoolean("config_probe_wifi_enabled", true);
+		
+		e.commit();
+	}
+
+	public void disable(Context context)
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		
+		Editor e = prefs.edit();
+		e.putBoolean("config_probe_wifi_enabled", false);
+		
+		e.commit();
+	}
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{

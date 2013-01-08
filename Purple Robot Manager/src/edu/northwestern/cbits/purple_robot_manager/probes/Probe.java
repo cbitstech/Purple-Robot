@@ -145,4 +145,7 @@ public abstract class Probe
 	{
 		return null;
 	}
+
+	public abstract void enable(Context context);
+	public abstract void disable(Context context);
 }

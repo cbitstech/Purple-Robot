@@ -5,6 +5,7 @@ import java.io.InterruptedIOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 
 import org.apache.http.ConnectionClosedException;
 import org.apache.http.HttpException;
@@ -75,8 +76,8 @@ public class LocalHttpServer
         {
 			try 
 			{
-//				this.serversocket = new ServerSocket(this._port, 8, InetAddress.getLocalHost());
-				this.serversocket = new ServerSocket(this._port, 1);
+				this.serversocket = new ServerSocket(this._port, 8, InetAddress.getLocalHost());
+//				this.serversocket = new ServerSocket(this._port, 1);
 			}
 			catch (IOException e) 
 			{
@@ -128,7 +129,14 @@ public class LocalHttpServer
             {
                 while (!Thread.interrupted() && this.conn.isOpen()) 
                 {
-                    this.httpservice.handleRequest(this.conn, context);
+                	try
+                	{
+                		this.httpservice.handleRequest(this.conn, context);
+                	}
+                	catch (SocketTimeoutException e)
+                	{
+                		
+                	}
                 }
             } 
             catch (ConnectionClosedException e) 

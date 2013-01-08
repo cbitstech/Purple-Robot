@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceActivity;
@@ -126,6 +127,26 @@ public class CallStateProbe extends Probe
 		String state = bundle.getString(CallStateProbe.CALL_STATE);
 
 		return String.format(context.getResources().getString(R.string.summary_call_state_probe), state);
+	}
+
+	public void enable(Context context)
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		
+		Editor e = prefs.edit();
+		e.putBoolean("config_probe_call_state_enabled", true);
+		
+		e.commit();
+	}
+
+	public void disable(Context context)
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		
+		Editor e = prefs.edit();
+		e.putBoolean("config_probe_call_state_enabled", false);
+		
+		e.commit();
 	}
 
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)

@@ -1,0 +1,41 @@
+<html>
+	<head>
+		<title>Enable Probe Test</title>
+		<script type="text/javascript" src="/js/date.js"></script>
+		<script type="text/javascript" src="/js/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function ()
+			{
+				var now = new Date();
+				
+				var json = {};
+				json.command = "execute_script";
+				json.script = "PurpleRobot.enableProbe('edu.northwestern.cbits.purple_robot_manager.probes.builtin.AccelerometerProbe'); PurpleRobot.playDefaultTone();";
+				
+				var post_data = {};
+				post_data.json = JSON.stringify(json);
+
+				$.ajax("/json/submit", {
+					type: "POST",
+					contentType: "application/x-www-form-urlencoded; charset=UTF-8", 
+					data: post_data,
+					success: function(data)
+					{
+						alert("Accelerometer probe enabled...");
+					},
+					error: function(jqXHR, textStatus, errorThrown) 
+					{ 
+						alert("Error enabling accelerometer probe: " + errorThrown);
+					}
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<h1>Enable Probe Test</h1>
+		
+		<p>Each time this page is loaded, it enables the accelerometer probe.</p>
+	</body>
+</html>
+	
+	

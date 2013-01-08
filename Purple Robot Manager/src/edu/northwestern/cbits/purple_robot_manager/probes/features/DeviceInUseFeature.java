@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
@@ -123,4 +124,25 @@ public class DeviceInUseFeature extends Feature
 
 		return this._isEnabled;
 	}
+	
+	public void enable(Context context)
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		
+		Editor e = prefs.edit();
+		e.putBoolean("config_probe_device_use_enabled", true);
+		
+		e.commit();
+	}
+
+	public void disable(Context context)
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		
+		Editor e = prefs.edit();
+		e.putBoolean("config_probe_device_use_enabled", false);
+		
+		e.commit();
+	}
+
 }

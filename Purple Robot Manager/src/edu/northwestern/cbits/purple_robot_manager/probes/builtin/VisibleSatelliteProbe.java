@@ -7,6 +7,7 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
 import android.location.Location;
@@ -60,6 +61,26 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 		screen.addPreference(duration);
 
 		return screen;
+	}
+
+	public void enable(Context context)
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		
+		Editor e = prefs.edit();
+		e.putBoolean("config_probe_satellites_enabled", true);
+		
+		e.commit();
+	}
+
+	public void disable(Context context)
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		
+		Editor e = prefs.edit();
+		e.putBoolean("config_probe_satellites_enabled", false);
+		
+		e.commit();
 	}
 
 	public boolean isEnabled(Context context)

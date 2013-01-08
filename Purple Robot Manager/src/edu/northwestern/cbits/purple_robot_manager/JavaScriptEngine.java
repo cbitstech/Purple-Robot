@@ -786,4 +786,15 @@ public class JavaScriptEngine
 
 		this.transmitData(bundle);
 	}
+	
+	public void enableProbe(String probeName)
+	{
+		ProbeManager.enableProbe(this._context, probeName);
+	}
+
+	public void disableProbe(String probeName)
+	{
+		ProbeManager.disableProbe(this._context, probeName);
+	}
+
 }
