@@ -10,7 +10,7 @@
 				
 				var json = {};
 				json.command = "execute_script";
-				json.script = "PurpleRobot.emitReading('Current JS Time', now.toString()); PurpleRobot.playDefaultTone();";
+				json.script = "PurpleRobot.emitReading('Current JS Time', (new Date()).toString()); PurpleRobot.playDefaultTone();";
 				
 				var post_data = {};
 				post_data.json = JSON.stringify(json);
@@ -21,11 +21,11 @@
 					data: post_data,
 					success: function(data)
 					{
-						alert("Probes disabled...");
+						alert("Reading emitted...");
 					},
 					error: function(jqXHR, textStatus, errorThrown) 
 					{ 
-						alert("Error disabling probes: " + errorThrown);
+						alert("Error emitting reading: " + errorThrown);
 					}
 				});
 			});
