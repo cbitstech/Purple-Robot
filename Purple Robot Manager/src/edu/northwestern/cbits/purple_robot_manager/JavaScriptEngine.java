@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
+import java.util.UUID;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,10 +38,15 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.AssetManager;
 import android.net.Uri;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
+import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
+import edu.northwestern.cbits.purple_robot_manager.probes.features.Feature;
+import edu.northwestern.cbits.purple_robot_manager.probes.features.JavascriptFeature;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 import edu.northwestern.cbits.purple_robot_manager.widget.PurpleRobotAppWideWidgetProvider;
@@ -719,5 +725,65 @@ public class JavaScriptEngine
 	public void enableAutoConfigUpdates(String triggerId)
 	{
 		// TODO
+	}
+
+	public void enableProbes()
+	{
+		ProbeManager.enableProbes(this._context);
+	}
+
+	public void disableProbes()
+	{
+		ProbeManager.disableProbes(this._context);
+	}
+	
+	public boolean probesState()
+	{
+		return ProbeManager.probesState(this._context);
+	}
+	
+	private void transmitData(Bundle data)
+	{
+		UUID uuid = UUID.randomUUID();
+		data.putString("GUID", uuid.toString());
+
+		LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(this._context);
+		Intent intent = new Intent(edu.northwestern.cbits.purple_robot_manager.probes.Probe.PROBE_READING);
+		intent.putExtras(data);
+
+		localManager.sendBroadcast(intent);
+	}
+
+	public void emitReading(String name, Object value)
+	{
+		Bundle bundle = new Bundle();
+		bundle.putString("PROBE", name);
+		bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+		
+		if (value instanceof String)
+			bundle.putString(Feature.FEATURE_VALUE, value.toString());
+		else if (value instanceof Double)
+		{
+			Double d = (Double) value;
+
+			bundle.putDouble(Feature.FEATURE_VALUE, d.doubleValue());
+		}
+		else if (value instanceof NativeObject)
+		{
+			NativeObject nativeObj = (NativeObject) value;
+
+			Bundle b = JavascriptFeature.bundleForNativeObject(nativeObj);
+
+			bundle.putParcelable(Feature.FEATURE_VALUE, b);
+		}
+		else
+		{
+			Log.e("PRM", "JS PLUGIN GOT UNKNOWN VALUE " + value);
+
+			if (value != null)
+				Log.e("PRM", "JS PLUGIN GOT UNKNOWN CLASS " + value.getClass());
+		}
+
+		this.transmitData(bundle);
 	}
 }
