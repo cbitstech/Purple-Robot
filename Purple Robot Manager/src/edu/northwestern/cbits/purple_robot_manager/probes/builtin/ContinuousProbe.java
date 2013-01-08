@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.hardware.Sensor;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -33,6 +34,30 @@ public abstract class ContinuousProbe extends Probe
 	}
 
 	protected Context _context = null;
+
+	public void enable(Context context)
+	{
+		String key = this.getPreferenceKey();
+
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		
+		Editor e = prefs.edit();
+		e.putBoolean("config_probe_" + key + "_enabled", true);
+		
+		e.commit();
+	}
+
+	public void disable(Context context)
+	{
+		String key = this.getPreferenceKey();
+
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		
+		Editor e = prefs.edit();
+		e.putBoolean("config_probe_" + key + "_enabled", false);
+		
+		e.commit();
+	}
 
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{

@@ -366,4 +366,28 @@ public class ProbeManager
 		
 		return prefs.getBoolean("config_probes_enabled", false);
 	}
+
+	public static void enableProbe(Context context, String probeName) 
+	{
+		Probe p = ProbeManager.probeForName(probeName, context);
+		
+		if (p != null)
+		{
+			p.enable(context);
+		
+			ProbeManager.nudgeProbes(context);
+		}
+	}
+
+	public static void disableProbe(Context context, String probeName) 
+	{
+		Probe p = ProbeManager.probeForName(probeName, context);
+		
+		if (p != null)
+		{
+			p.disable(context);
+
+			ProbeManager.nudgeProbes(context);
+		}
+	}
 }

@@ -14,6 +14,7 @@ import org.mozilla.javascript.NativeObject;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.os.Looper;
@@ -83,6 +84,26 @@ public class JavascriptFeature extends Feature
 		return context.getResources().getStringArray(R.array.js_feature_names);
 	}
 
+	public void enable(Context context)
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		
+		Editor e = prefs.edit();
+		e.putBoolean("config_feature_" + this.featureKey() + "_enabled", true);
+		
+		e.commit();
+	}
+
+	public void disable(Context context)
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		
+		Editor e = prefs.edit();
+		e.putBoolean("config_feature_" + this.featureKey() + "_enabled", false);
+		
+		e.commit();
+	}
+	
 	public boolean isEnabled(Context context)
 	{
 		boolean enabled = super.isEnabled(context);
