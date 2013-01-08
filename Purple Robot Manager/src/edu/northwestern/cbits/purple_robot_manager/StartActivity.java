@@ -50,6 +50,7 @@ import com.actionbarsherlock.view.MenuItem;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
+import edu.northwestern.cbits.purple_robot_manager.probes.features.Feature;
 
 public class StartActivity extends SherlockActivity
 {
@@ -256,6 +257,9 @@ public class StartActivity extends SherlockActivity
         			if (sensor != null && sensor.containsKey("POWER"))
         				formattedValue += " (" + sensor.getFloat("POWER") + " mA)";
         		}
+        		else if (value.containsKey(Feature.FEATURE_VALUE))
+        			formattedValue = value.get(Feature.FEATURE_VALUE).toString();
+        		
 
         		nameField.setText(displayName + " (" + sdf.format(sensorDate) + ")");
         		valueField.setText(formattedValue);

@@ -71,6 +71,7 @@ public class HttpUploadPlugin extends OutputPlugin
 	private final static String OPERATION_KEY = "Operation";
 	private final static String PAYLOAD_KEY = "Payload";
 	private final static String CHECKSUM_KEY = "Checksum";
+	private final static String CONTENT_LENGTH_KEY = "ContentLength";
 	private final static String STATUS_KEY = "Status";
 
 	private final static int WIFI_MULTIPLIER = 2;
@@ -437,9 +438,10 @@ public class HttpUploadPlugin extends OutputPlugin
 							jsonMessage.put(USER_HASH_KEY, userHash);
 
 							MessageDigest md = MessageDigest.getInstance("MD5");
+							
+							byte[] checksummed = (jsonMessage.get(USER_HASH_KEY).toString() + jsonMessage.get(OPERATION_KEY).toString() + jsonMessage.get(PAYLOAD_KEY).toString()).getBytes("US-ASCII");
 
-							byte[] digest = md.digest((jsonMessage.get(USER_HASH_KEY).toString() +
-									jsonMessage.get(OPERATION_KEY).toString() + jsonMessage.get(PAYLOAD_KEY).toString()).getBytes("UTF-8"));
+							byte[] digest = md.digest(checksummed);
 
 							String checksum = (new BigInteger(1, digest)).toString(16);
 
@@ -449,6 +451,7 @@ public class HttpUploadPlugin extends OutputPlugin
 							}
 
 							jsonMessage.put(CHECKSUM_KEY, checksum);
+							jsonMessage.put(CONTENT_LENGTH_KEY, checksummed.length);
 
 							NotificationManager noteManager = (NotificationManager) me.getContext().getSystemService(Context.NOTIFICATION_SERVICE);
 

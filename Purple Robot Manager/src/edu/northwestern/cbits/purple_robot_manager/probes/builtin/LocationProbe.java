@@ -98,12 +98,12 @@ public class LocationProbe extends Probe implements LocationListener
 		{
 	        this._context = context.getApplicationContext();
 
-			long now = System.currentTimeMillis();
-
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
 			if (prefs.getBoolean("config_probe_location_enabled", false))
 			{
+				long now = System.currentTimeMillis();
+
 				synchronized(this)
 				{
 					long freq = Long.parseLong(prefs.getString("config_probe_location_frequency", "300000"));

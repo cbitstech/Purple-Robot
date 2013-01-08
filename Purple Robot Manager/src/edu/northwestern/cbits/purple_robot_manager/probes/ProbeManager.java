@@ -10,6 +10,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
@@ -334,5 +336,34 @@ public class ProbeManager
 		JavascriptFeature feature = new JavascriptFeature(title, name, script, formatter, sources, false);
 
 		ProbeManager._probeInstances.add(feature);
+	}
+
+	public static void disableProbes(Context context) 
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+		Editor editor = prefs.edit();
+		editor.putBoolean("config_probes_enabled", false);
+		editor.commit();
+		
+		ProbeManager.nudgeProbes(context);
+	}
+
+	public static void enableProbes(Context context) 
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+		Editor editor = prefs.edit();
+		editor.putBoolean("config_probes_enabled", true);
+		editor.commit();
+		
+		ProbeManager.nudgeProbes(context);
+	}
+
+	public static boolean probesState(Context context) 
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		
+		return prefs.getBoolean("config_probes_enabled", false);
 	}
 }

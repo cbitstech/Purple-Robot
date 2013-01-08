@@ -203,7 +203,7 @@ public class JavascriptFeature extends Feature
 		t.start();
 	}
 
-	private static Bundle bundleForNativeObject(NativeObject obj)
+	public static Bundle bundleForNativeObject(NativeObject obj)
 	{
 		Bundle b = new Bundle();
 

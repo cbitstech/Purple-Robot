@@ -1,0 +1,39 @@
+<html>
+	<head>
+		<title>Disable Probes Test</title>
+		<script type="text/javascript" src="/js/date.js"></script>
+		<script type="text/javascript" src="/js/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function ()
+			{
+				var json = {};
+				json.command = "execute_script";
+				json.script = "PurpleRobot.disableProbes(); PurpleRobot.playDefaultTone();";
+				
+				var post_data = {};
+				post_data.json = JSON.stringify(json);
+
+				$.ajax("/json/submit", {
+					type: "POST",
+					contentType: "application/x-www-form-urlencoded; charset=UTF-8", 
+					data: post_data,
+					success: function(data)
+					{
+						alert("Probes disabled...");
+					},
+					error: function(jqXHR, textStatus, errorThrown) 
+					{ 
+						alert("Error disabling probes: " + errorThrown);
+					}
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<h1>Enable Probes Test</h1>
+		
+		<p>Each time this page is loaded, it disables probes on the local Purple Robot instance.</p>
+	</body>
+</html>
+	
+	
