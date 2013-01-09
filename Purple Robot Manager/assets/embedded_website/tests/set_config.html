@@ -1,0 +1,39 @@
+<html>
+	<head>
+		<title>Set Configuration Test</title>
+		<script type="text/javascript" src="/js/date.js"></script>
+		<script type="text/javascript" src="/js/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function ()
+			{
+				var json = {};
+				json.command = "execute_script";
+				json.script = "PurpleRobot.updateConfigUrl('http://mohrlab.northwestern.edu/ckarr/test.txt'); PurpleRobot.playDefaultTone();";
+				
+				var post_data = {};
+				post_data.json = JSON.stringify(json);
+
+				$.ajax("/json/submit", {
+					type: "POST",
+					contentType: "application/x-www-form-urlencoded; charset=UTF-8", 
+					data: post_data,
+					success: function(data)
+					{
+						alert("Configuration set...");
+					},
+					error: function(jqXHR, textStatus, errorThrown) 
+					{ 
+						alert("Error setting configuration: " + errorThrown);
+					}
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<h1>Set Configuration Test</h1>
+		
+		<p>Each time this page is loaded, it sets the configuration URL to be <a href="http://mohrlab.northwestern.edu/ckarr/test.txt">http://mohrlab.northwestern.edu/ckarr/test.txt</a>.</p>
+	</body>
+</html>
+	
+	

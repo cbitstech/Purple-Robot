@@ -25,6 +25,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.net.Uri;
+import android.net.Uri.Builder;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
@@ -39,7 +40,9 @@ public class JSONConfigFile
 	public static final String JSON_PROBE_SETTINGS = "probe_settings";
 	public static final String JSON_CONFIGURATION_URL = "config_json_url";
 	public static final String JSON_LAST_UPDATE = "json_configuration_last_update";
+	public static final String JSON_LAST_HASH = "json_configuration_last_update_hash";
 	public static final String FEATURES = "features";
+	private static final String JSON_INIT_SCRIPT = "init_script";
 
 	private static SharedPreferences prefs = null;
 
@@ -59,13 +62,30 @@ public class JSONConfigFile
 			{
 				public void run()
 				{
+					Runnable next = null;
+					
 					if (uri != null)
 					{
+						final EncryptionManager encryption = EncryptionManager.getInstance();
+
+						Uri newUri = uri;
+						
 						try
 						{
 							JSONConfigFile._configUri = uri;
+							
+							String userHash = encryption.getUserHash(context);
 
-							URL u = new URL(JSONConfigFile._configUri.toString());
+							if (uri.getQueryParameter("user_id") == null || uri.getQueryParameter("user_id").equals(userHash) == false)
+							{
+								Builder builder = uri.buildUpon();
+								
+								builder.appendQueryParameter("user_id", userHash);
+								
+								newUri = builder.build();
+							}
+
+							URL u = new URL(newUri.toString());
 
 							HttpURLConnection conn = (HttpURLConnection) u.openConnection();
 
@@ -82,11 +102,11 @@ public class JSONConfigFile
 
 							bin.close();
 
-							String jsonString = new String(bout.toByteArray(), "UTF-8");
+							final String jsonString = new String(bout.toByteArray(), "UTF-8");
 
-							JSONObject json = new JSONObject(jsonString);
+							final JSONObject json = new JSONObject(jsonString);
 
-							SharedPreferences prefs = JSONConfigFile.getPreferences(context);
+							final SharedPreferences prefs = JSONConfigFile.getPreferences(context);
 							Editor edit = prefs.edit();
 
 							edit.putString(JSONConfigFile.JSON_CONFIGURATION, json.toString());
@@ -94,6 +114,38 @@ public class JSONConfigFile
 
 							edit.commit();
 							
+							String oldHash = prefs.getString(JSONConfigFile.JSON_LAST_HASH, "");
+							final String newHash = encryption.createHash(jsonString);
+							
+							if (oldHash.equals(newHash) == false)
+							{
+								next = new Runnable()
+								{
+									public void run() 
+									{
+										try 
+										{
+											if (json.has(JSONConfigFile.JSON_INIT_SCRIPT))
+											{
+												String script = json.getString(JSONConfigFile.JSON_INIT_SCRIPT);
+												
+												JavaScriptEngine engine = new JavaScriptEngine(context);
+												
+												engine.runScript(script);
+											}
+											
+											Editor edit = prefs.edit();
+											edit.putString(JSONConfigFile.JSON_LAST_HASH, newHash);
+											edit.commit();
+										}
+										catch (JSONException e) 
+										{
+											e.printStackTrace();
+										}
+									}
+								};
+							}
+									
 							if (context instanceof Activity)
 							{
 								final Activity activity = (Activity) context;
@@ -120,7 +172,7 @@ public class JSONConfigFile
 							e.printStackTrace();
 						}
 
-						JSONConfigFile._sharedFile = new JSONConfigFile(context);
+						JSONConfigFile._sharedFile = new JSONConfigFile(context, next);
 					}
 				}
 			};
@@ -159,7 +211,7 @@ public class JSONConfigFile
 		ProbeManager.allProbes(context);
 
 		if (JSONConfigFile._sharedFile == null)
-			JSONConfigFile._sharedFile = new JSONConfigFile(context);
+			JSONConfigFile._sharedFile = new JSONConfigFile(context, null);
 
 		JSONConfigFile.update(context);
 
@@ -189,7 +241,7 @@ public class JSONConfigFile
 		return JSONConfigFile.prefs;
 	}
 
-	private JSONConfigFile(Context context)
+	private JSONConfigFile(Context context, Runnable next)
 	{
 		SharedPreferences prefs = JSONConfigFile.getPreferences(context);
 
@@ -200,6 +252,9 @@ public class JSONConfigFile
 			this.updateSharedPreferences(context);
 			
 			this.updateTriggers(context);
+			
+			if (next != null)
+				next.run();
 		}
 		catch (JSONException e)
 		{

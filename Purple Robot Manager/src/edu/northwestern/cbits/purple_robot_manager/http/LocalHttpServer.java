@@ -76,8 +76,8 @@ public class LocalHttpServer
         {
 			try 
 			{
-				this.serversocket = new ServerSocket(this._port, 8, InetAddress.getLocalHost());
-//				this.serversocket = new ServerSocket(this._port, 1);
+//				this.serversocket = new ServerSocket(this._port, 8, InetAddress.getLocalHost());
+				this.serversocket = new ServerSocket(this._port, 1);
 			}
 			catch (IOException e) 
 			{

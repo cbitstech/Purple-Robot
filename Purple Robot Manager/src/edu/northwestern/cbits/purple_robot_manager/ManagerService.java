@@ -84,27 +84,32 @@ public class ManagerService extends IntentService
 
 			try
 			{
-				toneUri = Uri.parse(prefs.getString(SettingsActivity.RINGTONE_KEY, null));
-
-				if (intent.hasExtra(ManagerService.RINGTONE_NAME))
+				String toneString = prefs.getString(SettingsActivity.RINGTONE_KEY, null);
+				
+				if (toneString != null)
 				{
-					String name = intent.getStringExtra(ManagerService.RINGTONE_NAME);
+					toneUri = Uri.parse(toneString);
 
-					RingtoneManager rm = new RingtoneManager(this);
-					rm.setType(RingtoneManager.TYPE_NOTIFICATION);
-
-					Cursor cursor = rm.getCursor();
-
-					do
+					if (intent.hasExtra(ManagerService.RINGTONE_NAME))
 					{
-						String title = cursor.getString(RingtoneManager.TITLE_COLUMN_INDEX);
+						String name = intent.getStringExtra(ManagerService.RINGTONE_NAME);
 
-						if (name.equalsIgnoreCase(title))
-							toneUri = rm.getRingtoneUri(cursor.getPosition());
+						RingtoneManager rm = new RingtoneManager(this);
+						rm.setType(RingtoneManager.TYPE_NOTIFICATION);
+
+						Cursor cursor = rm.getCursor();
+
+						do
+						{
+							String title = cursor.getString(RingtoneManager.TITLE_COLUMN_INDEX);
+
+							if (name.equalsIgnoreCase(title))
+								toneUri = rm.getRingtoneUri(cursor.getPosition());
+						}
+						while (cursor.moveToNext());
+
+						cursor.deactivate();
 					}
-					while (cursor.moveToNext());
-
-					cursor.deactivate();
 				}
 			}
 			catch(Exception e)
