@@ -796,5 +796,26 @@ public class JavaScriptEngine
 	{
 		ProbeManager.disableProbe(this._context, probeName);
 	}
+	
+	public void updateConfigUrl(String newUrl)
+	{
+		if (newUrl.trim().length() == 0)
+			newUrl = null;
+		
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
 
+		Editor e = prefs.edit();
+		
+		e.putString(JSONConfigFile.JSON_LAST_HASH, "");
+		e.putLong(JSONConfigFile.JSON_LAST_UPDATE, 0);
+		
+		if (newUrl != null)
+			e.putString(JSONConfigFile.JSON_CONFIGURATION_URL, newUrl);
+		else
+			e.remove(JSONConfigFile.JSON_CONFIGURATION_URL);
+		
+		e.commit();
+		
+		JSONConfigFile.update(this._context);
+	}
 }
