@@ -34,6 +34,8 @@ import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
 public class JSONConfigFile
 {
+	public static final String FIRST_RUN = "json_config_first_run";
+	
 	public static final String USER_ID = "user_id";
 	public static final String USER_HASH = "user_hash";
 	public static final String JSON_CONFIGURATION = "json_configuration_contents";
@@ -208,8 +210,20 @@ public class JSONConfigFile
 
 	public static JSONConfigFile getSharedFile(Context context)
 	{
-		ProbeManager.allProbes(context);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		
+		if (prefs.getBoolean(JSONConfigFile.FIRST_RUN, true))
+		{
+			Editor e = prefs.edit();
 
+			e.putString(JSONConfigFile.JSON_CONFIGURATION_URL, context.getString(R.string.json_config_url));
+			e.putBoolean(JSONConfigFile.FIRST_RUN, false);
+
+			e.commit();
+		}
+
+		ProbeManager.allProbes(context);
+		
 		if (JSONConfigFile._sharedFile == null)
 			JSONConfigFile._sharedFile = new JSONConfigFile(context, null);
 
