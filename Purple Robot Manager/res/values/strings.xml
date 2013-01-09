@@ -1,5 +1,6 @@
 <resources>
     <string name="sensor_upload_url">http://165.124.171.122:8093/funfImporter</string>
+    <string name="json_config_url">http://mohrlab.northwestern.edu/robot/</string>
     <string name="app_name">Purple Robot</string>
 
     <string name="widget_title">Purple Robot Standard Widget</string>
