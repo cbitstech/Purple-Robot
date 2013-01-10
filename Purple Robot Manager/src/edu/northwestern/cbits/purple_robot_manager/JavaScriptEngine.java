@@ -818,4 +818,27 @@ public class JavaScriptEngine
 		
 		JSONConfigFile.update(this._context);
 	}
+	
+	public void setPassword(String password)
+	{
+		if (password == null || password.trim().length() == 0)
+			this.clearPassword();
+		else
+		{
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+			
+			Editor e = prefs.edit();
+			e.putString("config_password", password);
+			e.commit();
+		}
+	}
+	
+	public void clearPassword()
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+		
+		Editor e = prefs.edit();
+		e.remove("config_password");
+		e.commit();
+	}
 }
