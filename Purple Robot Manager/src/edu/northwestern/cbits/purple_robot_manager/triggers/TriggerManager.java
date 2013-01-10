@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import android.content.Context;
+import android.util.Log;
 
 public class TriggerManager 
 {
@@ -26,6 +27,8 @@ public class TriggerManager
 	public void nudgeTriggers(Context context)
 	{
 		Date now = new Date();
+		
+		Log.e("PRM", "TRIGGER COUNT (NUDGE) " + this._triggers);
 
 		for (Trigger trigger : this._triggers)
 		{
@@ -92,5 +95,12 @@ public class TriggerManager
 		ts.add(t);
 		
 		this.updateTriggers(ts);
+	}
+
+	public void removeAllTriggers() 
+	{
+		this._triggers.clear();
+		
+		Log.e("PRM", "TRIGGER COUNT " + this._triggers);
 	}
 }

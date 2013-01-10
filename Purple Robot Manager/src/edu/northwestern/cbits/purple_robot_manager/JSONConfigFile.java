@@ -66,7 +66,7 @@ public class JSONConfigFile
 				{
 					Runnable next = null;
 					
-					if (uri != null)
+					if (uri != null && uri.toString().trim().length() > 0)
 					{
 						final EncryptionManager encryption = EncryptionManager.getInstance();
 
@@ -121,6 +121,8 @@ public class JSONConfigFile
 							
 							if (oldHash.equals(newHash) == false)
 							{
+								TriggerManager.getInstance().removeAllTriggers();
+								
 								next = new Runnable()
 								{
 									public void run() 
@@ -175,6 +177,20 @@ public class JSONConfigFile
 						}
 
 						JSONConfigFile._sharedFile = new JSONConfigFile(context, next);
+					}
+					else
+					{
+						final SharedPreferences prefs = JSONConfigFile.getPreferences(context);
+						
+						if (prefs.getString(JSONConfigFile.JSON_CONFIGURATION, "{}").length() > 4)
+						{
+							Editor edit = prefs.edit();
+	
+							edit.putString(JSONConfigFile.JSON_CONFIGURATION, "{}");
+							edit.commit();
+
+							TriggerManager.getInstance().removeAllTriggers();
+						}					
 					}
 				}
 			};
