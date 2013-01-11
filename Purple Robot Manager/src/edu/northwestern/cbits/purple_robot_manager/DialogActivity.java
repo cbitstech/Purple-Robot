@@ -60,7 +60,16 @@ public class DialogActivity extends Activity
 			public void onClick(View v)
 			{
 				if (confirmScript != null && confirmScript.length() >= 0)
-					jsEngine.runScript(confirmScript);
+				{
+					try
+					{
+						jsEngine.runScript(confirmScript);
+					}
+					catch (Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
 
 				me.finish();
 			}
@@ -71,8 +80,17 @@ public class DialogActivity extends Activity
 			public void onClick(View v)
 			{
 				if (cancelScript != null && cancelScript.length() >= 0)
-					jsEngine.runScript(cancelScript);
-
+				{
+					try
+					{
+						jsEngine.runScript(cancelScript);
+					}
+					catch (Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+				
 				me.finish();
 			}
         });

@@ -408,6 +408,11 @@ public class StartActivity extends SherlockActivity
         	listView.setVisibility(View.GONE);
         	logoView.setVisibility(View.VISIBLE);
         }
+        
+        boolean showBackground = prefs.getBoolean("config_show_background", true);
+        
+        if (showBackground == false)
+        	logoView.setVisibility(View.GONE);
 
         this.refreshList();
 	}
