@@ -1,5 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,6 +20,8 @@ public class DialogActivity extends Activity
 
 	public static String DIALOG_CONFIRM_SCRIPT = "dialog_confirm_script";
 	public static String DIALOG_CANCEL_SCRIPT = "dialog_cancel_script";
+	
+	private static ArrayList<DialogActivity> _dialogStack = new ArrayList<DialogActivity>();
 
 	protected void onCreate(Bundle savedInstanceState)
     {
@@ -26,7 +30,23 @@ public class DialogActivity extends Activity
         this.setContentView(R.layout.layout_dialog_activity);
 
         getWindow().setLayout(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        
+        while (DialogActivity._dialogStack.size() > 4)
+        {
+        	DialogActivity activity = DialogActivity._dialogStack.remove(0);
+        	
+        	activity.finish();
+        }
+        
+        DialogActivity._dialogStack.add(this);
     }
+	
+	protected void onStop()
+	{
+		super.onStop();
+		
+		DialogActivity._dialogStack.remove(this);
+	}
 
 	protected void onResume()
 	{
