@@ -16,7 +16,6 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
-import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
@@ -49,9 +48,18 @@ public class LocationProbe extends Probe implements LocationListener
 
 	public Intent viewIntent(Context context)
 	{
-		Intent i = new Intent(context, LocationProbeActivity.class);
-
-		return i;
+		try
+		{
+			Class.forName("com.google.android.maps.MapActivity");
+			
+			Intent i = new Intent(context, LocationProbeActivity.class);
+			
+			return i;
+		}
+		catch (Exception e)
+		{
+			return super.viewIntent(context);
+		}
 	}
 
 	public void enable(Context context)
@@ -99,13 +107,6 @@ public class LocationProbe extends Probe implements LocationListener
 		duration.setTitle(R.string.probe_frequency_label);
 
 		screen.addPreference(duration);
-
-		Preference showMap = new Preference(activity);
-		showMap.setKey("config_probe_" + key + "_show_map");
-		showMap.setTitle(R.string.probe_location_show_map_label);
-		showMap.setSummary(R.string.probe_location_show_map_summary);
-
-		screen.addPreference(showMap);
 
 		return screen;
 	}
