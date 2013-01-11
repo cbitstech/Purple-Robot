@@ -841,4 +841,22 @@ public class JavaScriptEngine
 		e.remove("config_password");
 		e.commit();
 	}
+
+	public void enableBackgroundImage()
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+		
+		Editor e = prefs.edit();
+		e.putBoolean("config_show_background", true);
+		e.commit();
+	}
+
+	public void disableBackgroundImage()
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+		
+		Editor e = prefs.edit();
+		e.putBoolean("config_show_background", false);
+		e.commit();
+	}
 }

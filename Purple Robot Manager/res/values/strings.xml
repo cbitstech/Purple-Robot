@@ -33,6 +33,10 @@
     <string name="config_user_id_title">User Identifier</string>
     <string name="config_user_id_message">Unique identifier used to associate your data with your online profile.</string>
 
+    
+    <string name="config_show_background">Enable Background Image</string>
+    <string name="summary_show_background">When probes are disabled, specifies whether to display the default placeholder image or to leave the area empty.</string>
+    
     <string name="error_json_set_uri">Unable to automatically set configuration from the web. Please verify that the configuration file is valid and reachable from the public Internet.</string>
     <string name="error_json_set_uri_password">Unable to automatically set configuration from the web while the password is set.</string>
     <string name="success_json_set_uri">Successfully configured via the web.</string>
