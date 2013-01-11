@@ -58,19 +58,34 @@ public class WifiAccessPointsProbe extends Probe
 	{
 		return context.getResources().getString(R.string.probe_environment_category);
 	}
+	
+	private boolean fetchEnabled(Context context)
+	{
+		if (super.isEnabled(context))
+		{
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+			return prefs.getBoolean("config_probe_wifi_enabled", true);
+		}
+		
+		return false;
+	}
 
 	public boolean isEnabled(Context context)
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
 		final WifiAccessPointsProbe me = this;
-
+		
 		if (this._receiver == null)
 		{
 			this._receiver = new BroadcastReceiver()
 			{
 				public void onReceive(Context context, Intent intent)
 				{
+					if (me.fetchEnabled(context) == false)
+						return;
+					
 					if (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(intent.getAction()))
 					{
 						WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
@@ -128,31 +143,28 @@ public class WifiAccessPointsProbe extends Probe
 		}
 
 		long now = System.currentTimeMillis();
-
-		if (super.isEnabled(context))
+		
+		if (this.fetchEnabled(context))
 		{
-			if (prefs.getBoolean("config_probe_wifi_enabled", true))
+			synchronized(this)
 			{
-				synchronized(this)
+				long freq = Long.parseLong(prefs.getString("config_probe_wifi_frequency", "300000"));
+
+				if (now - this._lastCheck > freq)
 				{
-					long freq = Long.parseLong(prefs.getString("config_probe_wifi_frequency", "300000"));
+					WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 
-					if (now - this._lastCheck > freq)
+					if (wifi.isWifiEnabled())
 					{
-						WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+						this._lastCheck = now;
+						this._foundNetworks.clear();
 
-						if (wifi.isWifiEnabled())
-						{
-							this._lastCheck = now;
-							this._foundNetworks.clear();
-
-							wifi.startScan();
-						}
+						wifi.startScan();
 					}
 				}
-
-				return true;
 			}
+
+			return true;
 		}
 
 		return false;
