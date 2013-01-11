@@ -32,7 +32,7 @@
 		android:largeHeap="true"
 		android:allowBackup="true"
 		android:persistent="true">
-		<uses-library android:name="com.google.android.maps" />
+		<uses-library android:name="com.google.android.maps" android:required="false" />
 		<receiver android:enabled="true" android:name=".BootUpReceiver"
 			android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
 			<intent-filter>
