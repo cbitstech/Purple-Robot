@@ -82,6 +82,7 @@ public class JSONConfigFile
 							{
 								Builder builder = uri.buildUpon();
 								
+								builder.clearQuery();
 								builder.appendQueryParameter("user_id", userHash);
 								
 								newUri = builder.build();
