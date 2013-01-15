@@ -32,7 +32,12 @@
     <string name="config_user_id_label">User Identifier</string>
     <string name="config_user_id_title">User Identifier</string>
     <string name="config_user_id_message">Unique identifier used to associate your data with your online profile.</string>
+    
+    <string name="title_status_note_enabled">Enable Persistent Status Notification</string>
+    <string name="summary_status_note_enabled">Displays a constant reminder in the status bar when Purple Robot is running on this device.</string>
 
+    <string name="config_appearance_category">Appearance &amp; Aesthetic Options</string>
+    <string name="config_network_category">Network Options</string>
     
     <string name="config_show_background">Enable Background Image</string>
     <string name="summary_show_background">When probes are disabled, specifies whether to display the default placeholder image or to leave the area empty.</string>
@@ -214,7 +219,7 @@
 
     <string name="message_wifi_pending">Waiting for WiFi&#8230;</string>
 
-    <string name="notify_running">Purple Robot is collecting data&#8230;</string>
+    <string name="notify_running">Status: Functioning Normally&#8230;</string>
 
     <string name="title_http_upload_section">HTTP Upload Settings</string>
     <string name="title_http_upload_uri">HTTP Upload Endpoint</string>

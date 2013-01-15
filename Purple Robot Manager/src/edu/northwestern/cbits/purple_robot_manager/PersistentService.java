@@ -28,14 +28,19 @@ public class PersistentService extends Service
 	{
 		super.onCreate();
 
-		String title = this.getString(R.string.app_name);
-		String message = this.getString(R.string.notify_running);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-		Notification note = new Notification(R.drawable.ic_notify_foreground, title, System.currentTimeMillis());
-		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, StartActivity.class), Notification.FLAG_ONGOING_EVENT | Notification.FLAG_NO_CLEAR);
-		note.setLatestEventInfo(this, title, message, contentIntent);
+		if (prefs.getBoolean("config_status_note", true))
+		{
+			String title = this.getString(R.string.app_name);
+			String message = this.getString(R.string.notify_running);
 
-		this.startForeground(12345, note);
+			Notification note = new Notification(R.drawable.ic_notify_foreground, title, System.currentTimeMillis());
+			PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, StartActivity.class), Notification.FLAG_ONGOING_EVENT | Notification.FLAG_NO_CLEAR);
+			note.setLatestEventInfo(this, title, message, contentIntent);
+
+			this.startForeground(12345, note);
+		}
 
 		AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
 
@@ -43,8 +48,6 @@ public class PersistentService extends Service
 		alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 15000, pi);
 
 		OutputPlugin.loadPluginClasses(this);
-		
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
 		if (prefs.getBoolean("config_http_server_enabled", true))
 			this._httpServer.start(this);
