@@ -76,15 +76,51 @@ public class JSONConfigFile
 						{
 							JSONConfigFile._configUri = uri;
 							
-							String userHash = encryption.getUserHash(context);
-
-							if (uri.getQueryParameter("user_id") == null || uri.getQueryParameter("user_id").equals(userHash) == false)
+							String userId = encryption.getUserId(context);
+							String existingId = uri.getQueryParameter("user_id");
+							
+							if (existingId == null || existingId.equals(userId) == false)
 							{
-								Builder builder = uri.buildUpon();
+								Builder builder = new Builder();
 								
-								builder.clearQuery();
-								builder.appendQueryParameter("user_id", userHash);
+								builder.scheme(uri.getScheme());
+								builder.authority(uri.getAuthority());
+
+								if (uri.getPath() != null)
+									builder.path(uri.getPath());
 								
+								if (uri.getFragment() != null)
+									builder.fragment(uri.getFragment());
+								
+								String query = uri.getQuery();
+								
+								ArrayList<String> keys = new ArrayList<String>();
+
+								if (query != null)
+								{
+									
+									String[] params = query.split("&");
+									
+									for (String param : params)
+									{
+										String[] components = param.split("=");
+										
+										keys.add(components[0]);
+									}
+								}
+								
+								for (String key : keys)
+								{
+									if ("user_id".equals(key))
+									{
+										// Skip since we're replacing...
+									}
+									else
+										builder.appendQueryParameter(key, uri.getQueryParameter(key));
+								}
+
+								builder.appendQueryParameter("user_id", userId);
+
 								newUri = builder.build();
 							}
 

@@ -159,6 +159,33 @@ public class EncryptionManager
 		
 		return hash;
 	}
+	
+	public String getUserId(Context context)
+	{
+		SharedPreferences prefs = EncryptionManager.getPreferences(context);
+
+		String userId = prefs.getString("config_user_id", null);
+
+		if (userId == null)
+		{
+			userId = "unknown-user";
+
+			AccountManager manager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
+			Account[] list = manager.getAccountsByType("com.google");
+
+			if (list.length == 0)
+				list = manager.getAccounts();
+
+			if (list.length > 0)
+				userId = list[0].name;
+
+			Editor e = prefs.edit();
+			e.putString("config_user_id", userId);
+			e.commit();
+		}
+		
+		return userId;
+	}
 
 	public String getUserHash(Context context)
 	{
@@ -168,28 +195,11 @@ public class EncryptionManager
 
 		if (userHash == null)
 		{
-			String userId = prefs.getString("config_user_id", null);
-
-			if (userId == null)
-			{
-				userId = "unknown-user";
-
-				AccountManager manager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
-				Account[] list = manager.getAccountsByType("com.google");
-
-				if (list.length == 0)
-					list = manager.getAccounts();
-
-				if (list.length > 0)
-					userId = list[0].name;
-			}
+			String userId = this.getUserId(context);
 
 			userHash = this.createHash(userId);
 
 			Editor e = prefs.edit();
-
-			if (userId != null)
-				e.putString("config_user_id", userId);
 
 			if (userHash != null)
 				e.putString("config_user_hash", userHash);

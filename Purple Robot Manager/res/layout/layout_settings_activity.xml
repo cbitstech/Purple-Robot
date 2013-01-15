@@ -18,51 +18,57 @@
             android:title="@string/config_vibrator_pattern_label"
             android:summary="@string/config_vibrator_pattern_message"
             android:defaultValue="60" />
-	</PreferenceCategory>
-	<PreferenceScreen android:title="@string/title_http_upload_section">
-        <CheckBoxPreference
-       	    android:title="@string/title_http_upload_enabled"
-            android:key="config_enable_data_server"
-            android:defaultValue="false"/>
-  	        <CheckBoxPreference
-   	   	    android:title="@string/title_external_storage_enabled"
-       	    android:summary="@string/summary_external_storage_enabled"
-           	android:key="config_external_storage"
-           	android:defaultValue="false"/>
-   	    <CheckBoxPreference
-       	    android:title="@string/title_archive_enabled"
-       	    android:summary="@string/summary_archive_enabled"
-           	android:key="config_http_archive"
-           	android:defaultValue="false"/>
-       	<CheckBoxPreference
-       	    android:title="@string/title_http_encrypt"
-       	    android:summary="@string/summary_http_encrypt"
-            android:key="config_http_encrypt"
-            android:defaultValue="true"/>
-        <EditTextPreference
-            android:key="config_data_server_uri"
-            android:title="@string/title_http_upload_uri"
-            android:dialogTitle="@string/title_http_upload_uri"
-            android:dialogMessage="@string/summary_http_upload_uri"
-            android:summary="@string/summary_http_upload_uri"
-            android:defaultValue="@string/sensor_upload_url" />
-      	<CheckBoxPreference
-       	    android:title="@string/title_http_upload_wifi_only"
-       	    android:summary="@string/summary_http_upload_wifi_only"
-            android:key="config_restrict_data_wifi"
-            android:defaultValue="true"/>
-		<PreferenceScreen android:title="@string/title_advanced_settings">
-			<Preference android:title="@string/title_email_files" android:key="config_mail_archives" android:defaultValue="0" />
-			<Preference android:title="@string/title_delete_files" android:key="config_delete_archives" android:defaultValue="0" />
-  			</PreferenceScreen>
-	</PreferenceScreen>
+   	</PreferenceCategory>
     <PreferenceCategory
+        android:title="@string/config_appearance_category">
+    	<CheckBoxPreference
+	   	    android:title="@string/config_show_background"
+   		    android:summary="@string/summary_show_background"
+        	android:key="config_show_background"
+       	 android:defaultValue="true"/>
+   	</PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/config_network_category">
+    	<PreferenceScreen android:title="@string/title_http_upload_section">
+			<CheckBoxPreference
+				android:title="@string/title_http_upload_enabled"
+	           	android:key="config_enable_data_server"
+	           	android:defaultValue="false"/>
+ 	        <CheckBoxPreference
+	  	   	    android:title="@string/title_external_storage_enabled"
+	      	    android:summary="@string/summary_external_storage_enabled"
+	          	android:key="config_external_storage"
+	          	android:defaultValue="false"/>
+	  	    <CheckBoxPreference
+	      	    android:title="@string/title_archive_enabled"
+	      	    android:summary="@string/summary_archive_enabled"
+	          	android:key="config_http_archive"
+	          	android:defaultValue="false"/>
+	      	<CheckBoxPreference
+	      	    android:title="@string/title_http_encrypt"
+      		    android:summary="@string/summary_http_encrypt"
+	        	android:key="config_http_encrypt"
+	           	android:defaultValue="true"/>
+	       <EditTextPreference
+	           	android:key="config_data_server_uri"
+	           	android:title="@string/title_http_upload_uri"
+	           	android:dialogTitle="@string/title_http_upload_uri"
+	           	android:dialogMessage="@string/summary_http_upload_uri"
+	           	android:summary="@string/summary_http_upload_uri"
+	           	android:defaultValue="@string/sensor_upload_url" />
+	     	<CheckBoxPreference
+	      	    android:title="@string/title_http_upload_wifi_only"
+	      	    android:summary="@string/summary_http_upload_wifi_only"
+	           	android:key="config_restrict_data_wifi"
+	           	android:defaultValue="true"/>
+			<PreferenceScreen android:title="@string/title_advanced_settings">
+				<Preference android:title="@string/title_email_files" android:key="config_mail_archives" android:defaultValue="0" />
+				<Preference android:title="@string/title_delete_files" android:key="config_delete_archives" android:defaultValue="0" />
+ 			</PreferenceScreen>
+		</PreferenceScreen>
+	</PreferenceCategory>
+	<PreferenceCategory
         android:title="@string/config_settings_category">
-      	<CheckBoxPreference
-       	    android:title="@string/config_show_background"
-       	    android:summary="@string/summary_show_background"
-            android:key="config_show_background"
-            android:defaultValue="true"/>
         <EditTextPreference
             android:key="config_user_id"
             android:title="@string/config_user_id_label"
