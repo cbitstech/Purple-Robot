@@ -860,50 +860,6 @@ public class JavaScriptEngine
 		e.commit();
 	}
 	
-	private void refreshNotification()
-	{
-		NotificationManager noteManager = (NotificationManager) this._context.getSystemService(android.content.Context.NOTIFICATION_SERVICE);
-
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
-
-		noteManager.cancelAll();
-		
-		if (prefs.getBoolean("config_status_note", true))
-		{
-			String title = this._context.getString(R.string.app_name);
-			String message = this._context.getString(R.string.notify_running);
-
-			Notification note = new Notification(R.drawable.ic_notify_foreground, title, System.currentTimeMillis());
-			PendingIntent contentIntent = PendingIntent.getActivity(this._context, 0, new Intent(this._context, StartActivity.class), Notification.FLAG_ONGOING_EVENT | Notification.FLAG_NO_CLEAR);
-			note.setLatestEventInfo(this._context, title, message, contentIntent);
-			
-			noteManager.notify(12345, note);
-		}
-	}
-	public void disablePersistentNotification()
-	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
-		
-		Editor e = prefs.edit();
-		e.putBoolean("config_status_note", false);
-		
-		e.commit();
-		
-		this.refreshNotification();
-	}
-
-	public void enablePersistentNotification()
-	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
-		
-		Editor e = prefs.edit();
-		e.putBoolean("config_status_note", true);
-		
-		e.commit();
-		
-		this.refreshNotification();
-	}
-	
 	private void refreshConfigUrl()
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
@@ -938,5 +894,23 @@ public class JavaScriptEngine
 		e.commit();
 
 		this.refreshConfigUrl();
+	}
+
+	public void enableUpdateChecks()
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+		
+		Editor e = prefs.edit();
+		e.putBoolean(SettingsActivity.CHECK_UPDATES_KEY, true);
+		e.commit();
+	}
+
+	public void disableUpdateChecks()
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+		
+		Editor e = prefs.edit();
+		e.putBoolean(SettingsActivity.CHECK_UPDATES_KEY, false);
+		e.commit();
 	}
 }

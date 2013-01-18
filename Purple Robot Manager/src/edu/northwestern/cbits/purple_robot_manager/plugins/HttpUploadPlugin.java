@@ -619,16 +619,11 @@ public class HttpUploadPlugin extends OutputPlugin
 							{
 								httpClient.close();
 
-								noteManager.cancelAll();
-								
-								if (prefs.getBoolean("config_status_note", true))
-								{
-									String message = me.getContext().getString(R.string.notify_running);
+								String message = me.getContext().getString(R.string.notify_running);
 
-									note.setLatestEventInfo(me.getContext(), message, message, contentIntent);
+								note.setLatestEventInfo(me.getContext(), message, message, contentIntent);
 
-									noteManager.notify(12345, note);
-								}
+								noteManager.notify(12345, note);
 							}
 
 							int l = 0;

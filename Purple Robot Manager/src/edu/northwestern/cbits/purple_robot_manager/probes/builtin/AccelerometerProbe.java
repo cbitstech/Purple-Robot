@@ -295,7 +295,7 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 	public void onSensorChanged(SensorEvent event)
 	{
 		final double now = (double) System.currentTimeMillis();
-
+		
 		if (now - this.lastSeen > this.getFrequency() && bufferIndex <= timeBuffer.length)
 		{
 			synchronized(this)

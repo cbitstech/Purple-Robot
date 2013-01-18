@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
@@ -12,11 +13,12 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 
-public class SettingsActivity extends PreferenceActivity implements OnPreferenceClickListener
+public class SettingsActivity extends PreferenceActivity implements OnPreferenceClickListener, OnPreferenceChangeListener
 {
 	public static final String PROBES_SCREEN_KEY = "config_probes_screen";
 	private static final String MANUAL_REFRESH_KEY = "config_json_refresh_manually";
@@ -26,6 +28,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 	public static final String DELETE_ARCHIVES_KEY = "config_delete_archives";
 	static final CharSequence USER_ID_KEY = "config_user_id";
 	protected static final String USER_HASH_KEY = "config_user_hash";
+	public static final String CHECK_UPDATES_KEY = "config_hockey_update";
 
 	public void onCreate(Bundle savedInstanceState)
     {
@@ -66,6 +69,9 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 
         Preference delete = prefs.findPreference(DELETE_ARCHIVES_KEY);
         delete.setOnPreferenceClickListener(this);
+        
+        CheckBoxPreference update = (CheckBoxPreference) prefs.findPreference(CHECK_UPDATES_KEY);
+        update.setOnPreferenceChangeListener(this);
     }
 
 	public boolean onPreferenceClick(Preference preference)
@@ -116,5 +122,17 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
         }
 
         return false;
+	}
+
+	public boolean onPreferenceChange(Preference pref, Object value) 
+	{
+		if (CHECK_UPDATES_KEY.equals(pref.getKey()))
+		{
+			Toast.makeText(this, R.string.message_update_check, Toast.LENGTH_LONG).show();
+
+			return true;
+		}
+
+		return false;
 	}
 }

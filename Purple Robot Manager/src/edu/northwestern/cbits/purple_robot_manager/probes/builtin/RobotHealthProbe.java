@@ -2,13 +2,20 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
+import org.apache.commons.net.ntp.NTPUDPClient;
+import org.apache.commons.net.ntp.TimeInfo;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
@@ -30,10 +37,19 @@ public class RobotHealthProbe extends Probe
 	private static final String ARCHIVE_SIZE = "ARCHIVE_SIZE";
 	private static final String THROUGHPUT = "THROUGHPUT";
 	private static final String CLEAR_TIME = "CLEAR_TIME";
+	protected static final String APP_VERSION_NAME = "APP_VERSION_NAME";
+	protected static final String APP_VERSION_CODE = "APP_VERSION_CODE";
 
 	private long _lastCheck = 0;
 	private boolean _checking = false;
 
+	private static final long NTP_CHECK_DURATION = 300000;
+	private static final String NTP_HOST = "0.north-america.pool.ntp.org";
+	protected static final String TIME_OFFSET_MS = "TIME_OFFSET_MS";
+	
+	private long _lastOffset = 0;
+	private long _lastTimeCheck = 0;
+	
 	public String name(Context context)
 	{
 		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.RobotHealthProbe";
@@ -73,7 +89,7 @@ public class RobotHealthProbe extends Probe
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-		long now = System.currentTimeMillis();
+		final long now = System.currentTimeMillis();
 
 		if (super.isEnabled(context))
 		{
@@ -175,6 +191,52 @@ public class RobotHealthProbe extends Probe
 										cleartime = pendingSize / ((long) throughput);
 
 									bundle.putLong(RobotHealthProbe.CLEAR_TIME, cleartime);
+									
+									// Version checks
+									
+									try 
+									{
+										PackageInfo info = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+
+										bundle.putString(RobotHealthProbe.APP_VERSION_NAME, info.versionName);
+										bundle.putInt(RobotHealthProbe.APP_VERSION_CODE, info.versionCode);
+									}
+									catch (NameNotFoundException e) 
+									{
+										e.printStackTrace();
+									}
+									
+									// NTP checks
+									
+									if ((now - me._lastTimeCheck) > NTP_CHECK_DURATION)
+									{
+										try 
+										{
+											NTPUDPClient client = new NTPUDPClient();
+
+											TimeInfo info = client.getTime(InetAddress.getByName(NTP_HOST));
+											
+											if (info != null)
+											{
+												info.computeDetails();
+												
+												if (info.getOffset() != null)
+													me._lastOffset = info.getOffset().longValue();
+													
+												me._lastTimeCheck = now;
+											}
+										}
+										catch (UnknownHostException e) 
+										{
+											e.printStackTrace();
+										} 
+										catch (IOException e) 
+										{
+											e.printStackTrace();
+										}
+									}
+									
+									bundle.putLong(RobotHealthProbe.TIME_OFFSET_MS, me._lastOffset);
 
 									me.transmitData(context, bundle);
 
