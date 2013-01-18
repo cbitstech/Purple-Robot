@@ -30,17 +30,14 @@ public class PersistentService extends Service
 
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-		if (prefs.getBoolean("config_status_note", true))
-		{
-			String title = this.getString(R.string.app_name);
-			String message = this.getString(R.string.notify_running);
+		String title = this.getString(R.string.app_name);
+		String message = this.getString(R.string.notify_running);
 
-			Notification note = new Notification(R.drawable.ic_notify_foreground, title, System.currentTimeMillis());
-			PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, StartActivity.class), Notification.FLAG_ONGOING_EVENT | Notification.FLAG_NO_CLEAR);
-			note.setLatestEventInfo(this, title, message, contentIntent);
+		Notification note = new Notification(R.drawable.ic_notify_foreground, title, System.currentTimeMillis());
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, StartActivity.class), Notification.FLAG_ONGOING_EVENT | Notification.FLAG_NO_CLEAR);
+		note.setLatestEventInfo(this, title, message, contentIntent);
 
-			this.startForeground(12345, note);
-		}
+		this.startForeground(12345, note);
 
 		AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
 

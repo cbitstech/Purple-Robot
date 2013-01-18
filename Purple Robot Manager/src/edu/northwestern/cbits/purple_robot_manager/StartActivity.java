@@ -10,7 +10,6 @@ import java.util.Map;
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.CrashManagerListener;
 import net.hockeyapp.android.UpdateManager;
-
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -115,14 +114,16 @@ public class StartActivity extends SherlockActivity
 
 		super.onCreate(savedInstanceState);
 
-        UpdateManager.register(this, "7550093e020b1a4a6df90f1e9dde68b6");
+		SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+		if (sharedPrefs.getBoolean(SettingsActivity.CHECK_UPDATES_KEY, true))
+			UpdateManager.register(this, "7550093e020b1a4a6df90f1e9dde68b6");
 
         this.getSupportActionBar().setTitle(R.string.title_probe_readings);
         this.setContentView(R.layout.layout_startup_activity);
 
         ManagerService.setupPeriodicCheck(this);
 
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPrefs.registerOnSharedPreferenceChangeListener(StartActivity._prefListener);
         
         final StartActivity me = this;

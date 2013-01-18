@@ -14,6 +14,12 @@
     <string name="config_settings_category">Configuration Options</string>
     <string name="config_notifications_category">Notification Options</string>
 
+    <string name="config_application_category">Application Options</string>
+    <string name="config_hockey_update">Check for Updates on Launch</string>
+    <string name="summary_hockey_update">Query any third-party update services (HockeyApp) for application updates &amp; bug fixes.</string>
+
+    <string name="message_update_check">This change will take effect the next time this application restarts.</string>
+    
     <string name="config_json_url_label">JSON Configuration URL</string>
     <string name="config_json_url_message">Please enter the URL for the application configuration file.</string>
 
