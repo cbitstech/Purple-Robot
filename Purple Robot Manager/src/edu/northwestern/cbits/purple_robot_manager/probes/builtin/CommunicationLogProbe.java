@@ -111,6 +111,10 @@ public class CommunicationLogProbe extends Probe
 
 								contactBundle.putString(CommunicationLogProbe.NUMBER_NAME, c.getString(c.getColumnIndex(Calls.CACHED_NAME)));
 								contactBundle.putString(CommunicationLogProbe.NUMBER_LABEL, c.getString(c.getColumnIndex(Calls.CACHED_NUMBER_LABEL)));
+								
+								if (c.getColumnIndex(Calls.CACHED_NUMBER_TYPE) != -1)
+									contactBundle.putString(CommunicationLogProbe.NUMBER_TYPE, c.getString(c.getColumnIndex(Calls.CACHED_NUMBER_TYPE)));								
+								
 								contactBundle.putLong(CommunicationLogProbe.CALL_TIMESTAMP, c.getLong(c.getColumnIndex(Calls.DATE)));
 								contactBundle.putLong(CommunicationLogProbe.CALL_DURATION, c.getLong(c.getColumnIndex(Calls.DURATION)));
 								contactBundle.putString(CommunicationLogProbe.NUMBER, PhoneNumberUtils.formatNumber(c.getString(c.getColumnIndex(Calls.NUMBER))));

@@ -168,7 +168,7 @@ public class ProbeViewerActivity extends PreferenceActivity
 
 			if (o == null)
 			{
-				Log.e("PRM", "NULL KEY: " + key);
+				Log.e("PRM", "NULL KEY (" + title + "): " + key);
 			}
 			else if (o instanceof Bundle)
 			{
@@ -358,8 +358,6 @@ public class ProbeViewerActivity extends PreferenceActivity
 			}
 			else
 			{
-				Log.e("PRM", key + ": " + o.getClass().getCanonicalName());
-
 				String desc = o.toString();
 
 				Preference pref = new Preference(this);
