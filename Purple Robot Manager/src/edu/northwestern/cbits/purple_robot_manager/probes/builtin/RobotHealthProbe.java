@@ -22,6 +22,7 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
@@ -95,13 +96,18 @@ public class RobotHealthProbe extends Probe
 		{
 			if (prefs.getBoolean("config_probe_robot_enabled", true))
 			{
+				Log.e("PR-RH", "ROBOT ENABLED");
 				synchronized(this)
 				{
 					long freq = Long.parseLong(prefs.getString("config_probe_robot_frequency", "60000"));
 
 					if (now - this._lastCheck  > freq)
 					{
+						Log.e("PR-RH", "TIME TO CHECK");
+						
 						OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(HttpUploadPlugin.class);
+
+						Log.e("PR-RH", "PLUGIN: " + plugin);
 
 						if (plugin != null && plugin instanceof HttpUploadPlugin)
 						{
@@ -241,15 +247,23 @@ public class RobotHealthProbe extends Probe
 									me.transmitData(context, bundle);
 
 									me._checking = false;
+									
+									Log.e("PR-RH", "THREAD COMPLETE");
 								}
 							};
+
+							Log.e("PR-RH", "STARTING THREAD");
 
 							Thread t = new Thread(r);
 							t.start();
 						}
 
+						Log.e("PR-RH", "SETTING LAST CHECK");
+
 						this._lastCheck = now;
 					}
+					else
+						Log.e("PR-RH", "SLEEPING...");
 				}
 			}
 

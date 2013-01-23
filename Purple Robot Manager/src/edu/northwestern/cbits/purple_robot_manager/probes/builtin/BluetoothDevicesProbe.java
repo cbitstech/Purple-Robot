@@ -20,6 +20,7 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -294,6 +295,8 @@ public class BluetoothDevicesProbe extends Probe
 				@SuppressWarnings("unchecked")
 				public void onReceive(Context context, Intent intent)
 				{
+					Log.e("PR-BT", "GOT INTENT " + intent.getAction());
+
 					if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction()))
 					{
 						BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
@@ -315,6 +318,8 @@ public class BluetoothDevicesProbe extends Probe
 					{
 						context.unregisterReceiver(this);
 
+						Log.e("PR-BT", "BT: Scan complete.");
+
 						Bundle bundle = new Bundle();
 
 						bundle.putString("PROBE", me.name(context));
@@ -326,7 +331,8 @@ public class BluetoothDevicesProbe extends Probe
 						{
 							me.transmitData(context, bundle);
 						}
-
+						
+						me._adapter.cancelDiscovery();
 						me._adapter = null;
 					}
 				}
@@ -334,7 +340,17 @@ public class BluetoothDevicesProbe extends Probe
 
 			IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
 			filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+			filter.addAction(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED);
+			filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
+			filter.addAction(BluetoothAdapter.ACTION_LOCAL_NAME_CHANGED);
+			filter.addAction(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+			filter.addAction(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+			filter.addAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
+			filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+			
 			context.registerReceiver(this._receiver, filter);
+			
+			Log.e("PR-BT", "RECEIVER ENABLED");
 		}
 
 		long now = System.currentTimeMillis();
@@ -346,27 +362,29 @@ public class BluetoothDevicesProbe extends Probe
 
 		if (enabled)
 		{
+			Log.e("PR-BT", "SENSOR ENABLED");
+			
 			synchronized(this)
 			{
 				long freq = Long.parseLong(prefs.getString("config_probe_bluetooth_frequency", "300000"));
 
 				if (now - this._lastCheck > freq)
 				{
+					Log.e("PR-BT", "CHECK TIME " + this._adapter);
+
 					if (this._adapter == null)
-					{
 						this._adapter = BluetoothAdapter.getDefaultAdapter();
 
-						if (this._adapter != null && this._adapter.isEnabled())
-						{
-							this._foundDevices.clear();
+					if (this._adapter != null && this._adapter.isEnabled())
+					{
+						this._foundDevices.clear();
+						
+						Log.e("PR-BT", "BT: Starting scan...");
 
-							this._adapter.startDiscovery();
-						}
-						else
-							this._adapter = null;
-
-						this._lastCheck = now;
+						this._adapter.startDiscovery();
 					}
+
+					this._lastCheck = now;
 				}
 			}
 
