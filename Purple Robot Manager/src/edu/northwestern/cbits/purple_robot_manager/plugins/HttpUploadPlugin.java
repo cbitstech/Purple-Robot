@@ -474,6 +474,8 @@ public class HttpUploadPlugin extends OutputPlugin
 								String uriString = prefs.getString("config_data_server_uri", me.getContext().getResources().getString(R.string.sensor_upload_url));
 
 								URI siteUri = new URI(uriString);
+								
+								Log.e("PR_HTTP", "SITE: " + siteUri);
 
 								HttpPost httpPost = new HttpPost(siteUri);
 
