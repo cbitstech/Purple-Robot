@@ -11,12 +11,19 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.UnknownHostException;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -25,12 +32,27 @@ import java.util.Random;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.HttpHostConnectException;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.X509HostnameVerifier;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.SingleClientConnManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
@@ -263,6 +285,46 @@ public class HttpUploadPlugin extends OutputPlugin
 
 		return this._wifiAvailable;
 	}
+	
+	private class LiberalSSLSocketFactory extends SSLSocketFactory 
+	{
+	    SSLContext sslContext = SSLContext.getInstance("TLS");
+
+	    public LiberalSSLSocketFactory(KeyStore truststore) throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException, UnrecoverableKeyException 
+	    {
+	        super(truststore);
+
+	        TrustManager tm = new X509TrustManager() 
+	        {
+	            public void checkClientTrusted(X509Certificate[] chain, String authType) 
+	            {
+	            	
+	            }
+
+	            public void checkServerTrusted(X509Certificate[] chain, String authType) 
+	            {
+	            
+	            }
+
+	            public X509Certificate[] getAcceptedIssuers() 
+	            {
+	                return null;
+	            }
+	        };
+
+	        sslContext.init(null, new TrustManager[] { tm }, null);
+	    }
+
+	    public Socket createSocket(Socket socket, String host, int port, boolean autoClose) throws IOException, UnknownHostException 
+	    {
+	        return sslContext.getSocketFactory().createSocket(socket, host, port, autoClose);
+	    }
+
+	    public Socket createSocket() throws IOException 
+	    {
+	        return sslContext.getSocketFactory().createSocket();
+	    }
+	}
 
 	private void uploadPendingObjects()
 	{
@@ -471,8 +533,33 @@ public class HttpUploadPlugin extends OutputPlugin
 
 							NotificationManager noteManager = (NotificationManager) me.getContext().getSystemService(Context.NOTIFICATION_SERVICE);
 
-							AndroidHttpClient httpClient = AndroidHttpClient.newInstance("Purple Robot", me.getContext());
+							AndroidHttpClient androidClient = AndroidHttpClient.newInstance("Purple Robot", me.getContext());
 
+							// Liberal HTTPS setup: http://stackoverflow.com/questions/2012497/accepting-a-certificate-for-https-on-android
+
+					        HostnameVerifier hostnameVerifier = org.apache.http.conn.ssl.SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
+
+							SchemeRegistry registry = new SchemeRegistry();
+							registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+							
+							SSLSocketFactory socketFactory = SSLSocketFactory.getSocketFactory();
+							
+							if (prefs.getBoolean("config_http_liberal_ssl", false))
+							{
+						        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+						        trustStore.load(null, null);
+
+						        socketFactory = new LiberalSSLSocketFactory(trustStore);								
+							}
+
+							//							socketFactory.setHostnameVerifier((X509HostnameVerifier) hostnameVerifier);
+							registry.register(new Scheme("https", socketFactory, 443));
+							
+							SingleClientConnManager mgr = new SingleClientConnManager(androidClient.getParams(), registry);
+							HttpClient httpClient = new DefaultHttpClient(mgr, androidClient.getParams());
+
+							HttpsURLConnection.setDefaultHostnameVerifier(hostnameVerifier);
+							
 							String title = me.getContext().getString(R.string.notify_upload_data);
 
 							Notification note = new Notification(R.drawable.ic_notify_foreground, title, System.currentTimeMillis());
@@ -625,6 +712,10 @@ public class HttpUploadPlugin extends OutputPlugin
 								me.broadcastMessage(R.string.message_response_error);
 								e.printStackTrace();
 							}
+							catch (SSLPeerUnverifiedException e)
+							{
+								me.broadcastMessage(R.string.message_unverified_server);
+							}
 							catch (Exception e)
 							{
 								e.printStackTrace();
@@ -635,11 +726,12 @@ public class HttpUploadPlugin extends OutputPlugin
 							}
 							finally
 							{
-								httpClient.close();
+								androidClient.close();
 
 								String message = me.getContext().getString(R.string.notify_running);
+								String messageTitle = me.getContext().getString(R.string.notify_running_title);
 
-								note.setLatestEventInfo(me.getContext(), message, message, contentIntent);
+								note.setLatestEventInfo(me.getContext(), messageTitle, message, contentIntent);
 
 								noteManager.notify(12345, note);
 							}
@@ -699,6 +791,22 @@ public class HttpUploadPlugin extends OutputPlugin
 							e.printStackTrace();
 						}
 						catch (IOException e)
+						{
+							e.printStackTrace();
+						} 
+						catch (KeyStoreException e) 
+						{
+							e.printStackTrace();
+						}
+						catch (CertificateException e) 
+						{
+							e.printStackTrace();
+						}
+						catch (KeyManagementException e) 
+						{
+							e.printStackTrace();
+						}
+						catch (UnrecoverableKeyException e) 
 						{
 							e.printStackTrace();
 						}

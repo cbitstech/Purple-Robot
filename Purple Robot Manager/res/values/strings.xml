@@ -215,7 +215,8 @@
     <string name="message_checksum_failed">Checksum error.</string>
     <string name="message_http_connection_error">HTTP connection failure.</string>
     <string name="message_socket_timeout_error">Socket timeout.</string>
-
+    <string name="message_unverified_server">Unverified server.</string>
+    
     <string name="message_transmit_bytes" formatted="false">Sending %d kB&#8230;</string>
     <string name="message_server_error" formatted="false">Application error: %s</string>
     <string name="message_socket_error" formatted="false">Socket error: %s</string>
@@ -225,8 +226,9 @@
 
     <string name="message_wifi_pending">Waiting for WiFi&#8230;</string>
 
-    <string name="notify_running">Status: Functioning Normally&#8230;</string>
-
+    <string name="notify_running">Functioning Normally&#8230;</string>
+    <string name="notify_running_title">Application Status</string>
+    
     <string name="title_http_upload_section">HTTP Upload Settings</string>
     <string name="title_http_upload_uri">HTTP Upload Endpoint</string>
     <string name="summary_http_upload_uri">URL of the HTTP endpoint where sensor data will be logged.</string>
@@ -237,6 +239,9 @@
     <string name="title_http_encrypt">Encrypt Sensor Data</string>
     <string name="summary_http_encrypt">Encrypt the collected sensor data on the local device and in transmissions.</string>
 
+    <string name="title_http_liberal_ssl">Accept All SSL Certificates</string>
+    <string name="summary_http_liberal_ssl">Accept all SSL certificates, regardless whether they validate properly.</string>
+    
     <string name="title_archive_enabled">Archive Transmitted Data</string>
     <string name="summary_archive_enabled">Save data transmitted to the server on the local device for later review.</string>
 
