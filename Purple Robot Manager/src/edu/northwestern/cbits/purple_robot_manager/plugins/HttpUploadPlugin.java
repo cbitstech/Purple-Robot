@@ -17,6 +17,7 @@ import java.net.URI;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -257,12 +258,16 @@ public class HttpUploadPlugin extends OutputPlugin
 			else
 				this._wifiAvailable =  false;
 		}
+		
+		Log.e("PR-HTTP", "WIFI AVAILABLE: " + this._wifiAvailable);
 
 		return this._wifiAvailable;
 	}
 
 	private void uploadPendingObjects()
 	{
+		Log.e("PR-HTTP", "UPLOADING? " + this._uploading);
+
 		if (this._uploading)
 			return;
 
@@ -270,8 +275,12 @@ public class HttpUploadPlugin extends OutputPlugin
 
 		final long now = System.currentTimeMillis();
 
+		Log.e("PR-HTTP", "CONTINUE? " + (now - me._lastUpload) + " > " + me.uploadPeriod());
+		
 		if (now - me._lastUpload > me.uploadPeriod())
 		{
+			Log.e("PR-HTTP", "CONTINUING");
+
 			this._uploading = true;
 
 			final SharedPreferences prefs = HttpUploadPlugin.getPreferences(this.getContext());
@@ -282,6 +291,7 @@ public class HttpUploadPlugin extends OutputPlugin
 				return;
 			}
 
+			
 			if (prefs.getBoolean("config_restrict_data_wifi", true))
 			{
 				if (this.wifiAvailable() == false)
@@ -431,7 +441,13 @@ public class HttpUploadPlugin extends OutputPlugin
 							JSONObject jsonMessage = new JSONObject();
 
 							jsonMessage.put(OPERATION_KEY, "SubmitProbes");
-							jsonMessage.put(PAYLOAD_KEY, uploadArray.toString());
+							
+							String payload = Normalizer.normalize(uploadArray.toString(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+									
+							payload = payload.replaceAll("\r", "");
+							payload = payload.replaceAll("\n", "");
+							
+							jsonMessage.put(PAYLOAD_KEY, payload);
 
 							String userHash = EncryptionManager.getInstance().getUserHash(me.getContext());
 
