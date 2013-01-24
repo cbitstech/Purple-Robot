@@ -30,7 +30,7 @@ public class PersistentService extends Service
 
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-		String title = this.getString(R.string.app_name);
+		String title = this.getString(R.string.notify_running_title);
 		String message = this.getString(R.string.notify_running);
 
 		Notification note = new Notification(R.drawable.ic_notify_foreground, title, System.currentTimeMillis());

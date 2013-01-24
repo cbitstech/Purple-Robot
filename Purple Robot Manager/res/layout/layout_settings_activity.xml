@@ -54,7 +54,12 @@
       		    android:summary="@string/summary_http_encrypt"
 	        	android:key="config_http_encrypt"
 	           	android:defaultValue="true"/>
-	       <EditTextPreference
+	      	<CheckBoxPreference
+	      	    android:title="@string/title_http_liberal_ssl"
+      		    android:summary="@string/summary_http_liberal_ssl"
+	        	android:key="config_http_liberal_ssl"
+	           	android:defaultValue="false"/>
+			<EditTextPreference
 	           	android:key="config_data_server_uri"
 	           	android:title="@string/title_http_upload_uri"
 	           	android:dialogTitle="@string/title_http_upload_uri"
