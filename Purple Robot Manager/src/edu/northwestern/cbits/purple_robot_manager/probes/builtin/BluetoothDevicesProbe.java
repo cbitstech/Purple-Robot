@@ -20,7 +20,6 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -295,8 +294,6 @@ public class BluetoothDevicesProbe extends Probe
 				@SuppressWarnings("unchecked")
 				public void onReceive(Context context, Intent intent)
 				{
-					Log.e("PR-BT", "GOT INTENT " + intent.getAction());
-
 					if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction()))
 					{
 						BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
@@ -316,10 +313,6 @@ public class BluetoothDevicesProbe extends Probe
 					}
 					else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction()))
 					{
-						context.unregisterReceiver(this);
-
-						Log.e("PR-BT", "BT: Scan complete.");
-
 						Bundle bundle = new Bundle();
 
 						bundle.putString("PROBE", me.name(context));
@@ -331,10 +324,9 @@ public class BluetoothDevicesProbe extends Probe
 						{
 							me.transmitData(context, bundle);
 						}
-						
-						me._adapter.cancelDiscovery();
-						me._adapter = null;
 					}
+					else if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(intent.getAction()))
+						me._lastCheck = 0;
 				}
 			};
 
@@ -349,8 +341,6 @@ public class BluetoothDevicesProbe extends Probe
 			filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
 			
 			context.registerReceiver(this._receiver, filter);
-			
-			Log.e("PR-BT", "RECEIVER ENABLED");
 		}
 
 		long now = System.currentTimeMillis();
@@ -362,16 +352,12 @@ public class BluetoothDevicesProbe extends Probe
 
 		if (enabled)
 		{
-			Log.e("PR-BT", "SENSOR ENABLED");
-			
 			synchronized(this)
 			{
 				long freq = Long.parseLong(prefs.getString("config_probe_bluetooth_frequency", "300000"));
 
 				if (now - this._lastCheck > freq)
 				{
-					Log.e("PR-BT", "CHECK TIME " + this._adapter);
-
 					if (this._adapter == null)
 						this._adapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -379,8 +365,6 @@ public class BluetoothDevicesProbe extends Probe
 					{
 						this._foundDevices.clear();
 						
-						Log.e("PR-BT", "BT: Starting scan...");
-
 						this._adapter.startDiscovery();
 					}
 
@@ -392,7 +376,7 @@ public class BluetoothDevicesProbe extends Probe
 		}
 		else
 		{
-			if (this._adapter != null && this._adapter.isEnabled())
+			if (this._adapter != null)
 			{
 				this._adapter.cancelDiscovery();
 
