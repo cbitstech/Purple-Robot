@@ -220,6 +220,7 @@ public class RobotHealthProbe extends Probe
 										{
 											NTPUDPClient client = new NTPUDPClient();
 
+											
 											TimeInfo info = client.getTime(InetAddress.getByName(NTP_HOST));
 											
 											if (info != null)
@@ -229,16 +230,19 @@ public class RobotHealthProbe extends Probe
 												if (info.getOffset() != null)
 													me._lastOffset = info.getOffset().longValue();
 													
-												me._lastTimeCheck = now;
 											}
 										}
 										catch (UnknownHostException e) 
 										{
-											e.printStackTrace();
+
 										} 
 										catch (IOException e) 
 										{
 											e.printStackTrace();
+										}
+										finally
+										{
+											me._lastTimeCheck = now;
 										}
 									}
 									

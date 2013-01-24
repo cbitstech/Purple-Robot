@@ -491,7 +491,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 								noteManager.notify(12345, note);
 
-								AndroidHttpClient.modifyRequestToAcceptGzipResponse(httpPost);
+//								AndroidHttpClient.modifyRequestToAcceptGzipResponse(httpPost);
 
 								HttpResponse response = httpClient.execute(httpPost);
 

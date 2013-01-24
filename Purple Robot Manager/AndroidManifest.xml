@@ -81,13 +81,13 @@
             	<data android:scheme="cbits-pr" />
 	        </intent-filter>
         </activity>
-		<activity android:name=".activities.LocationProbeActivity" android:label="@string/app_name" />
+		<activity android:name=".activities.LocationProbeActivity" android:label="@string/app_name" android:theme="@style/Theme.Sherlock" />
 		<activity android:name=".activities.WebkitActivity" android:label="@string/app_name" android:theme="@style/Theme.Sherlock" />
 		<activity android:name=".activities.WebkitLandscapeActivity" android:label="@string/app_name" android:screenOrientation="landscape" android:theme="@style/Theme.Sherlock" />
 		<activity android:name=".SettingsActivity" android:label="@string/app_name" />
 		<activity android:name=".PreferenceActivity" android:label="@string/app_name" />
 		<activity android:name=".DialogActivity" android:label="@string/app_name" android:theme="@android:style/Theme.Dialog" />
-		<activity android:name=".activities.LabelActivity" android:label="@string/app_name" />
+		<activity android:name=".activities.LabelActivity" android:label="@string/app_name" android:theme="@style/Theme.Sherlock" />
 		<activity android:name=".ProbeViewerActivity" android:label="@string/app_name" />
 		<activity android:name="net.hockeyapp.android.UpdateActivity" />
 	</application>
