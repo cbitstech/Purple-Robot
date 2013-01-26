@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Purple Notifier</string>
+   
+    <string name="widget_title_placeholder">(Widget Title)</string>
+    <string name="widget_message_placeholder">(Widget Message)</string>
+    
+    <string name="basic_widget_title">Purple: Basic Widget</string>
+    <string name="text_widget_title">Purple: Text-Only Widget</string>
+
+    <string name="config_settings_category">Widget Settings</string>
+    <string name="config_password_label">Settings Password</string>
+    <string name="config_password_title">Settings Password</string>
+    <string name="config_password_message">Set a password to lock widget settings.</string>
+
+    <string name="config_title_label">Title Text</string>
+    <string name="config_title_title">Title Text</string>
+    <string name="config_title_message">Set the widget title.</string>
+
+    <string name="config_message_label">Message Text</string>
+    <string name="config_message_title">Message Text</string>
+    <string name="config_message_message">Set the widget message.</string>
+</resources>
