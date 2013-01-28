@@ -4,7 +4,7 @@
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	android:orientation="horizontal"
-	android:id="@+id/widget_root_layout"
+	android:id="@+id/widget_basic_layout"
 	android:clickable="true"
 	android:background="@drawable/appwidget_dark_bg">
 	<ImageView
@@ -28,7 +28,7 @@
 	    android:paddingRight="8dp"
 	    android:orientation="vertical">
 	    <TextView
-	        android:id="@+id/widget_title_text"
+	        android:id="@+id/widget_basic_title_text"
 	        android:text="@string/widget_title_placeholder"
 	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
@@ -41,7 +41,7 @@
 	        android:ellipsize="end"
 	        android:typeface="sans" />
    	    <TextView
-	        android:id="@+id/widget_message_text"
+	        android:id="@+id/widget_basic_message_text"
 	        android:text="@string/widget_message_placeholder"
     	    android:layout_width="wrap_content"
         	android:layout_height="wrap_content"

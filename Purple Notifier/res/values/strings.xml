@@ -4,8 +4,8 @@
     <string name="widget_title_placeholder">(Widget Title)</string>
     <string name="widget_message_placeholder">(Widget Message)</string>
     
-    <string name="basic_widget_title">Purple: Basic Widget</string>
-    <string name="text_widget_title">Purple: Text-Only Widget</string>
+    <string name="basic_widget_title">Basic Notifications</string>
+    <string name="text_widget_title">Text Notifications</string>
 
     <string name="config_settings_category">Widget Settings</string>
     <string name="config_password_label">Settings Password</string>
@@ -17,6 +17,6 @@
     <string name="config_title_message">Set the widget title.</string>
 
     <string name="config_message_label">Message Text</string>
-    <string name="config_message_title">Message Text</string>
+    <string name="config_message_title">Message Title</string>
     <string name="config_message_message">Set the widget message.</string>
 </resources>
