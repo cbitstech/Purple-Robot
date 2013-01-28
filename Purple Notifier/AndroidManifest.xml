@@ -26,15 +26,25 @@
                 <category android:name="android.intent.category.LAUNCHER" />
 	        </intent-filter>
         </activity>
-		<activity android:name="edu.northwestern.cbits.purple.notifier.BasicSettingsActivity" android:label="@string/basic_widget_title" android:theme="@style/Theme.Sherlock">
+		<activity android:exported="true" android:name="edu.northwestern.cbits.purple.notifier.BasicSettingsActivity" android:label="@string/basic_widget_title" android:theme="@style/Theme.Sherlock">
             <intent-filter>
  				<action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
 			</intent-filter>	
 		</activity>
-		<activity android:name="edu.northwestern.cbits.purple.notifier.TextSettingsActivity" android:label="@string/text_widget_title" android:theme="@style/Theme.Sherlock">
+		<activity android:exported="true" android:name="edu.northwestern.cbits.purple.notifier.TextSettingsActivity" android:label="@string/text_widget_title" android:theme="@style/Theme.Sherlock">
             <intent-filter>
  				<action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
 			</intent-filter>	
 		</activity>
+ 		<receiver android:enabled="true" android:exported="true" android:name="edu.northwestern.cbits.purple.notifier.WidgetBroadcastReceiver" android:permission="edu.northwestern.cbits.purple.UPDATE_WIDGET">
+		    <intent-filter>
+		        <action android:name="edu.northwestern.cbits.purple.UPDATE_WIDGET" />
+		    </intent-filter>
+		</receiver>
+		<service android:enabled="true" android:exported="false" android:name="edu.northwestern.cbits.purple.notifier.WidgetIntentService">
+		    <intent-filter>
+		        <action android:name="edu.northwestern.cbits.purple.UPDATE_WIDGET" />
+		    </intent-filter>
+		</service>
 	</application>
 </manifest>
