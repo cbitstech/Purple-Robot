@@ -1,0 +1,22 @@
+<html>
+	<head>
+		<title>Broadcast Intent | Purple Robot</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	</head>
+	<body style="margin: 1em; font-family: Roboto, 'Droid Sans', sans-serif; overflow-y: scroll; overflow-x: hidden;">
+		<h3>Broadcast Intent</h3>
+		<p>Use the form below to test Purple Robot's built-in web-based scripting interface.</p>
+		<form action="/json/submit" method="POST">
+			<center>
+				<textarea name="json" rows="12" style="width: 90%;">{
+    "command": "execute_script",
+    "script": "PurpleRobot.broadcastIntent('edu.northwestern.cbits.purple.UPDATE_WIDGET', {'WIDGET': 'BASIC_WIDGET_UPDATE', 'package_name': 'com.facebook.katana', 'config_basic_title': 'Test from the Robot', 'config_basic_message': 'Message from the Robot.'});"
+}</textarea>
+				<br />
+				<button style="width: 85%; margin-top: 1em; margin-bottom: 1em; padding: 1em;">
+					<strong>Run Script</strong>
+				</button>
+			</center>
+		</form>
+	</body>
+</html>

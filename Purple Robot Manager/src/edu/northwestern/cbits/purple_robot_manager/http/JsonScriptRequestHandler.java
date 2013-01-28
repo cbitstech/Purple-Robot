@@ -1,6 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager.http;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
@@ -51,7 +52,7 @@ public class JsonScriptRequestHandler implements HttpRequestHandler
 
             try 
             {
-				arguments = new JSONObject(u.getQueryParameter("json"));
+				arguments = new JSONObject(URLDecoder.decode(u.getQueryParameter("json"), "UTF-8"));
 			} 
             catch (JSONException e) 
             {

@@ -293,6 +293,25 @@ public class JavaScriptEngine
 		return this.updateWidget(title, message, applicationName, new NativeObject(), null);
 	}
 
+	public boolean broadcastIntent(final String action, final NativeObject extras)
+	{
+		Intent intent = new Intent(action);
+
+		if (extras != null)
+		{
+			for (Entry<Object, Object> e : extras.entrySet())
+			{
+				intent.putExtra(e.getKey().toString(), e.getValue().toString());
+			}
+		}
+		
+		Log.e("PR-JS", "BROADCASTING INTENT: " + intent);
+		
+		this._context.sendBroadcast(intent);
+		
+		return true;
+	}
+	
 	public boolean updateWidget(final String title, final String message, final String applicationName, final NativeObject launchParams, final String script)
 	{
 		AppWidgetManager widgetManager = AppWidgetManager.getInstance(this._context);
