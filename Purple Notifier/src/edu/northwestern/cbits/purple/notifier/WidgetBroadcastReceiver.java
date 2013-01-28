@@ -3,14 +3,15 @@ package edu.northwestern.cbits.purple.notifier;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 public class WidgetBroadcastReceiver extends BroadcastReceiver 
 {
 	public void onReceive(Context context, Intent intent) 
 	{
-		Log.e("PR-RECV", "GOT INTENT, PASSING ALONG: " + intent);
+		Intent newIntent = new Intent(context, WidgetIntentService.class);
+		newIntent.setAction(intent.getAction());
+		newIntent.putExtras(intent.getExtras());
 		
-		context.startService(intent);
+		context.startService(newIntent);
 	}
 }

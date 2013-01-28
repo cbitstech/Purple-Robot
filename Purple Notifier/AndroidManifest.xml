@@ -36,12 +36,12 @@
  				<action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
 			</intent-filter>	
 		</activity>
- 		<receiver android:enabled="true" android:exported="true" android:name="edu.northwestern.cbits.purple.notifier.WidgetBroadcastReceiver" android:permission="edu.northwestern.cbits.purple.UPDATE_WIDGET">
+ 		<receiver android:enabled="true" android:exported="true" android:name="edu.northwestern.cbits.purple.notifier.WidgetBroadcastReceiver">  <!--  android:permission="edu.northwestern.cbits.purple.UPDATE_WIDGET"> -->
 		    <intent-filter>
 		        <action android:name="edu.northwestern.cbits.purple.UPDATE_WIDGET" />
 		    </intent-filter>
 		</receiver>
-		<service android:enabled="true" android:exported="false" android:name="edu.northwestern.cbits.purple.notifier.WidgetIntentService">
+		<service android:enabled="true" android:exported="true" android:name="edu.northwestern.cbits.purple.notifier.WidgetIntentService">
 		    <intent-filter>
 		        <action android:name="edu.northwestern.cbits.purple.UPDATE_WIDGET" />
 		    </intent-filter>
