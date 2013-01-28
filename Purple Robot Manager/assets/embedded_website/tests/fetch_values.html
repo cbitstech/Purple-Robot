@@ -1,0 +1,22 @@
+<html>
+	<head>
+		<title>Fetch Values Test | Purple Robot</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	</head>
+	<body style="margin: 1em; font-family: Roboto, 'Droid Sans', sans-serif; overflow-y: scroll; overflow-x: hidden;">
+		<h3>Test Interface</h3>
+		<p>Use the form below to test Purple Robot's built-in persistence features.</p>
+		<form action="/json/store" method="POST">
+			<center>
+				<textarea name="json" rows="12" style="width: 90%;">{
+    "action": "fetch",
+    "keys": ["foo", "bar", "baz"]
+}</textarea>
+				<br />
+				<button style="width: 85%; margin-top: 1em; margin-bottom: 1em; padding: 1em;">
+					<strong>Run Script</strong>
+				</button>
+			</center>
+		</form>
+	</body>
+</html>
