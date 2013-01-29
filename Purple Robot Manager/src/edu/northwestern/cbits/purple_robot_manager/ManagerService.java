@@ -36,6 +36,8 @@ public class ManagerService extends IntentService
 	public static String RINGTONE_NAME = "purple_robot_manager_ringtone_name";
 
 	public static String REFRESH_CONFIGURATION = "purple_robot_manager_refresh_configuration";
+	
+	public static long startTimestamp = System.currentTimeMillis();
 
 	private static boolean _checkSetup = false;
 
