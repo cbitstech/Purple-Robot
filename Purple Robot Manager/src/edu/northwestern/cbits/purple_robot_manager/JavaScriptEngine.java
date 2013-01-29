@@ -305,8 +305,6 @@ public class JavaScriptEngine
 			}
 		}
 		
-		Log.e("PR-JS", "BROADCASTING INTENT: " + intent);
-		
 		this._context.sendBroadcast(intent);
 		
 		return true;
