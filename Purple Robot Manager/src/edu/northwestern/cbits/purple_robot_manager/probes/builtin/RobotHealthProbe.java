@@ -23,6 +23,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 
+import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
@@ -39,6 +40,7 @@ public class RobotHealthProbe extends Probe
 	private static final String CLEAR_TIME = "CLEAR_TIME";
 	protected static final String APP_VERSION_NAME = "APP_VERSION_NAME";
 	protected static final String APP_VERSION_CODE = "APP_VERSION_CODE";
+	protected static final String ACTIVE_RUNTIME = "ACTIVE_RUNTIME";
 
 	private long _lastCheck = 0;
 	private boolean _checking = false;
@@ -241,6 +243,7 @@ public class RobotHealthProbe extends Probe
 									}
 
 									bundle.putLong(RobotHealthProbe.TIME_OFFSET_MS, me._lastOffset);
+									bundle.putLong(RobotHealthProbe.ACTIVE_RUNTIME, System.currentTimeMillis() - ManagerService.startTimestamp);
 
 									me.transmitData(context, bundle);
 
