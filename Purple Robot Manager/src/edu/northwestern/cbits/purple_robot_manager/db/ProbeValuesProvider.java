@@ -247,8 +247,15 @@ public class ProbeValuesProvider
 			}
 		};
 
-		Thread t = new Thread(r);
-		t.start();
+		try
+		{
+			Thread t = new Thread(r);
+			t.start();
+		}
+		catch (OutOfMemoryError e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	private void cleanup()
