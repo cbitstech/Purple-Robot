@@ -227,7 +227,10 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 
 			if (prefs.getBoolean("config_probe_magnetic_built_in_enabled", false))
 			{
-				sensors.registerListener(this, sensors.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_FASTEST, null);
+				Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+				
+				if (sensor != null)
+					sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST, null);
 
 				return true;
 			}

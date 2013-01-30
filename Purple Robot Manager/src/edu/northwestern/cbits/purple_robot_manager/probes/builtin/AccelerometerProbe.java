@@ -283,9 +283,12 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 
         	if (prefs.getBoolean("config_probe_accelerometer_built_in_enabled", false))
         	{
-            	sensors.registerListener(this, sensors.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_FASTEST, null);
+				Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+				
+				if (sensor != null)
+					sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST, null);
 
-        		return true;
+				return true;
         	}
         }
 

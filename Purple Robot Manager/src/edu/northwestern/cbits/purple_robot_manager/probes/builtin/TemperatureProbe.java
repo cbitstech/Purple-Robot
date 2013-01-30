@@ -144,7 +144,10 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 
 			if (prefs.getBoolean("config_probe_temperature_built_in_enabled", false))
 			{
-				sensors.registerListener(this, sensors.getDefaultSensor(Sensor.TYPE_TEMPERATURE), SensorManager.SENSOR_DELAY_FASTEST, null);
+				Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_TEMPERATURE);
+				
+				if (sensor != null)
+					sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST, null);
 
 				return true;
 			}

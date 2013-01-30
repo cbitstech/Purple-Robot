@@ -260,7 +260,10 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 
 			if (prefs.getBoolean("config_probe_proximity_built_in_enabled", false))
 			{
-				sensors.registerListener(this, sensors.getDefaultSensor(Sensor.TYPE_PROXIMITY), SensorManager.SENSOR_DELAY_FASTEST, null);
+				Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+				
+				if (sensor != null)
+					sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST, null);
 
 				return true;
 			}

@@ -265,7 +265,10 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 
 			if (prefs.getBoolean("config_probe_light_built_in_enabled", false))
 			{
-				sensors.registerListener(this, sensors.getDefaultSensor(Sensor.TYPE_LIGHT), SensorManager.SENSOR_DELAY_FASTEST, null);
+				Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_LIGHT);
+				
+				if (sensor != null)
+					sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST, null);
 
 				return true;
 			}
