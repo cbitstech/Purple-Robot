@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.hardware.Sensor;
+import android.hardware.SensorEvent;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
@@ -109,6 +110,8 @@ public abstract class ContinuousProbe extends Probe
 	public abstract int getCategoryResource();
 	public abstract long getFrequency();
 	public abstract String getPreferenceKey();
+
+	protected abstract boolean passesThreshold(SensorEvent event);
 
 	public void onAccuracyChanged(Sensor sensor, int accuracy)
 	{

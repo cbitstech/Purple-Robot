@@ -45,6 +45,10 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 
 	private static String[] fieldNames = { DISTANCE_KEY };
 
+	private static final double SENSOR_THRESHOLD = 5.0;
+
+	private double _lastValue = Double.MAX_VALUE;
+
 	private double lastSeen = 0;
 	private long lastFrequencyLookup = 0;
 	private long frequency = 1000;
@@ -272,12 +276,27 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 		return false;
 	}
 
+	protected boolean passesThreshold(SensorEvent event)
+	{
+		double value = event.values[0];
+
+		boolean passes = false;
+
+		if (Math.abs(value - this._lastValue) > ProximityProbe.SENSOR_THRESHOLD)
+			passes = true;
+		
+		if (passes)
+			this._lastValue = value;
+		
+		return passes;
+	}
+
 	@SuppressLint("NewApi")
 	public void onSensorChanged(SensorEvent event)
 	{
 		double now = System.currentTimeMillis();
 
-		if (now - this.lastSeen > this.getFrequency() && bufferIndex <= timeBuffer.length)
+		if (now - this.lastSeen > this.getFrequency() && bufferIndex <= timeBuffer.length && this.passesThreshold(event))
 		{
 			synchronized(this)
 			{
