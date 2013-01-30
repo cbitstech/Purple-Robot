@@ -258,7 +258,10 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 
         	if (prefs.getBoolean("config_probe_pressure_built_in_enabled", false))
         	{
-        		sensors.registerListener(this, sensors.getDefaultSensor(Sensor.TYPE_PRESSURE), SensorManager.SENSOR_DELAY_FASTEST, null);
+				Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_PRESSURE);
+				
+				if (sensor != null)
+					sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST, null);
 
         		return true;
         	}

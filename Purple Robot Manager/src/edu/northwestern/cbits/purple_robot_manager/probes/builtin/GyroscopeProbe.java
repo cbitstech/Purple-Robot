@@ -277,7 +277,10 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 
         	if (prefs.getBoolean("config_probe_gyroscope_built_in_enabled", false))
         	{
-        		sensors.registerListener(this, sensors.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_FASTEST, null);
+				Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+				
+				if (sensor != null)
+					sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST, null);
 
         		return true;
         	}
