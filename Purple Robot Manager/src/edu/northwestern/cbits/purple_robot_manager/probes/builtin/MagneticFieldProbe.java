@@ -46,6 +46,12 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 
 	private static final String[] fieldNames = { X_KEY, Y_KEY, Z_KEY };
 
+	private static final double SENSOR_THRESHOLD = 0.0025;
+
+	private double _lastX = Double.MAX_VALUE;
+	private double _lastY = Double.MAX_VALUE;
+	private double _lastZ = Double.MAX_VALUE;
+
 	private double lastSeen = 0;
 	private long lastFrequencyLookup = 0;
 	private long frequency = 1000;
@@ -239,11 +245,36 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 		return false;
 	}
 
+	protected boolean passesThreshold(SensorEvent event)
+	{
+		double x = event.values[0];
+		double y = event.values[1];
+		double z = event.values[2];
+
+		boolean passes = false;
+
+		if (Math.abs(x - this._lastX) > MagneticFieldProbe.SENSOR_THRESHOLD)
+			passes = true;
+		else if (Math.abs(y - this._lastY) > MagneticFieldProbe.SENSOR_THRESHOLD)
+			passes = true;
+		else if (Math.abs(z - this._lastZ) > MagneticFieldProbe.SENSOR_THRESHOLD)
+			passes = true;
+		
+		if (passes)
+		{
+			this._lastX = x;
+			this._lastY = y;
+			this._lastZ = z;
+		}
+		
+		return passes;
+	}
+
 	public void onSensorChanged(SensorEvent event)
 	{
 		double now = (double) System.currentTimeMillis();
 
-		if (now - this.lastSeen > this.getFrequency() && bufferIndex <= timeBuffer.length)
+		if (now - this.lastSeen > this.getFrequency() && bufferIndex <= timeBuffer.length && this.passesThreshold(event))
 		{
 			synchronized(this)
 			{
