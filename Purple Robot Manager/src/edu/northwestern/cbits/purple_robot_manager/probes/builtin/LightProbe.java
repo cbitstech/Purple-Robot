@@ -28,6 +28,10 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.preference.ListPreference;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
@@ -45,13 +49,14 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 
 	private static String[] fieldNames = { LIGHT_KEY };
 
-	private static final double SENSOR_THRESHOLD = 5.0;
-
 	private double _lastValue = Double.MAX_VALUE;
 
 	private double lastSeen = 0;
 	private long lastFrequencyLookup = 0;
 	private long frequency = 1000;
+
+	private long lastThresholdLookup = 0;
+	private double lastThreshold = 0;
 
 	private float valueBuffer[][] = new float[1][BUFFER_SIZE];
 	private double timeBuffer[] = new double[BUFFER_SIZE];
@@ -283,11 +288,21 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 
 	protected boolean passesThreshold(SensorEvent event)
 	{
+		long now = System.currentTimeMillis();
+		
+		if (now - this.lastThresholdLookup > 5000)
+		{
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+			this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_light_threshold", "10.0"));
+			
+			this.lastThresholdLookup = now;
+		}
+
 		double value = event.values[0];
 
 		boolean passes = false;
 
-		if (Math.abs(value - this._lastValue) > LightProbe.SENSOR_THRESHOLD)
+		if (Math.abs(value - this._lastValue) > this.lastThreshold)
 			passes = true;
 		
 		if (passes)
@@ -295,6 +310,24 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 		
 		return passes;
 	}
+	
+	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+	{
+		PreferenceScreen screen = super.preferenceScreen(activity);
+
+		ListPreference threshold = new ListPreference(activity);
+		threshold.setKey("config_probe_light_threshold");
+		threshold.setDefaultValue("10.0");
+		threshold.setEntryValues(R.array.probe_light_threshold);
+		threshold.setEntries(R.array.probe_light_threshold_labels);
+		threshold.setTitle(R.string.probe_noise_threshold_label);
+		threshold.setSummary(R.string.probe_noise_threshold_summary);
+
+		screen.addPreference(threshold);
+
+		return screen;
+	}
+
 	
 	@SuppressLint("NewApi")
 	public void onSensorChanged(SensorEvent event)

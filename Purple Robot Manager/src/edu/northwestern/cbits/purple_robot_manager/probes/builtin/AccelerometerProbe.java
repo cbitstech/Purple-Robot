@@ -12,10 +12,6 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.github.mustachejava.DefaultMustacheFactory;
-import com.github.mustachejava.Mustache;
-import com.github.mustachejava.MustacheFactory;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +23,14 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.preference.ListPreference;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
+
+import com.github.mustachejava.DefaultMustacheFactory;
+import com.github.mustachejava.Mustache;
+import com.github.mustachejava.MustacheFactory;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
@@ -44,14 +48,14 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 	private static final String Y_KEY = "Y";
 	private static final String Z_KEY = "Z";
 	
-
 	private static final String[] fieldNames = { X_KEY, Y_KEY, Z_KEY };
 
 	private double lastSeen = 0;
 	private long lastFrequencyLookup = 0;
 	private long frequency = 1000;
 
-	private static final double SENSOR_THRESHOLD = 0.25;
+	private long lastThresholdLookup = 0;
+	private double lastThreshold = 0;
 
 	private double _lastX = Double.MAX_VALUE;
 	private double _lastY = Double.MAX_VALUE;
@@ -304,17 +308,27 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 
 	protected boolean passesThreshold(SensorEvent event)
 	{
+		long now = System.currentTimeMillis();
+		
+		if (now - this.lastThresholdLookup > 5000)
+		{
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+			this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_accelerometer_threshold", "0.5"));
+			
+			this.lastThresholdLookup = now;
+		}
+
 		double x = event.values[0];
 		double y = event.values[1];
 		double z = event.values[2];
 
 		boolean passes = false;
 
-		if (Math.abs(x - this._lastX) > AccelerometerProbe.SENSOR_THRESHOLD)
+		if (Math.abs(x - this._lastX) > this.lastThreshold)
 			passes = true;
-		else if (Math.abs(y - this._lastY) > AccelerometerProbe.SENSOR_THRESHOLD)
+		else if (Math.abs(y - this._lastY) > this.lastThreshold)
 			passes = true;
-		else if (Math.abs(z - this._lastZ) > AccelerometerProbe.SENSOR_THRESHOLD)
+		else if (Math.abs(z - this._lastZ) > this.lastThreshold)
 			passes = true;
 		
 		if (passes)
@@ -325,6 +339,23 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 		}
 		
 		return passes;
+	}
+	
+	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+	{
+		PreferenceScreen screen = super.preferenceScreen(activity);
+
+		ListPreference threshold = new ListPreference(activity);
+		threshold.setKey("config_probe_accelerometer_threshold");
+		threshold.setDefaultValue("0.5");
+		threshold.setEntryValues(R.array.probe_accelerometer_threshold);
+		threshold.setEntries(R.array.probe_accelerometer_threshold_labels);
+		threshold.setTitle(R.string.probe_noise_threshold_label);
+		threshold.setSummary(R.string.probe_noise_threshold_summary);
+
+		screen.addPreference(threshold);
+
+		return screen;
 	}
 	
 	public void onSensorChanged(SensorEvent event)

@@ -234,4 +234,90 @@
         <item>Every 30 minutes</item>
 	</string-array>
 
+	<string-array name="probe_accelerometer_threshold">
+        <item>0.0</item>
+        <item>0.25</item>
+        <item>0.5</item>
+        <item>1.0</item>
+   	</string-array>
+
+	<string-array name="probe_accelerometer_threshold_labels">
+        <item>None</item>
+        <item>0.25 meters per second squared</item>
+        <item>0.5 meters per second squared</item>
+        <item>1 meter per second squared</item>
+	</string-array>
+	
+	<string-array name="probe_gyroscope_threshold">
+        <item>0.0</item>
+        <item>0.0025</item>
+   	</string-array>
+
+	<string-array name="probe_gyroscope_threshold_labels">
+        <item>None</item>
+        <item>2.5 milliradians per second</item>
+	</string-array>
+
+	<string-array name="probe_light_threshold">
+        <item>0.0</item>
+        <item>5.0</item>
+        <item>10.0</item>
+   	</string-array>
+
+	<string-array name="probe_light_threshold_labels">
+        <item>None</item>
+        <item>5 SI lux</item>
+        <item>10SI lux</item>
+   	</string-array>
+			
+	<string-array name="probe_magnetic_threshold">
+        <item>0.0</item>
+        <item>1.0</item>
+   	</string-array>
+
+	<string-array name="probe_magnetic_threshold_labels">
+        <item>None</item>
+        <item>1.0 micro-Tesla</item>
+   	</string-array>
+
+	<string-array name="probe_pressure_threshold">
+        <item>0.0</item>
+        <item>0.5</item>
+        <item>1.0</item>
+   	</string-array>
+
+	<string-array name="probe_pressure_threshold_labels">
+        <item>None</item>
+        <item>0.5 millibars</item>
+        <item>1 millibar</item>
+   	</string-array>
+
+	<string-array name="probe_proximity_threshold">
+        <item>0.0</item>
+        <item>1.0</item>
+        <item>2.0</item>
+        <item>5.0</item>
+   	</string-array>
+
+	<string-array name="probe_proximity_threshold_labels">
+        <item>None</item>
+        <item>1 centimeter</item>
+        <item>2 centimeters</item>
+        <item>5 centimeters</item>
+   	</string-array>
+
+	<string-array name="probe_temperature_threshold">
+        <item>0.0</item>
+        <item>1.0</item>
+        <item>2.0</item>
+        <item>5.0</item>
+   	</string-array>
+
+	<string-array name="probe_temperature_threshold_labels">
+        <item>None</item>
+        <item>1 degree</item>
+        <item>2 degrees</item>
+        <item>5 degrees</item>
+   	</string-array>
+	
 </resources>

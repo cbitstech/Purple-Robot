@@ -27,6 +27,10 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.preference.ListPreference;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
@@ -46,8 +50,6 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 
 	private static String[] fieldNames = { X_KEY, Y_KEY, Z_KEY };
 
-	private static final double SENSOR_THRESHOLD = 0.0025;
-
 	private double _lastX = Double.MAX_VALUE;
 	private double _lastY = Double.MAX_VALUE;
 	private double _lastZ = Double.MAX_VALUE;
@@ -55,6 +57,9 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 	private double lastSeen = 0;
 	private long lastFrequencyLookup = 0;
 	private long frequency = 1000;
+
+	private long lastThresholdLookup = 0;
+	private double lastThreshold = 0;
 
 	private float valueBuffer[][] = new float[3][BUFFER_SIZE];
 	private int accuracyBuffer[] = new int[BUFFER_SIZE];
@@ -297,17 +302,27 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 	
 	protected boolean passesThreshold(SensorEvent event)
 	{
+		long now = System.currentTimeMillis();
+		
+		if (now - this.lastThresholdLookup > 5000)
+		{
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+			this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_gyroscope_threshold", "0.0025"));
+			
+			this.lastThresholdLookup = now;
+		}
+
 		double x = event.values[0];
 		double y = event.values[1];
 		double z = event.values[2];
 
 		boolean passes = false;
 
-		if (Math.abs(x - this._lastX) > GyroscopeProbe.SENSOR_THRESHOLD)
+		if (Math.abs(x - this._lastX) > this.lastThreshold)
 			passes = true;
-		else if (Math.abs(y - this._lastY) > GyroscopeProbe.SENSOR_THRESHOLD)
+		else if (Math.abs(y - this._lastY) > this.lastThreshold)
 			passes = true;
-		else if (Math.abs(z - this._lastZ) > GyroscopeProbe.SENSOR_THRESHOLD)
+		else if (Math.abs(z - this._lastZ) > this.lastThreshold)
 			passes = true;
 		
 		if (passes)
@@ -410,6 +425,23 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 				this.lastSeen = now;
 			}
 		}
+	}
+	
+	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+	{
+		PreferenceScreen screen = super.preferenceScreen(activity);
+
+		ListPreference threshold = new ListPreference(activity);
+		threshold.setKey("config_probe_gyroscope_threshold");
+		threshold.setDefaultValue("0.0025");
+		threshold.setEntryValues(R.array.probe_gyroscope_threshold);
+		threshold.setEntries(R.array.probe_gyroscope_threshold_labels);
+		threshold.setTitle(R.string.probe_noise_threshold_label);
+		threshold.setSummary(R.string.probe_noise_threshold_summary);
+
+		screen.addPreference(threshold);
+
+		return screen;
 	}
 
 	public String getPreferenceKey()

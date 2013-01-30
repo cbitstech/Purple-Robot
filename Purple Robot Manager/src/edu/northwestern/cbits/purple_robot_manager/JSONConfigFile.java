@@ -112,9 +112,7 @@ public class JSONConfigFile
 								for (String key : keys)
 								{
 									if ("user_id".equals(key))
-									{
-										// Skip since we're replacing...
-									}
+										userId = uri.getQueryParameter(key);
 									else
 										builder.appendQueryParameter(key, uri.getQueryParameter(key));
 								}

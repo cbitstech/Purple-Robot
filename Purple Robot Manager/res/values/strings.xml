@@ -195,7 +195,7 @@
     <string name="summary_tasks_probe" formatted="false">%d running tasks</string>
     <string name="summary_android_version_probe" formatted="false">Android version %s</string>
     <string name="summary_time_offset_probe" formatted="false">%.2f second offset from time servers.</string>
-    <string name="summary_robot_probe" formatted="false">%d Files Pending (%.2f MB, %ds)</string>
+    <string name="summary_robot_probe" formatted="false">%.2f CPU, %d Files Pending (%.2f MB, %ds)</string>
 
     <string name="menu_pause_toggle_label">Pause</string>
     <string name="menu_resume_toggle_label">Resume</string>
@@ -203,7 +203,10 @@
     <string name="menu_new_label">New Label</string>
     <string name="menu_accept_label">Save New Label</string>
     <string name="menu_cancel">Cancel</string>
-
+    
+    <string name="probe_noise_threshold_label">Noise Threshold</string>
+    <string name="probe_noise_threshold_summary">Set the mimimum threshold to determine if a new reading is signal or noise.</string>
+    
     <string name="label_context" formatted="false">Context: %s</string>
 
     <string name="toast_refresh_probes">Refreshing probes&#8230;</string>
