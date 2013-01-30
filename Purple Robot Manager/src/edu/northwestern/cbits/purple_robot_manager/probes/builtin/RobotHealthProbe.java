@@ -3,6 +3,7 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -48,6 +49,7 @@ public class RobotHealthProbe extends Probe
 	private static final long NTP_CHECK_DURATION = 300000;
 	private static final String NTP_HOST = "0.north-america.pool.ntp.org";
 	protected static final String TIME_OFFSET_MS = "TIME_OFFSET_MS";
+	protected static final String CPU_USAGE = "CPU_USAGE";
 	
 	private long _lastOffset = 0;
 	private long _lastTimeCheck = 0;
@@ -87,6 +89,52 @@ public class RobotHealthProbe extends Probe
 		e.commit();
 	}
 
+	// Source: http://stackoverflow.com/questions/3118234/how-to-get-memory-usage-and-cpu-usage-in-android
+	
+	private float readUsage() 
+	{
+	    try 
+	    {
+	        RandomAccessFile reader = new RandomAccessFile("/proc/stat", "r");
+	        String load = reader.readLine();
+
+	        String[] toks = load.split(" ");
+
+	        long idle1 = Long.parseLong(toks[5]);
+	        long cpu1 = Long.parseLong(toks[2]) + Long.parseLong(toks[3]) + Long.parseLong(toks[4])
+	              + Long.parseLong(toks[6]) + Long.parseLong(toks[7]) + Long.parseLong(toks[8]);
+
+	        try 
+	        {
+	            Thread.sleep(360);
+	        } 
+	        catch (Exception e) 
+	        {
+	        	
+	        }
+
+	        reader.seek(0);
+	        load = reader.readLine();
+	        reader.close();
+
+	        toks = load.split(" ");
+
+	        long idle2 = Long.parseLong(toks[5]);
+	        long cpu2 = Long.parseLong(toks[2]) + Long.parseLong(toks[3]) + Long.parseLong(toks[4])
+	            + Long.parseLong(toks[6]) + Long.parseLong(toks[7]) + Long.parseLong(toks[8]);
+
+	        return (float)(cpu2 - cpu1) / ((cpu2 + idle2) - (cpu1 + idle1));
+
+	    }
+	    catch (IOException ex) 
+	    {
+	        ex.printStackTrace();
+	    }
+
+	    return 0;
+	} 
+
+	
 	public boolean isEnabled(final Context context)
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -244,6 +292,7 @@ public class RobotHealthProbe extends Probe
 
 									bundle.putLong(RobotHealthProbe.TIME_OFFSET_MS, me._lastOffset);
 									bundle.putLong(RobotHealthProbe.ACTIVE_RUNTIME, System.currentTimeMillis() - ManagerService.startTimestamp);
+									bundle.putFloat(RobotHealthProbe.CPU_USAGE, me.readUsage());
 
 									me.transmitData(context, bundle);
 
@@ -278,7 +327,9 @@ public class RobotHealthProbe extends Probe
 
 		size = size / (1024 * 1024);
 
-		return String.format(context.getResources().getString(R.string.summary_robot_probe), count, size, clear);
+		float cpu = bundle.getFloat(RobotHealthProbe.CPU_USAGE);
+
+		return String.format(context.getResources().getString(R.string.summary_robot_probe), cpu, count, size, clear);
 	}
 
 	/*

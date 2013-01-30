@@ -24,6 +24,10 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.preference.ListPreference;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
@@ -46,13 +50,14 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 
 	private static String[] fieldNames = { PRESSURE_KEY, ALTITUDE_KEY };
 
-	private static final double SENSOR_THRESHOLD = 0.25;
-
 	private double _lastValue = Double.MAX_VALUE;
 
 	private double lastSeen = 0;
 	private long lastFrequencyLookup = 0;
 	private long frequency = 1000;
+
+	private long lastThresholdLookup = 0;
+	private double lastThreshold = 0;
 
 	private float valueBuffer[][] = new float[2][BUFFER_SIZE];
 	private int accuracyBuffer[] = new int[BUFFER_SIZE];
@@ -274,13 +279,40 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
     	return false;
 	}
 
+	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+	{
+		PreferenceScreen screen = super.preferenceScreen(activity);
+
+		ListPreference threshold = new ListPreference(activity);
+		threshold.setKey("config_probe_pressure_threshold");
+		threshold.setDefaultValue("0.5");
+		threshold.setEntryValues(R.array.probe_pressure_threshold);
+		threshold.setEntries(R.array.probe_pressure_threshold_labels);
+		threshold.setTitle(R.string.probe_noise_threshold_label);
+		threshold.setSummary(R.string.probe_noise_threshold_summary);
+
+		screen.addPreference(threshold);
+
+		return screen;
+	}
+
 	protected boolean passesThreshold(SensorEvent event)
 	{
+		long now = System.currentTimeMillis();
+		
+		if (now - this.lastThresholdLookup > 5000)
+		{
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+			this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_pressure_threshold", "0.5"));
+			
+			this.lastThresholdLookup = now;
+		}
+
 		double value = event.values[0];
 
 		boolean passes = false;
 
-		if (Math.abs(value - this._lastValue) > PressureProbe.SENSOR_THRESHOLD)
+		if (Math.abs(value - this._lastValue) > this.lastThreshold)
 			passes = true;
 		
 		if (passes)
