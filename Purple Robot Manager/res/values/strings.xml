@@ -22,6 +22,9 @@
 
     <string name="message_update_check">This change will take effect the next time this application restarts.</string>
     
+    <string name="config_probe_communication_hash_title">Obfuscate Call Details</string>
+    <string name="config_probe_communication_hash_summary">When set, the app will hash the caller\'s name and phone number when collecting that data.</string>
+
     <string name="config_json_url_label">JSON Configuration URL</string>
     <string name="config_json_url_message">Please enter the URL for the application configuration file.</string>
 
