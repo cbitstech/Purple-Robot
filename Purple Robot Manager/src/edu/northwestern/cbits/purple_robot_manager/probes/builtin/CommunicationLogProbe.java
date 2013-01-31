@@ -19,7 +19,6 @@ import android.preference.PreferenceScreen;
 import android.provider.CallLog;
 import android.provider.CallLog.Calls;
 import android.telephony.PhoneNumberUtils;
-import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
