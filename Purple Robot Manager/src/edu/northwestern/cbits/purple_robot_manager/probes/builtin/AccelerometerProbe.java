@@ -27,6 +27,7 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
@@ -323,7 +324,7 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 		double z = event.values[2];
 
 		boolean passes = false;
-
+		
 		if (Math.abs(x - this._lastX) > this.lastThreshold)
 			passes = true;
 		else if (Math.abs(y - this._lastY) > this.lastThreshold)
