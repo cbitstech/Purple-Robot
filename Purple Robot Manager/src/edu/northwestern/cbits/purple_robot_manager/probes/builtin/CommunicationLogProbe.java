@@ -19,6 +19,8 @@ import android.preference.PreferenceScreen;
 import android.provider.CallLog;
 import android.provider.CallLog.Calls;
 import android.telephony.PhoneNumberUtils;
+import android.util.Log;
+import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
@@ -88,6 +90,7 @@ public class CommunicationLogProbe extends Probe
 				synchronized(this)
 				{
 					long freq = Long.parseLong(prefs.getString("config_probe_communication_frequency", "300000"));
+					boolean doHash = prefs.getBoolean("config_probe_communication_hash_data", true);
 
 					if (now - this._lastCheck  > freq)
 					{
@@ -103,13 +106,24 @@ public class CommunicationLogProbe extends Probe
 
 						try
 						{
+							EncryptionManager em = EncryptionManager.getInstance();
+							
 							Cursor c = context.getContentResolver().query(CallLog.Calls.CONTENT_URI, null, null, null, null);
 
 							while (c.moveToNext())
 							{
 								Bundle contactBundle = new Bundle();
 
-								contactBundle.putString(CommunicationLogProbe.NUMBER_NAME, c.getString(c.getColumnIndex(Calls.CACHED_NAME)));
+								String numberName = c.getString(c.getColumnIndex(Calls.CACHED_NAME));
+								String phoneNumber = PhoneNumberUtils.formatNumber(c.getString(c.getColumnIndex(Calls.NUMBER)));
+
+								if (doHash)
+								{
+									numberName = em.createHash(numberName);
+									phoneNumber = em.createHash(phoneNumber);
+								}
+
+								contactBundle.putString(CommunicationLogProbe.NUMBER_NAME, numberName);
 								contactBundle.putString(CommunicationLogProbe.NUMBER_LABEL, c.getString(c.getColumnIndex(Calls.CACHED_NUMBER_LABEL)));
 								
 								if (c.getColumnIndex(Calls.CACHED_NUMBER_TYPE) != -1)
@@ -117,7 +131,7 @@ public class CommunicationLogProbe extends Probe
 								
 								contactBundle.putLong(CommunicationLogProbe.CALL_TIMESTAMP, c.getLong(c.getColumnIndex(Calls.DATE)));
 								contactBundle.putLong(CommunicationLogProbe.CALL_DURATION, c.getLong(c.getColumnIndex(Calls.DURATION)));
-								contactBundle.putString(CommunicationLogProbe.NUMBER, PhoneNumberUtils.formatNumber(c.getString(c.getColumnIndex(Calls.NUMBER))));
+								contactBundle.putString(CommunicationLogProbe.NUMBER, phoneNumber);
 
 								int callType = c.getInt(c.getColumnIndex(Calls.CACHED_NUMBER_TYPE));
 
@@ -224,6 +238,14 @@ public class CommunicationLogProbe extends Probe
 		duration.setTitle(R.string.probe_frequency_label);
 
 		screen.addPreference(duration);
+
+		CheckBoxPreference hash = new CheckBoxPreference(activity);
+		hash.setKey("config_probe_communication_hash_data");
+		hash.setDefaultValue(true);
+		hash.setTitle(R.string.config_probe_communication_hash_title);
+		hash.setSummary(R.string.config_probe_communication_hash_summary);
+
+		screen.addPreference(hash);
 
 		return screen;
 	}

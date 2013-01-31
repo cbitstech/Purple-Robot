@@ -134,6 +134,9 @@ public class EncryptionManager
 	
 	public String createHash(String string)
 	{
+		if (string == null)
+			return null;
+		
 		String hash = null;
 		
 		try
