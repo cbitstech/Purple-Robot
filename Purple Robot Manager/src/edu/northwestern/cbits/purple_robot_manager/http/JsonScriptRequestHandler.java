@@ -18,7 +18,6 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.net.Uri;
-import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.ExecuteScriptCommand;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.JSONCommand;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.PingCommand;
@@ -37,7 +36,7 @@ public class JsonScriptRequestHandler implements HttpRequestHandler
 
 	public void handle(HttpRequest request, HttpResponse response, HttpContext argument) throws HttpException, IOException 
 	{
-    	Log.e("PR-HTTP-SCRIPTS", request.getRequestLine().getMethod() + " " + request.getRequestLine().getUri());
+//    	Log.e("PR-HTTP-SCRIPTS", request.getRequestLine().getMethod() + " " + request.getRequestLine().getUri());
 
     	response.setStatusCode(HttpStatus.SC_OK);
 		

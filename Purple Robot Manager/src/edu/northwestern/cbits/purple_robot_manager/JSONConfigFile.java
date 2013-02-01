@@ -121,7 +121,7 @@ public class JSONConfigFile
 
 								newUri = builder.build();
 							}
-
+							
 							URL u = new URL(newUri.toString());
 
 							HttpURLConnection conn = (HttpURLConnection) u.openConnection();
