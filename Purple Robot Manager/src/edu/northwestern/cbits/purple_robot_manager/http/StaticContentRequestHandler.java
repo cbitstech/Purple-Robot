@@ -19,7 +19,6 @@ import org.apache.http.protocol.HttpRequestHandler;
 import org.apache.http.util.EntityUtils;
 
 import android.content.Context;
-import android.util.Log;
 
 public class StaticContentRequestHandler implements HttpRequestHandler 
 {
@@ -36,7 +35,7 @@ public class StaticContentRequestHandler implements HttpRequestHandler
 	
     public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException
     {
-    	Log.e("PR-HTTP-STATIC", request.getRequestLine().getMethod() + " " + request.getRequestLine().getUri());
+//    	Log.e("PR-HTTP-STATIC", request.getRequestLine().getMethod() + " " + request.getRequestLine().getUri());
 
     	String method = request.getRequestLine().getMethod().toUpperCase(Locale.ENGLISH);
 

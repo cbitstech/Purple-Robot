@@ -19,7 +19,6 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.net.Uri;
-import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.JavaScriptEngine;
 import edu.northwestern.cbits.purple_robot_manager.R;
 
@@ -36,8 +35,6 @@ public class JsonStoreRequestHandler implements HttpRequestHandler
 
 	public void handle(HttpRequest request, HttpResponse response, HttpContext argument) throws HttpException, IOException 
 	{
-    	Log.e("PR-HTTP-STORE", request.getRequestLine().getMethod() + " " + request.getRequestLine().getUri());
-
     	response.setStatusCode(HttpStatus.SC_OK);
 		
         if (request instanceof HttpEntityEnclosingRequest) 
