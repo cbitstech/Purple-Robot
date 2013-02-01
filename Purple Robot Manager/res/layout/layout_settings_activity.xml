@@ -71,7 +71,21 @@
 	      	    android:summary="@string/summary_http_upload_wifi_only"
 	           	android:key="config_restrict_data_wifi"
 	           	android:defaultValue="true"/>
-			<PreferenceScreen android:title="@string/title_advanced_settings">
+	        <ListPreference
+	            android:key="config_http_upload_interval"
+	            android:entries="@array/http_upload_interval_labels"
+	            android:entryValues="@array/http_upload_interval_values"
+	            android:title="@string/config_http_upload_interval_label"
+	            android:summary="@string/config_http_upload_interval_summary"
+	            android:defaultValue="0" />
+	        <ListPreference
+	            android:key="config_http_upload_size"
+	            android:entries="@array/http_upload_size_labels"
+	            android:entryValues="@array/http_upload_size_values"
+	            android:title="@string/config_http_upload_size_label"
+	            android:summary="@string/config_http_upload_size_summary"
+	            android:defaultValue="60" />
+  			<PreferenceScreen android:title="@string/title_advanced_settings">
 				<Preference android:title="@string/title_email_files" android:key="config_mail_archives" android:defaultValue="0" />
 				<Preference android:title="@string/title_delete_files" android:key="config_delete_archives" android:defaultValue="0" />
  			</PreferenceScreen>

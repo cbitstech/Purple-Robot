@@ -25,6 +25,12 @@
     <string name="config_probe_communication_hash_title">Obfuscate Call Details</string>
     <string name="config_probe_communication_hash_summary">When set, the app will hash the caller\'s name and phone number when collecting that data.</string>
 
+    <string name="config_http_upload_interval_label">HTTP Upload Interval</string>
+    <string name="config_http_upload_interval_summary">Override the default upload intervals with a constant interval.</string>
+
+    <string name="config_http_upload_size_label">HTTP Upload Size</string>
+    <string name="config_http_upload_size_summary">Override the default upload payload size with a constant size.</string>
+    
     <string name="config_json_url_label">JSON Configuration URL</string>
     <string name="config_json_url_message">Please enter the URL for the application configuration file.</string>
 
