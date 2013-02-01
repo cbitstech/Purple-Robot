@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="edu.northwestern.cbits.purple_robot_manager"
-	android:versionCode="10025"
-	android:versionName="1.0.25">
+	android:versionCode="10026"
+	android:versionName="1.0.26">
    	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>

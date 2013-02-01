@@ -163,17 +163,38 @@ public class HttpUploadPlugin extends OutputPlugin
 
 	private long uploadPeriod()
 	{
-		return this._uploadPeriod;
+		long period = this._uploadPeriod;
+		
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getContext());
+		
+		long prefPeriod = Long.parseLong(prefs.getString("config_http_upload_interval", "0"));
+		
+		if (period != 0)
+			period = prefPeriod * 1000;
+		
+		return period;
 	}
 
 	private long maxUploadSize()
 	{
-		int multiplier = 1;
-
-		if (this.wifiAvailable())
-			multiplier = WIFI_MULTIPLIER;
-
-		return this._uploadSize * multiplier; // 128KB
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getContext());
+		
+		long size = Long.parseLong(prefs.getString("config_http_upload_size", "0"));
+		
+		if (size == 0)
+		{
+			int multiplier = 1;
+	
+			if (this.wifiAvailable())
+				multiplier = WIFI_MULTIPLIER;
+			
+			size = this._uploadSize * multiplier;
+		}
+		
+		if (size < MIN_UPLOAD_SIZE) 
+			size = MIN_UPLOAD_SIZE;
+		
+		return size;
 	}
 
 	public String[] respondsTo()
@@ -280,8 +301,6 @@ public class HttpUploadPlugin extends OutputPlugin
 				this._wifiAvailable =  false;
 		}
 		
-		Log.e("PR-HTTP", "WIFI AVAILABLE: " + this._wifiAvailable);
-
 		return this._wifiAvailable;
 	}
 	
@@ -327,8 +346,6 @@ public class HttpUploadPlugin extends OutputPlugin
 
 	private void uploadPendingObjects()
 	{
-		Log.e("PR-HTTP", "UPLOADING? " + this._uploading);
-
 		if (this._uploading)
 			return;
 
@@ -336,12 +353,8 @@ public class HttpUploadPlugin extends OutputPlugin
 
 		final long now = System.currentTimeMillis();
 
-		Log.e("PR-HTTP", "CONTINUE? " + (now - me._lastUpload) + " > " + me.uploadPeriod());
-		
 		if (now - me._lastUpload > me.uploadPeriod())
 		{
-			Log.e("PR-HTTP", "CONTINUING");
-
 			this._uploading = true;
 
 			final SharedPreferences prefs = HttpUploadPlugin.getPreferences(this.getContext());
@@ -351,7 +364,6 @@ public class HttpUploadPlugin extends OutputPlugin
 				this._uploading = false;
 				return;
 			}
-
 			
 			if (prefs.getBoolean("config_restrict_data_wifi", true))
 			{
@@ -405,26 +417,23 @@ public class HttpUploadPlugin extends OutputPlugin
 
 					for (String filename : filenames)
 					{
-						if (totalRead < maxUploadSize)
+						if (totalRead <= maxUploadSize)
 						{
 							File f = new File(pendingFolder, filename);
 
 							try
 							{
-								if (f.length() > 32)
+								byte[] bytes = EncryptionManager.getInstance().readFromEncryptedStream(me.getContext(), new FileInputStream(f), prefs.getBoolean("config_http_encrypt", true));
+
+								JSONArray jsonArray = new JSONArray(new String(bytes, "UTF-8"));
+
+								totalRead += bytes.length;
+
+								for (int i = 0; i < jsonArray.length(); i++)
 								{
-									byte[] bytes = EncryptionManager.getInstance().readFromEncryptedStream(me.getContext(), new FileInputStream(f), prefs.getBoolean("config_http_encrypt", true));
+									JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-									JSONArray jsonArray = new JSONArray(new String(bytes, "UTF-8"));
-
-									totalRead += bytes.length;
-
-									for (int i = 0; i < jsonArray.length(); i++)
-									{
-										JSONObject jsonObject = jsonArray.getJSONObject(i);
-
-										pendingObjects.add(jsonObject);
-									}
+									pendingObjects.add(jsonObject);
 								}
 							}
 							catch (FileNotFoundException e)
@@ -473,7 +482,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 								int jsonSize = jsonString.toString().getBytes("UTF-8").length;
 
-								if (jsonSize > maxUploadSize)
+								if (i > 0 && jsonSize > maxUploadSize)
 								{
 									// Skip until connection is better...
 								}
@@ -551,7 +560,6 @@ public class HttpUploadPlugin extends OutputPlugin
 						        socketFactory = new LiberalSSLSocketFactory(trustStore);								
 							}
 
-							//							socketFactory.setHostnameVerifier((X509HostnameVerifier) hostnameVerifier);
 							registry.register(new Scheme("https", socketFactory, 443));
 							
 							SingleClientConnManager mgr = new SingleClientConnManager(androidClient.getParams(), registry);
@@ -577,8 +585,6 @@ public class HttpUploadPlugin extends OutputPlugin
 
 								URI siteUri = new URI(uriString);
 								
-								Log.e("PR_HTTP", "SITE: " + siteUri);
-
 								HttpPost httpPost = new HttpPost(siteUri);
 
 								String jsonString = jsonMessage.toString();
@@ -594,8 +600,6 @@ public class HttpUploadPlugin extends OutputPlugin
 								me.broadcastMessage(uploadMessage);
 
 								noteManager.notify(12345, note);
-
-//								AndroidHttpClient.modifyRequestToAcceptGzipResponse(httpPost);
 
 								HttpResponse response = httpClient.execute(httpPost);
 
