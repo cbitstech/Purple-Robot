@@ -106,8 +106,8 @@ public class BatteryProbe extends Probe
 				cursor.close();
 			}
 
-			c.addSeries("bATTERY", battery);
-			c.addTime("tIME", time);
+			c.addSeries(activity.getString(R.string.battery_level_label), battery);
+			c.addTime(activity.getString(R.string.battery_time_label), time);
 
 			JSONObject json = c.highchartsJson(activity);
 
@@ -152,6 +152,80 @@ public class BatteryProbe extends Probe
 		return context.getResources().getString(R.string.probe_environment_category);
 	}
 
+	public Bundle formattedBundle(Context context, Bundle bundle)
+	{
+		Bundle formatted = super.formattedBundle(context, bundle);
+
+		formatted.putString(context.getString(R.string.battery_tech_label), bundle.getString(BatteryManager.EXTRA_TECHNOLOGY, context.getString(R.string.unknown_label)));
+		formatted.putInt(context.getString(R.string.battery_temp_label), bundle.getInt(BatteryManager.EXTRA_TEMPERATURE, -1));
+		formatted.putInt(context.getString(R.string.battery_volt_label), bundle.getInt(BatteryManager.EXTRA_VOLTAGE, -1));
+
+		int status = bundle.getInt(BatteryManager.EXTRA_STATUS, BatteryManager.BATTERY_STATUS_UNKNOWN);
+
+		switch (status)
+		{
+			case BatteryManager.BATTERY_STATUS_CHARGING:
+				formatted.putString(context.getString(R.string.battery_status_label), context.getString(R.string.battery_status_charging));
+				break;
+			case BatteryManager.BATTERY_STATUS_DISCHARGING:
+				formatted.putString(context.getString(R.string.battery_status_label), context.getString(R.string.battery_status_discharging));
+				break;
+			case BatteryManager.BATTERY_STATUS_FULL:
+				formatted.putString(context.getString(R.string.battery_status_label), context.getString(R.string.battery_status_full));
+				break;
+			case BatteryManager.BATTERY_STATUS_NOT_CHARGING:
+				formatted.putString(context.getString(R.string.battery_status_label), context.getString(R.string.battery_status_not_charging));
+				break;
+			default:
+				formatted.putString(context.getString(R.string.battery_status_label), context.getString(R.string.battery_status_unknown));
+		}
+
+		int health = bundle.getInt(BatteryManager.EXTRA_HEALTH, BatteryManager.BATTERY_HEALTH_UNKNOWN);
+
+		switch (health)
+		{
+			case BatteryManager.BATTERY_HEALTH_COLD:
+				formatted.putString(context.getString(R.string.battery_health_label), context.getString(R.string.battery_health_cold));
+				break;
+			case BatteryManager.BATTERY_HEALTH_DEAD:
+				formatted.putString(context.getString(R.string.battery_health_label), context.getString(R.string.battery_health_dead));
+				break;
+			case BatteryManager.BATTERY_HEALTH_GOOD:
+				formatted.putString(context.getString(R.string.battery_health_label), context.getString(R.string.battery_health_good));
+				break;
+			case BatteryManager.BATTERY_HEALTH_OVERHEAT:
+				formatted.putString(context.getString(R.string.battery_health_label), context.getString(R.string.battery_health_overheat));
+				break;
+			case BatteryManager.BATTERY_HEALTH_OVER_VOLTAGE:
+				formatted.putString(context.getString(R.string.battery_health_label), context.getString(R.string.battery_health_over_voltage));
+				break;
+			case BatteryManager.BATTERY_HEALTH_UNSPECIFIED_FAILURE:
+				formatted.putString(context.getString(R.string.battery_health_label), context.getString(R.string.battery_health_failure));
+				break;
+			default:
+				formatted.putString(context.getString(R.string.battery_health_label), context.getString(R.string.battery_health_unknown));
+		}
+
+		int source = bundle.getInt(BatteryManager.EXTRA_PLUGGED, 0);
+
+		switch (source)
+		{
+			case 0:
+				formatted.putString(context.getString(R.string.battery_plugged_label), context.getString(R.string.battery_source_none));
+				break;
+			case BatteryManager.BATTERY_PLUGGED_AC:
+				formatted.putString(context.getString(R.string.battery_plugged_label), context.getString(R.string.battery_source_ac));
+				break;
+			case BatteryManager.BATTERY_PLUGGED_USB:
+				formatted.putString(context.getString(R.string.battery_plugged_label), context.getString(R.string.battery_source_usb));
+				break;
+			default:
+				formatted.putString(context.getString(R.string.battery_plugged_label), context.getString(R.string.battery_source_other));
+		}
+
+		return formatted;
+	};
+	
 	public boolean isEnabled(Context context)
 	{
 		if (!this._isInited)

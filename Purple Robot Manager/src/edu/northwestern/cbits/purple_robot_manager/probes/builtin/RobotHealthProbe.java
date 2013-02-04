@@ -315,6 +315,22 @@ public class RobotHealthProbe extends Probe
 		return false;
 	}
 
+	public Bundle formattedBundle(Context context, Bundle bundle)
+	{
+		Bundle formatted = super.formattedBundle(context, bundle);
+
+		formatted.putLong(context.getString(R.string.robot_runtime_label), bundle.getLong(RobotHealthProbe.ACTIVE_RUNTIME, 0));
+		formatted.putFloat(context.getString(R.string.robot_cpu_load_label), bundle.getFloat(RobotHealthProbe.CPU_USAGE, 0));
+		formatted.putLong(context.getString(R.string.robot_time_offset_label), bundle.getLong(RobotHealthProbe.TIME_OFFSET_MS, 0));
+		formatted.putLong(context.getString(R.string.robot_pending_count_label), bundle.getLong(RobotHealthProbe.PENDING_COUNT, 0));
+		formatted.putLong(context.getString(R.string.robot_pending_size_label), bundle.getLong(RobotHealthProbe.PENDING_SIZE, 0));
+		formatted.putLong(context.getString(R.string.robot_clear_time_label), bundle.getLong(RobotHealthProbe.CLEAR_TIME, 0));
+
+		formatted.putString(context.getString(R.string.robot_version_label), bundle.getString(RobotHealthProbe.APP_VERSION_NAME, context.getString(R.string.unknown_label)));
+
+		return formatted;
+	};
+	
 	public String summarizeValue(Context context, Bundle bundle)
 	{
 		int count = bundle.getInt(RobotHealthProbe.PENDING_COUNT);

@@ -102,6 +102,15 @@ public class CallStateProbe extends Probe
 		return this._isEnabled;
 	}
 
+	public Bundle formattedBundle(Context context, Bundle bundle)
+	{
+		Bundle formatted = super.formattedBundle(context, bundle);
+
+		formatted.putString(context.getString(R.string.call_state_label), bundle.getString(CallStateProbe.CALL_STATE));
+
+		return formatted;
+	};
+	
 	protected String getCallState(int callState)
 	{
 		String state = "Unknown";
