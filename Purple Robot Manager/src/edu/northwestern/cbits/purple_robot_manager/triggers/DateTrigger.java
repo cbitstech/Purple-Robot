@@ -193,19 +193,26 @@ public class DateTrigger extends Trigger
 
 		if (periodList == null)
 		{
-			DateTime from = new DateTime(new Date(timestamp - 5000));
-			DateTime to = new DateTime(new Date(timestamp + 600000));
-
-			Period period = new Period(from, to);
-
-			for (Object o : this._calendar.getComponents("VEVENT"))
+			try
 			{
-				Component c = (Component) o;
-
-				PeriodList l = c.calculateRecurrenceSet(period);
-
-				if (l != null && l.size() > 0)
-					periodList = l;
+				DateTime from = new DateTime(new Date(timestamp - 5000));
+				DateTime to = new DateTime(new Date(timestamp + 600000));
+	
+				Period period = new Period(from, to);
+	
+				for (Object o : this._calendar.getComponents("VEVENT"))
+				{
+					Component c = (Component) o;
+	
+					PeriodList l = c.calculateRecurrenceSet(period);
+	
+					if (l != null && l.size() > 0)
+						periodList = l;
+				}
+			}
+			catch (IllegalArgumentException e)
+			{
+				e.printStackTrace();
 			}
 		}
 
