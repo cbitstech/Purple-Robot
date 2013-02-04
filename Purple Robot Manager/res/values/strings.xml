@@ -309,6 +309,9 @@
     <string name="display_bluetooth_device_major">Major Device Class</string>
     <string name="display_bluetooth_device_minor">Minor Device Class</string>
 
+    <string name="display_running_tasks_title" formatted="false">Running Tasks (%d)</string>
+    <string name="display_running_task_title" formatted="false">Task #%d</string>
+    
     <string name="display_data_bundle">Data Bundle</string>
 
     <string name="summary_screen_probe_active">Screen State: Active</string>
@@ -324,6 +327,55 @@
     <string name="title_email_files">Compress &amp; E-Mail Archived Files</string>
     <string name="title_delete_files">Delete Archived Files</string>
 
+    <string name="unknown_label">Unknown</string>
+    
+	<string name="battery_level_label">Battery Charge Level</string>
+    <string name="battery_time_label">Time</string>
+
+    <string name="battery_status_label">Battery Status</string>
+    <string name="battery_tech_label">Battery Technology</string>
+    <string name="battery_temp_label">Current Temperature</string>
+    <string name="battery_volt_label">Current Voltage</string>
+    
+    <string name="battery_status_charging">Charging</string>
+    <string name="battery_status_discharging">Discharging</string>
+    <string name="battery_status_full">Fully Charged</string>
+    <string name="battery_status_not_charging">Not Charging</string>
+    <string name="battery_status_unknown">Unknown</string>
+
+    <string name="battery_health_label">Battery Health</string>
+    <string name="battery_health_cold">Cold</string>
+	<string name="battery_health_dead">Dead</string>
+	<string name="battery_health_good">Good</string>
+	<string name="battery_health_overheat">Overheated</string>
+	<string name="battery_health_over_voltage">Over Voltage</string>
+	<string name="battery_health_failure">Unspecified Failure</string>
+	<string name="battery_health_unknown">Unknown</string>
+
+	<string name="battery_plugged_label">Power Source</string>
+	<string name="battery_source_none">None</string>
+	<string name="battery_source_ac">Wall Adapter</string>
+	<string name="battery_source_usb">USB Port</string>
+	<string name="battery_source_other">Other</string>
+
+    <string name="call_state_label">Current Call State</string>
+
+    <string name="pressure_label">Pressure (mb)</string>
+    <string name="pressure_time_label">Time</string>
+
+    <string name="robot_runtime_label">Application Runtime (ms)</string>
+    <string name="robot_cpu_load_label">CPU Load</string>
+    <string name="robot_time_offset_label">Time Offset from NTP Server</string>
+    <string name="robot_pending_count_label">Pending File Count</string>
+    <string name="robot_pending_size_label">Pending Upload Size (bytes)</string>
+    <string name="robot_clear_time_label">Estimated Upload Time (ms)</string>
+    <string name="robot_version_label">Purple Robot Version</string>
+    
+    <string name="hardware_model_label">Device Model</string>
+    <string name="hardware_mfr_label">Device Manufacturer</string>
+    <string name="hardware_bluetooth_label">Bluetooth MAC Address</string>
+    <string name="hardware_wifi_label">Wi-Fi MAC Address</string>
+        	
     <string name="label_unknown_feature">Unknown Feature</string>
     <string name="menu_data_label">Show Readings</string>
 

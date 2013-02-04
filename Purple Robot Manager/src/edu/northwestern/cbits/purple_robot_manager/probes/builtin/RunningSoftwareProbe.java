@@ -118,22 +118,45 @@ public class RunningSoftwareProbe extends Probe
 
 		return String.format(context.getResources().getString(R.string.summary_running_software_probe), count);
 	}
-/*
+
+	private Bundle bundleForTaskArray(Context context, ArrayList<Bundle> objects)
+	{
+		Bundle bundle = new Bundle();
+		
+		ArrayList<String> keys = new ArrayList<String>();
+
+		for (int i = 0; i < objects.size(); i++)
+		{
+			Bundle value = objects.get(i);
+			String name = value.getString(RunningSoftwareProbe.PACKAGE_NAME);
+
+			String key = String.format(context.getString(R.string.display_running_task_title), (i + 1));
+
+			keys.add(key);
+			bundle.putString(key, name);
+		}
+		
+		bundle.putStringArrayList("KEY_ORDER", keys);
+
+		return bundle;
+	}
+
+	
+	@SuppressWarnings("unchecked")
 	public Bundle formattedBundle(Context context, Bundle bundle)
 	{
 		Bundle formatted = super.formattedBundle(context, bundle);
 
-		@SuppressWarnings("unchecked")
-		ArrayList<Bundle> array = (ArrayList<Bundle>) bundle.get(HardwareInformationProbe.DEVICES);
-		int count = bundle.getInt(HardwareInformationProbe.DEVICES_COUNT);
+		ArrayList<Bundle> array = (ArrayList<Bundle>) bundle.get(RunningSoftwareProbe.RUNNING_TASKS);
 
-		Bundle devicesBundle = this.bundleForDevicesArray(context, array);
+		int count = bundle.getInt(RunningSoftwareProbe.RUNNING_TASK_COUNT);
 
-		formatted.putBundle(String.format(context.getString(R.string.display_bluetooth_devices_title), count), devicesBundle);
+		Bundle tasksBundle = this.bundleForTaskArray(context, array);
+
+		formatted.putBundle(String.format(context.getString(R.string.display_running_tasks_title), count), tasksBundle);
 
 		return formatted;
 	};
-*/
 
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{

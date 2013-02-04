@@ -120,8 +120,8 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 				cursor.close();
 			}
 
-			c.addSeries("pRESSURE", pressure);
-			c.addTime("tIME", time);
+			c.addSeries(activity.getString(R.string.pressure_label), pressure);
+			c.addTime(activity.getString(R.string.pressure_time_label), time);
 
 			JSONObject json = c.highchartsJson(activity);
 
