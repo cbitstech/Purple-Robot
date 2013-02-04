@@ -495,9 +495,16 @@ public class JSONConfigFile
 				}
 			}
 		};
-
-		Thread t = new Thread(r);
-		t.start();
+		
+		try
+		{
+			Thread t = new Thread(r);
+			t.start();
+		}
+		catch (OutOfMemoryError e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	protected String content()
