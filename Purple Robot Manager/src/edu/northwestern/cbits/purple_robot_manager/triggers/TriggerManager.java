@@ -27,18 +27,21 @@ public class TriggerManager
 	{
 		Date now = new Date();
 		
-		for (Trigger trigger : this._triggers)
+		synchronized(this._triggers)
 		{
-			boolean execute = false;
-
-			if (trigger instanceof DateTrigger)
+			for (Trigger trigger : this._triggers)
 			{
-				if (trigger.matches(context, now))
-					execute = true;
+				boolean execute = false;
+	
+				if (trigger instanceof DateTrigger)
+				{
+					if (trigger.matches(context, now))
+						execute = true;
+				}
+				
+				if (execute)
+					trigger.execute(context);
 			}
-			
-			if (execute)
-				trigger.execute(context);
 		}
 	}
 
@@ -46,37 +49,42 @@ public class TriggerManager
 	{
 		ArrayList<Trigger> toAdd = new ArrayList<Trigger>();
 		
-		for (Trigger newTrigger : triggerList)
+		synchronized(this._triggers)
 		{
-			boolean found = false;
-			
-			for (Trigger trigger : this._triggers)
+			for (Trigger newTrigger : triggerList)
 			{
-				if (trigger.equals(newTrigger))
+				boolean found = false;
+				
+				for (Trigger trigger : this._triggers)
 				{
-					trigger.merge(newTrigger);
-					
-					found = true;
+					if (trigger.equals(newTrigger))
+					{
+						trigger.merge(newTrigger);
+						
+						found = true;
+					}
 				}
+				
+				if (!found)
+					toAdd.add(newTrigger);
 			}
-			
-			if (!found)
-				toAdd.add(newTrigger);
-		}
 		
-		this._triggers.addAll(toAdd);
+			this._triggers.addAll(toAdd);
+		}
 	}
 
 	public List<Trigger> triggersForId(String triggerId) 
 	{
 		ArrayList<Trigger> matches = new ArrayList<Trigger>();
 		
-		for (Trigger trigger : this._triggers)
+		synchronized(this._triggers)
 		{
-			if (trigger.identifier().equals(triggerId))
-				matches.add(trigger);
-		}
-		
+			for (Trigger trigger : this._triggers)
+			{
+				if (trigger.identifier().equals(triggerId))
+					matches.add(trigger);
+			}
+		}		
 		return matches;
 	}
 
@@ -96,6 +104,9 @@ public class TriggerManager
 
 	public void removeAllTriggers() 
 	{
-		this._triggers.clear();
+		synchronized(this._triggers)
+		{
+			this._triggers.clear();
+		}
 	}
 }
