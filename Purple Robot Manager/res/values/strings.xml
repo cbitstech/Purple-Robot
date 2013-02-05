@@ -12,7 +12,29 @@
 	<string name="error_js" formatted="false">Javascript Error: %s&#8230;</string>
     
     <string name="error_malformed_request">Malformed request. Please try again.</string>
-	
+
+    <string name="activity_diagnostic_title">Diagnostics</string>
+    <string name="user_id_label">User Identifier</string>
+    <string name="user_id_placeholder">Unknown</string>
+    <string name="probe_status_label">Probe &amp; Sensor Status</string>
+    <string name="probe_status_placeholder">Unknown</string>
+    <string name="upload_status_label">HTTP Transmission Status</string>
+    <string name="upload_status_placeholder">Unknown</string>
+    <string name="last_upload_label">Most Recent Transmission</string>
+    <string name="last_upload_placeholder">Unknown</string>
+
+    <string name="email_diagnostic_subject">Purple Robot Diagnostic Settings</string>
+    
+    
+    <string name="probe_status_enabled">Sensors &amp; probes enabled and collecting readings&#8230;</string>
+    <string name="probe_status_disabled">Sensors &amp; probes disabled.</string>
+    <string name="upload_status_enabled_wifi_only">Transmissions enabled when Wi-Fi is present.</string>
+    <string name="upload_status_enabled">Transmissions enabled.</string>
+    <string name="upload_status_disabled">Transmissions disabled.</string>
+    <string name="last_upload_format" formatted="false">%s (%d KB)</string>
+
+    <string name="menu_email_label">E-Mail Diagnostics</string>
+    	
     <string name="config_settings_category">Configuration Options</string>
     <string name="config_notifications_category">Notification Options</string>
 
@@ -330,6 +352,7 @@
     <string name="display_wifi_frequency_title">Network Frequency (MHz)</string>
     <string name="display_wifi_level_title">Signal Level (dB)</string>
 
+    <string name="menu_diagnostic_label">Diagnostics</string>
     <string name="display_current_ssid_title">Current Network (SSID)</string>
     <string name="display_current_bssid_title">Current Base Station ID (BSSID)</string>
     <string name="display_current_speed_title">Network Speed (Mbps)</string>
@@ -440,7 +463,9 @@
     <!-- Proximity Probe -->
     <string name="title_proximity_probe">Proximity Probe</string>
     <string name="summary_proximity_probe_desc">How far the front of the device is from an object.</string>
-
+    <string name="proximity_label">Proximity</string>
+    <string name="proximity_formatted" formatted="false">Proximity: %f</string>
+    
     <!-- Temperature Probe -->
     <string name="title_temperature_probe">Temperature Probe</string>
     <string name="summary_temperature_probe_desc">Used to record temperature. Implementation depends on the device and does not exist on all devices. Some will record temperature of battery, others temperature of CPU or environment.</string>
@@ -494,7 +519,7 @@
     <string name="summary_device_inactive">Device curently inactive</string>
 
     <!-- Running Software Probe -->
-    <string name="title_running_software_probe">Running Apps Probe</string>
+    <string name="title_running_software_probe">Running Software Probe</string>
     <string name="summary_running_software_probe_desc">Details about the apps the device is currently running.</string>
 
     <!-- Location Probe -->

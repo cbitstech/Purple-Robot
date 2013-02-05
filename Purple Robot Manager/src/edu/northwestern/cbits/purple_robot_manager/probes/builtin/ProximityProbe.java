@@ -124,7 +124,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 			}
 
 			SplineChart c = new SplineChart();
-			c.addSeries("pROXIMITY", distance);
+			c.addSeries(activity.getString(R.string.proximity_label), distance);
 
 			c.addTime("tIME", time);
 
@@ -174,7 +174,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 
 				for (int i = 0; i < eventTimes.length; i++)
 				{
-					String formatString = "fORMATTED " + distance[i];
+					String formatString = context.getString(R.string.proximity_formatted);
 
 					double time = eventTimes[i];
 
