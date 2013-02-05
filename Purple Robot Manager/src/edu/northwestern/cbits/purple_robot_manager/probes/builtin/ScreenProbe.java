@@ -120,22 +120,20 @@ public class ScreenProbe extends Probe
 		return context.getResources().getString(R.string.summary_screen_probe_inactive);
 	}
 
-/*
 	public Bundle formattedBundle(Context context, Bundle bundle)
 	{
 		Bundle formatted = super.formattedBundle(context, bundle);
 
-		@SuppressWarnings("unchecked")
-		ArrayList<Bundle> array = (ArrayList<Bundle>) bundle.get(HardwareInformationProbe.DEVICES);
-		int count = bundle.getInt(HardwareInformationProbe.DEVICES_COUNT);
+		boolean active = bundle.getBoolean(ScreenProbe.SCREEN_ACTIVE, false);
 
-		Bundle devicesBundle = this.bundleForDevicesArray(context, array);
-
-		formatted.putBundle(String.format(context.getString(R.string.display_bluetooth_devices_title), count), devicesBundle);
-
+		if (active)
+			formatted.putString(context.getString(R.string.display_screen_label), context.getString(R.string.display_screen_active_label));
+		else
+			formatted.putString(context.getString(R.string.display_screen_label), context.getString(R.string.display_screen_inactive_label));
+		
 		return formatted;
 	};
-*/
+
 
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{
