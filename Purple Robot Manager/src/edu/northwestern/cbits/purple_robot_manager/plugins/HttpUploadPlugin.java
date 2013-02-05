@@ -68,6 +68,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -578,6 +579,8 @@ public class HttpUploadPlugin extends OutputPlugin
 							note.flags = Notification.FLAG_ONGOING_EVENT;
 
 							String body = null;
+							
+							long payloadSize = -1;
 
 							try
 							{
@@ -669,7 +672,9 @@ public class HttpUploadPlugin extends OutputPlugin
 
 										long elapsed = (System.currentTimeMillis() - start) / 1000;
 
-										me._throughput = ((double) httpPost.getEntity().getContentLength()) / elapsed;
+										payloadSize = httpPost.getEntity().getContentLength();
+										
+										me._throughput = ((double) payloadSize) / elapsed;
 									}
 									else
 									{
@@ -775,7 +780,14 @@ public class HttpUploadPlugin extends OutputPlugin
 
 							}
 							else
+							{
 								me.logSuccess(wasSuccessful);
+							
+								Editor e = prefs.edit();
+								e.putLong("http_last_upload", System.currentTimeMillis());
+								e.putLong("http_last_payload_size", payloadSize);
+								e.commit();
+							}
 						}
 						catch (JSONException e)
 						{

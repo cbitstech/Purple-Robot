@@ -46,6 +46,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
+import edu.northwestern.cbits.purple_robot_manager.activities.DiagnosticActivity;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
@@ -435,6 +436,13 @@ public class StartActivity extends SherlockActivity
     			Intent intent = new Intent(OutputPlugin.FORCE_UPLOAD);
 
     			localManager.sendBroadcast(intent);
+
+    			break;
+    		case R.id.menu_diagnostic_item:
+    			Intent diagIntent = new Intent();
+    			diagIntent.setClass(this, DiagnosticActivity.class);
+
+    			this.startActivity(diagIntent);
 
     			break;
     		case R.id.menu_settings_item:
