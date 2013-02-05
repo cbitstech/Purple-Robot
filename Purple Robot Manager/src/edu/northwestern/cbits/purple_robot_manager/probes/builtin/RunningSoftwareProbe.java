@@ -141,7 +141,6 @@ public class RunningSoftwareProbe extends Probe
 		return bundle;
 	}
 
-	
 	@SuppressWarnings("unchecked")
 	public Bundle formattedBundle(Context context, Bundle bundle)
 	{

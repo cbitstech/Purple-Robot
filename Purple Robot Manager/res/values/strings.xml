@@ -311,6 +311,29 @@
 
     <string name="display_running_tasks_title" formatted="false">Running Tasks (%d)</string>
     <string name="display_running_task_title" formatted="false">Task #%d</string>
+
+    <string name="display_installed_apps_title" formatted="false">Installed Packages (%d)</string>
+    <string name="display_android_version_title">Android Version</string>
+
+    <string name="display_telephony_operator_title">Mobile Network operator</string>
+    <string name="display_telephony_network_title">Mobile Network Type</string>
+    
+    <string name="display_screen_label">Screen State</string>
+    <string name="display_screen_active_label">Active</string>
+    <string name="display_screen_inactive_label">Inactive</string>
+
+    <string name="display_wifi_networks_title" formatted="false">Visible Wi-Fi Networks (%d)</string>
+    <string name="display_wifi_network_title" formatted="false">%s (%s)</string>
+    <string name="display_wifi_ssid_title">Network Name</string>
+    <string name="display_wifi_bssid_title">Base Station ID</string>
+    <string name="display_wifi_bssid_title">Base Station ID</string>
+    <string name="display_wifi_frequency_title">Network Frequency (MHz)</string>
+    <string name="display_wifi_level_title">Signal Level (dB)</string>
+
+    <string name="display_current_ssid_title">Current Network (SSID)</string>
+    <string name="display_current_bssid_title">Current Base Station ID (BSSID)</string>
+    <string name="display_current_speed_title">Network Speed (Mbps)</string>
+	<string name="display_current_rssi_title">Signal Strength (RSSI)</string>
     
     <string name="display_data_bundle">Data Bundle</string>
 

@@ -133,22 +133,43 @@ public class SoftwareInformationProbe extends Probe
 
 		return String.format(context.getResources().getString(R.string.summary_software_info_probe), release, count);
 	}
-/*
+	
+	private Bundle bundleForAppArray(Context context, ArrayList<Bundle> objects)
+	{
+		Bundle bundle = new Bundle();
+		
+		ArrayList<String> keys = new ArrayList<String>();
+
+		for (int i = 0; i < objects.size(); i++)
+		{
+			Bundle value = objects.get(i);
+			String name = value.getString(SoftwareInformationProbe.APP_NAME);
+			String key = value.getString(SoftwareInformationProbe.PACKAGE_NAME);
+
+			keys.add(key);
+			bundle.putString(key, name);
+		}
+		
+		bundle.putStringArrayList("KEY_ORDER", keys);
+
+		return bundle;
+	}
+
 	public Bundle formattedBundle(Context context, Bundle bundle)
 	{
 		Bundle formatted = super.formattedBundle(context, bundle);
 
 		@SuppressWarnings("unchecked")
-		ArrayList<Bundle> array = (ArrayList<Bundle>) bundle.get(HardwareInformationProbe.DEVICES);
-		int count = bundle.getInt(HardwareInformationProbe.DEVICES_COUNT);
+		ArrayList<Bundle> array = (ArrayList<Bundle>) bundle.get(SoftwareInformationProbe.INSTALLED_APPS);
+		int count = bundle.getInt(SoftwareInformationProbe.INSTALLED_APP_COUNT);
 
-		Bundle devicesBundle = this.bundleForDevicesArray(context, array);
+		Bundle appsBundle = this.bundleForAppArray(context, array);
 
-		formatted.putBundle(String.format(context.getString(R.string.display_bluetooth_devices_title), count), devicesBundle);
+		formatted.putBundle(String.format(context.getString(R.string.display_installed_apps_title), count), appsBundle);
+		formatted.putString(context.getString(R.string.display_android_version_title), bundle.getString(SoftwareInformationProbe.RELEASE));
 
 		return formatted;
 	};
-*/
 
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{

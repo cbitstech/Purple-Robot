@@ -137,6 +137,16 @@ public class TelephonyProbe extends Probe
 		return false;
 	}
 
+	public Bundle formattedBundle(Context context, Bundle bundle)
+	{
+		Bundle formatted = super.formattedBundle(context, bundle);
+
+		formatted.putString(context.getString(R.string.display_telephony_operator_title), bundle.getString(TelephonyProbe.NETWORK_OPERATOR_NAME));
+		formatted.putString(context.getString(R.string.display_telephony_network_title), bundle.getString(TelephonyProbe.PHONE_TYPE));
+
+		return formatted;
+	};
+	
 	public String summarizeValue(Context context, Bundle bundle)
 	{
 		String operator = bundle.getString(TelephonyProbe.SIM_OPERATOR_NAME);

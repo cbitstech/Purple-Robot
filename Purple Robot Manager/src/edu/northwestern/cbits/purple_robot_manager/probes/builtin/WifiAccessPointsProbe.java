@@ -170,6 +170,56 @@ public class WifiAccessPointsProbe extends Probe
 		return false;
 	}
 
+	private Bundle bundleForNetworksArray(Context context, ArrayList<Bundle> objects)
+	{
+		Bundle bundle = new Bundle();
+
+		for (Bundle value : objects)
+		{
+			ArrayList<String> keys = new ArrayList<String>();
+
+			String key = String.format(context.getString(R.string.display_wifi_network_title), value.getString(WifiAccessPointsProbe.SSID), value.getString(WifiAccessPointsProbe.BSSID));
+
+			Bundle wifiBundle = new Bundle();
+
+			wifiBundle.putString(context.getString(R.string.display_wifi_ssid_title), value.getString(WifiAccessPointsProbe.SSID));
+			wifiBundle.putString(context.getString(R.string.display_wifi_bssid_title), value.getString(WifiAccessPointsProbe.BSSID));
+			wifiBundle.putInt(context.getString(R.string.display_wifi_frequency_title), value.getInt(WifiAccessPointsProbe.FREQUENCY));
+			wifiBundle.putInt(context.getString(R.string.display_wifi_level_title), value.getInt(WifiAccessPointsProbe.LEVEL));
+
+			keys.add(context.getString(R.string.display_wifi_ssid_title));
+			keys.add(context.getString(R.string.display_wifi_bssid_title));
+			keys.add(context.getString(R.string.display_wifi_frequency_title));
+			keys.add(context.getString(R.string.display_wifi_level_title));
+
+			wifiBundle.putStringArrayList("KEY_ORDER", keys);
+
+			bundle.putBundle(key, wifiBundle);
+		}
+
+		return bundle;
+	}
+
+	public Bundle formattedBundle(Context context, Bundle bundle)
+	{
+		Bundle formatted = super.formattedBundle(context, bundle);
+
+		@SuppressWarnings("unchecked")
+		ArrayList<Bundle> array = (ArrayList<Bundle>) bundle.get(WifiAccessPointsProbe.ACCESS_POINTS);
+		int count = bundle.getInt(WifiAccessPointsProbe.ACCESS_POINT_COUNT);
+
+		Bundle devicesBundle = this.bundleForNetworksArray(context, array);
+
+		formatted.putBundle(String.format(context.getString(R.string.display_wifi_networks_title), count), devicesBundle);
+		
+		formatted.putString(context.getString(R.string.display_current_ssid_title), bundle.getString(WifiAccessPointsProbe.CURRENT_SSID));
+		formatted.putString(context.getString(R.string.display_current_bssid_title), bundle.getString(WifiAccessPointsProbe.CURRENT_BSSID));
+		formatted.putInt(context.getString(R.string.display_current_speed_title), bundle.getInt(WifiAccessPointsProbe.CURRENT_LINK_SPEED));
+		formatted.putInt(context.getString(R.string.display_current_rssi_title), bundle.getInt(WifiAccessPointsProbe.CURRENT_RSSI));
+
+		return formatted;
+	}
+	
 	public void enable(Context context)
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -196,43 +246,6 @@ public class WifiAccessPointsProbe extends Probe
 
 		return String.format(context.getResources().getString(R.string.summary_wifi_probe), count);
 	}
-
-/*	private Bundle bundleForNetworksArray(Context context, ArrayList<Bundle> objects)
-	{
-		Bundle bundle = new Bundle();
-
-		for (Bundle value : objects)
-		{
-			ArrayList<String> keys = new ArrayList<String>();
-
-			String key = String.format(context.getString(R.string.display), value.getString(WifiAccessPointsProbe.NAME), value.getString(WifiAccessPointsProbe.ADDRESS));
-
-			Bundle apBundle = new Bundle();
-
-
-			apBundle.putStringArrayList("KEY_ORDER", keys);
-
-			bundle.putBundle(key, apBundle);
-		}
-
-		return bundle;
-	}
-
-	public Bundle formattedBundle(Context context, Bundle bundle)
-	{
-		Bundle formatted = super.formattedBundle(context, bundle);
-
-		@SuppressWarnings("unchecked")
-		ArrayList<Bundle> array = (ArrayList<Bundle>) bundle.get(WifiAccessPointsProbe.DEVICES);
-		int count = bundle.getInt(WifiAccessPointsProbe.DEVICES_COUNT);
-
-		Bundle devicesBundle = this.bundleForDevicesArray(context, array);
-
-		formatted.putBundle(String.format(context.getString(R.string.display_bluetooth_devices_title), count), devicesBundle);
-
-		return formatted;
-	};
-*/
 
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{
