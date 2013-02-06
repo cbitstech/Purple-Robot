@@ -295,4 +295,66 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 	{
 
 	}
+	
+
+	private Bundle bundleForSatelliteArray(Context context, ArrayList<Bundle> objects)
+	{
+		Bundle bundle = new Bundle();
+
+		for (Bundle value : objects)
+		{
+			ArrayList<String> keys = new ArrayList<String>();
+
+			String key = String.format(context.getString(R.string.display_satellite_label), value.getInt("RANDOM_NUMBER"));
+
+			Bundle satBundle = new Bundle();
+
+			satBundle.putInt(context.getString(R.string.display_satellite_id_label), value.getInt("RANDOM_NUMBER"));
+			satBundle.putFloat(context.getString(R.string.display_satellite_elevation_label), value.getFloat("ELEVATION"));
+			satBundle.putFloat(context.getString(R.string.display_satellite_azimuth_label), value.getFloat("AZIMUTH"));
+			satBundle.putFloat(context.getString(R.string.display_satellite_signal_label), value.getFloat("SIGNAL_RATIO"));
+			
+			if (value.getBoolean("HAS_EPHEMERIS"))
+				satBundle.putString(context.getString(R.string.display_satellite_ephemeris_label), context.getString(R.string.display_satellite_has_ephemeris));
+			else
+				satBundle.putString(context.getString(R.string.display_satellite_ephemeris_label), context.getString(R.string.display_satellite_no_ephemeris));
+
+			if (value.getBoolean("HAS_ALMANAC"))
+				satBundle.putString(context.getString(R.string.display_satellite_almanac_label), context.getString(R.string.display_satellite_has_almanac));
+			else
+				satBundle.putString(context.getString(R.string.display_satellite_almanac_label), context.getString(R.string.display_satellite_no_almanac));
+			
+			keys.add(context.getString(R.string.display_satellite_id_label));
+			keys.add(context.getString(R.string.display_satellite_elevation_label));
+			keys.add(context.getString(R.string.display_satellite_azimuth_label));
+			keys.add(context.getString(R.string.display_satellite_signal_label));
+			keys.add(context.getString(R.string.display_satellite_ephemeris_label));
+			keys.add(context.getString(R.string.display_satellite_almanac_label));
+
+			satBundle.putStringArrayList("KEY_ORDER", keys);
+
+			bundle.putBundle(key, satBundle);
+		}
+
+		return bundle;
+	}
+
+	public Bundle formattedBundle(Context context, Bundle bundle)
+	{
+		Bundle formatted = super.formattedBundle(context, bundle);
+
+		@SuppressWarnings("unchecked")
+		ArrayList<Bundle> array = (ArrayList<Bundle>) bundle.get("SATELLITES");
+		int count = bundle.getInt("SATELLITE_COUNT");
+
+		Bundle satsBundle = this.bundleForSatelliteArray(context, array);
+
+		formatted.putBundle(String.format(context.getString(R.string.display_satellites_title), count), satsBundle);
+
+		formatted.putFloat(context.getString(R.string.display_satellites_signal_ratio), bundle.getFloat("AVERAGE_SIGNAL_RATIO"));
+
+		
+		return formatted;
+	};
+
 }
