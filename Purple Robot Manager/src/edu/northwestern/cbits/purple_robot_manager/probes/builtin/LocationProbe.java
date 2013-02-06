@@ -1,5 +1,6 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -244,6 +245,20 @@ public class LocationProbe extends Probe implements LocationListener
 		}
 	}
 
+	public Bundle formattedBundle(Context context, Bundle bundle)
+	{
+		Bundle formatted = super.formattedBundle(context, bundle);
+		
+		formatted.putString(context.getString(R.string.display_location_coordinates_label), String.format(context.getString(R.string.display_location_coordinates), bundle.getDouble(LocationProbe.LATITUDE), bundle.getDouble(LocationProbe.LONGITUDE)));
+		formatted.putString(context.getString(R.string.display_location_provider_label), bundle.getString(LocationProbe.PROVIDER));
+		formatted.putDouble(context.getString(R.string.display_location_altitude_label), bundle.getFloat(LocationProbe.ALTITUDE));
+		formatted.putFloat(context.getString(R.string.display_location_accuracy_label), bundle.getFloat(LocationProbe.ACCURACY));
+		formatted.putFloat(context.getString(R.string.display_location_bearing_label), bundle.getFloat(LocationProbe.BEARING));
+		formatted.putFloat(context.getString(R.string.display_location_speed_label), bundle.getFloat(LocationProbe.SPEED));
+
+		return formatted;
+	};
+	
 	public static Map<String, String> databaseSchema()
 	{
 		HashMap<String, String> schema = new HashMap<String, String>();

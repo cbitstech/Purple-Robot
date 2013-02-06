@@ -24,8 +24,30 @@
     <string name="last_upload_placeholder">Unknown</string>
 
     <string name="email_diagnostic_subject">Purple Robot Diagnostic Settings</string>
+
+    <string name="display_satellites_title" formatted="false">Satellites (%d)</string>
+    <string name="display_satellite_label" formatted="false">Satellite %d</string>
+    <string name="display_satellites_signal_ratio">Average Signal-to-Noise Ratio</string>
     
-    
+    <string name="display_satellite_id_label">Satellite Identifier</string>
+    <string name="display_satellite_elevation_label">Elevation (degrees)</string>
+    <string name="display_satellite_azimuth_label">Azimuth (degrees)</string>
+    <string name="display_satellite_signal_label">Signal-to-Noise Ratio</string>
+    <string name="display_satellite_ephemeris_label">Uses Ephemeris Data</string>
+    <string name="display_satellite_no_ephemeris">False</string>
+    <string name="display_satellite_has_ephemeris">True</string>
+    <string name="display_satellite_almanac_label">Uses Almanac Data</string>
+    <string name="display_satellite_no_almanac">False</string>
+    <string name="display_satellite_has_almanac">True</string>
+
+    <string name="display_location_coordinates_label">Coordinates (Latitude, Longitude)</string>
+    <string name="display_location_coordinates" formatted="false">%f, %f</string>
+    <string name="display_location_altitude_label">Altitude (Meters Above Sea Level))</string>
+    <string name="display_location_accuracy_label">Accuracy (Meters)</string>
+    <string name="display_location_bearing_label">Bearing (Degrees)</string>
+    <string name="display_location_speed_label">Speed (Meters per Second)</string>
+    <string name="display_location_provider_label">Location Provider</string>
+
     <string name="probe_status_enabled">Sensors &amp; probes enabled and collecting readings&#8230;</string>
     <string name="probe_status_disabled">Sensors &amp; probes disabled.</string>
     <string name="upload_status_enabled_wifi_only">Transmissions enabled when Wi-Fi is present.</string>
