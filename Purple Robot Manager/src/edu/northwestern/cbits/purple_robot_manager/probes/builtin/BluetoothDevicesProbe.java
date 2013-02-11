@@ -20,7 +20,6 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -315,9 +314,6 @@ public class BluetoothDevicesProbe extends Probe
 							deviceBundle.putString(BluetoothDevicesProbe.NAME, device.getName());
 							deviceBundle.putString(BluetoothDevicesProbe.ADDRESS, device.getAddress());
 						}
-						
-						Log.e("PR-BT", "NAME: " + deviceBundle.getString(BluetoothDevicesProbe.NAME));
-						Log.e("PR-BT", "ADDR: " + deviceBundle.getString(BluetoothDevicesProbe.ADDRESS));
 
 						deviceBundle.putString(BluetoothDevicesProbe.BOND_STATE, BluetoothDevicesProbe.bondState(device.getBondState()));
 
