@@ -20,7 +20,9 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 
+import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
@@ -283,8 +285,9 @@ public class BluetoothDevicesProbe extends Probe
 
 	public boolean isEnabled(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		final EncryptionManager em = EncryptionManager.getInstance();
+		
 		final BluetoothDevicesProbe me = this;
 
 		if (this._receiver == null)
@@ -296,12 +299,26 @@ public class BluetoothDevicesProbe extends Probe
 				{
 					if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction()))
 					{
+						boolean doHash = prefs.getBoolean("config_probe_bluetooth_hash_data", true);
+
 						BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
 						Bundle deviceBundle = new Bundle();
 
-						deviceBundle.putString(BluetoothDevicesProbe.NAME, device.getName());
-						deviceBundle.putString(BluetoothDevicesProbe.ADDRESS, device.getAddress());
+						if (doHash)
+						{
+							deviceBundle.putString(BluetoothDevicesProbe.NAME, em.createHash(device.getName()));
+							deviceBundle.putString(BluetoothDevicesProbe.ADDRESS, em.createHash(device.getAddress()));
+						}
+						else
+						{
+							deviceBundle.putString(BluetoothDevicesProbe.NAME, device.getName());
+							deviceBundle.putString(BluetoothDevicesProbe.ADDRESS, device.getAddress());
+						}
+						
+						Log.e("PR-BT", "NAME: " + deviceBundle.getString(BluetoothDevicesProbe.NAME));
+						Log.e("PR-BT", "ADDR: " + deviceBundle.getString(BluetoothDevicesProbe.ADDRESS));
+
 						deviceBundle.putString(BluetoothDevicesProbe.BOND_STATE, BluetoothDevicesProbe.bondState(device.getBondState()));
 
 						BluetoothClass deviceClass = device.getBluetoothClass();
@@ -421,10 +438,14 @@ public class BluetoothDevicesProbe extends Probe
 
 			Bundle deviceBundle = new Bundle();
 
+			deviceBundle.putString(context.getString(R.string.display_bluetooth_device_title_label), value.getString(BluetoothDevicesProbe.NAME));
+			deviceBundle.putString(context.getString(R.string.display_bluetooth_device_address_label), value.getString(BluetoothDevicesProbe.ADDRESS));
 			deviceBundle.putString(context.getString(R.string.display_bluetooth_device_pair), value.getString(BluetoothDevicesProbe.BOND_STATE));
 			deviceBundle.putString(context.getString(R.string.display_bluetooth_device_major), value.getString(BluetoothDevicesProbe.MAJOR_CLASS));
 			deviceBundle.putString(context.getString(R.string.display_bluetooth_device_minor), value.getString(BluetoothDevicesProbe.MINOR_CLASS));
 
+			keys.add(context.getString(R.string.display_bluetooth_device_title_label));
+			keys.add(context.getString(R.string.display_bluetooth_device_address_label));
 			keys.add(context.getString(R.string.display_bluetooth_device_pair));
 			keys.add(context.getString(R.string.display_bluetooth_device_major));
 			keys.add(context.getString(R.string.display_bluetooth_device_minor));
@@ -475,6 +496,14 @@ public class BluetoothDevicesProbe extends Probe
 		duration.setTitle(R.string.probe_frequency_label);
 
 		screen.addPreference(duration);
+
+		CheckBoxPreference hash = new CheckBoxPreference(activity);
+		hash.setKey("config_probe_bluetooth_hash_data");
+		hash.setDefaultValue(true);
+		hash.setTitle(R.string.config_probe_bluetooth_hash_title);
+		hash.setSummary(R.string.config_probe_bluetooth_hash_summary);
+
+		screen.addPreference(hash);
 
 		return screen;
 	}
