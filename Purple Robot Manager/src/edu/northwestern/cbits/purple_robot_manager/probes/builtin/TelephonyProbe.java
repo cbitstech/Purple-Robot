@@ -53,6 +53,7 @@ public class TelephonyProbe extends Probe
 	private static final String SERVICE_STATE = "SERVICE_STATE";
 
 	private long _lastCheck = 0;
+	private long _lastSignalCheck = 0;
 	
 	private boolean _isForwarding = false;
 
@@ -127,16 +128,23 @@ public class TelephonyProbe extends Probe
 	
 					public void onSignalStrengthsChanged(SignalStrength signal)
 					{
-						me._cdmaDbm = signal.getCdmaDbm();
-						me._cdmaEcio = signal.getCdmaEcio();
-						me._evdoDbm = signal.getEvdoDbm();
-						me._evdoEcio = signal.getEvdoEcio();
-						me._evdoSnr = signal.getEvdoSnr();
+						long now = System.currentTimeMillis();
 						
-						me._gsmErrorRate = signal.getGsmBitErrorRate();
-						me._gsmSignalStrength = signal.getGsmSignalStrength();
-						
-						me._lastCheck = 0;
+						if (now - me._lastSignalCheck > 5000)
+						{
+							me._cdmaDbm = signal.getCdmaDbm();
+							me._cdmaEcio = signal.getCdmaEcio();
+							me._evdoDbm = signal.getEvdoDbm();
+							me._evdoEcio = signal.getEvdoEcio();
+							me._evdoSnr = signal.getEvdoSnr();
+							
+							me._gsmErrorRate = signal.getGsmBitErrorRate();
+							me._gsmSignalStrength = signal.getGsmSignalStrength();
+							
+							me._lastCheck = 0;
+							
+							me._lastSignalCheck = now;
+						}
 					}
 	
 					public void onServiceStateChanged(ServiceState serviceState)
