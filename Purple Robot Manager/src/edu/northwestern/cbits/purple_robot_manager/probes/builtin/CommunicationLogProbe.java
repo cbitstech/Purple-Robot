@@ -1,6 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,6 +39,9 @@ public class CommunicationLogProbe extends Probe
 	private static final String CALL_TOTAL_COUNT = "CALL_TOTAL_COUNT";
 	private static final String SMS_OUTGOING_COUNT = "SMS_OUTGOING_COUNT";
 	private static final String SMS_INCOMING_COUNT = "SMS_INCOMING_COUNT";
+	private static final String RECENT_CALLER = "RECENT_CALLER";
+	private static final String RECENT_TIME = "RECENT_TIME";
+	private static final String RECENT_NUMBER = "RECENT_NUMBER";
 
 	private long _lastCheck = 0;
 
@@ -102,6 +106,10 @@ public class CommunicationLogProbe extends Probe
 						int sentCount = 0;
 						int receivedCount = 0;
 						int missedCount = 0;
+						
+						String recentName = null;
+						String recentNumber = null;
+						long recentTimestamp = 0;
 
 						try
 						{
@@ -128,12 +136,14 @@ public class CommunicationLogProbe extends Probe
 								if (c.getColumnIndex(Calls.CACHED_NUMBER_TYPE) != -1)
 									contactBundle.putString(CommunicationLogProbe.NUMBER_TYPE, c.getString(c.getColumnIndex(Calls.CACHED_NUMBER_TYPE)));								
 								
-								contactBundle.putLong(CommunicationLogProbe.CALL_TIMESTAMP, c.getLong(c.getColumnIndex(Calls.DATE)));
+								long callTime = c.getLong(c.getColumnIndex(Calls.DATE));
+								
+								contactBundle.putLong(CommunicationLogProbe.CALL_TIMESTAMP, callTime);
 								contactBundle.putLong(CommunicationLogProbe.CALL_DURATION, c.getLong(c.getColumnIndex(Calls.DURATION)));
 								contactBundle.putString(CommunicationLogProbe.NUMBER, phoneNumber);
 
 								int callType = c.getInt(c.getColumnIndex(Calls.CACHED_NUMBER_TYPE));
-
+								
 								contactBundle.putInt(CommunicationLogProbe.NUMBER_TYPE, callType);
 
 								if (callType == Calls.OUTGOING_TYPE)
@@ -144,6 +154,14 @@ public class CommunicationLogProbe extends Probe
 									missedCount += 1;
 
 								calls.add(contactBundle);
+								
+								if (callTime > recentTimestamp)
+								{
+									recentName = numberName;
+									recentNumber = phoneNumber;
+									
+									recentTimestamp = callTime;
+								}
 							}
 
 							c.close();
@@ -153,6 +171,15 @@ public class CommunicationLogProbe extends Probe
 							bundle.putInt(CommunicationLogProbe.CALL_INCOMING_COUNT, receivedCount);
 							bundle.putInt(CommunicationLogProbe.CALL_MISSED_COUNT, missedCount);
 							bundle.putInt(CommunicationLogProbe.CALL_TOTAL_COUNT, missedCount + receivedCount + sentCount);
+
+							if (recentName != null)
+								bundle.putString(CommunicationLogProbe.RECENT_CALLER, recentName);
+
+							if (recentNumber != null)
+								bundle.putString(CommunicationLogProbe.RECENT_NUMBER, recentNumber);
+
+							if (recentTimestamp > 0)
+								bundle.putLong(CommunicationLogProbe.RECENT_TIME, recentTimestamp);
 
 							sentCount = 0;
 							receivedCount = 0;
@@ -197,23 +224,6 @@ public class CommunicationLogProbe extends Probe
 		return String.format(context.getResources().getString(R.string.summary_call_log_probe), count);
 	}
 
-	/*
-	public Bundle formattedBundle(Context context, Bundle bundle)
-	{
-		Bundle formatted = super.formattedBundle(context, bundle);
-
-		@SuppressWarnings("unchecked")
-		ArrayList<Bundle> array = (ArrayList<Bundle>) bundle.get(HardwareInformationProbe.DEVICES);
-		int count = bundle.getInt(HardwareInformationProbe.DEVICES_COUNT);
-
-		Bundle devicesBundle = this.bundleForDevicesArray(context, array);
-
-		formatted.putBundle(String.format(context.getString(R.string.display_bluetooth_devices_title), count), devicesBundle);
-
-		return formatted;
-	};
-*/
-
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{
 		PreferenceManager manager = activity.getPreferenceManager();
@@ -247,6 +257,70 @@ public class CommunicationLogProbe extends Probe
 		screen.addPreference(hash);
 
 		return screen;
+	}
+	
+	private Bundle bundleForCallArray(Context context, ArrayList<Bundle> objects)
+	{
+		Bundle bundle = new Bundle();
+		
+		ArrayList<String> keys = new ArrayList<String>();
+
+		for (int i = 0; i < objects.size(); i++)
+		{
+			Bundle value = objects.get(i);
+			String name = value.getString(CommunicationLogProbe.NUMBER);
+			String number = value.getString(CommunicationLogProbe.NUMBER_NAME);
+
+			keys.add(name);
+			bundle.putString(name, number);
+		}
+		
+		bundle.putStringArrayList("KEY_ORDER", keys);
+
+		return bundle;
+	}
+
+	@SuppressWarnings("unchecked")
+	public Bundle formattedBundle(Context context, Bundle bundle)
+	{
+		Bundle formatted = super.formattedBundle(context, bundle);
+
+		ArrayList<Bundle> array = (ArrayList<Bundle>) bundle.get(CommunicationLogProbe.PHONE_CALLS);
+
+		int count = array.size();
+
+		Bundle callsBundle = this.bundleForCallArray(context, array);
+
+		formatted.putBundle(String.format(context.getString(R.string.display_calls_list_title), count), callsBundle);
+
+		formatted.putString(context.getString(R.string.display_calls_recent_caller_title), bundle.getString(CommunicationLogProbe.RECENT_CALLER));
+		formatted.putString(context.getString(R.string.display_calls_recent_number_title), bundle.getString(CommunicationLogProbe.RECENT_NUMBER));
+
+		Date d = new Date(bundle.getLong(CommunicationLogProbe.RECENT_TIME));
+
+		formatted.putString(context.getString(R.string.display_calls_recent_time_title), d.toString());
+
+		formatted.putInt(context.getString(R.string.display_calls_incoming_count_title), bundle.getInt(CommunicationLogProbe.CALL_INCOMING_COUNT));
+		formatted.putInt(context.getString(R.string.display_calls_missed_count_title), bundle.getInt(CommunicationLogProbe.CALL_MISSED_COUNT));
+		formatted.putInt(context.getString(R.string.display_calls_outgoing_count_title), bundle.getInt(CommunicationLogProbe.CALL_OUTGOING_COUNT));
+		formatted.putInt(context.getString(R.string.display_sms_incoming_count_title), bundle.getInt(CommunicationLogProbe.SMS_INCOMING_COUNT));
+		formatted.putInt(context.getString(R.string.display_sms_outgoing_count_title), bundle.getInt(CommunicationLogProbe.SMS_OUTGOING_COUNT));
+
+
+		ArrayList<String> keys = new ArrayList<String>();
+		keys.add(String.format(context.getString(R.string.display_calls_list_title), count));
+		keys.add(context.getString(R.string.display_calls_recent_caller_title));
+		keys.add(context.getString(R.string.display_calls_recent_number_title));
+		keys.add(context.getString(R.string.display_calls_recent_time_title));
+		keys.add(context.getString(R.string.display_calls_incoming_count_title));
+		keys.add(context.getString(R.string.display_calls_missed_count_title));
+		keys.add(context.getString(R.string.display_calls_outgoing_count_title));
+		keys.add(context.getString(R.string.display_sms_incoming_count_title));
+		keys.add(context.getString(R.string.display_sms_outgoing_count_title));
+
+		formatted.putStringArrayList("KEY_ORDER", keys);
+		
+		return formatted;
 	}
 
 	public void updateFromJSON(Context context, JSONObject json) throws JSONException

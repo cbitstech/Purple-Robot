@@ -250,6 +250,16 @@
     <string name="summary_time_offset_probe" formatted="false">%.2f second offset from time servers.</string>
     <string name="summary_robot_probe" formatted="false">%.2f CPU, %d Files Pending (%.2f MB, %ds)</string>
 
+    <string name="display_calls_list_title" formatted="false">%d Phone Calls</string>
+    <string name="display_calls_recent_caller_title">Most Recent Caller</string>
+    <string name="display_calls_recent_number_title">Most Recent Phone Number</string>
+    <string name="display_calls_recent_time_title">Time of Most Recent Phone Call</string>
+    <string name="display_calls_incoming_count_title">No. of Incoming Calls</string>
+    <string name="display_calls_missed_count_title">No. of Missed Calls</string>
+    <string name="display_calls_outgoing_count_title">No. of Outgoing Calls</string>
+    <string name="display_sms_incoming_count_title">No. of Incoming Text Messages</string>
+    <string name="display_sms_outgoing_count_title">No. of Outgoing Text Messages</string>
+    
     <string name="menu_pause_toggle_label">Pause</string>
     <string name="menu_resume_toggle_label">Resume</string>
     <string name="menu_refresh_label">Refresh</string>
@@ -316,7 +326,7 @@
     <string name="display_pressure_reading" formatted="false">Pressure: %.1f mb, Altitude: %.1f m</string>
 
     <string name="display_magnetic_readings">Magnetic Field Measurements</string>
-
+    
     <string name="display_gyroscope_readings">Gyroscope Measurements</string>
     <string name="display_gyroscope_reading" formatted="false">X %.3f, Y %.3f, Z %.3f</string>
     <string name="display_accelerometer_readings">Accelerometer Measurements</string>
