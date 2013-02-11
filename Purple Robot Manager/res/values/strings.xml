@@ -364,6 +364,13 @@
 
     <string name="display_bluetooth_device_title_label">Bluetooth Name</string>
     <string name="display_bluetooth_device_address_label">Bluetooth Hardware Address</string>
+
+    <string name="service_state_emergency">Emergency Use Only</string>
+    <string name="service_state_in_service">In Service</string>
+    <string name="service_state_out_service">Out of Service</string>
+    <string name="service_state_off">Radio Explicitly Deactivated</string>
+
+    <string name="label_no_operator">None</string>
     
     <string name="display_bluetooth_device_pair">Pairing Status</string>
     <string name="display_bluetooth_device_major">Major Device Class</string>
@@ -375,7 +382,7 @@
     <string name="display_installed_apps_title" formatted="false">Installed Packages (%d)</string>
     <string name="display_android_version_title">Android Version</string>
 
-    <string name="display_telephony_operator_title">Mobile Network operator</string>
+    <string name="display_telephony_operator_title">Mobile Network Operator</string>
     <string name="display_telephony_network_title">Mobile Network Type</string>
     
     <string name="display_screen_label">Screen State</string>
