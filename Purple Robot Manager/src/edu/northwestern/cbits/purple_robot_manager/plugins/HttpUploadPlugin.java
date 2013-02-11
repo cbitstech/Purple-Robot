@@ -388,7 +388,6 @@ public class HttpUploadPlugin extends OutputPlugin
 				{
 					long start = System.currentTimeMillis();
 
-					boolean continueUpload = false;
 					boolean wasSuccessful = false;
 
 					me._lastUpload = now;
@@ -659,8 +658,6 @@ public class HttpUploadPlugin extends OutputPlugin
 									{
 										pendingObjects.removeAll(toUpload);
 
-										continueUpload = true;
-
 										wasSuccessful = true;
 
 										String uploadedMessage = String.format(resources.getString(R.string.message_upload_successful),
@@ -829,7 +826,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 					me._uploading = false;
 
-					if (continueUpload || (me._failCount > 0 && me._failCount < MAX_RETRIES))
+					if (me._failCount > 0 && me._failCount < MAX_RETRIES)
 					{
 						me._lastUpload = 0;
 
