@@ -37,7 +37,7 @@ public class DiagnosticActivity extends SherlockActivity
 		TextView uploadStatus = (TextView) this.findViewById(R.id.upload_status_value);
 		TextView lastUpload = (TextView) this.findViewById(R.id.last_upload_value);
 		
-		userId.setText(EncryptionManager.getInstance().getUserId(this));
+		userId.setText("\"" + EncryptionManager.getInstance().getUserId(this) + "\"");
 
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		
@@ -96,7 +96,7 @@ public class DiagnosticActivity extends SherlockActivity
 
          		message.append(this.getString(R.string.user_id_label));
          		message.append(newline);
-         		message.append(EncryptionManager.getInstance().getUserId(this));
+         		message.append("\"" + EncryptionManager.getInstance().getUserId(this) + "\"");
 
          		message.append(newline);
          		message.append(newline);

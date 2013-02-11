@@ -1,6 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -83,23 +84,27 @@ public class RunningSoftwareProbe extends Probe
 						bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
 
 						ActivityManager am = (ActivityManager) context.getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
-						ArrayList<RunningTaskInfo> tasks = new ArrayList<RunningTaskInfo>(am.getRunningTasks(9999));
 
-						ArrayList<Bundle> running = new ArrayList<Bundle>();
+						List<RunningTaskInfo> tasks = am.getRunningTasks(9999);
 
-						for (RunningTaskInfo info : tasks)
+						if (tasks != null)
 						{
-							Bundle taskBundle = new Bundle();
-
-							taskBundle.putString(RunningSoftwareProbe.PACKAGE_NAME, info.baseActivity.getPackageName());
-
-							running.add(taskBundle);
+							ArrayList<Bundle> running = new ArrayList<Bundle>();
+	
+							for (RunningTaskInfo info : tasks)
+							{
+								Bundle taskBundle = new Bundle();
+	
+								taskBundle.putString(RunningSoftwareProbe.PACKAGE_NAME, info.baseActivity.getPackageName());
+	
+								running.add(taskBundle);
+							}
+	
+							bundle.putParcelableArrayList(RunningSoftwareProbe.RUNNING_TASKS, running);
+							bundle.putInt(RunningSoftwareProbe.RUNNING_TASK_COUNT, running.size());
+	
+							this.transmitData(context, bundle);
 						}
-
-						bundle.putParcelableArrayList(RunningSoftwareProbe.RUNNING_TASKS, running);
-						bundle.putInt(RunningSoftwareProbe.RUNNING_TASK_COUNT, running.size());
-
-						this.transmitData(context, bundle);
 
 						this._lastCheck = now;
 					}
