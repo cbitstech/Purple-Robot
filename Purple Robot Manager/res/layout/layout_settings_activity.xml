@@ -84,7 +84,7 @@
 	            android:entryValues="@array/http_upload_size_values"
 	            android:title="@string/config_http_upload_size_label"
 	            android:summary="@string/config_http_upload_size_summary"
-	            android:defaultValue="60" />
+	            android:defaultValue="0" />
   			<PreferenceScreen android:title="@string/title_advanced_settings">
 				<Preference android:title="@string/title_email_files" android:key="config_mail_archives" android:defaultValue="0" />
 				<Preference android:title="@string/title_delete_files" android:key="config_delete_archives" android:defaultValue="0" />

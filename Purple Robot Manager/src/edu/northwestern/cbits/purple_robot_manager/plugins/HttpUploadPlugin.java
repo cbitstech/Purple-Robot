@@ -77,7 +77,6 @@ import android.net.http.AndroidHttpClient;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.widget.Toast;
 import edu.emory.mathcs.backport.java.util.Arrays;
 import edu.emory.mathcs.backport.java.util.Collections;
@@ -104,7 +103,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 	private final static long MAX_RETRIES = 4;
 
-	private final static long MAX_UPLOAD_SIZE = 262144; // 512KB
+	private final static long MAX_UPLOAD_SIZE = 262144; // 256KB
 	private final static long MIN_UPLOAD_SIZE = 16384; // 16KB
 
 	private List<String> _pendingSaves = new ArrayList<String>();
@@ -170,7 +169,7 @@ public class HttpUploadPlugin extends OutputPlugin
 		
 		long prefPeriod = Long.parseLong(prefs.getString("config_http_upload_interval", "0"));
 		
-		if (period != 0)
+		if (prefPeriod != 0)
 			period = prefPeriod * 1000;
 		
 		return period;
@@ -349,7 +348,7 @@ public class HttpUploadPlugin extends OutputPlugin
 	{
 		if (this._uploading)
 			return;
-
+		
 		final HttpUploadPlugin me = this;
 
 		final long now = System.currentTimeMillis();
@@ -381,7 +380,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 			final Resources resources = this.getContext().getResources();
 			final long maxUploadSize = me.maxUploadSize();
-
+			
 			final Runnable r = new Runnable()
 			{
 				public void run()
@@ -461,8 +460,6 @@ public class HttpUploadPlugin extends OutputPlugin
 								f.delete();
 						}
 					}
-
-					me.broadcastMessage(R.string.message_reading_complete);
 
 					if (pendingObjects.size() > 0)
 					{
@@ -635,8 +632,6 @@ public class HttpUploadPlugin extends OutputPlugin
 
 								JSONObject json = new JSONObject(body);
 
-//								Log.i("PRM", "GOT RESPONSE (" + json.getString("Status") + "): " + body);
-
 								String status = json.getString(STATUS_KEY);
 
 								String responsePayload = "";
@@ -695,31 +690,43 @@ public class HttpUploadPlugin extends OutputPlugin
 							{
 								me.broadcastMessage(R.string.message_http_connection_error);
 								e.printStackTrace();
+
+								me._failCount += 1;
 							}
 							catch (SocketTimeoutException e)
 							{
 								me.broadcastMessage(R.string.message_socket_timeout_error);
 								e.printStackTrace();
+
+								me._failCount += 1;
 							}
 							catch (SocketException e)
 							{
 								String errorMessage = String.format(resources.getString(R.string.message_socket_error),	e.getMessage());
 								me.broadcastMessage(errorMessage);
 								e.printStackTrace();
+
+								me._failCount += 1;
 							}
 							catch (UnknownHostException e)
 							{
 								me.broadcastMessage(R.string.message_unreachable_error);
 								e.printStackTrace();
+
+								me._failCount += 1;
 							}
 							catch (JSONException e)
 							{
 								me.broadcastMessage(R.string.message_response_error);
 								e.printStackTrace();
+
+								me._failCount += 1;
 							}
 							catch (SSLPeerUnverifiedException e)
 							{
 								me.broadcastMessage(R.string.message_unverified_server);
+
+								me._failCount += 1;
 							}
 							catch (Exception e)
 							{
@@ -727,18 +734,11 @@ public class HttpUploadPlugin extends OutputPlugin
 								String errorMessage = String.format(resources.getString(R.string.message_general_error), e.toString());
 								me.broadcastMessage(errorMessage);
 
-								Log.i("PRM", "GENERAL ERROR BODY: " + body);
+								me._failCount += 1;
 							}
 							finally
 							{
 								androidClient.close();
-
-								String message = me.getContext().getString(R.string.notify_running);
-								String messageTitle = me.getContext().getString(R.string.notify_running_title);
-
-								note.setLatestEventInfo(me.getContext(), messageTitle, message, contentIntent);
-
-								noteManager.notify(12345, note);
 							}
 
 							int l = 0;
@@ -772,19 +772,23 @@ public class HttpUploadPlugin extends OutputPlugin
 								pendingObjects.removeAll(toRemove);
 							}
 
+
 							if (wasSuccessful == false && me._failCount < MAX_RETRIES)
 							{
 
 							}
 							else
 							{
-								me.logSuccess(wasSuccessful);
-							
 								Editor e = prefs.edit();
 								e.putLong("http_last_upload", System.currentTimeMillis());
 								e.putLong("http_last_payload_size", payloadSize);
 								e.commit();
 							}
+							
+							String message = me.getContext().getString(R.string.notify_running);
+							String messageTitle = me.getContext().getString(R.string.notify_running_title);
+							note.setLatestEventInfo(me.getContext(), messageTitle, message, contentIntent);
+							noteManager.notify(12345, note);
 						}
 						catch (JSONException e)
 						{
@@ -822,11 +826,26 @@ public class HttpUploadPlugin extends OutputPlugin
 						{
 							e.printStackTrace();
 						}
+						finally
+						{
+							me.logSuccess(wasSuccessful);
+						}
 					}
 
 					me._uploading = false;
 
-					if (me._failCount > 0 && me._failCount < MAX_RETRIES)
+					filenames = pendingFolder.list(new FilenameFilter()
+					{
+						public boolean accept(File dir, String filename)
+						{
+							return filename.endsWith(".json");
+						}
+					});
+
+					if (filenames == null)
+						filenames = new String[0];
+					
+					if (me._failCount < MAX_RETRIES && filenames.length > 0)
 					{
 						me._lastUpload = 0;
 
@@ -840,6 +859,8 @@ public class HttpUploadPlugin extends OutputPlugin
 
 						}
 					}
+					else if (me._failCount == 0)
+						me.broadcastMessage(R.string.message_reading_complete);
 				}
 			};
 
