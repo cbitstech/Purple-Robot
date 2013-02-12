@@ -322,7 +322,7 @@ public class RobotHealthProbe extends Probe
 		formatted.putLong(context.getString(R.string.robot_runtime_label), bundle.getLong(RobotHealthProbe.ACTIVE_RUNTIME, 0));
 		formatted.putFloat(context.getString(R.string.robot_cpu_load_label), bundle.getFloat(RobotHealthProbe.CPU_USAGE, 0));
 		formatted.putLong(context.getString(R.string.robot_time_offset_label), bundle.getLong(RobotHealthProbe.TIME_OFFSET_MS, 0));
-		formatted.putLong(context.getString(R.string.robot_pending_count_label), bundle.getLong(RobotHealthProbe.PENDING_COUNT, 0));
+		formatted.putInt(context.getString(R.string.robot_pending_count_label), bundle.getInt(RobotHealthProbe.PENDING_COUNT, 0));
 		formatted.putLong(context.getString(R.string.robot_pending_size_label), bundle.getLong(RobotHealthProbe.PENDING_SIZE, 0));
 		formatted.putLong(context.getString(R.string.robot_clear_time_label), bundle.getLong(RobotHealthProbe.CLEAR_TIME, 0));
 
