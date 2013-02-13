@@ -77,6 +77,7 @@ import android.net.http.AndroidHttpClient;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.Toast;
 import edu.emory.mathcs.backport.java.util.Arrays;
 import edu.emory.mathcs.backport.java.util.Collections;
@@ -230,7 +231,6 @@ public class HttpUploadPlugin extends OutputPlugin
 		{
 			try
 			{
-
 				Bundle extras = intent.getExtras();
 
 				final JSONObject jsonObject = OutputPlugin.jsonForBundle(extras);
@@ -242,10 +242,14 @@ public class HttpUploadPlugin extends OutputPlugin
 						this._pendingSaves.add(jsonObject.toString());
 					}
 				}
+				else
+				{
+					Log.e("PR-PERSIST", "NULL JSON FOR BUNDLE " + extras);
+				}
 
 				long now = System.currentTimeMillis();
 
-				if (now - this._lastSave > this.savePeriod() || this._pendingSaves.size() > 512)
+				if (now - this._lastSave > this.savePeriod() || this._pendingSaves.size() > 128)
 				{
 					final HttpUploadPlugin me = this;
 
@@ -940,10 +944,12 @@ public class HttpUploadPlugin extends OutputPlugin
 				}
 				catch (JSONException e)
 				{
+					e.printStackTrace();
 					invalidRemove.add(jsonString);
 				}
 				catch (OutOfMemoryError e)
 				{
+					e.printStackTrace();
 					invalidRemove.add(jsonString);
 				}
 			}
@@ -981,7 +987,7 @@ public class HttpUploadPlugin extends OutputPlugin
 			e.printStackTrace();
 		}
 
-		if (this._pendingSaves.size() > 512)
+		if (this._pendingSaves.size() > 128)
 		{
 			this._lastSave = 0;
 			this._failCount = 0;
