@@ -12,6 +12,8 @@ import android.content.SharedPreferences.Editor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
@@ -26,6 +28,8 @@ public abstract class ContinuousProbe extends Probe
 {
 	private static SharedPreferences prefs = null;
 
+	private WakeLock _wakeLock = null;
+	
 	protected static SharedPreferences getPreferences(Context context)
 	{
 		if (ContinuousProbe.prefs == null)
@@ -147,4 +151,32 @@ public abstract class ContinuousProbe extends Probe
 			localManager.sendBroadcast(intent);
 		}
 	}
+	
+	public boolean isEnabled(Context context)
+	{
+		boolean enabled = super.isEnabled(context);
+
+		PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+
+		if (enabled)
+		{
+			if (this._wakeLock == null)
+			{
+				this._wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, this.name(context));
+				this._wakeLock.acquire(60 * 1000);
+				this._wakeLock.setReferenceCounted(false);
+			}
+		}
+		else
+		{
+			if (this._wakeLock != null)
+			{
+				this._wakeLock.release();
+				this._wakeLock = null;
+			}
+		}
+		
+		return enabled;
+	}
+
 }
