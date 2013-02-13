@@ -12,6 +12,7 @@ import android.preference.PreferenceManager;
 import edu.northwestern.cbits.purple_robot_manager.http.LocalHttpServer;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RandomNoiseProbe;
 
 public class PersistentService extends Service
 {
@@ -52,8 +53,13 @@ public class PersistentService extends Service
 
 	public int onStartCommand(Intent intent, int flags, int startId)
 	{
-		if (intent != null && NUDGE_PROBES.equals(intent.getAction()))
-			ProbeManager.nudgeProbes(this);
+		if (intent != null)
+		{
+				if (NUDGE_PROBES.equals(intent.getAction()))
+					ProbeManager.nudgeProbes(this);
+				else if (RandomNoiseProbe.ACTION.equals(intent.getAction()) && RandomNoiseProbe.instance != null)
+					RandomNoiseProbe.instance.isEnabled(this);
+		}
 
 		return Service.START_STICKY;
 	}
