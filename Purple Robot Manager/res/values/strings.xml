@@ -579,4 +579,9 @@
     <string name="title_network_probe">Network Configuration Probe</string>
     <string name="summary_network_probe_desc">Current network configuration of the active interface.</string>
     <string name="summary_network_probe" formatted="false">Current IP Address: %s</string>
+
+    <!-- Random Noise Probe -->
+    <string name="title_random_noise_probe">Random Noise Probe</string>
+    <string name="summary_random_noise_probe_desc">Generates random floating point numbers at a 4Hz frequency for diagnostic purposes.</string>
+    <string name="summary_random_noise_probe" formatted="false">Random Value: %f</string>
 </resources>

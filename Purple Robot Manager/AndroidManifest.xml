@@ -65,6 +65,7 @@
 		<service android:enabled="true" android:exported="false" android:name=".PersistentService">
 			<intent-filter>
 				<action android:name="purple_robot_manager_nudge_probe" />
+				<action android:name="purple_robot_generate_noise" />
 			</intent-filter>
 		</service>
 		<activity android:name=".StartActivity" android:label="@string/app_name" android:launchMode="singleTask"
