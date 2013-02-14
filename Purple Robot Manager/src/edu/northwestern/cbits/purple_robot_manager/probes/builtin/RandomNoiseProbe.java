@@ -83,7 +83,9 @@ public class RandomNoiseProbe extends Probe
 					SecureRandom random = new SecureRandom();
 					
 					bundle.putFloat(RandomNoiseProbe.NOISE_VALUE, random.nextFloat());
-					
+
+					bundle.putBoolean("TRANSMIT", prefs.getBoolean("config_probe_random_noise_persist", false));
+
 					this.transmitData(context, bundle);
 					
 					if (this._intent == null)
@@ -130,8 +132,14 @@ public class RandomNoiseProbe extends Probe
 		enabled.setTitle(R.string.title_enable_probe);
 		enabled.setKey("config_probe_random_noise_enabled");
 		enabled.setDefaultValue(false);
-
 		screen.addPreference(enabled);
+
+		CheckBoxPreference persist = new CheckBoxPreference(activity);
+		persist.setTitle(R.string.title_probe_random_noise_persist);
+		persist.setSummary(R.string.summary_probe_random_noise_persist);
+		persist.setKey("config_probe_random_noise_persist");
+		persist.setDefaultValue(false);
+		screen.addPreference(persist);
 
 		return screen;
 	}

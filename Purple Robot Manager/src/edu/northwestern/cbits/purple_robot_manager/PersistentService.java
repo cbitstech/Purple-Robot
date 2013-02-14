@@ -12,6 +12,7 @@ import android.preference.PreferenceManager;
 import edu.northwestern.cbits.purple_robot_manager.http.LocalHttpServer;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RandomNoiseProbe;
 
 public class PersistentService extends Service
@@ -57,6 +58,10 @@ public class PersistentService extends Service
 		{
 				if (NUDGE_PROBES.equals(intent.getAction()))
 					ProbeManager.nudgeProbes(this);
+				else if (ContinuousProbe.WAKE_ACTION.equals(intent.getAction()))
+				{
+
+				}
 				else if (RandomNoiseProbe.ACTION.equals(intent.getAction()) && RandomNoiseProbe.instance != null)
 					RandomNoiseProbe.instance.isEnabled(this);
 		}

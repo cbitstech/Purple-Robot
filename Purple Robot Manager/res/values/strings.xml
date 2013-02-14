@@ -584,4 +584,6 @@
     <string name="title_random_noise_probe">Random Noise Probe</string>
     <string name="summary_random_noise_probe_desc">Generates random floating point numbers at a 4Hz frequency for diagnostic purposes.</string>
     <string name="summary_random_noise_probe" formatted="false">Random Value: %f</string>
+    <string name="title_probe_random_noise_persist">Retain Data</string>
+    <string name="summary_probe_random_noise_persist">Save &amp; transmit random values generated to the remote server.</string>
 </resources>
