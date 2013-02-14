@@ -1,6 +1,5 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
