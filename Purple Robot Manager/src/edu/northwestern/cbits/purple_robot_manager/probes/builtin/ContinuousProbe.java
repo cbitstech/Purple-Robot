@@ -5,6 +5,8 @@ import java.util.UUID;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,23 +14,22 @@ import android.content.SharedPreferences.Editor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.os.Bundle;
-import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
-
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public abstract class ContinuousProbe extends Probe
 {
+	public static final String WAKE_ACTION = "purple_robot_sensor_wake";
+
 	private static SharedPreferences prefs = null;
 
-	private WakeLock _wakeLock = null;
+	private PendingIntent _intent = null;
 	
 	protected static SharedPreferences getPreferences(Context context)
 	{
@@ -156,27 +157,26 @@ public abstract class ContinuousProbe extends Probe
 	{
 		boolean enabled = super.isEnabled(context);
 
-		PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-
 		if (enabled)
 		{
-			if (this._wakeLock == null)
+			if (this._intent == null)
 			{
-				this._wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, this.name(context));
-				this._wakeLock.acquire(60 * 1000);
-				this._wakeLock.setReferenceCounted(false);
+				this._intent = PendingIntent.getService(context, 0, new Intent(ContinuousProbe.WAKE_ACTION), PendingIntent.FLAG_UPDATE_CURRENT);
+
+				AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+				
+				am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 250, this._intent);
 			}
 		}
-		else
+		else if (this._intent != null)
 		{
-			if (this._wakeLock != null)
-			{
-				this._wakeLock.release();
-				this._wakeLock = null;
-			}
+			AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+			
+			am.cancel(this._intent);
+			
+			this._intent = null;
 		}
 		
 		return enabled;
 	}
-
 }

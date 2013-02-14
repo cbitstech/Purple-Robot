@@ -232,6 +232,9 @@ public class HttpUploadPlugin extends OutputPlugin
 			try
 			{
 				Bundle extras = intent.getExtras();
+				
+				if (extras.containsKey("TRANSMIT") && extras.getBoolean("TRANSMIT") == false)
+					return;
 
 				final JSONObject jsonObject = OutputPlugin.jsonForBundle(extras);
 
