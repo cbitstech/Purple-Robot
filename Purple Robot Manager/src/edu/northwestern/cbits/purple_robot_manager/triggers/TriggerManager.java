@@ -5,6 +5,12 @@ import java.util.Date;
 import java.util.List;
 
 import android.content.Context;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceCategory;
+import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
+import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
 
 public class TriggerManager 
 {
@@ -109,4 +115,31 @@ public class TriggerManager
 			this._triggers.clear();
 		}
 	}
+	
+	public static PreferenceScreen buildPreferenceScreen(PreferenceActivity settingsActivity)
+	{
+		PreferenceManager manager = settingsActivity.getPreferenceManager();
+
+		PreferenceScreen screen = manager.createPreferenceScreen(settingsActivity);
+		screen.setOrder(0);
+		screen.setTitle(R.string.title_preference_triggers_screen);
+		screen.setKey(SettingsActivity.TRIGGERS_SCREEN_KEY);
+
+		PreferenceCategory triggersCategory = new PreferenceCategory(settingsActivity);
+		triggersCategory.setTitle(R.string.title_preference_triggers_category);
+		triggersCategory.setKey("key_available_triggers");
+
+		screen.addPreference(triggersCategory);
+
+		for (Trigger trigger : TriggerManager.getInstance().allTriggers())
+		{
+			PreferenceScreen triggerScreen = trigger.preferenceScreen(settingsActivity);
+
+			if (triggerScreen != null)
+				screen.addPreference(triggerScreen);
+		}
+
+		return screen;
+	}
+
 }

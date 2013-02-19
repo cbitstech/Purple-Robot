@@ -17,6 +17,7 @@ import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
+import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
 public class SettingsActivity extends PreferenceActivity implements OnPreferenceClickListener, OnPreferenceChangeListener
 {
@@ -29,6 +30,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 	static final CharSequence USER_ID_KEY = "config_user_id";
 	protected static final String USER_HASH_KEY = "config_user_hash";
 	public static final String CHECK_UPDATES_KEY = "config_hockey_update";
+	public static final String TRIGGERS_SCREEN_KEY = "config_triggers_screen";
 
 	public void onCreate(Bundle savedInstanceState)
     {
@@ -64,6 +66,11 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
         PreferenceCategory category = (PreferenceCategory) prefs.findPreference("config_settings_probe_category");
         category.addPreference(probesScreen);
 
+        PreferenceScreen triggersScreen = TriggerManager.buildPreferenceScreen(this);
+
+        PreferenceCategory triggerCategory = (PreferenceCategory) prefs.findPreference("config_settings_trigger_category");
+        triggerCategory.addPreference(triggersScreen);
+        
         Preference archive = prefs.findPreference(ZIP_ARCHIVES_KEY);
         archive.setOnPreferenceClickListener(this);
 

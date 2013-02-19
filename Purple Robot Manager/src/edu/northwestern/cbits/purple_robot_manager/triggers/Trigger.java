@@ -5,7 +5,11 @@ import org.json.JSONObject;
 import org.mozilla.javascript.EvaluatorException;
 
 import android.content.Context;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.JavaScriptEngine;
+import edu.northwestern.cbits.purple_robot_manager.R;
 
 public abstract class Trigger
 {
@@ -140,5 +144,24 @@ public abstract class Trigger
 	public void reset(Context context) 
 	{
 		// Default implementation does nothing...
+	}
+
+	public PreferenceScreen preferenceScreen(PreferenceActivity activity) 
+	{
+		PreferenceManager manager = activity.getPreferenceManager();
+
+		PreferenceScreen screen = manager.createPreferenceScreen(activity);
+		screen.setTitle(this._name);
+
+		String type = activity.getString(R.string.type_trigger_unknown);
+		
+		if (this instanceof ProbeTrigger)
+			type = activity.getString(R.string.type_trigger_probe);
+		if (this instanceof DateTrigger)
+			type = activity.getString(R.string.type_trigger_datetime);
+		
+		screen.setSummary(type);
+
+		return screen;
 	}
 }
