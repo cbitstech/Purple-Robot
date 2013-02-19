@@ -16,7 +16,7 @@ public class ProbeTrigger extends Trigger
 	private static long _lastUpdate = 0;
 
 	private String _test = null;
-	private long _frequency;
+	private long _frequency = 0;
 
 	public ProbeTrigger(Context context, JSONObject object) throws JSONException
 	{

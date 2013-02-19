@@ -10,7 +10,25 @@
     <string name="crash_toast_text">Whoops - the app has crashed. Sending a report to the developer.</string>
     <string name="toast_incorrect_password">Incorrect password. Please try again.</string>
 	<string name="error_js" formatted="false">Javascript Error: %s&#8230;</string>
+
+    <string name="title_preference_triggers_screen">Triggers</string>
+    <string name="title_preference_triggers_category">Available Triggers</string>
     
+    <string name="config_probes_category_label">Probes</string>
+    <string name="config_triggers_category_label">Triggers</string>
+
+	<string name="type_trigger_unknown">Unknown Trigger</string>
+	<string name="type_trigger_probe">Probe Trigger</string>
+	<string name="type_trigger_datetime">Time-Based Trigger</string>
+
+	<string name="label_trigger_last_fire">Last Fired</string>
+	<string name="label_trigger_last_fire_never">Never</string>
+
+	<string name="label_trigger_upcoming_fires">Upcoming Firings</string>
+	<string name="label_trigger_upcoming_fires_none">No upcoming firings.</string>
+	<string name="label_trigger_upcoming_fires_summary" formatted="false">%d scheduled firings</string>
+	<string name="label_trigger_upcoming_fire_summary">1 scheduled firing</string>
+								
     <string name="error_malformed_request">Malformed request. Please try again.</string>
 
     <string name="activity_diagnostic_title">Diagnostics</string>

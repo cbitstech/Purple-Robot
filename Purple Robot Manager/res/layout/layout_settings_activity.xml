@@ -2,7 +2,10 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
         android:key="config_settings_probe_category"
-        android:title="@string/config_notifications_category_label" />
+        android:title="@string/config_probes_category_label" />
+    <PreferenceCategory
+        android:key="config_settings_trigger_category"
+        android:title="@string/config_triggers_category_label" />
     <PreferenceCategory
         android:title="@string/config_notifications_category">
         <RingtonePreference
