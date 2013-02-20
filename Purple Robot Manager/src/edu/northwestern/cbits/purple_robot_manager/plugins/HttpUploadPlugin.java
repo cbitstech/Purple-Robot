@@ -512,6 +512,9 @@ public class HttpUploadPlugin extends OutputPlugin
 
 						try
 						{
+							if (uploadArray.length() == 0)
+								throw new Exception(me.getContext().getString(R.string.error_empty_payload));
+
 							JSONObject jsonMessage = new JSONObject();
 
 							jsonMessage.put(OPERATION_KEY, "SubmitProbes");
@@ -830,6 +833,10 @@ public class HttpUploadPlugin extends OutputPlugin
 							e.printStackTrace();
 						}
 						catch (UnrecoverableKeyException e) 
+						{
+							e.printStackTrace();
+						}
+						catch (Exception e) 
 						{
 							e.printStackTrace();
 						}

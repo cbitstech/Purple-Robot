@@ -30,7 +30,8 @@
 	<string name="label_trigger_upcoming_fire_summary">1 scheduled firing</string>
 								
     <string name="error_malformed_request">Malformed request. Please try again.</string>
-
+    <string name="error_empty_payload">No payload to transmit.</string>
+    
     <string name="activity_diagnostic_title">Diagnostics</string>
     <string name="user_id_label">User Identifier</string>
     <string name="user_id_placeholder">Unknown</string>
