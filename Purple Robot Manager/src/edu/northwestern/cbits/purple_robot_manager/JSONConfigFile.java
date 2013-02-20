@@ -84,13 +84,13 @@ public class JSONConfigFile
 								Builder builder = new Builder();
 								
 								builder.scheme(uri.getScheme());
-								builder.authority(uri.getAuthority());
+								builder.encodedAuthority(uri.getAuthority());
 
 								if (uri.getPath() != null)
-									builder.path(uri.getPath());
+									builder.encodedPath(uri.getPath());
 								
 								if (uri.getFragment() != null)
-									builder.fragment(uri.getFragment());
+									builder.encodedFragment(uri.getFragment());
 								
 								String query = uri.getQuery();
 								
