@@ -1,6 +1,20 @@
 <resources>
     <string name="app_name">Purple Notifier</string>
-   
+
+    <string name="title_widget_identifiers">Available Identifiers</string>
+    <string name="menu_add_identifier_label">Add New Identifier</string>
+    <string name="menu_download_label">Download Labels</string>
+
+    <string name="prompt_new_identifier">Add Identifier</string>
+    <string name="message_new_identifier">Please add a new unique identifier.</string>
+    <string name="prompt_remove_identifier">Remove Identifier?</string>
+    <string name="message_remove_identifier" formatted="false">Remove "%s" from the list of identifiers?</string>
+
+    <string name="button_add">Add</string>
+    <string name="button_remove">Remove</string>
+    <string name="button_ok">OK</string>
+    <string name="button_cancel">Cancel</string>
+    
     <string name="widget_title_placeholder">(Widget Title)</string>
     <string name="widget_message_placeholder">(Widget Message)</string>
     

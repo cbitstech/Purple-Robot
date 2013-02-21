@@ -20,12 +20,12 @@
 			</intent-filter>
 			<meta-data android:name="android.appwidget.provider" android:resource="@xml/text_appwidget_info" />
 		</receiver>
-		<!-- <activity android:name="edu.northwestern.cbits.purple.notifier.MainSettingsActivity" android:label="@string/app_name"  android:theme="@style/Theme.Sherlock">
+		<activity android:name="edu.northwestern.cbits.purple.notifier.MainActivity" android:label="@string/app_name"  android:theme="@style/Theme.Sherlock">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
 	        </intent-filter>
-        </activity> -->
+        </activity>
 		<activity android:exported="true" android:name="edu.northwestern.cbits.purple.notifier.BasicSettingsActivity" android:label="@string/basic_widget_title" android:theme="@style/Theme.Sherlock">
             <intent-filter>
  				<action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />

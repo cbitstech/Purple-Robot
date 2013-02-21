@@ -29,6 +29,10 @@ public class WidgetIntentService extends IntentService
 		
 		String widget = intent.getStringExtra(WidgetIntentService.WIDGET);
 		
+		int widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, Integer.MAX_VALUE);
+		
+		Log.e("PN-SERV", "WIDGET ID: " + widgetId);
+		
 		if (BasicWidgetProvider.NAME.equals(widget))
 		{
 			Log.e("P-NSRV", "BASIC WIDGET");
