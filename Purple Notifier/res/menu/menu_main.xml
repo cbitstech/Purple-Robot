@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:id="@+id/menu_add_item"
+        android:title="@string/menu_add_identifier_label"
+        android:showAsAction="always"
+        android:icon="@drawable/ic_add_item" />
+    <item android:id="@+id/menu_download_item"
+        android:title="@string/menu_download_label"
+        android:icon="@drawable/ic_download_item"
+        android:showAsAction="always" />
+</menu>

@@ -48,6 +48,8 @@ public class BasicSettingsActivity extends SherlockPreferenceActivity implements
 		intent.putExtra("config_basic_title", prefs.getString("config_basic_title", this.getString(R.string.config_message_title)));
 		intent.putExtra("config_basic_message", prefs.getString("config_basic_message", this.getString(R.string.config_message_title)));
 		
+		intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, this.getIntent().getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, Integer.MAX_VALUE));
+		
 		this.startService(intent);
 	}
 }
