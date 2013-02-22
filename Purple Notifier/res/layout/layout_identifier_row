@@ -10,7 +10,7 @@
         android:text=""
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:paddingBottom="10dp"
-        android:paddingTop="10dp"
+        android:paddingBottom="18dp"
+        android:paddingTop="18dp"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 </LinearLayout>
