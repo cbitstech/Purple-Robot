@@ -1,5 +1,10 @@
 package edu.northwestern.cbits.purple.notifier;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -9,9 +14,11 @@ import android.appwidget.AppWidgetManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 public class WidgetIntentService extends IntentService 
@@ -33,19 +40,11 @@ public class WidgetIntentService extends IntentService
 
 	protected void onHandleIntent(Intent intent) 
 	{
-		Log.e("PN-SERV", "RUNNING INTENT: " + intent.getAction());
-		
 		if (UPDATE_WIDGETS.equals(intent.getAction()))
 		{
-			Log.e("PN-SERV", "UPDATING MULTIPLE WIDGETS");
-
 			String identifier = intent.getStringExtra("identifier");
 
-			Log.e("PN-SERV", "USING " + identifier);
-
 			int[] widgetIds = this.getWidgetIds(identifier);
-			
-			Log.e("PN-SERV", "WIDGET COUNT " + widgetIds.length);
 			
 			for (int widgetId : widgetIds)
 			{
@@ -63,8 +62,6 @@ public class WidgetIntentService extends IntentService
 			
 			int[] widgetIds = this.getWidgetIds(identifier);
 			
-			Log.e("PN-SERV", "WIDGET ID: " + widgetId);
-			
 			this.registerType(widgetId, widget);
 
 			for (int id : widgetIds)
@@ -78,15 +75,36 @@ public class WidgetIntentService extends IntentService
 	{
 		String widget = this.fetchType(widgetId);
 
-		Log.e("PN-SRV", "UPDATE WIDGET " + widgetId + " -- " + widget);
-		
 		if (BasicWidgetProvider.NAME.equals(widget))
 		{
 			String title = extras.getString("title");
 			String message = extras.getString("message");
+			String image = extras.getString("image");
 			
-			Log.e("P-NSRV", "BASIC WIDGET");
 			RemoteViews rv = new RemoteViews(this.getPackageName(), R.layout.layout_basic_widget);
+
+			Uri imageUri = null;
+			
+			try
+			{
+				imageUri = Uri.parse(image);
+			}
+			catch (NullPointerException e)
+			{
+				
+			}
+			
+			if (imageUri != null)
+			{
+				try
+				{
+					rv.setImageViewBitmap(R.id.widget_basic_image, this.bitmapForUri(imageUri));
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace();
+				}
+			}
 
 			rv.setTextViewText(R.id.widget_basic_title_text, title);
 			rv.setTextViewText(R.id.widget_basic_message_text, message);
@@ -103,7 +121,6 @@ public class WidgetIntentService extends IntentService
 			String title = extras.getString("title");
 			String message = extras.getString("message");
 
-			Log.e("P-NSRV", "TEXT WIDGET");
 			RemoteViews rv = new RemoteViews(this.getPackageName(), R.layout.layout_text_widget);
 
 			rv.setTextViewText(R.id.widget_text_title_text, title);
@@ -116,6 +133,67 @@ public class WidgetIntentService extends IntentService
 			
 			AppWidgetManager.getInstance(this).updateAppWidget(widgetId, rv);
 		}
+	}
+
+	// http://stackoverflow.com/questions/3879992/get-bitmap-from-an-uri-android
+
+	private static int getPowerOfTwoForSampleRatio(double ratio)
+    {
+        int k = Integer.highestOneBit((int)Math.floor(ratio));
+
+        if (k == 0)
+        	return 1;
+        
+        return k;
+    }
+	
+	private InputStream inputStreamForUri(Uri imageUri) throws MalformedURLException, IOException
+	{
+		InputStream input = null;
+
+		if ("http".equals(imageUri.getScheme().toLowerCase()) || 
+			"https".equals(imageUri.getScheme().toLowerCase()))
+		{
+			HttpURLConnection conn = (HttpURLConnection) (new URL(imageUri.toString())).openConnection();
+			
+			input = conn.getInputStream();
+		}
+		else
+			input = this.getContentResolver().openInputStream(imageUri);
+		
+		return input;
+	}
+
+	private Bitmap bitmapForUri(Uri imageUri) throws IOException 
+	{
+		InputStream input = this.inputStreamForUri(imageUri);
+
+        BitmapFactory.Options onlyBoundsOptions = new BitmapFactory.Options();
+        onlyBoundsOptions.inJustDecodeBounds = true;
+        onlyBoundsOptions.inDither=true;//optional
+        onlyBoundsOptions.inPreferredConfig=Bitmap.Config.ARGB_8888;//optional
+        BitmapFactory.decodeStream(input, null, onlyBoundsOptions);
+        input.close();
+
+        if ((onlyBoundsOptions.outWidth == -1) || (onlyBoundsOptions.outHeight == -1))
+            return null;
+
+        int originalSize = (onlyBoundsOptions.outHeight > onlyBoundsOptions.outWidth) ? onlyBoundsOptions.outHeight : onlyBoundsOptions.outWidth;
+
+        double ratio = (originalSize > 144) ? (originalSize / 144) : 1.0;
+
+        BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+
+        bitmapOptions.inSampleSize = getPowerOfTwoForSampleRatio(ratio);
+        bitmapOptions.inDither=true; 
+        bitmapOptions.inPreferredConfig=Bitmap.Config.ARGB_8888;//optional
+
+		input = this.inputStreamForUri(imageUri);
+
+		Bitmap bitmap = BitmapFactory.decodeStream(input, null, bitmapOptions);
+        input.close();
+
+        return bitmap;
 	}
 
 	private int[] getWidgetIds(String identifier) 

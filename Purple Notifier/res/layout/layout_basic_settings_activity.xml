@@ -12,4 +12,10 @@
 	    android:dialogTitle="@string/config_message_title"
 	    android:dialogMessage="@string/config_message_message"
 	    android:defaultValue="" />
+	<EditTextPreference
+	    android:key="config_basic_image"
+	    android:title="@string/config_image_label"
+	    android:dialogTitle="@string/config_image_title"
+	    android:dialogMessage="@string/config_image_message"
+	    android:defaultValue="" />
 </PreferenceScreen>
