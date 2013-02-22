@@ -19,9 +19,11 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 public class ManagerService extends IntentService
 {
+	public static String UPDATE_WIDGETS = "purple_robot_manager_update_widgets";
 	public static String PERIODIC_CHECK_INTENT = "purple_robot_manager_periodic_check";
 	public static String INCOMING_DATA_INTENT = "purple_robot_manager_incoming_data";
 	public static String APPLICATION_LAUNCH_INTENT = "purple_robot_manager_application_launch";
@@ -53,6 +55,15 @@ public class ManagerService extends IntentService
 
 	protected void onHandleIntent(Intent intent)
 	{
+		if (UPDATE_WIDGETS.equalsIgnoreCase(intent.getAction()))
+		{
+			Intent broadcast = new Intent("edu.northwestern.cbits.purple.UPDATE_WIDGETS");
+			broadcast.putExtras(intent.getExtras());
+			
+			this.startService(broadcast);
+
+			Log.e("PR", "INTENT BROADCAST!");
+		}
 		if (HAPTIC_PATTERN_INTENT.equalsIgnoreCase(intent.getAction()))
 		{
 			String pattern = intent.getStringExtra(HAPTIC_PATTERN_NAME);

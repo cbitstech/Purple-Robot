@@ -288,9 +288,18 @@ public class JavaScriptEngine
 		return null;
 	}
 
-	public boolean updateWidget(final String title, final String message, final String applicationName)
+	public void updateWidget(final NativeObject parameters)
 	{
-		return this.updateWidget(title, message, applicationName, new NativeObject(), null);
+		Intent intent = new Intent(ManagerService.UPDATE_WIDGETS);
+		
+		for (Object keyObj : parameters.keySet())
+		{
+			String key = keyObj.toString();
+			
+			intent.putExtra(key, parameters.get(key).toString());
+		}
+
+		this._context.startService(intent);
 	}
 
 	public boolean broadcastIntent(final String action, final NativeObject extras)
@@ -308,6 +317,11 @@ public class JavaScriptEngine
 		this._context.sendBroadcast(intent);
 		
 		return true;
+	}
+
+	public boolean updateWidget(final String title, final String message, final String applicationName)
+	{
+		return this.updateWidget(title, message, applicationName, new NativeObject(), null);
 	}
 	
 	public boolean updateWidget(final String title, final String message, final String applicationName, final NativeObject launchParams, final String script)
