@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="edu.northwestern.cbits.purple_robot_manager"
-	android:versionCode="10031"
-	android:versionName="1.0.31">
+	android:versionCode="10032"
+	android:versionName="1.0.32">
    	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
@@ -60,7 +60,8 @@
 				<action android:name="purple_robot_manager_refresh_configuration" />
 				<action android:name="purple_robot_manager_haptic_pattern" />
 				<action android:name="purple_robot_manager_ringtone" />
-			</intent-filter>
+				<action android:name="purple_robot_manager_update_widgets" />
+		</intent-filter>
 	    </service>
 		<service android:enabled="true" android:exported="false" android:name=".PersistentService">
 			<intent-filter>

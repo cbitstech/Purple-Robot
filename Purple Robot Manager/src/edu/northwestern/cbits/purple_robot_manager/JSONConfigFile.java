@@ -27,6 +27,7 @@ import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.net.Uri.Builder;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
@@ -123,9 +124,11 @@ public class JSONConfigFile
 							}
 							
 							URL u = new URL(newUri.toString());
+							
+							Log.e("PR", "URL: " + u.toString());
 
 							HttpURLConnection conn = (HttpURLConnection) u.openConnection();
-
+							
 							BufferedInputStream bin = new BufferedInputStream(conn.getInputStream());
 							ByteArrayOutputStream bout = new ByteArrayOutputStream();
 
