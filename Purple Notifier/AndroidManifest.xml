@@ -43,7 +43,8 @@
 		    <intent-filter>
 		        <action android:name="edu.northwestern.cbits.purple.UPDATE_WIDGET" />
 		        <action android:name="edu.northwestern.cbits.purple.UPDATE_WIDGETS" />
-   		    </intent-filter>
+		        <action android:name="edu.northwestern.cbits.purple.ACTION_BOOT" />
+  		    </intent-filter>
 		</service>
 	</application>
 </manifest>

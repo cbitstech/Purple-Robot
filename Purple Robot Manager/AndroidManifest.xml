@@ -33,11 +33,16 @@
 		android:allowBackup="true"
 		android:persistent="true">
 		<uses-library android:name="com.google.android.maps" android:required="false" />
-		<receiver android:enabled="true" android:name=".BootUpReceiver"
-			android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+		<receiver android:enabled="true" android:name=".BootUpReceiver" android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
 			<intent-filter>
 				<action android:name="android.intent.action.BOOT_COMPLETED" />
 				<category android:name="android.intent.category.DEFAULT" />
+				<action android:name="edu.northwestern.cbits.purple.WIDGET_ACTION" />
+			</intent-filter>
+		</receiver>
+		<receiver android:enabled="true" android:name=".WidgetReceiver">
+			<intent-filter>
+				<action android:name="edu.northwestern.cbits.purple.WIDGET_ACTION" />
 			</intent-filter>
 		</receiver>
 		<receiver android:name=".widget.PurpleRobotAppWidgetProvider" android:exported="false" android:label="@string/widget_title">

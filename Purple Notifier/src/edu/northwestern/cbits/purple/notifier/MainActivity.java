@@ -52,7 +52,10 @@ public class MainActivity extends SherlockListActivity
 	protected void onResume()
 	{
 		super.onResume();
-		
+
+        Intent intent = new Intent(WidgetIntentService.ACTION_BOOT);
+		this.startService(intent);
+
 		this.refreshList();
 	}
 	

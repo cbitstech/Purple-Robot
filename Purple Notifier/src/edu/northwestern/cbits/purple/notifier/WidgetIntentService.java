@@ -6,7 +6,11 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.IntentService;
 import android.app.PendingIntent;
@@ -23,8 +27,10 @@ import android.widget.RemoteViews;
 
 public class WidgetIntentService extends IntentService 
 {
+	public final static String WIDGET_ACTION = "edu.northwestern.cbits.purple.WIDGET_ACTION";
 	public final static String UPDATE_WIDGET = "edu.northwestern.cbits.purple.UPDATE_WIDGET";
 	public final static String UPDATE_WIDGETS = "edu.northwestern.cbits.purple.UPDATE_WIDGETS";
+	public static final String ACTION_BOOT = "edu.northwestern.cbits.purple.ACTION_BOOT";
 
 	public final static String WIDGET = "WIDGET";
 	public final static String LAUNCH_INTENT = "LAUNCH_INTENT";
@@ -40,7 +46,21 @@ public class WidgetIntentService extends IntentService
 
 	protected void onHandleIntent(Intent intent) 
 	{
-		if (UPDATE_WIDGETS.equals(intent.getAction()))
+		if (ACTION_BOOT.equals(intent.getAction()))
+		{
+			String[] identifiers = IdentifiersManager.fetchIdentifiers(this);
+			
+			for (String identifier : identifiers)
+			{
+				Bundle b = this.fetchWidgetState(identifier);
+				
+				Intent update = new Intent(WidgetIntentService.UPDATE_WIDGETS);
+				update.putExtras(b);
+				
+				this.onHandleIntent(update);
+			}
+		}
+		else if (UPDATE_WIDGETS.equals(intent.getAction()))
 		{
 			String identifier = intent.getStringExtra("identifier");
 
@@ -50,6 +70,8 @@ public class WidgetIntentService extends IntentService
 			{
 				this.refreshWidget(widgetId, intent.getExtras(), intent);
 			}
+
+			this.saveWidgetState(identifier, intent.getExtras());
 		}
 		else if (UPDATE_WIDGET.equals(intent.getAction()))
 		{
@@ -57,6 +79,8 @@ public class WidgetIntentService extends IntentService
 			
 			int widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, Integer.MAX_VALUE);
 			String identifier = intent.getStringExtra("identifier");
+			
+			this.saveWidgetState(identifier, intent.getExtras());
 			
 			this.registerIdentifier(identifier, widgetId);
 			
@@ -68,6 +92,58 @@ public class WidgetIntentService extends IntentService
 			{
 				this.refreshWidget(id, intent.getExtras(), intent);
 			}
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	private Bundle fetchWidgetState(String identifier)
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		String jsonString = prefs.getString("widget_state_" + identifier, "{}");
+
+		Bundle bundle = new Bundle();
+		
+		try 
+		{
+			JSONObject json = new JSONObject(jsonString);
+			
+			Iterator<String> keys = json.keys();
+			
+			while (keys.hasNext())
+			{
+				String key = keys.next();
+				
+				bundle.putString(key, json.getString(key));
+			}
+		} 
+		catch (JSONException e) 
+		{
+			e.printStackTrace();
+		}
+		
+		return bundle;
+		
+	}
+
+	private void saveWidgetState(String identifier, Bundle extras) 
+	{
+		JSONObject json = new JSONObject();
+		
+		for (String key : extras.keySet())
+		{
+			try 
+			{
+				json.put(key, extras.get(key).toString());
+			} 
+			catch (JSONException e) 
+			{
+				e.printStackTrace();
+			}
+			
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+			Editor e = prefs.edit();
+			e.putString("widget_state_" + identifier, json.toString());
+			e.commit();
 		}
 	}
 
@@ -108,11 +184,13 @@ public class WidgetIntentService extends IntentService
 
 			rv.setTextViewText(R.id.widget_basic_title_text, title);
 			rv.setTextViewText(R.id.widget_basic_message_text, message);
-
-			PendingIntent pendingIntent = this.pendingIntentFromIntent(intent);
 			
-			if (pendingIntent != null)
-				rv.setOnClickPendingIntent(R.id.widget_basic_layout, pendingIntent);
+			Intent tapIntent = new Intent(WidgetIntentService.WIDGET_ACTION);
+			tapIntent.putExtras(intent);
+			tapIntent.putExtra("widget_action", "tap");
+
+			PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, tapIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+			rv.setOnClickPendingIntent(R.id.widget_basic_layout, pendingIntent);
 			
 			AppWidgetManager.getInstance(this).updateAppWidget(widgetId, rv);
 		}
@@ -126,10 +204,12 @@ public class WidgetIntentService extends IntentService
 			rv.setTextViewText(R.id.widget_text_title_text, title);
 			rv.setTextViewText(R.id.widget_text_message_text, message);
 
-			PendingIntent pendingIntent = this.pendingIntentFromIntent(intent);
-			
-			if (pendingIntent != null)
-				rv.setOnClickPendingIntent(R.id.widget_text_layout, pendingIntent);
+			Intent tapIntent = new Intent(WidgetIntentService.WIDGET_ACTION);
+			tapIntent.putExtras(intent);
+			tapIntent.putExtra("widget_action", "tap");
+
+			PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, tapIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+			rv.setOnClickPendingIntent(R.id.widget_text_layout, pendingIntent);
 			
 			AppWidgetManager.getInstance(this).updateAppWidget(widgetId, rv);
 		}
@@ -149,6 +229,8 @@ public class WidgetIntentService extends IntentService
 	
 	private InputStream inputStreamForUri(Uri imageUri) throws MalformedURLException, IOException
 	{
+		// TODO: Insert caching layer../
+		
 		InputStream input = null;
 
 		if ("http".equals(imageUri.getScheme().toLowerCase()) || 
@@ -267,7 +349,7 @@ public class WidgetIntentService extends IntentService
 		e.putString(key, sb.toString());
 		e.commit();
 	}
-
+	
 	private void unregisterIdentifier(int widgetId) 
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -337,13 +419,5 @@ public class WidgetIntentService extends IntentService
 		Editor e = prefs.edit();
 		e.putString(key, sb.toString());
 		e.commit();
-	}
-
-	private PendingIntent pendingIntentFromIntent(Intent intent) 
-	{
-		if (intent.hasExtra("package_name"))
-			return PendingIntent.getActivity(this, 0, this.getPackageManager().getLaunchIntentForPackage(intent.getStringExtra("package_name")), 0);
-		
-		return null;
 	}
 }
