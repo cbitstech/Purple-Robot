@@ -22,7 +22,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -59,8 +58,6 @@ public class MainActivity extends SherlockListActivity
 	
 	public boolean onContextItemSelected(android.view.MenuItem item)
 	{
-		Log.e("PN", "ITEM SELECTED: " + item.getItemId());
-
 		final MainActivity me = this;
 
 		switch (item.getItemId())
@@ -75,8 +72,6 @@ public class MainActivity extends SherlockListActivity
     			break;
 
     		case R.id.menu_remove_item:
-    			Log.e("PN", "REMOVE " + this._contextLabel + "?");
-    			
 				AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
     			alert.setTitle(R.string.prompt_remove_identifier);
@@ -120,8 +115,6 @@ public class MainActivity extends SherlockListActivity
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
 	{
 		super.onCreateContextMenu(menu, v, menuInfo);
-
-		Log.e("PN", "CREATE CONTEXT MENU FOR " + menuInfo + " " + v.getClass());
 		
 		TextView labelView = (TextView) v.findViewById(R.id.identifier_value);
 		

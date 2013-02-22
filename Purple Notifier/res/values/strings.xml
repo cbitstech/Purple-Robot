@@ -47,6 +47,10 @@
     <string name="config_message_title">Message Text</string>
     <string name="config_message_message">Set the widget message.</string>
 
+    <string name="config_image_label">Set Image</string>
+    <string name="config_image_title">Set Image</string>
+    <string name="config_image_message">Enter the URI of the image to use.</string>
+    
     <string name="config_identifiers_label">Widget Identifier</string>
     <string name="config_identifiers_title">Select Widget Identifier</string>
     <string name="config_identifiers_message">Choose the identifier to assign to the new widget.</string>
