@@ -15,6 +15,7 @@ import org.json.JSONObject;
 import android.app.IntentService;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -23,6 +24,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 public class WidgetIntentService extends IntentService 
@@ -66,6 +68,8 @@ public class WidgetIntentService extends IntentService
 
 			int[] widgetIds = this.getWidgetIds(identifier);
 			
+			Log.e("PN", "GOT IDENTIFIER: " + identifier + " (" + widgetIds.length + ")");
+			
 			for (int widgetId : widgetIds)
 			{
 				this.refreshWidget(widgetId, intent.getExtras(), intent);
@@ -75,18 +79,20 @@ public class WidgetIntentService extends IntentService
 		}
 		else if (UPDATE_WIDGET.equals(intent.getAction()))
 		{
-			String widget = intent.getStringExtra(WidgetIntentService.WIDGET);
-			
-			int widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, Integer.MAX_VALUE);
 			String identifier = intent.getStringExtra("identifier");
-			
-			this.saveWidgetState(identifier, intent.getExtras());
-			
+
+			int widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, Integer.MAX_VALUE);
+
+			Log.e("PN", "MAKING IDENTIFIER: " + identifier + " (" + widgetId + ")");
+			Log.e("PN", "WIDGET TYPE: " + intent.getStringExtra(WidgetIntentService.WIDGET));
+
 			this.registerIdentifier(identifier, widgetId);
+
+			this.saveWidgetState(identifier, intent.getExtras());
 			
 			int[] widgetIds = this.getWidgetIds(identifier);
 			
-			this.registerType(widgetId, widget);
+			Log.e("PN", "ID COUNT " + widgetIds.length);
 
 			for (int id : widgetIds)
 			{
@@ -151,6 +157,16 @@ public class WidgetIntentService extends IntentService
 	{
 		String widget = this.fetchType(widgetId);
 
+		Log.e("PN", "UPDATING " + widget);
+
+		if (widget == null)
+		{
+			this.unregisterIdentifier(widgetId);
+			return;
+		}
+		
+		AppWidgetManager widgets = AppWidgetManager.getInstance(this);
+		
 		if (BasicWidgetProvider.NAME.equals(widget))
 		{
 			String title = extras.getString("title");
@@ -189,10 +205,10 @@ public class WidgetIntentService extends IntentService
 			tapIntent.putExtras(intent);
 			tapIntent.putExtra("widget_action", "tap");
 
-			PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, tapIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+			PendingIntent pendingIntent = PendingIntent.getBroadcast(this, widgetId, tapIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 			rv.setOnClickPendingIntent(R.id.widget_basic_layout, pendingIntent);
 			
-			AppWidgetManager.getInstance(this).updateAppWidget(widgetId, rv);
+			widgets.updateAppWidget(widgetId, rv);
 		}
 		else if (TextWidgetProvider.NAME.equals(widget))
 		{
@@ -208,10 +224,65 @@ public class WidgetIntentService extends IntentService
 			tapIntent.putExtras(intent);
 			tapIntent.putExtra("widget_action", "tap");
 
-			PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, tapIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+			PendingIntent pendingIntent = PendingIntent.getBroadcast(this, widgetId, tapIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 			rv.setOnClickPendingIntent(R.id.widget_text_layout, pendingIntent);
 			
-			AppWidgetManager.getInstance(this).updateAppWidget(widgetId, rv);
+			widgets.updateAppWidget(widgetId, rv);
+		}
+		else if (TitleWidgetProvider.NAME.equals(widget))
+		{
+			String title = extras.getString("title");
+
+			RemoteViews rv = new RemoteViews(this.getPackageName(), R.layout.layout_text_widget);
+
+			rv.setTextViewText(R.id.widget_text_title_text, title);
+
+			Intent tapIntent = new Intent(WidgetIntentService.WIDGET_ACTION);
+			tapIntent.putExtras(intent);
+			tapIntent.putExtra("widget_action", "tap");
+
+			PendingIntent pendingIntent = PendingIntent.getBroadcast(this, widgetId, tapIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+			rv.setOnClickPendingIntent(R.id.widget_title_layout, pendingIntent);
+			
+			widgets.updateAppWidget(widgetId, rv);
+		}
+		else if (ImageWidgetProvider.NAME.equals(widget))
+		{
+			String image = extras.getString("image");
+			
+			RemoteViews rv = new RemoteViews(this.getPackageName(), R.layout.layout_image_widget);
+
+			Uri imageUri = null;
+			
+			try
+			{
+				imageUri = Uri.parse(image);
+			}
+			catch (NullPointerException e)
+			{
+				
+			}
+			
+			if (imageUri != null)
+			{
+				try
+				{
+					rv.setImageViewBitmap(R.id.widget_image_image, this.bitmapForUri(imageUri));
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace();
+				}
+			}
+
+			Intent tapIntent = new Intent(WidgetIntentService.WIDGET_ACTION);
+			tapIntent.putExtras(intent);
+			tapIntent.putExtra("widget_action", "tap");
+
+			PendingIntent pendingIntent = PendingIntent.getBroadcast(this, widgetId, tapIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+			rv.setOnClickPendingIntent(R.id.widget_image_layout, pendingIntent);
+			
+			widgets.updateAppWidget(widgetId, rv);
 		}
 	}
 
@@ -367,24 +438,40 @@ public class WidgetIntentService extends IntentService
 		}
 	}
 	
-	private void registerType(int widgetId, String type)
-	{
-		String key = "widget_type_" + widgetId;
-			
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-		Editor e = prefs.edit();
-		e.putString(key,  type);
-		e.commit();
-	}
-	
 	private String fetchType(int widgetId)
 	{
-		String key = "widget_type_" + widgetId;
+		ArrayList<ComponentName> names = new ArrayList<ComponentName>();
 		
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		names.add(new ComponentName(this, BasicWidgetProvider.class));
+		names.add(new ComponentName(this, TextWidgetProvider.class));
+		names.add(new ComponentName(this, ImageWidgetProvider.class));
+		names.add(new ComponentName(this, TitleWidgetProvider.class));
+
+		AppWidgetManager widgets = AppWidgetManager.getInstance(this);
 		
-		return prefs.getString(key, "unknown");
+		for (ComponentName name : names)
+		{
+			Log.e("PN", "NAME: " + name.getShortClassName());
+			
+			int[] widgetIds = widgets.getAppWidgetIds(name);
+			
+			for (int arrayId : widgetIds)
+			{
+				if (widgetId == arrayId)
+				{
+					if (".BasicWidgetProvider".equals(name.getShortClassName()))
+						return BasicWidgetProvider.NAME;
+					else if (".TextWidgetProvider".equals(name.getShortClassName()))
+						return TextWidgetProvider.NAME;
+					else if (".ImageWidgetProvider".equals(name.getShortClassName()))
+						return ImageWidgetProvider.NAME;
+					else if (".TitleWidgetProvider".equals(name.getShortClassName()))
+						return TitleWidgetProvider.NAME;
+				}
+			}
+		}
+		
+		return null;
 	}
 
 	private void unregisterIdentifier(String identifier, int widgetId) 

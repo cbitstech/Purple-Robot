@@ -10,20 +10,20 @@ import android.preference.PreferenceScreen;
 import android.text.InputType;
 import android.widget.EditText;
 
-public class BasicSettingsActivity extends WidgetSettingsActivity 
+public class ImageSettingsActivity extends WidgetSettingsActivity 
 {
 	public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
 
-        this.addPreferencesFromResource(R.layout.layout_basic_settings_activity);
+        this.addPreferencesFromResource(R.layout.layout_image_settings_activity);
         
         PreferenceScreen screen = this.getPreferenceScreen();
         
         ListPreference idList = new ListPreference(this);
         idList.setTitle(R.string.config_identifiers_title);
         idList.setDialogTitle(R.string.config_identifiers_title);
-        idList.setKey("config_basic_identifier");
+        idList.setKey("config_image_identifier");
 
         String[] identifiers = IdentifiersManager.fetchIdentifiers(this);
 
@@ -31,8 +31,8 @@ public class BasicSettingsActivity extends WidgetSettingsActivity
         idList.setEntryValues(identifiers);
         
         screen.addPreference(idList);
-
-        EditTextPreference editPreference = (EditTextPreference) screen.findPreference("config_basic_image");
+        
+        EditTextPreference editPreference = (EditTextPreference) screen.findPreference("config_image_image");
 
         EditText field = editPreference.getEditText();
         field.setRawInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
@@ -42,11 +42,9 @@ public class BasicSettingsActivity extends WidgetSettingsActivity
 	{
         Intent intent = new Intent(WidgetIntentService.UPDATE_WIDGET);
 		
-		intent.putExtra(WidgetIntentService.WIDGET, BasicWidgetProvider.NAME);
-		intent.putExtra("title", prefs.getString("config_basic_title", this.getString(R.string.config_message_title)));
-		intent.putExtra("message", prefs.getString("config_basic_message", this.getString(R.string.config_message_title)));
-		intent.putExtra("identifier", prefs.getString("config_basic_identifier", this.getString(R.string.config_message_title)));
-		intent.putExtra("image", prefs.getString("config_basic_image", ""));
+		intent.putExtra(WidgetIntentService.WIDGET, ImageWidgetProvider.NAME);
+		intent.putExtra("identifier", prefs.getString("config_image_identifier", this.getString(R.string.config_message_title)));
+		intent.putExtra("image", prefs.getString("config_image_image", ""));
 
 		intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, this._widgetId);
 

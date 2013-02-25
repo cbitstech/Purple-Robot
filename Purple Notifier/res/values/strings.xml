@@ -31,9 +31,11 @@
     <string name="widget_title_placeholder">(Widget Title)</string>
     <string name="widget_message_placeholder">(Widget Message)</string>
     
-    <string name="basic_widget_title">Basic Notifications</string>
-    <string name="text_widget_title">Text Notifications</string>
-
+    <string name="basic_widget_title">Purple: Image, Title &amp; Message</string>
+    <string name="text_widget_title">Purple: Title &amp; Message</string>
+    <string name="image_widget_title">Purple: Image Only</string>
+    <string name="title_widget_title">Purple: Title Only</string>
+    
     <string name="config_settings_category">Widget Settings</string>
     <string name="config_password_label">Settings Password</string>
     <string name="config_password_title">Settings Password</string>

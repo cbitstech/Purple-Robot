@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<EditTextPreference
+	    android:key="config_image_image"
+	    android:title="@string/config_image_label"
+	    android:dialogTitle="@string/config_image_title"
+	    android:dialogMessage="@string/config_image_message"
+	    android:defaultValue="" />
+</PreferenceScreen>
