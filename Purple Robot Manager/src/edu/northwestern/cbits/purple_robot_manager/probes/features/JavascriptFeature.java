@@ -186,37 +186,44 @@ public class JavascriptFeature extends Feature
 
 				JavaScriptEngine engine = new JavaScriptEngine(context);
 
-				Object o = engine.runScript(script);
-
-				Bundle bundle = new Bundle();
-				bundle.putString("PROBE", me.name(context));
-				bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
-
-				if (o instanceof String)
-					bundle.putString(Feature.FEATURE_VALUE, o.toString());
-				else if (o instanceof Double)
+				try
 				{
-					Double d = (Double) o;
-
-					bundle.putDouble(Feature.FEATURE_VALUE, d.doubleValue());
+					Object o = engine.runScript(script);
+	
+					Bundle bundle = new Bundle();
+					bundle.putString("PROBE", me.name(context));
+					bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+	
+					if (o instanceof String)
+						bundle.putString(Feature.FEATURE_VALUE, o.toString());
+					else if (o instanceof Double)
+					{
+						Double d = (Double) o;
+	
+						bundle.putDouble(Feature.FEATURE_VALUE, d.doubleValue());
+					}
+					else if (o instanceof NativeObject)
+					{
+						NativeObject nativeObj = (NativeObject) o;
+	
+						Bundle b = JavascriptFeature.bundleForNativeObject(nativeObj);
+	
+						bundle.putParcelable(Feature.FEATURE_VALUE, b);
+					}
+					else
+					{
+						Log.e("PRM", "JS PLUGIN GOT UNKNOWN VALUE " + o);
+	
+						if (o != null)
+							Log.e("PRM", "JS PLUGIN GOT UNKNOWN CLASS " + o.getClass());
+					}
+	
+					me.transmitData(context, bundle);
 				}
-				else if (o instanceof NativeObject)
+				catch (Exception e)
 				{
-					NativeObject nativeObj = (NativeObject) o;
-
-					Bundle b = JavascriptFeature.bundleForNativeObject(nativeObj);
-
-					bundle.putParcelable(Feature.FEATURE_VALUE, b);
+					e.printStackTrace();
 				}
-				else
-				{
-					Log.e("PRM", "JS PLUGIN GOT UNKNOWN VALUE " + o);
-
-					if (o != null)
-						Log.e("PRM", "JS PLUGIN GOT UNKNOWN CLASS " + o.getClass());
-				}
-
-				me.transmitData(context, bundle);
 			}
 		};
 		

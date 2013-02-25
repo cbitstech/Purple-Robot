@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="edu.northwestern.cbits.purple_robot_manager"
-	android:versionCode="10032"
-	android:versionName="1.0.32">
+	android:versionCode="10034"
+	android:versionName="1.0.34">
    	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
@@ -25,7 +25,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"/>
    	<uses-permission android:name="com.android.browser.permission.READ_HISTORY_BOOKMARKS" />
-	<uses-sdk android:minSdkVersion="8" android:targetSdkVersion="14" />
+	<uses-sdk android:minSdkVersion="8" android:targetSdkVersion="17" />
  	<application android:label="@string/app_name"
 		android:icon="@drawable/ic_launcher"
 		android:name="PurpleRobotApplication"
@@ -40,7 +40,7 @@
 				<action android:name="edu.northwestern.cbits.purple.WIDGET_ACTION" />
 			</intent-filter>
 		</receiver>
-		<receiver android:enabled="true" android:name=".WidgetReceiver">
+		<receiver android:enabled="true" android:name=".WidgetReceiver" android:exported="true">
 			<intent-filter>
 				<action android:name="edu.northwestern.cbits.purple.WIDGET_ACTION" />
 			</intent-filter>
@@ -94,7 +94,6 @@
 		<activity android:name=".activities.WebkitActivity" android:label="@string/app_name" android:theme="@style/Theme.Sherlock" />
 		<activity android:name=".activities.WebkitLandscapeActivity" android:label="@string/app_name" android:screenOrientation="landscape" android:theme="@style/Theme.Sherlock" />
 		<activity android:name=".SettingsActivity" android:label="@string/app_name" />
-		<activity android:name=".PreferenceActivity" android:label="@string/app_name" />
 		<activity android:name=".DialogActivity" android:label="@string/app_name" android:theme="@android:style/Theme.Dialog" />
 		<activity android:name=".activities.LabelActivity" android:label="@string/app_name" android:theme="@style/Theme.Sherlock" />
 		<activity android:name=".ProbeViewerActivity" android:label="@string/app_name" />

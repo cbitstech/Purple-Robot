@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -25,6 +26,7 @@ import com.actionbarsherlock.view.MenuItem;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 
+@SuppressLint("SimpleDateFormat")
 public class LabelActivity extends SherlockFragmentActivity
 {
 	public static final String TIMESTAMP = "LABEL TIMESTAMP";
@@ -71,7 +73,8 @@ public class LabelActivity extends SherlockFragmentActivity
         return true;
 	}
 
-    public boolean onOptionsItemSelected(MenuItem item)
+    @SuppressLint("ValidFragment")
+	public boolean onOptionsItemSelected(MenuItem item)
     {
         switch (item.getItemId())
     	{

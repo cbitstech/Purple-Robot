@@ -21,6 +21,7 @@ import net.fortuna.ical4j.model.PeriodList;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -30,6 +31,7 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 
+@SuppressLint("SimpleDateFormat")
 public class DateTrigger extends Trigger
 {
 	public static final String TYPE_NAME = "datetime";
@@ -143,7 +145,7 @@ public class DateTrigger extends Trigger
 				if (repeats != null)
 					repeatString = "\nRRULE:" + repeats;
 
-				this._icalString = String.format(context.getString(R.string.ical_template), start, end, this.name(), repeatString);
+				this._icalString = String.format(context.getString(R.string.ical_template), start.toString(), end.toString(), this.name(), repeatString);
 				
 				this.refreshCalendar();
 	

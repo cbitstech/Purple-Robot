@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
@@ -14,6 +15,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
@@ -282,6 +284,7 @@ public class BluetoothDevicesProbe extends Probe
 		e.commit();
 	}
 
+	@SuppressLint("InlinedApi")
 	public boolean isEnabled(Context context)
 	{
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -345,14 +348,16 @@ public class BluetoothDevicesProbe extends Probe
 
 			IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
 			filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-			filter.addAction(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED);
 			filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
 			filter.addAction(BluetoothAdapter.ACTION_LOCAL_NAME_CHANGED);
 			filter.addAction(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
 			filter.addAction(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 			filter.addAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
 			filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
-			
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+				filter.addAction(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED);
+
 			context.registerReceiver(this._receiver, filter);
 		}
 
