@@ -39,6 +39,7 @@ import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeAct
 import edu.northwestern.cbits.purple_robot_manager.charts.SplineChart;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 
+@SuppressLint("SimpleDateFormat")
 public class PressureProbe extends ContinuousProbe implements SensorEventListener
 {
 	public static final String DB_TABLE = "pressure_probe";

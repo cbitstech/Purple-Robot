@@ -20,6 +20,7 @@ import android.preference.PreferenceScreen;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 
+@SuppressLint("SimpleDateFormat")
 public class TemperatureProbe extends ContinuousProbe implements SensorEventListener
 {
 	private static int BUFFER_SIZE = 40;

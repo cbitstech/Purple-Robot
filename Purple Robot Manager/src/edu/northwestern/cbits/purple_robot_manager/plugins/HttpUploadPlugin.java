@@ -28,6 +28,7 @@ import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -1044,7 +1045,7 @@ public class HttpUploadPlugin extends OutputPlugin
 				{
 					public boolean accept(File file)
 					{
-						if (file.getName().toLowerCase().endsWith(".archive"))
+						if (file.getName().toLowerCase(Locale.getDefault()).endsWith(".archive"))
 							return true;
 
 						return false;

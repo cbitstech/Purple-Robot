@@ -19,7 +19,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 public class ManagerService extends IntentService
 {
@@ -61,8 +60,6 @@ public class ManagerService extends IntentService
 			broadcast.putExtras(intent.getExtras());
 			
 			this.startService(broadcast);
-
-			Log.e("PR", "INTENT BROADCAST!");
 		}
 		if (HAPTIC_PATTERN_INTENT.equalsIgnoreCase(intent.getAction()))
 		{

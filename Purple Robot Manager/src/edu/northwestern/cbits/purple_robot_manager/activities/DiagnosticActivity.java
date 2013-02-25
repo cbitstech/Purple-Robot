@@ -3,6 +3,7 @@ package edu.northwestern.cbits.purple_robot_manager.activities;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import com.actionbarsherlock.view.MenuItem;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 
+@SuppressLint("SimpleDateFormat")
 public class DiagnosticActivity extends SherlockActivity 
 {
 	protected void onCreate(Bundle savedInstanceState)

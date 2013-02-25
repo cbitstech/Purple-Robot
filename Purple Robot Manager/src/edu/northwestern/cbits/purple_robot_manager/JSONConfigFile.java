@@ -27,7 +27,6 @@ import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.net.Uri.Builder;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
@@ -124,8 +123,6 @@ public class JSONConfigFile
 							}
 							
 							URL u = new URL(newUri.toString());
-							
-							Log.e("PR", "URL: " + u.toString());
 
 							HttpURLConnection conn = (HttpURLConnection) u.openConnection();
 							
@@ -183,6 +180,23 @@ public class JSONConfigFile
 										catch (JSONException e) 
 										{
 											e.printStackTrace();
+										}
+										catch (final Exception e)
+										{
+											e.printStackTrace();
+											
+											if (context instanceof Activity)
+											{
+												final Activity activity = (Activity) context;
+
+												activity.runOnUiThread(new Runnable()
+												{
+													public void run()
+													{
+														Toast.makeText(activity, e.getMessage(), Toast.LENGTH_LONG).show();
+													}
+												});
+											}
 										}
 									}
 								};

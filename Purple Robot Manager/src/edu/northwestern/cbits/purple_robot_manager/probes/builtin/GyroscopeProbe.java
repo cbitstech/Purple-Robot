@@ -16,6 +16,7 @@ import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -38,6 +39,7 @@ import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeAct
 import edu.northwestern.cbits.purple_robot_manager.charts.SplineChart;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 
+@SuppressLint("SimpleDateFormat")
 public class GyroscopeProbe extends ContinuousProbe implements SensorEventListener
 {
 	private static int BUFFER_SIZE = 512;

@@ -34,6 +34,7 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 
+@SuppressLint("SimpleDateFormat")
 public class WebkitActivity extends SherlockFragmentActivity
 {
 	private double _selectedTimestamp = 0;
