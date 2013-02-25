@@ -34,5 +34,4 @@ public abstract class WidgetSettingsActivity extends SherlockPreferenceActivity
 	}
 
 	public abstract void onSharedPreferenceChanged(SharedPreferences prefs, String key);
-
 }
