@@ -164,6 +164,8 @@ public class WidgetIntentService extends IntentService
 			TitleWidgetProvider.setupWidget(this, widgetId, intent, new RemoteViews(this.getPackageName(), R.layout.layout_title_widget));
 		else if (ImageWidgetProvider.NAME.equals(widget))
 			ImageWidgetProvider.setupWidget(this, widgetId, intent, new RemoteViews(this.getPackageName(), R.layout.layout_image_widget));
+		else if (FourWidgetProvider.NAME.equals(widget))
+			FourWidgetProvider.setupWidget(this, widgetId, intent, new RemoteViews(this.getPackageName(), R.layout.layout_four_widget));
 		else if (FiveWidgetProvider.NAME.equals(widget))
 			FiveWidgetProvider.setupWidget(this, widgetId, intent, new RemoteViews(this.getPackageName(), R.layout.layout_five_widget));
 	}
@@ -265,6 +267,7 @@ public class WidgetIntentService extends IntentService
 		names.add(new ComponentName(this, TextWidgetProvider.class));
 		names.add(new ComponentName(this, ImageWidgetProvider.class));
 		names.add(new ComponentName(this, TitleWidgetProvider.class));
+		names.add(new ComponentName(this, FourWidgetProvider.class));
 		names.add(new ComponentName(this, FiveWidgetProvider.class));
 
 		AppWidgetManager widgets = AppWidgetManager.getInstance(this);
@@ -287,6 +290,8 @@ public class WidgetIntentService extends IntentService
 						return ImageWidgetProvider.NAME;
 					else if (".TitleWidgetProvider".equals(name.getShortClassName()))
 						return TitleWidgetProvider.NAME;
+					else if (".FourWidgetProvider".equals(name.getShortClassName()))
+						return FourWidgetProvider.NAME;
 					else if (".FiveWidgetProvider".equals(name.getShortClassName()))
 						return FiveWidgetProvider.NAME;
 				}

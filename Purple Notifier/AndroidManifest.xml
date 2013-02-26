@@ -73,6 +73,18 @@
 			</intent-filter>	
 		</activity>
 
+		<receiver android:name="edu.northwestern.cbits.purple.notifier.FourWidgetProvider" android:label="@string/four_widget_title">
+			<intent-filter>
+				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+			</intent-filter>
+			<meta-data android:name="android.appwidget.provider" android:resource="@xml/four_appwidget_info" />
+		</receiver>
+		<activity android:exported="true" android:name="edu.northwestern.cbits.purple.notifier.FourSettingsActivity" android:label="@string/four_widget_title" android:theme="@style/Theme.Sherlock">
+            <intent-filter>
+ 				<action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+			</intent-filter>	
+		</activity>
+
 		<receiver android:name="edu.northwestern.cbits.purple.notifier.FiveWidgetProvider" android:label="@string/five_widget_title">
 			<intent-filter>
 				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -84,6 +96,6 @@
  				<action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
 			</intent-filter>	
 		</activity>
-				
-	</application>
+
+		</application>
 </manifest>

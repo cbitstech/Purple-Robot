@@ -35,7 +35,8 @@
     <string name="text_widget_title">Purple: Title &amp; Message</string>
     <string name="image_widget_title">Purple: Image Only</string>
     <string name="title_widget_title">Purple: Title Only</string>
-    <string name="five_widget_title">Purple: Five Images</string>
+    <string name="five_widget_title">Purple: Five Buttons</string>
+    <string name="four_widget_title">Purple: Four Buttons</string>
     
     <string name="config_settings_category">Widget Settings</string>
     <string name="config_password_label">Settings Password</string>
