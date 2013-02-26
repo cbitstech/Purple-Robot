@@ -1,8 +1,8 @@
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:minWidth="320dp"
+    android:minWidth="250dp"
     android:minHeight="30dp"
     android:updatePeriodMillis="86400000"
-    android:initialLayout="@layout/layout_five_widget"
-    android:configure="edu.northwestern.cbits.purple.notifier.FiveSettingsActivity"
+    android:initialLayout="@layout/layout_four_widget"
+    android:configure="edu.northwestern.cbits.purple.notifier.FourSettingsActivity"
 	android:resizeMode="none">"
 </appwidget-provider>

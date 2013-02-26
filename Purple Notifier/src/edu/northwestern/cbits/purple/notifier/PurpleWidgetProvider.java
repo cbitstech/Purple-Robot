@@ -25,15 +25,22 @@ public abstract class PurpleWidgetProvider extends AppWidgetProvider
 		
 		InputStream input = null;
 
-		if ("http".equals(imageUri.getScheme().toLowerCase()) || 
-			"https".equals(imageUri.getScheme().toLowerCase()))
+		try
 		{
-			HttpURLConnection conn = (HttpURLConnection) (new URL(imageUri.toString())).openConnection();
-			
-			input = conn.getInputStream();
+			if ("http".equals(imageUri.getScheme().toLowerCase()) || 
+				"https".equals(imageUri.getScheme().toLowerCase()))
+			{
+				HttpURLConnection conn = (HttpURLConnection) (new URL(imageUri.toString())).openConnection();
+				
+				input = conn.getInputStream();
+			}
+			else
+				input = context.getContentResolver().openInputStream(imageUri);
 		}
-		else
-			input = context.getContentResolver().openInputStream(imageUri);
+		catch (NullPointerException e)
+		{
+			
+		}
 		
 		return input;
 	}
@@ -41,6 +48,9 @@ public abstract class PurpleWidgetProvider extends AppWidgetProvider
 	protected static Bitmap bitmapForUri(Context context, Uri imageUri) throws IOException 
 	{
 		InputStream input = PurpleWidgetProvider.inputStreamForUri(context, imageUri);
+		
+		if (input == null)
+			return null;
 
         BitmapFactory.Options onlyBoundsOptions = new BitmapFactory.Options();
         onlyBoundsOptions.inJustDecodeBounds = true;
