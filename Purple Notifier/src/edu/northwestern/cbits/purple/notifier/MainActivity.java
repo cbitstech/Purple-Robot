@@ -8,6 +8,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
+import net.hockeyapp.android.CrashManager;
+import net.hockeyapp.android.UpdateManager;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -49,6 +52,16 @@ public class MainActivity extends SherlockListActivity
         this.setContentView(R.layout.layout_main_list);
     }
 	
+	private void checkForCrashes() 
+  	{
+	    CrashManager.register(this, "8c7ce7ece36e9c4c3020977ce042349c");
+  	}
+
+	private void checkForUpdates() 
+	{
+		UpdateManager.register(this, "8c7ce7ece36e9c4c3020977ce042349c");
+	}
+	
 	protected void onResume()
 	{
 		super.onResume();
@@ -57,6 +70,9 @@ public class MainActivity extends SherlockListActivity
 		this.startService(intent);
 
 		this.refreshList();
+
+	    checkForCrashes();
+	    checkForUpdates();
 	}
 	
 	public boolean onContextItemSelected(android.view.MenuItem item)
