@@ -5,51 +5,13 @@
    	<uses-permission android:name="android.permission.INTERNET" />
     <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="14" />
     <application android:allowBackup="true" android:icon="@drawable/ic_launcher" android:label="@string/app_name" android:theme="@style/AppTheme">
-		<receiver android:name="edu.northwestern.cbits.purple.notifier.BasicWidgetProvider" android:label="@string/basic_widget_title">
-			<intent-filter>
-				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-			</intent-filter>
-			<meta-data android:name="android.appwidget.provider" android:resource="@xml/basic_appwidget_info" />
-		</receiver>
-		<receiver android:name="edu.northwestern.cbits.purple.notifier.TextWidgetProvider" android:label="@string/text_widget_title">
-			<intent-filter>
-				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-			</intent-filter>
-			<meta-data android:name="android.appwidget.provider" android:resource="@xml/text_appwidget_info" />
-		</receiver>
-		<receiver android:name="edu.northwestern.cbits.purple.notifier.TitleWidgetProvider" android:label="@string/title_widget_title">
-			<intent-filter>
-				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-			</intent-filter>
-			<meta-data android:name="android.appwidget.provider" android:resource="@xml/title_appwidget_info" />
-		</receiver>
-		<activity android:name="edu.northwestern.cbits.purple.notifier.UpdateWidgetActivity" android:label="@string/app_name"  android:theme="@style/Theme.Sherlock" />
 		<activity android:name="edu.northwestern.cbits.purple.notifier.MainActivity" android:label="@string/app_name"  android:theme="@style/Theme.Sherlock">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
 	        </intent-filter>
         </activity>
-		<activity android:exported="true" android:name="edu.northwestern.cbits.purple.notifier.BasicSettingsActivity" android:label="@string/basic_widget_title" android:theme="@style/Theme.Sherlock">
-            <intent-filter>
- 				<action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
-			</intent-filter>	
-		</activity>
-		<activity android:exported="true" android:name="edu.northwestern.cbits.purple.notifier.TextSettingsActivity" android:label="@string/text_widget_title" android:theme="@style/Theme.Sherlock">
-            <intent-filter>
- 				<action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
-			</intent-filter>	
-		</activity>
-		<activity android:exported="true" android:name="edu.northwestern.cbits.purple.notifier.ImageSettingsActivity" android:label="@string/image_widget_title" android:theme="@style/Theme.Sherlock">
-            <intent-filter>
- 				<action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
-			</intent-filter>	
-		</activity>
-		<activity android:exported="true" android:name="edu.northwestern.cbits.purple.notifier.TitleSettingsActivity" android:label="@string/title_widget_title" android:theme="@style/Theme.Sherlock">
-            <intent-filter>
- 				<action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
-			</intent-filter>	
-		</activity>
+   		<activity android:name="edu.northwestern.cbits.purple.notifier.UpdateWidgetActivity" android:label="@string/app_name"  android:theme="@style/Theme.Sherlock" />
 		<receiver android:enabled="true" android:exported="true" android:name="edu.northwestern.cbits.purple.notifier.WidgetBroadcastReceiver">  <!--  android:permission="edu.northwestern.cbits.purple.UPDATE_WIDGET"> -->
 		    <intent-filter>
 		        <action android:name="edu.northwestern.cbits.purple.UPDATE_WIDGET" />
@@ -62,5 +24,66 @@
 		        <action android:name="edu.northwestern.cbits.purple.ACTION_BOOT" />
   		    </intent-filter>
 		</service>
+   		
+   		<receiver android:name="edu.northwestern.cbits.purple.notifier.BasicWidgetProvider" android:label="@string/basic_widget_title">
+			<intent-filter>
+				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+			</intent-filter>
+			<meta-data android:name="android.appwidget.provider" android:resource="@xml/basic_appwidget_info" />
+		</receiver>
+		<activity android:exported="true" android:name="edu.northwestern.cbits.purple.notifier.BasicSettingsActivity" android:label="@string/basic_widget_title" android:theme="@style/Theme.Sherlock">
+            <intent-filter>
+ 				<action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+			</intent-filter>	
+		</activity>
+   		
+		<receiver android:name="edu.northwestern.cbits.purple.notifier.TextWidgetProvider" android:label="@string/text_widget_title">
+			<intent-filter>
+				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+			</intent-filter>
+			<meta-data android:name="android.appwidget.provider" android:resource="@xml/text_appwidget_info" />
+		</receiver>
+		<activity android:exported="true" android:name="edu.northwestern.cbits.purple.notifier.TextSettingsActivity" android:label="@string/text_widget_title" android:theme="@style/Theme.Sherlock">
+            <intent-filter>
+ 				<action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+			</intent-filter>	
+		</activity>
+		
+		<receiver android:name="edu.northwestern.cbits.purple.notifier.TitleWidgetProvider" android:label="@string/title_widget_title">
+			<intent-filter>
+				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+			</intent-filter>
+			<meta-data android:name="android.appwidget.provider" android:resource="@xml/title_appwidget_info" />
+		</receiver>
+		<activity android:exported="true" android:name="edu.northwestern.cbits.purple.notifier.TitleSettingsActivity" android:label="@string/title_widget_title" android:theme="@style/Theme.Sherlock">
+            <intent-filter>
+ 				<action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+			</intent-filter>	
+		</activity>
+		
+		<receiver android:name="edu.northwestern.cbits.purple.notifier.ImageWidgetProvider" android:label="@string/image_widget_title">
+			<intent-filter>
+				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+			</intent-filter>
+			<meta-data android:name="android.appwidget.provider" android:resource="@xml/image_appwidget_info" />
+		</receiver>
+		<activity android:exported="true" android:name="edu.northwestern.cbits.purple.notifier.ImageSettingsActivity" android:label="@string/image_widget_title" android:theme="@style/Theme.Sherlock">
+            <intent-filter>
+ 				<action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+			</intent-filter>	
+		</activity>
+
+		<receiver android:name="edu.northwestern.cbits.purple.notifier.FiveWidgetProvider" android:label="@string/five_widget_title">
+			<intent-filter>
+				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+			</intent-filter>
+			<meta-data android:name="android.appwidget.provider" android:resource="@xml/five_appwidget_info" />
+		</receiver>
+		<activity android:exported="true" android:name="edu.northwestern.cbits.purple.notifier.FiveSettingsActivity" android:label="@string/five_widget_title" android:theme="@style/Theme.Sherlock">
+            <intent-filter>
+ 				<action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+			</intent-filter>	
+		</activity>
+				
 	</application>
 </manifest>

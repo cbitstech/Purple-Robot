@@ -1,10 +1,5 @@
 package edu.northwestern.cbits.purple.notifier;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
@@ -13,15 +8,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.IntentService;
-import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -165,188 +156,16 @@ public class WidgetIntentService extends IntentService
 			return;
 		}
 		
-		AppWidgetManager widgets = AppWidgetManager.getInstance(this);
-		
 		if (BasicWidgetProvider.NAME.equals(widget))
-		{
-			String title = extras.getString("title");
-			String message = extras.getString("message");
-			String image = extras.getString("image");
-			
-			RemoteViews rv = new RemoteViews(this.getPackageName(), R.layout.layout_basic_widget);
-
-			Uri imageUri = null;
-			
-			try
-			{
-				imageUri = Uri.parse(image);
-			}
-			catch (NullPointerException e)
-			{
-				
-			}
-			
-			if (imageUri != null)
-			{
-				try
-				{
-					rv.setImageViewBitmap(R.id.widget_basic_image, this.bitmapForUri(imageUri));
-				}
-				catch (IOException e)
-				{
-					e.printStackTrace();
-				}
-			}
-
-			rv.setTextViewText(R.id.widget_basic_title_text, title);
-			rv.setTextViewText(R.id.widget_basic_message_text, message);
-			
-			Intent tapIntent = new Intent(WidgetIntentService.WIDGET_ACTION);
-			tapIntent.putExtras(intent);
-			tapIntent.putExtra("widget_action", "tap");
-
-			PendingIntent pendingIntent = PendingIntent.getBroadcast(this, widgetId, tapIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-			rv.setOnClickPendingIntent(R.id.widget_basic_layout, pendingIntent);
-			
-			widgets.updateAppWidget(widgetId, rv);
-		}
+			BasicWidgetProvider.setupWidget(this, widgetId, intent, new RemoteViews(this.getPackageName(), R.layout.layout_basic_widget));
 		else if (TextWidgetProvider.NAME.equals(widget))
-		{
-			String title = extras.getString("title");
-			String message = extras.getString("message");
-
-			RemoteViews rv = new RemoteViews(this.getPackageName(), R.layout.layout_text_widget);
-
-			rv.setTextViewText(R.id.widget_text_title_text, title);
-			rv.setTextViewText(R.id.widget_text_message_text, message);
-
-			Intent tapIntent = new Intent(WidgetIntentService.WIDGET_ACTION);
-			tapIntent.putExtras(intent);
-			tapIntent.putExtra("widget_action", "tap");
-
-			PendingIntent pendingIntent = PendingIntent.getBroadcast(this, widgetId, tapIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-			rv.setOnClickPendingIntent(R.id.widget_text_layout, pendingIntent);
-			
-			widgets.updateAppWidget(widgetId, rv);
-		}
+			TextWidgetProvider.setupWidget(this, widgetId, intent, new RemoteViews(this.getPackageName(), R.layout.layout_text_widget));
 		else if (TitleWidgetProvider.NAME.equals(widget))
-		{
-			String title = extras.getString("title");
-
-			RemoteViews rv = new RemoteViews(this.getPackageName(), R.layout.layout_text_widget);
-
-			rv.setTextViewText(R.id.widget_text_title_text, title);
-
-			Intent tapIntent = new Intent(WidgetIntentService.WIDGET_ACTION);
-			tapIntent.putExtras(intent);
-			tapIntent.putExtra("widget_action", "tap");
-
-			PendingIntent pendingIntent = PendingIntent.getBroadcast(this, widgetId, tapIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-			rv.setOnClickPendingIntent(R.id.widget_title_layout, pendingIntent);
-			
-			widgets.updateAppWidget(widgetId, rv);
-		}
+			TitleWidgetProvider.setupWidget(this, widgetId, intent, new RemoteViews(this.getPackageName(), R.layout.layout_title_widget));
 		else if (ImageWidgetProvider.NAME.equals(widget))
-		{
-			String image = extras.getString("image");
-			
-			RemoteViews rv = new RemoteViews(this.getPackageName(), R.layout.layout_image_widget);
-
-			Uri imageUri = null;
-			
-			try
-			{
-				imageUri = Uri.parse(image);
-			}
-			catch (NullPointerException e)
-			{
-				
-			}
-			
-			if (imageUri != null)
-			{
-				try
-				{
-					rv.setImageViewBitmap(R.id.widget_image_image, this.bitmapForUri(imageUri));
-				}
-				catch (IOException e)
-				{
-					e.printStackTrace();
-				}
-			}
-
-			Intent tapIntent = new Intent(WidgetIntentService.WIDGET_ACTION);
-			tapIntent.putExtras(intent);
-			tapIntent.putExtra("widget_action", "tap");
-
-			PendingIntent pendingIntent = PendingIntent.getBroadcast(this, widgetId, tapIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-			rv.setOnClickPendingIntent(R.id.widget_image_layout, pendingIntent);
-			
-			widgets.updateAppWidget(widgetId, rv);
-		}
-	}
-
-	// http://stackoverflow.com/questions/3879992/get-bitmap-from-an-uri-android
-
-	private static int getPowerOfTwoForSampleRatio(double ratio)
-    {
-        int k = Integer.highestOneBit((int)Math.floor(ratio));
-
-        if (k == 0)
-        	return 1;
-        
-        return k;
-    }
-	
-	private InputStream inputStreamForUri(Uri imageUri) throws MalformedURLException, IOException
-	{
-		// TODO: Insert caching layer../
-		
-		InputStream input = null;
-
-		if ("http".equals(imageUri.getScheme().toLowerCase()) || 
-			"https".equals(imageUri.getScheme().toLowerCase()))
-		{
-			HttpURLConnection conn = (HttpURLConnection) (new URL(imageUri.toString())).openConnection();
-			
-			input = conn.getInputStream();
-		}
-		else
-			input = this.getContentResolver().openInputStream(imageUri);
-		
-		return input;
-	}
-
-	private Bitmap bitmapForUri(Uri imageUri) throws IOException 
-	{
-		InputStream input = this.inputStreamForUri(imageUri);
-
-        BitmapFactory.Options onlyBoundsOptions = new BitmapFactory.Options();
-        onlyBoundsOptions.inJustDecodeBounds = true;
-        onlyBoundsOptions.inDither=true;//optional
-        onlyBoundsOptions.inPreferredConfig=Bitmap.Config.ARGB_8888;//optional
-        BitmapFactory.decodeStream(input, null, onlyBoundsOptions);
-        input.close();
-
-        if ((onlyBoundsOptions.outWidth == -1) || (onlyBoundsOptions.outHeight == -1))
-            return null;
-
-        int originalSize = (onlyBoundsOptions.outHeight > onlyBoundsOptions.outWidth) ? onlyBoundsOptions.outHeight : onlyBoundsOptions.outWidth;
-
-        double ratio = (originalSize > 144) ? (originalSize / 144) : 1.0;
-
-        BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
-
-        bitmapOptions.inSampleSize = getPowerOfTwoForSampleRatio(ratio);
-        bitmapOptions.inDither=true; 
-        bitmapOptions.inPreferredConfig=Bitmap.Config.ARGB_8888;//optional
-
-		input = this.inputStreamForUri(imageUri);
-
-		Bitmap bitmap = BitmapFactory.decodeStream(input, null, bitmapOptions);
-        input.close();
-
-        return bitmap;
+			ImageWidgetProvider.setupWidget(this, widgetId, intent, new RemoteViews(this.getPackageName(), R.layout.layout_image_widget));
+		else if (FiveWidgetProvider.NAME.equals(widget))
+			FiveWidgetProvider.setupWidget(this, widgetId, intent, new RemoteViews(this.getPackageName(), R.layout.layout_five_widget));
 	}
 
 	private int[] getWidgetIds(String identifier) 
@@ -446,6 +265,7 @@ public class WidgetIntentService extends IntentService
 		names.add(new ComponentName(this, TextWidgetProvider.class));
 		names.add(new ComponentName(this, ImageWidgetProvider.class));
 		names.add(new ComponentName(this, TitleWidgetProvider.class));
+		names.add(new ComponentName(this, FiveWidgetProvider.class));
 
 		AppWidgetManager widgets = AppWidgetManager.getInstance(this);
 		
@@ -467,6 +287,8 @@ public class WidgetIntentService extends IntentService
 						return ImageWidgetProvider.NAME;
 					else if (".TitleWidgetProvider".equals(name.getShortClassName()))
 						return TitleWidgetProvider.NAME;
+					else if (".FiveWidgetProvider".equals(name.getShortClassName()))
+						return FiveWidgetProvider.NAME;
 				}
 			}
 		}

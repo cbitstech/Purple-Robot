@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<EditTextPreference
+	    android:key="config_five_one"
+	    android:title="@string/config_image_one_label"
+	    android:dialogTitle="@string/config_image_title"
+	    android:dialogMessage="@string/config_image_message"
+	    android:defaultValue="" />
+	<EditTextPreference
+	    android:key="config_five_two"
+	    android:title="@string/config_image_two_label"
+	    android:dialogTitle="@string/config_image_title"
+	    android:dialogMessage="@string/config_image_message"
+	    android:defaultValue="" />
+	<EditTextPreference
+	    android:key="config_five_three"
+	    android:title="@string/config_image_three_label"
+	    android:dialogTitle="@string/config_image_title"
+	    android:dialogMessage="@string/config_image_message"
+	    android:defaultValue="" />
+	<EditTextPreference
+	    android:key="config_five_four"
+	    android:title="@string/config_image_four_label"
+	    android:dialogTitle="@string/config_image_title"
+	    android:dialogMessage="@string/config_image_message"
+	    android:defaultValue="" />
+	<EditTextPreference
+	    android:key="config_five_five"
+	    android:title="@string/config_image_five_label"
+	    android:dialogTitle="@string/config_image_title"
+	    android:dialogMessage="@string/config_image_message"
+	    android:defaultValue="" />
+</PreferenceScreen>
