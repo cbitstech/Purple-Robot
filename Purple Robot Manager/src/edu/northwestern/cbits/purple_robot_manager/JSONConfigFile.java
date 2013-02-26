@@ -17,6 +17,7 @@ import java.util.prefs.Preferences;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.mozilla.javascript.EcmaError;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -181,7 +182,7 @@ public class JSONConfigFile
 										{
 											e.printStackTrace();
 										}
-										catch (final Exception e)
+										catch (final EcmaError e)
 										{
 											e.printStackTrace();
 											
@@ -489,9 +490,9 @@ public class JSONConfigFile
 
 				long now = System.currentTimeMillis();
 
-				int interval = Integer.parseInt(prefs.getString("config_json_refresh_interval", "60"));
+				int interval = Integer.parseInt(prefs.getString("config_json_refresh_interval", "3600"));
 
-				if (now - lastUpdate > 1000 * 60 * interval)
+				if (now - lastUpdate > 1000 * interval)
 				{
 					Editor edit = prefs.edit();
 

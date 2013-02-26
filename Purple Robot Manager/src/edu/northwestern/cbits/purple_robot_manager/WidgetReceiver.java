@@ -9,7 +9,6 @@ public class WidgetReceiver extends BroadcastReceiver
     public void onReceive(Context context, Intent intent)
     {
     	String action = intent.getStringExtra("widget_action");
-
     	if ("tap".equals(action))
     	{
     		String script = intent.getStringExtra("action");

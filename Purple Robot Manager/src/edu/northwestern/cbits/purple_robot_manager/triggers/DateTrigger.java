@@ -336,12 +336,8 @@ public class DateTrigger extends Trigger
 		
 		screen.addPreference(lastFire);
 		
-		List<Date> upcoming = this.upcomingFireDates(7);
+		List<Date> upcoming = this.nextFires(32);
 		
-		if (upcoming.size() > 128)
-			upcoming = upcoming.subList(0, 128);
-		
-
 		if (upcoming.size() > 0)
 		{
 			PreferenceManager manager = activity.getPreferenceManager();
@@ -376,36 +372,47 @@ public class DateTrigger extends Trigger
 		return screen;
 	}
 
-	private List<Date> upcomingFireDates(int days) 
+	private List<Date> nextFires(int count) 
 	{
 		this.refreshCalendar();
 		
 		ArrayList<Date> upcoming = new ArrayList<Date>();
 		
 		long now = System.currentTimeMillis();
+		long current = now;
+		
+		long hour = 1000 * 60 * 60;
 		
 		try
 		{
-			DateTime from = new DateTime(new Date(now));
-			DateTime to = new DateTime(new Date(now + (1000 * 60 * 60 * 24 * days)));
-
-			Period period = new Period(from, to);
-
-			for (Object o : this._calendar.getComponents("VEVENT"))
+			while (upcoming.size() < count)
 			{
-				Component c = (Component) o;
+				DateTime from = new DateTime(new Date(current));
+				DateTime to = new DateTime(new Date(current + (hour)));
 
-				PeriodList l = c.calculateRecurrenceSet(period);
-				
-				for (Object po : l)
+				Period period = new Period(from, to);
+
+				for (Object o : this._calendar.getComponents("VEVENT"))
 				{
-					if (po instanceof Period)
-					{
-						Period p = (Period) po;
+					Component c = (Component) o;
 
-						upcoming.add(p.getRangeStart());
+					PeriodList l = c.calculateRecurrenceSet(period);
+					
+					for (Object po : l)
+					{
+						if (po instanceof Period && upcoming.size() < count)
+						{
+							Period p = (Period) po;
+
+							upcoming.add(p.getRangeStart());
+						}
 					}
 				}
+				
+				current += (hour + 1);
+				
+				if (current - now > hour * 24)
+					return upcoming;
 			}
 		}
 		catch (IllegalArgumentException e)
