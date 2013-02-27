@@ -336,7 +336,7 @@ public class DateTrigger extends Trigger
 		
 		screen.addPreference(lastFire);
 		
-		List<Date> upcoming = this.nextFires(32);
+		List<Date> upcoming = new ArrayList<Date>(); // this.nextFires(32);
 		
 		if (upcoming.size() > 0)
 		{
