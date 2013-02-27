@@ -5,8 +5,8 @@
         android:showAsAction="always"
         android:icon="@drawable/action_about" />
     <item android:id="@+id/menu_settings_item"
-        android:title="@string/menu_settings_label"
-        android:icon="@drawable/action_settings" />
+        android:title="@string/menu_settings_label" 
+        android:showAsAction="never" />
     <item android:id="@+id/menu_upload_item"
         android:title="@string/menu_upload_label"
         android:showAsAction="never" />
