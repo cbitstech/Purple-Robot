@@ -39,32 +39,42 @@ public class FiveWidgetProvider extends PurpleWidgetProvider
 		{
 			if (image != null && "".equals(image.trim()) == false)
 			{
+				RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_five_widget);
 				imageUri = Uri.parse(image);
-				remoteViews.setImageViewBitmap(R.id.widget_five_one, PurpleWidgetProvider.bitmapForUri(context, imageUri));
+				rv.setImageViewBitmap(R.id.widget_five_one, PurpleWidgetProvider.bitmapForUri(context, imageUri));
+				widgets.updateAppWidget(widgetId, rv);
 			}
 			
 			if (imageTwo != null && "".equals(imageTwo.trim()) == false)
 			{
+				RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_five_widget);
 				imageTwoUri = Uri.parse(imageTwo);
-				remoteViews.setImageViewBitmap(R.id.widget_five_two, PurpleWidgetProvider.bitmapForUri(context, imageTwoUri));
+				rv.setImageViewBitmap(R.id.widget_five_two, PurpleWidgetProvider.bitmapForUri(context, imageTwoUri));
+				widgets.updateAppWidget(widgetId, rv);
 			}
 			
 			if (imageThree != null && "".equals(imageThree.trim()) == false)
 			{
+				RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_five_widget);
 				imageThreeUri = Uri.parse(imageThree);
-				remoteViews.setImageViewBitmap(R.id.widget_five_three, PurpleWidgetProvider.bitmapForUri(context, imageThreeUri));
+				rv.setImageViewBitmap(R.id.widget_five_three, PurpleWidgetProvider.bitmapForUri(context, imageThreeUri));
+				widgets.updateAppWidget(widgetId, rv);
 			}
 			
 			if (imageFour != null && "".equals(imageFour.trim()) == false)
 			{
+				RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_five_widget);
 				imageFourUri = Uri.parse(imageFour);
-				remoteViews.setImageViewBitmap(R.id.widget_five_four, PurpleWidgetProvider.bitmapForUri(context, imageFourUri));
+				rv.setImageViewBitmap(R.id.widget_five_four, PurpleWidgetProvider.bitmapForUri(context, imageFourUri));
+				widgets.updateAppWidget(widgetId, rv);
 			}
 			
 			if (imageFive != null && "".equals(imageFive.trim()) == false)
 			{
+				RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_five_widget);
 				imageFiveUri = Uri.parse(imageFive);
-				remoteViews.setImageViewBitmap(R.id.widget_five_five, PurpleWidgetProvider.bitmapForUri(context, imageFiveUri));
+				rv.setImageViewBitmap(R.id.widget_five_five, PurpleWidgetProvider.bitmapForUri(context, imageFiveUri));
+				widgets.updateAppWidget(widgetId, rv);
 			}
 		} 
 		catch (IOException e) 
@@ -73,35 +83,50 @@ public class FiveWidgetProvider extends PurpleWidgetProvider
 		}
 
 		Intent tapIntent = new Intent(WidgetIntentService.WIDGET_ACTION);
-		tapIntent.putExtras(intent);
 		tapIntent.putExtra("widget_action", "tap_one");
+		
+		if (intent.hasExtra("action_one"))
+			tapIntent.putExtra("action_one", intent.getStringExtra("action_one"));
+		
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, (widgetId * 100) + 1, tapIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 		remoteViews.setOnClickPendingIntent(R.id.widget_five_one, pendingIntent);
-		
+
 		tapIntent = new Intent(WidgetIntentService.WIDGET_ACTION);
-		tapIntent.putExtras(intent);
 		tapIntent.putExtra("widget_action", "tap_two");
+
+		if (intent.hasExtra("action_two"))
+			tapIntent.putExtra("action_two", intent.getStringExtra("action_two"));
+		
 		pendingIntent = PendingIntent.getBroadcast(context, (widgetId * 100) + 2, tapIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 		remoteViews.setOnClickPendingIntent(R.id.widget_five_two, pendingIntent);
 
 		tapIntent = new Intent(WidgetIntentService.WIDGET_ACTION);
-		tapIntent.putExtras(intent);
 		tapIntent.putExtra("widget_action", "tap_three");
+
+		if (intent.hasExtra("action_three"))
+			tapIntent.putExtra("action_three", intent.getStringExtra("action_three"));
+		
 		pendingIntent = PendingIntent.getBroadcast(context, (widgetId * 100) + 3, tapIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 		remoteViews.setOnClickPendingIntent(R.id.widget_five_three, pendingIntent);
 
 		tapIntent = new Intent(WidgetIntentService.WIDGET_ACTION);
-		tapIntent.putExtras(intent);
 		tapIntent.putExtra("widget_action", "tap_four");
+
+		if (intent.hasExtra("action_four"))
+			tapIntent.putExtra("action_four", intent.getStringExtra("action_four"));
+
 		pendingIntent = PendingIntent.getBroadcast(context, (widgetId * 100) + 4, tapIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 		remoteViews.setOnClickPendingIntent(R.id.widget_five_four, pendingIntent);
 
 		tapIntent = new Intent(WidgetIntentService.WIDGET_ACTION);
-		tapIntent.putExtras(intent);
 		tapIntent.putExtra("widget_action", "tap_five");
+	
+		if (intent.hasExtra("action_five"))
+			tapIntent.putExtra("action_five", intent.getStringExtra("action_five"));
+		
 		pendingIntent = PendingIntent.getBroadcast(context, (widgetId * 100) + 5, tapIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 		remoteViews.setOnClickPendingIntent(R.id.widget_five_five, pendingIntent);
-		
+
 		widgets.updateAppWidget(widgetId, remoteViews);
 	}
 }

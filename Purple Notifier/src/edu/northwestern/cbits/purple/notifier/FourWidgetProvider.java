@@ -37,26 +37,34 @@ public class FourWidgetProvider extends PurpleWidgetProvider
 		{
 			if (image != null && "".equals(image.trim()) == false)
 			{
+				RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_four_widget);
 				imageUri = Uri.parse(image);
-				remoteViews.setImageViewBitmap(R.id.widget_four_one, PurpleWidgetProvider.bitmapForUri(context, imageUri));
+				rv.setImageViewBitmap(R.id.widget_four_one, PurpleWidgetProvider.bitmapForUri(context, imageUri));
+				widgets.updateAppWidget(widgetId, rv);
 			}
 			
 			if (imageTwo != null && "".equals(imageTwo.trim()) == false)
 			{
+				RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_four_widget);
 				imageTwoUri = Uri.parse(imageTwo);
-				remoteViews.setImageViewBitmap(R.id.widget_four_two, PurpleWidgetProvider.bitmapForUri(context, imageTwoUri));
+				rv.setImageViewBitmap(R.id.widget_four_two, PurpleWidgetProvider.bitmapForUri(context, imageTwoUri));
+				widgets.updateAppWidget(widgetId, rv);
 			}
 			
 			if (imageThree != null && "".equals(imageThree.trim()) == false)
 			{
+				RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_four_widget);
 				imageThreeUri = Uri.parse(imageThree);
-				remoteViews.setImageViewBitmap(R.id.widget_four_three, PurpleWidgetProvider.bitmapForUri(context, imageThreeUri));
+				rv.setImageViewBitmap(R.id.widget_four_three, PurpleWidgetProvider.bitmapForUri(context, imageThreeUri));
+				widgets.updateAppWidget(widgetId, rv);
 			}
 			
 			if (imageFour != null && "".equals(imageFour.trim()) == false)
 			{
+				RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_four_widget);
 				imageFourUri = Uri.parse(imageFour);
-				remoteViews.setImageViewBitmap(R.id.widget_four_four, PurpleWidgetProvider.bitmapForUri(context, imageFourUri));
+				rv.setImageViewBitmap(R.id.widget_four_four, PurpleWidgetProvider.bitmapForUri(context, imageFourUri));
+				widgets.updateAppWidget(widgetId, rv);
 			}
 		} 
 		catch (IOException e) 
@@ -65,26 +73,38 @@ public class FourWidgetProvider extends PurpleWidgetProvider
 		}
 
 		Intent tapIntent = new Intent(WidgetIntentService.WIDGET_ACTION);
-		tapIntent.putExtras(intent);
 		tapIntent.putExtra("widget_action", "tap_one");
+
+		if (intent.hasExtra("action_one"))
+			tapIntent.putExtra("action_one", intent.getStringExtra("action_one"));
+
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, (widgetId * 100) + 1, tapIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 		remoteViews.setOnClickPendingIntent(R.id.widget_four_one, pendingIntent);
 		
 		tapIntent = new Intent(WidgetIntentService.WIDGET_ACTION);
-		tapIntent.putExtras(intent);
 		tapIntent.putExtra("widget_action", "tap_two");
+
+		if (intent.hasExtra("action_two"))
+			tapIntent.putExtra("action_two", intent.getStringExtra("action_two"));
+
 		pendingIntent = PendingIntent.getBroadcast(context, (widgetId * 100) + 2, tapIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 		remoteViews.setOnClickPendingIntent(R.id.widget_four_two, pendingIntent);
 
 		tapIntent = new Intent(WidgetIntentService.WIDGET_ACTION);
-		tapIntent.putExtras(intent);
 		tapIntent.putExtra("widget_action", "tap_three");
+	
+		if (intent.hasExtra("action_three"))
+			tapIntent.putExtra("action_three", intent.getStringExtra("action_three"));
+		
 		pendingIntent = PendingIntent.getBroadcast(context, (widgetId * 100) + 3, tapIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 		remoteViews.setOnClickPendingIntent(R.id.widget_four_three, pendingIntent);
 
 		tapIntent = new Intent(WidgetIntentService.WIDGET_ACTION);
-		tapIntent.putExtras(intent);
 		tapIntent.putExtra("widget_action", "tap_four");
+
+		if (intent.hasExtra("action_four"))
+			tapIntent.putExtra("action_four", intent.getStringExtra("action_four"));
+
 		pendingIntent = PendingIntent.getBroadcast(context, (widgetId * 100) + 4, tapIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 		remoteViews.setOnClickPendingIntent(R.id.widget_four_four, pendingIntent);
 		
