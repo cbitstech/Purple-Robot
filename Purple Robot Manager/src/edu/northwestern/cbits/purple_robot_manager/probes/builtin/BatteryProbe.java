@@ -156,7 +156,7 @@ public class BatteryProbe extends Probe
 	{
 		Bundle formatted = super.formattedBundle(context, bundle);
 
-		formatted.putString(context.getString(R.string.battery_tech_label), bundle.getString(BatteryManager.EXTRA_TECHNOLOGY, context.getString(R.string.unknown_label)));
+		formatted.putString(context.getString(R.string.battery_tech_label), bundle.getString(BatteryManager.EXTRA_TECHNOLOGY));
 		formatted.putInt(context.getString(R.string.battery_temp_label), bundle.getInt(BatteryManager.EXTRA_TEMPERATURE, -1));
 		formatted.putInt(context.getString(R.string.battery_volt_label), bundle.getInt(BatteryManager.EXTRA_VOLTAGE, -1));
 

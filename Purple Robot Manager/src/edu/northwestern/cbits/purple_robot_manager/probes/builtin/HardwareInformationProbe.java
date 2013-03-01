@@ -137,10 +137,10 @@ public class HardwareInformationProbe extends Probe
 	{
 		Bundle formatted = super.formattedBundle(context, bundle);
 
-		formatted.putString(context.getString(R.string.hardware_model_label), bundle.getString(HardwareInformationProbe.MODEL, context.getString(R.string.unknown_label)));
-		formatted.putString(context.getString(R.string.hardware_mfr_label), bundle.getString(HardwareInformationProbe.MANUFACTURER, context.getString(R.string.unknown_label)));
-		formatted.putString(context.getString(R.string.hardware_bluetooth_label), bundle.getString(HardwareInformationProbe.BLUETOOTH_MAC, context.getString(R.string.unknown_label)));
-		formatted.putString(context.getString(R.string.hardware_wifi_label), bundle.getString(HardwareInformationProbe.WIFI_MAC, context.getString(R.string.unknown_label)));
+		formatted.putString(context.getString(R.string.hardware_model_label), bundle.getString(HardwareInformationProbe.MODEL));
+		formatted.putString(context.getString(R.string.hardware_mfr_label), bundle.getString(HardwareInformationProbe.MANUFACTURER));
+		formatted.putString(context.getString(R.string.hardware_bluetooth_label), bundle.getString(HardwareInformationProbe.BLUETOOTH_MAC));
+		formatted.putString(context.getString(R.string.hardware_wifi_label), bundle.getString(HardwareInformationProbe.WIFI_MAC));
 
 		return formatted;
 	};
