@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory
-	    android:key="config_text_category"
-        android:title="wIDGET sETTINGS">
-      	<EditTextPreference
-		    android:key="config_text_title"
-		    android:title="@string/config_title_label"
-		    android:dialogTitle="@string/config_title_title"
-		    android:dialogMessage="@string/config_title_message"
-		    android:defaultValue="" />
-    </PreferenceCategory>
+	<EditTextPreference
+		android:key="config_title_title"
+		android:title="@string/config_title_label"
+		android:dialogTitle="@string/config_title_title"
+		android:dialogMessage="@string/config_title_message"
+		android:defaultValue="" />
 </PreferenceScreen>

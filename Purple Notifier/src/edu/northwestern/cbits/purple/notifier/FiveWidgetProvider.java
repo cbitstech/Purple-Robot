@@ -15,8 +15,10 @@ public class FiveWidgetProvider extends PurpleWidgetProvider
 	public static final String NAME = "FIVE_WIDGET_UPDATE";
 	public static final String WIDGET_LAUNCH = "config_widget_five_launch";
 
-	public static void setupWidget(Context context, int widgetId, Intent intent, RemoteViews remoteViews) 
+	public static void setupWidget(Context context, int widgetId, Intent intent) 
 	{
+		RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.layout_five_widget);
+		
 		Bundle extras = intent.getExtras();
 
 		AppWidgetManager widgets = AppWidgetManager.getInstance(context);
