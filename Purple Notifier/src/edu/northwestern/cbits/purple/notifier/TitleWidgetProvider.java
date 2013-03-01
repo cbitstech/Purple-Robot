@@ -21,7 +21,7 @@ public class TitleWidgetProvider extends PurpleWidgetProvider
 
 		String title = extras.getString("title");
 
-		remoteViews.setTextViewText(R.id.widget_text_title_text, title);
+		remoteViews.setTextViewText(R.id.widget_title_title_text, title);
 
 		Intent tapIntent = new Intent(WidgetIntentService.WIDGET_ACTION);
 		tapIntent.putExtras(intent);

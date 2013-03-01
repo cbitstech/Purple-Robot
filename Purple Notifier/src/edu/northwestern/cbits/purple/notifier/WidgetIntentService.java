@@ -9,12 +9,17 @@ import org.json.JSONObject;
 
 import android.app.IntentService;
 import android.appwidget.AppWidgetManager;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
+import android.view.OrientationEventListener;
 
 public class WidgetIntentService extends IntentService 
 {
@@ -25,6 +30,8 @@ public class WidgetIntentService extends IntentService
 
 	public final static String WIDGET = "WIDGET";
 	public final static String LAUNCH_INTENT = "LAUNCH_INTENT";
+
+	private static OrientationEventListener _orientation = null;
 	
 	public WidgetIntentService() 
 	{
@@ -37,6 +44,68 @@ public class WidgetIntentService extends IntentService
 
 	protected void onHandleIntent(Intent intent) 
 	{
+		if (WidgetIntentService._orientation == null)
+		{
+			Log.e("PR", "INIT LISTENER");
+			
+			WidgetIntentService._orientation = new OrientationEventListener(this)
+			{
+				public void onOrientationChanged(int arg0) 
+				{
+//					Intent newIntent = new Intent(WidgetIntentService.UPDATE_WIDGETS);
+//					context.startService(newIntent);
+					
+					Log.e("PR", "ORIENTATION CHANGED");
+				}
+			};
+			
+//			WidgetIntentService._orientation.enable();
+		}
+
+		if (intent.hasExtra("identifier"))
+		{
+			String identifier = intent.getStringExtra("identifier");
+
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+			
+			String key = identifier + "_saved_state";
+			
+			String idString = prefs.getString(key, "{}");
+			
+			try 
+			{
+				JSONObject json = new JSONObject(idString);
+				
+				for (String bundleKey : intent.getExtras().keySet())
+				{
+					String value = intent.getStringExtra(bundleKey);
+
+					json.put(bundleKey, value);
+				}
+				
+				@SuppressWarnings("unchecked")
+				Iterator<String> iter = json.keys();
+				
+				while (iter.hasNext())
+				{
+					String jsonKey = iter.next();
+					
+					String value = json.getString(jsonKey);
+
+					if (intent.hasExtra(jsonKey) == false)
+						intent.putExtra(jsonKey, value);
+				}
+
+				Editor e = prefs.edit();
+				e.putString(key, json.toString());
+				e.commit();
+			} 
+			catch (JSONException e) 
+			{
+				e.printStackTrace();
+			}
+		}
+		
 		if (ACTION_BOOT.equals(intent.getAction()))
 		{
 			String[] identifiers = IdentifiersManager.fetchIdentifiers(this);
@@ -59,7 +128,7 @@ public class WidgetIntentService extends IntentService
 			
 			for (int widgetId : widgetIds)
 			{
-				this.refreshWidget(widgetId, intent.getExtras(), intent);
+				this.refreshWidget(widgetId, intent);
 			}
 
 			this.saveWidgetState(identifier, intent.getExtras());
@@ -78,7 +147,7 @@ public class WidgetIntentService extends IntentService
 			
 			for (int id : widgetIds)
 			{
-				this.refreshWidget(id, intent.getExtras(), intent);
+				this.refreshWidget(id, intent);
 			}
 		}
 	}
@@ -135,7 +204,7 @@ public class WidgetIntentService extends IntentService
 		}
 	}
 
-	private void refreshWidget(int widgetId, Bundle extras, Intent intent) 
+	private void refreshWidget(int widgetId, Intent intent) 
 	{
 		String widget = this.fetchType(widgetId);
 
