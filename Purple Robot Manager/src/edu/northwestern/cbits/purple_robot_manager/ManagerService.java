@@ -225,6 +225,8 @@ public class ManagerService extends IntentService
 		}
 		else if (PERIODIC_CHECK_INTENT.equals(intent.getAction()))
 			TriggerManager.getInstance().nudgeTriggers(this);
+		else if (REFRESH_CONFIGURATION.equals(intent.getAction()))
+			JSONConfigFile.update(this);
 	}
 
 	public static void setupPeriodicCheck(final Context context)
@@ -235,8 +237,10 @@ public class ManagerService extends IntentService
 		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
 		PendingIntent pi = PendingIntent.getService(context, 0, new Intent(ManagerService.PERIODIC_CHECK_INTENT), PendingIntent.FLAG_UPDATE_CURRENT);
-
 		alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 15000, pi);
+
+		pi = PendingIntent.getService(context, 0, new Intent(ManagerService.REFRESH_CONFIGURATION), PendingIntent.FLAG_UPDATE_CURRENT);
+		alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 5000, pi);
 
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 

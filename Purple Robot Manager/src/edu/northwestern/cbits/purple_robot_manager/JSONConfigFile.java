@@ -59,7 +59,7 @@ public class JSONConfigFile
 	{
 		if (!uri.equals(JSONConfigFile._configUri))
 			JSONConfigFile._sharedFile = null;
-
+		
 		if (JSONConfigFile._sharedFile == null || force)
 		{
 			Runnable r = new Runnable()
@@ -126,6 +126,12 @@ public class JSONConfigFile
 							
 							URL u = new URL(newUri.toString());
 
+							final SharedPreferences prefs = JSONConfigFile.getPreferences(context);
+							Editor edit = prefs.edit();
+
+							edit.putString(JSONConfigFile.JSON_CONFIGURATION_URL, u.toString());
+							edit.commit();
+
 							HttpURLConnection conn = (HttpURLConnection) u.openConnection();
 							
 							BufferedInputStream bin = new BufferedInputStream(conn.getInputStream());
@@ -145,11 +151,7 @@ public class JSONConfigFile
 
 							final JSONObject json = new JSONObject(jsonString);
 
-							final SharedPreferences prefs = JSONConfigFile.getPreferences(context);
-							Editor edit = prefs.edit();
-
 							edit.putString(JSONConfigFile.JSON_CONFIGURATION, json.toString());
-							edit.putString(JSONConfigFile.JSON_CONFIGURATION_URL, u.toString());
 
 							edit.commit();
 							
@@ -509,19 +511,15 @@ public class JSONConfigFile
 				long now = System.currentTimeMillis();
 
 				int interval = Integer.parseInt(prefs.getString("config_json_refresh_interval", "3600"));
-
+				
 				if (now - lastUpdate > 1000 * interval)
 				{
 					Editor edit = prefs.edit();
 
-					boolean force = false;
-
-					force = (lastUpdate == 0);
-
 					String uriString = prefs.getString(JSONConfigFile.JSON_CONFIGURATION_URL, null);
 
 					if (uriString != null)
-						JSONConfigFile.updateFromOnline(context, Uri.parse(uriString), force);
+						JSONConfigFile.updateFromOnline(context, Uri.parse(uriString), true);
 
 					edit.putLong(JSONConfigFile.JSON_LAST_UPDATE, now);
 					edit.commit();
