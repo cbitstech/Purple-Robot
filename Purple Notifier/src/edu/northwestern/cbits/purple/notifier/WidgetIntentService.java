@@ -15,8 +15,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
-import android.widget.RemoteViews;
 
 public class WidgetIntentService extends IntentService 
 {
@@ -59,8 +57,6 @@ public class WidgetIntentService extends IntentService
 
 			int[] widgetIds = this.getWidgetIds(identifier);
 			
-			Log.e("PN", "GOT IDENTIFIER: " + identifier + " (" + widgetIds.length + ")");
-			
 			for (int widgetId : widgetIds)
 			{
 				this.refreshWidget(widgetId, intent.getExtras(), intent);
@@ -74,17 +70,12 @@ public class WidgetIntentService extends IntentService
 
 			int widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, Integer.MAX_VALUE);
 
-			Log.e("PN", "MAKING IDENTIFIER: " + identifier + " (" + widgetId + ")");
-			Log.e("PN", "WIDGET TYPE: " + intent.getStringExtra(WidgetIntentService.WIDGET));
-
 			this.registerIdentifier(identifier, widgetId);
 
 			this.saveWidgetState(identifier, intent.getExtras());
 			
 			int[] widgetIds = this.getWidgetIds(identifier);
 			
-			Log.e("PN", "ID COUNT " + widgetIds.length);
-
 			for (int id : widgetIds)
 			{
 				this.refreshWidget(id, intent.getExtras(), intent);
@@ -148,8 +139,6 @@ public class WidgetIntentService extends IntentService
 	{
 		String widget = this.fetchType(widgetId);
 
-		Log.e("PN", "UPDATING " + widget);
-
 		if (widget == null)
 		{
 			this.unregisterIdentifier(widgetId);
@@ -157,17 +146,17 @@ public class WidgetIntentService extends IntentService
 		}
 		
 		if (BasicWidgetProvider.NAME.equals(widget))
-			BasicWidgetProvider.setupWidget(this, widgetId, intent, new RemoteViews(this.getPackageName(), R.layout.layout_basic_widget));
+			BasicWidgetProvider.setupWidget(this, widgetId, intent);
 		else if (TextWidgetProvider.NAME.equals(widget))
-			TextWidgetProvider.setupWidget(this, widgetId, intent, new RemoteViews(this.getPackageName(), R.layout.layout_text_widget));
+			TextWidgetProvider.setupWidget(this, widgetId, intent);
 		else if (TitleWidgetProvider.NAME.equals(widget))
-			TitleWidgetProvider.setupWidget(this, widgetId, intent, new RemoteViews(this.getPackageName(), R.layout.layout_title_widget));
+			TitleWidgetProvider.setupWidget(this, widgetId, intent);
 		else if (ImageWidgetProvider.NAME.equals(widget))
-			ImageWidgetProvider.setupWidget(this, widgetId, intent, new RemoteViews(this.getPackageName(), R.layout.layout_image_widget));
+			ImageWidgetProvider.setupWidget(this, widgetId, intent);
 		else if (FourWidgetProvider.NAME.equals(widget))
-			FourWidgetProvider.setupWidget(this, widgetId, intent, new RemoteViews(this.getPackageName(), R.layout.layout_four_widget));
+			FourWidgetProvider.setupWidget(this, widgetId, intent);
 		else if (FiveWidgetProvider.NAME.equals(widget))
-			FiveWidgetProvider.setupWidget(this, widgetId, intent, new RemoteViews(this.getPackageName(), R.layout.layout_five_widget));
+			FiveWidgetProvider.setupWidget(this, widgetId, intent);
 	}
 
 	private int[] getWidgetIds(String identifier) 
@@ -274,8 +263,6 @@ public class WidgetIntentService extends IntentService
 		
 		for (ComponentName name : names)
 		{
-			Log.e("PN", "NAME: " + name.getShortClassName());
-			
 			int[] widgetIds = widgets.getAppWidgetIds(name);
 			
 			for (int arrayId : widgetIds)

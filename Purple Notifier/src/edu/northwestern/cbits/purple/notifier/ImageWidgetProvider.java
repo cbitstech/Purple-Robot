@@ -15,8 +15,10 @@ public class ImageWidgetProvider extends PurpleWidgetProvider
 	public static final String NAME = "IMAGE_WIDGET_UPDATE";
 	public static final String WIDGET_LAUNCH = "config_widget_image_launch";
 
-	public static void setupWidget(Context context, int widgetId, Intent intent, RemoteViews remoteViews) 
+	public static void setupWidget(Context context, int widgetId, Intent intent) 
 	{
+		RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.layout_image_widget);
+
 		Bundle extras = intent.getExtras();
 		AppWidgetManager widgets = AppWidgetManager.getInstance(context);
 
@@ -26,7 +28,8 @@ public class ImageWidgetProvider extends PurpleWidgetProvider
 		
 		try
 		{
-			imageUri = Uri.parse(image);
+			if (image.trim().length() > 0)
+				imageUri = Uri.parse(image);
 		}
 		catch (NullPointerException e)
 		{
@@ -51,7 +54,13 @@ public class ImageWidgetProvider extends PurpleWidgetProvider
 
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, widgetId, tapIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 		remoteViews.setOnClickPendingIntent(R.id.widget_image_layout, pendingIntent);
-		
-		widgets.updateAppWidget(widgetId, remoteViews);
+		try
+		{
+			widgets.updateAppWidget(widgetId, remoteViews);
+		}
+		catch (NullPointerException e)
+		{
+			e.printStackTrace();
+		}
 	}
 }

@@ -15,8 +15,10 @@ public class BasicWidgetProvider extends PurpleWidgetProvider
 	public static final String NAME = "BASIC_WIDGET_UPDATE";
 	public static final String WIDGET_LAUNCH = "config_widget_basic_launch";
 
-	public static void setupWidget(Context context, int widgetId, Intent intent, RemoteViews remoteViews) 
+	public static void setupWidget(Context context, int widgetId, Intent intent) 
 	{
+		RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.layout_basic_widget);
+		
 		Bundle extras = intent.getExtras();
 		AppWidgetManager widgets = AppWidgetManager.getInstance(context);
 
@@ -28,11 +30,12 @@ public class BasicWidgetProvider extends PurpleWidgetProvider
 		
 		try
 		{
-			imageUri = Uri.parse(image);
+			if (image.trim().length() > 0)
+				imageUri = Uri.parse(image);
 		}
 		catch (NullPointerException e)
 		{
-			
+
 		}
 		
 		if (imageUri != null)
@@ -43,7 +46,7 @@ public class BasicWidgetProvider extends PurpleWidgetProvider
 			}
 			catch (IOException e)
 			{
-				e.printStackTrace();
+				remoteViews.setImageViewResource(R.id.widget_basic_image, R.drawable.ic_launcher);
 			}
 		}
 
@@ -57,6 +60,13 @@ public class BasicWidgetProvider extends PurpleWidgetProvider
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, widgetId, tapIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 		remoteViews.setOnClickPendingIntent(R.id.widget_basic_layout, pendingIntent);
 		
-		widgets.updateAppWidget(widgetId, remoteViews);
+		try
+		{
+			widgets.updateAppWidget(widgetId, remoteViews);
+		}
+		catch (NullPointerException e)
+		{
+			e.printStackTrace();
+		}
 	}
 }
