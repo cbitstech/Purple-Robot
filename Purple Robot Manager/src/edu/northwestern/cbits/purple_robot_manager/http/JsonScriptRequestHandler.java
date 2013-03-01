@@ -19,6 +19,7 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.net.Uri;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.ExecuteScriptCommand;
+import edu.northwestern.cbits.purple_robot_manager.http.commands.FetchUserHashCommand;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.JSONCommand;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.PingCommand;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.UnknownCommand;
@@ -104,6 +105,8 @@ public class JsonScriptRequestHandler implements HttpRequestHandler
 				return new PingCommand(arguments, context);
 			else if (ExecuteScriptCommand.COMMAND_NAME.equals(arguments.get(JSONCommand.COMMAND)))
 				return new ExecuteScriptCommand(arguments, context);
+			else if (FetchUserHashCommand.COMMAND_NAME.equals(arguments.get(JSONCommand.COMMAND)))
+				return new FetchUserHashCommand(arguments, context);
 		} 
 		catch (JSONException e) 
 		{
