@@ -18,6 +18,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mozilla.javascript.EcmaError;
+import org.mozilla.javascript.EvaluatorException;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -183,6 +184,23 @@ public class JSONConfigFile
 											e.printStackTrace();
 										}
 										catch (final EcmaError e)
+										{
+											e.printStackTrace();
+											
+											if (context instanceof Activity)
+											{
+												final Activity activity = (Activity) context;
+
+												activity.runOnUiThread(new Runnable()
+												{
+													public void run()
+													{
+														Toast.makeText(activity, e.getMessage(), Toast.LENGTH_LONG).show();
+													}
+												});
+											}
+										}
+										catch (final EvaluatorException e)
 										{
 											e.printStackTrace();
 											

@@ -223,7 +223,7 @@ public class DateTrigger extends Trigger
 			}
 		}
 
-		if (periodList != null)
+		try
 		{
 			for (Object po : periodList)
 			{
@@ -237,6 +237,10 @@ public class DateTrigger extends Trigger
 						return p;
 				}
 			}
+		}
+		catch (NullPointerException e)
+		{
+			
 		}
 
 		return null;
@@ -390,26 +394,33 @@ public class DateTrigger extends Trigger
 				DateTime from = new DateTime(new Date(current));
 				DateTime to = new DateTime(new Date(current + (hour)));
 
-				Period period = new Period(from, to);
-
-				for (Object o : this._calendar.getComponents("VEVENT"))
+				try
 				{
-					Component c = (Component) o;
-
-					PeriodList l = c.calculateRecurrenceSet(period);
-					
-					for (Object po : l)
+					Period period = new Period(from, to);
+	
+					for (Object o : this._calendar.getComponents("VEVENT"))
 					{
-						if (po instanceof Period && upcoming.size() < count)
+						Component c = (Component) o;
+	
+						PeriodList l = c.calculateRecurrenceSet(period);
+						
+						for (Object po : l)
 						{
-							Period p = (Period) po;
-
-							upcoming.add(p.getRangeStart());
+							if (po instanceof Period && upcoming.size() < count)
+							{
+								Period p = (Period) po;
+	
+								upcoming.add(p.getRangeStart());
+							}
 						}
 					}
+					
+					current += (hour + 1);
 				}
-				
-				current += (hour + 1);
+				catch (NullPointerException e)
+				{
+					
+				}
 				
 				if (current - now > hour * 24)
 					return upcoming;

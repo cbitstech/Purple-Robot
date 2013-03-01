@@ -255,6 +255,10 @@ public class RobotHealthProbe extends Probe
 									{
 										e.printStackTrace();
 									}
+									catch (RuntimeException e)
+									{
+										e.printStackTrace();
+									}
 
 									// NTP checks
 									

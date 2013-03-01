@@ -70,7 +70,7 @@ public class JavaScriptEngine
 		this._context = context;
 	}
 
-	public Object runScript(String script) throws EvaluatorException
+	public Object runScript(String script) throws EvaluatorException, EcmaError
 	{
 		return this.runScript(script, null, null);
 	}
@@ -104,7 +104,7 @@ public class JavaScriptEngine
 		return null;
 	}
 
-	public Object runScript(String script, String extrasName, Object extras) throws EvaluatorException
+	public Object runScript(String script, String extrasName, Object extras) throws EvaluatorException, EcmaError
 	{
 		this._jsContext = Context.enter();
 		this._jsContext.setOptimizationLevel(-1);
@@ -224,6 +224,7 @@ public class JavaScriptEngine
 		return null;
 	}
 
+	@SuppressLint("DefaultLocale")
 	private Intent constructLaunchIntent(final String applicationName, final NativeObject launchParams, final String script)
 	{
 		if (applicationName == null)
