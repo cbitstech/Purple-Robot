@@ -9,11 +9,8 @@ import org.json.JSONObject;
 
 import android.app.IntentService;
 import android.appwidget.AppWidgetManager;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
@@ -78,9 +75,14 @@ public class WidgetIntentService extends IntentService
 				
 				for (String bundleKey : intent.getExtras().keySet())
 				{
-					String value = intent.getStringExtra(bundleKey);
+					if (AppWidgetManager.EXTRA_APPWIDGET_ID.equals(bundleKey) == false)
+					{
+						String value = intent.getStringExtra(bundleKey);
 
-					json.put(bundleKey, value);
+						Log.e("PN", "KEY: " + bundleKey + " => " + value);
+
+						json.put(bundleKey, value);
+					}
 				}
 				
 				@SuppressWarnings("unchecked")
@@ -226,6 +228,8 @@ public class WidgetIntentService extends IntentService
 			FourWidgetProvider.setupWidget(this, widgetId, intent);
 		else if (FiveWidgetProvider.NAME.equals(widget))
 			FiveWidgetProvider.setupWidget(this, widgetId, intent);
+		else if (BadgeWidgetProvider.NAME.equals(widget))
+			BadgeWidgetProvider.setupWidget(this, widgetId, intent);
 	}
 
 	private int[] getWidgetIds(String identifier) 
@@ -327,6 +331,7 @@ public class WidgetIntentService extends IntentService
 		names.add(new ComponentName(this, TitleWidgetProvider.class));
 		names.add(new ComponentName(this, FourWidgetProvider.class));
 		names.add(new ComponentName(this, FiveWidgetProvider.class));
+		names.add(new ComponentName(this, BadgeWidgetProvider.class));
 
 		AppWidgetManager widgets = AppWidgetManager.getInstance(this);
 		
@@ -350,6 +355,8 @@ public class WidgetIntentService extends IntentService
 						return FourWidgetProvider.NAME;
 					else if (".FiveWidgetProvider".equals(name.getShortClassName()))
 						return FiveWidgetProvider.NAME;
+					else if (".BadgeWidgetProvider".equals(name.getShortClassName()))
+						return BadgeWidgetProvider.NAME;
 				}
 			}
 		}
