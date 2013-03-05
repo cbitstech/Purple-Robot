@@ -1,0 +1,8 @@
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="180dp"
+    android:minHeight="40dp"
+    android:updatePeriodMillis="86400000"
+    android:initialLayout="@layout/layout_small_badge_widget"
+    android:configure="edu.northwestern.cbits.purple.notifier.SmallBadgeSettingsActivity"
+	android:resizeMode="horizontal|vertical">
+</appwidget-provider>

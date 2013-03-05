@@ -230,6 +230,8 @@ public class WidgetIntentService extends IntentService
 			FiveWidgetProvider.setupWidget(this, widgetId, intent);
 		else if (BadgeWidgetProvider.NAME.equals(widget))
 			BadgeWidgetProvider.setupWidget(this, widgetId, intent);
+		else if (SmallBadgeWidgetProvider.NAME.equals(widget))
+			SmallBadgeWidgetProvider.setupWidget(this, widgetId, intent);
 	}
 
 	private int[] getWidgetIds(String identifier) 
@@ -332,6 +334,7 @@ public class WidgetIntentService extends IntentService
 		names.add(new ComponentName(this, FourWidgetProvider.class));
 		names.add(new ComponentName(this, FiveWidgetProvider.class));
 		names.add(new ComponentName(this, BadgeWidgetProvider.class));
+		names.add(new ComponentName(this, SmallBadgeWidgetProvider.class));
 
 		AppWidgetManager widgets = AppWidgetManager.getInstance(this);
 		
@@ -357,6 +360,8 @@ public class WidgetIntentService extends IntentService
 						return FiveWidgetProvider.NAME;
 					else if (".BadgeWidgetProvider".equals(name.getShortClassName()))
 						return BadgeWidgetProvider.NAME;
+					else if (".SmallBadgeWidgetProvider".equals(name.getShortClassName()))
+						return SmallBadgeWidgetProvider.NAME;
 				}
 			}
 		}

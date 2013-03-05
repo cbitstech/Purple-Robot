@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="horizontal"
+	android:id="@+id/widget_small_badge_layout"
+	android:clickable="true"
+	android:background="@drawable/appwidget_dark_bg">
+	<ImageView
+        android:id="@+id/widget_small_badge_image"
+	    android:src="@drawable/ic_launcher"
+	    android:layout_width="72dp"
+	    android:layout_height="72dp"
+	    android:layout_gravity="top"
+	    android:background="@android:color/black"
+	    android:scaleType="centerCrop"
+	    android:layout_marginTop="4dp"
+	    android:layout_marginBottom="8dp"
+	    android:layout_marginLeft="4dp"
+	    android:layout_marginRight="8dp"
+	    android:contentDescription="@string/app_name" />
+    <TextView
+        android:id="@+id/widget_small_badge_title_text"
+        android:text="@string/widget_title_placeholder"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:lines="1"
+        android:singleLine="true"
+	    android:paddingBottom="4dp"
+        android:ellipsize="end"
+        android:typeface="sans" />
+</LinearLayout>
