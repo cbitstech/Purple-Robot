@@ -15,7 +15,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.OrientationEventListener;
 
 public class WidgetIntentService extends IntentService 
@@ -29,6 +28,7 @@ public class WidgetIntentService extends IntentService
 	public final static String LAUNCH_INTENT = "LAUNCH_INTENT";
 
 	private static OrientationEventListener _orientation = null;
+	private int _lastOrientation = 0;
 	
 	public WidgetIntentService() 
 	{
@@ -41,18 +41,21 @@ public class WidgetIntentService extends IntentService
 
 	protected void onHandleIntent(Intent intent) 
 	{
+		final WidgetIntentService me = this;
+		
 		if (WidgetIntentService._orientation == null)
 		{
-			Log.e("PR", "INIT LISTENER");
-			
 			WidgetIntentService._orientation = new OrientationEventListener(this)
 			{
-				public void onOrientationChanged(int arg0) 
+				public void onOrientationChanged(int orientation) 
 				{
-//					Intent newIntent = new Intent(WidgetIntentService.UPDATE_WIDGETS);
-//					context.startService(newIntent);
-					
-					Log.e("PR", "ORIENTATION CHANGED");
+					if (Math.abs(orientation - me._lastOrientation) > 45)
+					{
+						Intent newIntent = new Intent(WidgetIntentService.UPDATE_WIDGETS);
+						me.startService(newIntent);
+						
+						me._lastOrientation = orientation;
+					}
 				}
 			};
 			
@@ -78,8 +81,6 @@ public class WidgetIntentService extends IntentService
 					if (AppWidgetManager.EXTRA_APPWIDGET_ID.equals(bundleKey) == false)
 					{
 						String value = intent.getStringExtra(bundleKey);
-
-						Log.e("PN", "KEY: " + bundleKey + " => " + value);
 
 						json.put(bundleKey, value);
 					}
