@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="edu.northwestern.cbits.purple.notifier"
-    android:versionCode="10002"
-    android:versionName="1.0.2" >
+    android:versionCode="10004"
+    android:versionName="1.0.4" >
    	<uses-permission android:name="android.permission.INTERNET" />
    	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="14" />

@@ -10,7 +10,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 public class BadgeWidgetProvider extends PurpleWidgetProvider
@@ -20,8 +19,6 @@ public class BadgeWidgetProvider extends PurpleWidgetProvider
 
 	public static void setupWidget(Context context, int widgetId, Intent intent) 
 	{
-		Log.e("PN", "SETUP BADGE");
-		
 		RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.layout_badge_widget);
 		
 		Bundle extras = intent.getExtras();
@@ -35,11 +32,7 @@ public class BadgeWidgetProvider extends PurpleWidgetProvider
 		int color = Color.WHITE;
 		
 		if (extras.containsKey("color"))
-		{
 			color = Color.parseColor(extras.getString("color"));
-			
-			Log.e("PN", "GOT COLOR: " + extras.getString("color") + " " + color);
-		}
 
 		double ratio = 0.75;
 		
@@ -51,7 +44,6 @@ public class BadgeWidgetProvider extends PurpleWidgetProvider
 			}
 			catch (ClassCastException e)
 			{
-				Log.e("PN", "SETTING RATIO MANUALLY");
 				ratio = 0.75;
 			}
 		}

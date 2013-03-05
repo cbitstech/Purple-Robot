@@ -14,7 +14,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.net.Uri;
-import android.util.Log;
 
 public abstract class PurpleWidgetProvider extends AppWidgetProvider 
 {
@@ -51,15 +50,9 @@ public abstract class PurpleWidgetProvider extends AppWidgetProvider
 
 	protected static Bitmap bitmapForUri(Context context, Uri imageUri) throws IOException 
 	{
-		Log.e("PN", "URI: " + imageUri);
-		
 		if (imageUri == null)
 		{
-			Log.e("PN", "NULL URI");
-			
 			Bitmap b = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
-
-			Log.e("PN", "B: " + b);
 
 			return b;
 		}
