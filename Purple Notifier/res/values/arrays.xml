@@ -1,5 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string-array name="empty">
+   	<string-array name="color_names">
+        <item>White</item>
+        <item>Yellow</item>
+        <item>Fuchsia</item>
+        <item>Red</item>
+        <item>Gray</item>
+        <item>Silver</item>
+        <item>Olive</item>
+        <item>Purple</item>
+        <item>Aqua</item>
+        <item>Maroon</item>
+        <item>Lime</item>
+        <item>Teal</item>
+        <item>Green</item>
+        <item>Blue</item>
+        <item>Navy</item>
+        <item>Black</item>
+    </string-array>
+
+   	<string-array name="color_values">
+		<item>#FFFFFF</item>
+		<item>#FFFF00</item>
+		<item>#FF00FF</item>
+		<item>#FF0000</item>
+		<item>#C0C0C0</item>
+		<item>#808080</item>
+		<item>#808000</item>
+		<item>#800080</item>
+		<item>#800000</item>
+		<item>#00FFFF</item>
+		<item>#00FF00</item>
+		<item>#008080</item>
+		<item>#008000</item>
+		<item>#0000FF</item>
+		<item>#000080</item>
+		<item>#000000</item>
     </string-array>
 </resources>
+
+
+   	
+   	

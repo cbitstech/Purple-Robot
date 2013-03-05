@@ -37,6 +37,7 @@
     <string name="title_widget_title">Purple: Title Only</string>
     <string name="five_widget_title">Purple: Five Buttons</string>
     <string name="four_widget_title">Purple: Four Buttons</string>
+    <string name="badge_widget_title">Purple: Badge, Title &amp; Message</string>
     
     <string name="config_settings_category">Widget Settings</string>
     <string name="config_password_label">Settings Password</string>
@@ -55,11 +56,17 @@
     <string name="config_image_title">Set Image</string>
     <string name="config_image_message">Enter the URI of the image to use.</string>
 
+    <string name="config_color_title">Badge Text Color</string>
+    
     <string name="config_image_one_label">Button #1</string>
     <string name="config_image_two_label">Button #2</string>
     <string name="config_image_three_label">Button #3</string>
     <string name="config_image_four_label">Button #4</string>
     <string name="config_image_five_label">Button #5</string>
+
+    <string name="config_badge_label">Badge Text</string>
+    <string name="config_badge_title">Badge Text</string>
+    <string name="config_badge_message">Set text to be overlaid on the badge.</string>
     
     <string name="config_identifiers_label">Widget Identifier</string>
     <string name="config_identifiers_title">Select Widget Identifier</string>

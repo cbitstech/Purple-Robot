@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<EditTextPreference
+	    android:key="config_badge_title"
+	    android:title="@string/config_title_label"
+	    android:dialogTitle="@string/config_title_title"
+	    android:dialogMessage="@string/config_title_message"
+	    android:defaultValue="" />
+	<EditTextPreference
+	    android:key="config_badge_message"
+	    android:title="@string/config_message_label"
+	    android:dialogTitle="@string/config_message_title"
+	    android:dialogMessage="@string/config_message_message"
+	    android:defaultValue="" />
+	<EditTextPreference
+	    android:key="config_badge_image"
+	    android:title="@string/config_image_label"
+	    android:dialogTitle="@string/config_image_title"
+	    android:dialogMessage="@string/config_image_message"
+	    android:defaultValue="" />
+	<EditTextPreference
+	    android:key="config_badge_badge"
+	    android:title="@string/config_badge_label"
+	    android:dialogTitle="@string/config_badge_title"
+	    android:dialogMessage="@string/config_badge_message"
+	    android:defaultValue="" />
+    <ListPreference
+        android:key="config_badge_color"
+        android:entries="@array/color_names"
+        android:entryValues="@array/color_values"
+        android:title="@string/config_color_title" />
+</PreferenceScreen>

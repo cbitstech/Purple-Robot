@@ -10,7 +10,11 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.net.Uri;
+import android.util.Log;
 
 public abstract class PurpleWidgetProvider extends AppWidgetProvider 
 {
@@ -47,6 +51,19 @@ public abstract class PurpleWidgetProvider extends AppWidgetProvider
 
 	protected static Bitmap bitmapForUri(Context context, Uri imageUri) throws IOException 
 	{
+		Log.e("PN", "URI: " + imageUri);
+		
+		if (imageUri == null)
+		{
+			Log.e("PN", "NULL URI");
+			
+			Bitmap b = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
+
+			Log.e("PN", "B: " + b);
+
+			return b;
+		}
+		
 		InputStream input = PurpleWidgetProvider.inputStreamForUri(context, imageUri);
 		
 		if (input == null)
@@ -91,4 +108,41 @@ public abstract class PurpleWidgetProvider extends AppWidgetProvider
         
         return k;
     }
+
+	public static Bitmap badgedBitmapForUri(Context context, Uri imageUri, String badge, double fillRatio, int color) throws IOException 
+	{
+		Bitmap b = PurpleWidgetProvider.bitmapForUri(context, imageUri);
+		
+		Bitmap badged = Bitmap.createBitmap(b.getWidth(), b.getHeight(), Bitmap.Config.ARGB_8888);
+		
+		Canvas c = new Canvas(badged);
+
+        Paint textPaint = new Paint();
+        textPaint.setAntiAlias(true);
+        textPaint.setColor(color);
+        textPaint.setTextSize(50); 
+        textPaint.setTextAlign(Paint.Align.CENTER);
+
+        Rect bounds = new Rect();
+        textPaint.getTextBounds(badge, 0, badge.length(), bounds);
+        
+        while (bounds.width() < (b.getWidth() * fillRatio) && bounds.height() < (b.getHeight() * fillRatio))
+        {
+        	textPaint.setTextSize(textPaint.getTextSize() + 1);
+
+        	textPaint.getTextBounds(badge, 0, badge.length(), bounds);
+        }
+
+        while (bounds.width() > (b.getWidth() * fillRatio) || bounds.height() > (b.getHeight() * fillRatio))
+        {
+        	textPaint.setTextSize(textPaint.getTextSize() - 1);
+
+        	textPaint.getTextBounds(badge, 0, badge.length(), bounds);
+        }
+
+        c.drawBitmap(b, 0, 0, textPaint);
+        c.drawText(badge, b.getWidth() / 2, (b.getHeight() / 2) + (bounds.height() / 2), textPaint);
+		
+		return badged;
+	}
 }
