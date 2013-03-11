@@ -5,7 +5,7 @@ import org.json.JSONObject;
 import org.mozilla.javascript.EcmaError;
 
 import android.content.Context;
-import edu.northwestern.cbits.purple_robot_manager.JavaScriptEngine;
+import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 
 public class ProbeTrigger extends Trigger
 {

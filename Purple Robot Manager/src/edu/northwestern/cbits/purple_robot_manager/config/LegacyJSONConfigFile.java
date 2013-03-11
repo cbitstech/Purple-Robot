@@ -1,4 +1,4 @@
-package edu.northwestern.cbits.purple_robot_manager;
+package edu.northwestern.cbits.purple_robot_manager.config;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -30,11 +30,15 @@ import android.net.Uri;
 import android.net.Uri.Builder;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
+import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
+import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.R.string;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
+import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
-public class JSONConfigFile
+public class LegacyJSONConfigFile
 {
 	public static final String FIRST_RUN = "json_config_first_run";
 	
@@ -52,15 +56,15 @@ public class JSONConfigFile
 
 	private JSONObject parameters = null;
 
-	private static JSONConfigFile _sharedFile = null;
+	private static LegacyJSONConfigFile _sharedFile = null;
 	private static Uri _configUri = null;
 
 	public static void updateFromOnline(final Context context, final Uri uri, boolean force)
 	{
-		if (!uri.equals(JSONConfigFile._configUri))
-			JSONConfigFile._sharedFile = null;
+		if (!uri.equals(LegacyJSONConfigFile._configUri))
+			LegacyJSONConfigFile._sharedFile = null;
 		
-		if (JSONConfigFile._sharedFile == null || force)
+		if (LegacyJSONConfigFile._sharedFile == null || force)
 		{
 			Runnable r = new Runnable()
 			{
@@ -76,7 +80,7 @@ public class JSONConfigFile
 						
 						try
 						{
-							JSONConfigFile._configUri = uri;
+							LegacyJSONConfigFile._configUri = uri;
 							
 							String userId = encryption.getUserId(context);
 							String existingId = uri.getQueryParameter("user_id");
@@ -126,10 +130,10 @@ public class JSONConfigFile
 							
 							URL u = new URL(newUri.toString());
 
-							final SharedPreferences prefs = JSONConfigFile.getPreferences(context);
+							final SharedPreferences prefs = LegacyJSONConfigFile.getPreferences(context);
 							Editor edit = prefs.edit();
 
-							edit.putString(JSONConfigFile.JSON_CONFIGURATION_URL, u.toString());
+							edit.putString(LegacyJSONConfigFile.JSON_CONFIGURATION_URL, u.toString());
 							edit.commit();
 
 							HttpURLConnection conn = (HttpURLConnection) u.openConnection();
@@ -151,11 +155,11 @@ public class JSONConfigFile
 
 							final JSONObject json = new JSONObject(jsonString);
 
-							edit.putString(JSONConfigFile.JSON_CONFIGURATION, json.toString());
+							edit.putString(LegacyJSONConfigFile.JSON_CONFIGURATION, json.toString());
 
 							edit.commit();
 							
-							String oldHash = prefs.getString(JSONConfigFile.JSON_LAST_HASH, "");
+							String oldHash = prefs.getString(LegacyJSONConfigFile.JSON_LAST_HASH, "");
 							final String newHash = encryption.createHash(jsonString);
 							
 							if (oldHash.equals(newHash) == false)
@@ -168,9 +172,9 @@ public class JSONConfigFile
 									{
 										try 
 										{
-											if (json.has(JSONConfigFile.JSON_INIT_SCRIPT))
+											if (json.has(LegacyJSONConfigFile.JSON_INIT_SCRIPT))
 											{
-												String script = json.getString(JSONConfigFile.JSON_INIT_SCRIPT);
+												String script = json.getString(LegacyJSONConfigFile.JSON_INIT_SCRIPT);
 												
 												JavaScriptEngine engine = new JavaScriptEngine(context);
 												
@@ -178,7 +182,7 @@ public class JSONConfigFile
 											}
 											
 											Editor edit = prefs.edit();
-											edit.putString(JSONConfigFile.JSON_LAST_HASH, newHash);
+											edit.putString(LegacyJSONConfigFile.JSON_LAST_HASH, newHash);
 											edit.commit();
 										}
 										catch (JSONException e) 
@@ -249,17 +253,17 @@ public class JSONConfigFile
 							e.printStackTrace();
 						}
 
-						JSONConfigFile._sharedFile = new JSONConfigFile(context, next);
+						LegacyJSONConfigFile._sharedFile = new LegacyJSONConfigFile(context, next);
 					}
 					else
 					{
-						final SharedPreferences prefs = JSONConfigFile.getPreferences(context);
+						final SharedPreferences prefs = LegacyJSONConfigFile.getPreferences(context);
 						
-						if (prefs.getString(JSONConfigFile.JSON_CONFIGURATION, "{}").length() > 4)
+						if (prefs.getString(LegacyJSONConfigFile.JSON_CONFIGURATION, "{}").length() > 4)
 						{
 							Editor edit = prefs.edit();
 	
-							edit.putString(JSONConfigFile.JSON_CONFIGURATION, "{}");
+							edit.putString(LegacyJSONConfigFile.JSON_CONFIGURATION, "{}");
 							edit.commit();
 
 							TriggerManager.getInstance().removeAllTriggers();
@@ -297,28 +301,28 @@ public class JSONConfigFile
 		TriggerManager.getInstance().updateTriggers(triggerList);
 	}
 
-	public static JSONConfigFile getSharedFile(Context context)
+	public static LegacyJSONConfigFile getSharedFile(Context context)
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		
-		if (prefs.getBoolean(JSONConfigFile.FIRST_RUN, true))
+		if (prefs.getBoolean(LegacyJSONConfigFile.FIRST_RUN, true))
 		{
 			Editor e = prefs.edit();
 
-			e.putString(JSONConfigFile.JSON_CONFIGURATION_URL, context.getString(R.string.json_config_url));
-			e.putBoolean(JSONConfigFile.FIRST_RUN, false);
+			e.putString(LegacyJSONConfigFile.JSON_CONFIGURATION_URL, context.getString(R.string.json_config_url));
+			e.putBoolean(LegacyJSONConfigFile.FIRST_RUN, false);
 
 			e.commit();
 		}
 
 		ProbeManager.allProbes(context);
 		
-		if (JSONConfigFile._sharedFile == null)
-			JSONConfigFile._sharedFile = new JSONConfigFile(context, null);
+		if (LegacyJSONConfigFile._sharedFile == null)
+			LegacyJSONConfigFile._sharedFile = new LegacyJSONConfigFile(context, null);
 
-		JSONConfigFile.update(context);
+		LegacyJSONConfigFile.update(context);
 
-		return JSONConfigFile._sharedFile;
+		return LegacyJSONConfigFile._sharedFile;
 	}
 
 	public String getStringParameter(String key)
@@ -338,19 +342,19 @@ public class JSONConfigFile
 
 	private static SharedPreferences getPreferences(Context context)
 	{
-		if (JSONConfigFile.prefs == null)
-			JSONConfigFile.prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+		if (LegacyJSONConfigFile.prefs == null)
+			LegacyJSONConfigFile.prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
 
-		return JSONConfigFile.prefs;
+		return LegacyJSONConfigFile.prefs;
 	}
 
-	private JSONConfigFile(Context context, Runnable next)
+	private LegacyJSONConfigFile(Context context, Runnable next)
 	{
-		SharedPreferences prefs = JSONConfigFile.getPreferences(context);
+		SharedPreferences prefs = LegacyJSONConfigFile.getPreferences(context);
 
 		try
 		{
-			this.parameters = new JSONObject(prefs.getString(JSONConfigFile.JSON_CONFIGURATION, "{}"));
+			this.parameters = new JSONObject(prefs.getString(LegacyJSONConfigFile.JSON_CONFIGURATION, "{}"));
 
 			this.updateSharedPreferences(context);
 			
@@ -372,18 +376,18 @@ public class JSONConfigFile
 
 		try
 		{
-			if (this.parameters.has(JSONConfigFile.USER_ID))
-				userId = this.parameters.getString(JSONConfigFile.USER_ID);
+			if (this.parameters.has(LegacyJSONConfigFile.USER_ID))
+				userId = this.parameters.getString(LegacyJSONConfigFile.USER_ID);
 
-			if (this.parameters.has(JSONConfigFile.USER_HASH))
-				userHash = this.parameters.getString(JSONConfigFile.USER_HASH);
+			if (this.parameters.has(LegacyJSONConfigFile.USER_HASH))
+				userHash = this.parameters.getString(LegacyJSONConfigFile.USER_HASH);
 		}
 		catch (JSONException e)
 		{
 			e.printStackTrace();
 		}
 
-		SharedPreferences prefs = JSONConfigFile.getPreferences(context);
+		SharedPreferences prefs = LegacyJSONConfigFile.getPreferences(context);
 		Editor editor = prefs.edit();
 
 		if (userId == null)
@@ -433,11 +437,11 @@ public class JSONConfigFile
 		if (userHash != null)
 			editor.putString("config_user_hash", userHash);
 
-		if (this.parameters.has(JSONConfigFile.JSON_PROBE_SETTINGS))
+		if (this.parameters.has(LegacyJSONConfigFile.JSON_PROBE_SETTINGS))
 		{
 			try
 			{
-				JSONArray probeSettings = this.parameters.getJSONArray(JSONConfigFile.JSON_PROBE_SETTINGS);
+				JSONArray probeSettings = this.parameters.getJSONArray(LegacyJSONConfigFile.JSON_PROBE_SETTINGS);
 
 				ProbeManager.updateProbesFromJSON(context, probeSettings);
 			}
@@ -447,13 +451,13 @@ public class JSONConfigFile
 			}
 		}
 
-		if (this.parameters.has(JSONConfigFile.FEATURES))
+		if (this.parameters.has(LegacyJSONConfigFile.FEATURES))
 		{
 			ProbeManager.clearFeatures();
 
 			try
 			{
-				JSONArray features = this.parameters.getJSONArray(JSONConfigFile.FEATURES);
+				JSONArray features = this.parameters.getJSONArray(LegacyJSONConfigFile.FEATURES);
 
 				for (int i = 0; i < features.length(); i++)
 				{
@@ -504,9 +508,9 @@ public class JSONConfigFile
 		{
 			public void run()
 			{
-				SharedPreferences prefs = JSONConfigFile.getPreferences(context);
+				SharedPreferences prefs = LegacyJSONConfigFile.getPreferences(context);
 
-				long lastUpdate = prefs.getLong(JSONConfigFile.JSON_LAST_UPDATE, 0);
+				long lastUpdate = prefs.getLong(LegacyJSONConfigFile.JSON_LAST_UPDATE, 0);
 
 				long now = System.currentTimeMillis();
 
@@ -516,16 +520,16 @@ public class JSONConfigFile
 				{
 					Editor edit = prefs.edit();
 
-					String uriString = prefs.getString(JSONConfigFile.JSON_CONFIGURATION_URL, null);
+					String uriString = prefs.getString(LegacyJSONConfigFile.JSON_CONFIGURATION_URL, null);
 
 					if (uriString != null)
-						JSONConfigFile.updateFromOnline(context, Uri.parse(uriString), true);
+						LegacyJSONConfigFile.updateFromOnline(context, Uri.parse(uriString), true);
 
-					edit.putLong(JSONConfigFile.JSON_LAST_UPDATE, now);
+					edit.putLong(LegacyJSONConfigFile.JSON_LAST_UPDATE, now);
 					edit.commit();
 					
-					if (JSONConfigFile._sharedFile != null)
-						JSONConfigFile._sharedFile.updateTriggers(context);
+					if (LegacyJSONConfigFile._sharedFile != null)
+						LegacyJSONConfigFile._sharedFile.updateTriggers(context);
 				}
 			}
 		};

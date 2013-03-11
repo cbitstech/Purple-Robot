@@ -4,7 +4,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
-import edu.northwestern.cbits.purple_robot_manager.SchemeEngine;
+import edu.northwestern.cbits.purple_robot_manager.scripting.SchemeEngine;
 
 public class ExecuteSchemeCommand extends JSONCommand 
 {

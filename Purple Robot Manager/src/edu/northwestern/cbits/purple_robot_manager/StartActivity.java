@@ -47,6 +47,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
 import edu.northwestern.cbits.purple_robot_manager.activities.DiagnosticActivity;
+import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
@@ -281,7 +282,7 @@ public class StartActivity extends SherlockActivity
 
     	broadcastManager.registerReceiver(this._receiver, filter);
     	
-    	JSONConfigFile.getSharedFile(this.getApplicationContext());
+    	LegacyJSONConfigFile.getSharedFile(this.getApplicationContext());
     }
 
 	public void refreshList()
@@ -354,7 +355,7 @@ public class StartActivity extends SherlockActivity
 			jsonConfigUri = b.build();
 		}
 
-		JSONConfigFile.updateFromOnline(this, jsonConfigUri, true);
+		LegacyJSONConfigFile.updateFromOnline(this, jsonConfigUri, true);
 	}
 
 	protected void onResume()

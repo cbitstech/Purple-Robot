@@ -6,7 +6,7 @@ import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.Undefined;
 
 import android.content.Context;
-import edu.northwestern.cbits.purple_robot_manager.JavaScriptEngine;
+import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 
 public class ExecuteJavaScriptCommand extends JSONCommand 
 {

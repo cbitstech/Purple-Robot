@@ -8,8 +8,8 @@ import android.content.Context;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import edu.northwestern.cbits.purple_robot_manager.JavaScriptEngine;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 
 public abstract class Trigger
 {

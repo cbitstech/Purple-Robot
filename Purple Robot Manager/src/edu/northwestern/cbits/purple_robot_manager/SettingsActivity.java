@@ -14,6 +14,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.widget.Toast;
+import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
@@ -103,9 +104,9 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
 			Editor editor = prefs.edit();
 
-			editor.putLong(JSONConfigFile.JSON_LAST_UPDATE, 0);
+			editor.putLong(LegacyJSONConfigFile.JSON_LAST_UPDATE, 0);
 			editor.commit();
-			JSONConfigFile.update(this);
+			LegacyJSONConfigFile.update(this);
 
 			ProbeManager.nudgeProbes(this);
 

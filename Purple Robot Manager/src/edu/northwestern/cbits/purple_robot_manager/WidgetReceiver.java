@@ -1,5 +1,6 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
+import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;

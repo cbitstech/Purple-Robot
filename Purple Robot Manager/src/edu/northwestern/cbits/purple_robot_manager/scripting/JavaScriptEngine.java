@@ -1,4 +1,4 @@
-package edu.northwestern.cbits.purple_robot_manager;
+package edu.northwestern.cbits.purple_robot_manager.scripting;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +29,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
+import edu.northwestern.cbits.purple_robot_manager.DialogActivity;
+import edu.northwestern.cbits.purple_robot_manager.ManagerService;
+import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.R.drawable;
+import edu.northwestern.cbits.purple_robot_manager.R.id;
+import edu.northwestern.cbits.purple_robot_manager.R.layout;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.Feature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.JavascriptFeature;

@@ -2,6 +2,8 @@ package edu.northwestern.cbits.purple_robot_manager;
 
 import java.util.ArrayList;
 
+import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
