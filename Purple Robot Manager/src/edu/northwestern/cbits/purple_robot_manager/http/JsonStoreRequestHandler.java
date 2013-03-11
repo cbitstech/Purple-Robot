@@ -19,8 +19,8 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.net.Uri;
-import edu.northwestern.cbits.purple_robot_manager.JavaScriptEngine;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 
 public class JsonStoreRequestHandler implements HttpRequestHandler 
 {

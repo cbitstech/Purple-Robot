@@ -6,7 +6,7 @@ import org.json.JSONException;
 
 import android.content.Context;
 import android.content.Intent;
-import edu.northwestern.cbits.purple_robot_manager.JSONConfigFile;
+import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.triggers.ProbeTrigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
@@ -25,7 +25,7 @@ public class TriggerOutputPlugin extends OutputPlugin
 	{
 		Context context = this.getContext();
 
-		JSONConfigFile jsonConfig = JSONConfigFile.getSharedFile(context);
+		LegacyJSONConfigFile jsonConfig = LegacyJSONConfigFile.getSharedFile(context);
 
 		if (jsonConfig == null)
 			return;

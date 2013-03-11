@@ -1,4 +1,4 @@
-package edu.northwestern.cbits.purple_robot_manager;
+package edu.northwestern.cbits.purple_robot_manager.scripting;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -22,6 +22,12 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
+import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
+import edu.northwestern.cbits.purple_robot_manager.ManagerService;
+import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
+import edu.northwestern.cbits.purple_robot_manager.R.array;
+import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
@@ -322,17 +328,17 @@ public abstract class BaseScriptEngine
 
 		Editor e = prefs.edit();
 		
-		e.putString(JSONConfigFile.JSON_LAST_HASH, "");
-		e.putLong(JSONConfigFile.JSON_LAST_UPDATE, 0);
+		e.putString(LegacyJSONConfigFile.JSON_LAST_HASH, "");
+		e.putLong(LegacyJSONConfigFile.JSON_LAST_UPDATE, 0);
 		
 		if (newUrl != null)
-			e.putString(JSONConfigFile.JSON_CONFIGURATION_URL, newUrl);
+			e.putString(LegacyJSONConfigFile.JSON_CONFIGURATION_URL, newUrl);
 		else
-			e.remove(JSONConfigFile.JSON_CONFIGURATION_URL);
+			e.remove(LegacyJSONConfigFile.JSON_CONFIGURATION_URL);
 		
 		e.commit();
 		
-		JSONConfigFile.update(this._context);
+		LegacyJSONConfigFile.update(this._context);
 	}
 	
 	public void setPassword(String password)
@@ -381,9 +387,9 @@ public abstract class BaseScriptEngine
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
 		Editor editor = prefs.edit();
 
-		editor.putLong(JSONConfigFile.JSON_LAST_UPDATE, 0);
+		editor.putLong(LegacyJSONConfigFile.JSON_LAST_UPDATE, 0);
 		editor.commit();
-		JSONConfigFile.update(this._context);
+		LegacyJSONConfigFile.update(this._context);
 
 		ProbeManager.nudgeProbes(this._context);
 	}

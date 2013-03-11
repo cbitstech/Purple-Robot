@@ -5,6 +5,8 @@ import java.util.Iterator;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
+import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
 import android.app.AlarmManager;
@@ -226,7 +228,7 @@ public class ManagerService extends IntentService
 		else if (PERIODIC_CHECK_INTENT.equals(intent.getAction()))
 			TriggerManager.getInstance().nudgeTriggers(this);
 		else if (REFRESH_CONFIGURATION.equals(intent.getAction()))
-			JSONConfigFile.update(this);
+			LegacyJSONConfigFile.update(this);
 	}
 
 	public static void setupPeriodicCheck(final Context context)
