@@ -1,16 +1,10 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
-import java.util.UUID;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,24 +17,15 @@ import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
@@ -52,56 +37,21 @@ import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 import edu.northwestern.cbits.purple_robot_manager.widget.PurpleRobotAppWideWidgetProvider;
 import edu.northwestern.cbits.purple_robot_manager.widget.PurpleRobotAppWidgetProvider;
 
-public class JavaScriptEngine
+public class JavaScriptEngine extends BaseScriptEngine
 {
-	private static String JS_ENGINE_PERSISTENCE_PREFIX = "purple_robot_js_persist_prefix_";
-
 	private static final int NOTIFICATION_ID = 1;
-
-	private android.content.Context _context = null;
-
-	private static Map<String, String> packageMap = null;
 
 	private Context _jsContext = null;
 	private Scriptable _scope = null;
 
 	public JavaScriptEngine(android.content.Context context)
 	{
-		this._context = context;
+		super(context);
 	}
 
 	public Object runScript(String script) throws EvaluatorException, EcmaError
 	{
 		return this.runScript(script, null, null);
-	}
-
-	public String readUrl(String urlString)
-	{
-		try 
-		{
-			URL url = new URL(urlString);
-
-	        URLConnection connection = url.openConnection();
-
-	        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-
-	        StringBuilder response = new StringBuilder();
-
-	        String inputLine;
-
-	        while ((inputLine = in.readLine()) != null) 
-	            response.append(inputLine);
-
-	        in.close();
-
-	        return response.toString();
-		}
-		catch (Exception e) 
-		{
-			e.printStackTrace();
-		} 
-			
-		return null;
 	}
 
 	public Object runScript(String script, String extrasName, Object extras) throws EvaluatorException, EcmaError
@@ -196,99 +146,6 @@ public class JavaScriptEngine
 		return false;
 	}
 
-	@SuppressLint("DefaultLocale")
-	private Intent constructDirectLaunchIntent(final String applicationName, final NativeObject launchParams)
-	{
-		if (applicationName.toLowerCase().startsWith("http://") || applicationName.toLowerCase().startsWith("https://"))
-			return new Intent(Intent.ACTION_VIEW, Uri.parse(applicationName));
-		else
-		{
-			String packageName = this.packageForApplicationName(applicationName);
-
-			if (packageName != null)
-			{
-				Intent intent = this._context.getPackageManager().getLaunchIntentForPackage(packageName);
-
-				if (launchParams != null)
-				{
-					for (Entry<Object, Object> e : launchParams.entrySet())
-					{
-						intent.putExtra(e.getKey().toString(), e.getValue().toString());
-					}
-				}
-
-				return intent;
-			}
-		}
-
-		return null;
-	}
-
-	@SuppressLint("DefaultLocale")
-	private Intent constructLaunchIntent(final String applicationName, final NativeObject launchParams, final String script)
-	{
-		if (applicationName == null)
-			return null;
-
-		String packageName = this.packageForApplicationName(applicationName);
-
-		if (packageName != null)
-		{
-			Intent intent = new Intent(ManagerService.APPLICATION_LAUNCH_INTENT);
-			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-			intent.putExtra(ManagerService.APPLICATION_LAUNCH_INTENT_PACKAGE, packageName);
-
-			if (script != null)
-				intent.putExtra(ManagerService.APPLICATION_LAUNCH_INTENT_POSTSCRIPT, script);
-
-			if (launchParams != null)
-			{
-				HashMap<String, String> launchMap = new HashMap<String, String>();
-
-				for (Entry<Object, Object> e : launchParams.entrySet())
-				{
-					launchMap.put(e.getKey().toString(), e.getValue().toString());
-				}
-
-				JSONObject jsonMap = new JSONObject(launchMap);
-
-				intent.putExtra(ManagerService.APPLICATION_LAUNCH_INTENT_PARAMETERS, jsonMap.toString());
-			}
-
-			return intent;
-		}
-
-		if (applicationName.toLowerCase().startsWith("http://") || applicationName.toLowerCase().startsWith("https://"))
-		{
-			Intent intent = new Intent(ManagerService.APPLICATION_LAUNCH_INTENT);
-			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-			intent.putExtra(ManagerService.APPLICATION_LAUNCH_INTENT_URL, applicationName);
-
-			if (script != null)
-				intent.putExtra(ManagerService.APPLICATION_LAUNCH_INTENT_POSTSCRIPT, script);
-
-			if (launchParams != null)
-			{
-				HashMap<String, String> launchMap = new HashMap<String, String>();
-
-				for (Entry<Object, Object> e : launchParams.entrySet())
-				{
-					launchMap.put(e.getKey().toString(), e.getValue().toString());
-				}
-
-				JSONObject jsonMap = new JSONObject(launchMap);
-
-				intent.putExtra(ManagerService.APPLICATION_LAUNCH_INTENT_PARAMETERS, jsonMap.toString());
-			}
-
-			return intent;
-		}
-
-		return null;
-	}
-
 	public void updateWidget(final NativeObject parameters)
 	{
 		Intent intent = new Intent(ManagerService.UPDATE_WIDGETS);
@@ -373,85 +230,97 @@ public class JavaScriptEngine
 		return true;
 	}
 
-	public boolean emitToast(final String message, final boolean longDuration)
+	private Intent constructDirectLaunchIntent(final String applicationName, final NativeObject launchParams)
 	{
-		if (this._context instanceof Activity)
+		if (applicationName.toLowerCase().startsWith("http://") || applicationName.toLowerCase().startsWith("https://"))
+			return new Intent(Intent.ACTION_VIEW, Uri.parse(applicationName));
+		else
 		{
-			final Activity activity = (Activity) this._context;
+			String packageName = this.packageForApplicationName(applicationName);
 
-			activity.runOnUiThread(new Runnable()
+			if (packageName != null)
 			{
-				public void run()
+				Intent intent = this._context.getPackageManager().getLaunchIntentForPackage(packageName);
+
+				if (launchParams != null)
 				{
-					if (longDuration)
-						Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
-					else
-						Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
+					for (Entry<Object, Object> e : launchParams.entrySet())
+					{
+						intent.putExtra(e.getKey().toString(), e.getValue().toString());
+					}
 				}
-			});
 
-			return true;
+				return intent;
+			}
 		}
 
-		return false;
+		return null;
 	}
 
-	public boolean launchUrl(String urlString)
-	{
-		try
-		{
-			Intent launchIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlString));
-			launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-			this._context.startActivity(launchIntent);
-
-			return true;
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-
-		return false;
-	}
-
-	public String packageForApplicationName(String applicationName)
+	private Intent constructLaunchIntent(final String applicationName, final NativeObject launchParams, final String script)
 	{
 		if (applicationName == null)
 			return null;
 
-		if (JavaScriptEngine.packageMap == null)
+		String packageName = this.packageForApplicationName(applicationName);
+
+		if (packageName != null)
 		{
-			JavaScriptEngine.packageMap = new HashMap<String, String>();
+			Intent intent = new Intent(ManagerService.APPLICATION_LAUNCH_INTENT);
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-			String[] keyArray = this._context.getResources().getStringArray(R.array.app_package_keys);
-			String[] valueArray = this._context.getResources().getStringArray(R.array.app_package_values);
+			intent.putExtra(ManagerService.APPLICATION_LAUNCH_INTENT_PACKAGE, packageName);
 
-			if (keyArray.length == valueArray.length)
+			if (script != null)
+				intent.putExtra(ManagerService.APPLICATION_LAUNCH_INTENT_POSTSCRIPT, script);
+
+			if (launchParams != null)
 			{
-				for (int i = 0; i < keyArray.length; i++)
+				HashMap<String, String> launchMap = new HashMap<String, String>();
+
+				for (Entry<Object, Object> e : launchParams.entrySet())
 				{
-					JavaScriptEngine.packageMap.put(keyArray[i].toLowerCase(), valueArray[i]);
+					launchMap.put(e.getKey().toString(), e.getValue().toString());
 				}
+
+				JSONObject jsonMap = new JSONObject(launchMap);
+
+				intent.putExtra(ManagerService.APPLICATION_LAUNCH_INTENT_PARAMETERS, jsonMap.toString());
 			}
+
+			return intent;
 		}
 
-		String packageName = JavaScriptEngine.packageMap.get(applicationName.toLowerCase());
+		if (applicationName.toLowerCase().startsWith("http://") || applicationName.toLowerCase().startsWith("https://"))
+		{
+			Intent intent = new Intent(ManagerService.APPLICATION_LAUNCH_INTENT);
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-		if (packageName == null)
-			packageName = applicationName; // Allows us to launch by package name as well.
+			intent.putExtra(ManagerService.APPLICATION_LAUNCH_INTENT_URL, applicationName);
 
-		PackageManager pkgManager = this._context.getPackageManager();
+			if (script != null)
+				intent.putExtra(ManagerService.APPLICATION_LAUNCH_INTENT_POSTSCRIPT, script);
 
-		Intent launchIntent = pkgManager.getLaunchIntentForPackage(packageName);
+			if (launchParams != null)
+			{
+				HashMap<String, String> launchMap = new HashMap<String, String>();
 
-		if (launchIntent == null) // No matching package found on system...
+				for (Entry<Object, Object> e : launchParams.entrySet())
+				{
+					launchMap.put(e.getKey().toString(), e.getValue().toString());
+				}
 
-			packageName = null;
+				JSONObject jsonMap = new JSONObject(launchMap);
 
-		return packageName;
+				intent.putExtra(ManagerService.APPLICATION_LAUNCH_INTENT_PARAMETERS, jsonMap.toString());
+			}
+
+			return intent;
+		}
+
+		return null;
 	}
-
+	
 	public boolean launchApplication(String applicationName)
 	{
 		return this.launchApplication(applicationName, new NativeObject(), null);
@@ -518,22 +387,6 @@ public class JavaScriptEngine
 		return false;
 	}
 
-	public String version()
-	{
-		try
-		{
-			PackageInfo info = this._context.getPackageManager().getPackageInfo(this._context.getPackageName(), 0);
-
-			return info.versionName;
-		}
-		catch (NameNotFoundException e)
-		{
-			e.printStackTrace();
-		}
-
-		return null;
-	}
-
 	public void showNativeDialog(String title, String message, String confirmTitle, String cancelTitle, String confirmScript, String cancelScript)
 	{
 		Intent intent = new Intent(this._context, DialogActivity.class);
@@ -549,88 +402,6 @@ public class JavaScriptEngine
 		this._context.startActivity(intent);
 	}
 
-	public int versionCode()
-	{
-		try
-		{
-			PackageInfo info = this._context.getPackageManager().getPackageInfo(this._context.getPackageName(), 0);
-
-			return info.versionCode;
-		}
-		catch (NameNotFoundException e)
-		{
-			e.printStackTrace();
-		}
-
-		return -1;
-	}
-
-	public boolean persistString(String key, String value)
-	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
-		Editor editor = prefs.edit();
-
-		key = JS_ENGINE_PERSISTENCE_PREFIX + key;
-
-		if (value != null)
-			editor.putString(key,  value.toString());
-		else
-			editor.remove(key);
-
-		return editor.commit();
-	}
-
-	public String fetchString(String key)
-	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
-
-		key = JS_ENGINE_PERSISTENCE_PREFIX + key;
-
-		return prefs.getString(key, null);
-	}
-
-	public boolean persistEncryptedString(String key, String value)
-	{
-		key = JS_ENGINE_PERSISTENCE_PREFIX + key;
-
-		return EncryptionManager.getInstance().persistEncryptedString(this._context, key, value);
-	}
-
-	public String fetchEncryptedString(String key)
-	{
-		key = JS_ENGINE_PERSISTENCE_PREFIX + key;
-		
-		return EncryptionManager.getInstance().fetchEncryptedString(this._context, key);
-	}
-	
-	public void vibrate(String pattern)
-	{
-		Intent intent = new Intent(ManagerService.HAPTIC_PATTERN_INTENT);
-		intent.putExtra(ManagerService.HAPTIC_PATTERN_NAME, pattern);
-
-		this._context.startService(intent);
-	}
-
-	public void playTone(String tone)
-	{
-		Intent intent = new Intent(ManagerService.RINGTONE_INTENT);
-
-		if (tone != null)
-			intent.putExtra(ManagerService.RINGTONE_NAME, tone);
-
-		this._context.startService(intent);
-	}
-
-	public void playDefaultTone()
-	{
-		this.playTone(null);
-	}
-
-	public void log(String message)
-	{
-		Log.e("PRM.JavaScript", message);
-	}
-	
 	public boolean updateTrigger(String triggerId, NativeObject nativeJson)
 	{
 		boolean found = false;
@@ -725,67 +496,6 @@ public class JavaScriptEngine
 		return json;
 	}
 
-	public void resetTrigger(String triggerId)
-	{
-		for (Trigger trigger : TriggerManager.getInstance().triggersForId(triggerId))
-		{
-			trigger.reset(this._context);
-		}
-	}
-
-	public void enableTrigger(String triggerId)
-	{
-		for (Trigger trigger : TriggerManager.getInstance().triggersForId(triggerId))
-		{
-			trigger.setEnabled(true);
-		}
-	}
-
-	public void disableTrigger(String triggerId)
-	{
-		for (Trigger trigger : TriggerManager.getInstance().triggersForId(triggerId))
-		{
-			trigger.setEnabled(false);
-		}
-	}
-
-	public void disableAutoConfigUpdates(String triggerId)
-	{
-		// TODO
-	}
-
-	public void enableAutoConfigUpdates(String triggerId)
-	{
-		// TODO
-	}
-
-	public void enableProbes()
-	{
-		ProbeManager.enableProbes(this._context);
-	}
-
-	public void disableProbes()
-	{
-		ProbeManager.disableProbes(this._context);
-	}
-	
-	public boolean probesState()
-	{
-		return ProbeManager.probesState(this._context);
-	}
-	
-	private void transmitData(Bundle data)
-	{
-		UUID uuid = UUID.randomUUID();
-		data.putString("GUID", uuid.toString());
-
-		LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(this._context);
-		Intent intent = new Intent(edu.northwestern.cbits.purple_robot_manager.probes.Probe.PROBE_READING);
-		intent.putExtras(data);
-
-		localManager.sendBroadcast(intent);
-	}
-
 	public void emitReading(String name, Object value)
 	{
 		Bundle bundle = new Bundle();
@@ -823,126 +533,9 @@ public class JavaScriptEngine
 	{
 		ProbeManager.enableProbe(this._context, probeName);
 	}
-
-	public void disableProbe(String probeName)
-	{
-		ProbeManager.disableProbe(this._context, probeName);
-	}
 	
-	public void updateConfigUrl(String newUrl)
+	protected String language() 
 	{
-		if (newUrl.trim().length() == 0)
-			newUrl = null;
-		
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
-
-		Editor e = prefs.edit();
-		
-		e.putString(JSONConfigFile.JSON_LAST_HASH, "");
-		e.putLong(JSONConfigFile.JSON_LAST_UPDATE, 0);
-		
-		if (newUrl != null)
-			e.putString(JSONConfigFile.JSON_CONFIGURATION_URL, newUrl);
-		else
-			e.remove(JSONConfigFile.JSON_CONFIGURATION_URL);
-		
-		e.commit();
-		
-		JSONConfigFile.update(this._context);
-	}
-	
-	public void setPassword(String password)
-	{
-		if (password == null || password.trim().length() == 0)
-			this.clearPassword();
-		else
-		{
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
-			
-			Editor e = prefs.edit();
-			e.putString("config_password", password);
-			e.commit();
-		}
-	}
-	
-	public void clearPassword()
-	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
-		
-		Editor e = prefs.edit();
-		e.remove("config_password");
-		e.commit();
-	}
-
-	public void enableBackgroundImage()
-	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
-		
-		Editor e = prefs.edit();
-		e.putBoolean("config_show_background", true);
-		e.commit();
-	}
-
-	public void disableBackgroundImage()
-	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
-		
-		Editor e = prefs.edit();
-		e.putBoolean("config_show_background", false);
-		e.commit();
-	}
-	
-	private void refreshConfigUrl()
-	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
-		Editor editor = prefs.edit();
-
-		editor.putLong(JSONConfigFile.JSON_LAST_UPDATE, 0);
-		editor.commit();
-		JSONConfigFile.update(this._context);
-
-		ProbeManager.nudgeProbes(this._context);
-	}
-
-	public void setUserId(String userId)
-	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
-		
-		Editor e = prefs.edit();
-		e.putString("config_user_id", userId);
-		
-		e.commit();
-		
-		this.refreshConfigUrl();
-	}
-	
-	public void restoreDefaultId()
-	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
-		
-		Editor e = prefs.edit();
-		e.remove("config_user_id");
-		
-		e.commit();
-
-		this.refreshConfigUrl();
-	}
-
-	public void enableUpdateChecks()
-	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
-		
-		Editor e = prefs.edit();
-		e.putBoolean(SettingsActivity.CHECK_UPDATES_KEY, true);
-		e.commit();
-	}
-
-	public void disableUpdateChecks()
-	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
-		
-		Editor e = prefs.edit();
-		e.putBoolean(SettingsActivity.CHECK_UPDATES_KEY, false);
-		e.commit();
+		return "JavaScript";
 	}
 }

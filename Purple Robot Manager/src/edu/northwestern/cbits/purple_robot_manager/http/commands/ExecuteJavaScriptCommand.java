@@ -8,13 +8,13 @@ import org.mozilla.javascript.Undefined;
 import android.content.Context;
 import edu.northwestern.cbits.purple_robot_manager.JavaScriptEngine;
 
-public class ExecuteScriptCommand extends JSONCommand 
+public class ExecuteJavaScriptCommand extends JSONCommand 
 {
 	public static final String COMMAND_NAME = "execute_script";
 	
 	public static final String SCRIPT = "script";
 	
-	public ExecuteScriptCommand(JSONObject arguments, Context context) 
+	public ExecuteJavaScriptCommand(JSONObject arguments, Context context) 
 	{
 		super(arguments, context);
 	}
@@ -27,7 +27,7 @@ public class ExecuteScriptCommand extends JSONCommand
 		{
 			if (JSONCommand.STATUS_OK.equals(result.get(JSONCommand.STATUS)))
 			{
-				String script = this._arguments.getString(ExecuteScriptCommand.SCRIPT);
+				String script = this._arguments.getString(ExecuteJavaScriptCommand.SCRIPT);
 				
 				JavaScriptEngine engine = new JavaScriptEngine(this._context);
 				

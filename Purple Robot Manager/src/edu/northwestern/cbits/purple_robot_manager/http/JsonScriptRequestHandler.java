@@ -18,7 +18,8 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.net.Uri;
-import edu.northwestern.cbits.purple_robot_manager.http.commands.ExecuteScriptCommand;
+import edu.northwestern.cbits.purple_robot_manager.http.commands.ExecuteSchemeCommand;
+import edu.northwestern.cbits.purple_robot_manager.http.commands.ExecuteJavaScriptCommand;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.FetchUserHashCommand;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.JSONCommand;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.PingCommand;
@@ -55,7 +56,7 @@ public class JsonScriptRequestHandler implements HttpRequestHandler
 
             try 
             {
-				arguments = new JSONObject(URLDecoder.decode(u.getQueryParameter("json"), "UTF-8"));
+				arguments = new JSONObject(u.getQueryParameter("json"));
 			} 
             catch (JSONException e) 
             {
@@ -103,8 +104,10 @@ public class JsonScriptRequestHandler implements HttpRequestHandler
 		{
 			if (PingCommand.COMMAND_NAME.equals(arguments.get(JSONCommand.COMMAND)))
 				return new PingCommand(arguments, context);
-			else if (ExecuteScriptCommand.COMMAND_NAME.equals(arguments.get(JSONCommand.COMMAND)))
-				return new ExecuteScriptCommand(arguments, context);
+			else if (ExecuteJavaScriptCommand.COMMAND_NAME.equals(arguments.get(JSONCommand.COMMAND)))
+				return new ExecuteJavaScriptCommand(arguments, context);
+			else if (ExecuteSchemeCommand.COMMAND_NAME.equals(arguments.get(JSONCommand.COMMAND)))
+				return new ExecuteSchemeCommand(arguments, context);
 			else if (FetchUserHashCommand.COMMAND_NAME.equals(arguments.get(JSONCommand.COMMAND)))
 				return new FetchUserHashCommand(arguments, context);
 		} 
