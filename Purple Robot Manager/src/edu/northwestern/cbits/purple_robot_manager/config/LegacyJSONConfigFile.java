@@ -11,7 +11,10 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.prefs.Preferences;
 
 import org.json.JSONArray;
@@ -62,6 +65,17 @@ public class LegacyJSONConfigFile
 	{
 		if (!uri.equals(LegacyJSONConfigFile._configUri))
 			LegacyJSONConfigFile._sharedFile = null;
+		
+		if (force)
+		{
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+			Editor e = prefs.edit();
+			
+			e.putString(LegacyJSONConfigFile.JSON_LAST_HASH, "");
+			e.putLong(LegacyJSONConfigFile.JSON_LAST_UPDATE, 0);
+			e.commit();
+		}
 		
 		if (LegacyJSONConfigFile._sharedFile == null || force)
 		{
@@ -286,7 +300,21 @@ public class LegacyJSONConfigFile
 
 			for (int i = 0; triggers != null && i < triggers.length(); i++)
 			{
-				Trigger t = Trigger.parse(context, triggers.getJSONObject(i));
+				JSONObject json = triggers.getJSONObject(i);
+				
+				Map<String, Object> map = new HashMap<String, Object>();
+						
+				@SuppressWarnings("unchecked")
+				Iterator<String> keys = json.keys();
+				
+				while (keys.hasNext())
+				{
+					String key = keys.next();
+					
+					map.put(key, json.get(key));
+				}
+
+				Trigger t = Trigger.parse(context, map);
 
 				if (t != null)
 					triggerList.add(t);

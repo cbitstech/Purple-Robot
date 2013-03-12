@@ -78,7 +78,7 @@ public class RandomNoiseProbe extends Probe
 				{
 					Bundle bundle = new Bundle();
 					bundle.putString("PROBE", this.name(context));
-					bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+					bundle.putDouble("TIMESTAMP", ((double) System.currentTimeMillis()) / 1000);
 
 					SecureRandom random = new SecureRandom();
 					

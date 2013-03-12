@@ -5,13 +5,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.mozilla.javascript.NativeObject;
-
-import edu.northwestern.cbits.purple_robot_manager.DialogActivity;
-import edu.northwestern.cbits.purple_robot_manager.ManagerService;
-import edu.northwestern.cbits.purple_robot_manager.probes.features.Feature;
-import edu.northwestern.cbits.purple_robot_manager.probes.features.JavascriptFeature;
-
 import jscheme.JScheme;
 import jsint.DynamicEnvironment;
 import jsint.Evaluator;
@@ -21,6 +14,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import edu.northwestern.cbits.purple_robot_manager.ManagerService;
+import edu.northwestern.cbits.purple_robot_manager.probes.features.Feature;
 
 public class SchemeEngine extends BaseScriptEngine
 {
@@ -57,14 +52,14 @@ public class SchemeEngine extends BaseScriptEngine
 	
 	public boolean updateTrigger(String triggerId, Pair parameters)
 	{
-		Map<String, String> paramsMap = SchemeEngine.parsePair(parameters);
+		Map<String, Object> paramsMap = SchemeEngine.parsePair(parameters);
 		paramsMap.put("identifier", triggerId);
 
-		Iterator<Entry<String, String>> it = paramsMap.entrySet().iterator();
+		Iterator<Entry<String, Object>> it = paramsMap.entrySet().iterator();
 
 		while (it.hasNext())
 		{
-			Entry<String, String> entry = it.next();
+			Entry<String, Object> entry = it.next();
 			
 			Log.e("PR-SCM", "MAP: " + entry.getKey() + " => " + entry.getValue());
 		}
@@ -72,9 +67,9 @@ public class SchemeEngine extends BaseScriptEngine
 		return false;
 	}
 
-	private static Map<String, String> parsePair(Pair pair) 
+	private static Map<String, Object> parsePair(Pair pair) 
 	{
-		HashMap<String, String> map = new HashMap<String, String>();
+		HashMap<String, Object> map = new HashMap<String, Object>();
 		
 		if (pair.isEmpty() == false)
 		{
@@ -114,7 +109,7 @@ public class SchemeEngine extends BaseScriptEngine
 			{
 				Pair cdrPair = (Pair) cdr;
 				
-				Map<String, String> restMap = SchemeEngine.parsePair(cdrPair);
+				Map<String, Object> restMap = SchemeEngine.parsePair(cdrPair);
 				
 				if (restMap != null)
 					map.putAll(restMap);
@@ -174,33 +169,20 @@ public class SchemeEngine extends BaseScriptEngine
 		return b;
 	}
 
-	
 	public void showNativeDialog(String title, String message, String confirmTitle, String cancelTitle, Pair confirmAction, Pair cancelAction)
 	{
-		Intent intent = new Intent(this._context, DialogActivity.class);
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-		intent.putExtra(DialogActivity.DIALOG_TITLE, title);
-		intent.putExtra(DialogActivity.DIALOG_MESSAGE, message);
-		intent.putExtra(DialogActivity.DIALOG_CONFIRM_BUTTON, confirmTitle);
-		intent.putExtra(DialogActivity.DIALOG_CANCEL_BUTTON, cancelTitle);
-		intent.putExtra(DialogActivity.DIALOG_CONFIRM_SCRIPT, confirmAction.toString());
-		intent.putExtra(DialogActivity.DIALOG_CANCEL_SCRIPT, cancelAction.toString());
-
-		this._context.startActivity(intent);
+		this.showNativeDialog(title, message, confirmTitle, cancelTitle, confirmAction.toString(), cancelAction.toString());
 	}
-	
+
 	public void updateWidget(Pair parameters)
 	{
-		Map<String, String> paramsMap = SchemeEngine.parsePair(parameters);
+		Map<String, Object> paramsMap = SchemeEngine.parsePair(parameters);
 		
 		Intent intent = new Intent(ManagerService.UPDATE_WIDGETS);
 		
-		for (Object keyObj : paramsMap.keySet())
+		for (String key : paramsMap.keySet())
 		{
-			String key = keyObj.toString();
-			
-			intent.putExtra(key, paramsMap.get(key));
+			intent.putExtra(key, paramsMap.get(key).toString());
 		}
 
 		this._context.startService(intent);
@@ -237,5 +219,25 @@ public class SchemeEngine extends BaseScriptEngine
 		}
 
 		this.transmitData(bundle);
+	}
+
+	public boolean broadcastIntent(final String action, Pair extras)
+	{
+		return this.broadcastIntent(action, SchemeEngine.parsePair(extras));
+	}
+
+	public boolean updateWidget(final String title, final String message, final String applicationName, final Pair launchParams, final String script)
+	{
+		return this.updateWidget(title, message, applicationName, SchemeEngine.parsePair(launchParams), script);
+	}
+
+	public boolean launchApplication(String applicationName, final Pair launchParams, final String script)
+	{
+		return this.launchApplication(applicationName, SchemeEngine.parsePair(launchParams), script);
+	}
+
+	public boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen, final Pair launchParams, final String script)
+	{
+		return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen, SchemeEngine.parsePair(launchParams), script);
 	}
 }

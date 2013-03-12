@@ -1,7 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager.triggers;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.util.Map;
+
 import org.mozilla.javascript.EcmaError;
 
 import android.content.Context;
@@ -18,31 +18,26 @@ public class ProbeTrigger extends Trigger
 	private String _test = null;
 	private long _frequency = 0;
 
-	public ProbeTrigger(Context context, JSONObject object) throws JSONException
+	public ProbeTrigger(Context context, Map<String, Object> map)
 	{
-		super(context, object);
-
-		this._test = object.getString(ProbeTrigger.TRIGGER_TEST);
-		this._frequency = object.getLong(ProbeTrigger.TRIGGER_FREQUENCY);
+		super(context, map);
+		
+		this.updateFromMap(context, map);
 	}
 
-	public boolean updateFromJson(Context context, JSONObject json) 
+	public boolean updateFromMap(Context context, Map<String, Object> map) 
 	{
-		if (super.updateFromJson(context, json))
+		if (super.updateFromMap(context, map))
 		{
-			try
+			if (super.updateFromMap(context, map))
 			{
-				if (json.has(ProbeTrigger.TRIGGER_TEST))
-					this._test = json.getString(ProbeTrigger.TRIGGER_TEST);
+				if (map.containsKey(ProbeTrigger.TRIGGER_TEST))
+					this._test = map.get(ProbeTrigger.TRIGGER_TEST).toString();
 				
-				if (json.has(ProbeTrigger.TRIGGER_FREQUENCY))
-					this._frequency = json.getLong(ProbeTrigger.TRIGGER_FREQUENCY);
+				if (map.containsKey(ProbeTrigger.TRIGGER_FREQUENCY))
+					this._frequency = ((Long) map.get(ProbeTrigger.TRIGGER_FREQUENCY)).longValue();
 
 				return true;
-			} 
-			catch (JSONException e) 
-			{
-				e.printStackTrace();
 			}
 		}
 		

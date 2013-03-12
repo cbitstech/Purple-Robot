@@ -26,6 +26,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Editable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -346,6 +347,8 @@ public class StartActivity extends SherlockActivity
 
 	private void setJsonUri(Uri jsonConfigUri)
 	{
+		Log.e("PR", "SET JSON URI: " + jsonConfigUri);
+		
 		if (jsonConfigUri.getScheme().equals("cbits-prm") || jsonConfigUri.getScheme().equals("cbits-pr"))
 		{
 			Uri.Builder b = jsonConfigUri.buildUpon();
@@ -379,6 +382,8 @@ public class StartActivity extends SherlockActivity
 
         final String savedPassword = prefs.getString("config_password", null);
 
+        Log.e("PR", "INTENT DATA: " + jsonConfigUri);
+        
         if (jsonConfigUri != null)
         {
         	if (savedPassword == null || savedPassword.equals(""))

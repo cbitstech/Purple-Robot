@@ -1,7 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager.triggers;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.util.Map;
+
 import org.mozilla.javascript.EvaluatorException;
 
 import android.content.Context;
@@ -19,34 +19,9 @@ public abstract class Trigger
 	
 	private boolean _enabled = true;
 
-	public Trigger (Context context, JSONObject object) throws JSONException
+	public Trigger (Context context, Map<String, Object> map)
 	{
-		this._name = object.getString("name");
-		this._action = object.getString("action");
-		
-		if (object.has("identifier"))
-			this._identifier = object.getString("identifier");
-		else
-			this._identifier = this._name;
-	}
-
-	public static Trigger parse(Context context, JSONObject object)
-	{
-		try
-		{
-			String type = object.getString("type");
-
-			if (DateTrigger.TYPE_NAME.equals(type))
-				return new DateTrigger(context, object);
-			else if (ProbeTrigger.TYPE_NAME.equals(type))
-				return new ProbeTrigger(context, object);
-		}
-		catch (JSONException e)
-		{
-			e.printStackTrace();
-		}
-
-		return null;
+		this.updateFromMap(context, map);
 	}
 
 	public abstract boolean matches(Context context, Object obj);
@@ -118,29 +93,6 @@ public abstract class Trigger
 		return this._identifier;
 	}
 
-	public boolean updateFromJson(Context context, JSONObject json) 
-	{
-		try 
-		{
-			if (json.has("name"))
-				this._name = json.getString("name");
-
-			if (json.has("action"))
-				this._action = json.getString("action");
-			
-			if (json.has("identifier"))
-				this._identifier = json.getString("identifier");
-
-			return true;
-		} 
-		catch (JSONException e) 
-		{
-			e.printStackTrace();
-		}
-		
-		return false;
-	}
-
 	public void reset(Context context) 
 	{
 		// Default implementation does nothing...
@@ -163,5 +115,32 @@ public abstract class Trigger
 		screen.setSummary(type);
 
 		return screen;
+	}
+
+	public boolean updateFromMap(Context _context, Map<String, Object> params) 
+	{
+		if (params.containsKey("name"))
+			this._name = params.get("name").toString();
+
+		if (params.containsKey("action"))
+			this._name = params.get("action").toString();
+
+		if (params.containsKey("identifier"))
+			this._name = params.get("identifier").toString();
+
+		return true;
+	}
+
+	public static Trigger parse(Context context, Map<String, Object> params) 
+	{
+		String type = params.get("type").toString();
+
+		if (DateTrigger.TYPE_NAME.equals(type))
+			return new DateTrigger(context, params);
+		else if (ProbeTrigger.TYPE_NAME.equals(type))
+			return new ProbeTrigger(context, params);
+
+		return null;
+
 	}
 }
