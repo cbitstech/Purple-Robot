@@ -8,8 +8,8 @@
 	android:clickable="true"
     android:paddingTop="16dp"
     android:paddingBottom="16dp"
-    android:paddingLeft="24dp"
-    android:paddingRight="24dp"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
 	android:background="@drawable/appwidget_dark_bg">
     <TextView
         android:id="@+id/widget_title_title_text"
@@ -17,7 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="@android:color/white"
-        android:textSize="48sp"
+        android:textSize="36sp"
         android:textStyle="bold"
         android:lines="1"
         android:gravity="top|center"
