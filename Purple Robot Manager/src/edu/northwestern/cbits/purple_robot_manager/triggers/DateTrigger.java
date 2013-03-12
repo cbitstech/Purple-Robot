@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
@@ -17,9 +18,6 @@ import net.fortuna.ical4j.model.DateRange;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.PeriodList;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -113,79 +111,51 @@ public class DateTrigger extends Trigger
 		}
 	}
 	
-	public boolean updateFromJson(Context context, JSONObject json) 
+	public boolean updateFromMap(Context context, Map<String, Object> map) 
 	{
-		if (super.updateFromJson(context, json))
+		if (super.updateFromMap(context, map))
 		{
-			try
-			{
-				String start = null;
-				
-				if (json.has(DateTrigger.DATETIME_START))
-					start = json.getString(DateTrigger.DATETIME_START);
-				
-				String end = null;
-	
-				if (json.has(DateTrigger.DATETIME_END))
-					end = json.getString(DateTrigger.DATETIME_END);
-	
-				String repeats = "null";
-	
-				if (json.has(DateTrigger.DATETIME_REPEATS))
-					repeats = json.getString(DateTrigger.DATETIME_REPEATS);
-	
-				if (json.has(DateTrigger.DATETIME_RANDOM))
-					this._random = json.getBoolean(DateTrigger.DATETIME_RANDOM);
-	
-				if ("null".equals(repeats))
-					repeats = null;
-				
-				String repeatString = "";
+			String start = null;
+			
+			if (map.containsKey(DateTrigger.DATETIME_START))
+				start = map.get(DateTrigger.DATETIME_START).toString();
+			
+			String end = null;
 
-				if (repeats != null)
-					repeatString = "\nRRULE:" + repeats;
+			if (map.containsKey(DateTrigger.DATETIME_END))
+				end = map.get(DateTrigger.DATETIME_END).toString();
 
-				this._icalString = String.format(context.getString(R.string.ical_template), start.toString(), end.toString(), this.name(), repeatString);
-				
-				this.refreshCalendar();
-	
-				return true;
-			} 
-			catch (JSONException e) 
-			{
-				e.printStackTrace();
-			}
+			String repeats = "null";
+
+			if (map.containsKey(DateTrigger.DATETIME_REPEATS))
+				repeats = map.get(DateTrigger.DATETIME_REPEATS).toString();
+
+			if (map.containsKey(DateTrigger.DATETIME_RANDOM))
+				this._random = ((Boolean) map.get(DateTrigger.DATETIME_RANDOM)).booleanValue();
+
+			if ("null".equals(repeats))
+				repeats = null;
+			
+			String repeatString = "";
+
+			if (repeats != null)
+				repeatString = "\nRRULE:" + repeats;
+
+			this._icalString = String.format(context.getString(R.string.ical_template), start.toString(), end.toString(), this.name(), repeatString);
+			
+			this.refreshCalendar();
+
+			return true;
 		}
 		
 		return false;
 	}
 	
-	public DateTrigger(Context context, JSONObject object) throws JSONException
+	public DateTrigger(Context context, Map<String, Object> map)
 	{
-		super(context, object);
-
-		String start = object.getString(DateTrigger.DATETIME_START);
-		String end = object.getString(DateTrigger.DATETIME_END);
+		super(context, map);
 		
-		String repeats = "null";
-
-		if (object.has(DateTrigger.DATETIME_REPEATS))
-			repeats = object.getString(DateTrigger.DATETIME_REPEATS);
-
-		if (object.has(DateTrigger.DATETIME_RANDOM))
-			this._random = object.getBoolean(DateTrigger.DATETIME_RANDOM);
-
-		if ("null".equals(repeats))
-			repeats = null;
-
-		String repeatString = "";
-
-		if (repeats != null)
-			repeatString = "\nRRULE:" + repeats;
-
-		this._icalString = String.format(context.getString(R.string.ical_template), start, end, this.name(), repeatString);
-		
-		this.refreshCalendar();
+		this.updateFromMap(context, map);
 	}
 
 	public Period getPeriod(long timestamp)
