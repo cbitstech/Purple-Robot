@@ -1,9 +1,9 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
-import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
 public class WidgetReceiver extends BroadcastReceiver
 {
@@ -30,9 +30,7 @@ public class WidgetReceiver extends BroadcastReceiver
 		{
 			try
 			{
-    			JavaScriptEngine engine = new JavaScriptEngine(context);
-    			
-    			engine.runScript(script);
+				BaseScriptEngine.runScript(context, script);
 			}
 			catch (Exception e)
 			{

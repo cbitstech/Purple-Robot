@@ -26,7 +26,6 @@ import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
-import edu.northwestern.cbits.purple_robot_manager.R.array;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
@@ -39,12 +38,12 @@ public abstract class BaseScriptEngine
 	protected Context _context = null;
 	private static Map<String, String> packageMap = null;
 
+	protected abstract String language();
+
 	public BaseScriptEngine(Context context)
 	{
 		this._context = context;
 	}
-
-	protected abstract String language();
 	
 	public void log(String message)
 	{
@@ -434,5 +433,28 @@ public abstract class BaseScriptEngine
 		Editor e = prefs.edit();
 		e.putBoolean(SettingsActivity.CHECK_UPDATES_KEY, false);
 		e.commit();
+	}
+	
+	public void enableProbe(String probeName)
+	{
+		ProbeManager.enableProbe(this._context, probeName);
+	}
+
+	public static void runScript(Context context, String script) 
+	{
+		Log.e("PR-SCRIPT", "RUN: " + script);
+		
+		if (SchemeEngine.canRun(script))
+		{
+			SchemeEngine engine = new SchemeEngine(context);
+			
+			engine.evaluateSource(script);
+		}
+		else if (JavaScriptEngine.canRun(script))
+		{
+			JavaScriptEngine engine = new JavaScriptEngine(context);
+			
+			engine.runScript(script);
+		}
 	}
 }

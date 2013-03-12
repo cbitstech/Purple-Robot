@@ -32,7 +32,6 @@ import android.preference.PreferenceManager;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.R.string;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
