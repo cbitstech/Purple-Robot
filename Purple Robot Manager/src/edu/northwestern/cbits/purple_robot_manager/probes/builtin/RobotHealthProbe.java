@@ -18,6 +18,8 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.StatFs;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
@@ -50,6 +52,10 @@ public class RobotHealthProbe extends Probe
 	private static final String NTP_HOST = "0.north-america.pool.ntp.org";
 	protected static final String TIME_OFFSET_MS = "TIME_OFFSET_MS";
 	protected static final String CPU_USAGE = "CPU_USAGE";
+	protected static final String ROOT_FREE = "ROOT_FREE";
+	protected static final String ROOT_TOTAL = "ROOT_TOTAL";
+	protected static final String EXTERNAL_FREE = "EXTERNAL_FREE";
+	protected static final String EXTERNAL_TOTAL = "EXTERNAL_TOTAL";
 	
 	private long _lastOffset = 0;
 	private long _lastTimeCheck = 0;
@@ -297,6 +303,22 @@ public class RobotHealthProbe extends Probe
 									bundle.putLong(RobotHealthProbe.TIME_OFFSET_MS, me._lastOffset);
 									bundle.putLong(RobotHealthProbe.ACTIVE_RUNTIME, System.currentTimeMillis() - ManagerService.startTimestamp);
 									bundle.putFloat(RobotHealthProbe.CPU_USAGE, me.readUsage());
+									
+									StatFs root = new StatFs(Environment.getRootDirectory().getAbsolutePath());
+									
+									int rootFree = root.getAvailableBlocks() * root.getBlockSize();
+									int rootTotal = root.getBlockCount() * root.getBlockSize();
+
+									StatFs external = new StatFs(Environment.getExternalStorageDirectory().getAbsolutePath());
+									
+									int externalFree = external.getAvailableBlocks() * root.getBlockSize();
+									int externalTotal = external.getBlockCount() * root.getBlockSize();
+
+									bundle.putInt(RobotHealthProbe.ROOT_FREE, rootFree);
+									bundle.putInt(RobotHealthProbe.ROOT_TOTAL, rootTotal);
+
+									bundle.putInt(RobotHealthProbe.EXTERNAL_FREE, externalFree);
+									bundle.putInt(RobotHealthProbe.EXTERNAL_TOTAL, externalTotal);
 
 									me.transmitData(context, bundle);
 

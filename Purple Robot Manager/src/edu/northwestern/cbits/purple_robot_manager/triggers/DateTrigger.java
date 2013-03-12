@@ -10,6 +10,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import jsint.Pair;
+
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
@@ -39,10 +41,34 @@ public class DateTrigger extends Trigger
 	private static final String DATETIME_REPEATS = "datetime_repeat";
 	private static final String DATETIME_RANDOM = "datetime_random";
 
+	private static final String DATETIME_SPEC = "ical_string";
+
 	private static SecureRandom random = null;
 
 	private PeriodList periodList = null;
 	private long lastUpdate = 0;
+
+	private boolean _random = false;
+	private Calendar _calendar = null;
+	
+	private String _icalString = null;
+
+	public Pair schemePair() 
+	{
+		Pair pair = super.schemePair();
+		
+		Pair args = (Pair) pair.listTail(3);
+		
+		Pair rest = (Pair) args.rest();
+
+		rest = new Pair(new Pair("type", DateTrigger.TYPE_NAME), rest);
+		rest = new Pair(new Pair(DateTrigger.DATETIME_SPEC, this._icalString), rest);
+		rest = new Pair(new Pair(DateTrigger.DATETIME_RANDOM, this._random), rest);
+
+		args.setRest(rest);
+
+		return pair;
+	}
 
 	static
 	{
@@ -55,11 +81,6 @@ public class DateTrigger extends Trigger
 			e.printStackTrace();
 		}
 	}
-
-	private boolean _random = false;
-	private Calendar _calendar = null;
-	
-	private String _icalString = null;
 
 	public void reset(Context context) 
 	{

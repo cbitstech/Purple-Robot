@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import jsint.Pair;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -76,6 +78,21 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 		Intent i = new Intent(context, WebkitLandscapeActivity.class);
 
 		return i;
+	}
+	
+	public Pair schemePair(Context context) 
+	{
+		Pair pair = super.schemePair(context);
+		
+		Pair args = (Pair) pair.nth(2);
+		
+		Pair rest = (Pair) args.rest();
+		
+		rest = new Pair(new Pair(ContinuousProbe.PROBE_THRESHOLD, this.lastThreshold), rest);
+
+		args.setRest(rest);
+
+		return pair;
 	}
 
 	public String contentSubtitle(Context context)

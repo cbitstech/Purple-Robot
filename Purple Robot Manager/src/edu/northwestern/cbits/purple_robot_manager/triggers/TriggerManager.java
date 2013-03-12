@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import jsint.Pair;
+import jsint.Symbol;
+
 import android.content.Context;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
@@ -142,4 +145,26 @@ public class TriggerManager
 		return screen;
 	}
 
+	public Pair schemePairs(Context context) 
+	{
+		Pair pair = null;
+		
+		for (Trigger t : this._triggers)
+		{
+			Pair triggerPair = t.schemePair();
+			
+			if (pair == null)
+				pair = new Pair(Symbol.BEGIN, new Pair(triggerPair, Pair.EMPTY));
+			else
+			{
+				Pair rest = (Pair) pair.rest();
+				
+				rest = new Pair(triggerPair, rest);
+
+				pair.setRest(rest);
+			}
+		}
+
+		return new Pair(pair, Pair.EMPTY);
+	}
 }

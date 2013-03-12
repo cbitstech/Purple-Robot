@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import jsint.Pair;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -41,6 +43,20 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 
 	private int bufferIndex  = 0;
 
+	public Pair schemePair(Context context) 
+	{
+		Pair pair = super.schemePair(context);
+		
+		Pair args = (Pair) pair.nth(2);
+		
+		Pair rest = (Pair) args.rest();
+		
+		rest = new Pair(new Pair(ContinuousProbe.PROBE_THRESHOLD, this.lastThreshold), rest);
+
+		args.setRest(rest);
+
+		return pair;
+	}
 	
 	public Bundle formattedBundle(Context context, Bundle bundle)
 	{

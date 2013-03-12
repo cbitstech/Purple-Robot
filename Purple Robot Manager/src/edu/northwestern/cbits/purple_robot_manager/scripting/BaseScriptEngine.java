@@ -453,7 +453,7 @@ public abstract class BaseScriptEngine
 		ProbeManager.enableProbe(this._context, probeName);
 	}
 
-	public boolean updateWidget(final String title, final String message, final String applicationName, final Map<String, Object> launchParams, final String script)
+	protected boolean updateWidget(final String title, final String message, final String applicationName, final Map<String, Object> launchParams, final String script)
 	{
 		AppWidgetManager widgetManager = AppWidgetManager.getInstance(this._context);
 
@@ -501,7 +501,6 @@ public abstract class BaseScriptEngine
 		return true;
 	}
 
-	
 	protected Intent constructLaunchIntent(String applicationName, Map<String, Object> launchParams, String script) 
 	{
 		if (applicationName == null)
@@ -593,7 +592,7 @@ public abstract class BaseScriptEngine
 		return null;
 	}
 
-	public boolean updateTrigger(String triggerId, Map<String, Object> params)
+	protected boolean updateTrigger(String triggerId, Map<String, Object> params)
 	{
 		boolean found = false;
 
@@ -621,7 +620,7 @@ public abstract class BaseScriptEngine
 		return this.launchApplication(applicationName, new HashMap<String, Object>(), null);
 	}
 
-	public boolean launchApplication(String applicationName, Map<String, Object> launchParams, final String script)
+	protected boolean launchApplication(String applicationName, Map<String, Object> launchParams, final String script)
 	{
 		Intent intent = this.constructLaunchIntent(applicationName, launchParams, script);
 
@@ -635,8 +634,7 @@ public abstract class BaseScriptEngine
 		return false;
 	}
 
-	
-	public boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen, Map<String,Object> launchParams, final String script)
+	protected boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen, Map<String,Object> launchParams, final String script)
 	{
 		try
 		{
@@ -717,7 +715,7 @@ public abstract class BaseScriptEngine
 		this._context.startService(intent);
 	}
 
-	public boolean broadcastIntent(final String action, final Map<String, Object> extras)
+	protected boolean broadcastIntent(final String action, final Map<String, Object> extras)
 	{
 		Intent intent = new Intent(action);
 
