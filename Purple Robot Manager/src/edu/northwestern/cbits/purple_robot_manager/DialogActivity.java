@@ -2,7 +2,7 @@ package edu.northwestern.cbits.purple_robot_manager;
 
 import java.util.ArrayList;
 
-import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
+import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -55,7 +55,6 @@ public class DialogActivity extends Activity
 		super.onResume();
 
 		final DialogActivity me = this;
-		final JavaScriptEngine jsEngine = new JavaScriptEngine(this);
 
         final TextView messageText = (TextView) this.findViewById(R.id.text_dialog_message);
 
@@ -85,7 +84,7 @@ public class DialogActivity extends Activity
 				{
 					try
 					{
-						jsEngine.runScript(confirmScript);
+						BaseScriptEngine.runScript(me, confirmScript);
 					}
 					catch (Exception e)
 					{
@@ -105,7 +104,7 @@ public class DialogActivity extends Activity
 				{
 					try
 					{
-						jsEngine.runScript(cancelScript);
+						BaseScriptEngine.runScript(me, cancelScript);
 					}
 					catch (Exception e)
 					{

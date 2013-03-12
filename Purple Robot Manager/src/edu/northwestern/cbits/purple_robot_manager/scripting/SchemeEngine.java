@@ -5,12 +5,21 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.mozilla.javascript.NativeObject;
+
+import edu.northwestern.cbits.purple_robot_manager.DialogActivity;
+import edu.northwestern.cbits.purple_robot_manager.ManagerService;
+import edu.northwestern.cbits.purple_robot_manager.probes.features.Feature;
+import edu.northwestern.cbits.purple_robot_manager.probes.features.JavascriptFeature;
+
 import jscheme.JScheme;
 import jsint.DynamicEnvironment;
 import jsint.Evaluator;
 import jsint.Pair;
 import jsint.Symbol;
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 
 public class SchemeEngine extends BaseScriptEngine
@@ -19,7 +28,17 @@ public class SchemeEngine extends BaseScriptEngine
 	{
 		super(context);
 	}
-	
+
+	public static boolean canRun(String script) 
+	{
+		// TODO: Better validation & heuristics...
+
+		if (script.trim().charAt(0) == '(')
+			return true;
+		
+		return false;
+	}
+
 	public Object evaluateSource(String source)
 	{
 		DynamicEnvironment env = new DynamicEnvironment();
@@ -103,5 +122,120 @@ public class SchemeEngine extends BaseScriptEngine
 		}
 		
 		return map;
+	}
+
+	private static Bundle bundleForPair(Pair pair) 
+	{
+		Bundle b = new Bundle();
+		
+		if (pair.isEmpty() == false)
+		{
+			Object first = pair.first();
+			
+			if (first instanceof Pair)
+			{
+				Pair firstPair = (Pair) first;
+				
+				Object firstFirst = firstPair.first();
+				
+				if (firstFirst instanceof String)
+				{
+					String key = (String) firstFirst;
+					
+					Object second = firstPair.second();
+					
+					if (second instanceof String)
+						b.putString(key, second.toString());
+					else if (second instanceof Pair)
+					{
+						Pair secondPair = (Pair) second;
+						
+						if (secondPair.first().toString().equalsIgnoreCase("begin"))
+							b.putString(key, secondPair.toString());
+						else
+							b.putBundle(key, SchemeEngine.bundleForPair(secondPair));
+					}
+				}
+			}
+			
+			Object rest = pair.rest();
+	
+			if (rest instanceof Pair && !((Pair) rest).isEmpty())
+			{
+				Pair restPair = (Pair) rest;
+				
+				Bundle restBundle = SchemeEngine.bundleForPair(restPair);
+				
+				b.putAll(restBundle);
+				
+			}
+		}
+		
+		return b;
+	}
+
+	
+	public void showNativeDialog(String title, String message, String confirmTitle, String cancelTitle, Pair confirmAction, Pair cancelAction)
+	{
+		Intent intent = new Intent(this._context, DialogActivity.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+		intent.putExtra(DialogActivity.DIALOG_TITLE, title);
+		intent.putExtra(DialogActivity.DIALOG_MESSAGE, message);
+		intent.putExtra(DialogActivity.DIALOG_CONFIRM_BUTTON, confirmTitle);
+		intent.putExtra(DialogActivity.DIALOG_CANCEL_BUTTON, cancelTitle);
+		intent.putExtra(DialogActivity.DIALOG_CONFIRM_SCRIPT, confirmAction.toString());
+		intent.putExtra(DialogActivity.DIALOG_CANCEL_SCRIPT, cancelAction.toString());
+
+		this._context.startActivity(intent);
+	}
+	
+	public void updateWidget(Pair parameters)
+	{
+		Map<String, String> paramsMap = SchemeEngine.parsePair(parameters);
+		
+		Intent intent = new Intent(ManagerService.UPDATE_WIDGETS);
+		
+		for (Object keyObj : paramsMap.keySet())
+		{
+			String key = keyObj.toString();
+			
+			intent.putExtra(key, paramsMap.get(key));
+		}
+
+		this._context.startService(intent);
+	}
+	
+	public void emitReading(String name, Object value)
+	{
+		Bundle bundle = new Bundle();
+		bundle.putString("PROBE", name);
+		bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+		
+		if (value instanceof String)
+			bundle.putString(Feature.FEATURE_VALUE, value.toString());
+		else if (value instanceof Double)
+		{
+			Double d = (Double) value;
+
+			bundle.putDouble(Feature.FEATURE_VALUE, d.doubleValue());
+		}
+		else if (value instanceof Pair)
+		{
+			Pair pair = (Pair) value;
+
+			Bundle b = SchemeEngine.bundleForPair(pair);
+
+			bundle.putParcelable(Feature.FEATURE_VALUE, b);
+		}
+		else
+		{
+			Log.e("PRM", "SCHEME PLUGIN GOT UNKNOWN VALUE " + value);
+
+			if (value != null)
+				Log.e("PRM", "SCHEME PLUGIN GOT UNKNOWN CLASS " + value.getClass());
+		}
+
+		this.transmitData(bundle);
 	}
 }

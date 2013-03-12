@@ -32,9 +32,6 @@ import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.DialogActivity;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.R.drawable;
-import edu.northwestern.cbits.purple_robot_manager.R.id;
-import edu.northwestern.cbits.purple_robot_manager.R.layout;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.Feature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.JavascriptFeature;
@@ -535,13 +532,15 @@ public class JavaScriptEngine extends BaseScriptEngine
 		this.transmitData(bundle);
 	}
 	
-	public void enableProbe(String probeName)
-	{
-		ProbeManager.enableProbe(this._context, probeName);
-	}
-	
 	protected String language() 
 	{
 		return "JavaScript";
+	}
+
+	public static boolean canRun(String script) 
+	{
+		// TODO: Validate if actually JavaScript...
+
+		return true;
 	}
 }
