@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jsint.Pair;
+import jsint.Symbol;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -397,5 +400,28 @@ public class ProbeManager
 
 			ProbeManager.nudgeProbes(context);
 		}
+	}
+
+	public static Pair schemePairs(Context context) 
+	{
+		Pair pair = null;
+		
+		for (Probe p : ProbeManager.allProbes(context))
+		{
+			Pair probePair = p.schemePair(context);
+			
+			if (pair == null)
+				pair = new Pair(Symbol.BEGIN, new Pair(probePair, Pair.EMPTY));
+			else
+			{
+				Pair rest = (Pair) pair.rest();
+				
+				rest = new Pair(probePair, rest);
+
+				pair.setRest(rest);
+			}
+		}
+
+		return pair;
 	}
 }

@@ -5,6 +5,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import jsint.Pair;
+import jsint.Symbol;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -148,4 +151,16 @@ public abstract class Probe
 
 	public abstract void enable(Context context);
 	public abstract void disable(Context context);
+
+	public Pair schemePair(Context context) 
+	{
+		Pair rest = new Pair(new Pair("name", this.name(context)), Pair.EMPTY);
+		rest = new Pair(new Pair("enabled", this.isEnabled(context)), rest);
+		rest = new Pair(rest, Pair.EMPTY);
+
+		rest = new Pair(Symbol.intern("PurpleRobot"), rest);
+		rest = new Pair(Symbol.intern(".updateProbe"), rest);
+
+		return rest;
+	}
 }

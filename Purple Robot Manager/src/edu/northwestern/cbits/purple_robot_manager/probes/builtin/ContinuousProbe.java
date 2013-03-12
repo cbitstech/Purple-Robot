@@ -2,6 +2,8 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
 import java.util.UUID;
 
+import jsint.Pair;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -26,6 +28,9 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 public abstract class ContinuousProbe extends Probe
 {
 	public static final String WAKE_ACTION = "purple_robot_sensor_wake";
+
+	protected static final String PROBE_FREQUENCY = "frequency";
+	protected static final String PROBE_THRESHOLD = "threshold";
 
 	private static SharedPreferences prefs = null;
 
@@ -92,6 +97,21 @@ public abstract class ContinuousProbe extends Probe
 		screen.addPreference(duration);
 
 		return screen;
+	}
+
+	public Pair schemePair(Context context) 
+	{
+		Pair pair = super.schemePair(context);
+		
+		Pair args = (Pair) pair.nth(2);
+		
+		Pair rest = (Pair) args.rest();
+		
+		rest = new Pair(new Pair(ContinuousProbe.PROBE_FREQUENCY, this.getFrequency()), rest);
+
+		args.setRest(rest);
+
+		return pair;
 	}
 
 	public Bundle formattedBundle(Context context, Bundle bundle)

@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
+import edu.northwestern.cbits.purple_robot_manager.config.SchemeConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.Feature;
 
 public class SchemeEngine extends BaseScriptEngine
@@ -61,10 +62,10 @@ public class SchemeEngine extends BaseScriptEngine
 		{
 			Entry<String, Object> entry = it.next();
 			
-			Log.e("PR-SCM", "MAP: " + entry.getKey() + " => " + entry.getValue());
+			paramsMap.put(entry.getKey(), entry.getValue());
 		}
 		
-		return false;
+		return this.updateTrigger(triggerId, paramsMap);
 	}
 
 	private static Map<String, Object> parsePair(Pair pair) 
@@ -239,5 +240,12 @@ public class SchemeEngine extends BaseScriptEngine
 	public boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen, final Pair launchParams, final String script)
 	{
 		return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen, SchemeEngine.parsePair(launchParams), script);
+	}
+	
+	public String fetchConfig()
+	{
+		SchemeConfigFile config = new SchemeConfigFile(this._context);
+		
+		return config.toString();
 	}
 }

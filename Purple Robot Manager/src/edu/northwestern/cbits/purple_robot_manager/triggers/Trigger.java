@@ -2,6 +2,9 @@ package edu.northwestern.cbits.purple_robot_manager.triggers;
 
 import java.util.Map;
 
+import jsint.Pair;
+import jsint.Symbol;
+
 import org.mozilla.javascript.EvaluatorException;
 
 import android.content.Context;
@@ -75,7 +78,7 @@ public abstract class Trigger
 		{
 			Trigger t = (Trigger) obj;
 			
-			if (t._identifier.equals(this._identifier))
+			if (t._identifier != null && t._identifier.equals(this._identifier))
 				return true;
 		}
 		
@@ -141,6 +144,26 @@ public abstract class Trigger
 			return new ProbeTrigger(context, params);
 
 		return null;
+	}
 
+	public Pair schemePair() 
+	{
+		Pair rest = new Pair("name", this._name);
+		rest = new Pair(rest, Pair.EMPTY);
+		
+		if (this._action != null)
+		{
+			rest = new Pair(new Pair("action", this._action), rest);
+			rest = new Pair(rest, Pair.EMPTY);
+		}
+
+		rest = new Pair(rest, Pair.EMPTY);
+
+		rest = new Pair(this._identifier, rest);
+		rest = new Pair(Symbol.intern("PurpleRobot"), rest);
+
+		rest = new Pair(Symbol.intern(".updateTrigger"), rest);
+
+		return rest;
 	}
 }
