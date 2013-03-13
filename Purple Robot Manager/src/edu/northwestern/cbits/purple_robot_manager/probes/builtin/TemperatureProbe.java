@@ -36,7 +36,7 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 	private long frequency = 1000;
 
 	private long lastThresholdLookup = 0;
-	private double lastThreshold = 0;
+	private double lastThreshold = 1.0;
 
 	private float valueBuffer[][] = new float[1][BUFFER_SIZE];
 	private double timeBuffer[] = new double[BUFFER_SIZE];

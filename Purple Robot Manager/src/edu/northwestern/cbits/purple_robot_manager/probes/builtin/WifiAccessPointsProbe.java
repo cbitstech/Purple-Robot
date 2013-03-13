@@ -3,6 +3,8 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 import java.util.ArrayList;
 import java.util.List;
 
+import jsint.Pair;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -245,6 +247,23 @@ public class WifiAccessPointsProbe extends Probe
 		int count = bundle.getInt(WifiAccessPointsProbe.ACCESS_POINT_COUNT);
 
 		return String.format(context.getResources().getString(R.string.summary_wifi_probe), count);
+	}
+
+	public Pair schemePair(Context context) 
+	{
+		Pair pair = super.schemePair(context);
+		
+		Pair args = (Pair) pair.nth(2);
+		Pair rest = (Pair) args.rest();
+
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		long freq = Long.parseLong(prefs.getString("config_probe_wifi_frequency", "300000"));
+
+		rest = new Pair(new Pair(Probe.PROBE_FREQUENCY, freq), rest);
+
+		args.setRest(rest);
+
+		return pair;
 	}
 
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)

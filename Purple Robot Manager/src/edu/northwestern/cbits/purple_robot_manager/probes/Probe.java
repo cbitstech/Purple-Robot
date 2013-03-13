@@ -30,6 +30,9 @@ public abstract class Probe
 	public static final String DURATION = "DURATION";
 	public static final String PERIOD = "PERIOD";
 
+	public static final Object PROBE_FREQUENCY = "frequency";
+	public static final Object HASH_DATA = "hash_data";
+
 	public abstract String name(Context context);
 	public abstract String title(Context context);
 	public abstract String probeCategory(Context context);

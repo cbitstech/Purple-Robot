@@ -63,7 +63,7 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 	private long frequency = 1000;
 
 	private long lastThresholdLookup = 0;
-	private double lastThreshold = 0;
+	private double lastThreshold = 1.0;
 
 	private float valueBuffer[][] = new float[3][BUFFER_SIZE];
 	private int accuracyBuffer[] = new int[BUFFER_SIZE];

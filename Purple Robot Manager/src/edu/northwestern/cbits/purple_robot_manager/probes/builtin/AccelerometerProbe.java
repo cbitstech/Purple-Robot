@@ -59,7 +59,7 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 	private long frequency = 1000;
 
 	private long lastThresholdLookup = 0;
-	private double lastThreshold = 0;
+	private double lastThreshold = 0.5;
 
 	private double _lastX = Double.MAX_VALUE;
 	private double _lastY = Double.MAX_VALUE;

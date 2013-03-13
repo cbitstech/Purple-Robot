@@ -2,6 +2,8 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
 import java.util.ArrayList;
 
+import jsint.Pair;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -474,6 +476,28 @@ public class BluetoothDevicesProbe extends Probe
 		return formatted;
 	};
 
+	public Pair schemePair(Context context) 
+	{
+		Pair pair = super.schemePair(context);
+		
+		Pair args = (Pair) pair.nth(2);
+		Pair rest = (Pair) args.rest();
+		
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		long freq = Long.parseLong(prefs.getString("config_probe_bluetooth_frequency", "300000"));
+
+		rest = new Pair(new Pair(Probe.PROBE_FREQUENCY, freq), rest);
+
+		boolean doHash = prefs.getBoolean("config_probe_bluetooth_hash_data", true);
+
+		rest = new Pair(new Pair(Probe.HASH_DATA, doHash), rest);
+
+		args.setRest(rest);
+
+		return pair;
+	}
+
+	
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{
 		PreferenceManager manager = activity.getPreferenceManager();

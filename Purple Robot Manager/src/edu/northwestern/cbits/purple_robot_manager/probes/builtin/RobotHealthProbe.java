@@ -7,6 +7,8 @@ import java.io.RandomAccessFile;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import jsint.Pair;
+
 import org.apache.commons.net.ntp.NTPUDPClient;
 import org.apache.commons.net.ntp.TimeInfo;
 import org.json.JSONException;
@@ -390,6 +392,23 @@ public class RobotHealthProbe extends Probe
 		return formatted;
 	};
 */
+
+	public Pair schemePair(Context context) 
+	{
+		Pair pair = super.schemePair(context);
+		
+		Pair args = (Pair) pair.nth(2);
+		Pair rest = (Pair) args.rest();
+
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		long freq = Long.parseLong(prefs.getString("config_probe_robot_frequency", "300000"));
+
+		rest = new Pair(new Pair(Probe.PROBE_FREQUENCY, freq), rest);
+
+		args.setRest(rest);
+
+		return pair;
+	}
 
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{
