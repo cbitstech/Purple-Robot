@@ -30,22 +30,25 @@ public class TriggerOutputPlugin extends OutputPlugin
 		if (jsonConfig == null)
 			return;
 
-		List<Trigger> triggers = TriggerManager.getInstance().allTriggers();
-
-		for (Trigger trigger : triggers)
+		synchronized(this)
 		{
-			if (trigger instanceof ProbeTrigger)
+			List<Trigger> triggers = TriggerManager.getInstance().allTriggers();
+	
+			for (Trigger trigger : triggers)
 			{
-				ProbeTrigger probeTrigger = (ProbeTrigger) trigger;
-
-				try
+				if (trigger instanceof ProbeTrigger)
 				{
-					if (probeTrigger.matches(context, OutputPlugin.jsonForBundle(intent.getExtras())))
-						trigger.execute(context);
-				}
-				catch (JSONException e)
-				{
-					e.printStackTrace();
+					ProbeTrigger probeTrigger = (ProbeTrigger) trigger;
+	
+					try
+					{
+						if (probeTrigger.matches(context, OutputPlugin.jsonForBundle(intent.getExtras())))
+							trigger.execute(context);
+					}
+					catch (JSONException e)
+					{
+						e.printStackTrace();
+					}
 				}
 			}
 		}

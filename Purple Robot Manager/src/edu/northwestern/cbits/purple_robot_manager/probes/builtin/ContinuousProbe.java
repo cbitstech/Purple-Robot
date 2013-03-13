@@ -1,8 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
+import java.util.Map;
 import java.util.UUID;
-
-import jsint.Pair;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,7 +28,6 @@ public abstract class ContinuousProbe extends Probe
 {
 	public static final String WAKE_ACTION = "purple_robot_sensor_wake";
 
-	protected static final String PROBE_FREQUENCY = "frequency";
 	protected static final String PROBE_THRESHOLD = "threshold";
 
 	private static SharedPreferences prefs = null;
@@ -99,19 +97,34 @@ public abstract class ContinuousProbe extends Probe
 		return screen;
 	}
 
-	public Pair schemePair(Context context) 
+	public Map<String, Object> configuration(Context context)
 	{
-		Pair pair = super.schemePair(context);
+		Map<String, Object> map = super.configuration(context);
 		
-		Pair args = (Pair) pair.nth(2);
+		map.put(Probe.PROBE_FREQUENCY, this.getFrequency());
 		
-		Pair rest = (Pair) args.rest();
+		return map;
+	}
+	
+	public void updateFromMap(Context context, Map<String, Object> params) 
+	{
+		super.updateFromMap(context, params);
 		
-		rest = new Pair(new Pair(ContinuousProbe.PROBE_FREQUENCY, this.getFrequency()), rest);
-
-		args.setRest(rest);
-
-		return pair;
+		if (params.containsKey(Probe.PROBE_FREQUENCY))
+		{
+			Object frequency = params.get(Probe.PROBE_FREQUENCY);
+			
+			if (frequency instanceof Long)
+			{
+				String key = "config_probe_" + this.getPreferenceKey() + "_frequency";
+				
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				Editor e = prefs.edit();
+				
+				e.putString(key, frequency.toString());
+				e.commit();
+			}
+		}
 	}
 
 	public Bundle formattedBundle(Context context, Bundle bundle)

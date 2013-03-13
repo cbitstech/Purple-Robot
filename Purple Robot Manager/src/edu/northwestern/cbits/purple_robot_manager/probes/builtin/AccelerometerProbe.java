@@ -9,8 +9,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import jsint.Pair;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -19,6 +17,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -244,7 +243,7 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 		{
 			SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
 
-			frequency = Long.parseLong(prefs.getString("config_probe_accelerometer_built_in_frequency", "1000"));
+			this.frequency = Long.parseLong(prefs.getString("config_probe_accelerometer_built_in_frequency", "1000"));
 
 			int bufferSize = 1000 / (int) frequency;
 
@@ -345,19 +344,32 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 		return passes;
 	}
 
-	public Pair schemePair(Context context) 
+	public Map<String, Object> configuration(Context context)
 	{
-		Pair pair = super.schemePair(context);
+		Map<String, Object> map = super.configuration(context);
 		
-		Pair args = (Pair) pair.nth(2);
+		map.put(ContinuousProbe.PROBE_THRESHOLD, this.lastThreshold);
 		
-		Pair rest = (Pair) args.rest();
+		return map;
+	}
+	
+	public void updateFromMap(Context context, Map<String, Object> params) 
+	{
+		super.updateFromMap(context, params);
 		
-		rest = new Pair(new Pair(ContinuousProbe.PROBE_THRESHOLD, this.lastThreshold), rest);
-
-		args.setRest(rest);
-
-		return pair;
+		if (params.containsKey(ContinuousProbe.PROBE_THRESHOLD))
+		{
+			Object threshold = params.get(ContinuousProbe.PROBE_THRESHOLD);
+			
+			if (threshold instanceof Double)
+			{
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				Editor e = prefs.edit();
+				
+				e.putString("config_probe_accelerometer_threshold", threshold.toString());
+				e.commit();
+			}
+		}
 	}
 
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)

@@ -9,20 +9,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import jsint.Pair;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.github.mustachejava.DefaultMustacheFactory;
-import com.github.mustachejava.Mustache;
-import com.github.mustachejava.MustacheFactory;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -34,6 +29,10 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+
+import com.github.mustachejava.DefaultMustacheFactory;
+import com.github.mustachejava.Mustache;
+import com.github.mustachejava.MustacheFactory;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
@@ -73,21 +72,6 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 		Intent i = new Intent(context, WebkitLandscapeActivity.class);
 
 		return i;
-	}
-
-	public Pair schemePair(Context context) 
-	{
-		Pair pair = super.schemePair(context);
-		
-		Pair args = (Pair) pair.nth(2);
-		
-		Pair rest = (Pair) args.rest();
-		
-		rest = new Pair(new Pair(ContinuousProbe.PROBE_THRESHOLD, this.lastThreshold), rest);
-
-		args.setRest(rest);
-
-		return pair;
 	}
 
 	public String contentSubtitle(Context context)
@@ -329,6 +313,34 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 		return passes;
 	}
 	
+	public Map<String, Object> configuration(Context context)
+	{
+		Map<String, Object> map = super.configuration(context);
+		
+		map.put(ContinuousProbe.PROBE_THRESHOLD, this.lastThreshold);
+		
+		return map;
+	}
+	
+	public void updateFromMap(Context context, Map<String, Object> params) 
+	{
+		super.updateFromMap(context, params);
+		
+		if (params.containsKey(ContinuousProbe.PROBE_THRESHOLD))
+		{
+			Object threshold = params.get(ContinuousProbe.PROBE_THRESHOLD);
+			
+			if (threshold instanceof Double)
+			{
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				Editor e = prefs.edit();
+				
+				e.putString("config_probe_light_threshold", threshold.toString());
+				e.commit();
+			}
+		}
+	}
+
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{
 		PreferenceScreen screen = super.preferenceScreen(activity);

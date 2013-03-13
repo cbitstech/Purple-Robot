@@ -5,9 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jsint.Pair;
-import jsint.Symbol;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -402,26 +399,33 @@ public class ProbeManager
 		}
 	}
 
-	public static Pair schemePairs(Context context) 
+	public static List<Map<String, Object>> probeConfigurations(Context context)
 	{
-		Pair pair = null;
+		List<Map<String, Object>> configs = new ArrayList<Map<String, Object>>();
 		
 		for (Probe p : ProbeManager.allProbes(context))
 		{
-			Pair probePair = p.schemePair(context);
+			Map<String, Object> config = p.configuration(context);
 			
-			if (pair == null)
-				pair = new Pair(Symbol.BEGIN, new Pair(probePair, Pair.EMPTY));
-			else
-			{
-				Pair rest = (Pair) pair.rest();
-				
-				rest = new Pair(probePair, rest);
-
-				pair.setRest(rest);
-			}
+			configs.add(config);
 		}
 
-		return pair;
+		return configs;
+	}
+
+	public static boolean updateProbe(Context context, String probeName, Map<String, Object> params) 
+	{
+		Probe p = ProbeManager.probeForName(probeName, context);
+		
+		if (p != null)
+		{
+			p.updateFromMap(context, params);
+			
+			ProbeManager.nudgeProbes(context);
+			
+			return true;
+		}
+		
+		return false;
 	}
 }

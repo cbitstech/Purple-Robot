@@ -21,6 +21,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 public class ManagerService extends IntentService
 {

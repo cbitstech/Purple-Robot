@@ -2,8 +2,7 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import jsint.Pair;
+import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -164,22 +163,36 @@ public class RunningSoftwareProbe extends Probe
 		return formatted;
 	};
 
-	public Pair schemePair(Context context) 
+	public Map<String, Object> configuration(Context context)
 	{
-		Pair pair = super.schemePair(context);
+		Map<String, Object> map = super.configuration(context);
 		
-		Pair args = (Pair) pair.nth(2);
-		
-		Pair rest = (Pair) args.rest();
-
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
 		long freq = Long.parseLong(prefs.getString("config_probe_running_software_frequency", "300000"));
-
-		rest = new Pair(new Pair(Probe.PROBE_FREQUENCY, "config_probe_running_software_frequency"), rest);
-
-		args.setRest(rest);
-
-		return pair;
+		
+		map.put(Probe.PROBE_FREQUENCY, freq);
+		
+		return map;
+	}
+	
+	public void updateFromMap(Context context, Map<String, Object> params) 
+	{
+		super.updateFromMap(context, params);
+		
+		if (params.containsKey(Probe.PROBE_FREQUENCY))
+		{
+			Object frequency = params.get(Probe.PROBE_FREQUENCY);
+			
+			if (frequency instanceof Long)
+			{
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				Editor e = prefs.edit();
+				
+				e.putString("config_probe_running_software_frequency", frequency.toString());
+				e.commit();
+			}
+		}
 	}
 
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)

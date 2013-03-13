@@ -53,7 +53,7 @@ public class SchemeEngine extends BaseScriptEngine
 	
 	public boolean updateTrigger(String triggerId, Pair parameters)
 	{
-		Map<String, Object> paramsMap = SchemeEngine.parsePair(parameters);
+		Map<String, Object> paramsMap = SchemeEngine.parsePairList(parameters);
 		paramsMap.put("identifier", triggerId);
 
 		Iterator<Entry<String, Object>> it = paramsMap.entrySet().iterator();
@@ -67,53 +67,50 @@ public class SchemeEngine extends BaseScriptEngine
 		
 		return this.updateTrigger(triggerId, paramsMap);
 	}
+	
+	public boolean updateProbe(Pair params)
+	{
+		Map<String, Object> map = SchemeEngine.parsePairList(params);
 
-	private static Map<String, Object> parsePair(Pair pair) 
+		return this.updateProbe(map);
+	}
+
+	private static Map<String, Object> parsePairList(Pair pair) 
 	{
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		
 		if (pair.isEmpty() == false)
 		{
-			Object car = pair.first();
-			
-			if (car instanceof Pair)
+			Object first = pair.getFirst();
+
+			if (first instanceof Pair)
 			{
-				Pair carPair = (Pair) car;
+				Pair firstPair = (Pair) first;
 				
-				Object caar = carPair.first();
-				
-				if (caar instanceof String)
+				String key = firstPair.first.toString();
+
+				Object value = firstPair.rest();
+
+				if (value instanceof Pair)
 				{
-					String key = (String) caar;
+					Pair valuePair = (Pair) value;
 					
-					Object cdar = carPair.second();
-					
-					if (cdar instanceof String)
-					{
-						String value = (String) cdar;
-						
-						map.put(key, value);
-					}
-					else if (cdar instanceof Pair)
-					{
-						Pair cadar = (Pair) cdar;
-						
-						if (cadar.first().toString().equalsIgnoreCase("begin"))
-							map.put(key, cadar.toString());
-					}
+					if (valuePair.isEmpty() == false)
+						value = SchemeEngine.parsePairList(valuePair);
 				}
+
+				map.put(key, value);
 			}
 			
-			Object cdr = pair.rest();
-	
-			if (cdr instanceof Pair && !((Pair) cdr).isEmpty())
+			Object rest = pair.getRest();
+
+			if (rest instanceof Pair)
 			{
-				Pair cdrPair = (Pair) cdr;
+				Pair restPair = (Pair) rest;
 				
-				Map<String, Object> restMap = SchemeEngine.parsePair(cdrPair);
+				Map<String, Object> restMap = SchemeEngine.parsePairList(restPair);
 				
-				if (restMap != null)
-					map.putAll(restMap);
+				map.putAll(restMap);
 			}
 		}
 		
@@ -177,7 +174,7 @@ public class SchemeEngine extends BaseScriptEngine
 
 	public void updateWidget(Pair parameters)
 	{
-		Map<String, Object> paramsMap = SchemeEngine.parsePair(parameters);
+		Map<String, Object> paramsMap = SchemeEngine.parsePairList(parameters);
 		
 		Intent intent = new Intent(ManagerService.UPDATE_WIDGETS);
 		
@@ -224,22 +221,22 @@ public class SchemeEngine extends BaseScriptEngine
 
 	public boolean broadcastIntent(final String action, Pair extras)
 	{
-		return this.broadcastIntent(action, SchemeEngine.parsePair(extras));
+		return this.broadcastIntent(action, SchemeEngine.parsePairList(extras));
 	}
 
 	public boolean updateWidget(final String title, final String message, final String applicationName, final Pair launchParams, final String script)
 	{
-		return this.updateWidget(title, message, applicationName, SchemeEngine.parsePair(launchParams), script);
+		return this.updateWidget(title, message, applicationName, SchemeEngine.parsePairList(launchParams), script);
 	}
 
 	public boolean launchApplication(String applicationName, final Pair launchParams, final String script)
 	{
-		return this.launchApplication(applicationName, SchemeEngine.parsePair(launchParams), script);
+		return this.launchApplication(applicationName, SchemeEngine.parsePairList(launchParams), script);
 	}
 
 	public boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen, final Pair launchParams, final String script)
 	{
-		return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen, SchemeEngine.parsePair(launchParams), script);
+		return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen, SchemeEngine.parsePairList(launchParams), script);
 	}
 	
 	public String fetchConfig()

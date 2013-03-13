@@ -5,8 +5,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
-
-import jsint.Pair;
+import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -192,22 +191,36 @@ public class NetworkProbe extends Probe
 		return String.format(context.getResources().getString(R.string.summary_network_probe), ipAddress);
 	}
 
-	public Pair schemePair(Context context) 
+	public Map<String, Object> configuration(Context context)
 	{
-		Pair pair = super.schemePair(context);
+		Map<String, Object> map = super.configuration(context);
 		
-		Pair args = (Pair) pair.nth(2);
-		
-		Pair rest = (Pair) args.rest();
-
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		long freq = Long.parseLong(prefs.getString("config_probe_network_frequency", "60000"));
 
-		rest = new Pair(new Pair(Probe.PROBE_FREQUENCY, freq), rest);
-
-		args.setRest(rest);
-
-		return pair;
+		long freq = Long.parseLong(prefs.getString("config_probe_network_frequency", "300000"));
+		
+		map.put(Probe.PROBE_FREQUENCY, freq);
+		
+		return map;
+	}
+	
+	public void updateFromMap(Context context, Map<String, Object> params) 
+	{
+		super.updateFromMap(context, params);
+		
+		if (params.containsKey(Probe.PROBE_FREQUENCY))
+		{
+			Object frequency = params.get(Probe.PROBE_FREQUENCY);
+			
+			if (frequency instanceof Long)
+			{
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				Editor e = prefs.edit();
+				
+				e.putString("config_probe_network_frequency", frequency.toString());
+				e.commit();
+			}
+		}
 	}
 
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)

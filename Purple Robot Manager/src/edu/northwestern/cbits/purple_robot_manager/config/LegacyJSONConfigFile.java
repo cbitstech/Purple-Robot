@@ -32,11 +32,13 @@ import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.net.Uri.Builder;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
+import edu.northwestern.cbits.purple_robot_manager.scripting.SchemeEngine;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
@@ -59,124 +61,160 @@ public class LegacyJSONConfigFile
 	private JSONObject parameters = null;
 
 	private static LegacyJSONConfigFile _sharedFile = null;
-	private static Uri _configUri = null;
 
-	public static void updateFromOnline(final Context context, final Uri uri, boolean force)
+	public static void updateFromOnline(final Context context, final Uri uri)
 	{
-		if (!uri.equals(LegacyJSONConfigFile._configUri))
-			LegacyJSONConfigFile._sharedFile = null;
-		
-		if (force)
+		Runnable r = new Runnable()
 		{
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-
-			Editor e = prefs.edit();
-			
-			e.putString(LegacyJSONConfigFile.JSON_LAST_HASH, "");
-			e.putLong(LegacyJSONConfigFile.JSON_LAST_UPDATE, 0);
-			e.commit();
-		}
-		
-		if (LegacyJSONConfigFile._sharedFile == null || force)
-		{
-			Runnable r = new Runnable()
+			public void run()
 			{
-				public void run()
+				Runnable next = null;
+				
+				if (uri != null && uri.toString().trim().length() > 0)
 				{
-					Runnable next = null;
+					final EncryptionManager encryption = EncryptionManager.getInstance();
+
+					Uri newUri = uri;
 					
-					if (uri != null && uri.toString().trim().length() > 0)
+					try
 					{
-						final EncryptionManager encryption = EncryptionManager.getInstance();
-
-						Uri newUri = uri;
+						String userId = encryption.getUserId(context);
+						String existingId = uri.getQueryParameter("user_id");
 						
-						try
+						if (existingId == null || existingId.equals(userId) == false)
 						{
-							LegacyJSONConfigFile._configUri = uri;
+							Builder builder = new Builder();
 							
-							String userId = encryption.getUserId(context);
-							String existingId = uri.getQueryParameter("user_id");
+							builder.scheme(uri.getScheme());
+							builder.encodedAuthority(uri.getAuthority());
+
+							if (uri.getPath() != null)
+								builder.encodedPath(uri.getPath());
 							
-							if (existingId == null || existingId.equals(userId) == false)
+							if (uri.getFragment() != null)
+								builder.encodedFragment(uri.getFragment());
+							
+							String query = uri.getQuery();
+							
+							ArrayList<String> keys = new ArrayList<String>();
+
+							if (query != null)
 							{
-								Builder builder = new Builder();
 								
-								builder.scheme(uri.getScheme());
-								builder.encodedAuthority(uri.getAuthority());
-
-								if (uri.getPath() != null)
-									builder.encodedPath(uri.getPath());
+								String[] params = query.split("&");
 								
-								if (uri.getFragment() != null)
-									builder.encodedFragment(uri.getFragment());
-								
-								String query = uri.getQuery();
-								
-								ArrayList<String> keys = new ArrayList<String>();
-
-								if (query != null)
+								for (String param : params)
 								{
+									String[] components = param.split("=");
 									
-									String[] params = query.split("&");
-									
-									for (String param : params)
-									{
-										String[] components = param.split("=");
-										
-										keys.add(components[0]);
-									}
+									keys.add(components[0]);
 								}
-								
-								for (String key : keys)
-								{
-									if ("user_id".equals(key))
-										userId = uri.getQueryParameter(key);
-									else
-										builder.appendQueryParameter(key, uri.getQueryParameter(key));
-								}
-
-								builder.appendQueryParameter("user_id", userId);
-
-								newUri = builder.build();
 							}
 							
-							URL u = new URL(newUri.toString());
-
-							final SharedPreferences prefs = LegacyJSONConfigFile.getPreferences(context);
-							Editor edit = prefs.edit();
-
-							edit.putString(LegacyJSONConfigFile.JSON_CONFIGURATION_URL, u.toString());
-							edit.commit();
-
-							HttpURLConnection conn = (HttpURLConnection) u.openConnection();
-							
-							BufferedInputStream bin = new BufferedInputStream(conn.getInputStream());
-							ByteArrayOutputStream bout = new ByteArrayOutputStream();
-
-							byte[] buffer = new byte[4096];
-							int read = 0;
-
-							while ((read = bin.read(buffer, 0, buffer.length)) != -1)
+							for (String key : keys)
 							{
-								bout.write(buffer, 0, read);
+								if ("user_id".equals(key))
+									userId = uri.getQueryParameter(key);
+								else
+									builder.appendQueryParameter(key, uri.getQueryParameter(key));
 							}
 
-							bin.close();
+							builder.appendQueryParameter("user_id", userId);
 
-							final String jsonString = new String(bout.toByteArray(), "UTF-8");
+							newUri = builder.build();
+						}
+						
+						URL u = new URL(newUri.toString());
 
-							final JSONObject json = new JSONObject(jsonString);
+						final SharedPreferences prefs = LegacyJSONConfigFile.getPreferences(context);
+						Editor edit = prefs.edit();
 
-							edit.putString(LegacyJSONConfigFile.JSON_CONFIGURATION, json.toString());
+						edit.putString(LegacyJSONConfigFile.JSON_CONFIGURATION_URL, u.toString());
+						edit.commit();
 
-							edit.commit();
-							
-							String oldHash = prefs.getString(LegacyJSONConfigFile.JSON_LAST_HASH, "");
-							final String newHash = encryption.createHash(jsonString);
+						HttpURLConnection conn = (HttpURLConnection) u.openConnection();
+						
+						BufferedInputStream bin = new BufferedInputStream(conn.getInputStream());
+						ByteArrayOutputStream bout = new ByteArrayOutputStream();
+
+						byte[] buffer = new byte[4096];
+						int read = 0;
+
+						while ((read = bin.read(buffer, 0, buffer.length)) != -1)
+						{
+							bout.write(buffer, 0, read);
+						}
+
+						bin.close();
+
+						String scriptString = new String(bout.toByteArray(), "UTF-8");
+
+						String oldHash = prefs.getString(LegacyJSONConfigFile.JSON_LAST_HASH, "");
+						final String newHash = encryption.createHash(scriptString);
+
+						Log.e("PR-CONFIG", oldHash + " =? " + newHash);
+
+						if ("text/x-scheme".equalsIgnoreCase(conn.getContentType()))
+						{
+							// TODO: Temp code until we get a more flexible parsing system in place...
+
+							if ("".equals(scriptString.trim()))
+								scriptString = "(begin)";
 							
 							if (oldHash.equals(newHash) == false)
 							{
+								try
+								{
+									SchemeEngine scheme = new SchemeEngine(context);
+									scheme.evaluateSource(scriptString);
+								}
+								catch (final Exception e)
+								{
+									e.printStackTrace();
+									
+									if (context instanceof Activity)
+									{
+										final Activity activity = (Activity) context;
+
+										activity.runOnUiThread(new Runnable()
+										{
+											public void run()
+											{
+												Toast.makeText(activity, e.getMessage(), Toast.LENGTH_LONG).show();
+											}
+										});
+									}
+								}
+
+								edit.putString(LegacyJSONConfigFile.JSON_LAST_HASH, newHash);
+								edit.commit();
+								
+								if (context instanceof Activity)
+								{
+									final Activity activity = (Activity) context;
+		
+									activity.runOnUiThread(new Runnable()
+									{
+										public void run()
+										{
+											Toast.makeText(activity, R.string.success_json_set_uri, Toast.LENGTH_LONG).show();
+										}
+									});
+								}
+							}
+						}
+						else
+						{
+							if ("".equals(scriptString.trim()))
+								scriptString = "{}";
+	
+							final JSONObject json = new JSONObject(scriptString);
+							
+							if (oldHash.equals(newHash) == false)
+							{
+								edit.putString(LegacyJSONConfigFile.JSON_CONFIGURATION, scriptString);
+								edit.commit();
+	
 								TriggerManager.getInstance().removeAllTriggers();
 								
 								next = new Runnable()
@@ -209,7 +247,7 @@ public class LegacyJSONConfigFile
 											if (context instanceof Activity)
 											{
 												final Activity activity = (Activity) context;
-
+	
 												activity.runOnUiThread(new Runnable()
 												{
 													public void run()
@@ -226,7 +264,7 @@ public class LegacyJSONConfigFile
 											if (context instanceof Activity)
 											{
 												final Activity activity = (Activity) context;
-
+	
 												activity.runOnUiThread(new Runnable()
 												{
 													public void run()
@@ -243,7 +281,7 @@ public class LegacyJSONConfigFile
 							if (context instanceof Activity)
 							{
 								final Activity activity = (Activity) context;
-
+	
 								activity.runOnUiThread(new Runnable()
 								{
 									public void run()
@@ -253,41 +291,41 @@ public class LegacyJSONConfigFile
 								});
 							}
 						}
-						catch (MalformedURLException e)
-						{
-							e.printStackTrace();
-						}
-						catch (IOException e)
-						{
-							e.printStackTrace();
-						}
-						catch (JSONException e)
-						{
-							e.printStackTrace();
-						}
-
-						LegacyJSONConfigFile._sharedFile = new LegacyJSONConfigFile(context, next);
 					}
-					else
+					catch (MalformedURLException e)
 					{
-						final SharedPreferences prefs = LegacyJSONConfigFile.getPreferences(context);
-						
-						if (prefs.getString(LegacyJSONConfigFile.JSON_CONFIGURATION, "{}").length() > 4)
-						{
-							Editor edit = prefs.edit();
-	
-							edit.putString(LegacyJSONConfigFile.JSON_CONFIGURATION, "{}");
-							edit.commit();
-
-							TriggerManager.getInstance().removeAllTriggers();
-						}					
+						e.printStackTrace();
 					}
-				}
-			};
+					catch (IOException e)
+					{
+						e.printStackTrace();
+					}
+					catch (JSONException e)
+					{
+						e.printStackTrace();
+					}
 
-			Thread t = new Thread(r);
-			t.start();
-		}
+					LegacyJSONConfigFile._sharedFile = new LegacyJSONConfigFile(context, next);
+				}
+				else
+				{
+					final SharedPreferences prefs = LegacyJSONConfigFile.getPreferences(context);
+					
+					if (prefs.getString(LegacyJSONConfigFile.JSON_CONFIGURATION, "{}").length() > 4)
+					{
+						Editor edit = prefs.edit();
+
+						edit.putString(LegacyJSONConfigFile.JSON_CONFIGURATION, "{}");
+						edit.commit();
+
+						TriggerManager.getInstance().removeAllTriggers();
+					}					
+				}
+			}
+		};
+
+		Thread t = new Thread(r);
+		t.start();
 	}
 
 	protected void updateTriggers(Context context) 
@@ -345,9 +383,10 @@ public class LegacyJSONConfigFile
 		ProbeManager.allProbes(context);
 		
 		if (LegacyJSONConfigFile._sharedFile == null)
+		{
 			LegacyJSONConfigFile._sharedFile = new LegacyJSONConfigFile(context, null);
-
-		LegacyJSONConfigFile.update(context);
+			LegacyJSONConfigFile.update(context);
+		}
 
 		return LegacyJSONConfigFile._sharedFile;
 	}
@@ -550,7 +589,7 @@ public class LegacyJSONConfigFile
 					String uriString = prefs.getString(LegacyJSONConfigFile.JSON_CONFIGURATION_URL, null);
 
 					if (uriString != null)
-						LegacyJSONConfigFile.updateFromOnline(context, Uri.parse(uriString), true);
+						LegacyJSONConfigFile.updateFromOnline(context, Uri.parse(uriString));
 
 					edit.putLong(LegacyJSONConfigFile.JSON_LAST_UPDATE, now);
 					edit.commit();
