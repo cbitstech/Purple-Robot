@@ -9,8 +9,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import jsint.Pair;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -19,6 +17,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -75,21 +74,6 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 		Intent i = new Intent(context, WebkitLandscapeActivity.class);
 
 		return i;
-	}
-
-	public Pair schemePair(Context context) 
-	{
-		Pair pair = super.schemePair(context);
-		
-		Pair args = (Pair) pair.nth(2);
-		
-		Pair rest = (Pair) args.rest();
-		
-		rest = new Pair(new Pair(ContinuousProbe.PROBE_THRESHOLD, this.lastThreshold), rest);
-
-		args.setRest(rest);
-
-		return pair;
 	}
 
 	public String contentSubtitle(Context context)
@@ -295,6 +279,34 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
         }
 
     	return false;
+	}
+	
+	public Map<String, Object> configuration(Context context)
+	{
+		Map<String, Object> map = super.configuration(context);
+		
+		map.put(ContinuousProbe.PROBE_THRESHOLD, this.lastThreshold);
+		
+		return map;
+	}
+	
+	public void updateFromMap(Context context, Map<String, Object> params) 
+	{
+		super.updateFromMap(context, params);
+		
+		if (params.containsKey(ContinuousProbe.PROBE_THRESHOLD))
+		{
+			Object threshold = params.get(ContinuousProbe.PROBE_THRESHOLD);
+			
+			if (threshold instanceof Double)
+			{
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				Editor e = prefs.edit();
+				
+				e.putString("config_probe_pressure_threshold", threshold.toString());
+				e.commit();
+			}
+		}
 	}
 
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)

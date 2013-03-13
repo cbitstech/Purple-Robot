@@ -2,8 +2,7 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
 import java.util.ArrayList;
 import java.util.Date;
-
-import jsint.Pair;
+import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -226,25 +225,52 @@ public class CommunicationLogProbe extends Probe
 		return String.format(context.getResources().getString(R.string.summary_call_log_probe), count);
 	}
 
-	public Pair schemePair(Context context) 
+	public Map<String, Object> configuration(Context context)
 	{
-		Pair pair = super.schemePair(context);
+		Map<String, Object> map = super.configuration(context);
 		
-		Pair args = (Pair) pair.nth(2);
-		
-		Pair rest = (Pair) args.rest();
-
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
 		long freq = Long.parseLong(prefs.getString("config_probe_communication_frequency", "300000"));
+		map.put(Probe.PROBE_FREQUENCY, freq);
+		
+		boolean hash = prefs.getBoolean("config_probe_communication_hash_data", true);
+		map.put(Probe.HASH_DATA, hash);
 
-		boolean doHash = prefs.getBoolean("config_probe_communication_hash_data", true);
+		return map;
+	}
+	
+	public void updateFromMap(Context context, Map<String, Object> params) 
+	{
+		super.updateFromMap(context, params);
+		
+		if (params.containsKey(Probe.PROBE_FREQUENCY))
+		{
+			Object frequency = params.get(Probe.PROBE_FREQUENCY);
+			
+			if (frequency instanceof Long)
+			{
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				Editor e = prefs.edit();
+				
+				e.putString("config_probe_communication_frequency", frequency.toString());
+				e.commit();
+			}
+		}
 
-		rest = new Pair(new Pair(Probe.PROBE_FREQUENCY, freq), rest);
-		rest = new Pair(new Pair(Probe.HASH_DATA, doHash), rest);
-
-		args.setRest(rest);
-
-		return pair;
+		if (params.containsKey(Probe.HASH_DATA))
+		{
+			Object hash = params.get(Probe.HASH_DATA);
+			
+			if (hash instanceof Boolean)
+			{
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				Editor e = prefs.edit();
+				
+				e.putBoolean("config_probe_communication_hash_data", ((Boolean) hash).booleanValue());
+				e.commit();
+			}
+		}
 	}
 
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)

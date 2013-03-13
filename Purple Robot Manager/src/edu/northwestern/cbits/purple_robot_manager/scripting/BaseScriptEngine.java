@@ -340,9 +340,6 @@ public abstract class BaseScriptEngine
 
 		Editor e = prefs.edit();
 		
-		e.putString(LegacyJSONConfigFile.JSON_LAST_HASH, "");
-		e.putLong(LegacyJSONConfigFile.JSON_LAST_UPDATE, 0);
-		
 		if (newUrl != null)
 			e.putString(LegacyJSONConfigFile.JSON_CONFIGURATION_URL, newUrl);
 		else
@@ -401,6 +398,7 @@ public abstract class BaseScriptEngine
 
 		editor.putLong(LegacyJSONConfigFile.JSON_LAST_UPDATE, 0);
 		editor.commit();
+		
 		LegacyJSONConfigFile.update(this._context);
 
 		ProbeManager.nudgeProbes(this._context);
@@ -615,6 +613,18 @@ public abstract class BaseScriptEngine
 		return found;
 	}
 
+	protected boolean updateProbe(Map<String, Object> params)
+	{
+		if (params.containsKey("name"))
+		{
+			String probeName = params.get("name").toString();
+
+			return ProbeManager.updateProbe(this._context, probeName, params);
+		}
+		
+		return false;
+	}
+	
 	public boolean launchApplication(String applicationName)
 	{
 		return this.launchApplication(applicationName, new HashMap<String, Object>(), null);

@@ -6,8 +6,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-
-import jsint.Pair;
+import java.util.Map;
 
 import org.apache.commons.net.ntp.NTPUDPClient;
 import org.apache.commons.net.ntp.TimeInfo;
@@ -27,7 +26,6 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
@@ -393,21 +391,36 @@ public class RobotHealthProbe extends Probe
 	};
 */
 
-	public Pair schemePair(Context context) 
+	public Map<String, Object> configuration(Context context)
 	{
-		Pair pair = super.schemePair(context);
+		Map<String, Object> map = super.configuration(context);
 		
-		Pair args = (Pair) pair.nth(2);
-		Pair rest = (Pair) args.rest();
-
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
 		long freq = Long.parseLong(prefs.getString("config_probe_robot_frequency", "300000"));
-
-		rest = new Pair(new Pair(Probe.PROBE_FREQUENCY, freq), rest);
-
-		args.setRest(rest);
-
-		return pair;
+		
+		map.put(Probe.PROBE_FREQUENCY, freq);
+		
+		return map;
+	}
+	
+	public void updateFromMap(Context context, Map<String, Object> params) 
+	{
+		super.updateFromMap(context, params);
+		
+		if (params.containsKey(Probe.PROBE_FREQUENCY))
+		{
+			Object frequency = params.get(Probe.PROBE_FREQUENCY);
+			
+			if (frequency instanceof Long)
+			{
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				Editor e = prefs.edit();
+				
+				e.putString("config_probe_robot_frequency", frequency.toString());
+				e.commit();
+			}
+		}
 	}
 
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)

@@ -74,7 +74,7 @@ public abstract class Trigger
 	
 	public boolean equals(Object obj)
 	{
-		if (obj instanceof Trigger)
+		if (obj != null && obj instanceof Trigger)
 		{
 			Trigger t = (Trigger) obj;
 			

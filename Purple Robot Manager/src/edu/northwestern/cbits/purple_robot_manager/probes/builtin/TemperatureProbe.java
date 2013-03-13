@@ -3,12 +3,12 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-
-import jsint.Pair;
+import java.util.Map;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -43,21 +43,6 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 
 	private int bufferIndex  = 0;
 
-	public Pair schemePair(Context context) 
-	{
-		Pair pair = super.schemePair(context);
-		
-		Pair args = (Pair) pair.nth(2);
-		
-		Pair rest = (Pair) args.rest();
-		
-		rest = new Pair(new Pair(ContinuousProbe.PROBE_THRESHOLD, this.lastThreshold), rest);
-
-		args.setRest(rest);
-
-		return pair;
-	}
-	
 	public Bundle formattedBundle(Context context, Bundle bundle)
 	{
 		Bundle formatted = super.formattedBundle(context, bundle);
@@ -206,6 +191,34 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 			this._lastValue = value;
 		
 		return passes;
+	}
+
+	public Map<String, Object> configuration(Context context)
+	{
+		Map<String, Object> map = super.configuration(context);
+		
+		map.put(ContinuousProbe.PROBE_THRESHOLD, this.lastThreshold);
+		
+		return map;
+	}
+	
+	public void updateFromMap(Context context, Map<String, Object> params) 
+	{
+		super.updateFromMap(context, params);
+		
+		if (params.containsKey(ContinuousProbe.PROBE_THRESHOLD))
+		{
+			Object threshold = params.get(ContinuousProbe.PROBE_THRESHOLD);
+			
+			if (threshold instanceof Double)
+			{
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				Editor e = prefs.edit();
+				
+				e.putString("config_probe_temperature_threshold", threshold.toString());
+				e.commit();
+			}
+		}
 	}
 
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)

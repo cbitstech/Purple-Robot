@@ -2,11 +2,10 @@ package edu.northwestern.cbits.purple_robot_manager.probes;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
-
-import jsint.Pair;
-import jsint.Symbol;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,8 +29,8 @@ public abstract class Probe
 	public static final String DURATION = "DURATION";
 	public static final String PERIOD = "PERIOD";
 
-	public static final Object PROBE_FREQUENCY = "frequency";
-	public static final Object HASH_DATA = "hash_data";
+	public static final String PROBE_FREQUENCY = "frequency";
+	public static final String HASH_DATA = "hash_data";
 
 	public abstract String name(Context context);
 	public abstract String title(Context context);
@@ -155,15 +154,29 @@ public abstract class Probe
 	public abstract void enable(Context context);
 	public abstract void disable(Context context);
 
-	public Pair schemePair(Context context) 
+	public Map<String, Object> configuration(Context context)
 	{
-		Pair rest = new Pair(new Pair("name", this.name(context)), Pair.EMPTY);
-		rest = new Pair(new Pair("enabled", this.isEnabled(context)), rest);
-		rest = new Pair(rest, Pair.EMPTY);
-
-		rest = new Pair(Symbol.intern("PurpleRobot"), rest);
-		rest = new Pair(Symbol.intern(".updateProbe"), rest);
-
-		return rest;
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		
+		map.put("name", this.name(context));
+		map.put("enabled", this.isEnabled(context));
+		
+		return map;
+	}
+	
+	public void updateFromMap(Context context, Map<String, Object> params) 
+	{
+		if (params.containsKey("enabled"))
+		{
+			Object enabled = params.get("enabled");
+			
+			if (enabled instanceof Boolean)
+			{
+				if (((Boolean) enabled).booleanValue())
+					this.enable(context);
+				else
+					this.disable(context);
+			}
+		}
 	}
 }

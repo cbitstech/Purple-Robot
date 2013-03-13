@@ -355,7 +355,7 @@ public class StartActivity extends SherlockActivity
 			jsonConfigUri = b.build();
 		}
 
-		LegacyJSONConfigFile.updateFromOnline(this, jsonConfigUri, true);
+		LegacyJSONConfigFile.updateFromOnline(this, jsonConfigUri);
 	}
 
 	protected void onResume()
