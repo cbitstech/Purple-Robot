@@ -3,6 +3,8 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 import java.util.HashMap;
 import java.util.Map;
 
+import jsint.Pair;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -80,6 +82,23 @@ public class LocationProbe extends Probe implements LocationListener
 		e.putBoolean("config_probe_location_enabled", false);
 		
 		e.commit();
+	}
+	
+	public Pair schemePair(Context context) 
+	{
+		Pair pair = super.schemePair(context);
+		
+		Pair args = (Pair) pair.nth(2);
+		Pair rest = (Pair) args.rest();
+
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		long freq = Long.parseLong(prefs.getString("config_probe_location_frequency", "300000"));
+
+		rest = new Pair(new Pair(Probe.PROBE_FREQUENCY, freq), rest);
+
+		args.setRest(rest);
+
+		return pair;
 	}
 	
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)

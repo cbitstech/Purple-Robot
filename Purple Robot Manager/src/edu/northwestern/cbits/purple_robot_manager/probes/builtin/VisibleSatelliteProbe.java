@@ -2,6 +2,8 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
 import java.util.ArrayList;
 
+import jsint.Pair;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -33,6 +35,24 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 	private long _lastTransmit = 0;
 
 	private boolean _listening = false;
+
+	public Pair schemePair(Context context) 
+	{
+		Pair pair = super.schemePair(context);
+		
+		Pair args = (Pair) pair.nth(2);
+		
+		Pair rest = (Pair) args.rest();
+
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		long freq = Long.parseLong(prefs.getString("config_probe_satellites_frequency", "300000"));
+
+		rest = new Pair(new Pair(Probe.PROBE_FREQUENCY, freq), rest);
+
+		args.setRest(rest);
+
+		return pair;
+	}
 
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{

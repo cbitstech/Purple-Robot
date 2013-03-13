@@ -63,7 +63,7 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 	private long frequency = 1000;
 
 	private long lastThresholdLookup = 0;
-	private double lastThreshold = 0;
+	private double lastThreshold = 0.0025;
 
 	private float valueBuffer[][] = new float[3][BUFFER_SIZE];
 	private int accuracyBuffer[] = new int[BUFFER_SIZE];

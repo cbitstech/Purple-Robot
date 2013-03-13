@@ -60,7 +60,7 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 	private long frequency = 1000;
 
 	private long lastThresholdLookup = 0;
-	private double lastThreshold = 0;
+	private double lastThreshold = 0.5;
 
 	private float valueBuffer[][] = new float[2][BUFFER_SIZE];
 	private int accuracyBuffer[] = new int[BUFFER_SIZE];

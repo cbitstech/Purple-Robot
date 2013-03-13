@@ -6,6 +6,8 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
 
+import jsint.Pair;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -188,6 +190,24 @@ public class NetworkProbe extends Probe
 		String ipAddress = bundle.getString(NetworkProbe.IP_ADDRESS);
 
 		return String.format(context.getResources().getString(R.string.summary_network_probe), ipAddress);
+	}
+
+	public Pair schemePair(Context context) 
+	{
+		Pair pair = super.schemePair(context);
+		
+		Pair args = (Pair) pair.nth(2);
+		
+		Pair rest = (Pair) args.rest();
+
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		long freq = Long.parseLong(prefs.getString("config_probe_network_frequency", "60000"));
+
+		rest = new Pair(new Pair(Probe.PROBE_FREQUENCY, freq), rest);
+
+		args.setRest(rest);
+
+		return pair;
 	}
 
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
