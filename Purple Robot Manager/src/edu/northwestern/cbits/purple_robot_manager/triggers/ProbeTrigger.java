@@ -1,11 +1,11 @@
 package edu.northwestern.cbits.purple_robot_manager.triggers;
 
+import java.util.HashMap;
 import java.util.Map;
 
-import org.mozilla.javascript.EcmaError;
+import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
 import android.content.Context;
-import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 
 public class ProbeTrigger extends Trigger
 {
@@ -23,25 +23,6 @@ public class ProbeTrigger extends Trigger
 		super(context, map);
 		
 		this.updateFromMap(context, map);
-	}
-
-	public boolean updateFromMap(Context context, Map<String, Object> map) 
-	{
-		if (super.updateFromMap(context, map))
-		{
-			if (super.updateFromMap(context, map))
-			{
-				if (map.containsKey(ProbeTrigger.TRIGGER_TEST))
-					this._test = map.get(ProbeTrigger.TRIGGER_TEST).toString();
-				
-				if (map.containsKey(ProbeTrigger.TRIGGER_FREQUENCY))
-					this._frequency = ((Long) map.get(ProbeTrigger.TRIGGER_FREQUENCY)).longValue();
-
-				return true;
-			}
-		}
-		
-		return false;
 	}
 
 	public void merge(Trigger trigger) 
@@ -66,27 +47,48 @@ public class ProbeTrigger extends Trigger
 
 		if (now - this._frequency < ProbeTrigger._lastUpdate)
 			return false;
+		
+		HashMap<String, Object> objects = new HashMap<String, Object>();
+		
+		objects.put("probeInfo", object);
 
-		try
+		Object result = BaseScriptEngine.runScript(context, this._test, objects);
+
+		ProbeTrigger._lastUpdate = now;
+
+		if (result instanceof Boolean)
 		{
-			JavaScriptEngine js = new JavaScriptEngine(context);
+			Boolean boolResult = (Boolean) result;
 
-			Object result = js.runScript(this._test, "probeInfo", object);
-
-			ProbeTrigger._lastUpdate = now;
-
-			if (result instanceof Boolean)
-			{
-				Boolean boolResult = (Boolean) result;
-
-				return boolResult.booleanValue();
-			}
-		}
-		catch (EcmaError e)
-		{
-
+			return boolResult.booleanValue();
 		}
 
+		return false;
+	}
+	
+	public Map<String, Object> configuration(Context context) 
+	{
+		Map<String, Object> config = super.configuration(context);
+		
+		config.put(ProbeTrigger.TRIGGER_TEST, this._test);
+		config.put(ProbeTrigger.TRIGGER_FREQUENCY, this._frequency);
+		
+		return config;
+	}
+
+	public boolean updateFromMap(Context context, Map<String, Object> map) 
+	{
+		if (super.updateFromMap(context, map))
+		{
+			if (map.containsKey(ProbeTrigger.TRIGGER_TEST))
+				this._test = map.get(ProbeTrigger.TRIGGER_TEST).toString();
+			
+			if (map.containsKey(ProbeTrigger.TRIGGER_FREQUENCY))
+				this._frequency = ((Long) map.get(ProbeTrigger.TRIGGER_FREQUENCY)).longValue();
+
+			return true;
+		}
+		
 		return false;
 	}
 }

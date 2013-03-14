@@ -18,7 +18,6 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.net.Uri;
-import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.ExecuteSchemeCommand;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.ExecuteJavaScriptCommand;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.FetchUserHashCommand;
@@ -65,8 +64,6 @@ public class JsonScriptRequestHandler implements HttpRequestHandler
             	{
             		arguments = new JSONObject(URLDecoder.decode(u.getQueryParameter("json")));
             	}
-            	
-            	Log.e("PR", "GOT " + arguments.toString());
 			} 
             catch (JSONException e) 
             {
