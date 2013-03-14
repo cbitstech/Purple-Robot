@@ -3,9 +3,7 @@ package edu.northwestern.cbits.purple_robot_manager.triggers;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import jsint.Pair;
-import jsint.Symbol;
+import java.util.Map;
 
 import android.content.Context;
 import android.preference.PreferenceActivity;
@@ -145,26 +143,17 @@ public class TriggerManager
 		return screen;
 	}
 
-	public Pair schemePairs(Context context) 
+	public static List<Map<String, Object>> triggerConfigurations(Context context)
 	{
-		Pair pair = null;
-		
-		for (Trigger t : this._triggers)
+		List<Map<String, Object>> configs = new ArrayList<Map<String, Object>>();
+
+		for (Trigger t : TriggerManager.getInstance()._triggers)
 		{
-			Pair triggerPair = t.schemePair();
+			Map<String, Object> config = t.configuration(context);
 			
-			if (pair == null)
-				pair = new Pair(Symbol.BEGIN, new Pair(triggerPair, Pair.EMPTY));
-			else
-			{
-				Pair rest = (Pair) pair.rest();
-				
-				rest = new Pair(triggerPair, rest);
-
-				pair.setRest(rest);
-			}
+			configs.add(config);
 		}
-
-		return new Pair(pair, Pair.EMPTY);
+		
+		return configs;
 	}
 }

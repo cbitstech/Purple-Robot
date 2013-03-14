@@ -20,7 +20,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.features.Feature;
 
 public class SchemeEngine extends BaseScriptEngine
 {
-	public SchemeEngine(Context context) 
+	public SchemeEngine(Context context, Map<String, Object> objects) 
 	{
 		super(context);
 	}
@@ -66,6 +66,7 @@ public class SchemeEngine extends BaseScriptEngine
 		}
 		
 		return this.updateTrigger(triggerId, paramsMap);
+		
 	}
 	
 	public boolean updateProbe(Pair params)
@@ -95,8 +96,7 @@ public class SchemeEngine extends BaseScriptEngine
 				{
 					Pair valuePair = (Pair) value;
 					
-					if (valuePair.isEmpty() == false)
-						value = SchemeEngine.parsePairList(valuePair);
+					value = valuePair.toString();
 				}
 
 				map.put(key, value);
@@ -170,6 +170,13 @@ public class SchemeEngine extends BaseScriptEngine
 	public void showNativeDialog(String title, String message, String confirmTitle, String cancelTitle, Pair confirmAction, Pair cancelAction)
 	{
 		this.showNativeDialog(title, message, confirmTitle, cancelTitle, confirmAction.toString(), cancelAction.toString());
+	}
+
+	public boolean updateConfig(Pair parameters)
+	{
+		Map<String, Object> paramsMap = SchemeEngine.parsePairList(parameters);
+		
+		return super.updateConfigUrl(paramsMap);
 	}
 
 	public void updateWidget(Pair parameters)

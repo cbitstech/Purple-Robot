@@ -27,7 +27,7 @@ public class ExecuteSchemeCommand extends JSONCommand
 			{
 				String source = this._arguments.getString(ExecuteSchemeCommand.SOURCE);
 				
-				SchemeEngine engine = new SchemeEngine(this._context);
+				SchemeEngine engine = new SchemeEngine(this._context, null);
 				
 				Object o = engine.evaluateSource(source);
 

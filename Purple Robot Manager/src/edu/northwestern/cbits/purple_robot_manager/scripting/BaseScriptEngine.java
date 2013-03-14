@@ -34,6 +34,7 @@ import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.DialogActivity;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
+import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
@@ -593,23 +594,23 @@ public abstract class BaseScriptEngine
 	protected boolean updateTrigger(String triggerId, Map<String, Object> params)
 	{
 		boolean found = false;
-
+		
 		for (Trigger trigger : TriggerManager.getInstance().triggersForId(triggerId))
 		{
 			trigger.updateFromMap(this._context, params);
 			
 			found = true;
 		}
-		
+
 		if (found == false)
 		{
 			Trigger t = Trigger.parse(this._context, params);
 
 			TriggerManager.getInstance().addTrigger(t);
-			
+
 			found = true;
 		}
-		
+
 		return found;
 	}
 
@@ -742,21 +743,33 @@ public abstract class BaseScriptEngine
 		return true;
 	}
 
-	public static void runScript(Context context, String script) 
+	public static Object runScript(Context context, String script) 
+	{
+		return BaseScriptEngine.runScript(context, script, null);
+	}
+
+	public static Object runScript(Context context, String script, Map<String, Object> objects) 
 	{
 		Log.e("PR-SCRIPT", "RUN: " + script);
 		
 		if (SchemeEngine.canRun(script))
 		{
-			SchemeEngine engine = new SchemeEngine(context);
+			SchemeEngine engine = new SchemeEngine(context, objects);
 			
-			engine.evaluateSource(script);
+			return engine.evaluateSource(script);
 		}
 		else if (JavaScriptEngine.canRun(script))
 		{
-			JavaScriptEngine engine = new JavaScriptEngine(context);
+			JavaScriptEngine engine = new JavaScriptEngine(context, objects);
 			
-			engine.runScript(script);
+			return engine.runScript(script);
 		}
+		
+		return null;
+	}
+
+	public boolean updateConfigUrl(Map<String, Object> config) 
+	{
+		return PurpleRobotApplication.updateFromMap(this._context, config);
 	}
 }

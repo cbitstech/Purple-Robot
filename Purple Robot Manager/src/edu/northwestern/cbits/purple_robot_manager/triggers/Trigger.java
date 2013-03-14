@@ -1,18 +1,14 @@
 package edu.northwestern.cbits.purple_robot_manager.triggers;
 
+import java.util.HashMap;
 import java.util.Map;
-
-import jsint.Pair;
-import jsint.Symbol;
-
-import org.mozilla.javascript.EvaluatorException;
 
 import android.content.Context;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
+import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
 public abstract class Trigger
 {
@@ -49,16 +45,7 @@ public abstract class Trigger
 			{
 				public void run()
 				{
-					try
-					{
-						JavaScriptEngine engine = new JavaScriptEngine(context);
-
-						engine.runScript(me._action);
-					}
-					catch (EvaluatorException e)
-					{
-						e.printStackTrace();
-					}
+					BaseScriptEngine.runScript(context, me._action);
 				}
 			};
 
@@ -120,20 +107,6 @@ public abstract class Trigger
 		return screen;
 	}
 
-	public boolean updateFromMap(Context _context, Map<String, Object> params) 
-	{
-		if (params.containsKey("name"))
-			this._name = params.get("name").toString();
-
-		if (params.containsKey("action"))
-			this._name = params.get("action").toString();
-
-		if (params.containsKey("identifier"))
-			this._name = params.get("identifier").toString();
-
-		return true;
-	}
-
 	public static Trigger parse(Context context, Map<String, Object> params) 
 	{
 		String type = params.get("type").toString();
@@ -146,24 +119,28 @@ public abstract class Trigger
 		return null;
 	}
 
-	public Pair schemePair() 
+	public Map<String, Object> configuration(Context context) 
 	{
-		Pair rest = new Pair("name", this._name);
-		rest = new Pair(rest, Pair.EMPTY);
+		Map<String, Object> config = new HashMap<String,Object>();
 		
-		if (this._action != null)
-		{
-			rest = new Pair(new Pair("action", this._action), rest);
-			rest = new Pair(rest, Pair.EMPTY);
-		}
+		config.put("action", this._action);
+		config.put("identifier", this._identifier);
+		config.put("name", this._name);
+		
+		return config;
+	}
 
-		rest = new Pair(rest, Pair.EMPTY);
+	public boolean updateFromMap(Context _context, Map<String, Object> params) 
+	{
+		if (params.containsKey("name"))
+			this._name = params.get("name").toString();
 
-		rest = new Pair(this._identifier, rest);
-		rest = new Pair(Symbol.intern("PurpleRobot"), rest);
+		if (params.containsKey("action"))
+			this._action = params.get("action").toString();
 
-		rest = new Pair(Symbol.intern(".updateTrigger"), rest);
+		if (params.containsKey("identifier"))
+			this._identifier = params.get("identifier").toString();
 
-		return rest;
+		return true;
 	}
 }

@@ -165,7 +165,7 @@ public class LegacyJSONConfigFile
 							{
 								try
 								{
-									SchemeEngine scheme = new SchemeEngine(context);
+									SchemeEngine scheme = new SchemeEngine(context, null);
 									scheme.evaluateSource(scriptString);
 								}
 								catch (final Exception e)
@@ -227,7 +227,7 @@ public class LegacyJSONConfigFile
 											{
 												String script = json.getString(LegacyJSONConfigFile.JSON_INIT_SCRIPT);
 												
-												JavaScriptEngine engine = new JavaScriptEngine(context);
+												JavaScriptEngine engine = new JavaScriptEngine(context, null);
 												
 												engine.runScript(script);
 											}

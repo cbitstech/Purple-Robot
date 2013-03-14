@@ -33,7 +33,6 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
@@ -96,8 +95,6 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 		if (params.containsKey(ContinuousProbe.PROBE_THRESHOLD))
 		{
 			Object threshold = params.get(ContinuousProbe.PROBE_THRESHOLD);
-			
-			Log.e("PR-GYRO", "TH CLASS: " + threshold.getClass().getCanonicalName());
 			
 			if (threshold instanceof Double)
 			{

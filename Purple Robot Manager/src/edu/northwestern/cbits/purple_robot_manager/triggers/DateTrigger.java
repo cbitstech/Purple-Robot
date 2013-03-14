@@ -10,8 +10,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import jsint.Pair;
-
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
@@ -41,34 +39,19 @@ public class DateTrigger extends Trigger
 	private static final String DATETIME_REPEATS = "datetime_repeat";
 	private static final String DATETIME_RANDOM = "datetime_random";
 
-	private static final String DATETIME_SPEC = "ical_string";
-
 	private static SecureRandom random = null;
 
 	private PeriodList periodList = null;
 	private long lastUpdate = 0;
 
 	private boolean _random = false;
+	private String _start = null;
+	private String _end = null;
+	private String _repeats = null;
+	
 	private Calendar _calendar = null;
 	
 	private String _icalString = null;
-
-	public Pair schemePair() 
-	{
-		Pair pair = super.schemePair();
-		
-		Pair args = (Pair) pair.listTail(3);
-		
-		Pair rest = (Pair) args.rest();
-
-		rest = new Pair(new Pair("type", DateTrigger.TYPE_NAME), rest);
-		rest = new Pair(new Pair(DateTrigger.DATETIME_SPEC, this._icalString), rest);
-		rest = new Pair(new Pair(DateTrigger.DATETIME_RANDOM, this._random), rest);
-
-		args.setRest(rest);
-
-		return pair;
-	}
 
 	static
 	{
@@ -136,33 +119,27 @@ public class DateTrigger extends Trigger
 	{
 		if (super.updateFromMap(context, map))
 		{
-			String start = null;
-			
 			if (map.containsKey(DateTrigger.DATETIME_START))
-				start = map.get(DateTrigger.DATETIME_START).toString();
+				this._start = map.get(DateTrigger.DATETIME_START).toString();
 			
-			String end = null;
-
 			if (map.containsKey(DateTrigger.DATETIME_END))
-				end = map.get(DateTrigger.DATETIME_END).toString();
-
-			String repeats = "null";
+				this._end = map.get(DateTrigger.DATETIME_END).toString();
 
 			if (map.containsKey(DateTrigger.DATETIME_REPEATS))
-				repeats = map.get(DateTrigger.DATETIME_REPEATS).toString();
+				this._repeats = map.get(DateTrigger.DATETIME_REPEATS).toString();
 
 			if (map.containsKey(DateTrigger.DATETIME_RANDOM))
 				this._random = ((Boolean) map.get(DateTrigger.DATETIME_RANDOM)).booleanValue();
 
-			if ("null".equals(repeats))
-				repeats = null;
+			if ("null".equals(this._repeats))
+				this._repeats = null;
 			
 			String repeatString = "";
 
-			if (repeats != null)
-				repeatString = "\nRRULE:" + repeats;
+			if (this._repeats != null)
+				repeatString = "\nRRULE:" + this._repeats;
 
-			this._icalString = String.format(context.getString(R.string.ical_template), start.toString(), end.toString(), this.name(), repeatString);
+			this._icalString = String.format(context.getString(R.string.ical_template), this._start.toString(), this._end.toString(), this.name(), repeatString);
 			
 			this.refreshCalendar();
 
@@ -171,7 +148,19 @@ public class DateTrigger extends Trigger
 		
 		return false;
 	}
-	
+
+	public Map<String, Object> configuration(Context context) 
+	{
+		Map<String, Object> config = super.configuration(context);
+		
+		config.put(DateTrigger.DATETIME_START, this._start);
+		config.put(DateTrigger.DATETIME_END, this._end);
+		config.put(DateTrigger.DATETIME_REPEATS, this._repeats);
+		config.put(DateTrigger.DATETIME_RANDOM, this._random);
+		
+		return config;
+	}
+
 	public DateTrigger(Context context, Map<String, Object> map)
 	{
 		super(context, map);

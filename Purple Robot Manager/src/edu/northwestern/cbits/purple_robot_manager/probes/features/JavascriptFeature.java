@@ -184,7 +184,7 @@ public class JavascriptFeature extends Feature
 
 				script = "var probe = " + json.toString() + "; " + script;
 
-				JavaScriptEngine engine = new JavaScriptEngine(context);
+				JavaScriptEngine engine = new JavaScriptEngine(context, null);
 
 				try
 				{
@@ -304,7 +304,7 @@ public class JavascriptFeature extends Feature
 		else
 			script = "var result = '" + value.toString() + "'; " + script;
 
-		JavaScriptEngine engine = new JavaScriptEngine(context);
+		JavaScriptEngine engine = new JavaScriptEngine(context, null);
 
 		Object o = engine.runScript(script);
 

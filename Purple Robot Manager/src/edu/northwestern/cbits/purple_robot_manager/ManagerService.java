@@ -6,7 +6,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
-import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
+import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
 import android.app.AlarmManager;
@@ -21,7 +21,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 public class ManagerService extends IntentService
 {
@@ -197,11 +196,7 @@ public class ManagerService extends IntentService
 					String script = intent.getStringExtra(APPLICATION_LAUNCH_INTENT_POSTSCRIPT);
 
 					if (script != null)
-					{
-						JavaScriptEngine jsEngine = new JavaScriptEngine(this);
-
-						jsEngine.runScript(script);
-					}
+						BaseScriptEngine.runScript(this, script);
 				}
 			}
 			else if (intent.hasExtra(APPLICATION_LAUNCH_INTENT_URL))
@@ -218,11 +213,7 @@ public class ManagerService extends IntentService
 					String script = intent.getStringExtra(APPLICATION_LAUNCH_INTENT_POSTSCRIPT);
 
 					if (script != null)
-					{
-						JavaScriptEngine jsEngine = new JavaScriptEngine(this);
-
-						jsEngine.runScript(script);
-					}
+						BaseScriptEngine.runScript(this, script);
 				}
 			}
 		}

@@ -30,7 +30,7 @@ public class JavaScriptEngine extends BaseScriptEngine
 	private Context _jsContext = null;
 	private Scriptable _scope = null;
 
-	public JavaScriptEngine(android.content.Context context)
+	public JavaScriptEngine(android.content.Context context, Map<String, Object> objects)
 	{
 		super(context);
 	}
