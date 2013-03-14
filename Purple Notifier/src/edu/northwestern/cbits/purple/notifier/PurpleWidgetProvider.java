@@ -11,9 +11,11 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.net.Uri;
+import android.util.DisplayMetrics;
 
 public abstract class PurpleWidgetProvider extends AppWidgetProvider 
 {
@@ -137,5 +139,47 @@ public abstract class PurpleWidgetProvider extends AppWidgetProvider
         c.drawText(badge, b.getWidth() / 2, (b.getHeight() / 2) + (bounds.height() / 2), textPaint);
 		
 		return badged;
+	}
+
+	public static Bitmap bitmapForText(Context context, String text, int width, int height, String color) 
+	{
+		DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+
+		float floatWidth = width * metrics.density;
+		float floatHeight = height * metrics.density;
+
+		width = (int) floatWidth;
+		height = (int) floatHeight;
+		
+		Bitmap b = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+		Canvas c = new Canvas(b);
+
+        Paint textPaint = new Paint();
+        textPaint.setAntiAlias(true);
+        textPaint.setColor(Color.parseColor(color));
+        textPaint.setTextSize(128); 
+        textPaint.setTextAlign(Paint.Align.CENTER);
+
+        Rect bounds = new Rect();
+        textPaint.getTextBounds(text, 0, text.length(), bounds);
+        
+        while (bounds.width() < b.getWidth() && bounds.height() < b.getHeight() - textPaint.descent())
+        {
+        	textPaint.setTextSize(textPaint.getTextSize() + 1);
+
+        	textPaint.getTextBounds(text, 0, text.length(), bounds);
+        }
+
+        while (bounds.width() > b.getWidth() || bounds.height() > b.getHeight() - textPaint.descent())
+        {
+        	textPaint.setTextSize(textPaint.getTextSize() - 1);
+
+        	textPaint.getTextBounds(text, 0, text.length(), bounds);
+        }
+
+        c.drawText(text, b.getWidth() / 2, (b.getHeight() / 2) + (bounds.height() / 2) - (textPaint.descent() / 2), textPaint);
+		
+		return b;
 	}
 }
