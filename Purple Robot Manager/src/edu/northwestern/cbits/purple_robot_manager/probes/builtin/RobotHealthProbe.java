@@ -28,6 +28,8 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.config.JSONConfigFile;
+import edu.northwestern.cbits.purple_robot_manager.config.SchemeConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
@@ -56,6 +58,8 @@ public class RobotHealthProbe extends Probe
 	protected static final String ROOT_TOTAL = "ROOT_TOTAL";
 	protected static final String EXTERNAL_FREE = "EXTERNAL_FREE";
 	protected static final String EXTERNAL_TOTAL = "EXTERNAL_TOTAL";
+	protected static final String SCHEME_CONFIG = "SCHEME_CONFIG";
+	protected static final String JSON_CONFIG = "JSON_CONFIG";
 	
 	private long _lastOffset = 0;
 	private long _lastTimeCheck = 0;
@@ -143,7 +147,7 @@ public class RobotHealthProbe extends Probe
 	
 	public boolean isEnabled(final Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
 		final long now = System.currentTimeMillis();
 
@@ -319,6 +323,20 @@ public class RobotHealthProbe extends Probe
 
 									bundle.putInt(RobotHealthProbe.EXTERNAL_FREE, externalFree);
 									bundle.putInt(RobotHealthProbe.EXTERNAL_TOTAL, externalTotal);
+									
+									if (prefs.getBoolean("config_probe_robot_scheme_config", true))
+									{
+										SchemeConfigFile file = new SchemeConfigFile(context);
+										
+										bundle.putString(RobotHealthProbe.SCHEME_CONFIG, file.toString());
+									}
+
+									if (prefs.getBoolean("config_probe_robot_json_config", true))
+									{
+										JSONConfigFile file = new JSONConfigFile(context);
+										
+										bundle.putString(RobotHealthProbe.JSON_CONFIG, file.toString());
+									}
 
 									me.transmitData(context, bundle);
 
@@ -373,23 +391,6 @@ public class RobotHealthProbe extends Probe
 
 		return String.format(context.getResources().getString(R.string.summary_robot_probe), cpu, count, size, clear);
 	}
-
-	/*
-	public Bundle formattedBundle(Context context, Bundle bundle)
-	{
-		Bundle formatted = super.formattedBundle(context, bundle);
-
-		@SuppressWarnings("unchecked")
-		ArrayList<Bundle> array = (ArrayList<Bundle>) bundle.get(HardwareInformationProbe.DEVICES);
-		int count = bundle.getInt(HardwareInformationProbe.DEVICES_COUNT);
-
-		Bundle devicesBundle = this.bundleForDevicesArray(context, array);
-
-		formatted.putBundle(String.format(context.getString(R.string.display_bluetooth_devices_title), count), devicesBundle);
-
-		return formatted;
-	};
-*/
 
 	public Map<String, Object> configuration(Context context)
 	{
@@ -446,6 +447,18 @@ public class RobotHealthProbe extends Probe
 		duration.setTitle(R.string.probe_frequency_label);
 
 		screen.addPreference(duration);
+
+		CheckBoxPreference scheme = new CheckBoxPreference(activity);
+		scheme.setTitle(R.string.title_enable_scheme_config);
+		scheme.setKey("config_probe_robot_scheme_config");
+		scheme.setDefaultValue(true);
+		screen.addPreference(scheme);
+
+		CheckBoxPreference json = new CheckBoxPreference(activity);
+		json.setTitle(R.string.title_enable_json_config);
+		json.setKey("config_probe_robot_json_config");
+		json.setDefaultValue(true);
+		screen.addPreference(json);
 
 		return screen;
 	}

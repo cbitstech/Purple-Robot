@@ -15,6 +15,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -228,6 +229,12 @@ public class ManagerService extends IntentService
 		if (ManagerService._checkSetup)
 			return;
 
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+		Editor editor = prefs.edit();
+		editor.putString(LegacyJSONConfigFile.JSON_LAST_HASH, "");
+		editor.commit();
+
 		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
 		PendingIntent pi = PendingIntent.getService(context, 0, new Intent(ManagerService.PERIODIC_CHECK_INTENT), PendingIntent.FLAG_UPDATE_CURRENT);
@@ -235,8 +242,6 @@ public class ManagerService extends IntentService
 
 		pi = PendingIntent.getService(context, 0, new Intent(ManagerService.REFRESH_CONFIGURATION), PendingIntent.FLAG_UPDATE_CURRENT);
 		alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 5000, pi);
-
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
 		prefs.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener()
 		{

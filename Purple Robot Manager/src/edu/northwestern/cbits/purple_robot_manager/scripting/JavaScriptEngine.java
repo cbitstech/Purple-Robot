@@ -22,6 +22,7 @@ import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
+import edu.northwestern.cbits.purple_robot_manager.config.JSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.Feature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.JavascriptFeature;
 
@@ -285,4 +286,12 @@ public class JavaScriptEngine extends BaseScriptEngine
 		
 		return params;
 	}
+	
+	public String fetchConfig()
+	{
+		JSONConfigFile config = new JSONConfigFile(this._context);
+		
+		return config.toString();
+	}
+
 }

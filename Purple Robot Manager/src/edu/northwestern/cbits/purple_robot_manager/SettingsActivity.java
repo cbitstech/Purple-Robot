@@ -105,6 +105,8 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 			Editor editor = prefs.edit();
 
 			editor.putLong(LegacyJSONConfigFile.JSON_LAST_UPDATE, 0);
+			editor.putString(LegacyJSONConfigFile.JSON_LAST_HASH, "");
+
 			editor.commit();
 			LegacyJSONConfigFile.update(this);
 
