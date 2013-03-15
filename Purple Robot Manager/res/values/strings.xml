@@ -480,6 +480,9 @@
     <string name="robot_pending_size_label">Pending Upload Size (bytes)</string>
     <string name="robot_clear_time_label">Estimated Upload Time (ms)</string>
     <string name="robot_version_label">Purple Robot Version</string>
+
+    <string name="title_enable_scheme_config">Include Scheme Configuration</string>
+    <string name="title_enable_json_config">Include JSON Configuration</string>
     
     <string name="hardware_model_label">Device Model</string>
     <string name="hardware_mfr_label">Device Manufacturer</string>
