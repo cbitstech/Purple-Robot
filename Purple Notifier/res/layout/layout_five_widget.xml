@@ -13,12 +13,10 @@
         android:layout_weight="1" />
    	<ImageView
         android:id="@+id/widget_five_one"
-	    android:src="@drawable/one"
 	    android:layout_width="72dp"
 	    android:layout_height="match_parent"
 	    android:layout_gravity="top"
-	    android:background="@android:color/black"
-	    android:scaleType="centerCrop"
+	    android:scaleType="centerInside"
 	    android:layout_marginTop="4dp"
 	    android:layout_marginBottom="4dp"
 	    android:contentDescription="@string/app_name" />
@@ -28,12 +26,10 @@
         android:layout_weight="1" />
 	<ImageView
         android:id="@+id/widget_five_two"
-	    android:src="@drawable/two"
 	    android:layout_width="72dp"
 	    android:layout_height="match_parent"
 	    android:layout_gravity="top"
-	    android:background="@android:color/black"
-	    android:scaleType="centerCrop"
+	    android:scaleType="centerInside"
 	    android:layout_marginTop="4dp"
 	    android:layout_marginBottom="4dp"
 	    android:contentDescription="@string/app_name" />
@@ -43,12 +39,10 @@
         android:layout_weight="1" />
 	<ImageView
         android:id="@+id/widget_five_three"
-	    android:src="@drawable/three"
 	    android:layout_width="72dp"
 	    android:layout_height="match_parent"
 	    android:layout_gravity="top"
-	    android:background="@android:color/black"
-	    android:scaleType="centerCrop"
+	    android:scaleType="centerInside"
 	    android:layout_marginTop="4dp"
 	    android:layout_marginBottom="4dp"
 	    android:contentDescription="@string/app_name" />
@@ -58,12 +52,10 @@
         android:layout_weight="1" />
 	<ImageView
         android:id="@+id/widget_five_four"
-	    android:src="@drawable/four"
 	    android:layout_width="72dp"
 	    android:layout_height="match_parent"
 	    android:layout_gravity="top"
-	    android:background="@android:color/black"
-	    android:scaleType="centerCrop"
+	    android:scaleType="centerInside"
 	    android:layout_marginTop="4dp"
 	    android:layout_marginBottom="4dp"
 	    android:contentDescription="@string/app_name" />
@@ -73,12 +65,10 @@
         android:layout_weight="1" />
 	<ImageView
         android:id="@+id/widget_five_five"
-	    android:src="@drawable/five"
 	    android:layout_width="72dp"
 	    android:layout_height="match_parent"
 	    android:layout_gravity="top"
-	    android:background="@android:color/black"
-	    android:scaleType="centerCrop"
+	    android:scaleType="centerInside"
 	    android:layout_marginTop="4dp"
 	    android:layout_marginBottom="4dp"
 	    android:contentDescription="@string/app_name" />

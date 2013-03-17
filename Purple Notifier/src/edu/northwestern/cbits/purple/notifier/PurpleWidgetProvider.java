@@ -6,6 +6,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import android.annotation.SuppressLint;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -143,6 +144,11 @@ public abstract class PurpleWidgetProvider extends AppWidgetProvider
 
 	public static Bitmap bitmapForText(Context context, String text, int width, int height, String color) 
 	{
+		return PurpleWidgetProvider.bitmapForText(context, text, width, height, color, false, true);
+	}
+
+	public static Bitmap bitmapForText(Context context, String text, int width, int height, String color, boolean verticalCenter, boolean horizontalCenter) 
+	{
 		DisplayMetrics metrics = context.getResources().getDisplayMetrics();
 
 		float floatWidth = width * metrics.density;
@@ -150,6 +156,9 @@ public abstract class PurpleWidgetProvider extends AppWidgetProvider
 
 		width = (int) floatWidth;
 		height = (int) floatHeight;
+		
+		if (width < 1 || height < 1)
+			return null;
 		
 		Bitmap b = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 
@@ -164,21 +173,32 @@ public abstract class PurpleWidgetProvider extends AppWidgetProvider
         Rect bounds = new Rect();
         textPaint.getTextBounds(text, 0, text.length(), bounds);
         
-        while (bounds.width() < b.getWidth() && bounds.height() < b.getHeight() - textPaint.descent())
+        float drawHeight = height;
+        
+        while (bounds.width() < b.getWidth() && bounds.height() <  drawHeight)
         {
         	textPaint.setTextSize(textPaint.getTextSize() + 1);
 
         	textPaint.getTextBounds(text, 0, text.length(), bounds);
+
+            if (verticalCenter == false)
+            	drawHeight = height - textPaint.descent();
         }
 
-        while (bounds.width() > b.getWidth() || bounds.height() > b.getHeight() - textPaint.descent())
+        while ((bounds.width() > b.getWidth() || bounds.height() > drawHeight) && textPaint.getTextSize() > 0)
         {
         	textPaint.setTextSize(textPaint.getTextSize() - 1);
 
         	textPaint.getTextBounds(text, 0, text.length(), bounds);
+        
+            if (verticalCenter == false)
+            	drawHeight = height - textPaint.descent();
         }
 
-        c.drawText(text, b.getWidth() / 2, (b.getHeight() / 2) + (bounds.height() / 2) - (textPaint.descent() / 2), textPaint);
+        if (verticalCenter == false)
+        	c.drawText(text, b.getWidth() / 2, (b.getHeight() / 2) + (bounds.height() / 2) - (textPaint.descent() / 2), textPaint);
+        else
+        	c.drawText(text, b.getWidth() / 2, (b.getHeight() / 2) + (bounds.height() / 2), textPaint);
 		
 		return b;
 	}

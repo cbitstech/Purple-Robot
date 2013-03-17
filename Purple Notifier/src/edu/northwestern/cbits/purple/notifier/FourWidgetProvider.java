@@ -1,11 +1,10 @@
 package edu.northwestern.cbits.purple.notifier;
 
-import java.io.IOException;
-
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.RemoteViews;
@@ -17,8 +16,6 @@ public class FourWidgetProvider extends PurpleWidgetProvider
 
 	public static void setupWidget(Context context, int widgetId, Intent intent) 
 	{
-		RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.layout_four_widget);
-
 		Bundle extras = intent.getExtras();
 
 		AppWidgetManager widgets = AppWidgetManager.getInstance(context);
@@ -28,49 +25,64 @@ public class FourWidgetProvider extends PurpleWidgetProvider
 		String imageThree = extras.getString("image_three");
 		String imageFour = extras.getString("image_four");
 		
-		Uri imageUri = null;
-		Uri imageTwoUri = null;
-		Uri imageThreeUri = null;
-		Uri imageFourUri = null;
-		
-		try 
+		if (image == null || "".equals(image.trim()))
 		{
-			if (image != null && "".equals(image.trim()) == false)
-			{
-				RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_four_widget);
-				imageUri = Uri.parse(image);
-				rv.setImageViewBitmap(R.id.widget_four_one, PurpleWidgetProvider.bitmapForUri(context, imageUri));
-				widgets.updateAppWidget(widgetId, rv);
-			}
-			
-			if (imageTwo != null && "".equals(imageTwo.trim()) == false)
-			{
-				RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_four_widget);
-				imageTwoUri = Uri.parse(imageTwo);
-				rv.setImageViewBitmap(R.id.widget_four_two, PurpleWidgetProvider.bitmapForUri(context, imageTwoUri));
-				widgets.updateAppWidget(widgetId, rv);
-			}
-			
-			if (imageThree != null && "".equals(imageThree.trim()) == false)
-			{
-				RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_four_widget);
-				imageThreeUri = Uri.parse(imageThree);
-				rv.setImageViewBitmap(R.id.widget_four_three, PurpleWidgetProvider.bitmapForUri(context, imageThreeUri));
-				widgets.updateAppWidget(widgetId, rv);
-			}
-			
-			if (imageFour != null && "".equals(imageFour.trim()) == false)
-			{
-				RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_four_widget);
-				imageFourUri = Uri.parse(imageFour);
-				rv.setImageViewBitmap(R.id.widget_four_four, PurpleWidgetProvider.bitmapForUri(context, imageFourUri));
-				widgets.updateAppWidget(widgetId, rv);
-			}
-		} 
-		catch (IOException e) 
-		{
-			e.printStackTrace();
+			RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_four_widget);
+			Bitmap b = PurpleWidgetProvider.bitmapForText(context, "1", 60, 60, "#ffffff", true, false);
+			rv.setImageViewBitmap(R.id.widget_four_one, b);
+			widgets.updateAppWidget(widgetId, rv);
 		}
+		else
+		{
+			RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_four_widget);
+			rv.setImageViewUri(R.id.widget_four_one, Uri.parse(image));
+			widgets.updateAppWidget(widgetId, rv);
+		}
+
+		if (imageTwo == null || "".equals(imageTwo.trim()))
+		{
+			RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_four_widget);
+			Bitmap b = PurpleWidgetProvider.bitmapForText(context, "2", 60, 60, "#ffffff", true, false);
+			rv.setImageViewBitmap(R.id.widget_four_two, b);
+			widgets.updateAppWidget(widgetId, rv);
+		}
+		else
+		{
+			RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_four_widget);
+			rv.setImageViewUri(R.id.widget_four_two, Uri.parse(imageTwo));
+			widgets.updateAppWidget(widgetId, rv);
+		}
+		
+		if (imageThree == null || "".equals(imageThree.trim()))
+		{
+			RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_four_widget);
+			Bitmap b = PurpleWidgetProvider.bitmapForText(context, "3", 60, 60, "#ffffff", true, false);
+			rv.setImageViewBitmap(R.id.widget_four_three, b);
+			widgets.updateAppWidget(widgetId, rv);
+		}
+		else
+		{
+			RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_four_widget);
+			rv.setImageViewUri(R.id.widget_four_three, Uri.parse(imageThree));
+			widgets.updateAppWidget(widgetId, rv);
+		}
+		
+		if (imageFour == null || "".equals(imageFour.trim()))
+		{
+			RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_four_widget);
+			Bitmap b = PurpleWidgetProvider.bitmapForText(context, "4", 60, 60, "#ffffff", true, false);
+			rv.setImageViewBitmap(R.id.widget_four_four, b);
+			widgets.updateAppWidget(widgetId, rv);
+		}
+		else
+		{
+			RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_four_widget);
+			rv.setImageViewUri(R.id.widget_four_four, Uri.parse(imageFour));
+			widgets.updateAppWidget(widgetId, rv);
+		}
+
+		RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.layout_four_widget);
+
 
 		Intent tapIntent = new Intent(WidgetIntentService.WIDGET_ACTION);
 		tapIntent.putExtra("widget_action", "tap_one");
