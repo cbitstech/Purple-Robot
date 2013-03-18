@@ -560,7 +560,7 @@ public class HttpUploadPlugin extends OutputPlugin
 							
 							SSLSocketFactory socketFactory = SSLSocketFactory.getSocketFactory();
 							
-							if (prefs.getBoolean("config_http_liberal_ssl", false))
+							if (prefs.getBoolean("config_http_liberal_ssl", true))
 							{
 						        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
 						        trustStore.load(null, null);

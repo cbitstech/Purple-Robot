@@ -61,7 +61,7 @@
 	      	    android:title="@string/title_http_liberal_ssl"
       		    android:summary="@string/summary_http_liberal_ssl"
 	        	android:key="config_http_liberal_ssl"
-	           	android:defaultValue="false"/>
+	           	android:defaultValue="true"/>
 			<EditTextPreference
 	           	android:key="config_data_server_uri"
 	           	android:title="@string/title_http_upload_uri"
