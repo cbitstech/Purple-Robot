@@ -61,6 +61,7 @@ public class PersistentService extends Service
 				{
 					ProbeManager.nudgeProbes(this);
 					TriggerManager.refreshTriggers(this);
+					ScheduleManager.runOverdueScripts(this);
 				}
 				else if (ContinuousProbe.WAKE_ACTION.equals(intent.getAction()))
 				{
