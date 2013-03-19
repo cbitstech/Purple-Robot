@@ -114,8 +114,11 @@ public class DateTrigger extends Trigger
 									if (po instanceof Period)
 									{
 										Period p = (Period) po;
-			
-										upcoming.add(p.getRangeStart());
+										
+										Date start = p.getRangeStart();
+										
+										if (upcoming.contains(start) == false)
+											upcoming.add(start);
 									}
 								}
 							} 

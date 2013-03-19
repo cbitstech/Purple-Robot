@@ -36,6 +36,7 @@ import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.ScheduleManager;
 import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
@@ -724,6 +725,13 @@ public abstract class BaseScriptEngine
 		}
 
 		this._context.startService(intent);
+	}
+	
+	public void scheduleScript(String identifier, String dateString, String action)
+	{
+		Log.e("PN-SCH", "SCHEDULE " + identifier + " " + dateString + " --> " + action);
+		
+		ScheduleManager.updateScript(this._context, identifier, dateString, action);
 	}
 
 	protected boolean broadcastIntent(final String action, final Map<String, Object> extras)

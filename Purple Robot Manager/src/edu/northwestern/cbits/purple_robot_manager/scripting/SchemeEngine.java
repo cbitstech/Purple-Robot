@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
+import edu.northwestern.cbits.purple_robot_manager.ScheduleManager;
 import edu.northwestern.cbits.purple_robot_manager.config.SchemeConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.Feature;
 
@@ -29,7 +30,9 @@ public class SchemeEngine extends BaseScriptEngine
 	{
 		// TODO: Better validation & heuristics...
 
-		if (script.trim().charAt(0) == '(')
+		if (script == null || script.trim().length() < 1)
+			return false;
+		else if (script.trim().charAt(0) == '(')
 			return true;
 		
 		return false;
@@ -66,8 +69,13 @@ public class SchemeEngine extends BaseScriptEngine
 		}
 		
 		return this.updateTrigger(triggerId, paramsMap);
-		
 	}
+	
+	public void scheduleScript(String identifier, String dateString, Pair action)
+	{
+		super.scheduleScript(identifier, dateString, action.toString());
+	}
+
 	
 	public boolean updateProbe(Pair params)
 	{
