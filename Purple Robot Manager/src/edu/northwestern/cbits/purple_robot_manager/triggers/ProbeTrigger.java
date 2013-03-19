@@ -91,4 +91,9 @@ public class ProbeTrigger extends Trigger
 		
 		return false;
 	}
+
+	public void refresh(Context context) 
+	{
+		// Nothing to do for this trigger type...
+	}
 }

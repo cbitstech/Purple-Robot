@@ -156,4 +156,10 @@ public class TriggerManager
 		
 		return configs;
 	}
+
+	public static void refreshTriggers(Context context) 
+	{
+		for (Trigger t : TriggerManager.getInstance().allTriggers())
+			t.refresh(context);
+	}
 }
