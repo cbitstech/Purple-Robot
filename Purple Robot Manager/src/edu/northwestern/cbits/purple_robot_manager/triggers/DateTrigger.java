@@ -27,6 +27,7 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
 
 @SuppressLint("SimpleDateFormat")
@@ -53,6 +54,9 @@ public class DateTrigger extends Trigger
 	
 	private String _icalString = null;
 
+	private long _lastFireCalcDate = 0;
+	private List<Date> _upcomingFireDates = new ArrayList<Date>();
+	
 	static
 	{
 		try
@@ -64,6 +68,83 @@ public class DateTrigger extends Trigger
 			e.printStackTrace();
 		}
 	}
+	
+	public void refresh(Context context) 
+	{
+		long now = System.currentTimeMillis();
+		
+		if (now - this._lastFireCalcDate > (3600 * 1000))
+		{
+			this._lastFireCalcDate = now;
+			
+			final DateTrigger me = this;
+			
+			Runnable r = new Runnable()
+			{
+				public void run() 
+				{
+					me.refreshCalendar();
+					
+					ArrayList<Date> upcoming = new ArrayList<Date>();
+					
+					long now = System.currentTimeMillis();
+					long current = now;
+					
+					long maxCount = 64;
+
+					long hour = 1000 * 60 * 60;
+
+					while (current - now < (hour * 48) && upcoming.size() < maxCount)
+					{
+						DateTime from = new DateTime(new Date(current));
+						DateTime to = new DateTime(new Date(current + (hour)));
+
+						try
+						{
+							Period period = new Period(from, to);
+			
+							for (Object o : me._calendar.getComponents("VEVENT"))
+							{
+								Component c = (Component) o;
+			
+								PeriodList l = c.calculateRecurrenceSet(period);
+								
+								for (Object po : l)
+								{
+									if (po instanceof Period)
+									{
+										Period p = (Period) po;
+			
+										upcoming.add(p.getRangeStart());
+									}
+								}
+							} 
+							
+							current += hour;
+						}
+						catch (NullPointerException e)
+						{
+							
+						}
+						catch (IllegalArgumentException e)
+						{
+							e.printStackTrace();
+						}
+					}
+
+					synchronized(me._upcomingFireDates)
+					{
+						me._upcomingFireDates.clear();
+						me._upcomingFireDates.addAll(upcoming);
+					}
+				}
+			};
+			
+			Thread t = new Thread(r);
+			t.start();
+		}
+	}
+
 
 	public void reset(Context context) 
 	{
@@ -94,7 +175,7 @@ public class DateTrigger extends Trigger
 			this.refreshCalendar();
 		}
 	}
-
+	
 	private void refreshCalendar()
 	{
 		StringReader sin = new StringReader(this._icalString);
@@ -320,97 +401,40 @@ public class DateTrigger extends Trigger
 		
 		screen.addPreference(lastFire);
 		
-		List<Date> upcoming = new ArrayList<Date>(); // this.nextFires(32);
-		
-		if (upcoming.size() > 0)
+		synchronized(this._upcomingFireDates)
 		{
-			PreferenceManager manager = activity.getPreferenceManager();
-
-			PreferenceScreen upcomingScreen = manager.createPreferenceScreen(activity);
-			upcomingScreen.setSummary(R.string.label_trigger_upcoming_fires);
-
-			if (upcoming.size() == 1)
-				upcomingScreen.setTitle(R.string.label_trigger_upcoming_fire_summary);
-			else
-				upcomingScreen.setTitle(String.format(activity.getString(R.string.label_trigger_upcoming_fires_summary), upcoming.size()));
-
-			for (Date d : upcoming)
+			if (this._upcomingFireDates.size() > 0)
 			{
-				Preference upcomingFire = new Preference(activity);
-				upcomingFire.setTitle(sdf.format(d));
-				
-				upcomingScreen.addPreference(upcomingFire);
+				PreferenceManager manager = activity.getPreferenceManager();
+	
+				PreferenceScreen upcomingScreen = manager.createPreferenceScreen(activity);
+				upcomingScreen.setSummary(R.string.label_trigger_upcoming_fires);
+	
+				if (this._upcomingFireDates.size() == 1)
+					upcomingScreen.setTitle(R.string.label_trigger_upcoming_fire_summary);
+				else
+					upcomingScreen.setTitle(String.format(activity.getString(R.string.label_trigger_upcoming_fires_summary), this._upcomingFireDates.size()));
+	
+				for (Date d : this._upcomingFireDates)
+				{
+					Preference upcomingFire = new Preference(activity);
+					upcomingFire.setTitle(sdf.format(d));
+					
+					upcomingScreen.addPreference(upcomingFire);
+				}
+	
+				screen.addPreference(upcomingScreen);
 			}
-
-			screen.addPreference(upcomingScreen);
-		}
-		else
-		{
-			Preference upcomingFires = new Preference(activity);
-			upcomingFires.setSummary(R.string.label_trigger_upcoming_fires);
-			upcomingFires.setTitle(R.string.label_trigger_upcoming_fires_none);
-			
-			screen.addPreference(upcomingFires);
-		}
+			else
+			{
+				Preference upcomingFires = new Preference(activity);
+				upcomingFires.setSummary(R.string.label_trigger_upcoming_fires);
+				upcomingFires.setTitle(R.string.label_trigger_upcoming_fires_none);
+				
+				screen.addPreference(upcomingFires);
+			}
+		}	
 		
 		return screen;
-	}
-
-	private List<Date> nextFires(int count) 
-	{
-		this.refreshCalendar();
-		
-		ArrayList<Date> upcoming = new ArrayList<Date>();
-		
-		long now = System.currentTimeMillis();
-		long current = now;
-		
-		long hour = 1000 * 60 * 60;
-		
-		try
-		{
-			while (upcoming.size() < count)
-			{
-				DateTime from = new DateTime(new Date(current));
-				DateTime to = new DateTime(new Date(current + (hour)));
-
-				try
-				{
-					Period period = new Period(from, to);
-	
-					for (Object o : this._calendar.getComponents("VEVENT"))
-					{
-						Component c = (Component) o;
-	
-						PeriodList l = c.calculateRecurrenceSet(period);
-						
-						for (Object po : l)
-						{
-							if (po instanceof Period && upcoming.size() < count)
-							{
-								Period p = (Period) po;
-	
-								upcoming.add(p.getRangeStart());
-							}
-						}
-					}
-					
-					current += (hour + 1);
-				}
-				catch (NullPointerException e)
-				{
-					
-				}
-				
-				if (current - now > hour * 24)
-					return upcoming;
-			}
-		}
-		catch (IllegalArgumentException e)
-		{
-			e.printStackTrace();
-		}
-
-		return upcoming;
 	}
 }

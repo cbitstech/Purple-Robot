@@ -24,6 +24,7 @@ public abstract class Trigger
 	}
 
 	public abstract boolean matches(Context context, Object obj);
+	public abstract void refresh(Context context);
 	
 	public boolean enabled()
 	{

@@ -14,6 +14,7 @@ import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RandomNoiseProbe;
+import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
 public class PersistentService extends Service
 {
@@ -57,7 +58,10 @@ public class PersistentService extends Service
 		if (intent != null)
 		{
 				if (NUDGE_PROBES.equals(intent.getAction()))
+				{
 					ProbeManager.nudgeProbes(this);
+					TriggerManager.refreshTriggers(this);
+				}
 				else if (ContinuousProbe.WAKE_ACTION.equals(intent.getAction()))
 				{
 
