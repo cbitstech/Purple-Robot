@@ -1,5 +1,7 @@
 package edu.northwestern.cbits.purple.notifier;
 
+import java.io.IOException;
+
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
@@ -26,76 +28,88 @@ public class FiveWidgetProvider extends PurpleWidgetProvider
 		String imageFour = extras.getString("image_four");
 		String imageFive = extras.getString("image_five");
 		
-		if (image == null || "".equals(image.trim()))
+		try
 		{
-			RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_five_widget);
-			Bitmap b = PurpleWidgetProvider.bitmapForText(context, "4", 60, 60, "#ffffff", true, false);
-			rv.setImageViewBitmap(R.id.widget_five_one, b);
-			widgets.updateAppWidget(widgetId, rv);
+			if (image == null || "".equals(image.trim()))
+			{
+				RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_five_widget);
+				Bitmap b = PurpleWidgetProvider.bitmapForText(context, "4", 60, 60, "#ffffff", true, false);
+				rv.setImageViewBitmap(R.id.widget_five_one, b);
+				widgets.updateAppWidget(widgetId, rv);
+			}
+			else
+			{
+				RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_five_widget);
+				Bitmap b = PurpleWidgetProvider.bitmapForUri(context, Uri.parse(image));
+				rv.setImageViewBitmap(R.id.widget_five_one, b);
+				widgets.updateAppWidget(widgetId, rv);
+			}
+	
+			if (imageTwo == null || "".equals(imageTwo.trim()))
+			{
+				RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_five_widget);
+				Bitmap b = PurpleWidgetProvider.bitmapForText(context, "4", 60, 60, "#ffffff", true, false);
+				rv.setImageViewBitmap(R.id.widget_five_two, b);
+				widgets.updateAppWidget(widgetId, rv);
+			}
+			else
+			{
+				RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_five_widget);
+				Bitmap b = PurpleWidgetProvider.bitmapForUri(context, Uri.parse(imageTwo));
+				rv.setImageViewBitmap(R.id.widget_five_two, b);
+				widgets.updateAppWidget(widgetId, rv);
+			}
+	
+			if (imageThree == null || "".equals(imageThree.trim()))
+			{
+				RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_five_widget);
+				Bitmap b = PurpleWidgetProvider.bitmapForText(context, "4", 60, 60, "#ffffff", true, false);
+				rv.setImageViewBitmap(R.id.widget_five_three, b);
+				widgets.updateAppWidget(widgetId, rv);
+			}
+			else
+			{
+				RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_five_widget);
+				Bitmap b = PurpleWidgetProvider.bitmapForUri(context, Uri.parse(imageThree));
+				rv.setImageViewBitmap(R.id.widget_five_three, b);
+				widgets.updateAppWidget(widgetId, rv);
+			}
+			
+			if (imageFour == null || "".equals(imageFour.trim()))
+			{
+				RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_five_widget);
+				Bitmap b = PurpleWidgetProvider.bitmapForText(context, "4", 60, 60, "#ffffff", true, false);
+				rv.setImageViewBitmap(R.id.widget_five_four, b);
+				widgets.updateAppWidget(widgetId, rv);
+			}
+			else
+			{
+				RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_five_widget);
+				Bitmap b = PurpleWidgetProvider.bitmapForUri(context, Uri.parse(imageFour));
+				rv.setImageViewBitmap(R.id.widget_five_four, b);
+				widgets.updateAppWidget(widgetId, rv);
+			}
+			
+			if (imageFive == null || "".equals(imageFive.trim()))
+			{
+				RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_five_widget);
+				Bitmap b = PurpleWidgetProvider.bitmapForText(context, "4", 60, 60, "#ffffff", true, false);
+				rv.setImageViewBitmap(R.id.widget_five_five, b);
+				widgets.updateAppWidget(widgetId, rv);
+			}
+			else
+			{
+				RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_five_widget);
+				Bitmap b = PurpleWidgetProvider.bitmapForUri(context, Uri.parse(imageFive));
+				rv.setImageViewBitmap(R.id.widget_five_five, b);
+				widgets.updateAppWidget(widgetId, rv);
+			}
 		}
-		else
+		catch (IOException e)
 		{
-			RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_five_widget);
-			rv.setImageViewUri(R.id.widget_five_one, Uri.parse(image));
-			widgets.updateAppWidget(widgetId, rv);
-		}
-
-		if (imageTwo == null || "".equals(imageTwo.trim()))
-		{
-			RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_five_widget);
-			Bitmap b = PurpleWidgetProvider.bitmapForText(context, "4", 60, 60, "#ffffff", true, false);
-			rv.setImageViewBitmap(R.id.widget_five_two, b);
-			widgets.updateAppWidget(widgetId, rv);
-		}
-		else
-		{
-			RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_five_widget);
-			rv.setImageViewUri(R.id.widget_five_two, Uri.parse(imageTwo));
-			widgets.updateAppWidget(widgetId, rv);
-		}
-
-		if (imageThree == null || "".equals(imageThree.trim()))
-		{
-			RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_five_widget);
-			Bitmap b = PurpleWidgetProvider.bitmapForText(context, "4", 60, 60, "#ffffff", true, false);
-			rv.setImageViewBitmap(R.id.widget_five_three, b);
-			widgets.updateAppWidget(widgetId, rv);
-		}
-		else
-		{
-			RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_five_widget);
-			rv.setImageViewUri(R.id.widget_five_three, Uri.parse(imageThree));
-			widgets.updateAppWidget(widgetId, rv);
+			e.printStackTrace();
 		}
 		
-		if (imageFour == null || "".equals(imageFour.trim()))
-		{
-			RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_five_widget);
-			Bitmap b = PurpleWidgetProvider.bitmapForText(context, "4", 60, 60, "#ffffff", true, false);
-			rv.setImageViewBitmap(R.id.widget_five_four, b);
-			widgets.updateAppWidget(widgetId, rv);
-		}
-		else
-		{
-			RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_five_widget);
-			rv.setImageViewUri(R.id.widget_five_four, Uri.parse(imageFour));
-			widgets.updateAppWidget(widgetId, rv);
-		}
-		
-		if (imageFive == null || "".equals(imageFive.trim()))
-		{
-			RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_five_widget);
-			Bitmap b = PurpleWidgetProvider.bitmapForText(context, "4", 60, 60, "#ffffff", true, false);
-			rv.setImageViewBitmap(R.id.widget_five_five, b);
-			widgets.updateAppWidget(widgetId, rv);
-		}
-		else
-		{
-			RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.layout_five_widget);
-			rv.setImageViewUri(R.id.widget_five_five, Uri.parse(imageFive));
-			widgets.updateAppWidget(widgetId, rv);
-		}
-
 		RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.layout_five_widget);
 
 		Intent tapIntent = new Intent(WidgetIntentService.WIDGET_ACTION);

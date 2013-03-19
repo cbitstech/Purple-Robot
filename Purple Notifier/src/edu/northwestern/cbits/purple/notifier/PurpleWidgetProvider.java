@@ -1,12 +1,19 @@
 package edu.northwestern.cbits.purple.notifier;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
-import android.annotation.SuppressLint;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -24,31 +31,86 @@ public abstract class PurpleWidgetProvider extends AppWidgetProvider
 	{
 		
 	}
-	
-	private static InputStream inputStreamForUri(Context context, Uri imageUri) throws MalformedURLException, IOException
-	{
-		// TODO: Insert caching layer../
-		
-		InputStream input = null;
 
+	public static String createHash(String string)
+	{
+		if (string == null)
+			return null;
+		
+		String hash = null;
+		
 		try
 		{
-			if ("http".equals(imageUri.getScheme().toLowerCase()) || 
-				"https".equals(imageUri.getScheme().toLowerCase()))
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			byte[] digest = md.digest(string.getBytes("UTF-8"));
+
+			hash = (new BigInteger(1, digest)).toString(16);
+
+			while (hash.length() < 32)
 			{
-				HttpURLConnection conn = (HttpURLConnection) (new URL(imageUri.toString())).openConnection();
-				
-				input = conn.getInputStream();
+				hash = "0" + hash;
 			}
-			else
-				input = context.getContentResolver().openInputStream(imageUri);
 		}
-		catch (NullPointerException e)
+		catch (NoSuchAlgorithmException e)
 		{
-			
+			e.printStackTrace();
+		}
+		catch (UnsupportedEncodingException e)
+		{
+			e.printStackTrace();
 		}
 		
-		return input;
+		return hash;
+	}
+	
+	private static InputStream inputStreamForUri(Context context, Uri imageUri)
+	{
+		String hash = PurpleWidgetProvider.createHash(imageUri.toString());
+		
+		File folder = context.getCacheDir();
+		
+		File cacheFile = new File(folder, hash);
+		
+		try 
+		{
+			return new FileInputStream(cacheFile);
+		} 
+		catch (FileNotFoundException e) 
+		{
+			try 
+			{
+				HttpURLConnection conn = (HttpURLConnection) (new URL(imageUri.toString())).openConnection();
+
+				InputStream input = conn.getInputStream();
+
+				FileOutputStream fout = new FileOutputStream(cacheFile);
+				
+				byte[] buffer = new byte[4096];
+				int read = 0;
+				
+				while ((read = input.read(buffer, 0, buffer.length)) != -1)
+				{
+					fout.write(buffer, 0, read);
+				}
+				
+				input.close();
+				fout.close();
+				
+				return PurpleWidgetProvider.inputStreamForUri(context, imageUri);
+			} 
+			catch (MalformedURLException e1) 
+			{
+				e1.printStackTrace();
+			} 
+			catch (IOException e1) 
+			{
+				e1.printStackTrace();
+			}
+			
+			e.printStackTrace();
+		}
+
+		return null;
 	}
 
 	protected static Bitmap bitmapForUri(Context context, Uri imageUri) throws IOException 
