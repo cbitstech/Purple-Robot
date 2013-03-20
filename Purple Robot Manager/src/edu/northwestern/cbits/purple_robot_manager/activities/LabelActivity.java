@@ -1,20 +1,32 @@
 package edu.northwestern.cbits.purple_robot_manager.activities;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
+import android.content.SharedPreferences.Editor;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.WindowManager.LayoutParams;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -39,7 +51,7 @@ public class LabelActivity extends SherlockFragmentActivity
         super.onCreate(savedInstanceState);
 
         Bundle extras = this.getIntent().getExtras();
-
+        
         this._timestamp = extras.getDouble(LabelActivity.TIMESTAMP);
         this._labelContext = extras.getString(LabelActivity.LABEL_CONTEXT);
 
@@ -47,6 +59,47 @@ public class LabelActivity extends SherlockFragmentActivity
 
         getWindow().setLayout(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
     }
+	
+	private String[] savedLabels()
+	{
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        String[] labels = new String[0];
+        
+        try 
+        {
+			JSONArray jsonLabels = new JSONArray(prefs.getString("list_label_values", "['Activity', 'Location', 'Social Context']"));
+			
+			labels = new String[jsonLabels.length()];
+			
+			for (int i = 0; i < jsonLabels.length(); i++)
+			{
+				labels[i] = jsonLabels.getString(i);
+			}
+		}
+        catch (JSONException e) 
+        {
+			e.printStackTrace();
+		}
+        
+        return labels;
+	}
+
+	private void saveLabels(String[] labels) 
+	{
+		JSONArray array = new JSONArray();
+		
+		for (String label : labels)
+			array.put(label);
+		
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		Editor e = prefs.edit();
+		
+		e.putString("list_label_values", array.toString());
+		
+		e.commit();
+	}
+
 
 	protected void onResume()
 	{
@@ -60,6 +113,12 @@ public class LabelActivity extends SherlockFragmentActivity
         Date d = new Date((long) this._timestamp);
 
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss, MMM d");
+        
+        final AutoCompleteTextView label = (AutoCompleteTextView) this.findViewById(R.id.text_label_text);
+        
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, this.savedLabels());
+
+        label.setAdapter(adapter);
 
         actionBar.setSubtitle(sdf.format(d));
         actionBar.setTitle(R.string.title_confirm_label);
@@ -102,6 +161,15 @@ public class LabelActivity extends SherlockFragmentActivity
     				intent.putExtras(bundle);
 
     				localManager.sendBroadcast(intent);
+    				
+    				List<String> labels = new ArrayList<String>(Arrays.asList(this.savedLabels()));
+    				
+    				labels.remove(key);
+    				labels.add(0, key);
+    				
+    				String[] labelsArray = labels.toArray(new String[0]);
+    				
+    				this.saveLabels(labelsArray);
 
         			this.finish();
     			}
@@ -143,6 +211,4 @@ public class LabelActivity extends SherlockFragmentActivity
 
     	return true;
     }
-
-
 }

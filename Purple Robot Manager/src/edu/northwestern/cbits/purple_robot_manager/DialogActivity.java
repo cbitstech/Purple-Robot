@@ -64,7 +64,6 @@ public class DialogActivity extends Activity
         String message = intent.getStringExtra(DialogActivity.DIALOG_MESSAGE);
 
         final String confirmScript = intent.getStringExtra(DialogActivity.DIALOG_CONFIRM_SCRIPT);
-        final String cancelScript = intent.getStringExtra(DialogActivity.DIALOG_CANCEL_SCRIPT);
 
         this.setTitle(title);
 
@@ -72,9 +71,6 @@ public class DialogActivity extends Activity
 
         Button confirmButton = (Button) this.findViewById(R.id.button_dialog_confirm);
         confirmButton.setText(intent.getStringExtra(DialogActivity.DIALOG_CONFIRM_BUTTON));
-
-        Button cancelButton = (Button) this.findViewById(R.id.button_dialog_cancel);
-        cancelButton.setText(intent.getStringExtra(DialogActivity.DIALOG_CANCEL_BUTTON));
 
         confirmButton.setOnClickListener(new OnClickListener()
         {
@@ -96,24 +92,41 @@ public class DialogActivity extends Activity
 			}
         });
 
-        cancelButton.setOnClickListener(new OnClickListener()
+        Button cancelButton = (Button) this.findViewById(R.id.button_dialog_cancel);
+
+        if (intent.hasExtra(DialogActivity.DIALOG_CANCEL_BUTTON))
         {
-			public void onClick(View v)
-			{
-				if (cancelScript != null && cancelScript.length() >= 0)
-				{
-					try
-					{
-						BaseScriptEngine.runScript(me, cancelScript);
-					}
-					catch (Exception e)
-					{
-						e.printStackTrace();
-					}
-				}
-				
-				me.finish();
-			}
-        });
+            cancelButton.setText(intent.getStringExtra(DialogActivity.DIALOG_CANCEL_BUTTON));
+
+            if (intent.hasExtra(DialogActivity.DIALOG_CANCEL_SCRIPT))
+            {
+	            final String cancelScript = intent.getStringExtra(DialogActivity.DIALOG_CANCEL_SCRIPT);
+	
+	            cancelButton.setOnClickListener(new OnClickListener()
+	            {
+	    			public void onClick(View v)
+	    			{
+	    				if (cancelScript != null && cancelScript.length() >= 0)
+	    				{
+	    					try
+	    					{
+	    						BaseScriptEngine.runScript(me, cancelScript);
+	    					}
+	    					catch (Exception e)
+	    					{
+	    						e.printStackTrace();
+	    					}
+	    				}
+	    				
+	    				me.finish();
+	    			}
+	            });
+            }
+
+            cancelButton.setVisibility(View.VISIBLE);
+        }
+        else
+            cancelButton.setVisibility(View.GONE);
+        	
     }
 }

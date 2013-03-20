@@ -93,10 +93,10 @@ public class PurpleRobotApplication extends Application
 			e.printStackTrace();
 		}
 		
+		map.put("config_probes_enabled", Boolean.valueOf(prefs.getBoolean("config_probes_enabled", false)));
+		
 		return map;
 	}
-	
-	
 }
 
 

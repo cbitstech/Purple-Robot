@@ -14,6 +14,9 @@
     <string name="title_preference_triggers_screen">Triggers</string>
     <string name="title_preference_triggers_category">Available Triggers</string>
     
+    <string name="menu_label_label">Add label</string>
+    <string name="title_label_probe">Most Recent Label</string>
+    
     <string name="config_probes_category_label">Probes</string>
     <string name="config_triggers_category_label">Triggers</string>
 

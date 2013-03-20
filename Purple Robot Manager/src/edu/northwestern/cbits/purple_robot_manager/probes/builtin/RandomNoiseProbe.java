@@ -1,6 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
 import java.security.SecureRandom;
+import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -143,6 +144,38 @@ public class RandomNoiseProbe extends Probe
 
 		return screen;
 	}
+	
+	public Map<String, Object> configuration(Context context)
+	{
+		Map<String, Object> map = super.configuration(context);
+		
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		
+		map.put("retain", prefs.getBoolean("config_probe_random_noise_persist", false));
+		
+		return map;
+	}
+	
+	public void updateFromMap(Context context, Map<String, Object> params) 
+	{
+		super.updateFromMap(context, params);
+		
+		if (params.containsKey("retain"))
+		{
+			Object retain = params.get("retain");
+			
+			if (retain instanceof Boolean)
+			{
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				Editor e = prefs.edit();
+				
+				e.putBoolean("config_probe_random_noise_persist", ((Boolean) retain).booleanValue());
+				e.commit();
+			}
+		}
+	}
+
+
 
 	public void updateFromJSON(Context context, JSONObject json) throws JSONException
 	{
