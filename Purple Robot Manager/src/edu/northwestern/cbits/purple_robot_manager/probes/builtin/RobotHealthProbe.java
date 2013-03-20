@@ -60,7 +60,10 @@ public class RobotHealthProbe extends Probe
 	protected static final String EXTERNAL_TOTAL = "EXTERNAL_TOTAL";
 	protected static final String SCHEME_CONFIG = "SCHEME_CONFIG";
 	protected static final String JSON_CONFIG = "JSON_CONFIG";
-	
+
+	protected static final String LAST_BOOT = "LAST_BOOT";
+	protected static final String LAST_HALT = "LAST_HALT";
+
 	private long _lastOffset = 0;
 	private long _lastTimeCheck = 0;
 	
@@ -337,6 +340,10 @@ public class RobotHealthProbe extends Probe
 										
 										bundle.putString(RobotHealthProbe.JSON_CONFIG, file.toString());
 									}
+									
+									bundle.putLong(RobotHealthProbe.LAST_BOOT, prefs.getLong("system_last_boot", 0));
+									bundle.putLong(RobotHealthProbe.LAST_HALT, prefs.getLong("system_last_halt", 0));
+									
 
 									me.transmitData(context, bundle);
 

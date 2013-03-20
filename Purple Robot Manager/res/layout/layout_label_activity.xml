@@ -12,10 +12,11 @@
         android:layout_height="wrap_content"
         android:text="@string/text_label_instruction"
         android:textAppearance="?android:attr/textAppearanceMedium" />
-    <EditText
+    <AutoCompleteTextView
         android:id="@+id/text_label_text"
         android:layout_width="fill_parent"
         android:layout_height="48dp"
+		android:completionThreshold="1"
         android:hint="@string/text_label_label_placeholder" />
     <EditText
         android:id="@+id/text_value_text"

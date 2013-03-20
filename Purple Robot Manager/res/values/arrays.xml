@@ -33,6 +33,7 @@
         <item>features.DeviceInUseFeature</item>
 
         <item>builtin.RandomNoiseProbe</item>
+        <item>LabelProbe</item>
         
         <!-- <item>builtin.BluetoothReceiverProbe</item> -->
         <!-- <item>builtin.ZeroconfProbe</item> -->

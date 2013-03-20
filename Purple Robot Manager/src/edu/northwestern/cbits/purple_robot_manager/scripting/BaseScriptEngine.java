@@ -696,9 +696,13 @@ public abstract class BaseScriptEngine
 		intent.putExtra(DialogActivity.DIALOG_TITLE, title);
 		intent.putExtra(DialogActivity.DIALOG_MESSAGE, message);
 		intent.putExtra(DialogActivity.DIALOG_CONFIRM_BUTTON, confirmTitle);
-		intent.putExtra(DialogActivity.DIALOG_CANCEL_BUTTON, cancelTitle);
 		intent.putExtra(DialogActivity.DIALOG_CONFIRM_SCRIPT, confirmScript);
-		intent.putExtra(DialogActivity.DIALOG_CANCEL_SCRIPT, cancelScript);
+
+		if (cancelTitle != null  && "".equals(cancelTitle.trim()) == false)
+			intent.putExtra(DialogActivity.DIALOG_CANCEL_BUTTON, cancelTitle);
+
+		if (cancelScript != null && "".equals(cancelScript.trim()) == false)
+			intent.putExtra(DialogActivity.DIALOG_CANCEL_SCRIPT, cancelScript);
 
 		this._context.startActivity(intent);
 	}

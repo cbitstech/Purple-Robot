@@ -234,6 +234,13 @@ public class ProbeManager
 				if (software.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
+			else if (probe instanceof LabelProbe)
+			{
+				LabelProbe label = (LabelProbe) probe;
+
+				if (label.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
 
 			if (found)
 			{
