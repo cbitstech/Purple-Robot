@@ -117,7 +117,7 @@ public class TriggerManager
 		}
 	}
 	
-	public static PreferenceScreen buildPreferenceScreen(PreferenceActivity settingsActivity)
+	public PreferenceScreen buildPreferenceScreen(PreferenceActivity settingsActivity)
 	{
 		PreferenceManager manager = settingsActivity.getPreferenceManager();
 
@@ -132,34 +132,43 @@ public class TriggerManager
 
 		screen.addPreference(triggersCategory);
 
-		for (Trigger trigger : TriggerManager.getInstance().allTriggers())
+		synchronized(this._triggers)
 		{
-			PreferenceScreen triggerScreen = trigger.preferenceScreen(settingsActivity);
-
-			if (triggerScreen != null)
-				screen.addPreference(triggerScreen);
+			for (Trigger trigger : this._triggers)
+			{
+				PreferenceScreen triggerScreen = trigger.preferenceScreen(settingsActivity);
+	
+				if (triggerScreen != null)
+					screen.addPreference(triggerScreen);
+			}
 		}
-
+		
 		return screen;
 	}
 
-	public static List<Map<String, Object>> triggerConfigurations(Context context)
+	public List<Map<String, Object>> triggerConfigurations(Context context)
 	{
 		List<Map<String, Object>> configs = new ArrayList<Map<String, Object>>();
 
-		for (Trigger t : TriggerManager.getInstance()._triggers)
+		synchronized(this._triggers)
 		{
-			Map<String, Object> config = t.configuration(context);
-			
-			configs.add(config);
+			for (Trigger t : this._triggers)
+			{
+				Map<String, Object> config = t.configuration(context);
+				
+				configs.add(config);
+			}
 		}
 		
 		return configs;
 	}
 
-	public static void refreshTriggers(Context context) 
+	public void refreshTriggers(Context context) 
 	{
-		for (Trigger t : TriggerManager.getInstance().allTriggers())
-			t.refresh(context);
+		synchronized(this._triggers)
+		{
+			for (Trigger t : this._triggers)
+				t.refresh(context);
+		}
 	}
 }

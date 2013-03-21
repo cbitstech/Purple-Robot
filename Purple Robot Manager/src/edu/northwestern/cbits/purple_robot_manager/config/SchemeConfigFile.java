@@ -21,7 +21,7 @@ public class SchemeConfigFile
 	
 	public String toString()
 	{
-		Pair rest = this.triggersList(TriggerManager.triggerConfigurations(this._context));
+		Pair rest = this.triggersList(TriggerManager.getInstance().triggerConfigurations(this._context));
 		rest = new Pair(this.probesList(ProbeManager.probeConfigurations(this._context)), rest); 
 		rest = new Pair(this.configuration(this._context), rest); 
 		

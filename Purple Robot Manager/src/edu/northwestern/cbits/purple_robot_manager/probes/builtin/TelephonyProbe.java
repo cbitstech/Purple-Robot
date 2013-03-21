@@ -175,73 +175,80 @@ public class TelephonyProbe extends Probe
 
 					if (now - this._lastCheck  > freq)
 					{
-						Bundle bundle = new Bundle();
-						bundle.putString("PROBE", this.name(context));
-						bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
-
-						String operatorName = manager.getSimOperatorName();
-						
-						if (operatorName == null || operatorName.trim().length() == 0)
-							operatorName = context.getString(R.string.label_no_operator);
-						
-						bundle.putInt(TelephonyProbe.CALL_STATE, manager.getCallState());
-						bundle.putString(TelephonyProbe.NETWORK_COUNTRY_ISO, manager.getNetworkCountryIso());
-						bundle.putString(TelephonyProbe.NETWORK_OPERATOR, manager.getNetworkOperator());
-						bundle.putString(TelephonyProbe.NETWORK_OPERATOR_NAME, manager.getNetworkOperatorName());
-						bundle.putString(TelephonyProbe.SIM_COUNTRY_ISO, manager.getSimCountryIso());
-						bundle.putString(TelephonyProbe.SIM_OPERATOR, manager.getSimOperator());
-						bundle.putString(TelephonyProbe.SIM_OPERATOR_NAME, operatorName);
-						bundle.putBoolean(TelephonyProbe.HAS_ICC_CARD, manager.hasIccCard());
-						bundle.putString(TelephonyProbe.NETWORK_TYPE, this.networkType(manager.getNetworkType()));
-						bundle.putString(TelephonyProbe.PHONE_TYPE, this.phoneType(manager.getPhoneType()));
-						bundle.putString(TelephonyProbe.SIM_STATE, this.simState(manager.getSimState()));
-						bundle.putString(TelephonyProbe.DEVICE_SOFTWARE_VERSION, manager.getDeviceSoftwareVersion());
-
-						bundle.putBoolean(TelephonyProbe.IS_FORWARDING, this._isForwarding);
-						
-						if (this._serviceState == ServiceState.STATE_EMERGENCY_ONLY)
-							bundle.putString(TelephonyProbe.SERVICE_STATE, context.getString(R.string.service_state_emergency));
-						else if (this._serviceState == ServiceState.STATE_IN_SERVICE)
-							bundle.putString(TelephonyProbe.SERVICE_STATE, context.getString(R.string.service_state_in_service));
-						if (this._serviceState == ServiceState.STATE_OUT_OF_SERVICE)
-							bundle.putString(TelephonyProbe.SERVICE_STATE, context.getString(R.string.service_state_out_service));
-						if (this._serviceState == ServiceState.STATE_POWER_OFF)
-							bundle.putString(TelephonyProbe.SERVICE_STATE, context.getString(R.string.service_state_off));
-					
-
-						CellLocation location = manager.getCellLocation();
-
-						if (location instanceof GsmCellLocation)
+						try
 						{
-							GsmCellLocation gsmLocation = (GsmCellLocation) location;
-							gsmLocation.fillInNotifierBundle(bundle);
-							bundle.putString(TelephonyProbe.NETWORK_TYPE, "GSM");
+							Bundle bundle = new Bundle();
+							bundle.putString("PROBE", this.name(context));
+							bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+	
+							String operatorName = manager.getSimOperatorName();
 							
-							bundle.putInt(TelephonyProbe.GSM_ERROR_RATE, this._gsmErrorRate);
-							bundle.putInt(TelephonyProbe.GSM_SIGNAL_STRENGTH, this._gsmSignalStrength);
+							if (operatorName == null || operatorName.trim().length() == 0)
+								operatorName = context.getString(R.string.label_no_operator);
+							
+							bundle.putInt(TelephonyProbe.CALL_STATE, manager.getCallState());
+							bundle.putString(TelephonyProbe.NETWORK_COUNTRY_ISO, manager.getNetworkCountryIso());
+							bundle.putString(TelephonyProbe.NETWORK_OPERATOR, manager.getNetworkOperator());
+							bundle.putString(TelephonyProbe.NETWORK_OPERATOR_NAME, manager.getNetworkOperatorName());
+							bundle.putString(TelephonyProbe.SIM_COUNTRY_ISO, manager.getSimCountryIso());
+							bundle.putString(TelephonyProbe.SIM_OPERATOR, manager.getSimOperator());
+							bundle.putString(TelephonyProbe.SIM_OPERATOR_NAME, operatorName);
+							bundle.putBoolean(TelephonyProbe.HAS_ICC_CARD, manager.hasIccCard());
+							bundle.putString(TelephonyProbe.NETWORK_TYPE, this.networkType(manager.getNetworkType()));
+							bundle.putString(TelephonyProbe.PHONE_TYPE, this.phoneType(manager.getPhoneType()));
+							bundle.putString(TelephonyProbe.SIM_STATE, this.simState(manager.getSimState()));
+							bundle.putString(TelephonyProbe.DEVICE_SOFTWARE_VERSION, manager.getDeviceSoftwareVersion());
+	
+							bundle.putBoolean(TelephonyProbe.IS_FORWARDING, this._isForwarding);
+							
+							if (this._serviceState == ServiceState.STATE_EMERGENCY_ONLY)
+								bundle.putString(TelephonyProbe.SERVICE_STATE, context.getString(R.string.service_state_emergency));
+							else if (this._serviceState == ServiceState.STATE_IN_SERVICE)
+								bundle.putString(TelephonyProbe.SERVICE_STATE, context.getString(R.string.service_state_in_service));
+							if (this._serviceState == ServiceState.STATE_OUT_OF_SERVICE)
+								bundle.putString(TelephonyProbe.SERVICE_STATE, context.getString(R.string.service_state_out_service));
+							if (this._serviceState == ServiceState.STATE_POWER_OFF)
+								bundle.putString(TelephonyProbe.SERVICE_STATE, context.getString(R.string.service_state_off));
+						
+	
+							CellLocation location = manager.getCellLocation();
+	
+							if (location instanceof GsmCellLocation)
+							{
+								GsmCellLocation gsmLocation = (GsmCellLocation) location;
+								gsmLocation.fillInNotifierBundle(bundle);
+								bundle.putString(TelephonyProbe.NETWORK_TYPE, "GSM");
+								
+								bundle.putInt(TelephonyProbe.GSM_ERROR_RATE, this._gsmErrorRate);
+								bundle.putInt(TelephonyProbe.GSM_SIGNAL_STRENGTH, this._gsmSignalStrength);
+							}
+							else if (location instanceof CdmaCellLocation)
+							{
+								CdmaCellLocation cdmaLocation = (CdmaCellLocation) location;
+								cdmaLocation.fillInNotifierBundle(bundle);
+								bundle.putString(TelephonyProbe.NETWORK_TYPE, "CDMA");
+	
+								bundle.putInt(TelephonyProbe.CDMA_STATION, cdmaLocation.getBaseStationId());
+								bundle.putInt(TelephonyProbe.CDMA_LATITUDE, cdmaLocation.getBaseStationLatitude());
+								bundle.putInt(TelephonyProbe.CDMA_LONGITUDE, cdmaLocation.getBaseStationLongitude());
+								bundle.putInt(TelephonyProbe.CDMA_NETWORK_ID, cdmaLocation.getNetworkId());
+								bundle.putInt(TelephonyProbe.CDMA_SYSTEM_ID, cdmaLocation.getSystemId());
+	
+								bundle.putInt(TelephonyProbe.CDMA_DBM, this._cdmaDbm);
+								bundle.putInt(TelephonyProbe.CDMA_ECIO, this._cdmaEcio);
+								bundle.putInt(TelephonyProbe.CDMA_EVDO_DBM, this._evdoDbm);
+								bundle.putInt(TelephonyProbe.CDMA_EVDO_ECIO, this._evdoEcio);
+								bundle.putInt(TelephonyProbe.CDMA_EVDO_SNR, this._evdoSnr);
+							}
+							else
+								bundle.putString(TelephonyProbe.NETWORK_TYPE, "None");
+	
+							this.transmitData(context, bundle);
 						}
-						else if (location instanceof CdmaCellLocation)
+						catch (SecurityException e)
 						{
-							CdmaCellLocation cdmaLocation = (CdmaCellLocation) location;
-							cdmaLocation.fillInNotifierBundle(bundle);
-							bundle.putString(TelephonyProbe.NETWORK_TYPE, "CDMA");
-
-							bundle.putInt(TelephonyProbe.CDMA_STATION, cdmaLocation.getBaseStationId());
-							bundle.putInt(TelephonyProbe.CDMA_LATITUDE, cdmaLocation.getBaseStationLatitude());
-							bundle.putInt(TelephonyProbe.CDMA_LONGITUDE, cdmaLocation.getBaseStationLongitude());
-							bundle.putInt(TelephonyProbe.CDMA_NETWORK_ID, cdmaLocation.getNetworkId());
-							bundle.putInt(TelephonyProbe.CDMA_SYSTEM_ID, cdmaLocation.getSystemId());
-
-							bundle.putInt(TelephonyProbe.CDMA_DBM, this._cdmaDbm);
-							bundle.putInt(TelephonyProbe.CDMA_ECIO, this._cdmaEcio);
-							bundle.putInt(TelephonyProbe.CDMA_EVDO_DBM, this._evdoDbm);
-							bundle.putInt(TelephonyProbe.CDMA_EVDO_ECIO, this._evdoEcio);
-							bundle.putInt(TelephonyProbe.CDMA_EVDO_SNR, this._evdoSnr);
+							e.printStackTrace();
 						}
-						else
-							bundle.putString(TelephonyProbe.NETWORK_TYPE, "None");
-
-						this.transmitData(context, bundle);
 
 						this._lastCheck = now;
 					}

@@ -46,7 +46,14 @@ public abstract class Trigger
 			{
 				public void run()
 				{
-					BaseScriptEngine.runScript(context, me._action);
+					try
+					{
+						BaseScriptEngine.runScript(context, me._action);
+					}
+					catch (Exception e)
+					{
+						e.printStackTrace();
+					}
 				}
 			};
 

@@ -14,6 +14,7 @@
     <string name="title_preference_triggers_screen">Triggers</string>
     <string name="title_preference_triggers_category">Available Triggers</string>
     
+    <string name="label_unknown_context">Unknown Context</string>
     <string name="menu_label_label">Add label</string>
     <string name="title_label_probe">Most Recent Label</string>
     
