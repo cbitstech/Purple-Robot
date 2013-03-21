@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -38,6 +39,7 @@ import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.ScheduleManager;
 import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
+import edu.northwestern.cbits.purple_robot_manager.activities.LabelActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
@@ -174,6 +176,7 @@ public abstract class BaseScriptEngine
 		return false;
 	}
 
+	@SuppressLint("DefaultLocale")
 	public String packageForApplicationName(String applicationName)
 	{
 		if (applicationName == null)
@@ -258,6 +261,22 @@ public abstract class BaseScriptEngine
 		return editor.commit();
 	}
 
+	public void fetchLabel(String context, String key)
+	{
+		Intent labelIntent = new Intent(this._context, LabelActivity.class);
+		labelIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		
+		if (context == null || context.trim().length() < 1)
+			context = this._context.getString(R.string.label_unknown_context);
+		
+		labelIntent.putExtra(LabelActivity.LABEL_CONTEXT, context);
+		
+		if (key != null && key.trim().length() > 1)
+			labelIntent.putExtra(LabelActivity.LABEL_KEY, key);
+		
+		this._context.getApplicationContext().startActivity(labelIntent);
+	}
+	
 	public String fetchString(String key)
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);

@@ -22,6 +22,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 public class ManagerService extends IntentService
 {
@@ -100,9 +101,9 @@ public class ManagerService extends IntentService
 				String toneString = prefs.getString(SettingsActivity.RINGTONE_KEY, null);
 				
 				if (toneString != null)
-				{
 					toneUri = Uri.parse(toneString);
-
+				else
+				{
 					if (intent.hasExtra(ManagerService.RINGTONE_NAME))
 					{
 						String name = intent.getStringExtra(ManagerService.RINGTONE_NAME);
@@ -129,6 +130,8 @@ public class ManagerService extends IntentService
 			{
 				e.printStackTrace();
 			}
+			
+			Log.e("PR", "TONE URI: " + toneUri);
 
 			final Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), toneUri);
 
