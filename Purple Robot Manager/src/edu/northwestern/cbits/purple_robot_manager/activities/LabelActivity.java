@@ -42,24 +42,14 @@ public class LabelActivity extends SherlockFragmentActivity
 {
 	public static final String TIMESTAMP = "LABEL TIMESTAMP";
 	public static final String LABEL_CONTEXT = "LABEL_CONTEXT";
+	public static final String LABEL_KEY = "LABEL_KEY";
+
 	private double _timestamp = 0;
 	private String _labelContext = null;
 
 	protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
-        Bundle extras = this.getIntent().getExtras();
-        
-        if (extras.containsKey(LabelActivity.TIMESTAMP))
-        	this._timestamp = extras.getDouble(LabelActivity.TIMESTAMP);
-        else
-        	this._timestamp = System.currentTimeMillis();
-        
-        if (extras.containsKey(LabelActivity.LABEL_CONTEXT))
-        	this._labelContext = extras.getString(LabelActivity.LABEL_CONTEXT);
-        else
-        	this._labelContext = this.getString(R.string.label_unknown_context);
 
         this.setContentView(R.layout.layout_label_activity);
 
@@ -106,10 +96,28 @@ public class LabelActivity extends SherlockFragmentActivity
 		e.commit();
 	}
 
+	protected void onNewIntent(Intent intent)
+	{
+		super.onNewIntent(intent);
+		
+		this.setIntent(intent);
+	}
 
 	protected void onResume()
 	{
 		super.onResume();
+
+        Bundle extras = this.getIntent().getExtras();
+        
+        if (extras.containsKey(LabelActivity.TIMESTAMP))
+        	this._timestamp = extras.getDouble(LabelActivity.TIMESTAMP);
+        else
+        	this._timestamp = System.currentTimeMillis();
+        
+        if (extras.containsKey(LabelActivity.LABEL_CONTEXT))
+        	this._labelContext = extras.getString(LabelActivity.LABEL_CONTEXT);
+        else
+        	this._labelContext = this.getString(R.string.label_unknown_context);
 
 		ActionBar actionBar = this.getSupportActionBar();
 
@@ -125,6 +133,9 @@ public class LabelActivity extends SherlockFragmentActivity
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, this.savedLabels());
 
         label.setAdapter(adapter);
+        
+        if (extras.containsKey(LabelActivity.LABEL_KEY))
+        	label.setText(extras.getString(LabelActivity.LABEL_KEY));
 
         actionBar.setSubtitle(sdf.format(d));
         actionBar.setTitle(R.string.title_confirm_label);
