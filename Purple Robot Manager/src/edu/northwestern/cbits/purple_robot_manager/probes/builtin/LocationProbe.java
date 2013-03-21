@@ -14,6 +14,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Looper;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
@@ -160,6 +161,11 @@ public class LocationProbe extends Probe implements LocationListener
 
 				synchronized(this)
 				{
+					Looper looper = Looper.myLooper();
+					
+					if (looper == null)
+						Looper.prepare();
+					
 					long freq = Long.parseLong(prefs.getString("config_probe_location_frequency", "300000"));
 
 					if (now - this._lastCheck > 30000 && now - this._lastCheck < freq && this._listening) // Try to get position in 30 seconds...

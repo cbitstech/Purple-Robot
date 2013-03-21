@@ -130,7 +130,7 @@ public class NetworkProbe extends Probe
 												Enumeration<InetAddress> ips = iface.getInetAddresses();
 												InetAddress ipAddr = null;
 												
-												while ((ipAddr = ips.nextElement()) != null)
+												while (ips.hasMoreElements() && (ipAddr = ips.nextElement()) != null)
 												{
 													bundle.putString(NetworkProbe.IP_ADDRESS, ipAddr.getHostAddress());
 													bundle.putString(NetworkProbe.HOSTNAME, ipAddr.getHostName());

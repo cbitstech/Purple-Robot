@@ -13,12 +13,11 @@ import org.json.JSONException;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
-import android.content.SharedPreferences.Editor;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
@@ -52,8 +51,15 @@ public class LabelActivity extends SherlockFragmentActivity
 
         Bundle extras = this.getIntent().getExtras();
         
-        this._timestamp = extras.getDouble(LabelActivity.TIMESTAMP);
-        this._labelContext = extras.getString(LabelActivity.LABEL_CONTEXT);
+        if (extras.containsKey(LabelActivity.TIMESTAMP))
+        	this._timestamp = extras.getDouble(LabelActivity.TIMESTAMP);
+        else
+        	this._timestamp = System.currentTimeMillis();
+        
+        if (extras.containsKey(LabelActivity.LABEL_CONTEXT))
+        	this._labelContext = extras.getString(LabelActivity.LABEL_CONTEXT);
+        else
+        	this._labelContext = this.getString(R.string.label_unknown_context);
 
         this.setContentView(R.layout.layout_label_activity);
 

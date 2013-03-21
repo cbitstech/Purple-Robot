@@ -28,7 +28,7 @@ public class JSONConfigFile
 		{
 			JSONObject config = JSONConfigFile.jsonFromMap(PurpleRobotApplication.configuration(this._context));
 		
-			config.put("triggers", JSONConfigFile.jsonFromList(TriggerManager.triggerConfigurations(this._context)));
+			config.put("triggers", JSONConfigFile.jsonFromList(TriggerManager.getInstance().triggerConfigurations(this._context)));
 			config.put("probes", JSONConfigFile.jsonFromList(ProbeManager.probeConfigurations(this._context)));
 	
 			return config.toString();
