@@ -19,9 +19,14 @@ public class SchemeConfigFile
 		this._context = context;
 	}
 	
+	public String triggersScript(Context context)
+	{
+		return this.triggersList(TriggerManager.getInstance(context).triggerConfigurations(this._context)).first().toString();
+	}
+	
 	public String toString()
 	{
-		Pair rest = this.triggersList(TriggerManager.getInstance().triggerConfigurations(this._context));
+		Pair rest = this.triggersList(TriggerManager.getInstance(this._context).triggerConfigurations(this._context));
 		rest = new Pair(this.probesList(ProbeManager.probeConfigurations(this._context)), rest); 
 		rest = new Pair(this.configuration(this._context), rest); 
 		

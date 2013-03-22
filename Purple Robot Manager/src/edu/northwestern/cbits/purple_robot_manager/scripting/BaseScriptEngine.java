@@ -288,7 +288,7 @@ public abstract class BaseScriptEngine
 
 	public void resetTrigger(String triggerId)
 	{
-		for (Trigger trigger : TriggerManager.getInstance().triggersForId(triggerId))
+		for (Trigger trigger : TriggerManager.getInstance(this._context).triggersForId(triggerId))
 		{
 			trigger.reset(this._context);
 		}
@@ -296,7 +296,7 @@ public abstract class BaseScriptEngine
 
 	public void enableTrigger(String triggerId)
 	{
-		for (Trigger trigger : TriggerManager.getInstance().triggersForId(triggerId))
+		for (Trigger trigger : TriggerManager.getInstance(this._context).triggersForId(triggerId))
 		{
 			trigger.setEnabled(true);
 		}
@@ -304,7 +304,7 @@ public abstract class BaseScriptEngine
 
 	public void disableTrigger(String triggerId)
 	{
-		for (Trigger trigger : TriggerManager.getInstance().triggersForId(triggerId))
+		for (Trigger trigger : TriggerManager.getInstance(this._context).triggersForId(triggerId))
 		{
 			trigger.setEnabled(false);
 		}
@@ -615,7 +615,9 @@ public abstract class BaseScriptEngine
 	{
 		boolean found = false;
 		
-		for (Trigger trigger : TriggerManager.getInstance().triggersForId(triggerId))
+		params.put("identifier", triggerId);
+		
+		for (Trigger trigger : TriggerManager.getInstance(this._context).triggersForId(triggerId))
 		{
 			trigger.updateFromMap(this._context, params);
 			
@@ -626,7 +628,7 @@ public abstract class BaseScriptEngine
 		{
 			Trigger t = Trigger.parse(this._context, params);
 
-			TriggerManager.getInstance().addTrigger(t);
+			TriggerManager.getInstance(this._context).addTrigger(this._context, t);
 
 			found = true;
 		}
@@ -752,8 +754,6 @@ public abstract class BaseScriptEngine
 	
 	public void scheduleScript(String identifier, String dateString, String action)
 	{
-		Log.e("PN-SCH", "SCHEDULE " + identifier + " " + dateString + " --> " + action);
-		
 		ScheduleManager.updateScript(this._context, identifier, dateString, action);
 	}
 

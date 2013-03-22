@@ -215,7 +215,7 @@ public class LegacyJSONConfigFile
 								edit.putString(LegacyJSONConfigFile.JSON_CONFIGURATION, scriptString);
 								edit.commit();
 	
-								TriggerManager.getInstance().removeAllTriggers();
+								TriggerManager.getInstance(context).removeAllTriggers();
 								
 								next = new Runnable()
 								{
@@ -318,7 +318,7 @@ public class LegacyJSONConfigFile
 						edit.putString(LegacyJSONConfigFile.JSON_CONFIGURATION, "{}");
 						edit.commit();
 
-						TriggerManager.getInstance().removeAllTriggers();
+						TriggerManager.getInstance(context).removeAllTriggers();
 					}					
 				}
 			}
@@ -363,7 +363,7 @@ public class LegacyJSONConfigFile
 
 		}
 		
-		TriggerManager.getInstance().updateTriggers(triggerList);
+		TriggerManager.getInstance(context).updateTriggers(context, triggerList);
 	}
 
 	public static LegacyJSONConfigFile getSharedFile(Context context)

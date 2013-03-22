@@ -22,7 +22,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 public class ManagerService extends IntentService
 {
@@ -131,8 +130,6 @@ public class ManagerService extends IntentService
 				e.printStackTrace();
 			}
 			
-			Log.e("PR", "TONE URI: " + toneUri);
-
 			final Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), toneUri);
 
 			if (r != null)
@@ -222,7 +219,7 @@ public class ManagerService extends IntentService
 			}
 		}
 		else if (PERIODIC_CHECK_INTENT.equals(intent.getAction()))
-			TriggerManager.getInstance().nudgeTriggers(this);
+			TriggerManager.getInstance(this).nudgeTriggers(this);
 		else if (REFRESH_CONFIGURATION.equals(intent.getAction()))
 			LegacyJSONConfigFile.update(this);
 	}

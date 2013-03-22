@@ -241,6 +241,7 @@ public class DateTrigger extends Trigger
 		config.put(DateTrigger.DATETIME_END, this._end);
 		config.put(DateTrigger.DATETIME_REPEATS, this._repeats);
 		config.put(DateTrigger.DATETIME_RANDOM, this._random);
+		config.put("type", DateTrigger.TYPE_NAME);
 		
 		return config;
 	}

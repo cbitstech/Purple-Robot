@@ -72,6 +72,7 @@ public class ProbeTrigger extends Trigger
 		
 		config.put(ProbeTrigger.TRIGGER_TEST, this._test);
 		config.put(ProbeTrigger.TRIGGER_FREQUENCY, this._frequency);
+		config.put("type", ProbeTrigger.TYPE_NAME);
 		
 		return config;
 	}
