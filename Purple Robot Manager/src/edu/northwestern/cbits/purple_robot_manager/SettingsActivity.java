@@ -67,7 +67,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
         PreferenceCategory category = (PreferenceCategory) prefs.findPreference("config_settings_probe_category");
         category.addPreference(probesScreen);
 
-        PreferenceScreen triggersScreen = TriggerManager.getInstance().buildPreferenceScreen(this);
+        PreferenceScreen triggersScreen = TriggerManager.getInstance(this).buildPreferenceScreen(this);
 
         PreferenceCategory triggerCategory = (PreferenceCategory) prefs.findPreference("config_settings_trigger_category");
         triggerCategory.addPreference(triggersScreen);

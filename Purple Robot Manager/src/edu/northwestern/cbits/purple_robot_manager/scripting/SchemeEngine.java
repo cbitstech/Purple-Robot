@@ -1,9 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager.scripting;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import jscheme.JScheme;
 import jsint.DynamicEnvironment;
@@ -15,7 +13,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
-import edu.northwestern.cbits.purple_robot_manager.ScheduleManager;
 import edu.northwestern.cbits.purple_robot_manager.config.SchemeConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.Feature;
 
@@ -58,24 +55,28 @@ public class SchemeEngine extends BaseScriptEngine
 	{
 		Map<String, Object> paramsMap = SchemeEngine.parsePairList(parameters);
 		paramsMap.put("identifier", triggerId);
-
-		Iterator<Entry<String, Object>> it = paramsMap.entrySet().iterator();
-
-		while (it.hasNext())
-		{
-			Entry<String, Object> entry = it.next();
-			
-			paramsMap.put(entry.getKey(), entry.getValue());
-		}
 		
 		return this.updateTrigger(triggerId, paramsMap);
 	}
-	
+
+	public boolean updateTrigger(Pair parameters)
+	{
+		Map<String, Object> paramsMap = SchemeEngine.parsePairList(parameters);
+
+		if (paramsMap.containsKey("identifier"))
+		{
+			String triggerId = paramsMap.get("identifier").toString();
+			
+			return this.updateTrigger(triggerId, paramsMap);
+		}
+		
+		return false;
+	}
+
 	public void scheduleScript(String identifier, String dateString, Pair action)
 	{
 		super.scheduleScript(identifier, dateString, action.toString());
 	}
-
 	
 	public boolean updateProbe(Pair params)
 	{

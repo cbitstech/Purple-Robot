@@ -138,7 +138,7 @@ public abstract class Trigger
 		return config;
 	}
 
-	public boolean updateFromMap(Context _context, Map<String, Object> params) 
+	public boolean updateFromMap(Context context, Map<String, Object> params) 
 	{
 		if (params.containsKey("name"))
 			this._name = params.get("name").toString();
@@ -148,6 +148,8 @@ public abstract class Trigger
 
 		if (params.containsKey("identifier"))
 			this._identifier = params.get("identifier").toString();
+		
+		TriggerManager.getInstance(context).persistTriggers(context);
 
 		return true;
 	}

@@ -60,7 +60,7 @@ public class PersistentService extends Service
 				if (NUDGE_PROBES.equals(intent.getAction()))
 				{
 					ProbeManager.nudgeProbes(this);
-					TriggerManager.getInstance().refreshTriggers(this);
+					TriggerManager.getInstance(this).refreshTriggers(this);
 					ScheduleManager.runOverdueScripts(this);
 				}
 				else if (ContinuousProbe.WAKE_ACTION.equals(intent.getAction()))
