@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,7 +21,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.content.LocalBroadcastManager;
 import android.view.WindowManager.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -36,6 +34,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 
 @SuppressLint("SimpleDateFormat")
 public class LabelActivity extends SherlockFragmentActivity
@@ -81,6 +80,31 @@ public class LabelActivity extends SherlockFragmentActivity
         return labels;
 	}
 
+	private String[] savedValues()
+	{
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        String[] values = new String[0];
+        
+        try 
+        {
+			JSONArray jsonValues = new JSONArray(prefs.getString("list_value_values", "[]"));
+			
+			values = new String[jsonValues.length()];
+			
+			for (int i = 0; i < jsonValues.length(); i++)
+			{
+				values[i] = jsonValues.getString(i);
+			}
+		}
+        catch (JSONException e) 
+        {
+			e.printStackTrace();
+		}
+        
+        return values;
+	}
+	
 	private void saveLabels(String[] labels) 
 	{
 		JSONArray array = new JSONArray();
@@ -96,6 +120,22 @@ public class LabelActivity extends SherlockFragmentActivity
 		e.commit();
 	}
 
+	private void saveValues(String[] values) 
+	{
+		JSONArray array = new JSONArray();
+		
+		for (String value : values)
+			array.put(value);
+		
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		Editor e = prefs.edit();
+		
+		e.putString("list_value_values", array.toString());
+		
+		e.commit();
+	}
+
+	
 	protected void onNewIntent(Intent intent)
 	{
 		super.onNewIntent(intent);
@@ -137,6 +177,12 @@ public class LabelActivity extends SherlockFragmentActivity
         if (extras.containsKey(LabelActivity.LABEL_KEY))
         	label.setText(extras.getString(LabelActivity.LABEL_KEY));
 
+        final AutoCompleteTextView value = (AutoCompleteTextView) this.findViewById(R.id.text_value_text);
+        ArrayAdapter<String> valueAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, this.savedValues());
+        value.setAdapter(valueAdapter);
+        
+        value.requestFocus();
+
         actionBar.setSubtitle(sdf.format(d));
         actionBar.setTitle(R.string.title_confirm_label);
     }
@@ -163,32 +209,22 @@ public class LabelActivity extends SherlockFragmentActivity
 
     			if (key != null && value != null && key.length() > 0 && value.length() > 0)
     			{
-    				Bundle bundle = new Bundle();
-    				bundle.putString("PROBE", "edu.northwestern.cbits.purple_robot_manager.Label");
-    				bundle.putDouble("TIMESTAMP", this._timestamp / 1000);
-
-    				bundle.putString("KEY", key);
-    				bundle.putString("VALUE", value);
-
-    				UUID uuid = UUID.randomUUID();
-    				bundle.putString("GUID", uuid.toString());
-
-    				LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(this);
-    				Intent intent = new Intent(edu.northwestern.cbits.purple_robot_manager.probes.Probe.PROBE_READING);
-    				intent.putExtras(bundle);
-
-    				localManager.sendBroadcast(intent);
+    				JavaScriptEngine js = new JavaScriptEngine(this);
+    				js.emitReading(key, value);
     				
     				List<String> labels = new ArrayList<String>(Arrays.asList(this.savedLabels()));
-    				
     				labels.remove(key);
     				labels.add(0, key);
-    				
     				String[] labelsArray = labels.toArray(new String[0]);
-    				
     				this.saveLabels(labelsArray);
 
-        			this.finish();
+    				List<String> values = new ArrayList<String>(Arrays.asList(this.savedValues()));
+    				values.remove(value);
+    				values.add(0, value);
+    				String[] valuesArray = values.toArray(new String[0]);
+    				this.saveValues(valuesArray);
+
+    				this.finish();
     			}
     			else
     			{

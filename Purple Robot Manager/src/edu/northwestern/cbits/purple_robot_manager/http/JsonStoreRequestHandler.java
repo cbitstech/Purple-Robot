@@ -71,7 +71,7 @@ public class JsonStoreRequestHandler implements HttpRequestHandler
             {
 				try 
 				{
-    				JavaScriptEngine engine = new JavaScriptEngine(this._context, null);
+    				JavaScriptEngine engine = new JavaScriptEngine(this._context);
 
 	            	String action = arguments.getString("action");
 

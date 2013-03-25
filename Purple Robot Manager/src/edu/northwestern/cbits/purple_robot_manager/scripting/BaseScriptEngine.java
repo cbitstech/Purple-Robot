@@ -791,9 +791,9 @@ public abstract class BaseScriptEngine
 		}
 		else if (JavaScriptEngine.canRun(script))
 		{
-			JavaScriptEngine engine = new JavaScriptEngine(context, objects);
+			JavaScriptEngine engine = new JavaScriptEngine(context);
 			
-			return engine.runScript(script);
+			return engine.runScript(script, "extras", objects);
 		}
 		
 		return null;
