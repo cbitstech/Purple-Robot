@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jsint.BacktraceException;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,7 +51,7 @@ public class ScheduleManager
 					BaseScriptEngine.runScript(context, action);
 				}
 			}
-			catch (ParseException e) 
+			catch (Exception e) 
 			{
 				e.printStackTrace();
 
