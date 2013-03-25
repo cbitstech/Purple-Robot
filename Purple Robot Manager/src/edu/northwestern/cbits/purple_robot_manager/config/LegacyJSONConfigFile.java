@@ -227,7 +227,7 @@ public class LegacyJSONConfigFile
 											{
 												String script = json.getString(LegacyJSONConfigFile.JSON_INIT_SCRIPT);
 												
-												JavaScriptEngine engine = new JavaScriptEngine(context, null);
+												JavaScriptEngine engine = new JavaScriptEngine(context);
 												
 												engine.runScript(script);
 											}

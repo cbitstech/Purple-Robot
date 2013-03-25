@@ -18,10 +18,11 @@
         android:layout_height="48dp"
 		android:completionThreshold="1"
         android:hint="@string/text_label_label_placeholder" />
-    <EditText
+    <AutoCompleteTextView
         android:id="@+id/text_value_text"
         android:layout_width="fill_parent"
         android:layout_height="48dp"
+		android:completionThreshold="1"
         android:hint="@string/text_label_value_placeholder" />
     <TextView
         android:id="@+id/text_label_context"

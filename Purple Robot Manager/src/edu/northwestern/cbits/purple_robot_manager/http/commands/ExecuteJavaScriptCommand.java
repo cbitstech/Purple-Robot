@@ -29,7 +29,7 @@ public class ExecuteJavaScriptCommand extends JSONCommand
 			{
 				String script = this._arguments.getString(ExecuteJavaScriptCommand.SCRIPT);
 				
-				JavaScriptEngine engine = new JavaScriptEngine(this._context, null);
+				JavaScriptEngine engine = new JavaScriptEngine(this._context);
 				
 				Object o = engine.runScript(script);
 
