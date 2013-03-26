@@ -8,22 +8,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jsint.BacktraceException;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
+import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
 public class ScheduleManager 
 {
 	private static final String DATE_FORMAT = "yyyyMMdd'T'HHmmss";
+	
+	public static String formatString(Date date)
+	{
+		SimpleDateFormat sdf = new SimpleDateFormat(ScheduleManager.DATE_FORMAT);
+
+		return sdf.format(date);
+	}
 
 	public static void runOverdueScripts(Context context) 
 	{
@@ -160,5 +164,31 @@ public class ScheduleManager
 		}
 		
 		ScheduleManager.persistScripts(context, scripts);
+	}
+	
+	public static Date clearMillis(Date d)
+	{
+		long time = d.getTime();
+		
+		time = time - (time % 1000);
+		
+		return new Date(time);
+	}
+
+	public static Date parseString(String dateString) 
+	{
+		SimpleDateFormat sdf = new SimpleDateFormat(ScheduleManager.DATE_FORMAT);
+		
+		try 
+		{
+			return ScheduleManager.clearMillis(sdf.parse(dateString));
+			
+		} 
+		catch (ParseException e) 
+		{
+			e.printStackTrace();
+			
+			return null;
+		}
 	}
 }

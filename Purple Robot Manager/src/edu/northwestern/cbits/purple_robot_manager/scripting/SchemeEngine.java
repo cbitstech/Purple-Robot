@@ -1,20 +1,20 @@
 package edu.northwestern.cbits.purple_robot_manager.scripting;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import jscheme.JScheme;
 import jsint.DynamicEnvironment;
 import jsint.Evaluator;
-import jsint.InputPort;
 import jsint.Pair;
-import jsint.Scheme;
 import jsint.Symbol;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
+import edu.northwestern.cbits.purple_robot_manager.ScheduleManager;
 import edu.northwestern.cbits.purple_robot_manager.config.SchemeConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.Feature;
 
@@ -264,4 +264,51 @@ public class SchemeEngine extends BaseScriptEngine
 		
 		return config.toString();
 	}
+
+	public Pair dateToComponents(Date date)
+	{
+		String stringRep = this.formatDate(date);
+		
+		String year = stringRep.substring(0, 4);
+		String month = stringRep.substring(4, 6);
+		String day = stringRep.substring(6, 8);
+		String hour = stringRep.substring(9, 11);
+		String minute = stringRep.substring(11, 13);
+		String second = stringRep.substring(13, 15);
+
+		return new Pair(year, new Pair(month, new Pair(day, new Pair(hour, new Pair(minute, new Pair(second, null))))));
+	}
+
+	public Date dateFromComponents(Pair components)
+	{
+
+		String year = components.nth(0).toString();
+		String month = components.nth(1).toString();
+		String day = components.nth(2).toString();
+		String hour = components.nth(3).toString();
+		String minute = components.nth(4).toString();
+		String second = components.nth(5).toString();
+		
+		String dateString = year + month + day + "T" + hour + minute + second;
+		
+		return ScheduleManager.parseString(dateString);
+	}
+
+	public Object nth(int index, Object obj)
+	{
+		if (obj == null)
+			return null;
+		else if (index < 0)
+			return null;
+		else if ((obj instanceof Pair) == false)
+			return null;
+		
+		Pair list = (Pair) obj;
+		
+		if (index == 0)
+			return list.first();
+		
+		return this.nth(index - 1, list.rest());
+	}		
 }
+

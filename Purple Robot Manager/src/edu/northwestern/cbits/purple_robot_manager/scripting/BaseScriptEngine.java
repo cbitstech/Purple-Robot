@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -52,6 +54,7 @@ public abstract class BaseScriptEngine
 	protected static String SCRIPT_ENGINE_PERSISTENCE_PREFIX = "purple_robot_script_persist_prefix_";
 
 	private static final int NOTIFICATION_ID = 1;
+	private static String LOG_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";
 
 	protected Context _context = null;
 	private static Map<String, String> packageMap = null;
@@ -63,9 +66,31 @@ public abstract class BaseScriptEngine
 		this._context = context;
 	}
 	
-	public void log(String message)
+	public Date dateFromTimestamp(long epoch)
 	{
-		Log.e("PRM." + this.language(), message);
+		return new Date(epoch);
+	}
+
+	public String formatDate(Date date)
+	{
+		return ScheduleManager.formatString(date);
+	}
+
+	public Date parseDate(String dateString)
+	{
+		return ScheduleManager.parseString(dateString);
+	}
+
+	public Date now()
+	{
+		return ScheduleManager.clearMillis(new Date());
+	}
+
+	public void log(Object message)
+	{
+		SimpleDateFormat sdf = new SimpleDateFormat(BaseScriptEngine.LOG_DATE_FORMAT);
+		
+		Log.e("PRM." + this.language(), sdf.format(new Date()) + ": " + message.toString());
 	}
 	
 	public void playDefaultTone()
