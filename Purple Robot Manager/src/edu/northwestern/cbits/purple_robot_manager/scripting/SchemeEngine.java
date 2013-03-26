@@ -6,7 +6,9 @@ import java.util.Map;
 import jscheme.JScheme;
 import jsint.DynamicEnvironment;
 import jsint.Evaluator;
+import jsint.InputPort;
 import jsint.Pair;
+import jsint.Scheme;
 import jsint.Symbol;
 import android.content.Context;
 import android.content.Intent;
@@ -37,11 +39,12 @@ public class SchemeEngine extends BaseScriptEngine
 
 	public Object evaluateSource(String source)
 	{
-		DynamicEnvironment env = new DynamicEnvironment();
+		Evaluator eval = new Evaluator();
+
+		DynamicEnvironment env = new DynamicEnvironment(eval.getInitialEnvironment());
 		env.setValue(Symbol.intern("PurpleRobot"), this);
-		Evaluator eval = new Evaluator(env);
 		
-		JScheme scheme = new JScheme(eval);
+		JScheme scheme = new JScheme(new Evaluator(env));
 		
 		return scheme.eval(source);
 	}

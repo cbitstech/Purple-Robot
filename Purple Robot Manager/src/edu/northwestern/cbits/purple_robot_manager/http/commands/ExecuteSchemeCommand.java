@@ -37,6 +37,8 @@ public class ExecuteSchemeCommand extends JSONCommand
 		}
 		catch (Exception e) 
 		{
+			e.printStackTrace();
+			
 			try 
 			{
 				result.put(JSONCommand.STATUS, JSONCommand.STATUS_ERROR);
