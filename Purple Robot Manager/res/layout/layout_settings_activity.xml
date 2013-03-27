@@ -119,7 +119,7 @@
             android:entryValues="@array/json_refresh_interval_values"
             android:title="@string/config_json_refresh_interval_label"
             android:summary="@string/config_json_refresh_interval_message"
-            android:defaultValue="60" />
+            android:defaultValue="3600" />
    		<Preference android:title="@string/config_refresh_json_label"
             android:key="config_json_refresh_manually"
             android:defaultValue="0" />
