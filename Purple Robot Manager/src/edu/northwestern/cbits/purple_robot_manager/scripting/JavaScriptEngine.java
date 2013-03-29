@@ -293,5 +293,13 @@ public class JavaScriptEngine extends BaseScriptEngine
 		
 		return config.toString();
 	}
+	
+	public boolean updateConfig(NativeObject nativeObj)
+	{
+		Map<String, Object> paramsMap = JavaScriptEngine.nativeToMap(nativeObj);
+		
+		return super.updateConfig(paramsMap);
+	}
+
 
 }

@@ -824,7 +824,7 @@ public abstract class BaseScriptEngine
 		return null;
 	}
 
-	public boolean updateConfigUrl(Map<String, Object> config) 
+	public boolean updateConfig(Map<String, Object> config) 
 	{
 		return PurpleRobotApplication.updateFromMap(this._context, config);
 	}
