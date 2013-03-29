@@ -1,5 +1,6 @@
 package edu.northwestern.cbits.purple_robot_manager.plugins;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONException;
@@ -32,7 +33,7 @@ public class TriggerOutputPlugin extends OutputPlugin
 
 		synchronized(this)
 		{
-			List<Trigger> triggers = TriggerManager.getInstance(context).allTriggers();
+			List<Trigger> triggers = new ArrayList<Trigger>(TriggerManager.getInstance(context).allTriggers());
 	
 			for (Trigger trigger : triggers)
 			{
