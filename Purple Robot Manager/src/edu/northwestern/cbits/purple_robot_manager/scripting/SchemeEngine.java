@@ -188,7 +188,7 @@ public class SchemeEngine extends BaseScriptEngine
 	{
 		Map<String, Object> paramsMap = SchemeEngine.parsePairList(parameters);
 		
-		return super.updateConfigUrl(paramsMap);
+		return super.updateConfig(paramsMap);
 	}
 
 	public void updateWidget(Pair parameters)
