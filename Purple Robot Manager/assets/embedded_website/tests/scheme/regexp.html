@@ -1,0 +1,56 @@
+<html>
+	<head>
+		<title>Scheme Regular Expressions Test</title>
+		<script type="text/javascript" src="/js/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function ()
+			{
+				var json = {};
+				json.command = "execute_scheme";
+				json.source  = "(let* ((n0-255 \"(?x: \\\\d | \\\\d\\\\d | [01]\\\\d\\\\d | 2[0-4]\\\\d | 25[0-5])\")";
+				json.source += "       (ip-re (string-append \"(?![0.]*$)^\"";
+				json.source += "                             n0-255";
+				json.source += "                             \"(?x:\\\\.\"";
+				json.source += "                             n0-255";
+				json.source += "                             \"){3}$\")))";
+				json.source += "      (list (pregexp-match ip-re \"1.2.3.4\")";
+				json.source += "            (pregexp-match ip-re \"55.155.255.265\")";	
+				json.source += "            (pregexp-match ip-re \"0.00.000.00\")))";
+
+				var post_data = {};
+				post_data.json = JSON.stringify(json);
+
+				$.ajax("/json/submit", {
+					type: "POST",
+					contentType: "application/x-www-form-urlencoded; charset=UTF-8", 
+					data: post_data,
+					success: function(data)
+					{
+						alert("Results: " + data.payload);
+					},
+					error: function(jqXHR, textStatus, errorThrown) 
+					{ 
+						alert("Error running tests: " + errorThrown);
+					}
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<h1>Scheme Regular Expressions Test</h1>
+		
+		<p>Run regular expression tests using the <a href="http://www.ccs.neu.edu/home/dorai/pregexp/" target="_blank">pregexp library</a>.</p>
+		
+		<h2>Test Command</h2>
+<pre>
+(let* ((n0-255 "(?x: \\d | \\d\\d | [01]\\d\\d | 2[0-4]\\d | 25[0-5])")
+       (ip-re (string-append ""(?![0.]*$)^" n0-255 "(?x:\\." n0-255 "){3}$")))
+      (list (pregexp-match ip-re "1.2.3.4") 
+            (pregexp-match ip-re "55.155.255.265")	
+            (pregexp-match ip-re "0.00.000.00")))
+</pre>
+		<p><a href="http://www.ccs.neu.edu/home/dorai/pregexp/index-Z-H-4.html#node_sec_4" target="_blank">Example source</a>.</p>
+	</body>
+</html>
+	
+	

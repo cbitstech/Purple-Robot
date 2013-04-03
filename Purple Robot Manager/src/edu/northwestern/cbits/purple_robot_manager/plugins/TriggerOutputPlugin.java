@@ -45,7 +45,7 @@ public class TriggerOutputPlugin extends OutputPlugin
 					try
 					{
 						if (probeTrigger.matches(context, OutputPlugin.jsonForBundle(intent.getExtras())))
-							trigger.execute(context);
+							trigger.execute(context, false);
 					}
 					catch (JSONException e)
 					{

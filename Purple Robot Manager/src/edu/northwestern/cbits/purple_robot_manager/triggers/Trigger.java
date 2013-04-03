@@ -10,6 +10,7 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.CodeViewerActivity;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
@@ -40,8 +41,10 @@ public abstract class Trigger
 		this._enabled = enabled;
 	}
 
-	public void execute(final Context context)
+	public void execute(final Context context, boolean force)
 	{
+		Log.e("PR", "EXECUTING: " + this._action);
+		
 		if (this._enabled && this._action != null)
 		{
 			final Trigger me = this;
@@ -77,7 +80,9 @@ public abstract class Trigger
 		{
 			Trigger t = (Trigger) obj;
 			
-			if (t._identifier != null && t._identifier.equals(this._identifier))
+			if ((t._identifier == null || this._identifier == null) && (t._name != null && t._name.equals(this._name)))
+				return true;
+			else if (t._identifier != null && t._identifier.equals(this._identifier))
 				return true;
 		}
 		
@@ -148,7 +153,11 @@ public abstract class Trigger
 		{
 			public boolean onPreferenceClick(Preference preference) 
 			{
-				me.execute(activity);
+				Log.e("PR", "EXECUTE " + me._name);
+				
+				me.execute(activity, true);
+
+				Log.e("PR", "EXECUTED " + me._name);
 
 				return true;
 			}
@@ -175,10 +184,23 @@ public abstract class Trigger
 	{
 		Map<String, Object> config = new HashMap<String,Object>();
 		
-		config.put("action", this._action);
-		config.put("identifier", this._identifier);
 		config.put("name", this._name);
 		
+		if (this._identifier != null)
+			config.put("identifier", this._identifier);
+		else
+			config.put("identifier", "unspecified-identifier");
+
+		if (this._action != null)
+			config.put("action", this._action);
+		else
+			config.put("action", "");
+
+		if (this._name != null)
+			config.put("name", this._name);
+		else
+			config.put("name", context.getString(R.string.name_anonymous_trigger));
+
 		return config;
 	}
 
@@ -191,7 +213,16 @@ public abstract class Trigger
 			this._action = params.get("action").toString();
 
 		if (params.containsKey("identifier"))
-			this._identifier = params.get("identifier").toString();
+		{
+			try
+			{
+				this._identifier = params.get("identifier").toString();
+			}
+			catch (NullPointerException e)
+			{
+				this._identifier = "unspecified-identifier";
+			}
+		}
 		
 		TriggerManager.getInstance(context).persistTriggers(context);
 

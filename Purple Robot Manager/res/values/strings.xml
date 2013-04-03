@@ -155,6 +155,8 @@
 
     <string name="title_preference_probes_enable_probes">Enable Probes</string>
 
+    <string name="name_anonymous_trigger">Anonymous Trigger</string>
+    
     <string name="title_preference_probes_available_category">Available Probes</string>
 
     <string name="title_enable_probe">Enable Probe</string>
