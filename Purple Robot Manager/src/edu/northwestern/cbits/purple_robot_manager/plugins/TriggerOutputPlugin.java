@@ -33,7 +33,8 @@ public class TriggerOutputPlugin extends OutputPlugin
 
 		synchronized(this)
 		{
-			List<Trigger> triggers = new ArrayList<Trigger>(TriggerManager.getInstance(context).allTriggers());
+			List<Trigger> triggers = new ArrayList<Trigger>();
+			triggers.addAll(TriggerManager.getInstance(context).allTriggers());
 	
 			for (Trigger trigger : triggers)
 			{

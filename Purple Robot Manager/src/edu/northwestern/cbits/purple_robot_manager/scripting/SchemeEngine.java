@@ -2,6 +2,7 @@ package edu.northwestern.cbits.purple_robot_manager.scripting;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import jscheme.JScheme;
@@ -310,5 +311,53 @@ public class SchemeEngine extends BaseScriptEngine
 		
 		return this.nth(index - 1, list.rest());
 	}		
+	
+	public Object valueFromString(String key, String string)
+	{
+		Object value = super.valueFromString(key, string);
+		
+		if (value instanceof Map<?, ?>)
+			value = this.pairForMap((Map<?, ?>) value);
+		else if (value instanceof List<?>)
+			value = this.pairForList((List<?>) value);
+		
+		return value;
+	}
+	
+	private Pair pairForMap(Map<?, ?> map)
+	{
+		Pair list = Pair.EMPTY;
+		
+		for (Object key : map.keySet())
+		{
+			Object value = map.get(key.toString());
+			
+			if (value instanceof Map<?, ?>)
+				value = this.pairForMap((Map<?, ?>) value);
+			else if (value instanceof List<?>)
+				value = this.pairForList((List<?>) value);
+			
+			list = new Pair(new Pair(key, value), list);
+		}
+		
+		return new Pair(new Pair(Symbol.QUOTE, new Pair(list, Pair.EMPTY)), Pair.EMPTY);
+	}
+	
+	private Pair pairForList(List<?> list)
+	{
+		Pair pairs = Pair.EMPTY;
+		
+		for (Object value : list)
+		{
+			if (value instanceof Map<?, ?>)
+				value = this.pairForMap((Map<?, ?>) value);
+			else if (value instanceof List<?>)
+				value = this.pairForList((List<?>) value);
+
+			pairs = new Pair(value, pairs);
+		}
+
+		return new Pair(Symbol.QUOTE, new Pair(pairs, Pair.EMPTY));
+	}
 }
 
