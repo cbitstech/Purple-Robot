@@ -62,7 +62,7 @@ public class TriggerManager
 				}
 				
 				if (execute)
-					trigger.execute(context);
+					trigger.execute(context, false);
 			}
 		}
 	}

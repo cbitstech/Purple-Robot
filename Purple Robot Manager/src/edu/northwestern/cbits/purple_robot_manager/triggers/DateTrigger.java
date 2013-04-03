@@ -85,6 +85,9 @@ public class DateTrigger extends Trigger
 				{
 					me.refreshCalendar();
 					
+					if (me._calendar == null)
+						return;
+					
 					ArrayList<Date> upcoming = new ArrayList<Date>();
 					
 					long now = System.currentTimeMillis();
@@ -93,6 +96,8 @@ public class DateTrigger extends Trigger
 					long maxCount = 64;
 
 					long hour = 1000 * 60 * 60;
+					
+					Date currentDate = new Date(now);
 
 					while (current - now < (hour * 48) && upcoming.size() < maxCount)
 					{
@@ -117,8 +122,11 @@ public class DateTrigger extends Trigger
 										
 										Date start = p.getRangeStart();
 										
-										if (upcoming.contains(start) == false)
-											upcoming.add(start);
+										if (start.after(currentDate))
+										{
+											if (upcoming.contains(start) == false)
+												upcoming.add(start);
+										}
 									}
 								}
 							} 
@@ -181,6 +189,9 @@ public class DateTrigger extends Trigger
 	
 	private void refreshCalendar()
 	{
+		if (this._icalString == null)
+			return;
+		
 		StringReader sin = new StringReader(this._icalString);
 
 		CalendarBuilder builder = new CalendarBuilder();
@@ -312,7 +323,7 @@ public class DateTrigger extends Trigger
 		return null;
 	}
 
-	public void execute(Context context)
+	public void execute(Context context, boolean force)
 	{
 		long now = System.currentTimeMillis();
 
@@ -322,7 +333,7 @@ public class DateTrigger extends Trigger
 
 		String key = "last_fired_" + this.identifier();
 
-		if (p != null)
+		if (p != null && force == false)
 		{
 			long lastFired = prefs.getLong(key, 0);
 
@@ -361,7 +372,7 @@ public class DateTrigger extends Trigger
 		edit.putLong(key, now);
 		edit.commit();
 
-		super.execute(context);
+		super.execute(context, force);
 	}
 
 	public boolean matches(Context context, Object obj)
