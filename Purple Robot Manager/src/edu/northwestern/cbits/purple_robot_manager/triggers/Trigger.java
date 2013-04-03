@@ -4,10 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.content.Context;
+import android.content.Intent;
+import android.preference.Preference;
+import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.CodeViewerActivity;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
 public abstract class Trigger
@@ -96,7 +100,7 @@ public abstract class Trigger
 		// Default implementation does nothing...
 	}
 
-	public PreferenceScreen preferenceScreen(PreferenceActivity activity) 
+	public PreferenceScreen preferenceScreen(final PreferenceActivity activity) 
 	{
 		PreferenceManager manager = activity.getPreferenceManager();
 
@@ -111,6 +115,46 @@ public abstract class Trigger
 			type = activity.getString(R.string.type_trigger_datetime);
 		
 		screen.setSummary(type);
+
+		final Trigger me = this;
+
+		Preference viewAction = new Preference(activity);
+		viewAction.setTitle(R.string.label_trigger_show_action);
+		viewAction.setSummary(R.string.label_trigger_show_action_desc);
+		viewAction.setOrder(Integer.MAX_VALUE);
+		
+		viewAction.setOnPreferenceClickListener(new OnPreferenceClickListener()
+		{
+			public boolean onPreferenceClick(Preference preference) 
+			{
+				Intent intent = new Intent(activity, CodeViewerActivity.class);
+				intent.putExtra(CodeViewerActivity.SOURCE_CODE, me._action);
+				intent.putExtra(CodeViewerActivity.TITLE, me.name());
+				
+				activity.startActivity(intent);
+
+				return true;
+			}
+		});
+		
+		screen.addPreference(viewAction);
+		
+		Preference fireNow = new Preference(activity);
+		fireNow.setTitle(R.string.label_trigger_fire_now);
+		fireNow.setSummary(R.string.label_trigger_fire_now_desc);
+		fireNow.setOrder(Integer.MAX_VALUE / 2);
+		
+		fireNow.setOnPreferenceClickListener(new OnPreferenceClickListener()
+		{
+			public boolean onPreferenceClick(Preference preference) 
+			{
+				me.execute(activity);
+
+				return true;
+			}
+		});
+		
+		screen.addPreference(fireNow);
 
 		return screen;
 	}

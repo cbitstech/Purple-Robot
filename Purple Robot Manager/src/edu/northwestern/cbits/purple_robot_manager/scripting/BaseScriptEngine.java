@@ -5,12 +5,17 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
@@ -827,5 +832,89 @@ public abstract class BaseScriptEngine
 	public boolean updateConfig(Map<String, Object> config) 
 	{
 		return PurpleRobotApplication.updateFromMap(this._context, config);
+	}
+
+	public Object valueFromString(String key, String string) 
+	{
+		try 
+		{
+			JSONObject json = new JSONObject(string);
+			
+			if (json.has(key))
+			{
+				Object value = json.get(key);
+				
+				if (value instanceof JSONObject)
+					value = this.jsonToMap((JSONObject) value);
+				else if (value instanceof JSONArray)
+					value = this.jsonToList((JSONArray) value);
+				
+				return value;
+			}
+		}
+		catch (JSONException e) 
+		{
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	private Map<String, Object> jsonToMap(JSONObject object) 
+	{
+		Map<String, Object> map = new HashMap<String, Object>();
+		
+		Iterator<String> keys = object.keys();
+
+		while (keys.hasNext())
+		{
+			String key = keys.next();
+
+			try 
+			{
+				Object value = object.get(key);
+
+				if (value instanceof JSONObject)
+					value = this.jsonToMap((JSONObject) value);
+				else if (value instanceof JSONArray)
+					value = this.jsonToList((JSONArray) value);
+				
+				map.put(key, value);
+			}
+			catch (JSONException e) 
+			{
+				e.printStackTrace();
+			}
+		}
+
+		return map;
+	}
+
+	private List<Object> jsonToList(JSONArray array) 
+	{
+		List<Object> list = new ArrayList<Object>();
+		
+		for (int i = 0; i < array.length(); i++)
+		{
+			try 
+			{
+				Object value = array.get(i);
+
+				if (value instanceof JSONObject)
+					value = this.jsonToMap((JSONObject) value);
+				else if (value instanceof JSONArray)
+					value = this.jsonToList((JSONArray) value);
+			
+				list.add(value);
+			}
+			catch (JSONException e) 
+			{
+				e.printStackTrace();
+			}
+			
+		}
+
+		return list;
 	}
 }

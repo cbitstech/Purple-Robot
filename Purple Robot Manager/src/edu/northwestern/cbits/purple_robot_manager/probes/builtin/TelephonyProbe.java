@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.os.Looper;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
@@ -117,6 +118,11 @@ public class TelephonyProbe extends Probe
 		{
 			if (this._listener == null)
 			{
+				Looper looper = Looper.myLooper();
+				
+				if (looper == null)
+					Looper.prepare();
+
 				this._listener = new PhoneStateListener()
 				{
 					public void onCallForwardingIndicatorChanged(boolean forwarding)

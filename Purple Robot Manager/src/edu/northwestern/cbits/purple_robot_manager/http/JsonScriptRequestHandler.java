@@ -78,6 +78,19 @@ public class JsonScriptRequestHandler implements HttpRequestHandler
                 
                 return;
             }
+            catch (NullPointerException e) 
+            {
+				e.printStackTrace();
+
+                response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+                
+                StringEntity body = new StringEntity(e.toString());
+                body.setContentType("text/plain");
+
+                response.setEntity(body);
+                
+                return;
+            }
 
             if (arguments != null)
             {

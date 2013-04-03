@@ -223,9 +223,10 @@ public class DateTrigger extends Trigger
 			if (this._repeats != null)
 				repeatString = "\nRRULE:" + this._repeats;
 
-			this._icalString = String.format(context.getString(R.string.ical_template), this._start.toString(), this._end.toString(), this.name(), repeatString);
+			this._icalString = String.format(context.getString(R.string.ical_template), this._start, this._end, this.name(), repeatString);
 			
-			this.refreshCalendar();
+			this._lastFireCalcDate = 0;
+			this.refresh(context);
 
 			return true;
 		}
@@ -390,6 +391,7 @@ public class DateTrigger extends Trigger
 
 		Preference lastFire = new Preference(activity);
 		lastFire.setSummary(R.string.label_trigger_last_fire);
+		lastFire.setOrder(0);
 		
 		String key = "last_fired_" + this.identifier();
 		long lastFireTime = prefs.getLong(key, 0);
@@ -413,6 +415,7 @@ public class DateTrigger extends Trigger
 	
 				PreferenceScreen upcomingScreen = manager.createPreferenceScreen(activity);
 				upcomingScreen.setSummary(R.string.label_trigger_upcoming_fires);
+				upcomingScreen.setOrder(0);
 	
 				if (this._upcomingFireDates.size() == 1)
 					upcomingScreen.setTitle(R.string.label_trigger_upcoming_fire_summary);
@@ -432,6 +435,8 @@ public class DateTrigger extends Trigger
 			else
 			{
 				Preference upcomingFires = new Preference(activity);
+				upcomingFires.setOrder(0);
+				
 				upcomingFires.setSummary(R.string.label_trigger_upcoming_fires);
 				upcomingFires.setTitle(R.string.label_trigger_upcoming_fires_none);
 				
