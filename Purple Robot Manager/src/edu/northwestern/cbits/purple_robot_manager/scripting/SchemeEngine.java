@@ -1,7 +1,5 @@
 package edu.northwestern.cbits.purple_robot_manager.scripting;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Date;
@@ -15,7 +13,6 @@ import jsint.Pair;
 import jsint.Symbol;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.AssetFileDescriptor;
 import android.os.Bundle;
 import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
@@ -51,6 +48,7 @@ public class SchemeEngine extends BaseScriptEngine
 		try 
 		{
 			scheme.load(new InputStreamReader(this._context.getAssets().open("scheme/pregexp.scm")));
+			scheme.load(new InputStreamReader(this._context.getAssets().open("scheme/purple-robot.scm")));
 		} 
 		catch (IOException e) 
 		{

@@ -423,7 +423,6 @@
     <string name="display_wifi_network_title" formatted="false">%s (%s)</string>
     <string name="display_wifi_ssid_title">Network Name</string>
     <string name="display_wifi_bssid_title">Base Station ID</string>
-    <string name="display_wifi_bssid_title">Base Station ID</string>
     <string name="display_wifi_frequency_title">Network Frequency (MHz)</string>
     <string name="display_wifi_level_title">Signal Level (dB)</string>
 
