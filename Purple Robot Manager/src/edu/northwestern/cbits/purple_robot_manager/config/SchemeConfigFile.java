@@ -39,7 +39,7 @@ public class SchemeConfigFile
 	{
 		Map<String, Object> configMap = PurpleRobotApplication.configuration(context);
 		
-		return new Pair(Symbol.intern(".updateConfig"), new Pair(Symbol.intern("PurpleRobot"), this.pairsList(configMap)));
+		return new Pair(Symbol.intern("ps-update-config"), this.pairsList(configMap));
 	}
 
 	private Pair triggersList(List<Map<String, Object>> configs) 
@@ -48,7 +48,7 @@ public class SchemeConfigFile
 		
 		for (Map<String, Object> config : configs)
 		{
-			rest = new Pair(new Pair(Symbol.intern(".updateTrigger"), new Pair(Symbol.intern("PurpleRobot"), this.pairsList(config))), rest);
+			rest = new Pair(new Pair(Symbol.intern("pr-update-trigger"), this.pairsList(config)), rest);
 		}
 		
 		return new Pair(new Pair(Symbol.BEGIN, rest), Pair.EMPTY);
@@ -60,7 +60,7 @@ public class SchemeConfigFile
 		
 		for (Map<String, Object> config : configs)
 		{
-			rest = new Pair(new Pair(Symbol.intern(".updateProbe"), new Pair(Symbol.intern("PurpleRobot"), this.pairsList(config))), rest);
+			rest = new Pair(new Pair(Symbol.intern("pr-update-probe"), this.pairsList(config)), rest);
 		}
 		
 		return new Pair(Symbol.BEGIN, rest);
