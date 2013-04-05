@@ -1,0 +1,63 @@
+<html>
+	<head>
+		<title>Scheme JSON Test</title>
+		<script type="text/javascript" src="/js/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function ()
+			{
+				var json = {};
+				json.command = "execute_scheme";
+				json.source  = "(let* ((my-json-obj (json-parse \"{ \\\"foo\\\": \\\"bar\\\", \\\"numbers\\\": [1, 2, 3, 4], \\\"json_obj\\\": { \\\"hello\\\": \\\"world\\\" }}\"))\n";
+                json.source += "       (my-json-foo (json-get my-json-obj \"foo\"))\n";
+                json.source += "       (my-json-keys (json-keys my-json-obj))\n";
+                json.source += "       (my-is-array (json-array? (json-get my-json-obj \"numbers\")))\n";
+                json.source += "       (my-is-array-2 (json-array? (json-parse \"[1, 2, 3, 4, 5]\")))\n";
+                json.source += "       (my-is-not-array (json-array? (json-get my-json-obj \"hello\")))\n";
+                json.source += "       (my-array-length (json-array-length (json-parse \"[1, 2, 3, 4, 5]\")))\n";
+                json.source += "       (my-remove-length (json-array-remove (json-parse \"[1, 2, 3, 4, 5]\") 2))\n";
+                json.source += "       (my-obj-string (json->string my-json-obj 0))\n";
+                json.source += "       (my-array-string (json->string (json-get my-json-obj \"numbers\") 2)))\n";
+                json.source += "      (list my-json-obj my-json-foo my-json-keys my-is-array my-is-array-2 my-is-not-array my-array-length my-remove-length my-obj-string my-array-string))";
+
+				var post_data = {};
+				post_data.json = JSON.stringify(json);
+
+				$.ajax("/json/submit", {
+					type: "POST",
+					contentType: "application/x-www-form-urlencoded; charset=UTF-8", 
+					data: post_data,
+					success: function(data)
+					{
+						alert("Results: " + data.payload);
+					},
+					error: function(jqXHR, textStatus, errorThrown) 
+					{ 
+						alert("Error running tests: " + errorThrown);
+					}
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<h1>Scheme JSON Test</h1>
+		
+		<p>Run JSON tests using built-in JSON library (uses Android's JSONObject &amp; JSONArray classes).</p>
+		
+		<h2>Test Command</h2>
+<pre>
+(let* ((my-json-obj (json-parse "{ \"foo\": \"bar\", \"numbers\": [1, 2, 3, 4], \"json_obj\": { \"hello\": \"world\" }}"))
+       (my-json-foo (json-get my-json-obj "foo"))
+       (my-json-keys (json-keys my-json-obj))
+       (my-is-array (json-array? (json-get my-json-obj "numbers")))
+       (my-is-array-2 (json-array? (json-parse "[1, 2, 3, 4, 5]")))
+       (my-is-not-array (json-array? (json-get my-json-obj "hello")))
+       (my-array-length (json-array-length (json-parse "[1, 2, 3, 4, 5]")))
+       (my-remove-length (json-array-remove (json-parse "[1, 2, 3, 4, 5]") 2))
+       (my-obj-string (json->string my-json-obj 0))
+       (my-array-string (json->string (json-get my-json-obj "numbers" 2))))
+      (list my-json-obj my-json-foo my-json-keys my-is-array my-is-array-2 my-is-not-array my-array-length my-remove-length my-obj-string my-array-string))
+</pre>
+	</body>
+</html>
+	
+	

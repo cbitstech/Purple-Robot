@@ -43,11 +43,13 @@ public class SchemeEngine extends BaseScriptEngine
 	{
 		Evaluator eval = new Evaluator();
 		eval.getInteractionEnvironment().setValue(Symbol.intern("PurpleRobot"), this);
+		eval.getInteractionEnvironment().setValue(Symbol.intern("JSONHelper"), new JSONHelper());
 		JScheme scheme = new JScheme(eval);
 
 		try 
 		{
 			scheme.load(new InputStreamReader(this._context.getAssets().open("scheme/pregexp.scm")));
+			scheme.load(new InputStreamReader(this._context.getAssets().open("scheme/json.scm")));
 			scheme.load(new InputStreamReader(this._context.getAssets().open("scheme/purple-robot.scm")));
 		} 
 		catch (IOException e) 
