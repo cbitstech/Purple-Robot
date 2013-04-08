@@ -20,8 +20,10 @@ import android.content.Context;
 import android.net.Uri;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.ExecuteSchemeCommand;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.ExecuteJavaScriptCommand;
+import edu.northwestern.cbits.purple_robot_manager.http.commands.FetchStringCommand;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.FetchUserHashCommand;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.JSONCommand;
+import edu.northwestern.cbits.purple_robot_manager.http.commands.PersistStringCommand;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.PingCommand;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.UnknownCommand;
 
@@ -38,8 +40,6 @@ public class JsonScriptRequestHandler implements HttpRequestHandler
 
 	public void handle(HttpRequest request, HttpResponse response, HttpContext argument) throws HttpException, IOException 
 	{
-//    	Log.e("PR-HTTP-SCRIPTS", request.getRequestLine().getMethod() + " " + request.getRequestLine().getUri());
-
     	response.setStatusCode(HttpStatus.SC_OK);
 		
         if (request instanceof HttpEntityEnclosingRequest) 
@@ -130,6 +130,10 @@ public class JsonScriptRequestHandler implements HttpRequestHandler
 				return new ExecuteSchemeCommand(arguments, context);
 			else if (FetchUserHashCommand.COMMAND_NAME.equals(arguments.get(JSONCommand.COMMAND)))
 				return new FetchUserHashCommand(arguments, context);
+			else if (PersistStringCommand.COMMAND_NAME.equals(arguments.get(JSONCommand.COMMAND)))
+				return new PersistStringCommand(arguments, context);
+			else if (FetchStringCommand.COMMAND_NAME.equals(arguments.get(JSONCommand.COMMAND)))
+				return new FetchStringCommand(arguments, context);
 		} 
 		catch (JSONException e) 
 		{
