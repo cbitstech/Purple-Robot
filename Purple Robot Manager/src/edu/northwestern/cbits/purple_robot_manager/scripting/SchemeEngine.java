@@ -29,12 +29,19 @@ public class SchemeEngine extends BaseScriptEngine
 
 	public static boolean canRun(String script) 
 	{
-		// TODO: Better validation & heuristics...
+		script = script.trim();
 
-		if (script == null || script.trim().length() < 1)
+		if (script == null || script.length() < 1)
 			return false;
-		else if (script.trim().charAt(0) == '(')
+		else if (script.charAt(0) == '(')
+		{
+			if (script.charAt(script.length() - 1) == ';')
+				return false;
+			else if (script.toLowerCase().contains("function("))
+				return false;
+			
 			return true;
+		}
 		
 		return false;
 	}
