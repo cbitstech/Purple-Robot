@@ -1,0 +1,49 @@
+<html>
+	<head>
+		<title>Update Widgets Test</title>
+		<script type="text/javascript" src="/js/date.js"></script>
+		<script type="text/javascript" src="/js/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function ()
+			{
+				var json = {};
+				json.command = "execute_script";
+				json.script =  "var params1 = {};";
+				json.script += "params1['identifier'] = '1';";
+				json.script += "params1['title'] = 'Trouble breathing';";
+				json.script += "params1['action'] = 'PurpleRobot.launchApplication(\"edu.northwestern.cbits.smart.attack\")';";
+				json.script += "PurpleRobot.updateWidget(params1);";
+				json.script += "var params2 = {};";
+				json.script += "params2['identifier'] = '2';";
+				json.script += "params2['title'] = 'Feeling STRESSED';";
+				json.script += "params2['action'] = 'PurpleRobot.launchApplication(\"edu.northwestern.cbits.smart.trigger\")';";
+				json.script += "PurpleRobot.updateWidget(params2);";
+				json.script += "PurpleRobot.persistString(\"app_config\",PurpleRobot.readUrl(\"http://mohrlab.northwestern.edu/smart/robot/app_config.txt\"));";
+				
+				var post_data = {};
+				post_data.json = JSON.stringify(json);
+
+				$.ajax("/json/submit", {
+					type: "POST",
+					contentType: "application/x-www-form-urlencoded; charset=UTF-8", 
+					data: post_data,
+					success: function(data)
+					{
+						alert("Widget commands sent...");
+					},
+					error: function(jqXHR, textStatus, errorThrown) 
+					{ 
+						alert("Error sending commands: " + errorThrown);
+					}
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<h1>Update Widgets Test</h1>
+		
+		<p>Each time this page is loaded, updates 2 widgets.</p>
+	</body>
+</html>
+	
+	
