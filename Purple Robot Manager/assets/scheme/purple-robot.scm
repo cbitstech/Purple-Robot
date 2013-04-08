@@ -36,7 +36,7 @@
 (define pr-broadcast-intent (lambda (action extras) (.broadcastIntent PurpleRobot action extras)))
 (define pr-launch-application(lambda (app-name params post-script) (.launchApplication PurpleRobot app-name params post-script)))
 (define pr-show-application-launch-notification (lambda (title message app-name timestamp params post-script) (.showApplicationLaunchNotification PurpleRobot title message app-name timestamp params post-script)))
-(define pr-show-native-dialog (lambda (title message confirm-title cancel-title confirm-script cancel-script) (.showNativeDialog title message confirm-title cancel-title confirm-script cancel-script)))
+(define pr-show-native-dialog (lambda (title message confirm-title cancel-title confirm-script cancel-script) (.showNativeDialog PurpleRobot title message confirm-title cancel-title confirm-script cancel-script)))
 (define pr-fetch-config (lambda () (.fetchConfig PurpleRobot)))
 (define pr-date->components (lambda (date) (.dateToComponents PurpleRobot date)))
 (define pr-components->date (lambda (action components) (.dateFromComponents PurpleRobot components)))
