@@ -423,8 +423,11 @@ public class LegacyJSONConfigFile
 			this.parameters = new JSONObject(prefs.getString(LegacyJSONConfigFile.JSON_CONFIGURATION, "{}"));
 
 			this.updateSharedPreferences(context);
-			
 			this.updateTriggers(context);
+
+			String script = this.parameters.getString(LegacyJSONConfigFile.JSON_INIT_SCRIPT);
+			JavaScriptEngine engine = new JavaScriptEngine(context);
+			engine.runScript(script);
 			
 			if (next != null)
 				next.run();

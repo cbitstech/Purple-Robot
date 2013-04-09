@@ -48,6 +48,9 @@ public class SchemeEngine extends BaseScriptEngine
 
 	public Object evaluateSource(String source)
 	{
+		if (source.trim().toLowerCase().equals("(begin)"))
+			return null;
+
 		Evaluator eval = new Evaluator();
 		eval.getInteractionEnvironment().setValue(Symbol.intern("PurpleRobot"), this);
 		eval.getInteractionEnvironment().setValue(Symbol.intern("JSONHelper"), new JSONHelper());
@@ -64,7 +67,16 @@ public class SchemeEngine extends BaseScriptEngine
 			e.printStackTrace();
 		}
 		
-		return scheme.eval(source);
+		try
+		{
+			return scheme.eval(source);
+		}
+		catch (StackOverflowError e)
+		{
+
+		}
+		
+		return Boolean.valueOf(false);
 	}
 
 	protected String language() 

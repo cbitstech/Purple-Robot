@@ -20,6 +20,7 @@ import org.mozilla.javascript.ScriptableObject;
 
 import android.content.res.AssetManager;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.config.JSONConfigFile;
@@ -63,6 +64,8 @@ public class JavaScriptEngine extends BaseScriptEngine
 
 		try
 		{
+			Log.e("PR SCRIPT", script);
+			
 			return this._jsContext.evaluateString(this._scope, script, "<engine>", 1, null);
 		}
 		catch (EvaluatorException e)
@@ -71,6 +74,9 @@ public class JavaScriptEngine extends BaseScriptEngine
 
 			try
 			{
+				if (Looper.myLooper() == null)
+					Looper.prepare();
+				
 				Toast.makeText(this._context, e.getMessage(), Toast.LENGTH_LONG).show();
 			}
 			catch (RuntimeException ee)
