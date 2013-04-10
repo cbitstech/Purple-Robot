@@ -10,7 +10,6 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.CodeViewerActivity;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
@@ -43,8 +42,6 @@ public abstract class Trigger
 
 	public void execute(final Context context, boolean force)
 	{
-		Log.e("PR", "EXECUTING: " + this._action);
-		
 		if (this._enabled && this._action != null)
 		{
 			final Trigger me = this;
@@ -153,11 +150,7 @@ public abstract class Trigger
 		{
 			public boolean onPreferenceClick(Preference preference) 
 			{
-				Log.e("PR", "EXECUTE " + me._name);
-				
 				me.execute(activity, true);
-
-				Log.e("PR", "EXECUTED " + me._name);
 
 				return true;
 			}

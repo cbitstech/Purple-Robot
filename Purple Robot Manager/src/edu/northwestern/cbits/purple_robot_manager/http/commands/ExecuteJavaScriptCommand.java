@@ -4,6 +4,7 @@ import java.net.URLDecoder;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.Undefined;
 
@@ -29,11 +30,21 @@ public class ExecuteJavaScriptCommand extends JSONCommand
 		{
 			if (JSONCommand.STATUS_OK.equals(result.get(JSONCommand.STATUS)))
 			{
-				String script = URLDecoder.decode(this._arguments.getString(ExecuteJavaScriptCommand.SCRIPT), "UTF-8");
-				
 				JavaScriptEngine engine = new JavaScriptEngine(this._context);
+
+				Object o = null;
 				
-				Object o = engine.runScript(script);
+				String script = this._arguments.getString(ExecuteJavaScriptCommand.SCRIPT);
+				
+				try
+				{
+					o = engine.runScript(script);
+				}
+				catch (EvaluatorException ee)
+				{
+					script = URLDecoder.decode(script, "UTF-8");
+					o = engine.runScript(script);
+				}				
 
 				if ((o instanceof Undefined) == false)
 				{

@@ -20,9 +20,7 @@ import org.mozilla.javascript.ScriptableObject;
 
 import android.content.res.AssetManager;
 import android.os.Bundle;
-import android.os.Looper;
 import android.util.Log;
-import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.config.JSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.Feature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.JavascriptFeature;
@@ -62,45 +60,7 @@ public class JavaScriptEngine extends BaseScriptEngine
 		if (extras != null && extrasName != null)
 			script = "var " + extrasName + " = " + extras.toString() + "; " + script;
 
-		try
-		{
-			Log.e("PR SCRIPT", script);
-			
-			return this._jsContext.evaluateString(this._scope, script, "<engine>", 1, null);
-		}
-		catch (EvaluatorException e)
-		{
-			e.printStackTrace();
-
-			try
-			{
-				if (Looper.myLooper() == null)
-					Looper.prepare();
-				
-				Toast.makeText(this._context, e.getMessage(), Toast.LENGTH_LONG).show();
-			}
-			catch (RuntimeException ee)
-			{
-				ee.printStackTrace();
-			}
-			
-			throw e;
-		}
-		catch (EcmaError e)
-		{
-			e.printStackTrace();
-
-			try
-			{
-				Toast.makeText(this._context, e.getMessage(), Toast.LENGTH_LONG).show();
-			}
-			catch (RuntimeException ee)
-			{
-				ee.printStackTrace();
-			}
-			
-			throw e;
-		}
+		return this._jsContext.evaluateString(this._scope, script, "<engine>", 1, null);
 	}
 
 	public boolean loadLibrary(String libraryName)

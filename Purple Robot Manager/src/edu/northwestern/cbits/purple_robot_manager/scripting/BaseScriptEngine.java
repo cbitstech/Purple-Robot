@@ -91,6 +91,7 @@ public abstract class BaseScriptEngine
 		return ScheduleManager.clearMillis(new Date());
 	}
 
+	@SuppressLint("SimpleDateFormat")
 	public void log(Object message)
 	{
 		SimpleDateFormat sdf = new SimpleDateFormat(BaseScriptEngine.LOG_DATE_FORMAT);
@@ -811,8 +812,6 @@ public abstract class BaseScriptEngine
 
 	public static Object runScript(Context context, String script, Map<String, Object> objects) 
 	{
-		Log.e("PR-SCRIPT", "RUN: " + script);
-		
 		if (SchemeEngine.canRun(script))
 		{
 			SchemeEngine engine = new SchemeEngine(context, objects);
