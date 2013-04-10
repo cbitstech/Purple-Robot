@@ -62,6 +62,7 @@ import org.json.JSONObject;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -76,6 +77,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.http.AndroidHttpClient;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -352,6 +354,7 @@ public class HttpUploadPlugin extends OutputPlugin
 	    }
 	}
 
+	@SuppressLint("NewApi")
 	private void uploadPendingObjects()
 	{
 		if (this._uploading)
@@ -520,7 +523,10 @@ public class HttpUploadPlugin extends OutputPlugin
 
 							jsonMessage.put(OPERATION_KEY, "SubmitProbes");
 							
-							String payload = Normalizer.normalize(uploadArray.toString(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+							String payload = uploadArray.toString();
+							
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
+								payload = Normalizer.normalize(payload, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
 									
 							payload = payload.replaceAll("\r", "");
 							payload = payload.replaceAll("\n", "");
@@ -610,7 +616,7 @@ public class HttpUploadPlugin extends OutputPlugin
 								me.broadcastMessage(uploadMessage);
 
 								noteManager.notify(12345, note);
-
+								
 								HttpResponse response = httpClient.execute(httpPost);
 
 								HttpEntity httpEntity = response.getEntity();
@@ -1149,6 +1155,7 @@ public class HttpUploadPlugin extends OutputPlugin
 		t.start();
 	}
 
+	@SuppressLint("DefaultLocale")
 	public void deleteArchiveFiles(final Activity activity)
 	{
 		final HttpUploadPlugin me = this;
@@ -1161,9 +1168,10 @@ public class HttpUploadPlugin extends OutputPlugin
 
 				final File[] pendingFiles = pendingFolder.listFiles(new FileFilter()
 				{
+					@SuppressLint("DefaultLocale")
 					public boolean accept(File file)
 					{
-						if (file.getName().toLowerCase().endsWith(".archive"))
+						if (file.getName().toLowerCase(Locale.ENGLISH).endsWith(".archive"))
 							return true;
 
 						return false;

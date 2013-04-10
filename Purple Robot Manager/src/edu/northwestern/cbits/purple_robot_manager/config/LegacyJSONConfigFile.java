@@ -32,7 +32,6 @@ import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.net.Uri.Builder;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -151,8 +150,6 @@ public class LegacyJSONConfigFile
 
 						String oldHash = prefs.getString(LegacyJSONConfigFile.JSON_LAST_HASH, "");
 						final String newHash = encryption.createHash(scriptString);
-
-						Log.e("PR-CONFIG", oldHash + " =? " + newHash);
 
 						if ("text/x-scheme".equalsIgnoreCase(conn.getContentType()))
 						{
