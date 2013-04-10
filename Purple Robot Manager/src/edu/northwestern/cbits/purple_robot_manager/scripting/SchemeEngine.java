@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
+import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;
 import edu.northwestern.cbits.purple_robot_manager.ScheduleManager;
 import edu.northwestern.cbits.purple_robot_manager.config.SchemeConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.Feature;
@@ -59,21 +60,51 @@ public class SchemeEngine extends BaseScriptEngine
 		try 
 		{
 			scheme.load(new InputStreamReader(this._context.getAssets().open("scheme/pregexp.scm")));
+		} 
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+		}
+		catch (StackOverflowError e)
+		{
+			e.printStackTrace();
+		}
+
+		try 
+		{
 			scheme.load(new InputStreamReader(this._context.getAssets().open("scheme/json.scm")));
+		} 
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+		}
+		catch (StackOverflowError e)
+		{
+			e.printStackTrace();
+		}
+
+		try 
+		{
 			scheme.load(new InputStreamReader(this._context.getAssets().open("scheme/purple-robot.scm")));
 		} 
 		catch (IOException e) 
 		{
 			e.printStackTrace();
 		}
+		catch (StackOverflowError e)
+		{
+			e.printStackTrace();
+		}
 		
+		Log.e("PR", "EVALING SOURCE");
+
 		try
 		{
 			return scheme.eval(source);
 		}
 		catch (StackOverflowError e)
 		{
-
+			e.printStackTrace();
 		}
 		
 		return Boolean.valueOf(false);

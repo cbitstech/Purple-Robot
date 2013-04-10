@@ -32,6 +32,7 @@ import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.net.Uri.Builder;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -122,6 +123,8 @@ public class LegacyJSONConfigFile
 
 							newUri = builder.build();
 						}
+						
+						Log.e("PR", "USING CONFIG URI " + newUri);
 						
 						URL u = new URL(newUri.toString());
 
