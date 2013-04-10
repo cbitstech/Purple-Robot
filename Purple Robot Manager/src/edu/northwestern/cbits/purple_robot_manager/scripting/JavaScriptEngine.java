@@ -21,6 +21,7 @@ import org.mozilla.javascript.ScriptableObject;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.util.Log;
+import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;
 import edu.northwestern.cbits.purple_robot_manager.config.JSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.Feature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.JavascriptFeature;
@@ -262,10 +263,14 @@ public class JavaScriptEngine extends BaseScriptEngine
 	
 	public boolean updateConfig(NativeObject nativeObj)
 	{
+		Log.e("PR", "JS UPDATE CONFIG");
+
 		Map<String, Object> paramsMap = JavaScriptEngine.nativeToMap(nativeObj);
 		
+		Log.e("PR", "GOT AND CONVERTED JS CONFIG MAP: " + paramsMap.size());
+		
 		return super.updateConfig(paramsMap);
+
+//		return PurpleRobotApplication.updateFromMap(this._context, paramsMap);
 	}
-
-
 }

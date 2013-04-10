@@ -812,8 +812,11 @@ public abstract class BaseScriptEngine
 
 	public static Object runScript(Context context, String script, Map<String, Object> objects) 
 	{
+		
 		if (SchemeEngine.canRun(script))
 		{
+			Log.e("PR", "RUN: " + script);
+
 			SchemeEngine engine = new SchemeEngine(context, objects);
 			
 			return engine.evaluateSource(script);
@@ -828,9 +831,18 @@ public abstract class BaseScriptEngine
 		return null;
 	}
 
-	public boolean updateConfig(Map<String, Object> config) 
+	protected boolean updateConfig(Map<String, Object> config) 
 	{
+		Log.e("PR", "UPDATING FROM MAP COUNT: " + config.size());
+		
 		return PurpleRobotApplication.updateFromMap(this._context, config);
+	}
+
+	public boolean updateConfig(String key, Object value) 
+	{
+		Map<String, Object> values = new HashMap<String, Object>();
+		
+		return PurpleRobotApplication.updateFromMap(this._context, values);
 	}
 
 	public Object valueFromString(String key, String string) 
