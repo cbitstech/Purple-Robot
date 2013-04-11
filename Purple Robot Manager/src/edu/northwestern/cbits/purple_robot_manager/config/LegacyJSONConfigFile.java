@@ -154,7 +154,7 @@ public class LegacyJSONConfigFile
 						String oldHash = prefs.getString(LegacyJSONConfigFile.JSON_LAST_HASH, "");
 						final String newHash = encryption.createHash(scriptString);
 
-						if ("text/x-scheme".equalsIgnoreCase(conn.getContentType()))
+						if (conn.getContentType().toLowerCase().startsWith("text/x-scheme"))
 						{
 							// TODO: Temp code until we get a more flexible parsing system in place...
 
@@ -215,7 +215,7 @@ public class LegacyJSONConfigFile
 								edit.putString(LegacyJSONConfigFile.JSON_CONFIGURATION, scriptString);
 								edit.commit();
 	
-								TriggerManager.getInstance(context).removeAllTriggers();
+//								TriggerManager.getInstance(context).removeAllTriggers();
 								
 								next = new Runnable()
 								{
@@ -318,7 +318,7 @@ public class LegacyJSONConfigFile
 						edit.putString(LegacyJSONConfigFile.JSON_CONFIGURATION, "{}");
 						edit.commit();
 
-						TriggerManager.getInstance(context).removeAllTriggers();
+//						TriggerManager.getInstance(context).removeAllTriggers();
 					}					
 				}
 			}
