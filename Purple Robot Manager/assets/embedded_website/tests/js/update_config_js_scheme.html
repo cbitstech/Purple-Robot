@@ -1,0 +1,40 @@
+<html>
+	<head>
+		<title>Update Configuration Test 2</title>
+		<script type="text/javascript" src="/js/date.js"></script>
+		<script type="text/javascript" src="/js/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function ()
+			{
+				var json = {};
+
+				json.command = "execute_script";
+				json.script += "PurpleRobot.scheduleScript('foobar', '20010203T121314', '(.updateConfig PurpleRobot \'((\"config_update_data_server\" . #t) (\"config_restrict_wifi\" . #t) (\"config_json_url\" . \"http://mohrlab.northwestern.edu/robot/\")))');";
+
+				var post_data = {};
+				post_data.json = JSON.stringify(json);
+
+				$.ajax("/json/submit", {
+					type: "POST",
+					contentType: "application/x-www-form-urlencoded; charset=UTF-8", 
+					data: post_data,
+					success: function(data)
+					{
+						alert("Configuration updated...");
+					},
+					error: function(jqXHR, textStatus, errorThrown) 
+					{ 
+						alert("Error updating configuration: " + errorThrown);
+					}
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<h1>Clear Configuration Test</h1>
+		
+		<p>Each time this page is loaded, it sets the configuration URL to be an empty string.</p>
+	</body>
+</html>
+	
+	
