@@ -45,6 +45,9 @@ public class StaticContentRequestHandler implements HttpRequestHandler
         if (target.trim().length() == 1)
         	target = "/index.html";
         
+        if (target.contains("?"))
+        	target = target.substring(0, target.indexOf("?"));
+        
         if (request instanceof HttpEntityEnclosingRequest) 
         {
 			try 
