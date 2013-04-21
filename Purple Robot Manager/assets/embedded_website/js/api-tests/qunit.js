@@ -157,5 +157,194 @@ pendingTests.push(function ()
 	});
 });
 
+pendingTests.push(function()
+{
+	asyncTest("Unencrypted Namespace Test", 3, function()
+	{
+		var key = generateUuid();
+		var value = generateUuid();
+		var namespace = generateUuid();
+
+		runScript("PurpleRobot.persistString('" + namespace + "', '" + key + "', '" + value + "');", function(data)
+		{
+			ok(true, key + " => " + value + " persisted");
+
+			runScript("PurpleRobot.fetchString('" + namespace + "', '" + key + "');", function(data)
+			{
+				ok(value == data.payload, "Fetched value matches original value.");
+
+				runScript("PurpleRobot.fetchNamespaces();", function(data)
+				{
+					if (data.payload != undefined)
+						ok($.inArray(namespace, data.payload), "Namespace list contains expected namespace.");
+					else
+						ok(false, "Namespace list returned");
+	
+					start();
+							
+					if (pendingTests.length > 0)
+					{
+						var next = pendingTests.pop();
+						next();				
+					}
+				}, function(jqXHR, textStatus, errorThrown)
+				{
+					ok(false, "Encountered error: " + errorThrown);
+	
+					start();
+	
+					if (pendingTests.length > 0)
+					{
+						var next = pendingTests.pop();
+						next();				
+					}
+				});
+			}, function(jqXHR, textStatus, errorThrown)
+			{
+				ok(false, "Encountered error: " + errorThrown);
+
+				start();
+
+				if (pendingTests.length > 0)
+				{
+					var next = pendingTests.pop();
+					next();				
+				}
+			});
+		}, function(jqXHR, textStatus, errorThrown)
+		{
+			ok(false, "Encountered error: " + errorThrown);
+
+			start();
+
+			if (pendingTests.length > 0)
+			{
+				var next = pendingTests.pop();
+				next();				
+			}
+		});
+	});
+});
+
+pendingTests.push(function()
+{
+	asyncTest("Encrypted Namespace Test", 3, function()
+	{
+		var key = generateUuid();
+		var value = generateUuid();
+		var namespace = generateUuid();
+
+		runScript("PurpleRobot.persistEncryptedString('" + namespace + "', '" + key + "', '" + value + "');", function(data)
+		{
+			ok(true, key + " => " + value + " persisted");
+
+			runScript("PurpleRobot.fetchEncryptedString('" + namespace + "', '" + key + "');", function(data)
+			{
+				ok(value == data.payload, "Fetched value matches original value.");
+
+				runScript("PurpleRobot.fetchNamespaces();", function(data)
+				{
+					if (data.payload != undefined)
+						ok($.inArray(namespace, data.payload), "Namespace list contains expected namespace.");
+					else
+						ok(false, "Namespace list returned");
+	
+					start();
+							
+					if (pendingTests.length > 0)
+					{
+						var next = pendingTests.pop();
+						next();				
+					}
+				}, function(jqXHR, textStatus, errorThrown)
+				{
+					ok(false, "Encountered error: " + errorThrown);
+	
+					start();
+	
+					if (pendingTests.length > 0)
+					{
+						var next = pendingTests.pop();
+						next();				
+					}
+				});
+			}, function(jqXHR, textStatus, errorThrown)
+			{
+				ok(false, "Encountered error: " + errorThrown);
+
+				start();
+
+				if (pendingTests.length > 0)
+				{
+					var next = pendingTests.pop();
+					next();				
+				}
+			});
+		}, function(jqXHR, textStatus, errorThrown)
+		{
+			ok(false, "Encountered error: " + errorThrown);
+
+			start();
+
+			if (pendingTests.length > 0)
+			{
+				var next = pendingTests.pop();
+				next();				
+			}
+		});
+	});
+});
+
+pendingTests.push(function()
+{
+	asyncTest("Namespace Contents Test", 2, function()
+	{
+		var key = generateUuid();
+		var value = generateUuid();
+		var namespace = generateUuid();
+
+		runScript("PurpleRobot.persistString('" + namespace + "', '" + key + "', '" + value + "');", function(data)
+		{
+			ok(true, key + " => " + value + " persisted");
+
+			runScript("PurpleRobot.fetchNamespace('" + namespace + "');", function(data)
+			{
+				ok(value == data.payload[key], "Namespace object contains original value.");
+
+				start();
+
+				if (pendingTests.length > 0)
+				{
+					var next = pendingTests.pop();
+					next();				
+				}
+			}, function(jqXHR, textStatus, errorThrown)
+			{
+				ok(false, "Encountered error: " + errorThrown);
+
+				start();
+
+				if (pendingTests.length > 0)
+				{
+					var next = pendingTests.pop();
+					next();				
+				}
+			});
+		}, function(jqXHR, textStatus, errorThrown)
+		{
+			ok(false, "Encountered error: " + errorThrown);
+
+			start();
+
+			if (pendingTests.length > 0)
+			{
+				var next = pendingTests.pop();
+				next();				
+			}
+		});
+	});
+});
+
+
 var go = pendingTests.pop();
 go();

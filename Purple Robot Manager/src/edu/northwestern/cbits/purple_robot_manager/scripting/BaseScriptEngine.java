@@ -57,6 +57,7 @@ import edu.northwestern.cbits.purple_robot_manager.widget.PurpleRobotAppWidgetPr
 public abstract class BaseScriptEngine 
 {
 	protected static String SCRIPT_ENGINE_PERSISTENCE_PREFIX = "purple_robot_script_persist_prefix_";
+	protected static String SCRIPT_ENGINE_NAMESPACES = "purple_robot_script_namespaces";
 
 	private static final int NOTIFICATION_ID = 1;
 	private static String LOG_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";
@@ -121,13 +122,29 @@ public abstract class BaseScriptEngine
 		return EncryptionManager.getInstance().persistEncryptedString(this._context, key, value);
 	}
 
+	public boolean persistEncryptedString(String namespace, String key, String value)
+	{
+		key = SCRIPT_ENGINE_PERSISTENCE_PREFIX + key;
+		key = namespace + " - " + key;
+
+		return EncryptionManager.getInstance().persistEncryptedString(this._context, key, value);
+	}
+
 	public String fetchEncryptedString(String key)
 	{
 		key = SCRIPT_ENGINE_PERSISTENCE_PREFIX + key;
 		
 		return EncryptionManager.getInstance().fetchEncryptedString(this._context, key);
 	}
-	
+
+	public String fetchEncryptedString(String namespace, String key)
+	{
+		key = SCRIPT_ENGINE_PERSISTENCE_PREFIX + key;
+		key = namespace + " - " + key;
+
+		return EncryptionManager.getInstance().fetchEncryptedString(this._context, key);
+	}
+
 	public void vibrate(String pattern)
 	{
 		Intent intent = new Intent(ManagerService.HAPTIC_PATTERN_INTENT);
@@ -290,6 +307,62 @@ public abstract class BaseScriptEngine
 			editor.remove(key);
 
 		return editor.commit();
+	}
+	
+	public void addNamespace(String namespace)
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+		
+		try 
+		{
+			JSONArray namespaces = new JSONArray(prefs.getString(BaseScriptEngine.SCRIPT_ENGINE_NAMESPACES, "[]"));
+			
+			for (int i = 0; i < namespaces.length(); i++)
+			{
+				String item = namespaces.getString(i);
+				
+				if (item.equals(namespace))
+					return;
+			}
+			
+			namespaces.put(namespace);
+			
+			Editor e = prefs.edit();
+			e.putString(BaseScriptEngine.SCRIPT_ENGINE_NAMESPACES, namespaces.toString());
+			e.commit();
+		} 
+		catch (JSONException e) 
+		{
+			e.printStackTrace();
+		}
+	}
+
+	public boolean persistString(String namespace, String key, String value)
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+		Editor editor = prefs.edit();
+
+		this.addNamespace(namespace);
+		
+		key = SCRIPT_ENGINE_PERSISTENCE_PREFIX + key;
+		key = namespace + " - " + key;
+
+		if (value != null)
+			editor.putString(key,  value.toString());
+		else
+			editor.remove(key);
+
+		return editor.commit();
+	}
+
+	public String fetchString(String namespace, String key)
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+		
+		key = SCRIPT_ENGINE_PERSISTENCE_PREFIX + key;
+		key = namespace + " - " + key;
+		
+		return prefs.getString(key, null);
 	}
 
 	public void fetchLabel(String context, String key)
@@ -551,6 +624,7 @@ public abstract class BaseScriptEngine
 		return true;
 	}
 
+	@SuppressLint("DefaultLocale")
 	protected Intent constructLaunchIntent(String applicationName, Map<String, Object> launchParams, String script) 
 	{
 		if (applicationName == null)
