@@ -18,10 +18,11 @@ import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
+import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
-import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;
 import edu.northwestern.cbits.purple_robot_manager.config.JSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.Feature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.JavascriptFeature;
@@ -263,14 +264,65 @@ public class JavaScriptEngine extends BaseScriptEngine
 	
 	public boolean updateConfig(NativeObject nativeObj)
 	{
-		Log.e("PR", "JS UPDATE CONFIG");
-
 		Map<String, Object> paramsMap = JavaScriptEngine.nativeToMap(nativeObj);
 		
-		Log.e("PR", "GOT AND CONVERTED JS CONFIG MAP: " + paramsMap.size());
-		
 		return super.updateConfig(paramsMap);
-
-//		return PurpleRobotApplication.updateFromMap(this._context, paramsMap);
 	}
+
+	
+	public NativeArray fetchNamespaces()
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+		
+		try 
+		{
+			JSONArray namespaces = new JSONArray(prefs.getString(BaseScriptEngine.SCRIPT_ENGINE_NAMESPACES, "[]"));
+			
+			String[] values = new String[namespaces.length()];
+			
+			for (int i = 0; i < namespaces.length(); i++)
+			{
+				values[i] = namespaces.getString(i);
+			}
+			
+			return new NativeArray(values);
+		} 
+		catch (JSONException e) 
+		{
+			e.printStackTrace();
+		}
+		
+		return new NativeArray(0);
+	}
+
+	public JSONObject fetchNamespace(String namespace)
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+		
+		Map<String, ?> all = prefs.getAll();
+		
+		JSONObject obj = new JSONObject();
+		
+		String prefix = namespace + " - " + BaseScriptEngine.SCRIPT_ENGINE_PERSISTENCE_PREFIX;
+		
+		for (String key : all.keySet())
+		{
+			if (key.indexOf(prefix) == 0)
+			{
+				String newKey = key.substring(prefix.length());
+				
+				try 
+				{
+					obj.put(newKey, all.get(key));
+				} 
+				catch (JSONException e) 
+				{
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return obj;
+	}
+
 }
