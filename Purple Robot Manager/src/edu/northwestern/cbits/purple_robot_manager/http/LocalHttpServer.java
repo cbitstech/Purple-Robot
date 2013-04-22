@@ -105,6 +105,10 @@ public class LocalHttpServer
                 {
                     break;
                 }
+                catch (NullPointerException e) 
+                {
+                    break;
+                }
             }
         }
     }

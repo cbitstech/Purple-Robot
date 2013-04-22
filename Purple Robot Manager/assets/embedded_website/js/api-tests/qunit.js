@@ -38,6 +38,74 @@ var pendingTests = [];
 
 pendingTests.push(function()
 {
+	asyncTest("Logger Test", 3, function()
+	{
+		var userId = generateUuid();
+		
+		var script = "PurpleRobot.persistString('event_log_params', 'study_name', 'My Test Study');";
+		script += "PurpleRobot.persistString('event_log_params', 'group_id', 'My Group ID');";
+		script += "PurpleRobot.persistString('event_log_params', 'username', '" + userId + "');";
+		script += "PurpleRobot.persistString('event_log_params', 'user_id', PurpleRobot.fetchUserHash());";
+		script += "PurpleRobot.persistString('event_log_params', 'readable_content', 'Some simple readable content.');";
+		
+		runScript(script, function(data)
+		{
+			ok(true, "Log namespace values persisted.");
+
+			runScript("PurpleRobot.fetchString('event_log_params', 'username');", function(data)
+			{
+				ok(userId == data.payload, "Username matches.");
+
+				runScript("PurpleRobot.log('test_event', {'session_id': 'my-session-id'});", function(data)
+				{
+					ok(data.payload, "Event logged");
+	
+					start();
+				
+					if (pendingTests.length > 0)
+					{
+						var next = pendingTests.pop();
+						next();				
+					}
+				}, function(jqXHR, textStatus, errorThrown)
+				{
+					ok(false, "Encountered error: " + errorThrown);
+	
+					start();
+	
+					if (pendingTests.length > 0)
+					{
+						var next = pendingTests.pop();
+						next();				
+					}
+				});
+			}, function(jqXHR, textStatus, errorThrown)
+			{
+				ok(false, "Encountered error: " + errorThrown);
+
+				start();
+
+				if (pendingTests.length > 0)
+				{
+					var next = pendingTests.pop();
+					next();				
+				}
+			});
+		}, function(jqXHR, textStatus, errorThrown)
+		{
+			ok(false, "Encountered error: " + errorThrown);
+
+			if (pendingTests.length > 0)
+			{
+				var next = pendingTests.pop();
+				next();				
+			}
+		});
+	});
+});
+
+pendingTests.push(function()
+{
 	asyncTest("Unencrypted String Getters & Setters Test", 2, function()
 	{
 		var key = generateUuid();

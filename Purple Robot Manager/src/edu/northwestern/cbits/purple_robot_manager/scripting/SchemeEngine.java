@@ -16,7 +16,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
-import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;
 import edu.northwestern.cbits.purple_robot_manager.ScheduleManager;
 import edu.northwestern.cbits.purple_robot_manager.config.SchemeConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.Feature;

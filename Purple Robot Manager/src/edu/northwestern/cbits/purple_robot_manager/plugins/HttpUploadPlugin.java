@@ -11,7 +11,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
@@ -23,7 +22,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -35,10 +33,7 @@ import java.util.zip.ZipOutputStream;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLPeerUnverifiedException;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -72,11 +67,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.http.AndroidHttpClient;
-import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -87,6 +79,8 @@ import edu.emory.mathcs.backport.java.util.Collections;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.StartActivity;
+import edu.northwestern.cbits.purple_robot_manager.WiFiHelper;
+import edu.northwestern.cbits.purple_robot_manager.logging.LiberalSSLSocketFactory;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class HttpUploadPlugin extends OutputPlugin
@@ -115,9 +109,6 @@ public class HttpUploadPlugin extends OutputPlugin
 	private long _lastUpload = 0;
 
 	private double _throughput = 0.0;
-
-	private boolean _wifiAvailable = false;
-	private long _lastWifiCheck = 0;
 
 	private long _uploadSize = MIN_UPLOAD_SIZE;
 	private long _uploadPeriod = MIN_UPLOAD_PERIOD;
@@ -189,7 +180,7 @@ public class HttpUploadPlugin extends OutputPlugin
 		{
 			int multiplier = 1;
 	
-			if (this.wifiAvailable())
+			if (WiFiHelper.wifiAvailable(this.getContext()))
 				multiplier = WIFI_MULTIPLIER;
 			
 			size = this._uploadSize * multiplier;
@@ -279,81 +270,6 @@ public class HttpUploadPlugin extends OutputPlugin
 		}
 	}
 
-	private boolean wifiAvailable()
-	{
-		long now = System.currentTimeMillis();
-
-		if (now - this._lastWifiCheck > 10000)
-		{
-			this._lastWifiCheck = now;
-
-			WifiManager wifi = (WifiManager) this.getContext().getSystemService(Context.WIFI_SERVICE);
-
-			if (wifi.isWifiEnabled())
-			{
-				this._wifiAvailable = true;
-
-				ConnectivityManager connection = (ConnectivityManager) this.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-
-				NetworkInfo netInfo = connection.getActiveNetworkInfo();
-
-				if (netInfo != null)
-				{
-					if (netInfo.getType() != ConnectivityManager.TYPE_WIFI)
-						this._wifiAvailable = false;
-					else if (netInfo.getState() != NetworkInfo.State.CONNECTED && netInfo.getState() != NetworkInfo.State.CONNECTING)
-						this._wifiAvailable = false;
-				}
-				else
-					this._wifiAvailable = false;
-			}
-			else
-				this._wifiAvailable =  false;
-		}
-		
-		return this._wifiAvailable;
-	}
-	
-	private class LiberalSSLSocketFactory extends SSLSocketFactory 
-	{
-	    SSLContext sslContext = SSLContext.getInstance("TLS");
-
-	    public LiberalSSLSocketFactory(KeyStore truststore) throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException, UnrecoverableKeyException 
-	    {
-	        super(truststore);
-
-	        TrustManager tm = new X509TrustManager() 
-	        {
-	            public void checkClientTrusted(X509Certificate[] chain, String authType) 
-	            {
-	            	
-	            }
-
-	            public void checkServerTrusted(X509Certificate[] chain, String authType) 
-	            {
-	            
-	            }
-
-	            public X509Certificate[] getAcceptedIssuers() 
-	            {
-	                return null;
-	            }
-	        };
-
-	        sslContext.init(null, new TrustManager[] { tm }, null);
-	    }
-
-	    public Socket createSocket(Socket socket, String host, int port, boolean autoClose) throws IOException, UnknownHostException 
-	    {
-	        return sslContext.getSocketFactory().createSocket(socket, host, port, autoClose);
-	    }
-
-	    public Socket createSocket() throws IOException 
-	    {
-	        return sslContext.getSocketFactory().createSocket();
-	    }
-	}
-
 	@SuppressLint("NewApi")
 	private void uploadPendingObjects()
 	{
@@ -378,7 +294,7 @@ public class HttpUploadPlugin extends OutputPlugin
 			
 			if (prefs.getBoolean("config_restrict_data_wifi", true))
 			{
-				if (this.wifiAvailable() == false)
+				if (WiFiHelper.wifiAvailable(this.getContext()) == false)
 				{
 					this.broadcastMessage(R.string.message_wifi_pending);
 

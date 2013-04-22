@@ -3,6 +3,7 @@ package edu.northwestern.cbits.purple_robot_manager.scripting;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
@@ -18,12 +19,11 @@ import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
-import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.config.JSONConfigFile;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.Feature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.JavascriptFeature;
 
@@ -63,6 +63,16 @@ public class JavaScriptEngine extends BaseScriptEngine
 			script = "var " + extrasName + " = " + extras.toString() + "; " + script;
 
 		return this._jsContext.evaluateString(this._scope, script, "<engine>", 1, null);
+	}
+	
+	public boolean log(String event, NativeObject params)
+	{
+		Log.e("PR", "GOT LOG COMMAND FOR " + event);
+		
+		if (params != null)
+			return LogManager.getInstance(this._context).log(event, JavaScriptEngine.nativeToMap(params));
+	
+		return LogManager.getInstance(this._context).log(event, new HashMap<String, Object>());
 	}
 
 	public boolean loadLibrary(String libraryName)
@@ -268,61 +278,39 @@ public class JavaScriptEngine extends BaseScriptEngine
 		
 		return super.updateConfig(paramsMap);
 	}
-
 	
 	public NativeArray fetchNamespaces()
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
-		
-		try 
+		List<String> namespaces = super.fetchNamespaces();
+			
+		String[] values = new String[namespaces.size()];
+			
+		for (int i = 0; i < namespaces.size(); i++)
 		{
-			JSONArray namespaces = new JSONArray(prefs.getString(BaseScriptEngine.SCRIPT_ENGINE_NAMESPACES, "[]"));
-			
-			String[] values = new String[namespaces.length()];
-			
-			for (int i = 0; i < namespaces.length(); i++)
-			{
-				values[i] = namespaces.getString(i);
-			}
-			
-			return new NativeArray(values);
-		} 
-		catch (JSONException e) 
-		{
-			e.printStackTrace();
+			values[i] = namespaces.get(i);
 		}
-		
-		return new NativeArray(0);
+			
+		return new NativeArray(values);
 	}
 
 	public JSONObject fetchNamespace(String namespace)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
-		
-		Map<String, ?> all = prefs.getAll();
+		Map<String, Object> map = super.fetchNamespaceMap(namespace);
 		
 		JSONObject obj = new JSONObject();
 		
-		String prefix = namespace + " - " + BaseScriptEngine.SCRIPT_ENGINE_PERSISTENCE_PREFIX;
-		
-		for (String key : all.keySet())
+		for (String key : map.keySet())
 		{
-			if (key.indexOf(prefix) == 0)
+			try 
 			{
-				String newKey = key.substring(prefix.length());
-				
-				try 
-				{
-					obj.put(newKey, all.get(key));
-				} 
-				catch (JSONException e) 
-				{
-					e.printStackTrace();
-				}
+				obj.put(key, map.get(key));
+			} 
+			catch (JSONException e) 
+			{
+				e.printStackTrace();
 			}
 		}
 		
 		return obj;
 	}
-
 }

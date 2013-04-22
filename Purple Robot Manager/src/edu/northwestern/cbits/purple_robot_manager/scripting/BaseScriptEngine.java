@@ -540,7 +540,17 @@ public abstract class BaseScriptEngine
 		
 		this.refreshConfigUrl();
 	}
-	
+
+	public String fetchUserId()
+	{
+		return EncryptionManager.getInstance().getUserId(this._context);
+	}
+
+	public String fetchUserHash()
+	{
+		return EncryptionManager.getInstance().getUserHash(this._context);
+	}
+
 	public void restoreDefaultId()
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
@@ -1001,5 +1011,47 @@ public abstract class BaseScriptEngine
 		}
 
 		return list;
+	}
+
+	public List<String> fetchNamespaces() 
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+		
+		ArrayList<String> list = new ArrayList<String>();
+		
+		try 
+		{
+			JSONArray namespaces = new JSONArray(prefs.getString(BaseScriptEngine.SCRIPT_ENGINE_NAMESPACES, "[]"));
+			
+			for (int i = 0; i < namespaces.length(); i++)
+			{
+				list.add(namespaces.getString(i));
+			}
+		} 
+		catch (JSONException e) 
+		{
+			e.printStackTrace();
+		}
+		
+		return list;
+	}
+
+	public Map<String, Object> fetchNamespaceMap(String namespace) 
+	{
+		Map<String, Object> map = new HashMap<String, Object>();
+		
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+		
+		Map<String, ?> all = prefs.getAll();
+		
+		String prefix = namespace + " - " + BaseScriptEngine.SCRIPT_ENGINE_PERSISTENCE_PREFIX;
+		
+		for (String key : all.keySet())
+		{
+			if (key.indexOf(prefix) == 0)
+				map.put(key.substring(prefix.length()), all.get(key));
+		}
+		
+		return map;
 	}
 }
