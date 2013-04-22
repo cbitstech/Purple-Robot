@@ -71,7 +71,8 @@
 				<action android:name="purple_robot_manager_haptic_pattern" />
 				<action android:name="purple_robot_manager_ringtone" />
 				<action android:name="purple_robot_manager_update_widgets" />
-		</intent-filter>
+				<action android:name="purple_robot_manager_upload_logs" />
+			</intent-filter>
 	    </service>
 		<service android:enabled="true" android:exported="false" android:name=".PersistentService">
 			<intent-filter>

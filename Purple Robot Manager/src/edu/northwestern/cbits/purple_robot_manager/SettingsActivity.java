@@ -24,6 +24,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 {
 	public static final String PROBES_SCREEN_KEY = "config_probes_screen";
 	private static final String MANUAL_REFRESH_KEY = "config_json_refresh_manually";
+	private static final String LOG_REFRESH_KEY = "config_log_refresh_manually";
 	private static final String HAPTIC_PATTERN_KEY = "config_json_haptic_pattern";
 	public static final String RINGTONE_KEY = "config_default_notification_sound";
 	public static final String ZIP_ARCHIVES_KEY = "config_mail_archives";
@@ -43,6 +44,9 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 
         Preference refresh = prefs.findPreference(MANUAL_REFRESH_KEY);
         refresh.setOnPreferenceClickListener(this);
+
+        Preference logRefresh = prefs.findPreference(LOG_REFRESH_KEY);
+        logRefresh.setOnPreferenceClickListener(this);
 
         final SettingsActivity me = this;
 
@@ -111,6 +115,13 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 			LegacyJSONConfigFile.update(this);
 
 			ProbeManager.nudgeProbes(this);
+
+            return true;
+        }
+        else if (LOG_REFRESH_KEY.equals(preference.getKey()))
+        {
+        	Intent refreshIntent = new Intent(ManagerService.UPLOAD_LOGS_INTENT);
+        	this.startService(refreshIntent);
 
             return true;
         }
