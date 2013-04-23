@@ -33,6 +33,7 @@ import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
 import edu.northwestern.cbits.purple_robot_manager.charts.SplineChart;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class BatteryProbe extends Probe
@@ -53,7 +54,7 @@ public class BatteryProbe extends Probe
 
 	public String contentSubtitle(Context context)
 	{
-		Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(BatteryProbe.DB_TABLE, this.databaseSchema());
+		Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(context, BatteryProbe.DB_TABLE, this.databaseSchema());
 
 		int count = -1;
 
@@ -86,7 +87,7 @@ public class BatteryProbe extends Probe
 			ArrayList<Double> battery = new ArrayList<Double>();
 			ArrayList<Double> time = new ArrayList<Double>();
 
-			Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(BatteryProbe.DB_TABLE, this.databaseSchema());
+			Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(activity, BatteryProbe.DB_TABLE, this.databaseSchema());
 
 			int count = -1;
 
@@ -127,11 +128,11 @@ public class BatteryProbe extends Probe
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(activity).logException(e);
 		}
 		catch (JSONException e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(activity).logException(e);
 		}
 
 		return null;
@@ -253,7 +254,7 @@ public class BatteryProbe extends Probe
 						values.put(BatteryProbe.BATTERY_KEY, Double.valueOf(bundle.getInt(BatteryManager.EXTRA_LEVEL)));
 						values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(Double.valueOf(bundle.getLong("TIMESTAMP"))));
 
-						ProbeValuesProvider.getProvider(context).insertValue(BatteryProbe.DB_TABLE, me.databaseSchema(), values);
+						ProbeValuesProvider.getProvider(context).insertValue(context, BatteryProbe.DB_TABLE, me.databaseSchema(), values);
 					}
 				}
 			};

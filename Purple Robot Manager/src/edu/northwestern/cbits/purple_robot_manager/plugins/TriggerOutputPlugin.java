@@ -8,6 +8,7 @@ import org.json.JSONException;
 import android.content.Context;
 import android.content.Intent;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.triggers.ProbeTrigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
@@ -49,7 +50,7 @@ public class TriggerOutputPlugin extends OutputPlugin
 					}
 					catch (JSONException e)
 					{
-						e.printStackTrace();
+						LogManager.getInstance(context).logException(e);
 					}
 				}
 			}

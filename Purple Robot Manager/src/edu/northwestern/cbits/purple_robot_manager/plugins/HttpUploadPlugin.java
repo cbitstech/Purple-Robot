@@ -81,6 +81,7 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.StartActivity;
 import edu.northwestern.cbits.purple_robot_manager.WiFiHelper;
 import edu.northwestern.cbits.purple_robot_manager.logging.LiberalSSLSocketFactory;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class HttpUploadPlugin extends OutputPlugin
@@ -265,7 +266,7 @@ public class HttpUploadPlugin extends OutputPlugin
 			}
 			catch (JSONException e)
 			{
-				e.printStackTrace();
+				LogManager.getInstance(this.getContext()).logException(e);
 			}
 		}
 	}
@@ -364,15 +365,15 @@ public class HttpUploadPlugin extends OutputPlugin
 							}
 							catch (FileNotFoundException e)
 							{
-								e.printStackTrace();
+								LogManager.getInstance(me.getContext()).logException(e);
 							}
 							catch (IOException e)
 							{
-								e.printStackTrace();
+								LogManager.getInstance(me.getContext()).logException(e);
 							}
 							catch (JSONException e)
 							{
-								e.printStackTrace();
+								LogManager.getInstance(me.getContext()).logException(e);
 							}
 
 							if (prefs.getBoolean("config_http_archive", false))
@@ -419,7 +420,7 @@ public class HttpUploadPlugin extends OutputPlugin
 							}
 							catch (UnsupportedEncodingException e)
 							{
-								e.printStackTrace();
+								LogManager.getInstance(me.getContext()).logException(e);
 							}
 						}
 
@@ -622,14 +623,14 @@ public class HttpUploadPlugin extends OutputPlugin
 							catch (HttpHostConnectException e)
 							{
 								me.broadcastMessage(R.string.message_http_connection_error);
-								e.printStackTrace();
+								LogManager.getInstance(me.getContext()).logException(e);
 
 								me._failCount += 1;
 							}
 							catch (SocketTimeoutException e)
 							{
 								me.broadcastMessage(R.string.message_socket_timeout_error);
-								e.printStackTrace();
+								LogManager.getInstance(me.getContext()).logException(e);
 
 								me._failCount += 1;
 							}
@@ -637,33 +638,34 @@ public class HttpUploadPlugin extends OutputPlugin
 							{
 								String errorMessage = String.format(resources.getString(R.string.message_socket_error),	e.getMessage());
 								me.broadcastMessage(errorMessage);
-								e.printStackTrace();
+								LogManager.getInstance(me.getContext()).logException(e);
 
 								me._failCount += 1;
 							}
 							catch (UnknownHostException e)
 							{
 								me.broadcastMessage(R.string.message_unreachable_error);
-								e.printStackTrace();
+								LogManager.getInstance(me.getContext()).logException(e);
 
 								me._failCount += 1;
 							}
 							catch (JSONException e)
 							{
 								me.broadcastMessage(R.string.message_response_error);
-								e.printStackTrace();
+								LogManager.getInstance(me.getContext()).logException(e);
 
 								me._failCount += 1;
 							}
 							catch (SSLPeerUnverifiedException e)
 							{
+								LogManager.getInstance(me.getContext()).logException(e);
 								me.broadcastMessage(R.string.message_unverified_server);
 
 								me._failCount += 1;
 							}
 							catch (Exception e)
 							{
-								e.printStackTrace();
+								LogManager.getInstance(me.getContext()).logException(e);
 								String errorMessage = String.format(resources.getString(R.string.message_general_error), e.toString());
 								me.broadcastMessage(errorMessage);
 
@@ -725,7 +727,7 @@ public class HttpUploadPlugin extends OutputPlugin
 						}
 						catch (JSONException e)
 						{
-							e.printStackTrace();
+							LogManager.getInstance(me.getContext()).logException(e);
 						}
 						catch (NoSuchAlgorithmException e)
 						{
@@ -737,31 +739,30 @@ public class HttpUploadPlugin extends OutputPlugin
 						}
 						catch (FileNotFoundException e)
 						{
-							e.printStackTrace();
 						}
 						catch (IOException e)
 						{
-							e.printStackTrace();
+							LogManager.getInstance(me.getContext()).logException(e);
 						} 
 						catch (KeyStoreException e) 
 						{
-							e.printStackTrace();
+							LogManager.getInstance(me.getContext()).logException(e);
 						}
 						catch (CertificateException e) 
 						{
-							e.printStackTrace();
+							LogManager.getInstance(me.getContext()).logException(e);
 						}
 						catch (KeyManagementException e) 
 						{
-							e.printStackTrace();
+							LogManager.getInstance(me.getContext()).logException(e);
 						}
 						catch (UnrecoverableKeyException e) 
 						{
-							e.printStackTrace();
+							LogManager.getInstance(me.getContext()).logException(e);
 						}
 						catch (Exception e) 
 						{
-							e.printStackTrace();
+							LogManager.getInstance(me.getContext()).logException(e);
 						}
 						finally
 						{
@@ -877,12 +878,12 @@ public class HttpUploadPlugin extends OutputPlugin
 				}
 				catch (JSONException e)
 				{
-					e.printStackTrace();
+					LogManager.getInstance(this.getContext()).logException(e);
 					invalidRemove.add(jsonString);
 				}
 				catch (OutOfMemoryError e)
 				{
-					e.printStackTrace();
+					LogManager.getInstance(this.getContext()).logException(e);
 					invalidRemove.add(jsonString);
 				}
 			}
@@ -905,7 +906,7 @@ public class HttpUploadPlugin extends OutputPlugin
 		}
 		catch (FileNotFoundException e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(this.getContext()).logException(e);
 		}
 		catch (UnsupportedEncodingException e)
 		{
@@ -913,11 +914,11 @@ public class HttpUploadPlugin extends OutputPlugin
 		}
 		catch (OutOfMemoryError e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(this.getContext()).logException(e);
 		}
 		catch (IOException e) 
 		{
-			e.printStackTrace();
+			LogManager.getInstance(this.getContext()).logException(e);
 		}
 
 		if (this._pendingSaves.size() > 128)
@@ -1014,11 +1015,11 @@ public class HttpUploadPlugin extends OutputPlugin
 				}
 				catch (FileNotFoundException e)
 				{
-					e.printStackTrace();
+					LogManager.getInstance(me.getContext()).logException(e);
 				}
 				catch (IOException e)
 				{
-					e.printStackTrace();
+					LogManager.getInstance(me.getContext()).logException(e);
 				}
 
 				activity.runOnUiThread(new Runnable()

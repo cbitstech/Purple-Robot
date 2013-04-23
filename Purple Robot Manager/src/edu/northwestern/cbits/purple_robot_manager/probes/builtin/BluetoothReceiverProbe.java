@@ -18,6 +18,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.util.Log;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("NewApi")
@@ -70,7 +71,7 @@ public class BluetoothReceiverProbe extends Probe
 		e.commit();
 	}
 
-	public boolean isEnabled(Context context)
+	public boolean isEnabled(final Context context)
 	{
 		final BluetoothReceiverProbe me = this;
 
@@ -146,7 +147,7 @@ public class BluetoothReceiverProbe extends Probe
 					}
 					catch (IOException e)
 					{
-						e.printStackTrace();
+						LogManager.getInstance(context).logException(e);
 					}
 				}
 			});

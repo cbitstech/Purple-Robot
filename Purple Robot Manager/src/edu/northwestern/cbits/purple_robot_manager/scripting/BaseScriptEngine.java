@@ -48,6 +48,7 @@ import edu.northwestern.cbits.purple_robot_manager.ScheduleManager;
 import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.LabelActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
@@ -176,7 +177,7 @@ public abstract class BaseScriptEngine
 		}
 		catch (Exception e) 
 		{
-			e.printStackTrace();
+			LogManager.getInstance(this._context).logException(e);
 		} 
 			
 		return null;
@@ -218,7 +219,7 @@ public abstract class BaseScriptEngine
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(this._context).logException(e);
 		}
 
 		return false;
@@ -272,7 +273,7 @@ public abstract class BaseScriptEngine
 		}
 		catch (NameNotFoundException e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(this._context).logException(e);
 		}
 
 		return null;
@@ -288,7 +289,7 @@ public abstract class BaseScriptEngine
 		}
 		catch (NameNotFoundException e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(this._context).logException(e);
 		}
 
 		return -1;
@@ -333,7 +334,7 @@ public abstract class BaseScriptEngine
 		} 
 		catch (JSONException e) 
 		{
-			e.printStackTrace();
+			LogManager.getInstance(this._context).logException(e);
 		}
 	}
 
@@ -818,7 +819,7 @@ public abstract class BaseScriptEngine
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(this._context).logException(e);
 		}
 
 		return false;
@@ -949,7 +950,7 @@ public abstract class BaseScriptEngine
 		}
 		catch (JSONException e) 
 		{
-			e.printStackTrace();
+			LogManager.getInstance(this._context).logException(e);
 		}
 
 		return null;
@@ -979,7 +980,7 @@ public abstract class BaseScriptEngine
 			}
 			catch (JSONException e) 
 			{
-				e.printStackTrace();
+				LogManager.getInstance(this._context).logException(e);
 			}
 		}
 
@@ -1005,9 +1006,8 @@ public abstract class BaseScriptEngine
 			}
 			catch (JSONException e) 
 			{
-				e.printStackTrace();
+				LogManager.getInstance(this._context).logException(e);
 			}
-			
 		}
 
 		return list;
@@ -1030,7 +1030,7 @@ public abstract class BaseScriptEngine
 		} 
 		catch (JSONException e) 
 		{
-			e.printStackTrace();
+			LogManager.getInstance(this._context).logException(e);
 		}
 		
 		return list;

@@ -18,6 +18,8 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestHandler;
 import org.apache.http.util.EntityUtils;
 
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+
 import android.content.Context;
 
 public class StaticContentRequestHandler implements HttpRequestHandler 
@@ -59,7 +61,7 @@ public class StaticContentRequestHandler implements HttpRequestHandler
 			} 
 			catch (IOException e) 
 			{
-				e.printStackTrace();
+				LogManager.getInstance(this._context).logException(e);
 			}
         }
 
@@ -118,7 +120,7 @@ public class StaticContentRequestHandler implements HttpRequestHandler
 			}
 			catch (IOException e1) 
 			{
-				e1.printStackTrace();
+				LogManager.getInstance(this._context).logException(e1);
 			}
         }
     }

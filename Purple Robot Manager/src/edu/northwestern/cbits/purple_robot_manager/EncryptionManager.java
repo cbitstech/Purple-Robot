@@ -29,6 +29,7 @@ import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.util.Base64;
 import edu.emory.mathcs.backport.java.util.Arrays;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
 public class EncryptionManager 
 {
@@ -132,7 +133,7 @@ public class EncryptionManager
 		return cipher;
 	}
 	
-	public String createHash(String string)
+	public String createHash(Context context, String string)
 	{
 		if (string == null)
 			return null;
@@ -153,11 +154,11 @@ public class EncryptionManager
 		}
 		catch (NoSuchAlgorithmException e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(context).logException(e);
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(context).logException(e);
 		}
 		
 		return hash;
@@ -200,7 +201,7 @@ public class EncryptionManager
 		{
 			String userId = this.getUserId(context);
 
-			userHash = this.createHash(userId);
+			userHash = this.createHash(context, userId);
 
 			Editor e = prefs.edit();
 
@@ -278,7 +279,7 @@ public class EncryptionManager
 	
 	public String fetchEncryptedString(Context context, String key)
 	{
-		key = this.createHash(key);
+		key = this.createHash(context, key);
 		
 		SharedPreferences prefs = EncryptionManager.getPreferences(context);
 
@@ -296,15 +297,15 @@ public class EncryptionManager
 			} 
 			catch (IllegalBlockSizeException e) 
 			{
-				e.printStackTrace();
+				LogManager.getInstance(context).logException(e);
 			} 
 			catch (BadPaddingException e) 
 			{
-				e.printStackTrace();
+				LogManager.getInstance(context).logException(e);
 			} 
 			catch (UnsupportedEncodingException e) 
 			{
-				e.printStackTrace();
+				LogManager.getInstance(context).logException(e);
 			}
 		}
 		
@@ -321,7 +322,7 @@ public class EncryptionManager
 				
 				String baseEncoded = Base64.encodeToString(encoded, Base64.DEFAULT);
 				
-				key = this.createHash(key);
+				key = this.createHash(context, key);
 
 				SharedPreferences prefs = EncryptionManager.getPreferences(context);
 				Editor edit = prefs.edit();
@@ -332,15 +333,15 @@ public class EncryptionManager
 			}
 			catch (IllegalBlockSizeException e) 
 			{
-				e.printStackTrace();
+				LogManager.getInstance(context).logException(e);
 			} 
 			catch (BadPaddingException e) 
 			{
-				e.printStackTrace();
+				LogManager.getInstance(context).logException(e);
 			} 
 			catch (UnsupportedEncodingException e) 
 			{
-				e.printStackTrace();
+				LogManager.getInstance(context).logException(e);
 			}
 		}
 		

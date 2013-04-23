@@ -271,7 +271,7 @@ public class LocationProbe extends Probe implements LocationListener
 					values.put(LocationProbe.LATITUDE_KEY, Double.valueOf(location.getLatitude()));
 					values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(location.getTime() / 1000));
 
-					ProbeValuesProvider.getProvider(this._context).insertValue(LocationProbe.DB_TABLE, LocationProbe.databaseSchema(), values);
+					ProbeValuesProvider.getProvider(this._context).insertValue(this._context, LocationProbe.DB_TABLE, LocationProbe.databaseSchema(), values);
 
 					this._lastCache = time;
 					this._lastLocation = new Location(location);

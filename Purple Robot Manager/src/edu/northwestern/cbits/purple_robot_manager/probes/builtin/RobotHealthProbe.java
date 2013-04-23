@@ -30,6 +30,7 @@ import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.config.JSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.config.SchemeConfigFile;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
@@ -139,9 +140,9 @@ public class RobotHealthProbe extends Probe
 	        return (float)(cpu2 - cpu1) / ((cpu2 + idle2) - (cpu1 + idle1));
 
 	    }
-	    catch (IOException ex) 
+	    catch (IOException e) 
 	    {
-	        ex.printStackTrace();
+	        e.printStackTrace();
 	    }
 
 	    return 0;
@@ -266,11 +267,11 @@ public class RobotHealthProbe extends Probe
 									}
 									catch (NameNotFoundException e) 
 									{
-										e.printStackTrace();
+										LogManager.getInstance(context).logException(e);
 									}
 									catch (RuntimeException e)
 									{
-										e.printStackTrace();
+										LogManager.getInstance(context).logException(e);
 									}
 
 									// NTP checks
@@ -295,11 +296,11 @@ public class RobotHealthProbe extends Probe
 										}
 										catch (UnknownHostException e) 
 										{
-
+											LogManager.getInstance(context).logException(e);
 										} 
 										catch (IOException e) 
 										{
-											e.printStackTrace();
+											LogManager.getInstance(context).logException(e);
 										}
 										finally
 										{

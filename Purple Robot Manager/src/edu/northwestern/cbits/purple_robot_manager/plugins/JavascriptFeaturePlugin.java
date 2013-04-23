@@ -4,6 +4,7 @@ import org.json.JSONException;
 
 import android.content.Intent;
 import android.os.Bundle;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.JavascriptFeature;
@@ -37,7 +38,7 @@ public class JavascriptFeaturePlugin extends OutputPlugin
 						}
 						catch (JSONException e)
 						{
-							e.printStackTrace();
+							LogManager.getInstance(this.getContext()).logException(e);
 						}
 					}
 				}

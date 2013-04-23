@@ -9,6 +9,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
+
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+
 public class JSONHelper 
 {
 	public boolean isJson(Object o)
@@ -242,7 +246,7 @@ public class JSONHelper
 		return o.toString();			
 	}
 	
-	public Object get(JSONObject obj, String key)
+	public Object get(Context context, JSONObject obj, String key)
 	{
 		try 
 		{
@@ -257,7 +261,7 @@ public class JSONHelper
 		} 
 		catch (JSONException e) 
 		{
-			e.printStackTrace();
+			LogManager.getInstance(context).logException(e);
 		}
 		
 		return null;
@@ -309,7 +313,7 @@ public class JSONHelper
 		return new Pair(new Pair(Symbol.QUOTE, new Pair(list, Pair.EMPTY)), Pair.EMPTY);
 	}
 
-	public boolean put(JSONObject obj, String key, Object value)
+	public boolean put(Context context, JSONObject obj, String key, Object value)
 	{
 		try 
 		{
@@ -319,7 +323,7 @@ public class JSONHelper
 		} 
 		catch (JSONException e) 
 		{
-			e.printStackTrace();
+			LogManager.getInstance(context).logException(e);
 		}
 		
 		return false;

@@ -20,6 +20,7 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.net.Uri;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 
 public class JsonStoreRequestHandler implements HttpRequestHandler 
@@ -55,7 +56,7 @@ public class JsonStoreRequestHandler implements HttpRequestHandler
 			} 
             catch (JSONException e) 
             {
-				e.printStackTrace();
+				LogManager.getInstance(this._context).logException(e);
 
                 response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
                 
@@ -135,7 +136,7 @@ public class JsonStoreRequestHandler implements HttpRequestHandler
 				} 
 				catch (JSONException e) 
 				{
-					e.printStackTrace();
+					LogManager.getInstance(this._context).logException(e);
 
 	                response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
 	                

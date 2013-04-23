@@ -36,6 +36,7 @@ import android.util.Log;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 import edu.northwestern.cbits.purple_robot_manager.scripting.SchemeEngine;
@@ -152,7 +153,7 @@ public class LegacyJSONConfigFile
 						String scriptString = new String(bout.toByteArray(), "UTF-8");
 
 						String oldHash = prefs.getString(LegacyJSONConfigFile.JSON_LAST_HASH, "");
-						final String newHash = encryption.createHash(scriptString);
+						final String newHash = encryption.createHash(context, scriptString);
 
 						if (conn.getContentType().toLowerCase().startsWith("text/x-scheme"))
 						{
@@ -170,7 +171,7 @@ public class LegacyJSONConfigFile
 								}
 								catch (final Exception e)
 								{
-									e.printStackTrace();
+									LogManager.getInstance(context).logException(e);
 									
 									if (context instanceof Activity)
 									{
@@ -238,11 +239,11 @@ public class LegacyJSONConfigFile
 										}
 										catch (JSONException e) 
 										{
-											e.printStackTrace();
+											LogManager.getInstance(context).logException(e);
 										}
 										catch (final EcmaError e)
 										{
-											e.printStackTrace();
+											LogManager.getInstance(context).logException(e);
 											
 											if (context instanceof Activity)
 											{
@@ -259,7 +260,7 @@ public class LegacyJSONConfigFile
 										}
 										catch (final EvaluatorException e)
 										{
-											e.printStackTrace();
+											LogManager.getInstance(context).logException(e);
 											
 											if (context instanceof Activity)
 											{
@@ -294,15 +295,15 @@ public class LegacyJSONConfigFile
 					}
 					catch (MalformedURLException e)
 					{
-						e.printStackTrace();
+						LogManager.getInstance(context).logException(e);
 					}
 					catch (IOException e)
 					{
-						e.printStackTrace();
+						LogManager.getInstance(context).logException(e);
 					}
 					catch (JSONException e)
 					{
-						e.printStackTrace();
+						LogManager.getInstance(context).logException(e);
 					}
 
 					LegacyJSONConfigFile._sharedFile = new LegacyJSONConfigFile(context, next);
@@ -453,7 +454,7 @@ public class LegacyJSONConfigFile
 		}
 		catch (JSONException e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(context).logException(e);
 		}
 
 		SharedPreferences prefs = LegacyJSONConfigFile.getPreferences(context);
@@ -492,11 +493,11 @@ public class LegacyJSONConfigFile
 			}
 			catch (NoSuchAlgorithmException e)
 			{
-				e.printStackTrace();
+				LogManager.getInstance(context).logException(e);
 			}
 			catch (UnsupportedEncodingException e)
 			{
-				e.printStackTrace();
+				LogManager.getInstance(context).logException(e);
 			}
 		}
 
@@ -516,7 +517,7 @@ public class LegacyJSONConfigFile
 			}
 			catch (JSONException e)
 			{
-				e.printStackTrace();
+				LogManager.getInstance(context).logException(e);
 			}
 		}
 
@@ -564,7 +565,7 @@ public class LegacyJSONConfigFile
 			}
 			catch (JSONException e)
 			{
-				e.printStackTrace();
+				LogManager.getInstance(context).logException(e);
 			}
 		}
 
@@ -610,7 +611,7 @@ public class LegacyJSONConfigFile
 		}
 		catch (OutOfMemoryError e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(context).logException(e);
 		}
 	}
 

@@ -9,6 +9,7 @@ import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.Undefined;
 
 import android.content.Context;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 
 public class ExecuteJavaScriptCommand extends JSONCommand 
@@ -22,9 +23,9 @@ public class ExecuteJavaScriptCommand extends JSONCommand
 		super(arguments, context);
 	}
 
-	public JSONObject execute() 
+	public JSONObject execute(Context context) 
 	{
-		JSONObject result = super.execute();
+		JSONObject result = super.execute(context);
 
 		try 
 		{
@@ -61,7 +62,7 @@ public class ExecuteJavaScriptCommand extends JSONCommand
 		}
 		catch (Exception e) 
 		{
-			e.printStackTrace();
+			LogManager.getInstance(context).logException(e);
 			
 			try 
 			{
@@ -70,7 +71,7 @@ public class ExecuteJavaScriptCommand extends JSONCommand
 			}
 			catch (JSONException ee) 
 			{
-				ee.printStackTrace();
+				LogManager.getInstance(context).logException(ee);
 			}
 		}
 

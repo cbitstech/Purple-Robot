@@ -4,6 +4,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
 import android.content.Context;
 
@@ -16,9 +17,9 @@ public class FetchUserHashCommand extends JSONCommand
 		super(arguments, context);
 	}
 
-	public JSONObject execute() 
+	public JSONObject execute(Context context) 
 	{
-		JSONObject result = super.execute();
+		JSONObject result = super.execute(context);
 		
 		try 
 		{
@@ -29,7 +30,7 @@ public class FetchUserHashCommand extends JSONCommand
 		}
 		catch (JSONException e) 
 		{
-			e.printStackTrace();
+			LogManager.getInstance(context).logException(e);
 		}
 		
 		return result;

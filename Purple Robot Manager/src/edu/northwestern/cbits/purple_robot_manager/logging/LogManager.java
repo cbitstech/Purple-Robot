@@ -1,6 +1,8 @@
 package edu.northwestern.cbits.purple_robot_manager.logging;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.KeyManagementException;
@@ -10,6 +12,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,6 +49,7 @@ import android.util.Log;
 
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
+import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.WiFiHelper;
 import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
@@ -63,6 +67,8 @@ public class LogManager
 	private static final String MIXPANEL_PREFIX = "log://mixpanel/?token=";
 	private static final String LOG_QUEUE = "pending_log_queue";
 	private static final String CONTENT_OBJECT = "content_object";
+	private static final String USER_ID = "user_id";
+	private static final String STACKTRACE = "stacktrace";
 
 	private static LogManager _sharedInstance = null;
 	
@@ -86,7 +92,8 @@ public class LogManager
 		if (LogManager._sharedInstance != null)
 			return LogManager._sharedInstance;
 		
-		LogManager._sharedInstance = new LogManager(context.getApplicationContext());
+		if (context != null)
+			LogManager._sharedInstance = new LogManager(context.getApplicationContext());
 		
 		return LogManager._sharedInstance;
 	}
@@ -97,17 +104,12 @@ public class LogManager
 
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
 
-		Log.e("PR", "1");
-
 		if (prefs.getBoolean("config_enable_log_server", false))
 		{
-			Log.e("PR", "2");
 			String endpointUri = prefs.getString("config_log_server_uri", null);
 			
 			if (endpointUri != null)
 			{
-				Log.e("PR", "3");
-
 				JavaScriptEngine engine = new JavaScriptEngine(this._context);
 		
 				Map<String, Object> namespace = engine.fetchNamespaceMap(LogManager.NAMESPACE);
@@ -120,8 +122,6 @@ public class LogManager
 							payload.put(key, namespace.get(key));
 					}
 				}
-
-				Log.e("PR", "4");
 
 				if (prefs.getBoolean("config_log_location", false))
 				{
@@ -144,10 +144,11 @@ public class LogManager
 					}
 				}
 
-				Log.e("PR", "5");
-
 				payload.put(LogManager.EVENT_TYPE, event);
 				payload.put(LogManager.TIMESTAMP, now / 1000);
+				
+				if (payload.containsKey(LogManager.USER_ID) == false)
+					payload.put(LogManager.USER_ID, EncryptionManager.getInstance().getUserHash(this._context));
 				
 				try 
 				{
@@ -155,10 +156,8 @@ public class LogManager
 				}
 				catch (JSONException e) 
 				{
-					e.printStackTrace();
+					this.logException(e);
 				}
-
-				Log.e("PR", "6");
 
 				try 
 				{
@@ -174,24 +173,18 @@ public class LogManager
 
 					pendingEvents.put(jsonEvent);
 					
-					Log.e("PR", "WRITING " + pendingEvents.toString());
-					
 					Editor e = prefs.edit();
 					e.putString(LogManager.LOG_QUEUE, pendingEvents.toString());
 					e.commit();
 					e.apply();
 
-					Log.e("PR", "7");
-
 					pendingEvents = new JSONArray(prefs.getString(LogManager.LOG_QUEUE, "[]"));
-					
-					Log.e("FC", "PENDING EVENTS: " + pendingEvents.toString());
 
 					return true;
 				}
 				catch (JSONException e) 
 				{
-					e.printStackTrace();
+					this.logException(e);
 				}
 			}
 			else
@@ -210,8 +203,6 @@ public class LogManager
 
 	public void attemptUploads() 
 	{
-		Log.e("PR", "ATTEMPTING UPLOAD! " + this._uploading);
-
 		if (this._uploading)
 			return;
 		
@@ -229,8 +220,6 @@ public class LogManager
 			try 
 			{
 				JSONArray pendingEvents = new JSONArray(prefs.getString(LogManager.LOG_QUEUE, "[]"));
-				
-				Log.e("FC", "PENDING EVENTS: " + pendingEvents.toString());
 				
 				if (endpointUri.startsWith(LogManager.MIXPANEL_PREFIX))
 				{
@@ -299,38 +288,36 @@ public class LogManager
 							
 							HttpResponse response = httpClient.execute(httpPost);
 
-							HttpEntity httpEntity = response.getEntity();
-
-							Log.e("PR", "GOT " + EntityUtils.toString(httpEntity));
+//							HttpEntity httpEntity = response.getEntity();
 						}
 					}
 					catch (URISyntaxException e) 
 					{
-						e.printStackTrace();
+						this.logException(e);
 					} 
 					catch (KeyStoreException e) 
 					{
-						e.printStackTrace();
+						this.logException(e);
 					} 
 					catch (NoSuchAlgorithmException e) 
 					{
-						e.printStackTrace();
+						this.logException(e);
 					}
 					catch (CertificateException e) 
 					{
-						e.printStackTrace();
+						this.logException(e);
 					} 
 					catch (IOException e) 
 					{
-						e.printStackTrace();
+						this.logException(e);
 					} 
 					catch (KeyManagementException e) 
 					{
-						e.printStackTrace();
+						this.logException(e);
 					}
 					catch (UnrecoverableKeyException e) 
 					{
-						e.printStackTrace();
+						this.logException(e);
 					}
 				}
 				
@@ -340,11 +327,30 @@ public class LogManager
 			}
 			catch (JSONException e) 
 			{
-				e.printStackTrace();
+				this.logException(e);
 			}
-
 		}
 		
 		this._uploading = false;
+	}
+
+	public void logException(Throwable e) 
+	{
+		Map<String, Object> payload = new HashMap<String, Object>();
+		
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		PrintStream out = new PrintStream(baos);
+		
+		e.printStackTrace(out);
+		
+		out.close();
+		
+		String stacktrace = baos.toString();
+		
+		payload.put(LogManager.STACKTRACE, stacktrace);
+		
+		this.log("java-exception", payload);
+		
+		e.printStackTrace();
 	}
 }

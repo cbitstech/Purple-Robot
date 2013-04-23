@@ -18,6 +18,7 @@ import android.database.sqlite.SQLiteStatement;
 import edu.northwestern.cbits.purple_robot_manager.db.filters.Filter;
 import edu.northwestern.cbits.purple_robot_manager.db.filters.FrequencyThrottleFilter;
 import edu.northwestern.cbits.purple_robot_manager.db.filters.ValueDeltaFilter;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.AccelerometerProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.GyroscopeProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LightProbe;
@@ -60,7 +61,7 @@ public class ProbeValuesProvider
 		}
 		catch (SQLException e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(context).logException(e);
 		}
 
 		HashSet<String> highFreq = new HashSet<String>();
@@ -96,7 +97,7 @@ public class ProbeValuesProvider
 		this._dbHelper.close();
 	}
 
-	private String tableName(String name, Map<String, String> schema)
+	private String tableName(Context context, String name, Map<String, String> schema)
 	{
 		String tableName = name;
 
@@ -117,17 +118,17 @@ public class ProbeValuesProvider
 		}
 		catch (NoSuchAlgorithmException e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(context).logException(e);
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(context).logException(e);
 		}
 
 		return tableName;
 	}
 
-	private boolean tableExists(String tableName)
+	private boolean tableExists(Context context, String tableName)
 	{
 		Cursor c = null;
 
@@ -141,7 +142,7 @@ public class ProbeValuesProvider
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(context).logException(e);
 		}
 		finally
 		{
@@ -192,7 +193,7 @@ public class ProbeValuesProvider
 		return false;
 	}
 
-	public void insertValue(final String name, final Map<String, String> schema, final Map<String, Object> values)
+	public void insertValue(final Context context, final String name, final Map<String, String> schema, final Map<String, Object> values)
 	{
 		final ProbeValuesProvider me = this;
 
@@ -211,11 +212,11 @@ public class ProbeValuesProvider
 					long now = System.currentTimeMillis();
 
 					if (now - me._lastCleanup > 300000) // Flush old entries every 5 minutes...
-						me.cleanup();
+						me.cleanup(context);
 
-					String localName = me.tableName(name, schema);
+					String localName = me.tableName(context, name, schema);
 
-					if (me.tableExists(localName) == false)
+					if (me.tableExists(context, localName) == false)
 						me.createTable(localName, schema);
 
 					ContentValues toInsert = new ContentValues();
@@ -254,11 +255,11 @@ public class ProbeValuesProvider
 		}
 		catch (OutOfMemoryError e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(context).logException(e);
 		}
 	}
 
-	private void cleanup()
+	private void cleanup(Context context)
 	{
 		this._lastCleanup = System.currentTimeMillis();
 
@@ -288,22 +289,22 @@ public class ProbeValuesProvider
 			}
 			catch (SQLException e)
 			{
-				// e.printStackTrace();
+				LogManager.getInstance(context).logException(e);
 			}
 		}
 
 		c.close();
 	}
 
-	public Cursor retrieveValues(String name, Map<String, String> schema)
+	public Cursor retrieveValues(Context context, String name, Map<String, String> schema)
 	{
 		Cursor c = null;
 
 		synchronized(this._database)
 		{
-			String localName = this.tableName(name, schema);
+			String localName = this.tableName(context, name, schema);
 
-			if (this.tableExists(localName) == false)
+			if (this.tableExists(context, localName) == false)
 				this.createTable(localName, schema);
 
 			try
@@ -312,7 +313,7 @@ public class ProbeValuesProvider
 			}
 			catch (Exception e)
 			{
-				e.printStackTrace();
+				LogManager.getInstance(context).logException(e);
 			}
 		}
 

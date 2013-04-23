@@ -104,7 +104,7 @@ public class JavaScriptEngine extends BaseScriptEngine
 			}
 			catch (IOException e)
 			{
-				e.printStackTrace();
+				LogManager.getInstance(this._context).logException(e);
 			}
 		}
 
@@ -307,7 +307,7 @@ public class JavaScriptEngine extends BaseScriptEngine
 			} 
 			catch (JSONException e) 
 			{
-				e.printStackTrace();
+				LogManager.getInstance(this._context).logException(e);
 			}
 		}
 		

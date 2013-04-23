@@ -29,6 +29,7 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
 @SuppressLint("SimpleDateFormat")
 public class DateTrigger extends Trigger
@@ -65,11 +66,11 @@ public class DateTrigger extends Trigger
 		}
 		catch (NoSuchAlgorithmException e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(null).logException(e);
 		}
 	}
 	
-	public void refresh(Context context) 
+	public void refresh(final Context context) 
 	{
 		long now = System.currentTimeMillis();
 		
@@ -83,7 +84,7 @@ public class DateTrigger extends Trigger
 			{
 				public void run() 
 				{
-					me.refreshCalendar();
+					me.refreshCalendar(context);
 					
 					if (me._calendar == null)
 						return;
@@ -139,7 +140,7 @@ public class DateTrigger extends Trigger
 						}
 						catch (IllegalArgumentException e)
 						{
-							e.printStackTrace();
+							LogManager.getInstance(context).logException(e);
 						}
 					}
 
@@ -172,7 +173,7 @@ public class DateTrigger extends Trigger
 		edit.commit();
 	}
 
-	public void merge(Trigger trigger) 
+	public void merge(Context context, Trigger trigger) 
 	{
 		if (trigger instanceof DateTrigger)
 		{
@@ -183,11 +184,11 @@ public class DateTrigger extends Trigger
 			this._icalString = dateTrigger._icalString;
 			this._random = dateTrigger._random;
 			
-			this.refreshCalendar();
+			this.refreshCalendar(context);
 		}
 	}
 	
-	private void refreshCalendar()
+	private void refreshCalendar(Context context)
 	{
 		if (this._icalString == null)
 			return;
@@ -202,11 +203,11 @@ public class DateTrigger extends Trigger
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(context).logException(e);
 		}
 		catch (ParserException e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(context).logException(e);
 		}
 	}
 	
@@ -265,7 +266,7 @@ public class DateTrigger extends Trigger
 		this.updateFromMap(context, map);
 	}
 
-	public Period getPeriod(long timestamp)
+	public Period getPeriod(Context context, long timestamp)
 	{
 		if (timestamp - this.lastUpdate > 300000)
 		{
@@ -296,7 +297,7 @@ public class DateTrigger extends Trigger
 			}
 			catch (IllegalArgumentException e)
 			{
-				e.printStackTrace();
+				LogManager.getInstance(context).logException(e);
 			}
 		}
 
@@ -327,7 +328,7 @@ public class DateTrigger extends Trigger
 	{
 		long now = System.currentTimeMillis();
 
-		Period p = this.getPeriod(now);
+		Period p = this.getPeriod(context, now);
 
 		SharedPreferences prefs =  PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -383,7 +384,7 @@ public class DateTrigger extends Trigger
 			{
 				Date date = (Date) obj;
 
-				Period p = this.getPeriod(date.getTime());
+				Period p = this.getPeriod(context, date.getTime());
 
 				return (p != null);
 			}

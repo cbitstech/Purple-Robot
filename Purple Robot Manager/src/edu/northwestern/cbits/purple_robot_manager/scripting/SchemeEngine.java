@@ -18,6 +18,7 @@ import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.ScheduleManager;
 import edu.northwestern.cbits.purple_robot_manager.config.SchemeConfigFile;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.Feature;
 
 public class SchemeEngine extends BaseScriptEngine
@@ -62,11 +63,11 @@ public class SchemeEngine extends BaseScriptEngine
 		} 
 		catch (IOException e) 
 		{
-			e.printStackTrace();
+			LogManager.getInstance(this._context).logException(e);
 		}
 		catch (StackOverflowError e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(this._context).logException(e);
 		}
 
 		try 
@@ -75,11 +76,11 @@ public class SchemeEngine extends BaseScriptEngine
 		} 
 		catch (IOException e) 
 		{
-			e.printStackTrace();
+			LogManager.getInstance(this._context).logException(e);
 		}
 		catch (StackOverflowError e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(this._context).logException(e);
 		}
 
 		try 
@@ -88,11 +89,11 @@ public class SchemeEngine extends BaseScriptEngine
 		} 
 		catch (IOException e) 
 		{
-			e.printStackTrace();
+			LogManager.getInstance(this._context).logException(e);
 		}
 		catch (StackOverflowError e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(this._context).logException(e);
 		}
 		
 		Log.e("PR", "EVALING SOURCE");
@@ -103,7 +104,7 @@ public class SchemeEngine extends BaseScriptEngine
 		}
 		catch (StackOverflowError e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(this._context).logException(e);
 		}
 		
 		return Boolean.valueOf(false);

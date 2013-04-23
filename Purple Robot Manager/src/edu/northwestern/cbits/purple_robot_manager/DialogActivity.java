@@ -2,6 +2,7 @@ package edu.northwestern.cbits.purple_robot_manager;
 
 import java.util.ArrayList;
 
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
 import android.app.Activity;
@@ -84,7 +85,7 @@ public class DialogActivity extends Activity
 					}
 					catch (Exception e)
 					{
-						e.printStackTrace();
+						LogManager.getInstance(me).logException(e);
 					}
 				}
 
@@ -114,7 +115,7 @@ public class DialogActivity extends Activity
 	    					}
 	    					catch (Exception e)
 	    					{
-	    						e.printStackTrace();
+	    						LogManager.getInstance(me).logException(e);
 	    					}
 	    				}
 	    				

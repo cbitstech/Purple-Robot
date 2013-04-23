@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class LogCatOutputPlugin extends OutputPlugin
@@ -33,7 +34,7 @@ public class LogCatOutputPlugin extends OutputPlugin
 		}
 		catch (JSONException e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(this.getContext()).logException(e);
 		}
 	}
 

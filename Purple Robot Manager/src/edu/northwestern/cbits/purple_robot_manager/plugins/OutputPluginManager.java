@@ -3,6 +3,8 @@ package edu.northwestern.cbits.purple_robot_manager.plugins;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -37,11 +39,11 @@ public class OutputPluginManager extends BroadcastReceiver
 			}
 			catch (InstantiationException e)
 			{
-				e.printStackTrace();
+				LogManager.getInstance(context).logException(e);
 			}
 			catch (IllegalAccessException e)
 			{
-				e.printStackTrace();
+				LogManager.getInstance(context).logException(e);
 			}
 		}
 	}

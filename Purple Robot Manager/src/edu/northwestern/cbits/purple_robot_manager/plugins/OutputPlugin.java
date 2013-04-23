@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
 public abstract class OutputPlugin
 {
@@ -105,27 +106,27 @@ public abstract class OutputPlugin
 			}
 			catch (ClassNotFoundException e)
 			{
-				e.printStackTrace();
+				LogManager.getInstance(context).logException(e);
 			}
 			catch (NoSuchMethodException e)
 			{
-				e.printStackTrace();
+				LogManager.getInstance(context).logException(e);
 			}
 			catch (IllegalArgumentException e)
 			{
-				e.printStackTrace();
+				LogManager.getInstance(context).logException(e);
 			}
 			catch (IllegalAccessException e)
 			{
-				e.printStackTrace();
+				LogManager.getInstance(context).logException(e);
 			}
 			catch (InvocationTargetException e)
 			{
-				e.printStackTrace();
+				LogManager.getInstance(context).logException(e);
 			}
 			catch (InstantiationException e)
 			{
-				e.printStackTrace();
+				LogManager.getInstance(context).logException(e);
 			}
 		}
 

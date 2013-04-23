@@ -39,6 +39,7 @@ import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
 import edu.northwestern.cbits.purple_robot_manager.charts.SplineChart;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
 @SuppressLint("SimpleDateFormat")
 public class GyroscopeProbe extends ContinuousProbe implements SensorEventListener
@@ -109,7 +110,7 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 
 	public String contentSubtitle(Context context)
 	{
-		Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(GyroscopeProbe.DB_TABLE, this.databaseSchema());
+		Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(context, GyroscopeProbe.DB_TABLE, this.databaseSchema());
 
 		int count = -1;
 
@@ -146,7 +147,7 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 			ArrayList<Double> z = new ArrayList<Double>();
 			ArrayList<Double> time = new ArrayList<Double>();
 
-			Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(GyroscopeProbe.DB_TABLE, this.databaseSchema());
+			Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(activity, GyroscopeProbe.DB_TABLE, this.databaseSchema());
 
 			int count = -1;
 
@@ -196,11 +197,11 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(activity).logException(e);
 		}
 		catch (JSONException e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(activity).logException(e);
 		}
 
 		return null;
@@ -446,7 +447,7 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 
 							values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[j] / 1000));
 
-							ProbeValuesProvider.getProvider(this._context).insertValue(GyroscopeProbe.DB_TABLE, this.databaseSchema(), values);
+							ProbeValuesProvider.getProvider(this._context).insertValue(this._context, GyroscopeProbe.DB_TABLE, this.databaseSchema(), values);
 						}
 					}
 

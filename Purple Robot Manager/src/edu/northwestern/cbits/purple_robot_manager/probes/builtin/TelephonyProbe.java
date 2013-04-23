@@ -24,6 +24,7 @@ import android.telephony.cdma.CdmaCellLocation;
 import android.telephony.gsm.GsmCellLocation;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class TelephonyProbe extends Probe
@@ -253,7 +254,7 @@ public class TelephonyProbe extends Probe
 						}
 						catch (SecurityException e)
 						{
-							e.printStackTrace();
+							LogManager.getInstance(context).logException(e);
 						}
 
 						this._lastCheck = now;

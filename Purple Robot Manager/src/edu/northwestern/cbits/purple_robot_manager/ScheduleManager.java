@@ -16,6 +16,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
 public class ScheduleManager 
@@ -57,7 +58,7 @@ public class ScheduleManager
 			}
 			catch (Exception e) 
 			{
-				e.printStackTrace();
+				LogManager.getInstance(context).logException(e);
 
 				executed.add(script);
 			}
@@ -88,7 +89,7 @@ public class ScheduleManager
 				} 
 				catch (JSONException e) 
 				{
-					e.printStackTrace();
+					LogManager.getInstance(context).logException(e);
 				}
 			}
 		}
@@ -129,7 +130,7 @@ public class ScheduleManager
 		}
 		catch (JSONException e) 
 		{
-			e.printStackTrace();
+			LogManager.getInstance(context).logException(e);
 		}
 		
 		return scripts;
@@ -186,8 +187,15 @@ public class ScheduleManager
 		} 
 		catch (ParseException e) 
 		{
-			e.printStackTrace();
-			
+			try
+			{
+				LogManager.getInstance(null).logException(e);
+			}
+			catch (NullPointerException ee)
+			{
+				// No LogManager available yet.
+			}
+
 			return null;
 		}
 	}

@@ -310,8 +310,8 @@ public class BluetoothDevicesProbe extends Probe
 
 						if (doHash)
 						{
-							deviceBundle.putString(BluetoothDevicesProbe.NAME, em.createHash(device.getName()));
-							deviceBundle.putString(BluetoothDevicesProbe.ADDRESS, em.createHash(device.getAddress()));
+							deviceBundle.putString(BluetoothDevicesProbe.NAME, em.createHash(context, device.getName()));
+							deviceBundle.putString(BluetoothDevicesProbe.ADDRESS, em.createHash(context, device.getAddress()));
 						}
 						else
 						{

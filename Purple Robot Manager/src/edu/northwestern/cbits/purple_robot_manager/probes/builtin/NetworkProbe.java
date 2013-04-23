@@ -23,6 +23,7 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.text.format.Formatter;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class NetworkProbe extends Probe 
@@ -140,7 +141,7 @@ public class NetworkProbe extends Probe
 									} 
 									catch (SocketException e) 
 									{
-										e.printStackTrace();
+										LogManager.getInstance(context).logException(e);
 									}
 								}
 								
@@ -159,11 +160,11 @@ public class NetworkProbe extends Probe
 								}
 								catch (SocketException e) 
 								{
-									e.printStackTrace();
+									LogManager.getInstance(context).logException(e);
 								} 
 								catch (UnknownHostException e) 
 								{
-									e.printStackTrace();
+									LogManager.getInstance(context).logException(e);
 								}
 
 								me.transmitData(context, bundle);

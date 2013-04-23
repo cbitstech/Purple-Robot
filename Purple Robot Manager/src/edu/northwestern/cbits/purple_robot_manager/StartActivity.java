@@ -49,6 +49,7 @@ import com.actionbarsherlock.view.MenuItem;
 import edu.northwestern.cbits.purple_robot_manager.activities.DiagnosticActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.LabelActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
@@ -117,6 +118,8 @@ public class StartActivity extends SherlockActivity
 
 		super.onCreate(savedInstanceState);
 
+		LogManager.getInstance(this);
+		
 		SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
 		if (sharedPrefs.getBoolean(SettingsActivity.CHECK_UPDATES_KEY, true))
@@ -253,7 +256,7 @@ public class StartActivity extends SherlockActivity
         			}
         			catch (Exception e)
         			{
-        				e.printStackTrace();
+        				LogManager.getInstance(me).logException(e);
         			}
 
         			Bundle sensor = value.getBundle("SENSOR");

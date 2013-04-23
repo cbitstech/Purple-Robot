@@ -23,6 +23,7 @@ import android.provider.CallLog.Calls;
 import android.telephony.PhoneNumberUtils;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class CommunicationLogProbe extends Probe
@@ -127,8 +128,8 @@ public class CommunicationLogProbe extends Probe
 
 								if (doHash)
 								{
-									numberName = em.createHash(numberName);
-									phoneNumber = em.createHash(phoneNumber);
+									numberName = em.createHash(context, numberName);
+									phoneNumber = em.createHash(context, phoneNumber);
 								}
 
 								contactBundle.putString(CommunicationLogProbe.NUMBER_NAME, numberName);
@@ -204,7 +205,7 @@ public class CommunicationLogProbe extends Probe
 						{
 							// Broken call & SMS databases on several devices... Ignoring.
 
-							e.printStackTrace();
+							LogManager.getInstance(context).logException(e);
 						}
 
 						this._lastCheck = now;
