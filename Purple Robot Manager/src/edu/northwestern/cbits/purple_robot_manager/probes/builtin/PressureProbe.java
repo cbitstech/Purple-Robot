@@ -39,6 +39,7 @@ import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
 import edu.northwestern.cbits.purple_robot_manager.charts.SplineChart;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
 @SuppressLint("SimpleDateFormat")
 public class PressureProbe extends ContinuousProbe implements SensorEventListener
@@ -78,7 +79,7 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 
 	public String contentSubtitle(Context context)
 	{
-		Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(PressureProbe.DB_TABLE, this.databaseSchema());
+		Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(context, PressureProbe.DB_TABLE, this.databaseSchema());
 
 		int count = -1;
 
@@ -102,7 +103,7 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 			ArrayList<Double> pressure = new ArrayList<Double>();
 			ArrayList<Double> time = new ArrayList<Double>();
 
-			Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(PressureProbe.DB_TABLE, this.databaseSchema());
+			Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(activity, PressureProbe.DB_TABLE, this.databaseSchema());
 
 			int count = -1;
 
@@ -144,11 +145,11 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(activity).logException(e);
 		}
 		catch (JSONException e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(activity).logException(e);
 		}
 
 		return null;
@@ -433,7 +434,7 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 
 							values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[j] / 1000));
 
-							ProbeValuesProvider.getProvider(this._context).insertValue(PressureProbe.DB_TABLE, this.databaseSchema(), values);
+							ProbeValuesProvider.getProvider(this._context).insertValue(this._context, PressureProbe.DB_TABLE, this.databaseSchema(), values);
 						}
 					}
 

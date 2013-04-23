@@ -3,6 +3,7 @@ package edu.northwestern.cbits.purple_robot_manager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
 public class WidgetReceiver extends BroadcastReceiver
@@ -34,7 +35,7 @@ public class WidgetReceiver extends BroadcastReceiver
 			}
 			catch (Exception e)
 			{
-				e.printStackTrace();
+				LogManager.getInstance(context).logException(e);
 			}
 		}
     }

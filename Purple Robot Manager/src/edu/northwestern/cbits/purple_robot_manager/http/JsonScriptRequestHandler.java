@@ -26,6 +26,7 @@ import edu.northwestern.cbits.purple_robot_manager.http.commands.JSONCommand;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.PersistStringCommand;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.PingCommand;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.UnknownCommand;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
 public class JsonScriptRequestHandler implements HttpRequestHandler 
 {
@@ -67,9 +68,9 @@ public class JsonScriptRequestHandler implements HttpRequestHandler
 			} 
             catch (JSONException e) 
             {
-				e.printStackTrace();
+				LogManager.getInstance(this._context).logException(e);
 
-                response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+				response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
                 
                 StringEntity body = new StringEntity(e.toString());
                 body.setContentType("text/plain");
@@ -80,7 +81,7 @@ public class JsonScriptRequestHandler implements HttpRequestHandler
             }
             catch (NullPointerException e) 
             {
-				e.printStackTrace();
+				LogManager.getInstance(this._context).logException(e);
 
                 response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
                 
@@ -98,7 +99,7 @@ public class JsonScriptRequestHandler implements HttpRequestHandler
 	            {
 	                JSONCommand command = JsonScriptRequestHandler.commandForJson(arguments, this._context);
 	                
-	                JSONObject result = command.execute();
+	                JSONObject result = command.execute(this._context);
 	
 	                StringEntity body = new StringEntity(result.toString(2));
 	                body.setContentType("application/json");
@@ -137,7 +138,7 @@ public class JsonScriptRequestHandler implements HttpRequestHandler
 		} 
 		catch (JSONException e) 
 		{
-			e.printStackTrace();
+			LogManager.getInstance(context).logException(e);
 		}
 		
 		return new UnknownCommand(arguments, context);

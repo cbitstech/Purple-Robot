@@ -39,6 +39,7 @@ import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
 import edu.northwestern.cbits.purple_robot_manager.charts.SplineChart;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
 @SuppressLint("SimpleDateFormat")
 public class LightProbe extends ContinuousProbe implements SensorEventListener
@@ -76,7 +77,7 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 
 	public String contentSubtitle(Context context)
 	{
-		Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(LightProbe.DB_TABLE, this.databaseSchema());
+		Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(context, LightProbe.DB_TABLE, this.databaseSchema());
 
 		int count = -1;
 
@@ -110,7 +111,7 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 			ArrayList<Double> light = new ArrayList<Double>();
 			ArrayList<Double> time = new ArrayList<Double>();
 
-			Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(LightProbe.DB_TABLE, this.databaseSchema());
+			Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(activity, LightProbe.DB_TABLE, this.databaseSchema());
 
 			int count = -1;
 
@@ -153,11 +154,11 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(activity).logException(e);
 		}
 		catch (JSONException e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(activity).logException(e);
 		}
 
 		return null;
@@ -425,7 +426,7 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 
 							values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[j] / 1000));
 
-							ProbeValuesProvider.getProvider(this._context).insertValue(LightProbe.DB_TABLE, this.databaseSchema(), values);
+							ProbeValuesProvider.getProvider(this._context).insertValue(this._context, LightProbe.DB_TABLE, this.databaseSchema(), values);
 						}
 					}
 

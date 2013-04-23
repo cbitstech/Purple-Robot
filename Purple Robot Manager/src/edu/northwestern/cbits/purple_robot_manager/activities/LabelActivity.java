@@ -34,6 +34,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 
 @SuppressLint("SimpleDateFormat")
@@ -74,7 +75,7 @@ public class LabelActivity extends SherlockFragmentActivity
 		}
         catch (JSONException e) 
         {
-			e.printStackTrace();
+        	LogManager.getInstance(this).logException(e);
 		}
         
         return labels;
@@ -99,7 +100,7 @@ public class LabelActivity extends SherlockFragmentActivity
 		}
         catch (JSONException e) 
         {
-			e.printStackTrace();
+        	LogManager.getInstance(this).logException(e);
 		}
         
         return values;

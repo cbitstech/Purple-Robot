@@ -31,6 +31,7 @@ import com.actionbarsherlock.view.MenuItem;
 
 import edu.northwestern.cbits.purple_robot_manager.ProbeViewerActivity;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 
@@ -85,7 +86,7 @@ public class WebkitActivity extends SherlockFragmentActivity
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(this).logException(e);
 		}
 
 		return null;

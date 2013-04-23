@@ -3,6 +3,8 @@ package edu.northwestern.cbits.purple_robot_manager.http.commands;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+
 import android.content.Context;
 
 public abstract class JSONCommand 
@@ -25,7 +27,7 @@ public abstract class JSONCommand
 		this._arguments = arguments;
 	}
 	
-	public JSONObject execute()
+	public JSONObject execute(Context context)
 	{
 		JSONObject json = new JSONObject();
 		
@@ -36,7 +38,7 @@ public abstract class JSONCommand
 		} 
 		catch (JSONException e) 
 		{
-			e.printStackTrace();
+			LogManager.getInstance(context).logException(e);
 		}
 		
 		return json;

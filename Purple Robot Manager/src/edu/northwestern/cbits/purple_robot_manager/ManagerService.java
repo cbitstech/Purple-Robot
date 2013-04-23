@@ -144,13 +144,15 @@ public class ManagerService extends IntentService
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace();
+				LogManager.getInstance(this).logException(e);
 			}
 			
 			final Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), toneUri);
 
 			if (r != null)
 			{
+				final ManagerService me = this;
+				
 				Thread t = new Thread(new Runnable()
 				{
 					public void run()
@@ -164,7 +166,7 @@ public class ManagerService extends IntentService
 						}
 						catch (InterruptedException e)
 						{
-							e.printStackTrace();
+							LogManager.getInstance(me).logException(e);
 						}
 					}
 				});
@@ -204,7 +206,7 @@ public class ManagerService extends IntentService
 							}
 							catch (JSONException e)
 							{
-								e.printStackTrace();
+								LogManager.getInstance(this).logException(e);
 							}
 						}
 

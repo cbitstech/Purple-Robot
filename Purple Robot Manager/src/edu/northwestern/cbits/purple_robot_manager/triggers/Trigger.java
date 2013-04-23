@@ -12,6 +12,7 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.CodeViewerActivity;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
 public abstract class Trigger
@@ -56,7 +57,7 @@ public abstract class Trigger
 					}
 					catch (Exception e)
 					{
-						e.printStackTrace();
+						LogManager.getInstance(context).logException(e);
 					}
 				}
 			};

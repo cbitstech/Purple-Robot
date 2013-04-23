@@ -21,6 +21,7 @@ import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
 public abstract class Probe
 {
@@ -72,7 +73,7 @@ public abstract class Probe
 			}
 			catch (ClassNotFoundException e)
 			{
-				e.printStackTrace();
+				LogManager.getInstance(context).logException(e);
 			}
 		}
 	}

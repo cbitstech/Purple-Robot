@@ -197,7 +197,7 @@ public class LocationProbeActivity extends SherlockMapActivity
 
 		List<Location> locations = new ArrayList<Location>();
 
-		Cursor cursor = ProbeValuesProvider.getProvider(this).retrieveValues(LocationProbe.DB_TABLE, LocationProbe.databaseSchema());
+		Cursor cursor = ProbeValuesProvider.getProvider(this).retrieveValues(this, LocationProbe.DB_TABLE, LocationProbe.databaseSchema());
 
 		while (cursor.moveToNext())
 		{

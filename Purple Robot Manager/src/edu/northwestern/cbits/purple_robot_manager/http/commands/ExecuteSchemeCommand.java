@@ -4,6 +4,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.SchemeEngine;
 
 public class ExecuteSchemeCommand extends JSONCommand 
@@ -17,9 +18,9 @@ public class ExecuteSchemeCommand extends JSONCommand
 		super(arguments, context);
 	}
 
-	public JSONObject execute() 
+	public JSONObject execute(Context context) 
 	{
-		JSONObject result = super.execute();
+		JSONObject result = super.execute(context);
 
 		try 
 		{
@@ -37,7 +38,7 @@ public class ExecuteSchemeCommand extends JSONCommand
 		}
 		catch (Exception e) 
 		{
-			e.printStackTrace();
+			LogManager.getInstance(context).logException(e);
 			
 			try 
 			{
@@ -46,7 +47,7 @@ public class ExecuteSchemeCommand extends JSONCommand
 			}
 			catch (JSONException ee) 
 			{
-				ee.printStackTrace();
+				LogManager.getInstance(context).logException(ee);
 			}
 		}
 

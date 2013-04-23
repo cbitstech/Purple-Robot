@@ -21,6 +21,7 @@ import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 
@@ -135,7 +136,7 @@ public class JavascriptFeature extends Feature
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(context).logException(e);
 		}
 
 	    return script;
@@ -222,7 +223,7 @@ public class JavascriptFeature extends Feature
 				}
 				catch (Exception e)
 				{
-					e.printStackTrace();
+					LogManager.getInstance(context).logException(e);
 				}
 			}
 		};
@@ -298,7 +299,7 @@ public class JavascriptFeature extends Feature
 			}
 			catch (JSONException e)
 			{
-				e.printStackTrace();
+				LogManager.getInstance(context).logException(e);
 			}
 		}
 		else

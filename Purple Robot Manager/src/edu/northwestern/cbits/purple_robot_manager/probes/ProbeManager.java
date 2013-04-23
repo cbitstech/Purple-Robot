@@ -19,6 +19,7 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.BatteryProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.BluetoothDevicesProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CallStateProbe;
@@ -65,11 +66,11 @@ public class ProbeManager
 				}
 				catch (InstantiationException e)
 				{
-					e.printStackTrace();
+					LogManager.getInstance(context).logException(e);
 				}
 				catch (IllegalAccessException e)
 				{
-					e.printStackTrace();
+					LogManager.getInstance(context).logException(e);
 				}
 			}
 
@@ -315,7 +316,7 @@ public class ProbeManager
 			}
 			catch (JSONException e)
 			{
-				e.printStackTrace();
+				LogManager.getInstance(context).logException(e);
 			}
 		}
 	}

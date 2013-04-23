@@ -8,6 +8,8 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -86,11 +88,11 @@ public class PurpleRobotApplication extends Application
 		}
 		catch (XmlPullParserException e) 
 		{
-			e.printStackTrace();
+			LogManager.getInstance(context).logException(e);
 		} 
 		catch (IOException e) 
 		{
-			e.printStackTrace();
+			LogManager.getInstance(context).logException(e);
 		}
 		
 		map.put("config_probes_enabled", Boolean.valueOf(prefs.getBoolean("config_probes_enabled", false)));

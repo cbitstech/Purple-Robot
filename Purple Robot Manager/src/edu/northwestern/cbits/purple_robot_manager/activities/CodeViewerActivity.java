@@ -18,6 +18,7 @@ import android.webkit.WebView;
 import com.actionbarsherlock.app.SherlockActivity;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
 public class CodeViewerActivity extends SherlockActivity 
 {
@@ -73,7 +74,7 @@ public class CodeViewerActivity extends SherlockActivity
 			} 
 			catch (IOException e) 
 			{
-				e.printStackTrace();
+	        	LogManager.getInstance(this).logException(e);
 			}
 		}
 		
@@ -85,7 +86,7 @@ public class CodeViewerActivity extends SherlockActivity
 		}
     	catch (UnsupportedEncodingException e) 
     	{
-			e.printStackTrace();
+        	LogManager.getInstance(this).logException(e);
 		}
 
 		WebView webView = (WebView) this.findViewById(R.id.code_web_view);

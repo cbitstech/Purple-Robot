@@ -39,6 +39,7 @@ import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
 import edu.northwestern.cbits.purple_robot_manager.charts.SplineChart;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
 @SuppressLint("SimpleDateFormat")
 public class ProximityProbe extends ContinuousProbe implements SensorEventListener
@@ -74,7 +75,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 
 	public String contentSubtitle(Context context)
 	{
-		Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(ProximityProbe.DB_TABLE, this.databaseSchema());
+		Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(context, ProximityProbe.DB_TABLE, this.databaseSchema());
 
 		int count = -1;
 
@@ -105,7 +106,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 			ArrayList<Double> distance = new ArrayList<Double>();
 			ArrayList<Double> time = new ArrayList<Double>();
 
-			Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(ProximityProbe.DB_TABLE, this.databaseSchema());
+			Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(activity, ProximityProbe.DB_TABLE, this.databaseSchema());
 
 			int count = -1;
 
@@ -147,11 +148,11 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(activity).logException(e);
 		}
 		catch (JSONException e)
 		{
-			e.printStackTrace();
+			LogManager.getInstance(activity).logException(e);
 		}
 
 		return null;
@@ -418,7 +419,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 
 							values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[j] / 1000));
 
-							ProbeValuesProvider.getProvider(this._context).insertValue(ProximityProbe.DB_TABLE, this.databaseSchema(), values);
+							ProbeValuesProvider.getProvider(this._context).insertValue(this._context, ProximityProbe.DB_TABLE, this.databaseSchema(), values);
 						}
 					}
 
