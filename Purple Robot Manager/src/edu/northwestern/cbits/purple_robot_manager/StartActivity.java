@@ -346,6 +346,14 @@ public class StartActivity extends SherlockActivity
 		super.onPause();
 
 		this._isPaused = true;
+
+        ListView listView = (ListView) this.findViewById(R.id.list_probes);
+		
+		boolean probesEnabled = (listView.getVisibility() == View.VISIBLE);
+
+		HashMap <String, Object> payload = new HashMap<String, Object>();
+		payload.put("probes_enabled", probesEnabled);
+		LogManager.getInstance(this).log("main_ui_dismissed", payload);
 	}
 
 	private void setJsonUri(Uri jsonConfigUri)
@@ -422,8 +430,12 @@ public class StartActivity extends SherlockActivity
         	logoView.setVisibility(View.GONE);
 
         this.refreshList();
+        
+		HashMap <String, Object> payload = new HashMap<String, Object>();
+		payload.put("probes_enabled", probesEnabled);
+		LogManager.getInstance(this).log("main_ui_shown", payload);
 	}
-
+	
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
         MenuInflater inflater = this.getSupportMenuInflater();

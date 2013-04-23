@@ -99,10 +99,16 @@ public abstract class BaseScriptEngine
 		SimpleDateFormat sdf = new SimpleDateFormat(BaseScriptEngine.LOG_DATE_FORMAT);
 		
 		Log.e("PRM." + this.language(), sdf.format(new Date()) + ": " + message.toString());
+
+		HashMap <String, Object> payload = new HashMap<String, Object>();
+		payload.put("message", message);
+		LogManager.getInstance(this._context).log("script_log_message", payload);
 	}
 	
 	public void playDefaultTone()
 	{
+		LogManager.getInstance(this._context).log("default_tone_played", null);
+
 		this.playTone(null);
 	}
 	
@@ -112,6 +118,10 @@ public abstract class BaseScriptEngine
 
 		if (tone != null)
 			intent.putExtra(ManagerService.RINGTONE_NAME, tone);
+
+		HashMap <String, Object> payload = new HashMap<String, Object>();
+		payload.put("tone", tone);
+		LogManager.getInstance(this._context).log("tone_played", payload);
 
 		this._context.startService(intent);
 	}
@@ -151,6 +161,10 @@ public abstract class BaseScriptEngine
 		Intent intent = new Intent(ManagerService.HAPTIC_PATTERN_INTENT);
 		intent.putExtra(ManagerService.HAPTIC_PATTERN_NAME, pattern);
 
+		HashMap <String, Object> payload = new HashMap<String, Object>();
+		payload.put("pattern", pattern);
+		LogManager.getInstance(this._context).log("vibrate_device", payload);
+
 		this._context.startService(intent);
 	}
 
@@ -185,6 +199,11 @@ public abstract class BaseScriptEngine
 	
 	public boolean emitToast(final String message, final boolean longDuration)
 	{
+		HashMap <String, Object> payload = new HashMap<String, Object>();
+		payload.put("has_activity", (this._context instanceof Activity));
+		payload.put("message", message);
+		LogManager.getInstance(this._context).log("toast_message", payload);
+
 		if (this._context instanceof Activity)
 		{
 			final Activity activity = (Activity) this._context;
@@ -214,6 +233,10 @@ public abstract class BaseScriptEngine
 			launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
 			this._context.startActivity(launchIntent);
+
+			HashMap <String, Object> payload = new HashMap<String, Object>();
+			payload.put("url", urlString);
+			LogManager.getInstance(this._context).log("launch_url", payload);
 
 			return true;
 		}
@@ -773,6 +796,11 @@ public abstract class BaseScriptEngine
 	{
 		Intent intent = this.constructLaunchIntent(applicationName, launchParams, script);
 
+		HashMap <String, Object> payload = new HashMap<String, Object>();
+		payload.put("application_present", (intent != null));
+		payload.put("application_name", applicationName);
+		LogManager.getInstance(this._context).log("application_launch", payload);
+
 		if (intent != null)
 		{
 			this._context.startService(intent);
@@ -795,6 +823,11 @@ public abstract class BaseScriptEngine
 			Notification note = new Notification(R.drawable.ic_launcher, message, displayWhen);
 
 			Intent intent = this.constructDirectLaunchIntent(applicationName, launchParams);
+
+			HashMap <String, Object> payload = new HashMap<String, Object>();
+			payload.put("application_present", (intent != null));
+			payload.put("application_name", applicationName);
+			LogManager.getInstance(this._context).log("application_launch_notification", payload);
 
 			if (intent != null)
 			{
@@ -900,8 +933,6 @@ public abstract class BaseScriptEngine
 		
 		if (SchemeEngine.canRun(script))
 		{
-			Log.e("PR", "RUN: " + script);
-
 			SchemeEngine engine = new SchemeEngine(context, objects);
 			
 			return engine.evaluateSource(script);
@@ -918,8 +949,6 @@ public abstract class BaseScriptEngine
 
 	protected boolean updateConfig(Map<String, Object> config) 
 	{
-		Log.e("PR", "UPDATING FROM MAP COUNT: " + config.size());
-		
 		return PurpleRobotApplication.updateFromMap(this._context, config);
 	}
 

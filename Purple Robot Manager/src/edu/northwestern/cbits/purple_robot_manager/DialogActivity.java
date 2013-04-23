@@ -1,6 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
@@ -50,6 +51,22 @@ public class DialogActivity extends Activity
 		
 		DialogActivity._dialogStack.remove(this);
 	}
+	
+	protected void onPause()
+	{
+		super.onPause();
+
+        Intent intent = this.getIntent();
+
+        final String title = intent.getStringExtra(DialogActivity.DIALOG_TITLE);
+        final String message = intent.getStringExtra(DialogActivity.DIALOG_MESSAGE);
+
+        HashMap <String, Object> payload = new HashMap<String, Object>();
+		payload.put("title", title);
+		payload.put("message", message);
+		
+		LogManager.getInstance(this).log("dialog_dismissed", payload);
+	}
 
 	protected void onResume()
 	{
@@ -61,8 +78,8 @@ public class DialogActivity extends Activity
 
         Intent intent = this.getIntent();
 
-        String title = intent.getStringExtra(DialogActivity.DIALOG_TITLE);
-        String message = intent.getStringExtra(DialogActivity.DIALOG_MESSAGE);
+        final String title = intent.getStringExtra(DialogActivity.DIALOG_TITLE);
+        final String message = intent.getStringExtra(DialogActivity.DIALOG_MESSAGE);
 
         final String confirmScript = intent.getStringExtra(DialogActivity.DIALOG_CONFIRM_SCRIPT);
 
@@ -73,10 +90,22 @@ public class DialogActivity extends Activity
         Button confirmButton = (Button) this.findViewById(R.id.button_dialog_confirm);
         confirmButton.setText(intent.getStringExtra(DialogActivity.DIALOG_CONFIRM_BUTTON));
 
+		HashMap <String, Object> payload = new HashMap<String, Object>();
+		payload.put("title", title);
+		payload.put("message", message);
+		
+		LogManager.getInstance(me).log("dialog_shown", payload);
+
         confirmButton.setOnClickListener(new OnClickListener()
         {
 			public void onClick(View v)
 			{
+				HashMap <String, Object> payload = new HashMap<String, Object>();
+				payload.put("title", title);
+				payload.put("message", message);
+				
+				LogManager.getInstance(me).log("dialog_confirm", payload);
+				
 				if (confirmScript != null && confirmScript.length() >= 0)
 				{
 					try
@@ -97,7 +126,7 @@ public class DialogActivity extends Activity
 
         if (intent.hasExtra(DialogActivity.DIALOG_CANCEL_BUTTON))
         {
-            cancelButton.setText(intent.getStringExtra(DialogActivity.DIALOG_CANCEL_BUTTON));
+			cancelButton.setText(intent.getStringExtra(DialogActivity.DIALOG_CANCEL_BUTTON));
 
             if (intent.hasExtra(DialogActivity.DIALOG_CANCEL_SCRIPT))
             {
@@ -107,6 +136,12 @@ public class DialogActivity extends Activity
 	            {
 	    			public void onClick(View v)
 	    			{
+	    				HashMap <String, Object> payload = new HashMap<String, Object>();
+	    				payload.put("title", title);
+	    				payload.put("message", message);
+	    				
+	    				LogManager.getInstance(me).log("dialog_cancel", payload);
+
 	    				if (cancelScript != null && cancelScript.length() >= 0)
 	    				{
 	    					try

@@ -102,6 +102,9 @@ public class LogManager
 	{
 		long now = System.currentTimeMillis();
 
+		if (payload == null)
+			payload = new HashMap<String, Object>();
+		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
 
 		if (prefs.getBoolean("config_enable_log_server", false))
@@ -149,15 +152,6 @@ public class LogManager
 				
 				if (payload.containsKey(LogManager.USER_ID) == false)
 					payload.put(LogManager.USER_ID, EncryptionManager.getInstance().getUserHash(this._context));
-				
-				try 
-				{
-					payload.put(LogManager.CONTENT_OBJECT, new JSONObject(payload.toString()));
-				}
-				catch (JSONException e) 
-				{
-					this.logException(e);
-				}
 
 				try 
 				{
@@ -184,7 +178,7 @@ public class LogManager
 				}
 				catch (JSONException e) 
 				{
-					this.logException(e);
+					e.printStackTrace();
 				}
 			}
 			else
@@ -286,38 +280,43 @@ public class LogManager
 
 							httpPost.setEntity(entity);
 							
+							httpClient.execute(httpPost);
 							HttpResponse response = httpClient.execute(httpPost);
 
-//							HttpEntity httpEntity = response.getEntity();
+							HttpEntity httpEntity = response.getEntity();
+							
+							Log.e("PR-LOGGING", "Log upload result: " + EntityUtils.toString(httpEntity));
 						}
+						
+						mgr.shutdown();
 					}
 					catch (URISyntaxException e) 
 					{
-						this.logException(e);
+						e.printStackTrace();
 					} 
 					catch (KeyStoreException e) 
 					{
-						this.logException(e);
+						e.printStackTrace();
 					} 
 					catch (NoSuchAlgorithmException e) 
 					{
-						this.logException(e);
+						e.printStackTrace();
 					}
 					catch (CertificateException e) 
 					{
-						this.logException(e);
+						e.printStackTrace();
 					} 
 					catch (IOException e) 
 					{
-						this.logException(e);
+						e.printStackTrace();
 					} 
 					catch (KeyManagementException e) 
 					{
-						this.logException(e);
+						e.printStackTrace();
 					}
 					catch (UnrecoverableKeyException e) 
 					{
-						this.logException(e);
+						e.printStackTrace();
 					}
 				}
 				
@@ -327,7 +326,7 @@ public class LogManager
 			}
 			catch (JSONException e) 
 			{
-				this.logException(e);
+				e.printStackTrace();
 			}
 		}
 		
@@ -336,6 +335,8 @@ public class LogManager
 
 	public void logException(Throwable e) 
 	{
+		e.printStackTrace();
+
 		Map<String, Object> payload = new HashMap<String, Object>();
 		
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -349,8 +350,6 @@ public class LogManager
 		
 		payload.put(LogManager.STACKTRACE, stacktrace);
 		
-		this.log("java-exception", payload);
-		
-		e.printStackTrace();
+		this.log("java_exception", payload);
 	}
 }

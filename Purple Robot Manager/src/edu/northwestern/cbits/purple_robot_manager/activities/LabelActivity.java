@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -174,10 +175,15 @@ public class LabelActivity extends SherlockFragmentActivity
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, this.savedLabels());
 
         label.setAdapter(adapter);
-        
-        if (extras.containsKey(LabelActivity.LABEL_KEY))
-        	label.setText(extras.getString(LabelActivity.LABEL_KEY));
 
+		HashMap <String, Object> payload = new HashMap<String, Object>();
+
+        if (extras.containsKey(LabelActivity.LABEL_KEY))
+        {
+        	label.setText(extras.getString(LabelActivity.LABEL_KEY));
+    		payload.put("label", extras.getString(LabelActivity.LABEL_KEY));
+        }
+        
         final AutoCompleteTextView value = (AutoCompleteTextView) this.findViewById(R.id.text_value_text);
         ArrayAdapter<String> valueAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, this.savedValues());
         value.setAdapter(valueAdapter);
@@ -186,7 +192,29 @@ public class LabelActivity extends SherlockFragmentActivity
 
         actionBar.setSubtitle(sdf.format(d));
         actionBar.setTitle(R.string.title_confirm_label);
+        
+		payload.put("label_time", this._timestamp);
+		payload.put("label_context", this._labelContext);
+		
+		LogManager.getInstance(this).log("label_prompt", payload);
     }
+
+	protected void onPause()
+	{
+		super.onPause();
+
+        Bundle extras = this.getIntent().getExtras();
+
+        HashMap <String, Object> payload = new HashMap<String, Object>();
+
+        if (extras.containsKey(LabelActivity.LABEL_KEY))
+    		payload.put("label", extras.getString(LabelActivity.LABEL_KEY));
+
+        payload.put("label_time", this._timestamp);
+		payload.put("label_context", this._labelContext);
+		
+		LogManager.getInstance(this).log("label_dismissed", payload);
+	}
 
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
@@ -224,6 +252,14 @@ public class LabelActivity extends SherlockFragmentActivity
     				values.add(0, value);
     				String[] valuesArray = values.toArray(new String[0]);
     				this.saveValues(valuesArray);
+
+    				HashMap <String, Object> payload = new HashMap<String, Object>();
+
+    				payload.put("label_time", this._timestamp);
+    				payload.put("label", key);
+    				payload.put("label_value", value);
+    				
+    				LogManager.getInstance(this).log("label_submit", payload);
 
     				this.finish();
     			}

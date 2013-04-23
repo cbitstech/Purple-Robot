@@ -1,5 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
+import java.util.HashMap;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -26,6 +28,10 @@ public class WidgetReceiver extends BroadcastReceiver
     		script = intent.getStringExtra("action_four");
     	else if ("tap_five".equals(action))
     		script = intent.getStringExtra("action_five");
+
+		HashMap <String, Object> payload = new HashMap<String, Object>();
+		payload.put("widget_action", action);
+		LogManager.getInstance(context).log("widget_tapped", payload);
     	
 		if (script != null)
 		{

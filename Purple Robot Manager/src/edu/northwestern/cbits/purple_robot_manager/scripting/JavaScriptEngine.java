@@ -67,8 +67,6 @@ public class JavaScriptEngine extends BaseScriptEngine
 	
 	public boolean log(String event, NativeObject params)
 	{
-		Log.e("PR", "GOT LOG COMMAND FOR " + event);
-		
 		if (params != null)
 			return LogManager.getInstance(this._context).log(event, JavaScriptEngine.nativeToMap(params));
 	

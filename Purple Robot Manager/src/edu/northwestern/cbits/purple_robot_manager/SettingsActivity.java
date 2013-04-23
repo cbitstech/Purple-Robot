@@ -15,6 +15,7 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
@@ -84,7 +85,16 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
         
         CheckBoxPreference update = (CheckBoxPreference) prefs.findPreference(CHECK_UPDATES_KEY);
         update.setOnPreferenceChangeListener(this);
+        
+		LogManager.getInstance(me).log("settings_visited", null);
     }
+	
+	protected void onDestroy()
+	{
+		super.onDestroy();
+
+		LogManager.getInstance(this).log("settings_exited", null);
+	}
 
 	public boolean onPreferenceClick(Preference preference)
 	{

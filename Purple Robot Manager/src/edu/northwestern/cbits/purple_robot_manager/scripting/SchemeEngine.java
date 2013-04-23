@@ -95,8 +95,6 @@ public class SchemeEngine extends BaseScriptEngine
 		{
 			LogManager.getInstance(this._context).logException(e);
 		}
-		
-		Log.e("PR", "EVALING SOURCE");
 
 		try
 		{
