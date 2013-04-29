@@ -31,7 +31,8 @@
         <item>builtin.VisibleSatelliteProbe</item>
         <item>builtin.WifiAccessPointsProbe</item>
         <item>features.DeviceInUseFeature</item>
-
+        <item>features.CallHistoryFeature</item>
+        
         <item>builtin.RandomNoiseProbe</item>
         <item>LabelProbe</item>
         

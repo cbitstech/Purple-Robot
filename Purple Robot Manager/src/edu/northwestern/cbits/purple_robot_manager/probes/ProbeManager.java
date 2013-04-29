@@ -36,6 +36,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.SoftwareInform
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TelephonyProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.VisibleSatelliteProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.WifiAccessPointsProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.features.CallHistoryFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.DeviceInUseFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.JavascriptFeature;
 
@@ -219,6 +220,13 @@ public class ProbeManager
 				DeviceInUseFeature device = (DeviceInUseFeature) probe;
 
 				if (device.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof CallHistoryFeature)
+			{
+				CallHistoryFeature call = (CallHistoryFeature) probe;
+
+				if (call.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 			else if (probe instanceof RunningSoftwareProbe)
