@@ -115,7 +115,9 @@ public class LegacyJSONConfigFile
 							for (String key : keys)
 							{
 								if ("user_id".equals(key))
-									userId = uri.getQueryParameter(key);
+								{
+									// Don't keep existing User ID. Use value set in prefs...
+								}
 								else
 									builder.appendQueryParameter(key, uri.getQueryParameter(key));
 							}

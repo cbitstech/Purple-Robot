@@ -413,6 +413,62 @@ pendingTests.push(function()
 	});
 });
 
+pendingTests.push(function()
+{
+	asyncTest("Javascript Update Config Test", 2, function()
+	{
+		var key = "config_json_refresh_manually"; // Unused ID used in the preferences screen for button activity.
+		var value = generateUuid();
+
+		runScript("PurpleRobot.updateConfig({ '" + key + "': '" + value + "'});", function(data)
+		{
+			ok(true, key + " => " + value + " persisted");
+
+			runScript("PurpleRobot.fetchConfig();", function(data)
+			{
+			    alert("PAY: " + data.payload);
+			    
+				var result = JSON.parse(data.payload);
+				
+				alert(value + " =? " + result[key]);
+				
+				var matches = (value == result[key]);
+
+				ok(matches, key + " => " + value + " set successfully.");
+	
+				start();
+
+				if (pendingTests.length > 0)
+				{
+					var next = pendingTests.pop();
+					next();				
+				}
+			}, function(jqXHR, textStatus, errorThrown)
+			{
+				ok(false, "Encountered error: " + errorThrown);
+
+				start();
+
+				if (pendingTests.length > 0)
+				{
+					var next = pendingTests.pop();
+					next();				
+				}
+			});
+		}, function(jqXHR, textStatus, errorThrown)
+		{
+			ok(false, "Encountered error: " + errorThrown);
+
+			start();
+
+			if (pendingTests.length > 0)
+			{
+				var next = pendingTests.pop();
+				next();				
+			}
+		});
+	});
+});
 
 var go = pendingTests.pop();
 go();
