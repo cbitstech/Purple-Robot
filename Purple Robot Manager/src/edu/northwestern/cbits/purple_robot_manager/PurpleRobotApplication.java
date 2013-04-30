@@ -34,7 +34,7 @@ public class PurpleRobotApplication extends Application
     
     public static boolean updateFromMap(Context context, Map<String, Object> config)
     {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
 		Editor e = prefs.edit();
 		
 		for (String key : config.keySet())
@@ -47,7 +47,9 @@ public class PurpleRobotApplication extends Application
 				e.putBoolean(key, ((Boolean) value).booleanValue());
 		}
 		
-		return e.commit();
+		boolean success = e.commit();
+		
+		return success;
     }
 
 	public static Map<String, Object> configuration(Context context) 
@@ -80,6 +82,8 @@ public class PurpleRobotApplication extends Application
         					map.put(key, prefs.getString(key, null));
         				else if ("CheckBoxPreference".equals(name))
         					map.put(key, prefs.getBoolean(key, false));
+        				else if ("Preference".equals(name))
+        					map.put(key, prefs.getString(key, null));
         			}
 	        	} 
 
