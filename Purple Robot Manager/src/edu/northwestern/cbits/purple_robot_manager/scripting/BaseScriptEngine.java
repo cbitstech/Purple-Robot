@@ -482,7 +482,7 @@ public abstract class BaseScriptEngine
 	
 	public void updateConfigUrl(String newUrl)
 	{
-		if (newUrl.trim().length() == 0)
+		if (newUrl != null && newUrl.trim().length() == 0)
 			newUrl = null;
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);

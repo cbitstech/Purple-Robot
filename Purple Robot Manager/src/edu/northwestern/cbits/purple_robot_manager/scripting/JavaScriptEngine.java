@@ -44,10 +44,15 @@ public class JavaScriptEngine extends BaseScriptEngine
 
 	public Object runScript(String script, String extrasName, Object extras) throws EvaluatorException, EcmaError
 	{
+		Log.e("PR", "1");
+		
 		this._jsContext = Context.enter();
 		this._jsContext.setOptimizationLevel(-1);
 
+		Log.e("PR", "2");
+
 		this._scope = _jsContext.initStandardObjects();
+
 
 		/* if (extras instanceof JSONObject)
 		{
@@ -56,11 +61,19 @@ public class JavaScriptEngine extends BaseScriptEngine
 			extras = new JsonParser().parse(json.toString());
 		} */
 
+		Log.e("PR", "3");
+
 		Object thisWrapper = Context.javaToJS(this, this._scope);
 		ScriptableObject.putProperty(this._scope, "PurpleRobot", thisWrapper);
 
+		Log.e("PR", "3");
+
 		if (extras != null && extrasName != null)
 			script = "var " + extrasName + " = " + extras.toString() + "; " + script;
+
+		Log.e("PR", "4");
+
+		Log.e("PR", "SCRIPT: " + script);
 
 		return this._jsContext.evaluateString(this._scope, script, "<engine>", 1, null);
 	}
