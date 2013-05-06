@@ -5,6 +5,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.InetAddress;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.Map;
 
@@ -297,6 +298,10 @@ public class RobotHealthProbe extends Probe
 											}
 										}
 										catch (UnknownHostException e) 
+										{
+											LogManager.getInstance(context).logException(e);
+										} 
+										catch (SocketTimeoutException e) 
 										{
 											LogManager.getInstance(context).logException(e);
 										} 
