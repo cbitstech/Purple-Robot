@@ -9,13 +9,15 @@ import android.preference.PreferenceManager;
 
 public class ShutdownReceiver extends BroadcastReceiver
 {
+	public static final String SHUTDOWN_KEY = "system_last_halt";
+
     public void onReceive(Context context, Intent intent)
     {
     	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
     	
     	Editor e = prefs.edit();
     	
-    	e.putLong("system_last_halt", System.currentTimeMillis());
+    	e.putLong(ShutdownReceiver.SHUTDOWN_KEY, System.currentTimeMillis());
     	
     	e.commit();
     }

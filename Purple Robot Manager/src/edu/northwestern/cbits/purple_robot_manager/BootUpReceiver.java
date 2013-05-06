@@ -10,17 +10,19 @@ import android.preference.PreferenceManager;
 
 public class BootUpReceiver extends BroadcastReceiver
 {
+	public static final String BOOT_KEY = "system_last_boot";
+
     public void onReceive(Context context, Intent intent)
     {
-    	ManagerService.setupPeriodicCheck(context);
-    	
     	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
     	
     	Editor e = prefs.edit();
     	
-    	e.putLong("system_last_boot", System.currentTimeMillis());
+    	e.putLong(BootUpReceiver.BOOT_KEY, System.currentTimeMillis());
     	
     	e.commit();
+
+    	ManagerService.setupPeriodicCheck(context);
 
     	LegacyJSONConfigFile.getSharedFile(context.getApplicationContext());
     }

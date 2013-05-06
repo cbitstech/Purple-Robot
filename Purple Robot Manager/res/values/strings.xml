@@ -623,6 +623,11 @@
     <string name="title_call_history_feature">Call History Statistics</string>
     <string name="summary_call_history_feature_desc">Generates aggregate statistics that describe the user\'s phone call activity, include counts of daily calls.</string>
     <string name="summary_call_history_probe" formatted="false">%.0f Calls, %.1f Avg. Length (%.1f std.)</string>
+
+        <!-- Call History Probe -->
+    <string name="title_weather_underground_feature">Current Weather Conditions</string>
+    <string name="summary_weather_underground_feature_desc">Acquires the latest weather data for the user\'s location from a Weather Underground station.</string>
+    <string name="summary_weather_underground_probe" formatted="false">%s:, %.1f&#176;C (%s)</string>
     
     <!-- Logging Strings -->
     <string name="title_log_upload_section">Network Logging Settings</string>
@@ -638,5 +643,6 @@
     <string name="title_log_location">Log Location Data</string>
     <string name="summary_log_location">Include last known location with log events.</string>
     <string name="config_upload_logs">Upload Logs Now</string>
-    
+
+    <string name="app_category_unknown">Unknown</string>
 </resources>

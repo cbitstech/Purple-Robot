@@ -1,11 +1,17 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningTaskInfo;
@@ -19,6 +25,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.WiFiHelper;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class RunningSoftwareProbe extends Probe
@@ -26,6 +33,9 @@ public class RunningSoftwareProbe extends Probe
 	private static final String PACKAGE_NAME = "PACKAGE_NAME";
 	private static final String RUNNING_TASKS = "RUNNING_TASKS";
 	private static final String RUNNING_TASK_COUNT = "RUNNING_TASK_COUNT";
+	private static final String PACKAGE_CATEGORY = "PACKAGE_CATEGORY";
+	
+	private static final HashMap<String, String> _categories = new HashMap<String, String>();
 
 	private long _lastCheck = 0;
 
@@ -64,13 +74,13 @@ public class RunningSoftwareProbe extends Probe
 		e.commit();
 	}
 
-	public boolean isEnabled(Context context)
+	public boolean isEnabled(final Context context)
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
 		if (super.isEnabled(context))
 		{
-			long now = System.currentTimeMillis();
+			final long now = System.currentTimeMillis();
 
 			if (prefs.getBoolean("config_probe_running_software_enabled", true))
 			{
@@ -80,34 +90,48 @@ public class RunningSoftwareProbe extends Probe
 
 					if (now - this._lastCheck  > freq)
 					{
-						Bundle bundle = new Bundle();
-						bundle.putString("PROBE", this.name(context));
-						bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
-
-						ActivityManager am = (ActivityManager) context.getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
-
-						List<RunningTaskInfo> tasks = am.getRunningTasks(9999);
-
-						if (tasks != null)
+						final RunningSoftwareProbe me = this;
+						
+						Runnable r = new Runnable()
 						{
-							ArrayList<Bundle> running = new ArrayList<Bundle>();
-	
-							for (RunningTaskInfo info : tasks)
+							public void run() 
 							{
-								Bundle taskBundle = new Bundle();
-	
-								taskBundle.putString(RunningSoftwareProbe.PACKAGE_NAME, info.baseActivity.getPackageName());
-	
-								running.add(taskBundle);
-							}
-	
-							bundle.putParcelableArrayList(RunningSoftwareProbe.RUNNING_TASKS, running);
-							bundle.putInt(RunningSoftwareProbe.RUNNING_TASK_COUNT, running.size());
-	
-							this.transmitData(context, bundle);
-						}
+								Bundle bundle = new Bundle();
+								bundle.putString("PROBE", me.name(context));
+								bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
 
-						this._lastCheck = now;
+								ActivityManager am = (ActivityManager) context.getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
+
+								List<RunningTaskInfo> tasks = am.getRunningTasks(9999);
+
+								if (tasks != null)
+								{
+									ArrayList<Bundle> running = new ArrayList<Bundle>();
+			
+									for (RunningTaskInfo info : tasks)
+									{
+										Bundle taskBundle = new Bundle();
+			
+										taskBundle.putString(RunningSoftwareProbe.PACKAGE_NAME, info.baseActivity.getPackageName());
+
+										running.add(taskBundle);
+
+										String category = RunningSoftwareProbe.fetchCategory(context, info.baseActivity.getPackageName());
+										taskBundle.putString(RunningSoftwareProbe.PACKAGE_CATEGORY, category);
+									}
+			
+									bundle.putParcelableArrayList(RunningSoftwareProbe.RUNNING_TASKS, running);
+									bundle.putInt(RunningSoftwareProbe.RUNNING_TASK_COUNT, running.size());
+			
+									me.transmitData(context, bundle);
+								
+									me._lastCheck = now;
+								}
+							}
+						};
+						
+						Thread t = new Thread(r);
+						t.start();
 					}
 				}
 
@@ -116,6 +140,48 @@ public class RunningSoftwareProbe extends Probe
 		}
 
 		return false;
+	}
+
+	protected static String fetchCategory(Context context, String packageName) 
+	{
+		if (RunningSoftwareProbe._categories.containsKey(packageName))
+			return RunningSoftwareProbe._categories.get(packageName);
+
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		
+		if (prefs.getBoolean("config_restrict_data_wifi", true))
+		{
+			if (WiFiHelper.wifiAvailable(context) == false)
+				return context.getString(R.string.app_category_unknown);
+		}
+
+		String category = null;
+
+		try 
+		{
+			Document doc = Jsoup.connect("https://play.google.com/store/apps/details?id=" + packageName).get();
+
+			Element detailsTab = doc.select("div#details-tab-1").first();
+			
+			Elements links = detailsTab.select("a[href]");
+			
+			for (Element link : links)
+			{
+				if (link.attr("href").startsWith("/store/apps/category/"))
+					category = link.text();
+			}
+		}
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+		}
+		
+		if (category == null)
+			category = context.getString(R.string.app_category_unknown);
+		
+		RunningSoftwareProbe._categories.put(packageName, category);
+		
+		return category;
 	}
 
 	public String summarizeValue(Context context, Bundle bundle)
