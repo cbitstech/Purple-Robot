@@ -26,8 +26,10 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import edu.northwestern.cbits.purple_robot_manager.BootUpReceiver;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.ShutdownReceiver;
 import edu.northwestern.cbits.purple_robot_manager.config.JSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.config.SchemeConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -342,9 +344,8 @@ public class RobotHealthProbe extends Probe
 										bundle.putString(RobotHealthProbe.JSON_CONFIG, file.toString());
 									}
 									
-									bundle.putLong(RobotHealthProbe.LAST_BOOT, prefs.getLong("system_last_boot", 0));
-									bundle.putLong(RobotHealthProbe.LAST_HALT, prefs.getLong("system_last_halt", 0));
-									
+									bundle.putLong(RobotHealthProbe.LAST_BOOT, prefs.getLong(BootUpReceiver.BOOT_KEY, 0));
+									bundle.putLong(RobotHealthProbe.LAST_HALT, prefs.getLong(ShutdownReceiver.SHUTDOWN_KEY, 0));
 
 									me.transmitData(context, bundle);
 

@@ -27,8 +27,10 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class LocationProbe extends Probe implements LocationListener
 {
-	private static final String LATITUDE = "LATITUDE";
-	private static final String LONGITUDE = "LONGITUDE";
+	public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe";
+
+	public static final String LATITUDE = "LATITUDE";
+	public static final String LONGITUDE = "LONGITUDE";
 	private static final String PROVIDER = "PROVIDER";
 	private static final String ACCURACY = "ACCURACY";
 	private static final String ALTITUDE = "ALTITUDE";
@@ -214,7 +216,7 @@ public class LocationProbe extends Probe implements LocationListener
 
 	public String name(Context context)
 	{
-		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe";
+		return LocationProbe.NAME;
 	}
 
 	public void onLocationChanged(Location location)
