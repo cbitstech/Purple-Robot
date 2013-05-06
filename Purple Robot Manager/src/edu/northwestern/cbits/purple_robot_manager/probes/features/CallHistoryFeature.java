@@ -1,9 +1,11 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.features;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -11,6 +13,8 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.CallLog;
+import android.telephony.PhoneNumberUtils;
+import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 
 public class CallHistoryFeature extends Feature
@@ -32,6 +36,9 @@ public class CallHistoryFeature extends Feature
 	private static final String ACK_COUNT = "ACK_COUNT";
 	private static final String NEW_COUNT = "NEW_COUNT";
 	private static final String ACK_RATIO = "ACK_RATIO";
+	private static final String CONTACT_ANALYSES = "CONTACT_ANALYSES";
+	private static final String IS_ACQUAINTANCE = "IS_ACQUAINTANCE";
+	private static final String IDENTIFIER = "IDENTIFIER";
 
 	private long _lastCheck = 0;
 
@@ -81,6 +88,8 @@ public class CallHistoryFeature extends Feature
 					{
 						this._lastCheck = now;
 
+						boolean doHash = prefs.getBoolean("config_probe_call_hash_data", true);
+
 						Bundle bundle = new Bundle();
 						bundle.putString("PROBE", this.name(context));
 						bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
@@ -92,6 +101,8 @@ public class CallHistoryFeature extends Feature
 						for (double period : periods)
 						{
 							Bundle analysis = new Bundle();
+							
+							HashMap<String, ArrayList<ContentValues>> contacts = new HashMap<String, ArrayList<ContentValues>>();
 
 							long start = now - ((long) Math.floor(period * 1000 * 60 * 60));
 
@@ -141,6 +152,24 @@ public class CallHistoryFeature extends Feature
 											ackCount += 1;
 									}
 								}
+								
+								String number = cursor.getString(cursor.getColumnIndex(CallLog.Calls.NUMBER));
+								number = PhoneNumberUtils.formatNumber(number);
+
+								if (doHash)
+									number = EncryptionManager.getInstance().createHash(context, number);
+								
+								ContentValues phoneCall = CallHistoryFeature.parseCursor(cursor);
+								
+								ArrayList<ContentValues> calls = contacts.get(number);
+								
+								if (calls == null)
+								{
+									calls = new ArrayList<ContentValues>();
+									contacts.put(number, calls);
+								}
+								
+								calls.add(phoneCall);
 							}
 
 							cursor.close();
@@ -191,6 +220,84 @@ public class CallHistoryFeature extends Feature
 								analysis.putDouble(CallHistoryFeature.MIN_DURATION, minDuration);
 								analysis.putDouble(CallHistoryFeature.MAX_DURATION, maxDuration);
 								analysis.putDouble(CallHistoryFeature.STD_DEVIATION, stdDev);
+								
+								ArrayList<Bundle> contactBundles = new ArrayList<Bundle>();
+								
+								for (String key : contacts.keySet())
+								{
+									Bundle contactInfo = new Bundle();
+									
+									ArrayList<ContentValues> calls = contacts.get(key);
+
+									contactInfo.putString(CallHistoryFeature.IDENTIFIER, key);
+									contactInfo.putDouble(CallHistoryFeature.TOTAL, calls.size());
+									contactInfo.putBoolean(CallHistoryFeature.IS_ACQUAINTANCE, calls.get(0).containsKey(CallLog.Calls.CACHED_NAME));
+									
+									total = 0.0;
+									totalDuration = 0;
+									double incoming = 0.0;
+									double acked = 0.0;
+									durations = new ArrayList<Double>();
+									
+									for (ContentValues call : calls)
+									{
+										total += 1;
+												
+										if (call.getAsInteger(CallLog.Calls.TYPE) == CallLog.Calls.INCOMING_TYPE)
+											incoming += 1;
+										
+										if (call.getAsInteger(CallLog.Calls.NEW) == 0)
+											acked += 1;
+										
+										double duration = call.getAsDouble(CallLog.Calls.DURATION);
+										
+										durations.add(duration);
+										totalDuration += duration;
+									}
+									
+									contactInfo.putDouble(CallHistoryFeature.INCOMING_COUNT, incoming);
+									contactInfo.putDouble(CallHistoryFeature.OUTCOMING_COUNT, total - incoming);
+									contactInfo.putDouble(CallHistoryFeature.INCOMING_RATIO, incoming / total);
+
+									contactInfo.putDouble(CallHistoryFeature.ACK_COUNT, acked);
+									contactInfo.putDouble(CallHistoryFeature.NEW_COUNT, total - acked);
+									contactInfo.putDouble(CallHistoryFeature.ACK_RATIO, acked / total);
+
+									totalDuration = 0;
+									maxDuration = Double.MIN_VALUE;
+									minDuration = Double.MAX_VALUE;
+									
+									primitives = new double[durations.size()];
+									
+									for (int k = 0; k < durations.size(); k++)
+									{
+										Double duration = durations.get(k);
+										
+										primitives[k] = duration.doubleValue();
+										
+										totalDuration += duration;
+										
+										if (maxDuration < duration)
+											maxDuration = duration;
+										
+										if (minDuration > duration)
+											minDuration = duration;
+									}
+									
+									sd = new StandardDeviation();
+									stdDev = sd.evaluate(primitives);
+									
+									contactInfo.putDouble(CallHistoryFeature.TOTAL_DURATION, totalDuration);
+									contactInfo.putDouble(CallHistoryFeature.AVG_DURATION, totalDuration / total);
+									contactInfo.putDouble(CallHistoryFeature.MIN_DURATION, minDuration);
+									contactInfo.putDouble(CallHistoryFeature.MAX_DURATION, maxDuration);
+
+									contactInfo.putDouble(CallHistoryFeature.STD_DEVIATION, stdDev);
+									
+									contactBundles.add(contactInfo);
+								}
+								
+								analysis.putParcelableArrayList(CallHistoryFeature.CONTACT_ANALYSES, contactBundles);
 							}
 							else
 							{
@@ -232,6 +339,31 @@ public class CallHistoryFeature extends Feature
 		}
 		
 		return false;
+	}
+
+	private static ContentValues parseCursor(Cursor cursor) 
+	{
+		ContentValues values = new ContentValues();
+		
+		for (int i = 0; i < cursor.getColumnCount(); i++)
+		{
+			String name = cursor.getColumnName(i);
+			
+			switch(cursor.getType(i))
+			{
+				case Cursor.FIELD_TYPE_FLOAT:
+					values.put(name, cursor.getFloat(i));
+					break;
+				case Cursor.FIELD_TYPE_INTEGER:
+					values.put(name, cursor.getInt(i));
+					break;
+				case Cursor.FIELD_TYPE_STRING:
+					values.put(name, cursor.getString(i));
+					break;
+			}
+		}
+		
+		return values;
 	}
 
 	public String summarizeValue(Context context, Bundle bundle)
