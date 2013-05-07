@@ -9,6 +9,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/user_id_label"
+        android:textIsSelectable="true"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <TextView
@@ -17,12 +18,14 @@
         android:layout_height="wrap_content"
         android:paddingBottom="10dp"
         android:text="@string/user_id_placeholder"
+        android:textIsSelectable="true"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/probe_status_label"
+        android:textIsSelectable="true"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <TextView
@@ -31,12 +34,14 @@
         android:layout_height="wrap_content"
         android:paddingBottom="10dp"
         android:text="@string/probe_status_placeholder"
+        android:textIsSelectable="true"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/upload_status_label"
+        android:textIsSelectable="true"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <TextView
@@ -45,12 +50,14 @@
         android:layout_height="wrap_content"
         android:paddingBottom="10dp"
         android:text="@string/upload_status_placeholder"
+        android:textIsSelectable="true"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/last_upload_label"
+        android:textIsSelectable="true"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <TextView
@@ -58,7 +65,23 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingBottom="10dp"
+        android:textIsSelectable="true"
         android:text="@string/last_upload_placeholder"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/pr_version_label"
+        android:textIsSelectable="true"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/pr_version_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="10dp"
+        android:textIsSelectable="true"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+    
 </LinearLayout>

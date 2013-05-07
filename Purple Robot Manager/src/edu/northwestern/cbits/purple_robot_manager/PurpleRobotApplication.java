@@ -1,6 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,13 +9,17 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
+import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.net.Uri;
+import android.net.Uri.Builder;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 public class PurpleRobotApplication extends Application
 {
@@ -42,7 +47,59 @@ public class PurpleRobotApplication extends Application
 			Object value = config.get(key);
 			
 			if (value instanceof String)
+			{
+				if ("config_json_url".equals(key))
+				{
+					Uri uri = Uri.parse(value.toString());
+					
+					Builder builder = new Builder();
+					
+					builder.scheme(uri.getScheme());
+					builder.encodedAuthority(uri.getAuthority());
+
+					if (uri.getPath() != null)
+						builder.encodedPath(uri.getPath());
+					
+					if (uri.getFragment() != null)
+						builder.encodedFragment(uri.getFragment());
+					
+					String query = uri.getQuery();
+					
+					ArrayList<String> keys = new ArrayList<String>();
+
+					if (query != null)
+					{
+						String[] params = query.split("&");
+						
+						for (String param : params)
+						{
+							String[] components = param.split("=");
+							
+							keys.add(components[0]);
+						}
+					}
+					
+					for (String param : keys)
+					{
+						if ("user_id".equals(key))
+						{
+							// Don't keep existing User ID. Use value set in prefs...
+						}
+						else
+							builder.appendQueryParameter(param, uri.getQueryParameter(param));
+					}
+
+					String userId = EncryptionManager.getInstance().getUserId(PurpleRobotApplication.getAppContext());
+					
+					builder.appendQueryParameter("user_id", userId);
+
+					Uri newUri = builder.build();
+					
+					value = newUri.toString();
+				}
+
 				e.putString(key, value.toString());
+			}
 			else if (value instanceof Boolean)
 				e.putBoolean(key, ((Boolean) value).booleanValue());
 		}
