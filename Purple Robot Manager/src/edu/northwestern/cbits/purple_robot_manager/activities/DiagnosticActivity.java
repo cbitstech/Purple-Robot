@@ -6,6 +6,8 @@ import java.util.Date;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.widget.TextView;
@@ -17,6 +19,7 @@ import com.actionbarsherlock.view.MenuItem;
 
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
 @SuppressLint("SimpleDateFormat")
 public class DiagnosticActivity extends SherlockActivity 
@@ -38,6 +41,7 @@ public class DiagnosticActivity extends SherlockActivity
 		TextView probeStatus = (TextView) this.findViewById(R.id.probe_status_value);
 		TextView uploadStatus = (TextView) this.findViewById(R.id.upload_status_value);
 		TextView lastUpload = (TextView) this.findViewById(R.id.last_upload_value);
+		TextView prVersion = (TextView) this.findViewById(R.id.pr_version_value);
 		
 		userId.setText("\"" + EncryptionManager.getInstance().getUserId(this) + "\"");
 
@@ -74,6 +78,16 @@ public class DiagnosticActivity extends SherlockActivity
 			String dateString = sdf.format(new Date(lastUploadTime));
 			
 			lastUpload.setText(String.format(this.getString(R.string.last_upload_format), dateString, lastPayloadSize));
+		}
+
+		try 
+		{
+			PackageInfo pInfo = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
+			prVersion.setText(pInfo.versionName);
+		} 
+		catch (NameNotFoundException e) 
+		{
+			LogManager.getInstance(this).logException(e);
 		}
 	}
 	
@@ -152,7 +166,23 @@ public class DiagnosticActivity extends SherlockActivity
 				}
          		else
              		message.append(this.getString(R.string.last_upload_placeholder));
-         		
+
+         		message.append(newline);
+         		message.append(newline);
+
+         		message.append(this.getString(R.string.pr_version_label));
+         		message.append(newline);
+
+         		try 
+        		{
+        			PackageInfo pInfo = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
+        			message.append(pInfo.versionName);
+        		} 
+        		catch (NameNotFoundException e) 
+        		{
+        			LogManager.getInstance(this).logException(e);
+        		}
+
          		Intent intent = new Intent(Intent.ACTION_SEND);
 
          		intent.setType("message/rfc822");

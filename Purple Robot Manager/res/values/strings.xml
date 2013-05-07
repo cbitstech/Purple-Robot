@@ -652,4 +652,8 @@
 
     <string name="summary_sunrise_sunset_feature_desc">Calculates whether it is day or night and the times for sunrise and sunset.</string>
     <string name="title_sunrise_sunset_feature">Sunrise &amp; Sunset Feature</string>
+
+    <string name="pr_version_label">Purple Robot Version</string>
+    
 </resources>
+

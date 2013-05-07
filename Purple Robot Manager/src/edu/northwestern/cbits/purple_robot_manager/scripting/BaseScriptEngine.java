@@ -33,6 +33,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
+import android.net.Uri.Builder;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
@@ -490,7 +491,54 @@ public abstract class BaseScriptEngine
 		Editor e = prefs.edit();
 		
 		if (newUrl != null)
-			e.putString(LegacyJSONConfigFile.JSON_CONFIGURATION_URL, newUrl);
+		{
+			Uri uri = Uri.parse(newUrl);
+			
+			Builder builder = new Builder();
+			
+			builder.scheme(uri.getScheme());
+			builder.encodedAuthority(uri.getAuthority());
+
+			if (uri.getPath() != null)
+				builder.encodedPath(uri.getPath());
+			
+			if (uri.getFragment() != null)
+				builder.encodedFragment(uri.getFragment());
+			
+			String query = uri.getQuery();
+			
+			ArrayList<String> keys = new ArrayList<String>();
+
+			if (query != null)
+			{
+				String[] params = query.split("&");
+				
+				for (String param : params)
+				{
+					String[] components = param.split("=");
+					
+					keys.add(components[0]);
+				}
+			}
+			
+			for (String key : keys)
+			{
+				if ("user_id".equals(key))
+				{
+					// Don't keep existing User ID. Use value set in prefs...
+				}
+				else
+					builder.appendQueryParameter(key, uri.getQueryParameter(key));
+			}
+
+			String userId = EncryptionManager.getInstance().getUserId(this._context);
+			
+			builder.appendQueryParameter("user_id", userId);
+
+			Uri newUri = builder.build();
+			
+			e.putString(LegacyJSONConfigFile.JSON_CONFIGURATION_URL, newUri.toString());
+		}
 		else
 			e.remove(LegacyJSONConfigFile.JSON_CONFIGURATION_URL);
 		
