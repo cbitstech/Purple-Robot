@@ -33,6 +33,7 @@
         <item>features.DeviceInUseFeature</item>
         <item>features.CallHistoryFeature</item>
         <item>features.WeatherUndergroundFeature</item>
+        <item>features.SunriseSunsetFeature</item>
         
         <item>builtin.RandomNoiseProbe</item>
         <item>LabelProbe</item>
