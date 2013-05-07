@@ -645,4 +645,11 @@
     <string name="config_upload_logs">Upload Logs Now</string>
 
     <string name="app_category_unknown">Unknown</string>
+    
+    <string name="summary_after_sunset_probe" formatted="false">Night: %d minute(s) after sunset</string>
+    <string name="summary_before_sunrise_probe" formatted="false">Night: %d minute(s) before sunrise</string>
+    <string name="summary_before_sunset_probe" formatted="false">Day: %d minute(s) before sunset</string>
+
+    <string name="summary_sunrise_sunset_feature_desc">Calculates whether it is day or night and the times for sunrise and sunset.</string>
+    <string name="title_sunrise_sunset_feature">Sunrise &amp; Sunset Feature</string>
 </resources>

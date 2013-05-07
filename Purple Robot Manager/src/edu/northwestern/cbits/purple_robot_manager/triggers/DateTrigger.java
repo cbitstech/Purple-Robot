@@ -193,13 +193,17 @@ public class DateTrigger extends Trigger
 		if (this._icalString == null)
 			return;
 		
-		StringReader sin = new StringReader(this._icalString);
-
-		CalendarBuilder builder = new CalendarBuilder();
 
 		try
 		{
+			StringReader sin = new StringReader(this._icalString);
+			CalendarBuilder builder = new CalendarBuilder();
+
 			this._calendar = builder.build(sin);
+		}
+		catch (NullPointerException e)
+		{
+			LogManager.getInstance(context).logException(e);
 		}
 		catch (IOException e)
 		{

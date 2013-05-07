@@ -11,5 +11,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="lib" path="C:/adt-bundle-windows-x86/sdk/add-ons/addon-google_apis-google-14/libs/maps.jar"/>
+	<classpathentry kind="lib" path="libs/sunrise.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

@@ -39,6 +39,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.WifiAccessPoin
 import edu.northwestern.cbits.purple_robot_manager.probes.features.CallHistoryFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.DeviceInUseFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.JavascriptFeature;
+import edu.northwestern.cbits.purple_robot_manager.probes.features.SunriseSunsetFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.WeatherUndergroundFeature;
 
 public class ProbeManager
@@ -228,6 +229,13 @@ public class ProbeManager
 				WeatherUndergroundFeature weather = (WeatherUndergroundFeature) probe;
 
 				if (weather.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof SunriseSunsetFeature)
+			{
+				SunriseSunsetFeature sunrise = (SunriseSunsetFeature) probe;
+
+				if (sunrise.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 			else if (probe instanceof CallHistoryFeature)
