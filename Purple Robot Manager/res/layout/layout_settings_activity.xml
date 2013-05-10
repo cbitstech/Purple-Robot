@@ -92,10 +92,6 @@
 				<Preference android:title="@string/title_email_files" android:key="config_mail_archives" android:defaultValue="0" />
 				<Preference android:title="@string/title_delete_files" android:key="config_delete_archives" android:defaultValue="0" />
  			</PreferenceScreen>
-  			<PreferenceScreen android:title="@string/title_advanced_settings">
-				<Preference android:title="@string/title_email_files" android:key="config_mail_archives" android:defaultValue="0" />
-				<Preference android:title="@string/title_delete_files" android:key="config_delete_archives" android:defaultValue="0" />
- 			</PreferenceScreen>
  		</PreferenceScreen>
     	<PreferenceScreen android:title="@string/title_log_upload_section">
 			<CheckBoxPreference
