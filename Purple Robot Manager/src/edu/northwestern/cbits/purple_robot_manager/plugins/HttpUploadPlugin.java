@@ -166,7 +166,11 @@ public class HttpUploadPlugin extends OutputPlugin
 		long prefPeriod = Long.parseLong(prefs.getString("config_http_upload_interval", "0"));
 		
 		if (prefPeriod != 0)
+		{
 			period = prefPeriod * 1000;
+			
+			this._uploadPeriod = period;
+		}
 		
 		return period;
 	}
@@ -249,6 +253,8 @@ public class HttpUploadPlugin extends OutputPlugin
 
 				if (now - this._lastSave > this.savePeriod() || this._pendingSaves.size() > 128)
 				{
+					this._failCount = 0;
+
 					final HttpUploadPlugin me = this;
 
 					Runnable r = new Runnable()

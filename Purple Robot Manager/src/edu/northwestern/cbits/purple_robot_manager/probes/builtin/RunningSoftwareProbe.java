@@ -163,12 +163,15 @@ public class RunningSoftwareProbe extends Probe
 
 			Element detailsTab = doc.select("div#details-tab-1").first();
 			
-			Elements links = detailsTab.select("a[href]");
-			
-			for (Element link : links)
+			if (detailsTab != null)
 			{
-				if (link.attr("href").startsWith("/store/apps/category/"))
-					category = link.text();
+				Elements links = detailsTab.select("a[href]");
+				
+				for (Element link : links)
+				{
+					if (link.attr("href").startsWith("/store/apps/category/"))
+						category = link.text();
+				}
 			}
 		}
 		catch (IOException e) 

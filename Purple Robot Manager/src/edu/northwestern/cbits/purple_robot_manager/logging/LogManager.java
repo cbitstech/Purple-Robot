@@ -131,12 +131,21 @@ public class LogManager
 					LocationManager lm = (LocationManager) this._context.getSystemService(Context.LOCATION_SERVICE);
 				
 					Location lastLocation = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+					
+					Location backupLocation = null;
 				
-					if (lastLocation != null && now - lastLocation.getTime() > (1000 * 60 * 15))
+					if (lastLocation != null && now - lastLocation.getTime() > (1000 * 60 * 60))
+					{
+						backupLocation = lastLocation;
+					
 						lastLocation = null;
+					}
 					
 					if (lastLocation == null)
 						lastLocation = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+					
+					if (lastLocation == null)
+						lastLocation = backupLocation;
 					
 					if (lastLocation != null)
 					{

@@ -22,6 +22,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.EvaluatorException;
+import org.mozilla.javascript.RhinoException;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -437,6 +438,12 @@ public class LegacyJSONConfigFile
 		}
 		catch (JSONException e)
 		{
+			this.parameters = new JSONObject();
+		}
+		catch (RhinoException e)
+		{
+			LogManager.getInstance(context).logException(e);
+
 			this.parameters = new JSONObject();
 		}
 	}
