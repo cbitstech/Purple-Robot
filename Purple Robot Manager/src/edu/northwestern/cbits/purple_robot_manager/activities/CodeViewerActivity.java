@@ -76,6 +76,10 @@ public class CodeViewerActivity extends SherlockActivity
 			{
 	        	LogManager.getInstance(this).logException(e);
 			}
+			catch (StackOverflowError e)
+			{
+	        	LogManager.getInstance(this).logException(e);
+			}
 		}
 		
 		code = "<!DOCTYPE html><html><body style=\"background-color: #000; color: #00c000;\"><pre>" + code + "</pre></body></html>";
