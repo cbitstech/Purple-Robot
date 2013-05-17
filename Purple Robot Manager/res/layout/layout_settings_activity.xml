@@ -157,4 +157,102 @@
             android:key="config_json_refresh_manually"
             android:defaultValue="0" />
     </PreferenceCategory>
+	<PreferenceCategory android:title="@string/title_acknowledgements_section">
+		<PreferenceScreen android:title="@string/title_third_party_libraries">
+	   		<Preference android:title="@string/title_third_actionbarsherlock"
+	   		    android:summary="@string/summary_third_actionbarsherlock">
+		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_actionbarsherlock" />
+	        </Preference>
+	   		<Preference android:title="@string/title_third_rhino"
+	   		    android:summary="@string/summary_third_rhino">
+		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_rhino" />
+	        </Preference>
+	        <Preference android:title="@string/title_third_ical"
+	   		    android:summary="@string/summary_third_ical">
+		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_ical" />
+	        </Preference>
+	        <Preference android:title="@string/title_third_hockeyapp"
+	   		    android:summary="@string/summary_third_hockeyapp">
+		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_hockeyapp" />
+	        </Preference>
+	        <Preference android:title="@string/title_third_commons"
+	   		    android:summary="@string/summary_third_commons">
+		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_commons" />
+	        </Preference>
+	        	        <Preference android:title="@string/title_third_backport"
+	   		    android:summary="@string/summary_third_backport">
+		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_backport" />
+	        </Preference>
+	        <Preference android:title="@string/title_third_jscheme"
+	   		    android:summary="@string/summary_third_jscheme">
+		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_jscheme" />
+	        </Preference>
+	        <Preference android:title="@string/title_third_jquery"
+	   		    android:summary="@string/summary_third_jquery">
+		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_jquery" />
+	        </Preference>
+	        <Preference android:title="@string/title_third_qunit"
+	   		    android:summary="@string/summary_third_qunit">
+		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_qunit" />
+	        </Preference>
+	        <Preference android:title="@string/title_third_highcharts"
+	   		    android:summary="@string/summary_third_highcharts">
+		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_highcharts" />
+	        </Preference>
+	        <Preference android:title="@string/title_third_datejs"
+	   		    android:summary="@string/summary_third_datejs">
+		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_datejs" />
+	        </Preference>
+	        <Preference android:title="@string/title_third_pregexpscm"
+	   		    android:summary="@string/summary_third_pregexpscm">
+		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_pregexpscm" />
+	        </Preference>
+	        <Preference android:title="@string/title_third_underscore"
+	   		    android:summary="@string/summary_third_underscore">
+		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_underscore" />
+	        </Preference>
+	        <Preference android:title="@string/title_third_jstat"
+	   		    android:summary="@string/summary_third_jstat">
+		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_jstat" />
+	        </Preference>
+	        <Preference android:title="@string/title_third_beautifier"
+	   		    android:summary="@string/summary_third_beautifier">
+		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_beautifier" />
+	        </Preference>
+	        	        <Preference android:title="@string/title_third_gson"
+	   		    android:summary="@string/summary_third_gson">
+		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_gson" />
+	        </Preference>
+   	        <Preference android:title="@string/title_third_guava"
+	   		    android:summary="@string/summary_third_guava">
+		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_guava" />
+	        </Preference>
+   	        <Preference android:title="@string/title_third_jmdns"
+	   		    android:summary="@string/summary_third_jmdns">
+		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_jmdns" />
+	        </Preference>
+   	        <Preference android:title="@string/title_third_jsoup"
+	   		    android:summary="@string/summary_third_jsoup">
+		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_jsoup" />
+	        </Preference>
+   	        <Preference android:title="@string/title_third_mixpanel"
+	   		    android:summary="@string/summary_third_mixpanel">
+		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_mixpanel" />
+	        </Preference>
+   	        <Preference android:title="@string/title_third_sunrise"
+	   		    android:summary="@string/summary_third_sunrise">
+		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_sunrise" />
+	        </Preference>
+   	        <Preference android:title="@string/title_third_mustache"
+	   		    android:summary="@string/summary_third_mustache">
+		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_mustache" />
+	        </Preference>
+	   	</PreferenceScreen>
+		<PreferenceScreen android:title="@string/title_funders">
+	   		<Preference android:title="@string/title_funder_nih"
+	   		    android:summary="@string/summary_funder_nih">
+		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_funder_nih" />
+	        </Preference>
+		</PreferenceScreen>
+	</PreferenceCategory>
 </PreferenceScreen>
