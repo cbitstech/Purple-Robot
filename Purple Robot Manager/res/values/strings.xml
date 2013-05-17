@@ -655,5 +655,102 @@
 
     <string name="pr_version_label">Purple Robot Version</string>
     
+    <!-- Acknowledgements -->
+    <string name="title_acknowledgements_section">Acknowledgements</string>
+    <string name="title_third_party_libraries">Third Party Libraries &amp; Code</string>
+    
+    <string name="title_third_actionbarsherlock">ActionBarSherlock</string>
+    <string name="summary_third_actionbarsherlock">Jake Wharton (Apache 2.0 License)</string>
+    <string name="url_third_actionbarsherlock">http://actionbarsherlock.com/</string>
+    
+    <string name="title_third_rhino">Rhino</string>
+    <string name="summary_third_rhino">Mozilla (Mozilla Public License 2.0)</string>
+    <string name="url_third_rhino">https://developer.mozilla.org/en-US/docs/Rhino</string>
+    
+    <string name="title_third_ical">iCal4j</string>
+    <string name="summary_third_ical">Ben Fortuna (New BSD License)</string>
+    <string name="url_third_ical">http://ical4j.sourceforge.net/</string>
+
+    <string name="title_third_hockeyapp">HockeyApp</string>
+    <string name="summary_third_hockeyapp">Bit Stadium GmbH</string>
+    <string name="url_third_hockeyapp">http://hockeyapp.net/</string>
+
+    <string name="title_third_commons">Apache Commons</string>
+    <string name="summary_third_commons">Apache Foundation (Apache License 2.0)</string>
+    <string name="url_third_commons">http://commons.apache.org/</string>
+
+    <string name="title_third_backport">backport-util-concurrent</string>
+    <string name="summary_third_backport">Distributed Computing Laboratory, Emory University (Public Domain)</string>
+    <string name="url_third_backport">http://backport-jsr166.sourceforge.net/</string>
+
+    <string name="title_third_jscheme">JScheme</string>
+    <string name="summary_third_jscheme">Ken Anderson, Tim Hickey, Peter Norvig, et al. (zlib/libpng License)</string>
+    <string name="url_third_jscheme">http://jscheme.sourceforge.net/jscheme/main.html</string>
+    
+    <string name="title_third_jquery">jQuery</string>
+    <string name="summary_third_jquery">jQuery Foundation (MIT License)</string>
+    <string name="url_third_jquery">http://jquery.com/</string>
+
+    <string name="title_third_qunit">QUnit</string>
+    <string name="summary_third_qunit">jQuery Foundation (MIT License)</string>
+    <string name="url_third_qunit">http://qunitjs.com/</string>
+
+    <string name="title_third_highcharts">Highcharts</string>
+    <string name="summary_third_highcharts">HighSoft (CC BY-NC 3.0 License)</string>
+    <string name="url_third_highcharts">http://www.highcharts.com/</string>
+
+    <string name="title_third_datejs">Datejs</string>
+    <string name="summary_third_datejs">Coolite Inc. (MIT License)</string>
+    <string name="url_third_datejs">http://www.datejs.com/</string>
+
+	<string name="title_third_pregexpscm">pregexp.scm</string>
+    <string name="summary_third_pregexpscm">Dorai Sitaram (LGPL License)</string>
+    <string name="url_third_pregexpscm">http://www.ccs.neu.edu/home/dorai/pregexp/index.html</string>
+
+    <string name="title_third_underscore">Underscore.js</string>
+    <string name="summary_third_underscore">Jeremy Ashkenas, DocumentCloud (MIT License)</string>
+    <string name="url_third_underscore">http://underscorejs.org/</string>
+
+    <string name="title_third_jstat">jStat</string>
+    <string name="summary_third_jstat">John Resig (MIT License)</string>
+    <string name="url_third_jstat">http://www.jstat.org/</string>
+    
+    <string name="title_third_beautifier">JS Beautifier</string>
+    <string name="summary_third_beautifier">Einar Lielmanis (MIT License)</string>
+    <string name="url_third_beautifier">https://github.com/einars/js-beautify</string>
+    
+    <string name="title_third_gson">GSON</string>
+    <string name="summary_third_gson">Google (Apache License 2.0)</string>
+    <string name="url_third_gson">https://code.google.com/p/google-gson/</string>
+    
+    <string name="title_third_guava">Guava</string>
+    <string name="summary_third_guava">Google (Apache License 2.0)</string>
+    <string name="url_third_guava">https://code.google.com/p/guava-libraries/</string>
+    
+    <string name="title_third_jmdns">JmDNS</string>
+    <string name="summary_third_jmdns">Arthur van Hoff, Rich Blair, Pierre Frisch, et al. (Apache License 2.0)</string>
+    <string name="url_third_jmdns">http://jmdns.sourceforge.net/</string>
+    
+    <string name="title_third_jsoup">jsoup</string>
+    <string name="summary_third_jsoup">Jonathan Hedley (MIT License)</string>
+    <string name="url_third_jsoup">http://jsoup.org/</string>
+    
+    <string name="title_third_mixpanel">MixPanel API</string>
+    <string name="summary_third_mixpanel">MixPanel (MIT License)</string>
+    <string name="url_third_mixpanel">https://mixpanel.com/docs/integration-libraries/android</string>
+
+    <string name="title_third_sunrise">Sunrise/SunsetLib</string>
+    <string name="summary_third_sunrise">Mike Reedell (Apache License 2.0)</string>
+    <string name="url_third_sunrise">https://github.com/mikereedell/sunrisesunsetlib-java</string>
+
+    <string name="title_third_mustache">mustache.java</string>
+    <string name="summary_third_mustache">RightTime, Inc. (Apache License 2.0)</string>
+    <string name="url_third_mustache">https://github.com/spullara/mustache.java</string>
+
+	<string name="title_funders">Funders &amp; Benefactors</string>
+    
+    <string name="title_funder_nih">National Institutes of Health</string>
+    <string name="summary_funder_nih">U.S. Department of Health &amp; Human Services</string>
+    <string name="url_funder_nih">http://www.nih.gov/</string>
 </resources>
 
