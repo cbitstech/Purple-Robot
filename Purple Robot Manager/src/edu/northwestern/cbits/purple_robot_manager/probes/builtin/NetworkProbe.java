@@ -33,6 +33,8 @@ public class NetworkProbe extends Probe
 	private static final String IFACE_NAME = "INTERFACE_NAME";
 	private static final String IFACE_DISPLAY_NAME = "INTERFACE_DISPLAY";
 
+	private static final boolean DEFAULT_ENABLED = true;
+
 	private long _lastCheck = 0;
 
 	public String name(Context context)
@@ -78,11 +80,11 @@ public class NetworkProbe extends Probe
 		{
 			final long now = System.currentTimeMillis();
 
-			if (prefs.getBoolean("config_probe_network_enabled", true))
+			if (prefs.getBoolean("config_probe_network_enabled", NetworkProbe.DEFAULT_ENABLED))
 			{
 				synchronized(this)
 				{
-					long freq = Long.parseLong(prefs.getString("config_probe_network_frequency", "60000"));
+					long freq = Long.parseLong(prefs.getString("config_probe_network_frequency", Probe.DEFAULT_FREQUENCY));
 
 					if (now - this._lastCheck  > freq)
 					{
@@ -198,7 +200,7 @@ public class NetworkProbe extends Probe
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-		long freq = Long.parseLong(prefs.getString("config_probe_network_frequency", "300000"));
+		long freq = Long.parseLong(prefs.getString("config_probe_network_frequency", Probe.DEFAULT_FREQUENCY));
 		
 		map.put(Probe.PROBE_FREQUENCY, freq);
 		
@@ -235,16 +237,16 @@ public class NetworkProbe extends Probe
 		CheckBoxPreference enabled = new CheckBoxPreference(activity);
 		enabled.setTitle(R.string.title_enable_probe);
 		enabled.setKey("config_probe_network_enabled");
-		enabled.setDefaultValue(true);
+		enabled.setDefaultValue(NetworkProbe.DEFAULT_ENABLED);
 
 		screen.addPreference(enabled);
 
 		ListPreference duration = new ListPreference(activity);
 		duration.setKey("config_probe_network_frequency");
-		duration.setDefaultValue("60000");
 		duration.setEntryValues(R.array.probe_satellite_frequency_values);
 		duration.setEntries(R.array.probe_satellite_frequency_labels);
 		duration.setTitle(R.string.probe_frequency_label);
+		duration.setDefaultValue(Probe.DEFAULT_FREQUENCY);
 
 		screen.addPreference(duration);
 

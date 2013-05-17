@@ -68,6 +68,10 @@ public class RobotHealthProbe extends Probe
 	protected static final String LAST_BOOT = "LAST_BOOT";
 	protected static final String LAST_HALT = "LAST_HALT";
 
+	private static final boolean DEFAULT_ENABLED = true;
+	private static final boolean DEFAULT_SCHEME = true;
+	private static final boolean DEFAULT_JAVASCRIPT = true;
+
 	private long _lastOffset = 0;
 	private long _lastTimeCheck = 0;
 	
@@ -160,11 +164,11 @@ public class RobotHealthProbe extends Probe
 
 		if (super.isEnabled(context))
 		{
-			if (prefs.getBoolean("config_probe_robot_enabled", true))
+			if (prefs.getBoolean("config_probe_robot_enabled", RobotHealthProbe.DEFAULT_ENABLED))
 			{
 				synchronized(this)
 				{
-					long freq = Long.parseLong(prefs.getString("config_probe_robot_frequency", "60000"));
+					long freq = Long.parseLong(prefs.getString("config_probe_robot_frequency", Probe.DEFAULT_FREQUENCY));
 
 					if (now - this._lastCheck  > freq)
 					{
@@ -335,14 +339,14 @@ public class RobotHealthProbe extends Probe
 									bundle.putInt(RobotHealthProbe.EXTERNAL_FREE, externalFree);
 									bundle.putInt(RobotHealthProbe.EXTERNAL_TOTAL, externalTotal);
 									
-									if (prefs.getBoolean("config_probe_robot_scheme_config", true))
+									if (prefs.getBoolean("config_probe_robot_scheme_config", RobotHealthProbe.DEFAULT_SCHEME))
 									{
 										SchemeConfigFile file = new SchemeConfigFile(context);
 										
 										bundle.putString(RobotHealthProbe.SCHEME_CONFIG, file.toString());
 									}
 
-									if (prefs.getBoolean("config_probe_robot_json_config", true))
+									if (prefs.getBoolean("config_probe_robot_json_config", RobotHealthProbe.DEFAULT_JAVASCRIPT))
 									{
 										JSONConfigFile file = new JSONConfigFile(context);
 										
@@ -412,9 +416,11 @@ public class RobotHealthProbe extends Probe
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-		long freq = Long.parseLong(prefs.getString("config_probe_robot_frequency", "300000"));
+		long freq = Long.parseLong(prefs.getString("config_probe_robot_frequency", Probe.DEFAULT_FREQUENCY));
 		
 		map.put(Probe.PROBE_FREQUENCY, freq);
+		
+		// TODO: Add JS + Scheme params...
 		
 		return map;
 	}
@@ -449,29 +455,29 @@ public class RobotHealthProbe extends Probe
 		CheckBoxPreference enabled = new CheckBoxPreference(activity);
 		enabled.setTitle(R.string.title_enable_probe);
 		enabled.setKey("config_probe_robot_enabled");
-		enabled.setDefaultValue(true);
+		enabled.setDefaultValue(RobotHealthProbe.DEFAULT_ENABLED);
 
 		screen.addPreference(enabled);
 
 		ListPreference duration = new ListPreference(activity);
 		duration.setKey("config_probe_robot_frequency");
-		duration.setDefaultValue("300000");
 		duration.setEntryValues(R.array.probe_satellite_frequency_values);
 		duration.setEntries(R.array.probe_satellite_frequency_labels);
 		duration.setTitle(R.string.probe_frequency_label);
+		duration.setDefaultValue(Probe.DEFAULT_FREQUENCY);
 
 		screen.addPreference(duration);
 
 		CheckBoxPreference scheme = new CheckBoxPreference(activity);
 		scheme.setTitle(R.string.title_enable_scheme_config);
 		scheme.setKey("config_probe_robot_scheme_config");
-		scheme.setDefaultValue(true);
+		scheme.setDefaultValue(RobotHealthProbe.DEFAULT_SCHEME);
 		screen.addPreference(scheme);
 
 		CheckBoxPreference json = new CheckBoxPreference(activity);
 		json.setTitle(R.string.title_enable_json_config);
 		json.setKey("config_probe_robot_json_config");
-		json.setDefaultValue(true);
+		json.setDefaultValue(RobotHealthProbe.DEFAULT_JAVASCRIPT);
 		screen.addPreference(json);
 
 		return screen;

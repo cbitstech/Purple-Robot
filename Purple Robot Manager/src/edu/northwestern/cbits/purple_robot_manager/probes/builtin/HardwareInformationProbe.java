@@ -39,6 +39,8 @@ public class HardwareInformationProbe extends Probe
 	private static final String BLUETOOTH_MAC = "BLUETOOTH_MAC";
 	private static final String MOBILE_ID = "MOBILE_ID";
 
+	private static final boolean DEFAULT_ENABLED = true;
+
 	private long _lastCheck = 0;
 
 	public String name(Context context)
@@ -84,11 +86,11 @@ public class HardwareInformationProbe extends Probe
 
 		if (super.isEnabled(context))
 		{
-			if (prefs.getBoolean("config_probe_hardware_enabled", true))
+			if (prefs.getBoolean("config_probe_hardware_enabled", HardwareInformationProbe.DEFAULT_ENABLED))
 			{
 				synchronized(this)
 				{
-					long freq = Long.parseLong(prefs.getString("config_probe_hardware_frequency", "300000"));
+					long freq = Long.parseLong(prefs.getString("config_probe_hardware_frequency", Probe.DEFAULT_FREQUENCY));
 
 					if (now - this._lastCheck  > freq)
 					{
@@ -177,7 +179,7 @@ public class HardwareInformationProbe extends Probe
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-		long freq = Long.parseLong(prefs.getString("config_probe_hardware_frequency", "300000"));
+		long freq = Long.parseLong(prefs.getString("config_probe_hardware_frequency", Probe.DEFAULT_FREQUENCY));
 		
 		map.put(Probe.PROBE_FREQUENCY, freq);
 		
@@ -214,13 +216,13 @@ public class HardwareInformationProbe extends Probe
 		CheckBoxPreference enabled = new CheckBoxPreference(activity);
 		enabled.setTitle(R.string.title_enable_probe);
 		enabled.setKey("config_probe_hardware_enabled");
-		enabled.setDefaultValue(true);
+		enabled.setDefaultValue(HardwareInformationProbe.DEFAULT_ENABLED);
 
 		screen.addPreference(enabled);
 
 		ListPreference duration = new ListPreference(activity);
 		duration.setKey("config_probe_hardware_frequency");
-		duration.setDefaultValue("300000");
+		duration.setDefaultValue(Probe.DEFAULT_FREQUENCY);
 		duration.setEntryValues(R.array.probe_satellite_frequency_values);
 		duration.setEntries(R.array.probe_satellite_frequency_labels);
 		duration.setTitle(R.string.probe_frequency_label);

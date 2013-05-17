@@ -48,6 +48,8 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 
 	private static final String LIGHT_KEY = "LUX";
 
+	private static final String DEFAULT_THRESHOLD = "10.0";
+
 	private static int BUFFER_SIZE = 512;
 
 	private static String[] fieldNames = { LIGHT_KEY };
@@ -224,7 +226,7 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 		{
 			SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
 
-			frequency = Long.parseLong(prefs.getString("config_probe_light_built_in_frequency", "1000"));
+			frequency = Long.parseLong(prefs.getString("config_probe_light_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
 
 			int bufferSize = 1000 / (int) frequency;
 
@@ -275,7 +277,7 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 
 			SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
-			if (prefs.getBoolean("config_probe_light_built_in_enabled", false))
+			if (prefs.getBoolean("config_probe_light_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
 			{
 				Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_LIGHT);
 				
@@ -296,7 +298,7 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 		if (now - this.lastThresholdLookup > 5000)
 		{
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
-			this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_light_threshold", "10.0"));
+			this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_light_threshold", LightProbe.DEFAULT_THRESHOLD));
 			
 			this.lastThresholdLookup = now;
 		}
@@ -348,7 +350,7 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 
 		ListPreference threshold = new ListPreference(activity);
 		threshold.setKey("config_probe_light_threshold");
-		threshold.setDefaultValue("10.0");
+		threshold.setDefaultValue(LightProbe.DEFAULT_THRESHOLD);
 		threshold.setEntryValues(R.array.probe_light_threshold);
 		threshold.setEntries(R.array.probe_light_threshold_labels);
 		threshold.setTitle(R.string.probe_noise_threshold_label);
@@ -358,7 +360,6 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 
 		return screen;
 	}
-
 	
 	@SuppressLint("NewApi")
 	public void onSensorChanged(SensorEvent event)

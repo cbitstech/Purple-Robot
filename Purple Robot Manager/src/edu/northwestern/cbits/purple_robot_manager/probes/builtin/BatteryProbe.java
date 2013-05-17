@@ -42,6 +42,8 @@ public class BatteryProbe extends Probe
 
 	private static final String BATTERY_KEY = "BATTERY_LEVEL";
 
+	private static final boolean DEFAULT_ENABLED = true;
+
 	private boolean _isInited = false;
 	private boolean _isEnabled = false;
 
@@ -270,7 +272,7 @@ public class BatteryProbe extends Probe
 
 		if (super.isEnabled(context))
 		{
-			if (prefs.getBoolean("config_probe_battery_enabled", true))
+			if (prefs.getBoolean("config_probe_battery_enabled", BatteryProbe.DEFAULT_ENABLED))
 				this._isEnabled = true;
 		}
 
@@ -352,7 +354,7 @@ public class BatteryProbe extends Probe
 		CheckBoxPreference enabled = new CheckBoxPreference(activity);
 		enabled.setTitle(R.string.title_enable_probe);
 		enabled.setKey("config_probe_battery_enabled");
-		enabled.setDefaultValue(true);
+		enabled.setDefaultValue(BatteryProbe.DEFAULT_ENABLED);
 
 		screen.addPreference(enabled);
 

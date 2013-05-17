@@ -50,6 +50,8 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 
 	private static final String DISTANCE_KEY = "DISTANCE";
 
+	private static final String DEFAULT_THRESHOLD = "5.0";
+
 	private static String[] fieldNames = { DISTANCE_KEY };
 
 	private double _lastValue = Double.MAX_VALUE;
@@ -218,7 +220,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 		{
 			SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
 
-			frequency = Long.parseLong(prefs.getString("config_probe_proximity_built_in_frequency", "1000"));
+			frequency = Long.parseLong(prefs.getString("config_probe_proximity_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
 
 			int bufferSize = 1000 / (int) frequency;
 
@@ -269,7 +271,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 
 			SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
-			if (prefs.getBoolean("config_probe_proximity_built_in_enabled", false))
+			if (prefs.getBoolean("config_probe_proximity_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
 			{
 				Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_PROXIMITY);
 				
@@ -317,7 +319,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 
 		ListPreference threshold = new ListPreference(activity);
 		threshold.setKey("config_probe_proximity_threshold");
-		threshold.setDefaultValue("5.0");
+		threshold.setDefaultValue(ProximityProbe.DEFAULT_THRESHOLD);
 		threshold.setEntryValues(R.array.probe_proximity_threshold);
 		threshold.setEntries(R.array.probe_proximity_threshold_labels);
 		threshold.setTitle(R.string.probe_noise_threshold_label);
@@ -335,7 +337,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 		if (now - this.lastThresholdLookup > 5000)
 		{
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
-			this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_proximity_threshold", "5.0"));
+			this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_proximity_threshold", ProximityProbe.DEFAULT_THRESHOLD));
 			
 			this.lastThresholdLookup = now;
 		}

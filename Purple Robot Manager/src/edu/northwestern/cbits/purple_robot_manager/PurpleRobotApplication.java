@@ -9,9 +9,6 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
-import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
-import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
-
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -19,7 +16,7 @@ import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.net.Uri.Builder;
 import android.preference.PreferenceManager;
-import android.util.Log;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
 public class PurpleRobotApplication extends Application
 {

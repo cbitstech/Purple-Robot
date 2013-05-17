@@ -30,6 +30,9 @@ public abstract class ContinuousProbe extends Probe
 
 	protected static final String PROBE_THRESHOLD = "threshold";
 
+	protected static final boolean DEFAULT_ENABLED = false;
+	protected static final String DEFAULT_FREQUENCY = "1000";
+
 	private static SharedPreferences prefs = null;
 
 	private PendingIntent _intent = null;
@@ -81,16 +84,16 @@ public abstract class ContinuousProbe extends Probe
 		CheckBoxPreference enabled = new CheckBoxPreference(activity);
 		enabled.setTitle(R.string.title_enable_probe);
 		enabled.setKey("config_probe_" + key + "_enabled");
-		enabled.setDefaultValue(false);
+		enabled.setDefaultValue(ContinuousProbe.DEFAULT_ENABLED);
 
 		screen.addPreference(enabled);
 
 		ListPreference duration = new ListPreference(activity);
 		duration.setKey("config_probe_" + key + "_frequency");
-		duration.setDefaultValue("1000");
 		duration.setEntryValues(this.getResourceFrequencyValues());
 		duration.setEntries(this.getResourceFrequencyLabels());
 		duration.setTitle(R.string.probe_frequency_label);
+		duration.setDefaultValue(ContinuousProbe.DEFAULT_FREQUENCY);
 
 		screen.addPreference(duration);
 

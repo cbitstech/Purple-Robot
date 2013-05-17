@@ -54,6 +54,8 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 
 	private static final String[] fieldNames = { X_KEY, Y_KEY, Z_KEY };
 
+	private static final String DEFAULT_THRESHOLD = "1.0";
+
 	private double _lastX = Double.MAX_VALUE;
 	private double _lastY = Double.MAX_VALUE;
 	private double _lastZ = Double.MAX_VALUE;
@@ -188,7 +190,7 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 		{
 			SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
 
-			frequency = Long.parseLong(prefs.getString("config_probe_magnetic_built_in_frequency", "1000"));
+			frequency = Long.parseLong(prefs.getString("config_probe_magnetic_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
 
 			int bufferSize = 1000 / (int) frequency;
 
@@ -240,7 +242,7 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 
 			SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
-			if (prefs.getBoolean("config_probe_magnetic_built_in_enabled", false))
+			if (prefs.getBoolean("config_probe_magnetic_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
 			{
 				Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 				
@@ -288,7 +290,7 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 
 		ListPreference threshold = new ListPreference(activity);
 		threshold.setKey("config_probe_magnetic_threshold");
-		threshold.setDefaultValue("1.0");
+		threshold.setDefaultValue(MagneticFieldProbe.DEFAULT_THRESHOLD);
 		threshold.setEntryValues(R.array.probe_magnetic_threshold);
 		threshold.setEntries(R.array.probe_magnetic_threshold_labels);
 		threshold.setTitle(R.string.probe_noise_threshold_label);
@@ -306,7 +308,7 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 		if (now - this.lastThresholdLookup > 5000)
 		{
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
-			this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_magnetic_threshold", "1.0"));
+			this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_magnetic_threshold", MagneticFieldProbe.DEFAULT_THRESHOLD));
 			
 			this.lastThresholdLookup = now;
 		}

@@ -14,6 +14,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
@@ -24,6 +25,9 @@ public class RandomNoiseProbe extends Probe
 {
 	private static final String NOISE_VALUE = "NOISE_VALUE";
 	public static final String ACTION = "purple_robot_generate_noise";
+
+	private static final boolean DEFAULT_ENABLED = false;
+	private static final boolean DEFAULT_PERSIST = false;
 
 	private PendingIntent _intent = null;
 	
@@ -73,7 +77,7 @@ public class RandomNoiseProbe extends Probe
 		
 		if (super.isEnabled(context))
 		{
-			if (prefs.getBoolean("config_probe_random_noise_enabled", false))
+			if (prefs.getBoolean("config_probe_random_noise_enabled", RandomNoiseProbe.DEFAULT_ENABLED))
 			{
 				synchronized(this)
 				{
@@ -85,7 +89,7 @@ public class RandomNoiseProbe extends Probe
 					
 					bundle.putFloat(RandomNoiseProbe.NOISE_VALUE, random.nextFloat());
 
-					bundle.putBoolean("TRANSMIT", prefs.getBoolean("config_probe_random_noise_persist", false));
+					bundle.putBoolean("TRANSMIT", prefs.getBoolean("config_probe_random_noise_persist", RandomNoiseProbe.DEFAULT_PERSIST));
 
 					this.transmitData(context, bundle);
 					
@@ -132,15 +136,15 @@ public class RandomNoiseProbe extends Probe
 		CheckBoxPreference enabled = new CheckBoxPreference(activity);
 		enabled.setTitle(R.string.title_enable_probe);
 		enabled.setKey("config_probe_random_noise_enabled");
-		enabled.setDefaultValue(false);
+		enabled.setDefaultValue(RandomNoiseProbe.DEFAULT_ENABLED);
 		screen.addPreference(enabled);
 
 		CheckBoxPreference persist = new CheckBoxPreference(activity);
 		persist.setTitle(R.string.title_probe_random_noise_persist);
 		persist.setSummary(R.string.summary_probe_random_noise_persist);
 		persist.setKey("config_probe_random_noise_persist");
-		persist.setDefaultValue(false);
 		screen.addPreference(persist);
+		persist.setDefaultValue(RandomNoiseProbe.DEFAULT_PERSIST);
 
 		return screen;
 	}
