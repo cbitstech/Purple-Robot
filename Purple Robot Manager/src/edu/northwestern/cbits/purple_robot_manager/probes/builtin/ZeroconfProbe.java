@@ -106,7 +106,7 @@ public class ZeroconfProbe extends Probe implements ServiceListener
 
 		if (enabled)
 		{
-//			long freq = Long.parseLong(prefs.getString("config_probe_zeroconf_frequency", "300000"));
+//			long freq = Long.parseLong(prefs.getString("config_probe_zeroconf_frequency", Probe.DEFAULT_FREQUENCY));
 
 			Log.e("PR", "3");
 			
@@ -217,7 +217,7 @@ public class ZeroconfProbe extends Probe implements ServiceListener
 
 		ListPreference duration = new ListPreference(activity);
 		duration.setKey("config_probe_zeroconf_frequency");
-		duration.setDefaultValue("300000");
+		duration.setDefaultValue(Probe.DEFAULT_FREQUENCY);
 		duration.setEntryValues(R.array.probe_satellite_frequency_values);
 		duration.setEntries(R.array.probe_satellite_frequency_labels);
 		duration.setTitle(R.string.probe_frequency_label);

@@ -25,6 +25,8 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 @SuppressLint("SimpleDateFormat")
 public class TemperatureProbe extends ContinuousProbe implements SensorEventListener
 {
+	private static final String DEFAULT_THRESHOLD = "1.0";
+
 	private static int BUFFER_SIZE = 40;
 
 	private static String[] fieldNames = { "TEMPERATURE" };
@@ -103,7 +105,7 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 		{
 			SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
 
-			frequency = Long.parseLong(prefs.getString("config_probe_temperature_built_in_frequency", "1000"));
+			frequency = Long.parseLong(prefs.getString("config_probe_temperature_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
 
 			int bufferSize = 1000 / (int) frequency;
 
@@ -154,7 +156,7 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 
 			SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
-			if (prefs.getBoolean("config_probe_temperature_built_in_enabled", false))
+			if (prefs.getBoolean("config_probe_temperature_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
 			{
 				Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_TEMPERATURE);
 				
@@ -175,7 +177,7 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 		if (now - this.lastThresholdLookup > 5000)
 		{
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
-			this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_temperature_threshold", "1.0"));
+			this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_temperature_threshold", TemperatureProbe.DEFAULT_THRESHOLD));
 			
 			this.lastThresholdLookup = now;
 		}
@@ -227,7 +229,7 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 
 		ListPreference threshold = new ListPreference(activity);
 		threshold.setKey("config_probe_temperature_threshold");
-		threshold.setDefaultValue("1.0");
+		threshold.setDefaultValue(TemperatureProbe.DEFAULT_THRESHOLD);
 		threshold.setEntryValues(R.array.probe_temperature_threshold);
 		threshold.setEntries(R.array.probe_temperature_threshold_labels);
 		threshold.setTitle(R.string.probe_noise_threshold_label);

@@ -45,6 +45,8 @@ public class CommunicationLogProbe extends Probe
 	private static final String RECENT_TIME = "RECENT_TIME";
 	private static final String RECENT_NUMBER = "RECENT_NUMBER";
 
+	private static final boolean DEFAULT_ENABLED = true;
+
 	private long _lastCheck = 0;
 
 	public String name(Context context)
@@ -90,12 +92,12 @@ public class CommunicationLogProbe extends Probe
 		{
 			long now = System.currentTimeMillis();
 
-			if (prefs.getBoolean("config_probe_communication_enabled", false))
+			if (prefs.getBoolean("config_probe_communication_enabled", CommunicationLogProbe.DEFAULT_ENABLED))
 			{
 				synchronized(this)
 				{
-					long freq = Long.parseLong(prefs.getString("config_probe_communication_frequency", "300000"));
-					boolean doHash = prefs.getBoolean("config_probe_communication_hash_data", true);
+					long freq = Long.parseLong(prefs.getString("config_probe_communication_frequency", Probe.DEFAULT_FREQUENCY));
+					boolean doHash = prefs.getBoolean("config_probe_communication_hash_data", Probe.DEFAULT_HASH_DATA);
 
 					if (now - this._lastCheck  > freq)
 					{
@@ -232,10 +234,10 @@ public class CommunicationLogProbe extends Probe
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-		long freq = Long.parseLong(prefs.getString("config_probe_communication_frequency", "300000"));
+		long freq = Long.parseLong(prefs.getString("config_probe_communication_frequency", Probe.DEFAULT_FREQUENCY));
 		map.put(Probe.PROBE_FREQUENCY, freq);
 		
-		boolean hash = prefs.getBoolean("config_probe_communication_hash_data", true);
+		boolean hash = prefs.getBoolean("config_probe_communication_hash_data", Probe.DEFAULT_HASH_DATA);
 		map.put(Probe.HASH_DATA, hash);
 
 		return map;
@@ -285,22 +287,22 @@ public class CommunicationLogProbe extends Probe
 		CheckBoxPreference enabled = new CheckBoxPreference(activity);
 		enabled.setTitle(R.string.title_enable_probe);
 		enabled.setKey("config_probe_communication_enabled");
-		enabled.setDefaultValue(false);
+		enabled.setDefaultValue(CommunicationLogProbe.DEFAULT_ENABLED);
 
 		screen.addPreference(enabled);
 
 		ListPreference duration = new ListPreference(activity);
 		duration.setKey("config_probe_communication_frequency");
-		duration.setDefaultValue("300000");
 		duration.setEntryValues(R.array.probe_satellite_frequency_values);
 		duration.setEntries(R.array.probe_satellite_frequency_labels);
 		duration.setTitle(R.string.probe_frequency_label);
+		duration.setDefaultValue(Probe.DEFAULT_FREQUENCY);
 
 		screen.addPreference(duration);
 
 		CheckBoxPreference hash = new CheckBoxPreference(activity);
 		hash.setKey("config_probe_communication_hash_data");
-		hash.setDefaultValue(true);
+		hash.setDefaultValue(Probe.DEFAULT_HASH_DATA);
 		hash.setTitle(R.string.config_probe_communication_hash_title);
 		hash.setSummary(R.string.config_probe_communication_hash_summary);
 

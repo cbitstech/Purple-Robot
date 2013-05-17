@@ -25,6 +25,8 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, GpsStatus.NmeaListener, LocationListener
 {
+	private static final boolean DEFAULT_ENABLED = false;
+
 	protected Context _context = null;
 
 	private ArrayList<Bundle> _satellites = new ArrayList<Bundle>();
@@ -40,7 +42,7 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-		long freq = Long.parseLong(prefs.getString("config_probe_satellites_frequency", "300000"));
+		long freq = Long.parseLong(prefs.getString("config_probe_satellites_frequency", Probe.DEFAULT_FREQUENCY));
 		
 		map.put(Probe.PROBE_FREQUENCY, freq);
 		
@@ -79,16 +81,16 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 		CheckBoxPreference enabled = new CheckBoxPreference(activity);
 		enabled.setTitle(R.string.title_enable_probe);
 		enabled.setKey("config_probe_" + key + "_enabled");
-		enabled.setDefaultValue(false);
+		enabled.setDefaultValue(VisibleSatelliteProbe.DEFAULT_ENABLED);
 
 		screen.addPreference(enabled);
 
 		ListPreference duration = new ListPreference(activity);
 		duration.setKey("config_probe_" + key + "_frequency");
-		duration.setDefaultValue("300000");
 		duration.setEntryValues(R.array.probe_satellite_frequency_values);
 		duration.setEntries(R.array.probe_satellite_frequency_labels);
 		duration.setTitle(R.string.probe_frequency_label);
+		duration.setDefaultValue(Probe.DEFAULT_FREQUENCY);
 
 		screen.addPreference(duration);
 
@@ -127,7 +129,7 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-			if (prefs.getBoolean("config_probe_satellites_enabled", false))
+			if (prefs.getBoolean("config_probe_satellites_enabled", VisibleSatelliteProbe.DEFAULT_ENABLED))
 			{
 				if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
 				{
@@ -136,7 +138,7 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 
 					synchronized(this)
 					{
-						long freq = Long.parseLong(prefs.getString("config_probe_satellite_frequency", "300000"));
+						long freq = Long.parseLong(prefs.getString("config_probe_satellite_frequency", Probe.DEFAULT_FREQUENCY));
 
 						if (now - this._lastCheck > 60000 && now - this._lastCheck < freq) // Try to get satellites in 60 seconds...
 						{

@@ -23,6 +23,8 @@ public class ScreenProbe extends Probe
 
 	public static final String SCREEN_ACTIVE = "SCREEN_ACTIVE";
 
+	private static final boolean DEFAULT_ENABLED = true;
+
 	private boolean _isInited = false;
 	private boolean _isEnabled = false;
 
@@ -83,7 +85,7 @@ public class ScreenProbe extends Probe
 
 		if (super.isEnabled(context))
 		{
-			if (prefs.getBoolean("config_probe_screen_enabled", true))
+			if (prefs.getBoolean("config_probe_screen_enabled", ScreenProbe.DEFAULT_ENABLED))
 				this._isEnabled = true;
 		}
 
@@ -146,7 +148,7 @@ public class ScreenProbe extends Probe
 		CheckBoxPreference enabled = new CheckBoxPreference(activity);
 		enabled.setTitle(R.string.title_enable_probe);
 		enabled.setKey("config_probe_screen_enabled");
-		enabled.setDefaultValue(true);
+		enabled.setDefaultValue(ScreenProbe.DEFAULT_ENABLED);
 
 		screen.addPreference(enabled);
 

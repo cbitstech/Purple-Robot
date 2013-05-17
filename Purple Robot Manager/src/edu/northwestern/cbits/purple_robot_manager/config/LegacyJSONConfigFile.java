@@ -321,8 +321,6 @@ public class LegacyJSONConfigFile
 
 						edit.putString(LegacyJSONConfigFile.JSON_CONFIGURATION, "{}");
 						edit.commit();
-
-//						TriggerManager.getInstance(context).removeAllTriggers();
 					}					
 				}
 			}

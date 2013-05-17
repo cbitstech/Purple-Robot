@@ -48,6 +48,8 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 
 	public static final String DB_TABLE = "gyroscope_probe";
 
+	private static final String DEFAULT_THRESHOLD = "0.0025";
+
 	private static String X_KEY = "X";
 	private static String Y_KEY = "Y";
 	private static String Z_KEY = "Z";
@@ -266,7 +268,7 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 		{
 			SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
 
-			frequency = Long.parseLong(prefs.getString("config_probe_gyroscope_built_in_frequency", "1000"));
+			frequency = Long.parseLong(prefs.getString("config_probe_gyroscope_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
 
 			int bufferSize = 1000 / (int) frequency;
 
@@ -318,7 +320,7 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 
         	SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
-        	if (prefs.getBoolean("config_probe_gyroscope_built_in_enabled", false))
+        	if (prefs.getBoolean("config_probe_gyroscope_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
         	{
 				Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 				
@@ -339,7 +341,7 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 		if (now - this.lastThresholdLookup > 5000)
 		{
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
-			this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_gyroscope_threshold", "0.0025"));
+			this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_gyroscope_threshold", GyroscopeProbe.DEFAULT_THRESHOLD));
 			
 			this.lastThresholdLookup = now;
 		}
@@ -366,7 +368,6 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 		
 		return passes;
 	}
-
 
 	public void onSensorChanged(SensorEvent event)
 	{
@@ -465,7 +466,7 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 
 		ListPreference threshold = new ListPreference(activity);
 		threshold.setKey("config_probe_gyroscope_threshold");
-		threshold.setDefaultValue("0.0025");
+		threshold.setDefaultValue(GyroscopeProbe.DEFAULT_THRESHOLD);
 		threshold.setEntryValues(R.array.probe_gyroscope_threshold);
 		threshold.setEntries(R.array.probe_gyroscope_threshold_labels);
 		threshold.setTitle(R.string.probe_noise_threshold_label);

@@ -27,6 +27,9 @@ public class CallStateProbe extends Probe
 	public static final String STATE_RINGING = "Ringing";
 
 	public static final String CALL_STATE = "CALL_STATE";
+
+	private static final boolean DEFAULT_ENABLED = true;
+
 	private boolean _isInited = false;
 	private boolean _isEnabled = false;
 
@@ -83,7 +86,7 @@ public class CallStateProbe extends Probe
 
 		if (super.isEnabled(context))
 		{
-			if (prefs.getBoolean("config_probe_call_state_enabled", true))
+			if (prefs.getBoolean("config_probe_call_state_enabled", CallStateProbe.DEFAULT_ENABLED))
 			{
 				TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 
@@ -169,7 +172,7 @@ public class CallStateProbe extends Probe
 		CheckBoxPreference enabled = new CheckBoxPreference(activity);
 		enabled.setTitle(R.string.title_enable_probe);
 		enabled.setKey("config_probe_call_state_enabled");
-		enabled.setDefaultValue(true);
+		enabled.setDefaultValue(CallStateProbe.DEFAULT_ENABLED);
 
 		screen.addPreference(enabled);
 

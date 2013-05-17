@@ -54,6 +54,8 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 	
 	private static final String[] fieldNames = { X_KEY, Y_KEY, Z_KEY };
 
+	private static final String DEFAULT_THRESHOLD = "0.5";
+
 	private double lastSeen = 0;
 	private long lastFrequencyLookup = 0;
 	private long frequency = 1000;
@@ -244,7 +246,7 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 		{
 			SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
 
-			this.frequency = Long.parseLong(prefs.getString("config_probe_accelerometer_built_in_frequency", "1000"));
+			this.frequency = Long.parseLong(prefs.getString("config_probe_accelerometer_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
 
 			int bufferSize = 1000 / (int) frequency;
 
@@ -296,7 +298,7 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 
         	SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
-        	if (prefs.getBoolean("config_probe_accelerometer_built_in_enabled", false))
+        	if (prefs.getBoolean("config_probe_accelerometer_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
         	{
 				Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 				
@@ -317,7 +319,7 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 		if (now - this.lastThresholdLookup > 5000)
 		{
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
-			this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_accelerometer_threshold", "0.5"));
+			this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_accelerometer_threshold", AccelerometerProbe.DEFAULT_THRESHOLD));
 			
 			this.lastThresholdLookup = now;
 		}
@@ -379,7 +381,7 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 
 		ListPreference threshold = new ListPreference(activity);
 		threshold.setKey("config_probe_accelerometer_threshold");
-		threshold.setDefaultValue("0.5");
+		threshold.setDefaultValue(AccelerometerProbe.DEFAULT_THRESHOLD);
 		threshold.setEntryValues(R.array.probe_accelerometer_threshold);
 		threshold.setEntries(R.array.probe_accelerometer_threshold_labels);
 		threshold.setTitle(R.string.probe_noise_threshold_label);

@@ -41,6 +41,8 @@ public class LocationProbe extends Probe implements LocationListener
 	public static final String LATITUDE_KEY = LATITUDE;
 	public static final String DB_TABLE = "location_probe";
 
+	private static final boolean DEFAULT_ENABLED = true;
+
 	protected Context _context = null;
 
 	private long _lastCheck = 0;
@@ -91,7 +93,7 @@ public class LocationProbe extends Probe implements LocationListener
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-		long freq = Long.parseLong(prefs.getString("config_probe_location_frequency", "300000"));
+		long freq = Long.parseLong(prefs.getString("config_probe_location_frequency", Probe.DEFAULT_FREQUENCY));
 		
 		map.put(Probe.PROBE_FREQUENCY, freq);
 		
@@ -130,13 +132,13 @@ public class LocationProbe extends Probe implements LocationListener
 		CheckBoxPreference enabled = new CheckBoxPreference(activity);
 		enabled.setTitle(R.string.title_enable_probe);
 		enabled.setKey("config_probe_" + key + "_enabled");
-		enabled.setDefaultValue(false);
+		enabled.setDefaultValue(LocationProbe.DEFAULT_ENABLED);
 
 		screen.addPreference(enabled);
 
 		ListPreference duration = new ListPreference(activity);
 		duration.setKey("config_probe_" + key + "_frequency");
-		duration.setDefaultValue("300000");
+		duration.setDefaultValue(Probe.DEFAULT_FREQUENCY);
 		duration.setEntryValues(R.array.probe_satellite_frequency_values);
 		duration.setEntries(R.array.probe_satellite_frequency_labels);
 		duration.setTitle(R.string.probe_frequency_label);
@@ -157,7 +159,7 @@ public class LocationProbe extends Probe implements LocationListener
 
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-			if (prefs.getBoolean("config_probe_location_enabled", false))
+			if (prefs.getBoolean("config_probe_location_enabled", LocationProbe.DEFAULT_ENABLED))
 			{
 				long now = System.currentTimeMillis();
 
@@ -168,7 +170,7 @@ public class LocationProbe extends Probe implements LocationListener
 					if (looper == null)
 						Looper.prepare();
 					
-					long freq = Long.parseLong(prefs.getString("config_probe_location_frequency", "300000"));
+					long freq = Long.parseLong(prefs.getString("config_probe_location_frequency", Probe.DEFAULT_FREQUENCY));
 
 					if (now - this._lastCheck > 30000 && now - this._lastCheck < freq && this._listening) // Try to get position in 30 seconds...
 					{

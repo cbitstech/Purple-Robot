@@ -33,6 +33,8 @@ public class SoftwareInformationProbe extends Probe
 	private static final String INSTALLED_APPS = "INSTALLED_APPS";
 	private static final String INSTALLED_APP_COUNT = "INSTALLED_APP_COUNT";
 
+	private static final boolean DEFAULT_ENABLED = true;
+
 	private long _lastCheck = 0;
 
 	public String name(Context context)
@@ -78,11 +80,11 @@ public class SoftwareInformationProbe extends Probe
 		{
 			long now = System.currentTimeMillis();
 
-			if (prefs.getBoolean("config_probe_software_enabled", true))
+			if (prefs.getBoolean("config_probe_software_enabled", SoftwareInformationProbe.DEFAULT_ENABLED))
 			{
 				synchronized(this)
 				{
-					long freq = Long.parseLong(prefs.getString("config_probe_software_frequency", "300000"));
+					long freq = Long.parseLong(prefs.getString("config_probe_software_frequency", Probe.DEFAULT_FREQUENCY));
 
 					if (now - this._lastCheck  > freq)
 					{
@@ -178,7 +180,7 @@ public class SoftwareInformationProbe extends Probe
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-		long freq = Long.parseLong(prefs.getString("config_probe_software_frequency", "300000"));
+		long freq = Long.parseLong(prefs.getString("config_probe_software_frequency", Probe.DEFAULT_FREQUENCY));
 		
 		map.put(Probe.PROBE_FREQUENCY, freq);
 		
@@ -215,16 +217,16 @@ public class SoftwareInformationProbe extends Probe
 		CheckBoxPreference enabled = new CheckBoxPreference(activity);
 		enabled.setTitle(R.string.title_enable_probe);
 		enabled.setKey("config_probe_software_enabled");
-		enabled.setDefaultValue(true);
+		enabled.setDefaultValue(SoftwareInformationProbe.DEFAULT_ENABLED);
 
 		screen.addPreference(enabled);
 
 		ListPreference duration = new ListPreference(activity);
 		duration.setKey("config_probe_software_frequency");
-		duration.setDefaultValue("300000");
 		duration.setEntryValues(R.array.probe_satellite_frequency_values);
 		duration.setEntries(R.array.probe_satellite_frequency_labels);
 		duration.setTitle(R.string.probe_frequency_label);
+		duration.setDefaultValue(Probe.DEFAULT_FREQUENCY);
 
 		screen.addPreference(duration);
 

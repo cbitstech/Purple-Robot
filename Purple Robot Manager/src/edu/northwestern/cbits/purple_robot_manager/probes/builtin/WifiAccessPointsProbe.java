@@ -39,6 +39,8 @@ public class WifiAccessPointsProbe extends Probe
 	protected static final String CURRENT_BSSID = "CURRENT_BSSID";
 	protected static final String CURRENT_LINK_SPEED = "CURRENT_LINK_SPEED";
 
+	private static final boolean DEFAULT_ENABLED = true;
+
 	private long _lastCheck = 0;
 
 	private BroadcastReceiver _receiver = null;
@@ -66,7 +68,7 @@ public class WifiAccessPointsProbe extends Probe
 		{
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-			return prefs.getBoolean("config_probe_wifi_enabled", true);
+			return prefs.getBoolean("config_probe_wifi_enabled", WifiAccessPointsProbe.DEFAULT_ENABLED);
 		}
 		
 		return false;
@@ -149,7 +151,7 @@ public class WifiAccessPointsProbe extends Probe
 		{
 			synchronized(this)
 			{
-				long freq = Long.parseLong(prefs.getString("config_probe_wifi_frequency", "300000"));
+				long freq = Long.parseLong(prefs.getString("config_probe_wifi_frequency", Probe.DEFAULT_FREQUENCY));
 
 				if (now - this._lastCheck > freq)
 				{
@@ -254,7 +256,7 @@ public class WifiAccessPointsProbe extends Probe
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-		long freq = Long.parseLong(prefs.getString("config_probe_wifi_frequency", "300000"));
+		long freq = Long.parseLong(prefs.getString("config_probe_wifi_frequency", Probe.DEFAULT_FREQUENCY));
 		
 		map.put(Probe.PROBE_FREQUENCY, freq);
 		
@@ -291,16 +293,16 @@ public class WifiAccessPointsProbe extends Probe
 		CheckBoxPreference enabled = new CheckBoxPreference(activity);
 		enabled.setTitle(R.string.title_enable_probe);
 		enabled.setKey("config_probe_wifi_enabled");
-		enabled.setDefaultValue(true);
+		enabled.setDefaultValue(WifiAccessPointsProbe.DEFAULT_ENABLED);
 
 		screen.addPreference(enabled);
 
 		ListPreference duration = new ListPreference(activity);
 		duration.setKey("config_probe_wifi_frequency");
-		duration.setDefaultValue("300000");
 		duration.setEntryValues(R.array.probe_satellite_frequency_values);
 		duration.setEntries(R.array.probe_satellite_frequency_labels);
 		duration.setTitle(R.string.probe_frequency_label);
+		duration.setDefaultValue(Probe.DEFAULT_FREQUENCY);
 
 		screen.addPreference(duration);
 
