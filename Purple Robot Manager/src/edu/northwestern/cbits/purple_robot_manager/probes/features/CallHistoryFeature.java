@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.CallLog;
@@ -159,7 +160,9 @@ public class CallHistoryFeature extends Feature
 								if (doHash)
 									number = EncryptionManager.getInstance().createHash(context, number);
 								
-								ContentValues phoneCall = CallHistoryFeature.parseCursor(cursor);
+								ContentValues phoneCall = new ContentValues();
+								
+								DatabaseUtils.cursorRowToContentValues(cursor, phoneCall);
 								
 								ArrayList<ContentValues> calls = contacts.get(number);
 								
@@ -341,7 +344,7 @@ public class CallHistoryFeature extends Feature
 		return false;
 	}
 
-	private static ContentValues parseCursor(Cursor cursor) 
+/*	private static ContentValues parseCursor(Cursor cursor) 
 	{
 		ContentValues values = new ContentValues();
 		
@@ -364,7 +367,7 @@ public class CallHistoryFeature extends Feature
 		}
 		
 		return values;
-	}
+	} */
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
