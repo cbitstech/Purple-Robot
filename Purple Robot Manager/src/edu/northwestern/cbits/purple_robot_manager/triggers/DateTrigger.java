@@ -27,6 +27,7 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -315,7 +316,7 @@ public class DateTrigger extends Trigger
 
 					DateRange range = new DateRange(p.getStart(), p.getEnd());
 
-					if (range.includes(date, DateRange.INCLUSIVE_END | DateRange.INCLUSIVE_END))
+					if (range.includes(date, DateRange.INCLUSIVE_START | DateRange.INCLUSIVE_END))
 						return p;
 				}
 			}
@@ -337,6 +338,8 @@ public class DateTrigger extends Trigger
 		SharedPreferences prefs =  PreferenceManager.getDefaultSharedPreferences(context);
 
 		String key = "last_fired_" + this.identifier();
+		
+		Log.e("PR", "Matching trigger period: " + p);
 
 		if (p != null && force == false)
 		{
@@ -349,8 +352,12 @@ public class DateTrigger extends Trigger
 
 			DateRange range = new DateRange(start, end);
 
-			if (range.includes(lastFireDate, DateRange.INCLUSIVE_END | DateRange.INCLUSIVE_END))
+			if (range.includes(lastFireDate, DateRange.INCLUSIVE_START | DateRange.INCLUSIVE_END))
+			{
+				Log.e("PR", "Already fired this period. Bailing...");
+
 				return; // Already fired.
+			}
 
 			if (this._random && DateTrigger.random != null)
 			{
@@ -368,7 +375,11 @@ public class DateTrigger extends Trigger
 					double randomDouble = random.nextDouble();
 
 					if (randomDouble > fireThreshold)
+					{
+						Log.e("PR", "Luck is not on your side, Snake-Eyes.");
+
 						return; // Not your time, please try again.
+					}
 				}
 			}
 		}
@@ -376,6 +387,8 @@ public class DateTrigger extends Trigger
 		Editor edit = prefs.edit();
 		edit.putLong(key, now);
 		edit.commit();
+
+		Log.e("PR", "w00t! Executing...");
 
 		super.execute(context, force);
 	}
@@ -390,7 +403,11 @@ public class DateTrigger extends Trigger
 
 				Period p = this.getPeriod(context, date.getTime());
 
-				return (p != null);
+				boolean matches = (p != null);
+				
+				Log.e("PR", "Trigger match test (" + this.name() + "): " + matches);
+
+				return matches;
 			}
 		}
 
