@@ -293,6 +293,20 @@ public class JavaScriptEngine extends BaseScriptEngine
 		return new NativeArray(values);
 	}
 
+	public NativeArray fetchTriggerIds()
+	{
+		List<String> triggerIds = super.fetchTriggerIds();
+			
+		String[] values = new String[triggerIds.size()];
+			
+		for (int i = 0; i < triggerIds.size(); i++)
+		{
+			values[i] = triggerIds.get(i);
+		}
+			
+		return new NativeArray(values);
+	}
+
 	public JSONObject fetchNamespace(String namespace)
 	{
 		Map<String, Object> map = super.fetchNamespaceMap(namespace);

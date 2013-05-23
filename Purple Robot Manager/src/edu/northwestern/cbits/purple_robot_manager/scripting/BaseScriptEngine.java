@@ -1131,4 +1131,9 @@ public abstract class BaseScriptEngine
 		
 		return map;
 	}
+
+	public List<String> fetchTriggerIds() 
+	{
+		return TriggerManager.getInstance(this._context).triggerIds();
+	}
 }
