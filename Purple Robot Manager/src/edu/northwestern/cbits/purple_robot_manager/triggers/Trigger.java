@@ -19,7 +19,7 @@ public abstract class Trigger
 {
 	private String _name = null;
 	private String _action = null;
-	private String _identifier = null;
+	private String _identifier = "unidentified-trigger";
 	
 	private boolean _enabled = true;
 
