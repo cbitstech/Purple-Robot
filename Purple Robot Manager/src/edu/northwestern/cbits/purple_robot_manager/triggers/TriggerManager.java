@@ -14,7 +14,6 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.SchemeConfigFile;
@@ -49,8 +48,6 @@ public class TriggerManager
 
 	public void nudgeTriggers(Context context)
 	{
-		Log.e("PR", "Nudge Triggers (from intent)");
-		
 		Date now = new Date();
 		
 		synchronized(this._triggers)
@@ -162,7 +159,7 @@ public class TriggerManager
 		{
 			for (Trigger trigger : this._triggers)
 			{
-				if (trigger.identifier().equals(triggerId))
+				if (trigger.identifier() != null && trigger.identifier().equals(triggerId))
 					matches.add(trigger);
 			}
 		}		
