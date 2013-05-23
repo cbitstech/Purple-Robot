@@ -174,7 +174,7 @@ public class JavaScriptEngine extends BaseScriptEngine
 		this.transmitData(bundle);
 	}
 
-	private static JSONArray nativeToJson(NativeArray nativeArray) throws JSONException
+	public static JSONArray nativeToJson(NativeArray nativeArray) throws JSONException
 	{
 		JSONArray array = new JSONArray();
 		
@@ -203,7 +203,7 @@ public class JavaScriptEngine extends BaseScriptEngine
 		return array;
 	}
 	
-	private static JSONObject nativeToJson(NativeObject nativeObj) throws JSONException 
+	public static JSONObject nativeToJson(NativeObject nativeObj) throws JSONException 
 	{
 		if (nativeObj == null)
 			return null;
@@ -264,7 +264,19 @@ public class JavaScriptEngine extends BaseScriptEngine
 		
 		return params;
 	}
-	
+
+	private static NativeObject mapToNative(Context context, Scriptable scope, Map<String, Object> map)
+	{
+		NativeObject obj = (NativeObject) context.newObject(scope);
+				
+		for (String key : map.keySet())
+		{
+			obj.put(key, obj, map.get(key));
+		}
+		
+		return obj;
+	}
+
 	public String fetchConfig()
 	{
 		JSONConfigFile config = new JSONConfigFile(this._context);
@@ -307,24 +319,20 @@ public class JavaScriptEngine extends BaseScriptEngine
 		return new NativeArray(values);
 	}
 
-	public JSONObject fetchNamespace(String namespace)
+	public NativeObject fetchNamespace(String namespace)
 	{
 		Map<String, Object> map = super.fetchNamespaceMap(namespace);
 		
-		JSONObject obj = new JSONObject();
+		return JavaScriptEngine.mapToNative(this._jsContext, this._scope, map);
+	}
+	
+	public NativeObject fetchTrigger(String id)
+	{
+		Map<String, Object> trigger = super.fetchTrigger(id);
 		
-		for (String key : map.keySet())
-		{
-			try 
-			{
-				obj.put(key, map.get(key));
-			} 
-			catch (JSONException e) 
-			{
-				LogManager.getInstance(this._context).logException(e);
-			}
-		}
+		if (trigger != null)
+			return JavaScriptEngine.mapToNative(this._jsContext, this._scope, trigger);
 		
-		return obj;
+		return null;
 	}
 }

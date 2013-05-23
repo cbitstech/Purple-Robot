@@ -260,4 +260,26 @@ public class TriggerManager
 		
 		return triggerIds;
 	}
+
+	public Map<String, Object> fetchTrigger(Context context, String id) 
+	{
+		List<Trigger> triggers = this.triggersForId(id); 
+		
+		if (triggers.size() > 0)
+			return triggers.get(0).configuration(context);
+
+		return null;
+	}
+
+	public boolean deleteTrigger(String id) 
+	{
+		List<Trigger> triggers = this.triggersForId(id);
+		
+		synchronized(this._triggers)
+		{
+			this._triggers.removeAll(triggers);
+		}
+		
+		return triggers.size() > 0;
+	}
 }
