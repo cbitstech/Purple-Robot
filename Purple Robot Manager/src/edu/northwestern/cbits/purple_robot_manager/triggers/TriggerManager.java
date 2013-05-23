@@ -245,4 +245,22 @@ public class TriggerManager
 				t.refresh(context);
 		}
 	}
+
+	public List<String> triggerIds() 
+	{
+		ArrayList<String> triggerIds = new ArrayList<String>();
+		
+		synchronized(this._triggers)
+		{
+			for (Trigger t : this._triggers)
+			{
+				String id = t.identifier();
+				
+				if (id != null && triggerIds.contains(id) == false)
+					triggerIds.add(id);
+			}
+		}
+		
+		return triggerIds;
+	}
 }
