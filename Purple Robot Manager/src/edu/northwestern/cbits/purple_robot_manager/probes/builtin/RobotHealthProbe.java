@@ -323,21 +323,35 @@ public class RobotHealthProbe extends Probe
 									bundle.putLong(RobotHealthProbe.ACTIVE_RUNTIME, System.currentTimeMillis() - ManagerService.startTimestamp);
 									bundle.putFloat(RobotHealthProbe.CPU_USAGE, me.readUsage());
 									
-									StatFs root = new StatFs(Environment.getRootDirectory().getAbsolutePath());
-									
-									int rootFree = root.getAvailableBlocks() * root.getBlockSize();
-									int rootTotal = root.getBlockCount() * root.getBlockSize();
+									try
+									{
+										StatFs root = new StatFs(Environment.getRootDirectory().getAbsolutePath());
+										
+										int rootFree = root.getAvailableBlocks() * root.getBlockSize();
+										int rootTotal = root.getBlockCount() * root.getBlockSize();
+	
+										bundle.putInt(RobotHealthProbe.ROOT_FREE, rootFree);
+										bundle.putInt(RobotHealthProbe.ROOT_TOTAL, rootTotal);
+									}
+									catch (IllegalArgumentException e)
+									{
+										LogManager.getInstance(context).logException(e);
+									}
 
-									StatFs external = new StatFs(Environment.getExternalStorageDirectory().getAbsolutePath());
-									
-									int externalFree = external.getAvailableBlocks() * root.getBlockSize();
-									int externalTotal = external.getBlockCount() * root.getBlockSize();
+									try
+									{
+										StatFs external = new StatFs(Environment.getExternalStorageDirectory().getAbsolutePath());
+										
+										int externalFree = external.getAvailableBlocks() * external.getBlockSize();
+										int externalTotal = external.getBlockCount() * external.getBlockSize();
 
-									bundle.putInt(RobotHealthProbe.ROOT_FREE, rootFree);
-									bundle.putInt(RobotHealthProbe.ROOT_TOTAL, rootTotal);
-
-									bundle.putInt(RobotHealthProbe.EXTERNAL_FREE, externalFree);
-									bundle.putInt(RobotHealthProbe.EXTERNAL_TOTAL, externalTotal);
+										bundle.putInt(RobotHealthProbe.EXTERNAL_FREE, externalFree);
+										bundle.putInt(RobotHealthProbe.EXTERNAL_TOTAL, externalTotal);
+									}
+									catch (IllegalArgumentException e)
+									{
+										LogManager.getInstance(context).logException(e);
+									}
 									
 									if (prefs.getBoolean("config_probe_robot_scheme_config", RobotHealthProbe.DEFAULT_SCHEME))
 									{
