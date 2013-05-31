@@ -20,6 +20,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class SoftwareInformationProbe extends Probe
@@ -97,25 +98,32 @@ public class SoftwareInformationProbe extends Probe
 						bundle.putString(SoftwareInformationProbe.RELEASE, Build.VERSION.RELEASE);
 						bundle.putInt(SoftwareInformationProbe.SDK_INT, Build.VERSION.SDK_INT);
 
-						PackageManager pm = context.getApplicationContext().getPackageManager();
-
-						List<ApplicationInfo> infos = pm.getInstalledApplications(0);
-
-						ArrayList<Bundle> installed = new ArrayList<Bundle>();
-
-						for (ApplicationInfo info : infos)
+						try
 						{
-							Bundle appBundle = new Bundle();
-
-							appBundle.putString(SoftwareInformationProbe.APP_NAME, info.loadLabel(pm).toString());
-							appBundle.putString(SoftwareInformationProbe.PACKAGE_NAME, info.packageName);
-
-							installed.add(appBundle);
+							PackageManager pm = context.getApplicationContext().getPackageManager();
+	
+							List<ApplicationInfo> infos = pm.getInstalledApplications(0);
+	
+							ArrayList<Bundle> installed = new ArrayList<Bundle>();
+	
+							for (ApplicationInfo info : infos)
+							{
+								Bundle appBundle = new Bundle();
+	
+								appBundle.putString(SoftwareInformationProbe.APP_NAME, info.loadLabel(pm).toString());
+								appBundle.putString(SoftwareInformationProbe.PACKAGE_NAME, info.packageName);
+	
+								installed.add(appBundle);
+							}
+	
+							bundle.putParcelableArrayList(SoftwareInformationProbe.INSTALLED_APPS, installed);
+							bundle.putInt(SoftwareInformationProbe.INSTALLED_APP_COUNT, installed.size());
 						}
-
-						bundle.putParcelableArrayList(SoftwareInformationProbe.INSTALLED_APPS, installed);
-						bundle.putInt(SoftwareInformationProbe.INSTALLED_APP_COUNT, installed.size());
-
+						catch (RuntimeException e)
+						{
+							LogManager.getInstance(context).logException(e);
+						}
+						
 						this.transmitData(context, bundle);
 
 						this._lastCheck = now;
