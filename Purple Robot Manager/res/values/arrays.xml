@@ -379,4 +379,16 @@
         <item>1 megabyte</item>
         <item>2 megabytes</item>
    	</string-array>
+   	
+   	<array name="sanity_check_classes">
+        <item>DiskSpaceCheck</item>
+        <item>LastUploadCheck</item>
+        <!-- <item>ScriptDurationCheck</item> -->
+        <!-- <item>ScriptErrorCheck</item> -->
+        <!-- <item>ServerFailureCheck</item> -->
+        <item>UploadProgressCheck</item>
+        <!-- <item>TestErrorCheck</item> -->
+        <!-- <item>TestWarningCheck</item> -->
+   	</array>
+	
 </resources>

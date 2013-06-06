@@ -188,7 +188,7 @@ public class RobotHealthProbe extends Probe
 										return;
 
 									me._checking = true;
-
+									
 									File archiveFolder = httpPlugin.getArchiveFolder();
 									File pendingFolder = httpPlugin.getPendingFolder();
 
@@ -366,7 +366,7 @@ public class RobotHealthProbe extends Probe
 										
 										bundle.putString(RobotHealthProbe.JSON_CONFIG, file.toString());
 									}
-									
+
 									bundle.putLong(RobotHealthProbe.LAST_BOOT, prefs.getLong(BootUpReceiver.BOOT_KEY, 0));
 									bundle.putLong(RobotHealthProbe.LAST_HALT, prefs.getLong(ShutdownReceiver.SHUTDOWN_KEY, 0));
 

@@ -49,6 +49,7 @@ import com.actionbarsherlock.view.MenuItem;
 import edu.northwestern.cbits.purple_robot_manager.activities.DiagnosticActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.LabelActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -59,6 +60,7 @@ public class StartActivity extends SherlockActivity
 {
 	public static final String UPDATE_MESSAGE = "UPDATE_LIST_MESSAGE";
 	public static final String DISPLAY_MESSAGE = "DISPLAY_MESSAGE";
+	
 	public static String UPDATE_DISPLAY = "UPDATE_LIST_DISPLAY";
 	public static String DISPLAY_PROBE_NAME = "DISPLAY_PROBE_NAME";
 	public static String DISPLAY_PROBE_VALUE = "DISPLAY_PROBE_VALUE";
@@ -76,6 +78,8 @@ public class StartActivity extends SherlockActivity
 
 	private SharedPreferences prefs = null;
 	protected String _lastProbe = "";
+	
+	private Menu _menu = null;
 
 	private static OnSharedPreferenceChangeListener _prefListener = new OnSharedPreferenceChangeListener()
     {
@@ -318,6 +322,8 @@ public class StartActivity extends SherlockActivity
 			    	        listView.invalidateViews();
 
 			    	        me.getSupportActionBar().setTitle(String.format(me.getResources().getString(R.string.title_probes_count), StartActivity._probeNames.size()));
+			    	        
+			    	        me.updateAlertIcon();
 						}
 	    			};
 
@@ -433,10 +439,24 @@ public class StartActivity extends SherlockActivity
 		LogManager.getInstance(this).log("main_ui_shown", payload);
 	}
 	
+	private void updateAlertIcon()
+	{
+        if (this._menu != null)
+        {
+        	MenuItem diagIcon = this._menu.findItem(R.id.menu_diagnostic_item);
+
+        	diagIcon.setIcon(SanityManager.getInstance(this).getErrorIconResource());
+        }
+	}
+
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
         MenuInflater inflater = this.getSupportMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
+
+        this._menu = menu;
+        
+        this.updateAlertIcon();
 
         return true;
 	}

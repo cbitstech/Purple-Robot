@@ -110,6 +110,10 @@ public class HttpUploadPlugin extends OutputPlugin
 	private long _lastUpload = 0;
 
 	private double _throughput = 0.0;
+	private double _accumulation = 0.0;
+	
+	private long _lastAccumulationMeasure = System.currentTimeMillis();
+	private double _accumulationSum = 0.0;
 
 	private long _uploadSize = MIN_UPLOAD_SIZE;
 	private long _uploadPeriod = MIN_UPLOAD_PERIOD;
@@ -126,6 +130,11 @@ public class HttpUploadPlugin extends OutputPlugin
 	public double getRecentThroughput()
 	{
 		return this._throughput;
+	}
+
+	public double getRecentAccumulation()
+	{
+		return this._accumulation;
 	}
 
 	private void logSuccess(boolean success)
@@ -301,8 +310,11 @@ public class HttpUploadPlugin extends OutputPlugin
 			
 			if (prefs.getBoolean("config_restrict_data_wifi", true))
 			{
+				
 				if (WiFiHelper.wifiAvailable(this.getContext()) == false)
 				{
+					this._throughput = 0.0;
+
 					this.broadcastMessage(R.string.message_wifi_pending);
 
 					this._lastUpload = now;
@@ -632,6 +644,7 @@ public class HttpUploadPlugin extends OutputPlugin
 								LogManager.getInstance(me.getContext()).logException(e);
 
 								me._failCount += 1;
+								me._throughput = 0.0;
 							}
 							catch (SocketTimeoutException e)
 							{
@@ -639,6 +652,7 @@ public class HttpUploadPlugin extends OutputPlugin
 								LogManager.getInstance(me.getContext()).logException(e);
 
 								me._failCount += 1;
+								me._throughput = 0.0;
 							}
 							catch (SocketException e)
 							{
@@ -647,6 +661,7 @@ public class HttpUploadPlugin extends OutputPlugin
 								LogManager.getInstance(me.getContext()).logException(e);
 
 								me._failCount += 1;
+								me._throughput = 0.0;
 							}
 							catch (UnknownHostException e)
 							{
@@ -654,6 +669,7 @@ public class HttpUploadPlugin extends OutputPlugin
 								LogManager.getInstance(me.getContext()).logException(e);
 
 								me._failCount += 1;
+								me._throughput = 0.0;
 							}
 							catch (JSONException e)
 							{
@@ -661,6 +677,7 @@ public class HttpUploadPlugin extends OutputPlugin
 								LogManager.getInstance(me.getContext()).logException(e);
 
 								me._failCount += 1;
+								me._throughput = 0.0;
 							}
 							catch (SSLPeerUnverifiedException e)
 							{
@@ -668,6 +685,7 @@ public class HttpUploadPlugin extends OutputPlugin
 								me.broadcastMessage(R.string.message_unverified_server);
 
 								me._failCount += 1;
+								me._throughput = 0.0;
 							}
 							catch (Exception e)
 							{
@@ -676,6 +694,7 @@ public class HttpUploadPlugin extends OutputPlugin
 								me.broadcastMessage(errorMessage);
 
 								me._failCount += 1;
+								me._throughput = 0.0;
 							}
 							finally
 							{
@@ -853,7 +872,7 @@ public class HttpUploadPlugin extends OutputPlugin
 	private void persistJSONObject(final JSONObject jsonObject)
 	{
 		long now = System.currentTimeMillis();
-
+		
 		this._lastSave = now;
 
 		File pendingFolder = this.getPendingFolder();
@@ -904,6 +923,18 @@ public class HttpUploadPlugin extends OutputPlugin
 			SharedPreferences prefs = HttpUploadPlugin.getPreferences(this.getContext());
 
 			EncryptionManager.getInstance().writeToEncryptedStream(this.getContext(), new FileOutputStream(f), jsonBytes, prefs.getBoolean("config_http_encrypt", true));
+			
+			this._accumulationSum += jsonBytes.length;
+			
+			if (now - this._lastAccumulationMeasure > 10000)
+			{
+				long duration = (now - this._lastAccumulationMeasure) / 1000;
+
+				this._accumulation = ((double) this._accumulationSum) / duration;
+				
+				this._accumulationSum = 0;
+				this._lastAccumulationMeasure = now;
+			}
 			
 			synchronized (this._pendingSaves)
 			{
