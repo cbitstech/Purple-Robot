@@ -5,7 +5,9 @@ import java.net.URLDecoder;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mozilla.javascript.EvaluatorException;
+import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeJavaObject;
+import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Undefined;
 
 import android.content.Context;
@@ -54,6 +56,14 @@ public class ExecuteJavaScriptCommand extends JSONCommand
 						NativeJavaObject nativeObj = (NativeJavaObject) o;
 						
 						o = nativeObj.unwrap();
+					}
+					else if (o instanceof NativeArray)
+					{
+						o = JavaScriptEngine.nativeToJson((NativeArray) o);
+					}
+					else if (o instanceof NativeObject)
+					{
+						o = JavaScriptEngine.nativeToJson((NativeObject) o);
 					}
 
 					result.put(JSONCommand.PAYLOAD, o);
