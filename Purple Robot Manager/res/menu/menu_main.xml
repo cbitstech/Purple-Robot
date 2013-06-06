@@ -3,7 +3,7 @@
     <item android:id="@+id/menu_diagnostic_item"
         android:title="@string/menu_diagnostic_label"
         android:showAsAction="always"
-        android:icon="@drawable/action_about" />
+        android:icon="@drawable/action_error" />
     <item android:id="@+id/menu_settings_item"
         android:title="@string/menu_settings_label" 
         android:showAsAction="never" />
