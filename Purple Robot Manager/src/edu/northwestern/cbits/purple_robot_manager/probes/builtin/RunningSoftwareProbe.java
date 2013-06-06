@@ -3,11 +3,13 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -26,6 +28,7 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.WiFiHelper;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class RunningSoftwareProbe extends Probe
@@ -36,6 +39,7 @@ public class RunningSoftwareProbe extends Probe
 	private static final String PACKAGE_CATEGORY = "PACKAGE_CATEGORY";
 	
 	private static final HashMap<String, String> _categories = new HashMap<String, String>();
+	private static final HashSet<String> _ignorePackages = new HashSet<String>();
 
 	private static final boolean DEFAULT_ENABLED = true;
 
@@ -149,6 +153,9 @@ public class RunningSoftwareProbe extends Probe
 		if (RunningSoftwareProbe._categories.containsKey(packageName))
 			return RunningSoftwareProbe._categories.get(packageName);
 
+		if (RunningSoftwareProbe._ignorePackages.contains(packageName))
+			return null;
+				
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		
 		if (prefs.getBoolean("config_restrict_data_wifi", true))
@@ -176,9 +183,20 @@ public class RunningSoftwareProbe extends Probe
 				}
 			}
 		}
+		catch (HttpStatusException e) 
+		{
+			if (e.getStatusCode() == 404)
+			{
+				RunningSoftwareProbe._ignorePackages.add(packageName);
+				
+				return null;
+			}
+			else
+				LogManager.getInstance(context).logException(e);
+		}
 		catch (IOException e) 
 		{
-			e.printStackTrace();
+			LogManager.getInstance(context).logException(e);
 		}
 		
 		if (category == null)

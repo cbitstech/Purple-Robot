@@ -72,6 +72,7 @@
 				<action android:name="purple_robot_manager_ringtone" />
 				<action android:name="purple_robot_manager_update_widgets" />
 				<action android:name="purple_robot_manager_upload_logs" />
+				<action android:name="purple_robot_manager_refresh_errors" />
 			</intent-filter>
 	    </service>
 		<service android:enabled="true" android:exported="false" android:name=".PersistentService">

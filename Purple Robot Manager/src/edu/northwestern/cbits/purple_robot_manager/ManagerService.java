@@ -6,6 +6,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
@@ -30,6 +31,7 @@ public class ManagerService extends IntentService
 	public static String PERIODIC_CHECK_INTENT = "purple_robot_manager_periodic_check";
 	public static String INCOMING_DATA_INTENT = "purple_robot_manager_incoming_data";
 	public static String UPLOAD_LOGS_INTENT = "purple_robot_manager_upload_logs";
+	public static String REFRESH_ERROR_STATE_INTENT = "purple_robot_manager_refresh_errors";
 	public static String APPLICATION_LAUNCH_INTENT = "purple_robot_manager_application_launch";
 	public static String APPLICATION_LAUNCH_INTENT_PACKAGE = "purple_robot_manager_widget_launch_package";
 	public static String APPLICATION_LAUNCH_INTENT_URL = "purple_robot_manager_widget_launch_url";
@@ -68,6 +70,21 @@ public class ManagerService extends IntentService
 				public void run() 
 				{
 					LogManager.getInstance(me).attemptUploads();
+				}
+			};
+			
+			Thread t = new Thread(r);
+			t.start();
+		}
+		else if (REFRESH_ERROR_STATE_INTENT.equalsIgnoreCase(intent.getAction()))
+		{
+			final ManagerService me = this;
+			
+			Runnable r = new Runnable()
+			{
+				public void run() 
+				{
+					SanityManager.getInstance(me).refreshState();
 				}
 			};
 			
@@ -273,6 +290,8 @@ public class ManagerService extends IntentService
 	    });
 
 		context.startService(new Intent(PersistentService.NUDGE_PROBES));
+		
+		SanityManager.getInstance(context);
 
 		ManagerService._checkSetup = true;
 	}

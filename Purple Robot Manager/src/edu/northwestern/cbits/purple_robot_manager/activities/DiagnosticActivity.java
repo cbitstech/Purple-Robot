@@ -2,6 +2,7 @@ package edu.northwestern.cbits.purple_robot_manager.activities;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -10,6 +11,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.View;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockActivity;
@@ -20,6 +22,8 @@ import com.actionbarsherlock.view.MenuItem;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 
 @SuppressLint("SimpleDateFormat")
 public class DiagnosticActivity extends SherlockActivity 
@@ -89,6 +93,58 @@ public class DiagnosticActivity extends SherlockActivity
 		{
 			LogManager.getInstance(this).logException(e);
 		}
+		
+		TextView okText = (TextView) this.findViewById(R.id.pr_error_none_value);
+		TextView errorText = (TextView) this.findViewById(R.id.pr_error_errors_value);
+		TextView warnText = (TextView) this.findViewById(R.id.pr_error_warnings_value);
+		
+		SanityManager sanity = SanityManager.getInstance(this);
+		
+		if (sanity.getErrorLevel() != SanityCheck.OK)
+		{
+			okText.setVisibility(View.GONE);
+			
+			Map<String, String> errors = sanity.errors();
+			
+			if (errors.size() > 0)
+			{
+				errorText.setVisibility(View.VISIBLE);
+				errorText.setText(DiagnosticActivity.constructErrorLines(errors));
+			}
+			else
+				errorText.setVisibility(View.GONE);
+
+			Map<String, String> warnings = sanity.warnings();
+			
+			if (warnings.size() > 0)
+			{
+				warnText.setVisibility(View.VISIBLE);
+				warnText.setText(DiagnosticActivity.constructErrorLines(warnings));
+			}
+			else
+				warnText.setVisibility(View.GONE);
+		}
+		else
+		{
+			okText.setVisibility(View.VISIBLE);
+			errorText.setVisibility(View.GONE);
+			warnText.setVisibility(View.GONE);
+		}
+	}
+	
+	private static String constructErrorLines(Map<String, String> errors)
+	{
+		StringBuffer sb = new StringBuffer();
+		
+		for (String key : errors.keySet())
+		{
+			if (sb.length() > 0)
+				sb.append(System.getProperty("line.separator"));
+			
+			sb.append(key + ": " + errors.get(key));
+		}
+		
+		return sb.toString();
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu)
