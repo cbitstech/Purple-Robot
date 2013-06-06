@@ -27,6 +27,8 @@ import org.apache.http.protocol.ResponseContent;
 import org.apache.http.protocol.ResponseDate;
 import org.apache.http.protocol.ResponseServer;
 
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+
 import android.content.Context;
 
 public class LocalHttpServer 
@@ -79,37 +81,44 @@ public class LocalHttpServer
 			{
 //				this.serversocket = new ServerSocket(this._port, 8, InetAddress.getLocalHost());
 				this.serversocket = new ServerSocket(this._port, 1);
+				
+				while (!Thread.interrupted()) 
+	            {
+	                try 
+	                {
+	                    Socket socket = this.serversocket.accept();
+	                    DefaultHttpServerConnection conn = new DefaultHttpServerConnection();
+	                    conn.bind(socket, this.params);
+
+	                    Thread t = new WorkerThread(this.httpService, conn);
+	                    t.setDaemon(true);
+	                    t.start();
+	                } 
+	                catch (InterruptedIOException ex) 
+	                {
+	                    break;
+	                } 
+	                catch (IOException e) 
+	                {
+	                    break;
+	                }
+	                catch (NullPointerException e) 
+	                {
+	                    break;
+	                }
+	            }
 			}
 			catch (IOException e) 
 			{
-				e.printStackTrace();
+				try
+				{
+					LogManager.getInstance(null).logException(e);
+				}
+				catch (Throwable th)
+				{
+					th.printStackTrace();
+				}
 			}
-
-			while (!Thread.interrupted()) 
-            {
-                try 
-                {
-                    Socket socket = this.serversocket.accept();
-                    DefaultHttpServerConnection conn = new DefaultHttpServerConnection();
-                    conn.bind(socket, this.params);
-
-                    Thread t = new WorkerThread(this.httpService, conn);
-                    t.setDaemon(true);
-                    t.start();
-                } 
-                catch (InterruptedIOException ex) 
-                {
-                    break;
-                } 
-                catch (IOException e) 
-                {
-                    break;
-                }
-                catch (NullPointerException e) 
-                {
-                    break;
-                }
-            }
         }
     }
 

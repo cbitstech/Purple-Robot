@@ -242,4 +242,44 @@ public class TriggerManager
 				t.refresh(context);
 		}
 	}
+
+	public List<String> triggerIds() 
+	{
+		ArrayList<String> triggerIds = new ArrayList<String>();
+		
+		synchronized(this._triggers)
+		{
+			for (Trigger t : this._triggers)
+			{
+				String id = t.identifier();
+				
+				if (id != null && triggerIds.contains(id) == false)
+					triggerIds.add(id);
+			}
+		}
+		
+		return triggerIds;
+	}
+
+	public Map<String, Object> fetchTrigger(Context context, String id) 
+	{
+		List<Trigger> triggers = this.triggersForId(id); 
+		
+		if (triggers.size() > 0)
+			return triggers.get(0).configuration(context);
+
+		return null;
+	}
+
+	public boolean deleteTrigger(String id) 
+	{
+		List<Trigger> triggers = this.triggersForId(id);
+		
+		synchronized(this._triggers)
+		{
+			this._triggers.removeAll(triggers);
+		}
+		
+		return triggers.size() > 0;
+	}
 }

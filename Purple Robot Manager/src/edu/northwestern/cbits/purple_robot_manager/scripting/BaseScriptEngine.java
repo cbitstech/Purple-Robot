@@ -1131,4 +1131,19 @@ public abstract class BaseScriptEngine
 		
 		return map;
 	}
+
+	public List<String> fetchTriggerIds() 
+	{
+		return TriggerManager.getInstance(this._context).triggerIds();
+	}
+
+	public Map<String, Object> fetchTrigger(String id) 
+	{
+		return TriggerManager.getInstance(this._context).fetchTrigger(this._context, id);
+	}
+	
+	public boolean deleteTrigger(String id)
+	{
+		return TriggerManager.getInstance(this._context).deleteTrigger(id);
+	}
 }
