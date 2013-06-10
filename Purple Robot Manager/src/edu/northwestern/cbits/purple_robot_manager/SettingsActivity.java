@@ -85,8 +85,11 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
         
         CheckBoxPreference update = (CheckBoxPreference) prefs.findPreference(CHECK_UPDATES_KEY);
         update.setOnPreferenceChangeListener(this);
-        
-		LogManager.getInstance(me).log("settings_visited", null);
+
+        ListPreference listUpdate = (ListPreference) prefs.findPreference(RINGTONE_KEY);
+        listUpdate.setOnPreferenceChangeListener(this);
+
+        LogManager.getInstance(me).log("settings_visited", null);
     }
 	
 	protected void onDestroy()
@@ -162,6 +165,19 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 			Toast.makeText(this, R.string.message_update_check, Toast.LENGTH_LONG).show();
 
 			return true;
+		}
+		else if (RINGTONE_KEY.equals(pref.getKey()))
+		{
+			String name = ManagerService.soundNameForPath(this, value.toString());
+			
+        	Intent playIntent = new Intent(ManagerService.RINGTONE_INTENT);
+        	
+        	if (name != null)
+        		playIntent.putExtra(SettingsActivity.RINGTONE_KEY, name);
+        	
+        	this.startService(playIntent);
+        	
+        	return true;
 		}
 
 		return false;

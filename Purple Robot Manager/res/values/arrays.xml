@@ -390,5 +390,24 @@
         <!-- <item>TestErrorCheck</item> -->
         <!-- <item>TestWarningCheck</item> -->
    	</array>
-	
+
+   	<string-array name="sound_effect_labels">
+        <item>Default Ringtone</item>
+        <item>vision i: CRcv</item>
+        <item>vision i: CSnd</item>
+        <item>vision i: Error</item>
+        <item>vision i: New</item>
+        <item>vision i: Off</item>
+        <item>vision i: On</item>
+   	</string-array>
+   	
+   	<string-array name="sound_effect_values">
+        <item>0</item>
+        <item>sounds/vision-i/CRcv.m4a</item>
+        <item>sounds/vision-i/CSnd.m4a</item>
+        <item>sounds/vision-i/Error.m4a</item>
+        <item>sounds/vision-i/New.m4a</item>
+        <item>sounds/vision-i/Off.m4a</item>
+        <item>sounds/vision-i/On.m4a</item>
+   	</string-array>
 </resources>

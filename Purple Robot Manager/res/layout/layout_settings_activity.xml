@@ -8,12 +8,21 @@
         android:title="@string/config_triggers_category_label" />
     <PreferenceCategory
         android:title="@string/config_notifications_category">
-        <RingtonePreference
+        <!-- <RingtonePreference
             android:title="@string/config_notification_sound_label"
             android:summary="@string/config_notification_sound_summary"
             android:ringtoneType="notification"
             android:showSilent="false"
-            android:key="config_default_notification_sound" />
+            android:key="config_default_notification_sound" />  -->
+
+        <ListPreference
+	        android:key="config_default_notification_sound"
+	        android:entries="@array/sound_effect_labels"
+	        android:entryValues="@array/sound_effect_values"
+	        android:title="@string/config_notification_sound_label"
+	        android:summary="@string/config_notification_sound_summary"
+	        android:defaultValue="0" />
+        
         <ListPreference
             android:key="config_json_haptic_pattern"
             android:entries="@array/vibrator_pattern_labels"

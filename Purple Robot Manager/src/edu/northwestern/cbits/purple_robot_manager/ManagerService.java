@@ -1,5 +1,6 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
+import java.io.IOException;
 import java.util.Iterator;
 
 import org.json.JSONException;
@@ -18,7 +19,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
+import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -129,18 +132,28 @@ public class ManagerService extends IntentService
 
 			Uri toneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
+			String toneString = prefs.getString(SettingsActivity.RINGTONE_KEY, null);
+
+			String name = null;
+			
+			if (intent.hasExtra(ManagerService.RINGTONE_NAME))
+				name = intent.getStringExtra(ManagerService.RINGTONE_NAME);
+			
 			try
 			{
-				String toneString = prefs.getString(SettingsActivity.RINGTONE_KEY, null);
-				
 				if (toneString != null)
-					toneUri = Uri.parse(toneString);
+				{
+					if (toneString.equals("0"))
+						toneUri = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_NOTIFICATION);
+					else if (toneString.startsWith("sounds/") == false) 
+						toneUri = Uri.parse(toneString);
+					else
+						toneUri = null;
+				}
 				else
 				{
-					if (intent.hasExtra(ManagerService.RINGTONE_NAME))
+					if (name != null)
 					{
-						String name = intent.getStringExtra(ManagerService.RINGTONE_NAME);
-
 						RingtoneManager rm = new RingtoneManager(this);
 						rm.setType(RingtoneManager.TYPE_NOTIFICATION);
 
@@ -164,31 +177,77 @@ public class ManagerService extends IntentService
 				LogManager.getInstance(this).logException(e);
 			}
 			
-			final Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), toneUri);
-
-			if (r != null)
+			if (toneUri != null)
 			{
-				final ManagerService me = this;
-				
-				Thread t = new Thread(new Runnable()
+				final Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), toneUri);
+	
+				if (r != null)
 				{
-					public void run()
+					final ManagerService me = this;
+					
+					Thread t = new Thread(new Runnable()
 					{
-						r.play();
-
-						try
+						public void run()
 						{
-							while (r.isPlaying())
-								Thread.sleep(100);
+							r.play();
+	
+							try
+							{
+								while (r.isPlaying())
+									Thread.sleep(100);
+							}
+							catch (InterruptedException e)
+							{
+								LogManager.getInstance(me).logException(e);
+							}
 						}
-						catch (InterruptedException e)
-						{
-							LogManager.getInstance(me).logException(e);
-						}
-					}
-				});
+					});
+	
+					t.start();
+				}
+			}
+			else
+			{
+				try 
+				{
+					final ManagerService me = this;
 
-				t.start();
+					final AssetFileDescriptor afd = this.getAssets().openFd(ManagerService.pathForSound(this, toneString));
+
+					Runnable r = new Runnable()
+					{
+						public void run() 
+						{
+							MediaPlayer player = new MediaPlayer();
+							
+							try 
+							{
+								player.setDataSource(afd.getFileDescriptor() ,afd.getStartOffset(),afd.getLength());
+							    player.prepare();
+							    player.start();
+							}
+							catch (IllegalArgumentException e) 
+							{
+								LogManager.getInstance(me).logException(e);
+							} 
+							catch (IllegalStateException e) 
+							{
+								LogManager.getInstance(me).logException(e);
+							} 
+							catch (IOException e) 
+							{
+								LogManager.getInstance(me).logException(e);
+							}
+						}
+					};
+					
+					Thread t = new Thread(r);
+					t.start();
+				}
+				catch (IOException e) 
+				{
+					LogManager.getInstance(this).logException(e);
+				}
 			}
 		}
 		else if (APPLICATION_LAUNCH_INTENT.equalsIgnoreCase(intent.getAction()))
@@ -295,4 +354,33 @@ public class ManagerService extends IntentService
 
 		ManagerService._checkSetup = true;
 	}
+
+	public static String soundNameForPath(Context context, String path) 
+	{
+		String[] values = context.getResources().getStringArray(R.array.sound_effect_values);
+		String[] labels = context.getResources().getStringArray(R.array.sound_effect_labels);
+		
+		for (int i = 0; i < labels.length && i < values.length; i++)
+		{
+			if (values[i].toLowerCase().equals(path.toLowerCase()))
+				return labels[i];
+		}
+			
+		return path;
+	}
+	
+	private static String pathForSound(Context context, String name) 
+	{
+		String[] values = context.getResources().getStringArray(R.array.sound_effect_values);
+		String[] labels = context.getResources().getStringArray(R.array.sound_effect_labels);
+		
+		for (int i = 0; i < labels.length && i < values.length; i++)
+		{
+			if (labels[i].toLowerCase().equals(name.toLowerCase()))
+				return values[i];
+		}
+			
+		return name;
+	}
+
 }

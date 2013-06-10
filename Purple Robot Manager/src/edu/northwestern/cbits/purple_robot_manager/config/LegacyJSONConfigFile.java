@@ -140,6 +140,15 @@ public class LegacyJSONConfigFile
 
 						HttpURLConnection conn = (HttpURLConnection) u.openConnection();
 						
+						for (int z = 0; z < 16 && conn.getHeaderField("Location") != null; z++)
+						{
+							URL newUrl = new URL(conn.getHeaderField("Location"));
+							
+							conn.disconnect();
+							
+							conn = (HttpURLConnection) newUrl.openConnection();
+						}
+						
 						BufferedInputStream bin = new BufferedInputStream(conn.getInputStream());
 						ByteArrayOutputStream bout = new ByteArrayOutputStream();
 
@@ -154,11 +163,11 @@ public class LegacyJSONConfigFile
 						bin.close();
 
 						String scriptString = new String(bout.toByteArray(), "UTF-8");
-
+						
 						String oldHash = prefs.getString(LegacyJSONConfigFile.JSON_LAST_HASH, "");
 						final String newHash = encryption.createHash(context, scriptString);
 
-						if (conn.getContentType().toLowerCase().startsWith("text/x-scheme"))
+						if (conn.getContentType().toLowerCase().startsWith("text/x-scheme") || scriptString.toLowerCase().startsWith("(begin "))
 						{
 							// TODO: Temp code until we get a more flexible parsing system in place...
 
