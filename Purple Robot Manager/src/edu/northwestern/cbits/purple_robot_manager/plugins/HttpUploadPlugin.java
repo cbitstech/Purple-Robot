@@ -60,7 +60,7 @@ import android.accounts.AccountManager;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Notification;
-import android.app.NotificationManager;
+// import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -488,7 +488,7 @@ public class HttpUploadPlugin extends OutputPlugin
 							jsonMessage.put(CHECKSUM_KEY, checksum);
 							jsonMessage.put(CONTENT_LENGTH_KEY, checksummed.length);
 
-							NotificationManager noteManager = (NotificationManager) me.getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+//							NotificationManager noteManager = (NotificationManager) me.getContext().getSystemService(Context.NOTIFICATION_SERVICE);
 
 							AndroidHttpClient androidClient = AndroidHttpClient.newInstance("Purple Robot", me.getContext());
 
@@ -550,7 +550,7 @@ public class HttpUploadPlugin extends OutputPlugin
 										(httpPost.getEntity().getContentLength() / 1024));
 								me.broadcastMessage(uploadMessage);
 
-								noteManager.notify(12345, note);
+//								noteManager.notify(12345, note);
 								
 								HttpResponse response = httpClient.execute(httpPost);
 
@@ -748,7 +748,7 @@ public class HttpUploadPlugin extends OutputPlugin
 							String message = me.getContext().getString(R.string.notify_running);
 							String messageTitle = me.getContext().getString(R.string.notify_running_title);
 							note.setLatestEventInfo(me.getContext(), messageTitle, message, contentIntent);
-							noteManager.notify(12345, note);
+//							noteManager.notify(12345, note);
 						}
 						catch (JSONException e)
 						{
