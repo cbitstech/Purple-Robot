@@ -44,7 +44,7 @@ import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 @SuppressLint("SimpleDateFormat")
 public class AccelerometerProbe extends ContinuousProbe implements SensorEventListener
 {
-	private static int BUFFER_SIZE = 512;
+	private static int BUFFER_SIZE = 1024;
 
 	public static final String DB_TABLE = "accelerometer_probe";
 
@@ -240,7 +240,7 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 
 	public long getFrequency()
 	{
-		long now = System.currentTimeMillis();
+/* 		long now = System.currentTimeMillis();
 
 		if (now - this.lastFrequencyLookup > 5000 && this._context != null)
 		{
@@ -269,6 +269,8 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 		}
 
 		return frequency;
+*/
+		return 0;
 	}
 
 	public String name(Context context)
@@ -303,7 +305,7 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 				Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 				
 				if (sensor != null)
-					sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST, null);
+					sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL, null);
 
 				return true;
         	}
