@@ -307,7 +307,7 @@ public class HttpUploadPlugin extends OutputPlugin
 				this._uploading = false;
 				return;
 			}
-			
+
 			if (prefs.getBoolean("config_restrict_data_wifi", true))
 			{
 				
@@ -326,7 +326,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 			final Resources resources = this.getContext().getResources();
 			final long maxUploadSize = me.maxUploadSize();
-			
+
 			final Runnable r = new Runnable()
 			{
 				public void run()
@@ -355,7 +355,7 @@ public class HttpUploadPlugin extends OutputPlugin
 						filenames = new String[0];
 
 					Collections.shuffle(Arrays.asList(filenames));
-
+					
 					ArrayList<JSONObject> pendingObjects = new ArrayList<JSONObject>();
 
 					int totalRead = 0;
@@ -406,7 +406,7 @@ public class HttpUploadPlugin extends OutputPlugin
 								f.delete();
 						}
 					}
-
+					
 					if (pendingObjects.size() > 0)
 					{
 						me.broadcastMessage(R.string.message_package_upload);
@@ -732,7 +732,6 @@ public class HttpUploadPlugin extends OutputPlugin
 								pendingObjects.removeAll(toRemove);
 							}
 
-
 							if (wasSuccessful == false && me._failCount < MAX_RETRIES)
 							{
 
@@ -744,7 +743,7 @@ public class HttpUploadPlugin extends OutputPlugin
 								e.putLong("http_last_payload_size", payloadSize);
 								e.commit();
 							}
-							
+
 							String message = me.getContext().getString(R.string.notify_running);
 							String messageTitle = me.getContext().getString(R.string.notify_running_title);
 							note.setLatestEventInfo(me.getContext(), messageTitle, message, contentIntent);

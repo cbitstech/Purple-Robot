@@ -43,8 +43,8 @@ public class RobotHealthProbe extends Probe
 {
 	private static final String PENDING_COUNT = "PENDING_COUNT";
 	private static final String PENDING_SIZE = "PENDING_SIZE";
-	private static final String ARCHIVE_COUNT = "ARCHIVE_COUNT";
-	private static final String ARCHIVE_SIZE = "ARCHIVE_SIZE";
+//	private static final String ARCHIVE_COUNT = "ARCHIVE_COUNT";
+//	private static final String ARCHIVE_SIZE = "ARCHIVE_SIZE";
 	private static final String THROUGHPUT = "THROUGHPUT";
 	private static final String CLEAR_TIME = "CLEAR_TIME";
 	protected static final String APP_VERSION_NAME = "APP_VERSION_NAME";
@@ -189,28 +189,32 @@ public class RobotHealthProbe extends Probe
 
 									me._checking = true;
 									
-									File archiveFolder = httpPlugin.getArchiveFolder();
+//									File archiveFolder = httpPlugin.getArchiveFolder();
 									File pendingFolder = httpPlugin.getPendingFolder();
 
 									int pendingCount = 0;
-									int archiveCount = 0;
+//									int archiveCount = 0;
 
 									long pendingSize = 0;
-									long archiveSize = 0;
+//									long archiveSize = 0;
 
-									File[] archives = archiveFolder.listFiles();
 
-									if (archives != null)
+//									String[] archivesNames = archiveFolder.list();
+
+//									Log.e("PR", "CC " + archivesNames.length);
+
+//									archiveCount = archivesNames.length;
+	
+/*									if (archiveCount < 2048)
 									{
-										for (File f : archives)
+										for (File f : archiveFolder.listFiles())
 										{
-											if (f.isFile())
-											{
-												archiveCount += 1;
-												archiveSize += f.length();
-											}
+											archiveSize += f.length();
 										}
 									}
+									else
+										archiveSize = Integer.MAX_VALUE;
+*/
 
 									FilenameFilter jsonFilter =  new FilenameFilter()
 									{
@@ -249,8 +253,8 @@ public class RobotHealthProbe extends Probe
 									bundle.putInt(RobotHealthProbe.PENDING_COUNT, pendingCount);
 									bundle.putLong(RobotHealthProbe.PENDING_SIZE, pendingSize);
 
-									bundle.putInt(RobotHealthProbe.ARCHIVE_COUNT, archiveCount);
-									bundle.putLong(RobotHealthProbe.ARCHIVE_SIZE, archiveSize);
+//									bundle.putInt(RobotHealthProbe.ARCHIVE_COUNT, archiveCount);
+//									bundle.putLong(RobotHealthProbe.ARCHIVE_SIZE, archiveSize);
 
 									double throughput = httpPlugin.getRecentThroughput();
 
