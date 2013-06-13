@@ -140,19 +140,25 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
         }
         else if (ZIP_ARCHIVES_KEY.equals(preference.getKey()))
         {
-        	HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance.pluginForClass(HttpUploadPlugin.class);
+        	HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance.pluginForClass(this, HttpUploadPlugin.class);
 
-        	plugin.mailArchiveFiles(this);
-
-        	return true;
+        	if (plugin != null)
+        	{
+	        	plugin.mailArchiveFiles(this);
+	
+	        	return true;
+        	}
         }
         else if (DELETE_ARCHIVES_KEY.equals(preference.getKey()))
         {
-        	HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance.pluginForClass(HttpUploadPlugin.class);
+        	HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance.pluginForClass(this, HttpUploadPlugin.class);
+        	
+        	if (plugin != null)
+        	{
+        		plugin.deleteArchiveFiles(this);
 
-        	plugin.deleteArchiveFiles(this);
-
-        	return true;
+        		return true;
+        	}
         }
 
         return false;

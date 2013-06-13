@@ -785,6 +785,7 @@
 	<string name="name_sanity_upload_progress">Upload Progress</string>
 
     <string name="name_sanity_server_failure">Server Failures</string>
-	
+    <string name="message_clearing_archive">Clearing archive files&#8230;</string>
+    	
 </resources>
 
