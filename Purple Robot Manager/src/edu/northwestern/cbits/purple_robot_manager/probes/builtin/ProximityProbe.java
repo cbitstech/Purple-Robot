@@ -439,16 +439,6 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 		return "proximity_built_in";
 	}
 
-	public int getResourceFrequencyLabels()
-	{
-		return R.array.probe_builtin_frequency_labels;
-	}
-
-	public int getResourceFrequencyValues()
-	{
-		return R.array.probe_builtin_frequency_values;
-	}
-
 	public String summarizeValue(Context context, Bundle bundle)
 	{
 		float distance = bundle.getFloatArray("DISTANCE")[0];
