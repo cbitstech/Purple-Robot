@@ -31,7 +31,7 @@ public abstract class ContinuousProbe extends Probe
 	protected static final String PROBE_THRESHOLD = "threshold";
 
 	protected static final boolean DEFAULT_ENABLED = false;
-	protected static final String DEFAULT_FREQUENCY = "1000";
+	protected static final String DEFAULT_FREQUENCY = "0";
 
 	private static SharedPreferences prefs = null;
 
@@ -127,6 +127,16 @@ public abstract class ContinuousProbe extends Probe
 				e.putString(key, frequency.toString());
 				e.commit();
 			}
+			else if (frequency instanceof String)
+			{
+				String key = "config_probe_" + this.getPreferenceKey() + "_frequency";
+				
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				Editor e = prefs.edit();
+				
+				e.putString(key, frequency.toString());
+				e.commit();
+			}
 		}
 	}
 
@@ -141,15 +151,23 @@ public abstract class ContinuousProbe extends Probe
 	{
 		// TODO...
 	}
+	
+	public int getResourceFrequencyLabels()
+	{
+		return R.array.probe_continuous_frequency_labels;
+	}
 
-	public abstract int getResourceFrequencyLabels();
-	public abstract int getResourceFrequencyValues();
+	public int getResourceFrequencyValues()
+	{
+		return R.array.probe_continuous_frequency_values;
+	}
+	
+	public abstract long getFrequency();
 
 	public abstract int getTitleResource();
 	public abstract int getSummaryResource();
 
 	public abstract int getCategoryResource();
-	public abstract long getFrequency();
 	public abstract String getPreferenceKey();
 
 	protected abstract boolean passesThreshold(SensorEvent event);

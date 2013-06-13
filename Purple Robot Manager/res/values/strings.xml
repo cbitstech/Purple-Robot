@@ -645,6 +645,7 @@
     <string name="config_upload_logs">Upload Logs Now</string>
 
     <string name="app_category_unknown">Unknown</string>
+    <string name="app_category_bundled">Bundled</string>
     
     <string name="summary_after_sunset_probe" formatted="false">Night: %d minute(s) after sunset</string>
     <string name="summary_before_sunrise_probe" formatted="false">Night: %d minute(s) before sunrise</string>

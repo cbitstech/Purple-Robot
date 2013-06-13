@@ -2,8 +2,6 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -37,9 +35,6 @@ public class RunningSoftwareProbe extends Probe
 	private static final String RUNNING_TASKS = "RUNNING_TASKS";
 	private static final String RUNNING_TASK_COUNT = "RUNNING_TASK_COUNT";
 	private static final String PACKAGE_CATEGORY = "PACKAGE_CATEGORY";
-	
-	private static final HashMap<String, String> _categories = new HashMap<String, String>();
-	private static final HashSet<String> _ignorePackages = new HashSet<String>();
 
 	private static final boolean DEFAULT_ENABLED = true;
 
@@ -150,14 +145,13 @@ public class RunningSoftwareProbe extends Probe
 
 	protected static String fetchCategory(Context context, String packageName) 
 	{
-		if (RunningSoftwareProbe._categories.containsKey(packageName))
-			return RunningSoftwareProbe._categories.get(packageName);
-
-		if (RunningSoftwareProbe._ignorePackages.contains(packageName))
-			return null;
-				
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		
+		String key = "category_" + packageName;
+		
+		if (prefs.contains(key))
+			return prefs.getString(key, context.getString(R.string.app_category_unknown));
+
 		if (prefs.getBoolean("config_restrict_data_wifi", true))
 		{
 			if (WiFiHelper.wifiAvailable(context) == false)
@@ -165,7 +159,7 @@ public class RunningSoftwareProbe extends Probe
 		}
 
 		String category = null;
-
+		
 		try 
 		{
 			Document doc = Jsoup.connect("https://play.google.com/store/apps/details?id=" + packageName).get();
@@ -183,26 +177,28 @@ public class RunningSoftwareProbe extends Probe
 				}
 			}
 		}
-		catch (HttpStatusException e) 
+		catch (HttpStatusException ex) 
 		{
-			if (e.getStatusCode() == 404)
-			{
-				RunningSoftwareProbe._ignorePackages.add(packageName);
-				
-				return null;
-			}
+			if (ex.getStatusCode() == 404)
+				category = context.getString(R.string.app_category_bundled);
 			else
-				LogManager.getInstance(context).logException(e);
+				LogManager.getInstance(context).logException(ex);
 		}
-		catch (IOException e) 
+		catch (IOException ex) 
 		{
-			LogManager.getInstance(context).logException(e);
+			LogManager.getInstance(context).logException(ex);
 		}
-		
+
 		if (category == null)
 			category = context.getString(R.string.app_category_unknown);
-		
-		RunningSoftwareProbe._categories.put(packageName, category);
+		else
+		{
+			Editor e = prefs.edit();
+			
+			e.putString(key, category);
+			
+			e.commit();
+		}
 		
 		return category;
 	}

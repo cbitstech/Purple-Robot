@@ -183,18 +183,18 @@
         <item>1000</item>
 	</integer-array>
 
-	<string-array name="probe_acceleration_frequency_values">
-        <item>5</item>
-        <item>10</item>
-        <item>20</item>
-        <item>30</item>
-        <item>50</item>
-        <item>100</item>
-        <item>200</item>
-        <item>500</item>
-        <item>1000</item>
-        <item>5000</item>
-        <item>10000</item>
+	<string-array name="probe_continuous_frequency_labels">
+        <item>Fastest</item>
+        <item>Fast (Game)</item>
+        <item>Slow (UI)</item>
+        <item>Slowest (Normal)</item>
+   	</string-array>
+	
+	<string-array name="probe_continuous_frequency_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
    	</string-array>
 
 	<string-array name="probe_acceleration_frequency_labels">
@@ -211,6 +211,20 @@
         <item>Every 10 seconds</item>
 	</string-array>
 
+	<string-array name="probe_acceleration_frequency_values">
+        <item>5</item>
+        <item>10</item>
+        <item>20</item>
+        <item>30</item>
+        <item>50</item>
+        <item>100</item>
+        <item>200</item>
+        <item>500</item>
+        <item>1000</item>
+        <item>5000</item>
+        <item>10000</item>
+   	</string-array>
+	
 	<string-array name="probe_builtin_frequency_values">
         <item>100</item>
         <item>200</item>
