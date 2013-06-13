@@ -39,7 +39,7 @@ public class UploadProgressCheck extends SanityCheck
 		
 		long now = System.currentTimeMillis();
 		
-		final HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance.pluginForClass(HttpUploadPlugin.class);
+		final HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance.pluginForClass(context, HttpUploadPlugin.class);
 		
 		if (plugin != null)
 		{

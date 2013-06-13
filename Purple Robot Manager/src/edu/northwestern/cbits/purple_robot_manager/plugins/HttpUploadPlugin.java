@@ -1112,37 +1112,22 @@ public class HttpUploadPlugin extends OutputPlugin
 	public void deleteArchiveFiles(final Activity activity)
 	{
 		final HttpUploadPlugin me = this;
-
+		
 		Runnable r = new Runnable()
 		{
 			public void run()
 			{
 				File pendingFolder = me.getArchiveFolder();
-
-				final File[] pendingFiles = pendingFolder.listFiles(new FileFilter()
-				{
-					@SuppressLint("DefaultLocale")
-					public boolean accept(File file)
-					{
-						if (file.getName().toLowerCase(Locale.ENGLISH).endsWith(".archive"))
-							return true;
-
-						return false;
-					}
-				});
-
+				
 				activity.runOnUiThread(new Runnable()
 				{
 					public void run()
 					{
-				        Toast.makeText(activity, "Deleting " + pendingFiles.length + " archive files...", Toast.LENGTH_LONG).show();
+				        Toast.makeText(activity, activity.getString(R.string.message_clearing_archive), Toast.LENGTH_LONG).show();
 					}
 				});
 
-				for (File f : pendingFiles)
-				{
-					f.delete();
-				}
+				pendingFolder.delete();
 			}
 		};
 

@@ -15,8 +15,15 @@ public class OutputPluginManager extends BroadcastReceiver
 
 	private Map<Class<OutputPlugin>, OutputPlugin> _plugins = new HashMap<Class<OutputPlugin>, OutputPlugin>();
 
-	public OutputPlugin pluginForClass(Class<?> c)
+	public OutputPlugin pluginForClass(Context context, Class<?> c)
 	{
+		OutputPlugin plugin = this._plugins.get(c);
+		
+		if (plugin != null)
+			return plugin;
+		
+		this.onReceive(context, null);
+		
 		return this._plugins.get(c);
 	}
 
@@ -35,7 +42,9 @@ public class OutputPluginManager extends BroadcastReceiver
 				}
 
 				plugin.setContext(context);
-				plugin.process(intent);
+
+				if (intent != null)
+					plugin.process(intent);
 			}
 			catch (InstantiationException e)
 			{

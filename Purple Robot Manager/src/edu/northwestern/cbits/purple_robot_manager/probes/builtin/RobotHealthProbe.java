@@ -172,7 +172,7 @@ public class RobotHealthProbe extends Probe
 
 					if (now - this._lastCheck  > freq)
 					{
-						OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(HttpUploadPlugin.class);
+						OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(context, HttpUploadPlugin.class);
 
 						if (plugin != null && plugin instanceof HttpUploadPlugin)
 						{

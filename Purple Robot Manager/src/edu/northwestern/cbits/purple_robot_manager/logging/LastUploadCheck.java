@@ -33,7 +33,7 @@ public class LastUploadCheck extends SanityCheck
 		
 		if (lastUploadTime == 0)
 		{
-			OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(HttpUploadPlugin.class);
+			OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(context, HttpUploadPlugin.class);
 
 			if (plugin != null && plugin instanceof HttpUploadPlugin)
 			{

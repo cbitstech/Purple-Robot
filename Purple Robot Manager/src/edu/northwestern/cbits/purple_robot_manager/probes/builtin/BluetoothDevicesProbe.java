@@ -26,6 +26,7 @@ import android.preference.PreferenceScreen;
 
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class BluetoothDevicesProbe extends Probe
@@ -375,21 +376,28 @@ public class BluetoothDevicesProbe extends Probe
 		{
 			synchronized(this)
 			{
-				long freq = Long.parseLong(prefs.getString("config_probe_bluetooth_frequency", Probe.DEFAULT_FREQUENCY));
-
-				if (now - this._lastCheck > freq)
+				try
 				{
-					if (this._adapter == null)
-						this._adapter = BluetoothAdapter.getDefaultAdapter();
-
-					if (this._adapter != null && this._adapter.isEnabled())
+					long freq = Long.parseLong(prefs.getString("config_probe_bluetooth_frequency", Probe.DEFAULT_FREQUENCY));
+	
+					if (now - this._lastCheck > freq)
 					{
-						this._foundDevices.clear();
-						
-						this._adapter.startDiscovery();
+						if (this._adapter == null)
+							this._adapter = BluetoothAdapter.getDefaultAdapter();
+	
+						if (this._adapter != null && this._adapter.isEnabled())
+						{
+							this._foundDevices.clear();
+							
+							this._adapter.startDiscovery();
+						}
+	
+						this._lastCheck = now;
 					}
-
-					this._lastCheck = now;
+				}
+				catch (SecurityException e)
+				{
+					LogManager.getInstance(context).logException(e);
 				}
 			}
 
