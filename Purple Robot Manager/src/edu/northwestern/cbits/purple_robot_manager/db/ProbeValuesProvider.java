@@ -6,6 +6,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -42,6 +43,8 @@ public class ProbeValuesProvider
 	private long _lastCleanup = 0;
 
 	private static ProbeValuesProvider _instance = null;
+	
+	private HashMap<String, Long> _lastUpdates = new HashMap<String, Long>();
 
 	public static ProbeValuesProvider getProvider(Context context)
 	{
@@ -195,6 +198,18 @@ public class ProbeValuesProvider
 
 	public void insertValue(final Context context, final String name, final Map<String, String> schema, final Map<String, Object> values)
 	{
+		long now = System.currentTimeMillis();
+		
+		long lastUpdate = 0;
+		
+		if (this._lastUpdates.containsKey(name))
+			lastUpdate = this._lastUpdates.get(name);
+		
+		if (now - lastUpdate < 5000)
+			return;
+		
+		this._lastUpdates.put(name, now);
+		
 		final ProbeValuesProvider me = this;
 
 		Runnable r = new Runnable()

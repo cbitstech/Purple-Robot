@@ -48,7 +48,7 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 
 	private static final String DEFAULT_THRESHOLD = "0.5";
 
-	private static int BUFFER_SIZE = 512;
+	private static int BUFFER_SIZE = 1024;
 
 	private static String PRESSURE_KEY = "PRESSURE";
 	private static String ALTITUDE_KEY = "ALTITUDE";
@@ -56,10 +56,6 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 	private static String[] fieldNames = { PRESSURE_KEY, ALTITUDE_KEY };
 
 	private double _lastValue = Double.MAX_VALUE;
-
-	private double lastSeen = 0;
-	private long lastFrequencyLookup = 0;
-	private long frequency = 1000;
 
 	private long lastThresholdLookup = 0;
 	private double lastThreshold = 0.5;
@@ -71,6 +67,8 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 	private int bufferIndex  = 0;
 
 	private Map<String, String> _schema = null;
+
+	private int _lastFrequency = -1;
 
 	public Intent viewIntent(Context context)
 	{
@@ -212,35 +210,8 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 
 	public long getFrequency()
 	{
-		long now = System.currentTimeMillis();
-
-		if (now - this.lastFrequencyLookup > 5000 && this._context != null)
-		{
-			SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
-
-			frequency = Long.parseLong(prefs.getString("config_probe_pressure_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
-
-			int bufferSize = 1000 / (int) frequency;
-
-			if (timeBuffer.length != bufferSize)
-			{
-				if (bufferSize < 1)
-					bufferSize = 1;
-
-				synchronized(this)
-				{
-					bufferIndex = 0;
-
-					valueBuffer = new float[2][bufferSize];
-					accuracyBuffer = new int[bufferSize];
-					timeBuffer = new double[bufferSize];
-				}
-			}
-
-			this.lastFrequencyLookup = now;
-		}
-
-		return frequency;
+		SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
+		return Long.parseLong(prefs.getString("config_probe_pressure_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
 	}
 
 	public String name(Context context)
@@ -260,28 +231,59 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 
 	public boolean isEnabled(Context context)
 	{
-        SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+    	SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
-        sensors.unregisterListener(this);
-
+    	this._context = context.getApplicationContext();
+    	
         if (super.isEnabled(context))
         {
-        	this._context = context.getApplicationContext();
-
-        	SharedPreferences prefs = ContinuousProbe.getPreferences(context);
-
         	if (prefs.getBoolean("config_probe_pressure_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
         	{
-				Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_PRESSURE);
-				
-				if (sensor != null)
-					sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST, null);
+            	SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
 
-        		return true;
+				Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_PRESSURE);
+
+				int frequency = Integer.parseInt(prefs.getString("config_probe_pressure_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
+
+				if (this._lastFrequency != frequency)
+				{
+	                sensors.unregisterListener(this);
+	                
+	                switch (frequency)
+	                {
+	                	case SensorManager.SENSOR_DELAY_FASTEST:
+		                	sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST, null);
+	                		break;
+	                	case SensorManager.SENSOR_DELAY_GAME:
+		                	sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME, null);
+	                		break;
+	                	case SensorManager.SENSOR_DELAY_UI:
+		                	sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI, null);
+	                		break;
+	                	case SensorManager.SENSOR_DELAY_NORMAL:
+		                	sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL, null);
+	                		break;
+	                }
+	                
+	                this._lastFrequency = frequency;
+				}
+				
+				return true;
+        	}
+        	else
+        	{
+            	SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+                sensors.unregisterListener(this);
         	}
         }
+    	else
+    	{
+        	SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+            sensors.unregisterListener(this);
+    	}
 
-    	return false;
+        return false;
+	
 	}
 	
 	public Map<String, Object> configuration(Context context)
@@ -359,7 +361,7 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 	{
 		double now = System.currentTimeMillis();
 
-		if (now - this.lastSeen > this.getFrequency() && bufferIndex <= timeBuffer.length && this.passesThreshold(event))
+		if (this.passesThreshold(event))
 		{
 			synchronized(this)
 			{
@@ -442,8 +444,6 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 
 					bufferIndex = 0;
 				}
-
-				this.lastSeen = now;
 			}
 		}
 	}
@@ -464,16 +464,6 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 	public String getPreferenceKey()
 	{
 		return "pressure_built_in";
-	}
-
-	public int getResourceFrequencyLabels()
-	{
-		return R.array.probe_builtin_frequency_labels;
-	}
-
-	public int getResourceFrequencyValues()
-	{
-		return R.array.probe_builtin_frequency_values;
 	}
 
 	public String summarizeValue(Context context, Bundle bundle)

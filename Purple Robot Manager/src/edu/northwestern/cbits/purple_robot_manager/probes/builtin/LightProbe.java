@@ -56,10 +56,6 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 
 	private double _lastValue = Double.MAX_VALUE;
 
-	private double lastSeen = 0;
-	private long lastFrequencyLookup = 0;
-	private long frequency = 1000;
-
 	private long lastThresholdLookup = 0;
 	private double lastThreshold = 10.0;
 
@@ -69,6 +65,8 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 	private Map<String, String> _schema = null;
 
 	private int bufferIndex  = 0;
+
+	private int _lastFrequency = -1;
 
 	public Intent viewIntent(Context context)
 	{
@@ -220,34 +218,9 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 
 	public long getFrequency()
 	{
-		long now = System.currentTimeMillis();
+		SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
 
-		if (now - this.lastFrequencyLookup > 5000 && this._context != null)
-		{
-			SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
-
-			frequency = Long.parseLong(prefs.getString("config_probe_light_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
-
-			int bufferSize = 1000 / (int) frequency;
-
-			if (timeBuffer.length != bufferSize)
-			{
-				if (bufferSize < 1)
-					bufferSize = 1;
-
-				synchronized(this)
-				{
-					bufferIndex = 0;
-
-					valueBuffer = new float[1][bufferSize];
-					timeBuffer = new double[bufferSize];
-				}
-			}
-
-			this.lastFrequencyLookup = now;
-		}
-
-		return frequency;
+		return Long.parseLong(prefs.getString("config_probe_light_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
 	}
 
 	public String name(Context context)
@@ -267,28 +240,59 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 
 	public boolean isEnabled(Context context)
 	{
-        SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+    	SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
-        sensors.unregisterListener(this);
-
+    	this._context = context.getApplicationContext();
+    	
         if (super.isEnabled(context))
         {
-	        this._context = context.getApplicationContext();
+        	if (prefs.getBoolean("config_probe_light_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
+        	{
+            	SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
 
-			SharedPreferences prefs = ContinuousProbe.getPreferences(context);
-
-			if (prefs.getBoolean("config_probe_light_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
-			{
 				Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_LIGHT);
+
+				int frequency = Integer.parseInt(prefs.getString("config_probelight_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
+
+				if (this._lastFrequency  != frequency)
+				{
+	                sensors.unregisterListener(this);
+	                
+	                switch (frequency)
+	                {
+	                	case SensorManager.SENSOR_DELAY_FASTEST:
+		                	sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST, null);
+	                		break;
+	                	case SensorManager.SENSOR_DELAY_GAME:
+		                	sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME, null);
+	                		break;
+	                	case SensorManager.SENSOR_DELAY_UI:
+		                	sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI, null);
+	                		break;
+	                	case SensorManager.SENSOR_DELAY_NORMAL:
+		                	sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL, null);
+	                		break;
+	                }
+	                
+	                this._lastFrequency = frequency;
+				}
 				
-				if (sensor != null)
-					sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST, null);
-
 				return true;
-			}
+        	}
+        	else
+        	{
+            	SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+                sensors.unregisterListener(this);
+        	}
         }
+    	else
+    	{
+        	SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+            sensors.unregisterListener(this);
+    	}
 
-		return false;
+        return false;
+	
 	}
 
 	protected boolean passesThreshold(SensorEvent event)
@@ -366,7 +370,7 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 	{
 		double now = System.currentTimeMillis();
 
-		if (now - this.lastSeen > this.getFrequency() && bufferIndex <= timeBuffer.length && this.passesThreshold(event))
+		if (this.passesThreshold(event))
 		{
 			synchronized(this)
 			{
@@ -433,8 +437,6 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 
 					bufferIndex = 0;
 				}
-
-				this.lastSeen = now;
 			}
 		}
 	}
@@ -442,16 +444,6 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 	public String getPreferenceKey()
 	{
 		return "light_built_in";
-	}
-
-	public int getResourceFrequencyLabels()
-	{
-		return R.array.probe_builtin_frequency_labels;
-	}
-
-	public int getResourceFrequencyValues()
-	{
-		return R.array.probe_builtin_frequency_values;
 	}
 
 	public String summarizeValue(Context context, Bundle bundle)
