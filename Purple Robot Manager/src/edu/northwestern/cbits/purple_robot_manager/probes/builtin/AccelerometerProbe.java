@@ -303,12 +303,16 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
         	{
             	SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
                 sensors.unregisterListener(this);
+                
+                this._lastFrequency = -1;
         	}
         }
     	else
     	{
         	SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
             sensors.unregisterListener(this);
+
+            this._lastFrequency = -1;
     	}
 
         return false;
