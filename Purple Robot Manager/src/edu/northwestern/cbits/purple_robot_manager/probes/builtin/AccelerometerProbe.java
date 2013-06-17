@@ -56,6 +56,8 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 
 	private static final String DEFAULT_THRESHOLD = "0.5";
 
+	public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.AccelerometerProbe";
+
 	private long lastThresholdLookup = 0;
 	private double lastThreshold = 0.5;
 
@@ -245,7 +247,7 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 
 	public String name(Context context)
 	{
-		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.AccelerometerProbe";
+		return AccelerometerProbe.NAME;
 	}
 
 	public int getTitleResource()

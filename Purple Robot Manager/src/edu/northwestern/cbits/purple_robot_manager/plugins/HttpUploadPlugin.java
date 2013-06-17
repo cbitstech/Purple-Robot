@@ -287,7 +287,7 @@ public class HttpUploadPlugin extends OutputPlugin
 	}
 
 	@SuppressLint("NewApi")
-	private void uploadPendingObjects()
+	public void uploadPendingObjects()
 	{
 		if (this._uploading)
 			return;
@@ -310,7 +310,6 @@ public class HttpUploadPlugin extends OutputPlugin
 
 			if (prefs.getBoolean("config_restrict_data_wifi", true))
 			{
-				
 				if (WiFiHelper.wifiAvailable(this.getContext()) == false)
 				{
 					this._throughput = 0.0;
@@ -1133,5 +1132,23 @@ public class HttpUploadPlugin extends OutputPlugin
 
 		Thread t = new Thread(r);
 		t.start();
+	}
+
+	public int pendingFilesCount()
+	{
+		File pendingFolder = this.getPendingFolder();
+
+		String[] filenames = pendingFolder.list(new FilenameFilter()
+		{
+			public boolean accept(File dir, String filename)
+			{
+				return filename.endsWith(".json");
+			}
+		});
+
+		if (filenames == null)
+			filenames = new String[0];
+		
+		return filenames.length;
 	}
 }

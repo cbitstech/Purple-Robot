@@ -10,7 +10,9 @@ import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import edu.northwestern.cbits.purple_robot_manager.http.LocalHttpServer;
+import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
+import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RandomNoiseProbe;
@@ -45,7 +47,7 @@ public class PersistentService extends Service
 		AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
 
 		PendingIntent pi = PendingIntent.getService(this, 0, new Intent(PersistentService.NUDGE_PROBES), PendingIntent.FLAG_UPDATE_CURRENT);
-		alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 15000, pi);
+		alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 15000, pi);
 
 		OutputPlugin.loadPluginClasses(this);
 
@@ -57,18 +59,26 @@ public class PersistentService extends Service
 	{
 		if (intent != null)
 		{
-				if (NUDGE_PROBES.equals(intent.getAction()))
-				{
-					ProbeManager.nudgeProbes(this);
-					TriggerManager.getInstance(this).refreshTriggers(this);
-					ScheduleManager.runOverdueScripts(this);
-				}
-				else if (ContinuousProbe.WAKE_ACTION.equals(intent.getAction()))
-				{
+			if (NUDGE_PROBES.equals(intent.getAction()))
+			{
+				ProbeManager.nudgeProbes(this);
+				TriggerManager.getInstance(this).refreshTriggers(this);
+				ScheduleManager.runOverdueScripts(this);
 
+				OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(this, HttpUploadPlugin.class);
+				
+				if (plugin instanceof HttpUploadPlugin)
+				{
+					HttpUploadPlugin http = (HttpUploadPlugin) plugin;
+					http.uploadPendingObjects();
 				}
-				else if (RandomNoiseProbe.ACTION.equals(intent.getAction()) && RandomNoiseProbe.instance != null)
-					RandomNoiseProbe.instance.isEnabled(this);
+			}
+			else if (ContinuousProbe.WAKE_ACTION.equals(intent.getAction()))
+			{
+				
+			}
+			else if (RandomNoiseProbe.ACTION.equals(intent.getAction()) && RandomNoiseProbe.instance != null)
+				RandomNoiseProbe.instance.isEnabled(this);
 		}
 
 		return Service.START_STICKY;

@@ -30,10 +30,14 @@
         <item>builtin.TemperatureProbe</item>
         <item>builtin.VisibleSatelliteProbe</item>
         <item>builtin.WifiAccessPointsProbe</item>
+
         <item>features.DeviceInUseFeature</item>
         <item>features.CallHistoryFeature</item>
         <item>features.WeatherUndergroundFeature</item>
         <item>features.SunriseSunsetFeature</item>
+        <item>features.AccelerometerBasicStatisticsFeature</item>
+        <item>features.GyroscopeBasicStatisticsFeature</item>
+        <item>features.MagneticFieldBasicStatisticsFeature</item>
         
         <item>builtin.RandomNoiseProbe</item>
         <item>LabelProbe</item>

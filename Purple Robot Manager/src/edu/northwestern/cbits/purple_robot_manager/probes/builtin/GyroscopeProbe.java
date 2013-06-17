@@ -50,6 +50,8 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 
 	private static final String DEFAULT_THRESHOLD = "0.0025";
 
+	public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.GyroscopeProbe";
+
 	private static String X_KEY = "X";
 	private static String Y_KEY = "Y";
 	private static String Z_KEY = "Z";
@@ -267,7 +269,7 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 
 	public String name(Context context)
 	{
-		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.GyroscopeProbe";
+		return GyroscopeProbe.NAME;
 	}
 
 	public int getTitleResource()
