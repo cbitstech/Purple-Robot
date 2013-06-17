@@ -24,6 +24,9 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
+import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
+import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
+import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
 
 @SuppressLint("SimpleDateFormat")
 public class DiagnosticActivity extends SherlockActivity 
@@ -84,6 +87,16 @@ public class DiagnosticActivity extends SherlockActivity
 			lastUpload.setText(String.format(this.getString(R.string.last_upload_format), dateString, lastPayloadSize));
 		}
 
+		OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(this, HttpUploadPlugin.class);
+		
+		if (plugin instanceof HttpUploadPlugin)
+		{
+			HttpUploadPlugin http = (HttpUploadPlugin) plugin;
+
+			TextView uploadCount = (TextView) this.findViewById(R.id.pending_files_value);
+			uploadCount.setText(this.getString(R.string.pending_files_file, http.pendingFilesCount()));
+		}
+		
 		try 
 		{
 			PackageInfo pInfo = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);

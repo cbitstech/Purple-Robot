@@ -36,9 +36,12 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.SoftwareInform
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TelephonyProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.VisibleSatelliteProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.WifiAccessPointsProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.features.AccelerometerBasicStatisticsFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.CallHistoryFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.DeviceInUseFeature;
+import edu.northwestern.cbits.purple_robot_manager.probes.features.GyroscopeBasicStatisticsFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.JavascriptFeature;
+import edu.northwestern.cbits.purple_robot_manager.probes.features.MagneticFieldBasicStatisticsFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.SunriseSunsetFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.WeatherUndergroundFeature;
 
@@ -180,6 +183,27 @@ public class ProbeManager
 				BatteryProbe battery = (BatteryProbe) probe;
 
 				if (battery.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof AccelerometerBasicStatisticsFeature)
+			{
+				AccelerometerBasicStatisticsFeature stats = (AccelerometerBasicStatisticsFeature) probe;
+
+				if (stats.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof GyroscopeBasicStatisticsFeature)
+			{
+				GyroscopeBasicStatisticsFeature stats = (GyroscopeBasicStatisticsFeature) probe;
+
+				if (stats.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof MagneticFieldBasicStatisticsFeature)
+			{
+				MagneticFieldBasicStatisticsFeature stats = (MagneticFieldBasicStatisticsFeature) probe;
+
+				if (stats.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 			else if (probe instanceof LocationProbe)

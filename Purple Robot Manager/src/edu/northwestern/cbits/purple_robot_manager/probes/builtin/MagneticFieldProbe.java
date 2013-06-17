@@ -56,6 +56,8 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 
 	private static final String DEFAULT_THRESHOLD = "1.0";
 
+	public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.MagneticFieldProbe";
+
 	private double _lastX = Double.MAX_VALUE;
 	private double _lastY = Double.MAX_VALUE;
 	private double _lastZ = Double.MAX_VALUE;
@@ -189,7 +191,7 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 
 	public String name(Context context)
 	{
-		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.MagneticFieldProbe";
+		return MagneticFieldProbe.NAME;
 	}
 
 	public int getTitleResource()
