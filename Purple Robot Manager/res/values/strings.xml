@@ -805,5 +805,25 @@
     <string name="pending_files_label">Pending Uploads Count</string>
     <string name="pending_files_file" formatted="false">%d file(s)</string>
     <string name="pending_files_placeholder">Calculating file count&#8230;</string>
+
+    <string name="summary_univariate_statistics_feature" formatted="false">%.2f (mean), %.2f (std. dev.), %.2f (RMS)</string>
+    
+    <!-- Light Sensor Statistics Probe -->
+    <string name="title_light_statistics_feature">Light Sensor Statistics</string>
+    <string name="summary_light_statistics_feature_desc">Provides basic descriptive statistics for incoming light sensor data.</string>
+    
+    <!-- Pressure Sensor Statistics Probe -->
+    <string name="title_pressure_statistics_feature">Pressure Sensor Statistics</string>
+    <string name="summary_pressure_statistics_feature_desc">Provides basic descriptive statistics for incoming pressure sensor data.</string>
+    
+    <!-- Proximity Sensor Statistics Probe -->
+    <string name="title_proximity_statistics_feature">Proximity Sensor Statistics</string>
+    <string name="summary_proximity_statistics_feature_desc">Provides basic descriptive statistics for incoming proximity sensor data.</string>
+    
+    <!-- Temperature Sensor Statistics Probe -->
+    <string name="title_temperature_statistics_feature">Temperature Sensor Statistics</string>
+    <string name="summary_temperature_statistics_feature_desc">Provides basic descriptive statistics for incoming temperature sensor data.</string>
+    
+    
 </resources>
 

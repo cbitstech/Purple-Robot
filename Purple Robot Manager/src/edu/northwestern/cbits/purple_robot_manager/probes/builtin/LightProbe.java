@@ -50,6 +50,8 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 
 	private static final String DEFAULT_THRESHOLD = "10.0";
 
+	public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.LightProbe";
+
 	private static int BUFFER_SIZE = 512;
 
 	private static String[] fieldNames = { LIGHT_KEY };
@@ -225,7 +227,7 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 
 	public String name(Context context)
 	{
-		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.LightProbe";
+		return LightProbe.NAME;
 	}
 
 	public int getTitleResource()

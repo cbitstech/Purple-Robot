@@ -27,6 +27,8 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 {
 	private static final String DEFAULT_THRESHOLD = "1.0";
 
+	public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.TemperatureProbe";
+
 	private static int BUFFER_SIZE = 256;
 
 	private static String[] fieldNames = { "TEMPERATURE" };
@@ -104,7 +106,7 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 
 	public String name(Context context)
 	{
-		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.TemperatureProbe";
+		return TemperatureProbe.NAME;
 	}
 
 	public int getTitleResource()

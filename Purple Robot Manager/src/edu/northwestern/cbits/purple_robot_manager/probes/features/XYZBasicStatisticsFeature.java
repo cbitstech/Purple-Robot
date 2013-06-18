@@ -40,26 +40,24 @@ public abstract class XYZBasicStatisticsFeature extends XYZContinuousProbeFeatur
 		data.putDouble("X_MIN", xStats.getMin());
 		data.putDouble("X_MAX", xStats.getMax());
 		data.putDouble("X_MEAN", xStats.getMean());
-		data.putDouble("X_KURTOSIS", xStats.getKurtosis());
 		data.putDouble("X_STD_DEV", xStats.getStandardDeviation());
 		data.putDouble("X_RMS", Math.sqrt(xStats.getSumsq() / XYZContinuousProbeFeature.BUFFER_SIZE));
 
 		data.putDouble("Y_MIN", yStats.getMin());
 		data.putDouble("Y_MAX", yStats.getMax());
 		data.putDouble("Y_MEAN", yStats.getMean());
-		data.putDouble("Y_KURTOSIS", yStats.getKurtosis());
 		data.putDouble("Y_STD_DEV", yStats.getStandardDeviation());
 		data.putDouble("Y_RMS", Math.sqrt(yStats.getSumsq() / XYZContinuousProbeFeature.BUFFER_SIZE));
 
 		data.putDouble("Z_MIN", zStats.getMin());
 		data.putDouble("Z_MAX", zStats.getMax());
 		data.putDouble("Z_MEAN", zStats.getMean());
-		data.putDouble("Z_KURTOSIS", zStats.getKurtosis());
 		data.putDouble("Z_STD_DEV", zStats.getStandardDeviation());
 		data.putDouble("Z_RMS", Math.sqrt(zStats.getSumsq() / XYZContinuousProbeFeature.BUFFER_SIZE));
 
 		data.putInt("BUFFER_SIZE", XYZContinuousProbeFeature.BUFFER_SIZE);
 		data.putDouble("FREQUENCY", ((double) XYZContinuousProbeFeature.BUFFER_SIZE) / ((maxTime - minTime) * 1000));
+		data.putDouble("DURATION", ((double) ((maxTime - minTime) * 1000)));
 
 		this.transmitData(context, data);
 	}
