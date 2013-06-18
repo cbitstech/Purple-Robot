@@ -48,6 +48,8 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 
 	private static final String DEFAULT_THRESHOLD = "0.5";
 
+	public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.PressureProbe";
+
 	private static int BUFFER_SIZE = 1024;
 
 	private static String PRESSURE_KEY = "PRESSURE";
@@ -216,7 +218,7 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 
 	public String name(Context context)
 	{
-		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.PressureProbe";
+		return PressureProbe.NAME;
 	}
 
 	public int getTitleResource()

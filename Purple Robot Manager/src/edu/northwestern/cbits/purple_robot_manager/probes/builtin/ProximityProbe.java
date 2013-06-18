@@ -52,6 +52,8 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 
 	private static final String DEFAULT_THRESHOLD = "5.0";
 
+	public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.ProximityProbe";
+
 	private static String[] fieldNames = { DISTANCE_KEY };
 
 	private double _lastValue = Double.MAX_VALUE;
@@ -219,7 +221,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 
 	public String name(Context context)
 	{
-		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.ProximityProbe";
+		return ProximityProbe.NAME;
 	}
 
 	public int getTitleResource()

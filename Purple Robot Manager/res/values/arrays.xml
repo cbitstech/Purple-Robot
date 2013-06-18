@@ -38,7 +38,11 @@
         <item>features.AccelerometerBasicStatisticsFeature</item>
         <item>features.GyroscopeBasicStatisticsFeature</item>
         <item>features.MagneticFieldBasicStatisticsFeature</item>
-        
+        <item>features.LightProbeBasicStatisticsFeature</item>
+        <item>features.PressureProbeBasicStatisticsFeature</item>
+        <item>features.ProximityProbeBasicStatisticsFeature</item>
+        <item>features.TemperatureProbeBasicStatisticsFeature</item>
+                
         <item>builtin.RandomNoiseProbe</item>
         <item>LabelProbe</item>
         

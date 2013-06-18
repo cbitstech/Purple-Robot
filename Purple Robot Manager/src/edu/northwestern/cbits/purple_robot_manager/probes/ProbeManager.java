@@ -41,8 +41,12 @@ import edu.northwestern.cbits.purple_robot_manager.probes.features.CallHistoryFe
 import edu.northwestern.cbits.purple_robot_manager.probes.features.DeviceInUseFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.GyroscopeBasicStatisticsFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.JavascriptFeature;
+import edu.northwestern.cbits.purple_robot_manager.probes.features.LightProbeBasicStatisticsFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.MagneticFieldBasicStatisticsFeature;
+import edu.northwestern.cbits.purple_robot_manager.probes.features.PressureProbeBasicStatisticsFeature;
+import edu.northwestern.cbits.purple_robot_manager.probes.features.ProximityProbeBasicStatisticsFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.SunriseSunsetFeature;
+import edu.northwestern.cbits.purple_robot_manager.probes.features.TemperatureProbeBasicStatisticsFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.WeatherUndergroundFeature;
 
 public class ProbeManager
@@ -199,6 +203,13 @@ public class ProbeManager
 				if (stats.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
+			else if (probe instanceof LightProbeBasicStatisticsFeature)
+			{
+				LightProbeBasicStatisticsFeature stats = (LightProbeBasicStatisticsFeature) probe;
+
+				if (stats.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
 			else if (probe instanceof MagneticFieldBasicStatisticsFeature)
 			{
 				MagneticFieldBasicStatisticsFeature stats = (MagneticFieldBasicStatisticsFeature) probe;
@@ -288,6 +299,27 @@ public class ProbeManager
 				LabelProbe label = (LabelProbe) probe;
 
 				if (label.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof PressureProbeBasicStatisticsFeature)
+			{
+				PressureProbeBasicStatisticsFeature stats = (PressureProbeBasicStatisticsFeature) probe;
+
+				if (stats.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof ProximityProbeBasicStatisticsFeature)
+			{
+				ProximityProbeBasicStatisticsFeature stats = (ProximityProbeBasicStatisticsFeature) probe;
+
+				if (stats.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof TemperatureProbeBasicStatisticsFeature)
+			{
+				TemperatureProbeBasicStatisticsFeature stats = (TemperatureProbeBasicStatisticsFeature) probe;
+
+				if (stats.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 
