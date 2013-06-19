@@ -223,8 +223,8 @@ public class HardwareInformationProbe extends Probe
 		ListPreference duration = new ListPreference(activity);
 		duration.setKey("config_probe_hardware_frequency");
 		duration.setDefaultValue(Probe.DEFAULT_FREQUENCY);
-		duration.setEntryValues(R.array.probe_satellite_frequency_values);
-		duration.setEntries(R.array.probe_satellite_frequency_labels);
+		duration.setEntryValues(R.array.probe_low_frequency_values);
+		duration.setEntries(R.array.probe_low_frequency_labels);
 		duration.setTitle(R.string.probe_frequency_label);
 
 		screen.addPreference(duration);

@@ -293,8 +293,8 @@ public class CommunicationLogProbe extends Probe
 
 		ListPreference duration = new ListPreference(activity);
 		duration.setKey("config_probe_communication_frequency");
-		duration.setEntryValues(R.array.probe_satellite_frequency_values);
-		duration.setEntries(R.array.probe_satellite_frequency_labels);
+		duration.setEntryValues(R.array.probe_low_frequency_values);
+		duration.setEntries(R.array.probe_low_frequency_labels);
 		duration.setTitle(R.string.probe_frequency_label);
 		duration.setDefaultValue(Probe.DEFAULT_FREQUENCY);
 
