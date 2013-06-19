@@ -427,7 +427,7 @@ public abstract class BaseScriptEngine
 	{
 		for (Trigger trigger : TriggerManager.getInstance(this._context).triggersForId(triggerId))
 		{
-			trigger.setEnabled(true);
+			trigger.setEnabled(this._context, true);
 		}
 	}
 
@@ -435,7 +435,7 @@ public abstract class BaseScriptEngine
 	{
 		for (Trigger trigger : TriggerManager.getInstance(this._context).triggersForId(triggerId))
 		{
-			trigger.setEnabled(false);
+			trigger.setEnabled(this._context, false);
 		}
 	}
 	

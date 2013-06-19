@@ -613,7 +613,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 										me.broadcastMessage(uploadedMessage);
 
-										long elapsed = (System.currentTimeMillis() - start) / 1000;
+										double elapsed = ((double) (System.currentTimeMillis() - start)) / 1000.0;
 
 										payloadSize = httpPost.getEntity().getContentLength();
 										

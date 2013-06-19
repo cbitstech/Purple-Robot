@@ -5,11 +5,15 @@ import java.util.Map;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.CodeViewerActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -21,8 +25,6 @@ public abstract class Trigger
 	private String _action = null;
 	private String _identifier = "unidentified-trigger";
 	
-	private boolean _enabled = true;
-
 	public Trigger (Context context, Map<String, Object> map)
 	{
 		this.updateFromMap(context, map);
@@ -31,19 +33,24 @@ public abstract class Trigger
 	public abstract boolean matches(Context context, Object obj);
 	public abstract void refresh(Context context);
 	
-	public boolean enabled()
+	public boolean enabled(Context context)
 	{
-		return this._enabled;
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		
+		return prefs.getBoolean(this.enabledKey(), true);
 	}
 	
-	public void setEnabled(boolean enabled)
+	public void setEnabled(Context context, boolean enabled)
 	{
-		this._enabled = enabled;
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		Editor e = prefs.edit();
+		e.putBoolean(this.enabledKey(), enabled);
+		e.commit();
 	}
 
 	public void execute(final Context context, boolean force)
 	{
-		if (this._enabled && this._action != null)
+		if (this.enabled(context) && this._action != null)
 		{
 			final Trigger me = this;
 
@@ -141,7 +148,27 @@ public abstract class Trigger
 		});
 		
 		screen.addPreference(viewAction);
+
+		CheckBoxPreference enabled = new CheckBoxPreference(activity);
+		enabled.setTitle(R.string.label_trigger_enable_action);
+		enabled.setSummary(R.string.label_trigger_enable_action_desc);
+		enabled.setKey(this.enabledKey());
+		enabled.setDefaultValue(true);
 		
+		enabled.setOrder(Integer.MAX_VALUE);
+		
+		enabled.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
+		{
+			public boolean onPreferenceChange(Preference preference, Object newValue) 
+			{
+				Log.e("FC", "NEW TRIGGER VALUE: " + newValue + " (" + preference.getKey() + ")");
+				
+				return true;
+			}
+		});
+
+		screen.addPreference(enabled);
+
 		Preference fireNow = new Preference(activity);
 		fireNow.setTitle(R.string.label_trigger_fire_now);
 		fireNow.setSummary(R.string.label_trigger_fire_now_desc);
@@ -160,6 +187,11 @@ public abstract class Trigger
 		screen.addPreference(fireNow);
 
 		return screen;
+	}
+
+	private String enabledKey() 
+	{
+		return "trigger_enabled_" + this._identifier;
 	}
 
 	public static Trigger parse(Context context, Map<String, Object> params) 

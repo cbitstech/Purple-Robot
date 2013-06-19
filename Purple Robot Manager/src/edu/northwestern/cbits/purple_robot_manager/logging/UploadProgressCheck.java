@@ -46,7 +46,6 @@ public class UploadProgressCheck extends SanityCheck
 			double throughput = plugin.getRecentThroughput();
 			double accumulation = plugin.getRecentAccumulation();
 			
-			
 			double throughputSum = throughput;
 			double accumulationSum = accumulation;
 			
