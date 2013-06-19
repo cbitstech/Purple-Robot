@@ -22,7 +22,9 @@
     <string name="label_trigger_fire_now_desc">Execute trigger\'s action immediately</string>
     <string name="label_trigger_show_action">Inspect action</string>
     <string name="label_trigger_show_action_desc">Display the source code of the trigger\'s action</string>
-    
+    <string name="label_trigger_enable_action">Enable trigger</string>
+    <string name="label_trigger_enable_action_desc">Disable trigger to skip future firings.</string>
+
     <string name="config_probes_category_label">Probes</string>
     <string name="config_triggers_category_label">Triggers</string>
 

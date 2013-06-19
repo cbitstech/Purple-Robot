@@ -239,9 +239,23 @@ public class DiagnosticActivity extends SherlockActivity
          		message.append(newline);
          		message.append(newline);
 
+        		OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(this, HttpUploadPlugin.class);
+        		
+        		if (plugin instanceof HttpUploadPlugin)
+        		{
+        			HttpUploadPlugin http = (HttpUploadPlugin) plugin;
+        			
+        			message.append(this.getString(R.string.robot_pending_count_label));
+             		message.append(newline);
+        			message.append(this.getString(R.string.pending_files_file, http.pendingFilesCount()));
+
+             		message.append(newline);
+             		message.append(newline);
+        		}
+         		
          		message.append(this.getString(R.string.pr_version_label));
          		message.append(newline);
-
+         		
          		try 
         		{
         			PackageInfo pInfo = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
