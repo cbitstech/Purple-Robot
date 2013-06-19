@@ -49,6 +49,8 @@ import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.SingleClientConnManager;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
@@ -510,8 +512,12 @@ public class HttpUploadPlugin extends OutputPlugin
 
 							registry.register(new Scheme("https", socketFactory, 443));
 							
-							SingleClientConnManager mgr = new SingleClientConnManager(androidClient.getParams(), registry);
-							HttpClient httpClient = new DefaultHttpClient(mgr, androidClient.getParams());
+							HttpParams params = androidClient.getParams();
+							HttpConnectionParams.setConnectionTimeout(params, 180000);
+							HttpConnectionParams.setSoTimeout(params, 180000);
+							
+							SingleClientConnManager mgr = new SingleClientConnManager(params, registry);
+							HttpClient httpClient = new DefaultHttpClient(mgr, params);
 
 							HttpsURLConnection.setDefaultHostnameVerifier(hostnameVerifier);
 							
