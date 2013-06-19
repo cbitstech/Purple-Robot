@@ -410,6 +410,10 @@
 	
 	<string-array name="http_upload_size_values">
         <item>0</item>
+        <item>16384</item>
+        <item>32768</item>
+        <item>65536</item>
+        <item>131072</item>
         <item>262114</item>
         <item>524288</item>
         <item>1048576</item>
@@ -418,6 +422,10 @@
 
 	<string-array name="http_upload_size_labels">
         <item>Default Adaptive Behavior</item>
+        <item>16 kilobytes</item>
+        <item>32 kilobytes</item>
+        <item>64 kilobytes</item>
+        <item>128 kilobytes</item>
         <item>256 kilobytes</item>
         <item>512 kilobytes</item>
         <item>1 megabyte</item>
