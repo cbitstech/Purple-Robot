@@ -32,6 +32,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.net.Uri.Builder;
 import android.os.Bundle;
@@ -1131,7 +1132,7 @@ public abstract class BaseScriptEngine
 		
 		return map;
 	}
-
+	
 	public List<String> fetchTriggerIds() 
 	{
 		return TriggerManager.getInstance(this._context).triggerIds();
