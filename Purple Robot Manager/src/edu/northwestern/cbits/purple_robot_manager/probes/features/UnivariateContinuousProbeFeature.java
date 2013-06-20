@@ -15,45 +15,68 @@ public abstract class UnivariateContinuousProbeFeature extends ContinuousProbeFe
 	
 	protected int index = 0;
 	private boolean _filled = false;
+
+	private long _lastCheck = 0;
+	private boolean _running = false;
 	
 	protected abstract String valueKey();
 
-	protected void analyzeBuffers(Context context) 
+	protected void analyzeBuffers(final Context context) 
 	{
-		long now = System.currentTimeMillis();
+		final long now = System.currentTimeMillis();
 		
-		Bundle data = new Bundle();
-
-		data.putDouble("TIMESTAMP", now / 1000);
-		data.putString("PROBE", this.name(context));
-		
-		double maxTime = Double.MIN_VALUE;
-		double minTime = Double.MAX_VALUE;
-		
-		DescriptiveStatistics stats = new DescriptiveStatistics(XYZContinuousProbeFeature.BUFFER_SIZE);
-		
-		for (int i = 0; i < UnivariateContinuousProbeFeature.BUFFER_SIZE; i++)
+		if (now - this._lastCheck  > 10000 && this._running  == false)
 		{
-			stats.addValue(this.value[i]);
+			this._lastCheck = now;
 
-			if (this.timestamp[i] > maxTime)
-				maxTime = this.timestamp[i];
+			final UnivariateContinuousProbeFeature me = this;
+			
+			Runnable r = new Runnable()
+			{
+				public void run() 
+				{
+					me._running = true;
 
-			if (this.timestamp[i] < minTime)
-				minTime = this.timestamp[i];
+					Bundle data = new Bundle();
+			
+					data.putDouble("TIMESTAMP", now / 1000);
+					data.putString("PROBE", me.name(context));
+					
+					double maxTime = Double.MIN_VALUE;
+					double minTime = Double.MAX_VALUE;
+					
+					DescriptiveStatistics stats = new DescriptiveStatistics(XYZContinuousProbeFeature.BUFFER_SIZE);
+					
+					for (int i = 0; i < UnivariateContinuousProbeFeature.BUFFER_SIZE; i++)
+					{
+						stats.addValue(me.value[i]);
+			
+						if (me.timestamp[i] > maxTime)
+							maxTime = me.timestamp[i];
+			
+						if (me.timestamp[i] < minTime)
+							minTime = me.timestamp[i];
+					}
+					
+					data.putDouble("MIN", stats.getMin());
+					data.putDouble("MAX", stats.getMax());
+					data.putDouble("MEAN", stats.getMean());
+					data.putDouble("STD_DEV", stats.getStandardDeviation());
+					data.putDouble("RMS", Math.sqrt(stats.getSumsq() / UnivariateContinuousProbeFeature.BUFFER_SIZE));
+			
+					data.putInt("BUFFER_SIZE", UnivariateContinuousProbeFeature.BUFFER_SIZE);
+					data.putDouble("FREQUENCY", ((double) UnivariateContinuousProbeFeature.BUFFER_SIZE) / ((maxTime - minTime) / 1000));
+					data.putDouble("DURATION", ((double) ((maxTime - minTime) / 1000.0)));
+			
+					me.transmitData(context, data);
+
+					me._running = false;
+				}
+			};
+			
+			Thread t = new Thread(r);
+			t.start();
 		}
-		
-		data.putDouble("MIN", stats.getMin());
-		data.putDouble("MAX", stats.getMax());
-		data.putDouble("MEAN", stats.getMean());
-		data.putDouble("STD_DEV", stats.getStandardDeviation());
-		data.putDouble("RMS", Math.sqrt(stats.getSumsq() / UnivariateContinuousProbeFeature.BUFFER_SIZE));
-
-		data.putInt("BUFFER_SIZE", UnivariateContinuousProbeFeature.BUFFER_SIZE);
-		data.putDouble("FREQUENCY", ((double) UnivariateContinuousProbeFeature.BUFFER_SIZE) / ((maxTime - minTime) * 1000));
-		data.putDouble("DURATION", ((double) ((maxTime - minTime) * 1000)));
-
-		this.transmitData(context, data);
 	}
 
 	protected void processData(Context context, Bundle dataBundle) 
