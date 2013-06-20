@@ -67,7 +67,7 @@ public class JavascriptFeature extends Feature
 
 	public String name(Context context)
 	{
-		return "javascript::" + this._name;
+		return "javascript_" + this._name;
 	}
 
 	public String title(Context context)

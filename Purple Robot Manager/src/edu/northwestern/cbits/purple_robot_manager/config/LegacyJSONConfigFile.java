@@ -10,12 +10,16 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.Normalizer;
+import java.text.Normalizer.Form;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.prefs.Preferences;
+import java.util.regex.Pattern;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -575,8 +579,8 @@ public class LegacyJSONConfigFile
 							sources.add(source);
 						}
 					}
-
-					ProbeManager.addFeature(name, name, script, formatter, sources, false);
+					
+					ProbeManager.addFeature(name, LegacyJSONConfigFile.toSlug(name), script, formatter, sources, false);
 				}
 			}
 			catch (JSONException e)
@@ -586,6 +590,18 @@ public class LegacyJSONConfigFile
 		}
 
 		editor.commit();
+	}
+
+	public static String toSlug(String input) 
+	{
+		Pattern NONLATIN = Pattern.compile("[^\\w-]");
+		Pattern WHITESPACE = Pattern.compile("[\\s]");
+
+		String nowhitespace = WHITESPACE.matcher(input).replaceAll("_");
+		
+		String slug = NONLATIN.matcher(nowhitespace).replaceAll("");
+	
+		return slug.toLowerCase(Locale.ENGLISH);
 	}
 
 	public static void update(final Context context)
