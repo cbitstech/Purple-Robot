@@ -287,20 +287,19 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
     	SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
     	this._context = context.getApplicationContext();
-    	
+
+    	SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+		Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+
         if (super.isEnabled(context))
         {
         	if (prefs.getBoolean("config_probe_gyroscope_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
         	{
-            	SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-
-				Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-
 				int frequency = Integer.parseInt(prefs.getString("config_probe_gyroscope_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
 
 				if (this._lastFrequency != frequency)
 				{
-	                sensors.unregisterListener(this);
+					sensors.unregisterListener(this, sensor);
 	                
 	                switch (frequency)
 	                {
@@ -316,6 +315,9 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 	                	case SensorManager.SENSOR_DELAY_NORMAL:
 		                	sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL, null);
 	                		break;
+	                	default:
+		                	sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME, null);
+	                		break;
 	                }
 	                
 	                this._lastFrequency = frequency;
@@ -325,17 +327,13 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
         	}
         	else
         	{
-            	SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-                sensors.unregisterListener(this);
-
+                sensors.unregisterListener(this, sensor);
                 this._lastFrequency = -1;
         	}
         }
     	else
     	{
-        	SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-            sensors.unregisterListener(this);
-
+            sensors.unregisterListener(this, sensor);
             this._lastFrequency = -1;
     	}
 

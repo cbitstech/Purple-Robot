@@ -190,8 +190,8 @@ public class LogManager
 					e.printStackTrace();
 				}
 			}
-			else
-				Log.w("PR-LOGGING", "No logging endpoint provided.");
+//			else
+//				Log.w("PR-LOGGING", "No logging endpoint provided.");
 		}
 		else
 			Log.w("PR-LOGGING", "Logging is not currently enabled.");
