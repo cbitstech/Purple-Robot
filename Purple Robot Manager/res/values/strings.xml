@@ -826,6 +826,12 @@
     <string name="title_temperature_statistics_feature">Temperature Sensor Statistics</string>
     <string name="summary_temperature_statistics_feature_desc">Provides basic descriptive statistics for incoming temperature sensor data.</string>
     
+    <!-- Date Calendar Probe -->
+    <string name="title_date_calendar_probe">Date Calendar Sensor</string>
+    <string name="summary_date_calendar_probe_desc">Records basic information from the local calendar, including elements like the day of the week, week of the month, month of the year, etc.</string>
+ 
+    <string name="summary_date_calendar_probe" formatted="false">Month of Year %d, Week of Month %d, Day of Week %d</string>
+    
     
 </resources>
 
