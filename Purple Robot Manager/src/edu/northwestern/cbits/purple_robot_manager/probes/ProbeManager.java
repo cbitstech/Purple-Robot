@@ -25,6 +25,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.BluetoothDevic
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CallStateProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CommunicationLogProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.DateCalendarProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.HardwareInformationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.NetworkProbe;
@@ -234,6 +235,13 @@ public class ProbeManager
 			else if (probe instanceof CommunicationLogProbe)
 			{
 				CommunicationLogProbe comms = (CommunicationLogProbe) probe;
+
+				if (comms.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof DateCalendarProbe)
+			{
+				DateCalendarProbe comms = (DateCalendarProbe) probe;
 
 				if (comms.name(context).equalsIgnoreCase(name))
 					found = true;

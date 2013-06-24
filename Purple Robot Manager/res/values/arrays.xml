@@ -14,6 +14,7 @@
         <item>builtin.BluetoothDevicesProbe</item>
         <item>builtin.CallStateProbe</item>
         <item>builtin.CommunicationLogProbe</item>
+        <item>builtin.DateCalendarProbe</item>
         <item>builtin.GyroscopeProbe</item>
         <item>builtin.HardwareInformationProbe</item>
         <item>builtin.LightProbe</item>
