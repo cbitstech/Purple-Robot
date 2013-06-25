@@ -85,7 +85,7 @@ public class DateCalendarProbe extends Probe
 
 			if (prefs.getBoolean("config_probe_date_calendar_enabled", DateCalendarProbe.DEFAULT_ENABLED))
 			{
-				if (now - this._lastCheck > prefs.getLong("config_probe_date_calendar_frequency", Long.parseLong(Probe.DEFAULT_FREQUENCY)))
+				if (now - this._lastCheck > Long.parseLong(prefs.getString("config_probe_date_calendar_frequency", Probe.DEFAULT_FREQUENCY)))
 				{
 					Bundle bundle = new Bundle();
 					bundle.putString("PROBE", this.name(context));
