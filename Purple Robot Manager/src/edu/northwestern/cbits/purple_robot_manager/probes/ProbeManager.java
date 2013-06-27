@@ -20,6 +20,7 @@ import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.AddressBookDistancesProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.BatteryProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.BluetoothDevicesProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CallStateProbe;
@@ -139,6 +140,13 @@ public class ProbeManager
 				BluetoothDevicesProbe bluetooth = (BluetoothDevicesProbe) probe;
 
 				if (bluetooth.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof AddressBookDistancesProbe)
+			{
+				AddressBookDistancesProbe distances = (AddressBookDistancesProbe) probe;
+
+				if (distances.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 			else if (probe instanceof NetworkProbe)
