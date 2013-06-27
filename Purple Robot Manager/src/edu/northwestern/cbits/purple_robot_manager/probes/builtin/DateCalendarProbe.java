@@ -108,7 +108,6 @@ public class DateCalendarProbe extends Probe
 
 					this._lastCheck  = now;
 				}
-				
 
 				return true;
 			}

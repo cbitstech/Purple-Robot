@@ -10,6 +10,7 @@
 
    	<array name="probe_classes">
         <item>builtin.AccelerometerProbe</item>
+        <item>builtin.AddressBookDistancesProbe</item>
         <item>builtin.BatteryProbe</item>
         <item>builtin.BluetoothDevicesProbe</item>
         <item>builtin.CallStateProbe</item>
@@ -434,6 +435,7 @@
    	</string-array>
    	
    	<array name="sanity_check_classes">
+        <item>ConfigurationCheck</item>
         <item>DiskSpaceCheck</item>
         <item>LastUploadCheck</item>
         <!-- <item>ScriptDurationCheck</item> -->
@@ -463,4 +465,24 @@
         <item>sounds/vision-i/Off.m4a</item>
         <item>sounds/vision-i/On.m4a</item>
    	</string-array>
+   	
+
+	<string-array name="probe_distance_frequency_values">
+        <item>600000</item>
+        <item>1800000</item>
+        <item>3600000</item>
+        <item>14400000</item>
+        <item>43200000</item>
+        <item>86400000</item>
+   	</string-array>
+
+	<string-array name="probe_distance_frequency_labels">
+        <item>Every 10 minutes</item>
+        <item>Every 30 minutes</item>
+        <item>Every hour</item>
+        <item>Every 4 hours</item>
+        <item>Every 12 hours</item>
+        <item>Every day</item>
+   	</string-array>
+   		
 </resources>
