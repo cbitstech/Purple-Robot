@@ -9,6 +9,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.StartActivity;
@@ -115,7 +117,9 @@ public class SanityManager
 			}
 		}
 		
-		if (this.getErrorLevel() != this._lastStatus)
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+		
+		if (prefs.getBoolean("config_mute_warnings", false) == false && this.getErrorLevel() != this._lastStatus)
 		{
 			this._lastStatus = this.getErrorLevel();
 

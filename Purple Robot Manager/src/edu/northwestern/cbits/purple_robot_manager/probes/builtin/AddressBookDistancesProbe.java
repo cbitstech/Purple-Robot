@@ -8,6 +8,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -16,6 +17,7 @@ import android.database.Cursor;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -25,6 +27,7 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.StructuredPostal;
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.db.DistancesProvider;
@@ -39,6 +42,10 @@ public class AddressBookDistancesProbe extends Probe
 	private static final String NOW = "NOW";
 
 	private long _lastCheck = 0;
+	private double _lastLatitude = 100;
+	private double _lastLongitude = 200;
+	
+	private LocationListener _listener = null;
 
 	public String name(Context context)
 	{
@@ -78,6 +85,7 @@ public class AddressBookDistancesProbe extends Probe
 	public boolean isEnabled(Context context)
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
 		if (super.isEnabled(context))
 		{
@@ -85,6 +93,7 @@ public class AddressBookDistancesProbe extends Probe
 
 			if (prefs.getBoolean("config_probe_distances_enabled", AddressBookDistancesProbe.DEFAULT_ENABLED))
 			{
+				
 				HashMap<String, String> addresses = new HashMap<String, String>();
 
 				long freq = Long.parseLong(prefs.getString("config_probe_distances_frequency", AddressBookDistancesProbe.DEFAULT_FREQUENCY));
@@ -92,7 +101,41 @@ public class AddressBookDistancesProbe extends Probe
 
 				synchronized(this)
 				{
-					if (now - this._lastCheck  > freq)
+					final AddressBookDistancesProbe me = this;
+					
+					if (this._listener == null)
+					{
+						Log.e("PR", "ADDING LOCATION LISTENER");
+						
+						this._listener = new LocationListener()
+						{
+							public void onLocationChanged(Location location) 
+							{
+								Log.e("PR", "GOT UPDATE " + location);
+								
+								me._lastLatitude = location.getLatitude();
+								me._lastLongitude = location.getLongitude();
+							}
+
+							public void onProviderDisabled(String provider) 
+							{
+
+							}
+
+							public void onProviderEnabled(String provider) 
+							{
+
+							}
+
+							public void onStatusChanged(String provider, int status, Bundle extras) 
+							{
+
+							}
+						};
+						
+						locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 0, 0, this._listener);
+					}
+					else if (now - this._lastCheck  > freq && this._lastLatitude < 90 && this._lastLongitude < 180)
 					{
 						Bundle bundle = new Bundle();
 						bundle.putString("PROBE", this.name(context));
@@ -152,10 +195,10 @@ public class AddressBookDistancesProbe extends Probe
 						}
 	
 						cursor.close();
-
-						LocationManager location = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 						
-						Location here = location.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+						Location here = new Location("Purple Robot");
+						here.setLatitude(this._lastLatitude);
+						here.setLongitude(this._lastLongitude);
 
 						Bundle nowDistances = this.distancesForDays(context, here, addresses, 0, now, false);
 
@@ -184,10 +227,19 @@ public class AddressBookDistancesProbe extends Probe
 				return true;
 			}
 		}
+		
+		if (this._listener != null)
+		{
+			Log.e("PR", "CLEARING LISTENER");
+			
+			locationManager.removeUpdates(this._listener);
+			this._listener = null;
+		}
 
 		return false;
 	}
 
+	@SuppressLint("DefaultLocale")
 	private Bundle distancesForDays(Context context, Location here, HashMap<String, String> addresses, long days, long now, boolean clear) 
 	{
 		long start = now - (days * 24 * 60 * 60 * 1000);
