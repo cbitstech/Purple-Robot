@@ -14,7 +14,6 @@
             android:ringtoneType="notification"
             android:showSilent="false"
             android:key="config_default_notification_sound" />  -->
-
         <ListPreference
 	        android:key="config_default_notification_sound"
 	        android:entries="@array/sound_effect_labels"
@@ -22,7 +21,6 @@
 	        android:title="@string/config_notification_sound_label"
 	        android:summary="@string/config_notification_sound_summary"
 	        android:defaultValue="0" />
-        
         <ListPreference
             android:key="config_json_haptic_pattern"
             android:entries="@array/vibrator_pattern_labels"
@@ -30,7 +28,12 @@
             android:title="@string/config_vibrator_pattern_label"
             android:summary="@string/config_vibrator_pattern_message"
             android:defaultValue="60" />
-   	</PreferenceCategory>
+    	<CheckBoxPreference
+	   	    android:title="@string/config_mute_warnings"
+   		    android:summary="@string/summary_mute_warnings"
+        	android:key="config_mute_warnings"
+			android:defaultValue="false"/>
+       	</PreferenceCategory>
     <PreferenceCategory
         android:title="@string/config_application_category">
     	<CheckBoxPreference
