@@ -771,6 +771,7 @@ public abstract class BaseScriptEngine
 		return null;
 	}
 	
+	@SuppressLint("DefaultLocale")
 	protected Intent constructDirectLaunchIntent(final String applicationName, Map<String,Object> launchParams)
 	{
 		if (applicationName.toLowerCase().startsWith("http://") || applicationName.toLowerCase().startsWith("https://"))
@@ -1155,4 +1156,12 @@ public abstract class BaseScriptEngine
 	{
 		return TriggerManager.getInstance(this._context).deleteTrigger(id);
 	}
+	
+	public void clearTriggers()
+	{
+		for (String id : this.fetchTriggerIds())
+		{
+			this.deleteTrigger(id);
+		}
+	}		
 }

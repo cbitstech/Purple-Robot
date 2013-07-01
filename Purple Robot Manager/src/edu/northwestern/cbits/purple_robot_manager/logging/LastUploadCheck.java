@@ -3,13 +3,13 @@ package edu.northwestern.cbits.purple_robot_manager.logging;
 import java.io.File;
 import java.io.FilenameFilter;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
 public class LastUploadCheck extends SanityCheck 
 {
@@ -23,6 +23,20 @@ public class LastUploadCheck extends SanityCheck
 
 	public void runCheck(Context context) 
 	{
+		OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(context, HttpUploadPlugin.class);
+		
+		if (plugin instanceof HttpUploadPlugin)
+		{
+			HttpUploadPlugin http = (HttpUploadPlugin) plugin;
+
+			if (http.pendingFilesCount() < 8)
+			{
+				this._errorLevel = SanityCheck.OK;
+				
+				return;
+			}
+		}
+		
 		long now = System.currentTimeMillis();
 
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -33,8 +47,6 @@ public class LastUploadCheck extends SanityCheck
 		
 		if (lastUploadTime == 0)
 		{
-			OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(context, HttpUploadPlugin.class);
-
 			if (plugin != null && plugin instanceof HttpUploadPlugin)
 			{
 				final HttpUploadPlugin httpPlugin = (HttpUploadPlugin) plugin;
