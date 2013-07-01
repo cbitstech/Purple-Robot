@@ -937,16 +937,25 @@ public abstract class BaseScriptEngine
 
 	protected void updateWidget(Map<String, Object> parameters)
 	{
+		Log.e("PR", "A");
 		Intent intent = new Intent(ManagerService.UPDATE_WIDGETS);
 		
+		Log.e("PR", "B");
 		for (Object keyObj : parameters.keySet())
 		{
+			Log.e("PR", "C " + keyObj);
 			String key = keyObj.toString();
 			
+			Log.e("PR", "D " + key + " " + parameters.get(key).toString());
 			intent.putExtra(key, parameters.get(key).toString());
+			Log.e("PR", "E");
 		}
 
+		Log.e("PR", "F " + this._context);
+
 		this._context.startService(intent);
+		
+		Log.e("PR", "G");
 	}
 	
 	public void scheduleScript(String identifier, String dateString, String action)
