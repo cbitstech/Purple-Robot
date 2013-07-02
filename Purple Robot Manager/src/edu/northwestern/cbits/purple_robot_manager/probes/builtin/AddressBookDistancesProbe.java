@@ -36,7 +36,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class AddressBookDistancesProbe extends Probe
 {
-	private static final boolean DEFAULT_ENABLED = true;
+	private static final boolean DEFAULT_ENABLED = false;
 	private static final String DEFAULT_FREQUENCY = "3600000";
 
 	private static final String NOW = "NOW";
@@ -474,7 +474,7 @@ public class AddressBookDistancesProbe extends Probe
 		duration.setEntryValues(R.array.probe_distance_frequency_values);
 		duration.setEntries(R.array.probe_distance_frequency_labels);
 		duration.setTitle(R.string.probe_frequency_label);
-		duration.setDefaultValue(Probe.DEFAULT_FREQUENCY);
+		duration.setDefaultValue(AddressBookDistancesProbe.DEFAULT_FREQUENCY);
 
 		screen.addPreference(duration);
 
