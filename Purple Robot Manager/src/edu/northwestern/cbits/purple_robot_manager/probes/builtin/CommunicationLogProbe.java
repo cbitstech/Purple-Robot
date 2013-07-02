@@ -98,7 +98,7 @@ public class CommunicationLogProbe extends Probe
 				{
 					long freq = Long.parseLong(prefs.getString("config_probe_communication_frequency", Probe.DEFAULT_FREQUENCY));
 					boolean doHash = prefs.getBoolean("config_probe_communication_hash_data", Probe.DEFAULT_HASH_DATA);
-
+					
 					if (now - this._lastCheck  > freq)
 					{
 						Bundle bundle = new Bundle();
@@ -128,6 +128,9 @@ public class CommunicationLogProbe extends Probe
 								String numberName = c.getString(c.getColumnIndex(Calls.CACHED_NAME));
 								String phoneNumber = PhoneNumberUtils.formatNumber(c.getString(c.getColumnIndex(Calls.NUMBER)));
 
+								if (numberName == null)
+									numberName = phoneNumber;
+
 								if (doHash)
 								{
 									numberName = em.createHash(context, numberName);
@@ -135,7 +138,7 @@ public class CommunicationLogProbe extends Probe
 								}
 
 								contactBundle.putString(CommunicationLogProbe.NUMBER_NAME, numberName);
-								contactBundle.putString(CommunicationLogProbe.NUMBER_LABEL, c.getString(c.getColumnIndex(Calls.CACHED_NUMBER_LABEL)));
+								contactBundle.putString(CommunicationLogProbe.NUMBER_LABEL, phoneNumber);
 								
 								if (c.getColumnIndex(Calls.CACHED_NUMBER_TYPE) != -1)
 									contactBundle.putString(CommunicationLogProbe.NUMBER_TYPE, c.getString(c.getColumnIndex(Calls.CACHED_NUMBER_TYPE)));								
@@ -154,17 +157,20 @@ public class CommunicationLogProbe extends Probe
 									sentCount += 1;
 								else if (callType == Calls.INCOMING_TYPE)
 									receivedCount += 1;
-								if (callType == Calls.MISSED_TYPE)
+								else if (callType == Calls.MISSED_TYPE)
 									missedCount += 1;
-
-								calls.add(contactBundle);
 								
-								if (callTime > recentTimestamp)
+								if (callType > 0)
 								{
-									recentName = numberName;
-									recentNumber = phoneNumber;
+									calls.add(contactBundle);
 									
-									recentTimestamp = callTime;
+									if (callTime > recentTimestamp)
+									{
+										recentName = numberName;
+										recentNumber = phoneNumber;
+										
+										recentTimestamp = callTime;
+									}
 								}
 							}
 
@@ -322,7 +328,7 @@ public class CommunicationLogProbe extends Probe
 			Bundle value = objects.get(i);
 			String name = value.getString(CommunicationLogProbe.NUMBER);
 			String number = value.getString(CommunicationLogProbe.NUMBER_NAME);
-
+			
 			keys.add(name);
 			bundle.putString(name, number);
 		}
