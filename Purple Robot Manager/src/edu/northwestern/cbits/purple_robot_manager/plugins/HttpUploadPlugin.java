@@ -450,11 +450,45 @@ public class HttpUploadPlugin extends OutputPlugin
 							uploadArray.put(toUpload.get(i));
 						}
 
+						int l = 0;
+						Random r = new Random(System.currentTimeMillis());
+
 						try
 						{
 							if (uploadArray.length() == 0)
-								throw new Exception(me.getContext().getString(R.string.error_empty_payload));
+							{
+								while (pendingObjects.size() > 0)
+								{
+									JSONArray toSave = new JSONArray();
 
+									List<JSONObject> toRemove = new ArrayList<JSONObject>();
+
+									for (int i = 0; i < pendingObjects.size() && i < 100; i++)
+									{
+										toSave.put(pendingObjects.get(i));
+										toRemove.add(pendingObjects.get(i));
+									}
+
+									File f = new File(pendingFolder, "pending_" + l + ".json");
+
+									while (f.exists())
+									{
+										l += r.nextInt(10);
+
+										f = new File(pendingFolder, "pending_" + l + ".json");
+									}
+
+									byte[] jsonBytes = toSave.toString().getBytes("UTF-8");
+
+									EncryptionManager.getInstance().writeToEncryptedStream(me.getContext(), new FileOutputStream(f), jsonBytes, prefs.getBoolean("config_http_encrypt", true));
+
+									pendingObjects.removeAll(toRemove);
+								}
+								
+								throw new Exception(me.getContext().getString(R.string.error_empty_payload));
+							}
+							
+							
 							JSONObject jsonMessage = new JSONObject();
 
 							jsonMessage.put(OPERATION_KEY, "SubmitProbes");
@@ -706,10 +740,7 @@ public class HttpUploadPlugin extends OutputPlugin
 								androidClient.close();
 							}
 
-							int l = 0;
-							Random r = new Random(System.currentTimeMillis());
-
-							while(pendingObjects.size() > 0)
+							while (pendingObjects.size() > 0)
 							{
 								JSONArray toSave = new JSONArray();
 
