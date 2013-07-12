@@ -112,7 +112,7 @@ public class DeviceInUseFeature extends Feature
 			this._isInited = true;
 		}
 
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 
 		 this._isEnabled = false;
 
@@ -127,7 +127,7 @@ public class DeviceInUseFeature extends Feature
 	
 	public void enable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_device_use_enabled", true);
@@ -137,7 +137,7 @@ public class DeviceInUseFeature extends Feature
 
 	public void disable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_device_use_enabled", false);

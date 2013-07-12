@@ -92,7 +92,7 @@ public class RobotHealthProbe extends Probe
 
 	public void enable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_robot_enabled", true);
@@ -102,7 +102,7 @@ public class RobotHealthProbe extends Probe
 
 	public void disable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_robot_enabled", false);
@@ -158,7 +158,7 @@ public class RobotHealthProbe extends Probe
 	
 	public boolean isEnabled(final Context context)
 	{
-		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		final SharedPreferences prefs = Probe.getPreferences(context);
 
 		final long now = System.currentTimeMillis();
 
@@ -432,7 +432,7 @@ public class RobotHealthProbe extends Probe
 	{
 		Map<String, Object> map = super.configuration(context);
 		
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 
 		long freq = Long.parseLong(prefs.getString("config_probe_robot_frequency", Probe.DEFAULT_FREQUENCY));
 		
@@ -453,7 +453,7 @@ public class RobotHealthProbe extends Probe
 			
 			if (frequency instanceof Long)
 			{
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				SharedPreferences prefs = Probe.getPreferences(context);
 				Editor e = prefs.edit();
 				
 				e.putString("config_probe_robot_frequency", frequency.toString());

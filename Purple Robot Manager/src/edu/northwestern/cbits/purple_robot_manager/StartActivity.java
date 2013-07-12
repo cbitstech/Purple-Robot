@@ -118,7 +118,7 @@ public class StartActivity extends SherlockActivity
 
 		LogManager.getInstance(this);
 		
-		SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+		SharedPreferences sharedPrefs = this.getPreferences(this);
 
 		if (this.getPackageManager().getInstallerPackageName(this.getPackageName()) == null) 
 		{

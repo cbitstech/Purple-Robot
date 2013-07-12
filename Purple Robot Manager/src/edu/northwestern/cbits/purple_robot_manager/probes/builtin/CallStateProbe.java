@@ -80,7 +80,7 @@ public class CallStateProbe extends Probe
 			this._isInited = true;
 		}
 
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 
 		this._isEnabled = false;
 
@@ -143,7 +143,7 @@ public class CallStateProbe extends Probe
 
 	public void enable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_call_state_enabled", true);
@@ -153,7 +153,7 @@ public class CallStateProbe extends Probe
 
 	public void disable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_call_state_enabled", false);

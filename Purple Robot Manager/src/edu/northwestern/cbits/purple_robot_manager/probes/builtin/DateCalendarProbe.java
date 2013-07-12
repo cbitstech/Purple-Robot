@@ -77,7 +77,7 @@ public class DateCalendarProbe extends Probe
 
 	public boolean isEnabled(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 
 		if (super.isEnabled(context))
 		{
@@ -132,7 +132,7 @@ public class DateCalendarProbe extends Probe
 
 	public void enable(Context context) 
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_date_calendar_enabled", true);
@@ -142,7 +142,7 @@ public class DateCalendarProbe extends Probe
 
 	public void disable(Context context) 
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_date_calendar_enabled", false);

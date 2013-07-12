@@ -28,7 +28,7 @@ public abstract class ContinuousProbeFeature extends Feature
 	{
 		if (super.isEnabled(context))
 		{
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+			SharedPreferences prefs = Probe.getPreferences(context);
 
 			if (prefs.getBoolean("config_feature_" + this.featureKey() + "_enabled", true))
 			{
@@ -68,7 +68,7 @@ public abstract class ContinuousProbeFeature extends Feature
 
 	public void disable(Context context) 
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_feature_" + this.featureKey() + "_enabled", false);
@@ -86,7 +86,7 @@ public abstract class ContinuousProbeFeature extends Feature
 
 	public void enable(Context context) 
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_feature_" + this.featureKey() + "_enabled", true);

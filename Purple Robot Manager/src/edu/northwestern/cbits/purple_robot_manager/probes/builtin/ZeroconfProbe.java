@@ -73,7 +73,7 @@ public class ZeroconfProbe extends Probe implements ServiceListener
 
 	public void enable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_zeroconf_enabled", true);
@@ -83,7 +83,7 @@ public class ZeroconfProbe extends Probe implements ServiceListener
 
 	public void disable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_zeroconf_enabled", false);
@@ -93,7 +93,7 @@ public class ZeroconfProbe extends Probe implements ServiceListener
 
 	public boolean isEnabled(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 
 		boolean enabled = super.isEnabled(context);
 

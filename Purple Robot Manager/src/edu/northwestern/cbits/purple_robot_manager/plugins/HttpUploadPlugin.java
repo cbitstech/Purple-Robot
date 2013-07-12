@@ -123,10 +123,16 @@ public class HttpUploadPlugin extends OutputPlugin
 	private boolean _uploading = false;
 
 	private int _failCount = 0;
+	
+	private static SharedPreferences _preferences = null;
+	
 
 	protected static SharedPreferences getPreferences(Context context)
 	{
-		return PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+		if (HttpUploadPlugin._preferences == null)
+			HttpUploadPlugin._preferences = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+		
+		return HttpUploadPlugin._preferences;
 	}
 
 	public double getRecentThroughput()

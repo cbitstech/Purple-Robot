@@ -92,7 +92,7 @@ public class TelephonyProbe extends Probe
 
 	public void enable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_telephony_enabled", true);
@@ -102,7 +102,7 @@ public class TelephonyProbe extends Probe
 
 	public void disable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_telephony_enabled", false);
@@ -112,7 +112,7 @@ public class TelephonyProbe extends Probe
 
 	public boolean isEnabled(final Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		TelephonyManager manager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 		
 		final TelephonyProbe me = this;
@@ -402,7 +402,7 @@ public class TelephonyProbe extends Probe
 	{
 		Map<String, Object> map = super.configuration(context);
 		
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 
 		long freq = Long.parseLong(prefs.getString("config_probe_telephony_frequency", Probe.DEFAULT_FREQUENCY));
 		map.put(Probe.PROBE_FREQUENCY, freq);
@@ -420,7 +420,7 @@ public class TelephonyProbe extends Probe
 			
 			if (frequency instanceof Long)
 			{
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				SharedPreferences prefs = Probe.getPreferences(context);
 				Editor e = prefs.edit();
 				
 				e.putString("config_probe_telephony_frequency", frequency.toString());

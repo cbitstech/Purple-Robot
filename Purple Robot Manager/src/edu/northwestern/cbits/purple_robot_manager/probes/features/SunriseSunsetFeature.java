@@ -82,7 +82,7 @@ public class SunriseSunsetFeature extends Feature
 
 	public void enable(Context context) 
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_feature_sunrise_sunset_enabled", true);
@@ -92,7 +92,7 @@ public class SunriseSunsetFeature extends Feature
 
 	public void disable(Context context) 
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_feature_sunrise_sunset_enabled", false);
@@ -173,7 +173,7 @@ public class SunriseSunsetFeature extends Feature
 			this._isInited = true;
 		}
 
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 
 		this._isEnabled = false;
 

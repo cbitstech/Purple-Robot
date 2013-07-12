@@ -266,7 +266,7 @@ public class BatteryProbe extends Probe
 			this._isInited = true;
 		}
 
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 
 		 this._isEnabled = false;
 
@@ -281,7 +281,7 @@ public class BatteryProbe extends Probe
 
 	public void enable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_battery_enabled", true);
@@ -291,7 +291,7 @@ public class BatteryProbe extends Probe
 
 	public void disable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_battery_enabled", false);

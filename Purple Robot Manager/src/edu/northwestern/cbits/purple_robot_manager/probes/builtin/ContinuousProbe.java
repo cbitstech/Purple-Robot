@@ -33,17 +33,7 @@ public abstract class ContinuousProbe extends Probe
 	protected static final boolean DEFAULT_ENABLED = false;
 	protected static final String DEFAULT_FREQUENCY = "0";
 
-	private static SharedPreferences prefs = null;
-
 	private PendingIntent _intent = null;
-	
-	protected static SharedPreferences getPreferences(Context context)
-	{
-		if (ContinuousProbe.prefs == null)
-			ContinuousProbe.prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-
-		return ContinuousProbe.prefs;
-	}
 
 	protected Context _context = null;
 
@@ -51,7 +41,7 @@ public abstract class ContinuousProbe extends Probe
 	{
 		String key = this.getPreferenceKey();
 
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_" + key + "_enabled", true);
@@ -63,7 +53,7 @@ public abstract class ContinuousProbe extends Probe
 	{
 		String key = this.getPreferenceKey();
 
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_" + key + "_enabled", false);
@@ -121,7 +111,7 @@ public abstract class ContinuousProbe extends Probe
 			{
 				String key = "config_probe_" + this.getPreferenceKey() + "_frequency";
 				
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				SharedPreferences prefs = Probe.getPreferences(context);
 				Editor e = prefs.edit();
 				
 				e.putString(key, frequency.toString());
@@ -131,7 +121,7 @@ public abstract class ContinuousProbe extends Probe
 			{
 				String key = "config_probe_" + this.getPreferenceKey() + "_frequency";
 				
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				SharedPreferences prefs = Probe.getPreferences(context);
 				Editor e = prefs.edit();
 				
 				e.putString(key, frequency.toString());

@@ -18,6 +18,7 @@ import android.telephony.PhoneNumberUtils;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class CallHistoryFeature extends Feature
 {
@@ -66,7 +67,7 @@ public class CallHistoryFeature extends Feature
 
 	public void enable(Context context) 
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_feature_call_history_enabled", true);
@@ -76,7 +77,7 @@ public class CallHistoryFeature extends Feature
 
 	public boolean isEnabled(final Context context)
 	{
-		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		final SharedPreferences prefs = Probe.getPreferences(context);
 
 		final long now = System.currentTimeMillis();
 
@@ -391,7 +392,7 @@ public class CallHistoryFeature extends Feature
 	
 	public void disable(Context context) 
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_feature_call_history_enabled", false);

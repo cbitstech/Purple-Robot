@@ -23,6 +23,7 @@ import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
+import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 
 @SuppressLint("DefaultLocale")
@@ -87,7 +88,7 @@ public class JavascriptFeature extends Feature
 
 	public void enable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_feature_" + this.featureKey() + "_enabled", true);
@@ -97,7 +98,7 @@ public class JavascriptFeature extends Feature
 
 	public void disable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_feature_" + this.featureKey() + "_enabled", false);
@@ -109,7 +110,7 @@ public class JavascriptFeature extends Feature
 	{
 		boolean enabled = super.isEnabled(context);
 
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 
 		if (enabled && prefs.getBoolean("config_feature_" + this.featureKey() + "_enabled", true))
 			return true;

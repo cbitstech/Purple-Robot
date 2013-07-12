@@ -66,7 +66,7 @@ public class CommunicationLogProbe extends Probe
 
 	public void enable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_communication_enabled", true);
@@ -76,7 +76,7 @@ public class CommunicationLogProbe extends Probe
 
 	public void disable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_communication_enabled", false);
@@ -86,7 +86,7 @@ public class CommunicationLogProbe extends Probe
 
 	public boolean isEnabled(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 
 		if (super.isEnabled(context))
 		{
@@ -238,7 +238,7 @@ public class CommunicationLogProbe extends Probe
 	{
 		Map<String, Object> map = super.configuration(context);
 		
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 
 		long freq = Long.parseLong(prefs.getString("config_probe_communication_frequency", Probe.DEFAULT_FREQUENCY));
 		map.put(Probe.PROBE_FREQUENCY, freq);
@@ -259,7 +259,7 @@ public class CommunicationLogProbe extends Probe
 			
 			if (frequency instanceof Long)
 			{
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				SharedPreferences prefs = Probe.getPreferences(context);
 				Editor e = prefs.edit();
 				
 				e.putString("config_probe_communication_frequency", frequency.toString());
@@ -273,7 +273,7 @@ public class CommunicationLogProbe extends Probe
 			
 			if (hash instanceof Boolean)
 			{
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				SharedPreferences prefs = Probe.getPreferences(context);
 				Editor e = prefs.edit();
 				
 				e.putBoolean("config_probe_communication_hash_data", ((Boolean) hash).booleanValue());

@@ -64,7 +64,7 @@ public class AddressBookDistancesProbe extends Probe
 
 	public void enable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_distances_enabled", true);
@@ -74,7 +74,7 @@ public class AddressBookDistancesProbe extends Probe
 
 	public void disable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_distances_enabled", false);
@@ -84,7 +84,7 @@ public class AddressBookDistancesProbe extends Probe
 
 	public boolean isEnabled(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
 		if (super.isEnabled(context))
@@ -240,7 +240,7 @@ public class AddressBookDistancesProbe extends Probe
 	{
 		long start = now - (days * 24 * 60 * 60 * 1000);
 		
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Bundle bundle = new Bundle();
 
@@ -406,7 +406,7 @@ public class AddressBookDistancesProbe extends Probe
 	{
 		Map<String, Object> map = super.configuration(context);
 		
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 
 		long freq = Long.parseLong(prefs.getString("config_probe_distance_frequency", AddressBookDistancesProbe.DEFAULT_FREQUENCY));
 		map.put(Probe.PROBE_FREQUENCY, freq);
@@ -427,7 +427,7 @@ public class AddressBookDistancesProbe extends Probe
 			
 			if (frequency instanceof Long)
 			{
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				SharedPreferences prefs = Probe.getPreferences(context);
 				Editor e = prefs.edit();
 				
 				e.putString("config_probe_distances_frequency", frequency.toString());
@@ -441,7 +441,7 @@ public class AddressBookDistancesProbe extends Probe
 			
 			if (hash instanceof Boolean)
 			{
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				SharedPreferences prefs = Probe.getPreferences(context);
 				Editor e = prefs.edit();
 				
 				e.putBoolean("config_probe_distances_hash_data", ((Boolean) hash).booleanValue());

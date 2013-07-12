@@ -40,6 +40,7 @@ import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeAct
 import edu.northwestern.cbits.purple_robot_manager.charts.SplineChart;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("SimpleDateFormat")
 public class AccelerometerProbe extends ContinuousProbe implements SensorEventListener
@@ -324,7 +325,8 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 		
 		if (now - this.lastThresholdLookup > 5000)
 		{
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+			SharedPreferences prefs = Probe.getPreferences(this._context);
+
 			this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_accelerometer_threshold", AccelerometerProbe.DEFAULT_THRESHOLD));
 			
 			this.lastThresholdLookup = now;
@@ -372,7 +374,7 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 			
 			if (threshold instanceof Double)
 			{
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				SharedPreferences prefs = Probe.getPreferences(context);
 				Editor e = prefs.edit();
 				
 				e.putString("config_probe_accelerometer_threshold", threshold.toString());

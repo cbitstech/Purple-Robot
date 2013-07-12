@@ -61,7 +61,7 @@ public class HardwareInformationProbe extends Probe
 
 	public void enable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_hardware_enabled", true);
@@ -71,7 +71,7 @@ public class HardwareInformationProbe extends Probe
 
 	public void disable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_hardware_enabled", false);
@@ -81,7 +81,7 @@ public class HardwareInformationProbe extends Probe
 
 	public boolean isEnabled(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 
 		long now = System.currentTimeMillis();
 
@@ -185,7 +185,7 @@ public class HardwareInformationProbe extends Probe
 	{
 		Map<String, Object> map = super.configuration(context);
 		
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 
 		long freq = Long.parseLong(prefs.getString("config_probe_hardware_frequency", Probe.DEFAULT_FREQUENCY));
 		
@@ -204,7 +204,7 @@ public class HardwareInformationProbe extends Probe
 			
 			if (frequency instanceof Long)
 			{
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				SharedPreferences prefs = Probe.getPreferences(context);
 				Editor e = prefs.edit();
 				
 				e.putString("config_probe_hardware_frequency", frequency.toString());

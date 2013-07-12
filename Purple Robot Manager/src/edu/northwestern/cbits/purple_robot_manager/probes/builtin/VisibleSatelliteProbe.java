@@ -40,7 +40,7 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 	{
 		Map<String, Object> map = super.configuration(context);
 		
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 
 		long freq = Long.parseLong(prefs.getString("config_probe_satellites_frequency", Probe.DEFAULT_FREQUENCY));
 		
@@ -59,7 +59,7 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 			
 			if (frequency instanceof Long)
 			{
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				SharedPreferences prefs = Probe.getPreferences(context);
 				Editor e = prefs.edit();
 				
 				e.putString("config_probe_satellites_frequency", frequency.toString());
@@ -99,7 +99,7 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 
 	public void enable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_satellites_enabled", true);
@@ -109,7 +109,7 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 
 	public void disable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_satellites_enabled", false);
@@ -127,7 +127,7 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 
 			long now = System.currentTimeMillis();
 
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+			SharedPreferences prefs = Probe.getPreferences(context);
 
 			if (prefs.getBoolean("config_probe_satellites_enabled", VisibleSatelliteProbe.DEFAULT_ENABLED))
 			{
