@@ -181,11 +181,11 @@ public class WeatherUndergroundFeature extends Feature
 										double windSpeed = obs.getDouble("wind_kph");
 										double gustSpeed = obs.getDouble("wind_gust_kph");
 										
-										double pressure = Double.parseDouble(obs.getString("pressure_mb"));
-										String pressureTrend = obs.getString("pressure_trend");
-										
 										double dewPoint = obs.getDouble("dewpoint_c");
 										double visiblility = obs.getDouble("visibility_km");
+
+										double pressure = Double.parseDouble(obs.getString("pressure_mb"));
+										String pressureTrend = obs.getString("pressure_trend");
 										
 										Bundle bundle = new Bundle();
 										bundle.putString("PROBE", me.name(context));
@@ -200,8 +200,9 @@ public class WeatherUndergroundFeature extends Feature
 										bundle.putDouble(WeatherUndergroundFeature.WIND_DEGREES, windDegrees);
 										bundle.putDouble(WeatherUndergroundFeature.WIND_SPEED, windSpeed);
 										bundle.putDouble(WeatherUndergroundFeature.GUST_SPEED, gustSpeed);
-										bundle.putDouble(WeatherUndergroundFeature.PRESSURE, pressure);
 										bundle.putString(WeatherUndergroundFeature.PRESSURE_TREND, pressureTrend);
+										bundle.putDouble(WeatherUndergroundFeature.PRESSURE, pressure);
+
 										bundle.putDouble(WeatherUndergroundFeature.DEWPOINT, dewPoint);
 										bundle.putDouble(WeatherUndergroundFeature.VISIBILITY, visiblility);
 
@@ -216,6 +217,10 @@ public class WeatherUndergroundFeature extends Feature
 										LogManager.getInstance(context).logException(e);
 									} 
 									catch (JSONException e) 
+									{
+										LogManager.getInstance(context).logException(e);
+									}
+									catch (NumberFormatException e)
 									{
 										LogManager.getInstance(context).logException(e);
 									}

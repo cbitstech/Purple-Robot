@@ -389,6 +389,9 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 
 				double timestamp = event.timestamp + boot;
 
+				if (timestamp > now * (1000 * 1000) * 1.1) // Used to detect if sensors already have built-in times...
+					timestamp = event.timestamp;
+
 				timeBuffer[bufferIndex] = timestamp / 1000000;
 				accuracyBuffer[bufferIndex] = event.accuracy;
 

@@ -22,7 +22,7 @@ public class ConfigurationCheck extends SanityCheck
 
 		long refresh = Long.parseLong(prefs.getString("config_json_refresh_interval", "0"));
 		
-		if (refresh > 0 && refresh < 1800)
+		if (refresh > 0 && refresh < 600)
 		{
 			this._errorLevel = SanityCheck.WARNING;
 			this._errorMessage = context.getString(R.string.name_sanity_configuration_refresh_warning);

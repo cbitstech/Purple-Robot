@@ -76,8 +76,15 @@ public class ManagerService extends IntentService
 				}
 			};
 			
-			Thread t = new Thread(r);
-			t.start();
+			try
+			{
+				Thread t = new Thread(r);
+				t.start();
+			}
+			catch (OutOfMemoryError e)
+			{
+				System.gc();
+			}
 		}
 		else if (REFRESH_ERROR_STATE_INTENT.equalsIgnoreCase(intent.getAction()))
 		{

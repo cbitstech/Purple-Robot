@@ -410,6 +410,9 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 				double boot = (now - elapsed) * 1000 * 1000;
 
 				double timestamp = event.timestamp + boot;
+				
+				if (timestamp > now * (1000 * 1000) * 1.1) // Used to detect if sensors already have built-in times...
+					timestamp = event.timestamp;
 
 				timeBuffer[bufferIndex] = timestamp / 1000000;
 

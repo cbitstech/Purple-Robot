@@ -5,10 +5,12 @@ import java.util.Date;
 import java.util.Map;
 
 import android.annotation.SuppressLint;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
@@ -266,14 +268,25 @@ public class DiagnosticActivity extends SherlockActivity
         			LogManager.getInstance(this).logException(e);
         		}
 
-         		Intent intent = new Intent(Intent.ACTION_SEND);
+         		try
+         		{
+	         		Intent intent = new Intent(Intent.ACTION_SEND);
+	
+	         		intent.setType("message/rfc822");
+	         		intent.putExtra(Intent.EXTRA_SUBJECT, this.getString(R.string.email_diagnostic_subject));
+	         		intent.putExtra(Intent.EXTRA_TEXT, message.toString());
+	
+	         		this.startActivity(intent);
+         		}
+         		catch (ActivityNotFoundException e)
+         		{
+         			Intent mailIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("mailto:c-karr@northwestern.edu"));
+         			mailIntent.putExtra(Intent.EXTRA_SUBJECT, this.getString(R.string.email_diagnostic_subject));
+         			mailIntent.putExtra(Intent.EXTRA_TEXT, message.toString());
 
-         		intent.setType("message/rfc822");
-         		intent.putExtra(Intent.EXTRA_SUBJECT, this.getString(R.string.email_diagnostic_subject));
-         		intent.putExtra(Intent.EXTRA_TEXT, message.toString());
-
-         		this.startActivity(intent);
-
+         			this.startActivity(mailIntent);
+         		}
+         		
     			break;
     	}
         

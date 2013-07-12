@@ -319,6 +319,10 @@ public class LegacyJSONConfigFile
 					{
 						LogManager.getInstance(context).logException(e);
 					}
+					catch (NullPointerException e)
+					{
+						LogManager.getInstance(context).logException(e);
+					}
 
 					LegacyJSONConfigFile._sharedFile = new LegacyJSONConfigFile(context, next);
 				}
@@ -336,9 +340,19 @@ public class LegacyJSONConfigFile
 				}
 			}
 		};
-
+		
 		Thread t = new Thread(r);
-		t.start();
+
+		try
+		{
+			t.start();
+		}
+		catch (OutOfMemoryError e)
+		{
+			System.gc();
+			
+			LogManager.getInstance(context).logException(e);
+		}
 	}
 
 	protected void updateTriggers(Context context) 

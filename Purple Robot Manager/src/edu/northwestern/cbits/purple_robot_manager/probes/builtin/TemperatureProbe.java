@@ -261,6 +261,9 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 
 				double timestamp = event.timestamp + boot;
 
+				if (timestamp > now * (1000 * 1000) * 1.1) // Used to detect if sensors already have built-in times...
+					timestamp = event.timestamp;
+
 				timeBuffer[bufferIndex] = timestamp / 1000000;
 				valueBuffer[0][bufferIndex] = event.values[0];
 
@@ -308,9 +311,9 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
-		float lux = bundle.getFloatArray("TEMPERATURE")[0];
+		float temperature = bundle.getFloatArray("TEMPERATURE")[0];
 
-		return String.format(context.getResources().getString(R.string.summary_temperature_probe), lux);
+		return String.format(context.getResources().getString(R.string.summary_temperature_probe), temperature);
 	}
 
 	public int getSummaryResource()

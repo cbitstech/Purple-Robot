@@ -46,7 +46,7 @@
 				<action android:name="edu.northwestern.cbits.purple.WIDGET_ACTION" />
 			</intent-filter>
 		</receiver>
-				<receiver android:enabled="true" android:name=".WidgetReceiver" android:exported="true">
+		<receiver android:enabled="true" android:name=".WidgetReceiver" android:exported="true">
 			<intent-filter>
 				<action android:name="edu.northwestern.cbits.purple.WIDGET_ACTION" />
 			</intent-filter>
