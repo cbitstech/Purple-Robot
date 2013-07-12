@@ -47,19 +47,30 @@ public class DiskSpaceCheck extends SanityCheck
 			
 			if (this._errorMessage == null && externalCache != null)
 			{
-				StatFs stat = new StatFs(externalCache.getAbsolutePath());
-				
-				long free = ((long) stat.getAvailableBlocks()) * ((long) stat.getBlockSize());
-				
-				if (free < DiskSpaceCheck.ERROR_SIZE)
+				try
 				{
-					this._errorLevel = SanityCheck.ERROR;
-					this._errorMessage = context.getString(R.string.name_sanity_disk_space_external_error);
+					StatFs stat = new StatFs(externalCache.getAbsolutePath());
+					
+					long free = ((long) stat.getAvailableBlocks()) * ((long) stat.getBlockSize());
+					
+					if (free < DiskSpaceCheck.ERROR_SIZE)
+					{
+						this._errorLevel = SanityCheck.ERROR;
+						this._errorMessage = context.getString(R.string.name_sanity_disk_space_external_error);
+					}
+					else if (free < DiskSpaceCheck.WARNING_SIZE)
+					{
+						this._errorLevel = SanityCheck.WARNING;
+						this._errorMessage = context.getString(R.string.name_sanity_disk_space_external_warning);
+					}
 				}
-				else if (free < DiskSpaceCheck.WARNING_SIZE)
+				catch (IllegalArgumentException e)
 				{
-					this._errorLevel = SanityCheck.WARNING;
-					this._errorMessage = context.getString(R.string.name_sanity_disk_space_external_warning);
+					if (this._errorLevel == SanityCheck.OK)
+					{
+						this._errorLevel = SanityCheck.WARNING;
+						this._errorMessage = context.getString(R.string.name_sanity_disk_space_external_unknown_warning);
+					}
 				}
 			}
 		}

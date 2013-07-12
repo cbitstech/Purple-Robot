@@ -788,8 +788,9 @@
     <string name="name_sanity_disk_space_local_error">Less than 4MB of space is available on local storage.</string>
     <string name="name_sanity_disk_space_local_warning">Less than 10MB of space is available on local storage.</string>
     <string name="name_sanity_disk_space_external_error">Less than 4MB of space is available on external storage (SD Card).</string>
-    <string name="name_sanity_disk_space_external_warning">Less than 10MB of space is available on external storage  (SD Card).</string>
-
+    <string name="name_sanity_disk_space_external_warning">Less than 10MB of space is available on external storage (SD Card).</string>
+    <string name="name_sanity_disk_space_external_unknown_warning">Unable to inspect external storage (SD Card).</string>
+    
   	<string name="name_sanity_last_upload">Last Upload</string>
     <string name="name_sanity_last_upload_never">Sensor data has not ever been uploaded.</string>
    	<string name="name_sanity_last_upload_error">Sensor data has not been uploaded in the last day.</string>
@@ -849,7 +850,7 @@
 
   	<string name="name_sanity_configuration">Purple Robot Configuration</string>
 	<string name="name_sanity_configuration_upload_warning">The HTTP data upload interval is less than 10 minutes. Consider extending this interval to extend battery life. (Settings &#8594; HTTP UPload Settings &#8594;HTTP Upload Interval)</string>
-	<string name="name_sanity_configuration_refresh_warning">The configuration refresh interval is less than 30 minutes. Consider extending this interval to extend battery life. (Settings &#8594; Refresh Interval)</string>
+	<string name="name_sanity_configuration_refresh_warning">The configuration refresh interval is less than 10 minutes. Consider extending this interval to extend battery life. (Settings &#8594; Refresh Interval)</string>
 		
 <!--<string name="name_sanity_last_upload_never">Sensor data has not ever been uploaded.</string>
    	<string name="name_sanity_last_upload_error">Sensor data has not been uploaded in the last day.</string>

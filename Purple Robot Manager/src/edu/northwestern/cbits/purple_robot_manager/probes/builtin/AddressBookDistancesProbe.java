@@ -105,14 +105,10 @@ public class AddressBookDistancesProbe extends Probe
 					
 					if (this._listener == null)
 					{
-						Log.e("PR", "ADDING LOCATION LISTENER");
-						
 						this._listener = new LocationListener()
 						{
 							public void onLocationChanged(Location location) 
 							{
-								Log.e("PR", "GOT UPDATE " + location);
-								
 								me._lastLatitude = location.getLatitude();
 								me._lastLongitude = location.getLongitude();
 							}

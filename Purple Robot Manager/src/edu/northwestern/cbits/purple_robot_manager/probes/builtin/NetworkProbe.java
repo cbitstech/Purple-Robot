@@ -126,7 +126,7 @@ public class NetworkProbe extends Probe
 
 										NetworkInterface iface = null;
 										
-										while ((iface = ifaces.nextElement()) != null && bundle.containsKey(NetworkProbe.IP_ADDRESS) == false)
+										while (ifaces.hasMoreElements() && (iface = ifaces.nextElement()) != null && bundle.containsKey(NetworkProbe.IP_ADDRESS) == false)
 										{
 											if (iface.getName().equals("lo") == false)
 											{

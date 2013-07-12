@@ -19,6 +19,7 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.telephony.TelephonyManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class HardwareInformationProbe extends Probe
@@ -111,9 +112,16 @@ public class HardwareInformationProbe extends Probe
 						bundle.putString(HardwareInformationProbe.MODEL, Build.MODEL);
 						bundle.putString(HardwareInformationProbe.PRODUCT, Build.PRODUCT);
 
-						WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-						bundle.putString(HardwareInformationProbe.WIFI_MAC, wifi.getConnectionInfo().getMacAddress());
-
+						try
+						{
+							WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+							bundle.putString(HardwareInformationProbe.WIFI_MAC, wifi.getConnectionInfo().getMacAddress());
+						}
+						catch (NullPointerException e)
+						{
+							LogManager.getInstance(context).logException(e);
+						}
+						
 						TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 						bundle.putString(HardwareInformationProbe.MOBILE_ID, tm.getDeviceId());
 
