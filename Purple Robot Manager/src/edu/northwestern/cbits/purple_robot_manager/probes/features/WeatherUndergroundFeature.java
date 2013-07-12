@@ -76,7 +76,7 @@ public class WeatherUndergroundFeature extends Feature
 
 	public void enable(Context context) 
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);;
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_feature_weather_underground_enabled", true);
@@ -86,14 +86,14 @@ public class WeatherUndergroundFeature extends Feature
 
 	private long lastCheck(Context context) 
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);;
 		
 		return prefs.getLong("config_last_weather_underground_check", 0);
 	}
 
 	public void disable(Context context) 
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_feature_weather_underground_enabled", false);
@@ -123,7 +123,7 @@ public class WeatherUndergroundFeature extends Feature
 					
 						if (now - me.lastCheck(context) > (1000 * 60 * 60))
 						{
-							SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+							SharedPreferences prefs = Probe.getPreferences(context);
 
 							if (prefs.getBoolean("config_restrict_data_wifi", true))
 							{
@@ -237,13 +237,13 @@ public class WeatherUndergroundFeature extends Feature
 			LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(context);
 			localManager.registerReceiver(receiver, intentFilter);
 
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+			SharedPreferences prefs = Probe.getPreferences(context);
 			prefs.edit().putLong("config_last_weather_underground_check", 0).commit();
 
 			this._isInited = true;
 		}
 
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 
 		this._isEnabled = false;
 

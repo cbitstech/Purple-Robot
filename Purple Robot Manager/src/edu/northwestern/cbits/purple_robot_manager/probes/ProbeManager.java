@@ -59,6 +59,8 @@ public class ProbeManager
 
 	private static boolean _initing = false;
 	private static boolean _inited = false;
+	
+	private static ArrayList<Probe> _allProbes = null;
 
 	public static List<Probe> allProbes(Context context)
 	{
@@ -88,9 +90,12 @@ public class ProbeManager
 
 			ProbeManager._inited = true;
 			ProbeManager._initing = false;
+			
+			
+			ProbeManager._allProbes = new ArrayList<Probe>(ProbeManager._probeInstances);
 		}
 
-		return new ArrayList<Probe>(ProbeManager._probeInstances);
+		return ProbeManager._allProbes;
 	}
 
 	public static void nudgeProbes(Context context)
@@ -452,7 +457,7 @@ public class ProbeManager
 
 	public static void disableProbes(Context context) 
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 
 		Editor editor = prefs.edit();
 		editor.putBoolean("config_probes_enabled", false);
@@ -463,7 +468,7 @@ public class ProbeManager
 
 	public static void enableProbes(Context context) 
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 
 		Editor editor = prefs.edit();
 		editor.putBoolean("config_probes_enabled", true);
@@ -474,7 +479,7 @@ public class ProbeManager
 
 	public static boolean probesState(Context context) 
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		return prefs.getBoolean("config_probes_enabled", false);
 	}

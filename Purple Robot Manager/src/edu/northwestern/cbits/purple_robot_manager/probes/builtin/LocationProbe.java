@@ -69,7 +69,7 @@ public class LocationProbe extends Probe implements LocationListener
 
 	public void enable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_location_enabled", true);
@@ -79,7 +79,7 @@ public class LocationProbe extends Probe implements LocationListener
 
 	public void disable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_location_enabled", false);
@@ -91,7 +91,7 @@ public class LocationProbe extends Probe implements LocationListener
 	{
 		Map<String, Object> map = super.configuration(context);
 		
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 
 		long freq = Long.parseLong(prefs.getString("config_probe_location_frequency", Probe.DEFAULT_FREQUENCY));
 		
@@ -110,7 +110,7 @@ public class LocationProbe extends Probe implements LocationListener
 			
 			if (frequency instanceof Long)
 			{
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				SharedPreferences prefs = Probe.getPreferences(context);
 				Editor e = prefs.edit();
 				
 				e.putString("config_probe_location_frequency", frequency.toString());
@@ -157,7 +157,7 @@ public class LocationProbe extends Probe implements LocationListener
 		{
 	        this._context = context.getApplicationContext();
 
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+			SharedPreferences prefs = Probe.getPreferences(context);
 
 			if (prefs.getBoolean("config_probe_location_enabled", LocationProbe.DEFAULT_ENABLED))
 			{

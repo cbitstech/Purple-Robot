@@ -66,7 +66,7 @@ public class WifiAccessPointsProbe extends Probe
 	{
 		if (super.isEnabled(context))
 		{
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+			SharedPreferences prefs = Probe.getPreferences(context);
 
 			return prefs.getBoolean("config_probe_wifi_enabled", WifiAccessPointsProbe.DEFAULT_ENABLED);
 		}
@@ -76,7 +76,7 @@ public class WifiAccessPointsProbe extends Probe
 
 	public boolean isEnabled(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 
 		final WifiAccessPointsProbe me = this;
 		
@@ -225,7 +225,7 @@ public class WifiAccessPointsProbe extends Probe
 	
 	public void enable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_wifi_enabled", true);
@@ -235,7 +235,7 @@ public class WifiAccessPointsProbe extends Probe
 
 	public void disable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_wifi_enabled", false);
@@ -254,7 +254,7 @@ public class WifiAccessPointsProbe extends Probe
 	{
 		Map<String, Object> map = super.configuration(context);
 		
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 
 		long freq = Long.parseLong(prefs.getString("config_probe_wifi_frequency", Probe.DEFAULT_FREQUENCY));
 		
@@ -273,7 +273,7 @@ public class WifiAccessPointsProbe extends Probe
 			
 			if (frequency instanceof Long)
 			{
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				SharedPreferences prefs = Probe.getPreferences(context);
 				Editor e = prefs.edit();
 				
 				e.putString("config_probe_wifi_frequency", frequency.toString());

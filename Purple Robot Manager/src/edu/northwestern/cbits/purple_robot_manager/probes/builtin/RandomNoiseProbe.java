@@ -49,7 +49,7 @@ public class RandomNoiseProbe extends Probe
 
 	public void enable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_random_noise_enabled", true);
@@ -59,7 +59,7 @@ public class RandomNoiseProbe extends Probe
 
 	public void disable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_random_noise_enabled", false);
@@ -72,7 +72,7 @@ public class RandomNoiseProbe extends Probe
 		if (RandomNoiseProbe.instance == null)
 			RandomNoiseProbe.instance = this;
 		
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		if (super.isEnabled(context))
 		{
@@ -152,7 +152,7 @@ public class RandomNoiseProbe extends Probe
 	{
 		Map<String, Object> map = super.configuration(context);
 		
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		map.put("retain", prefs.getBoolean("config_probe_random_noise_persist", false));
 		
@@ -169,7 +169,7 @@ public class RandomNoiseProbe extends Probe
 			
 			if (retain instanceof Boolean)
 			{
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				SharedPreferences prefs = Probe.getPreferences(context);
 				Editor e = prefs.edit();
 				
 				e.putBoolean("config_probe_random_noise_persist", ((Boolean) retain).booleanValue());

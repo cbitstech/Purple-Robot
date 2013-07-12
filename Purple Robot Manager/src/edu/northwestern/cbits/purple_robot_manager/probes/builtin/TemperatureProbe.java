@@ -21,6 +21,7 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("SimpleDateFormat")
 public class TemperatureProbe extends ContinuousProbe implements SensorEventListener
@@ -183,7 +184,7 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 		
 		if (now - this.lastThresholdLookup > 5000)
 		{
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+			SharedPreferences prefs = Probe.getPreferences(this._context);
 			this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_temperature_threshold", TemperatureProbe.DEFAULT_THRESHOLD));
 			
 			this.lastThresholdLookup = now;
@@ -221,7 +222,7 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 			
 			if (threshold instanceof Double)
 			{
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				SharedPreferences prefs = Probe.getPreferences(context);
 				Editor e = prefs.edit();
 				
 				e.putString("config_probe_temperature_threshold", threshold.toString());

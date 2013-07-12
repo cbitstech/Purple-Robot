@@ -395,7 +395,7 @@ public class LegacyJSONConfigFile
 
 	public static LegacyJSONConfigFile getSharedFile(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = LegacyJSONConfigFile.getPreferences(context);
 		
 		if (prefs.getBoolean(LegacyJSONConfigFile.FIRST_RUN, true))
 		{

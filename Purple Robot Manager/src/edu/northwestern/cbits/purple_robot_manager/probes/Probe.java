@@ -40,7 +40,20 @@ public abstract class Probe
 	public abstract String title(Context context);
 	public abstract String probeCategory(Context context);
 	public abstract PreferenceScreen preferenceScreen(PreferenceActivity settingsActivity);
-
+	
+	private static long _lastEnabledCheck = 0;
+	private static boolean _lastEnabled = false;
+	
+	private static SharedPreferences _preferences = null;
+	
+	protected static SharedPreferences getPreferences(Context context)
+	{
+		if (Probe._preferences == null)
+			Probe._preferences = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+		
+		return Probe._preferences;
+	}
+	
 	public void nudge(Context context)
 	{
 		this.isEnabled(context);
@@ -83,9 +96,18 @@ public abstract class Probe
 
 	public boolean isEnabled(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		long now = System.currentTimeMillis();
+		
+		if (now - Probe._lastEnabledCheck > 10000)
+		{
+			Probe._lastEnabledCheck = now;
 
-		return prefs.getBoolean("config_probes_enabled", false);
+			SharedPreferences prefs = Probe.getPreferences(context);
+
+			Probe._lastEnabled = prefs.getBoolean("config_probes_enabled", false);
+		}
+		
+		return Probe._lastEnabled;
 	}
 
 	public String summarizeValue(Context context, Bundle bundle)

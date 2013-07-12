@@ -40,6 +40,7 @@ import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeAct
 import edu.northwestern.cbits.purple_robot_manager.charts.SplineChart;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("SimpleDateFormat")
 public class PressureProbe extends ContinuousProbe implements SensorEventListener
@@ -308,7 +309,7 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 			
 			if (threshold instanceof Double)
 			{
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				SharedPreferences prefs = Probe.getPreferences(context);
 				Editor e = prefs.edit();
 				
 				e.putString("config_probe_pressure_threshold", threshold.toString());
@@ -340,7 +341,7 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 		
 		if (now - this.lastThresholdLookup > 5000)
 		{
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+			SharedPreferences prefs = Probe.getPreferences(this._context);
 			this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_pressure_threshold", PressureProbe.DEFAULT_THRESHOLD));
 			
 			this.lastThresholdLookup = now;

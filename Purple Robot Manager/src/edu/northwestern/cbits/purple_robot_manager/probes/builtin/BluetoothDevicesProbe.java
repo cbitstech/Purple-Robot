@@ -270,7 +270,7 @@ public class BluetoothDevicesProbe extends Probe
 
 	public void enable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_bluetooth_enabled", true);
@@ -280,7 +280,7 @@ public class BluetoothDevicesProbe extends Probe
 
 	public void disable(Context context)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_bluetooth_enabled", false);
@@ -291,7 +291,7 @@ public class BluetoothDevicesProbe extends Probe
 	@SuppressLint("InlinedApi")
 	public boolean isEnabled(Context context)
 	{
-		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		final SharedPreferences prefs = Probe.getPreferences(context);
 		final EncryptionManager em = EncryptionManager.getInstance();
 		
 		final BluetoothDevicesProbe me = this;
@@ -489,7 +489,7 @@ public class BluetoothDevicesProbe extends Probe
 	{
 		Map<String, Object> map = super.configuration(context);
 		
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		// TODO: include whether enabled?
 
@@ -512,7 +512,7 @@ public class BluetoothDevicesProbe extends Probe
 			
 			if (frequency instanceof Long)
 			{
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				SharedPreferences prefs = Probe.getPreferences(context);
 				Editor e = prefs.edit();
 				
 				e.putString("config_probe_bluetooth_frequency", frequency.toString());
@@ -526,7 +526,7 @@ public class BluetoothDevicesProbe extends Probe
 			
 			if (hash instanceof Boolean)
 			{
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				SharedPreferences prefs = Probe.getPreferences(context);
 				Editor e = prefs.edit();
 				
 				e.putBoolean("config_probe_bluetooth_hash_data", ((Boolean) hash).booleanValue());
