@@ -938,25 +938,16 @@ public abstract class BaseScriptEngine
 
 	protected void updateWidget(Map<String, Object> parameters)
 	{
-		Log.e("PR", "A");
 		Intent intent = new Intent(ManagerService.UPDATE_WIDGETS);
 		
-		Log.e("PR", "B");
 		for (Object keyObj : parameters.keySet())
 		{
-			Log.e("PR", "C " + keyObj);
 			String key = keyObj.toString();
 			
-			Log.e("PR", "D " + key + " " + parameters.get(key).toString());
 			intent.putExtra(key, parameters.get(key).toString());
-			Log.e("PR", "E");
 		}
 
-		Log.e("PR", "F " + this._context);
-
 		this._context.startService(intent);
-		
-		Log.e("PR", "G");
 	}
 	
 	public void scheduleScript(String identifier, String dateString, String action)
@@ -1163,5 +1154,53 @@ public abstract class BaseScriptEngine
 		{
 			this.deleteTrigger(id);
 		}
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void fetchLabels(String appContext, Map<String, Object> labels) 
+	{
+		Intent labelIntent = new Intent();
+		labelIntent.setClass(this._context, LabelActivity.class);
+
+		labelIntent.putExtra(LabelActivity.LABEL_CONTEXT, appContext);
+		labelIntent.putExtra(LabelActivity.TIMESTAMP, ((double) System.currentTimeMillis()));
+
+		Bundle labelsBundle = new Bundle();
+		
+		for (String key : labels.keySet())
+		{
+			Map<String, Object> labelMap = (Map<String, Object>) labels.get(key);
+			
+			Bundle labelBundle = new Bundle();
+			
+			for (String labelKey : labelMap.keySet())
+			{
+				Object o = labelMap.get(labelKey);
+
+				Log.e("PR", "[LABELS] " + labelKey + " : " + o.getClass());
+
+				if (o instanceof String)
+					labelBundle.putString(labelKey, o.toString());
+				else if (o instanceof Double)
+					labelBundle.putDouble(labelKey, ((Double) o).doubleValue());
+				else if (o instanceof ArrayList)
+				{
+					ArrayList<String> listItems = new ArrayList<String>();
+					
+					for (Object item : ((ArrayList) o))
+					{
+						listItems.add(item.toString());
+					}
+
+					labelBundle.putStringArrayList(labelKey, listItems);
+				}
+			}
+			
+			labelsBundle.putParcelable(key, labelBundle);
+		}
+		
+		labelIntent.putExtra(LabelActivity.LABEL_DEFINITIONS, labelsBundle);
+		
+		this._context.startActivity(labelIntent);
 	}		
 }

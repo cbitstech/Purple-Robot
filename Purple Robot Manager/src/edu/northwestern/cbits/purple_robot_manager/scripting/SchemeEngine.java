@@ -2,6 +2,7 @@ package edu.northwestern.cbits.purple_robot_manager.scripting;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -154,7 +155,7 @@ public class SchemeEngine extends BaseScriptEngine
 		if (pair.isEmpty() == false)
 		{
 			Object first = pair.getFirst();
-
+			
 			if (first instanceof Pair)
 			{
 				Pair firstPair = (Pair) first;
@@ -167,7 +168,28 @@ public class SchemeEngine extends BaseScriptEngine
 				{
 					Pair valuePair = (Pair) value;
 					
-					value = valuePair.toString();
+//					value = valuePair.toString();
+					
+					if (valuePair.first() instanceof String && valuePair.rest() instanceof Pair)
+					{
+						ArrayList<Object> list = new ArrayList<Object>();
+						
+						Pair restPair = (Pair) valuePair.rest();
+						
+						while (restPair.isEmpty() == false)
+						{
+							list.add(restPair.first());
+							
+							if (restPair.rest() instanceof Pair)
+								restPair = (Pair) restPair.rest();
+							else
+								restPair = Pair.EMPTY;
+						}
+						
+						value = list;
+					}
+					else
+						value = SchemeEngine.parsePairList(valuePair);
 				}
 
 				map.put(key, value);
@@ -305,6 +327,11 @@ public class SchemeEngine extends BaseScriptEngine
 	public boolean updateWidget(final String title, final String message, final String applicationName, final Pair launchParams, final String script)
 	{
 		return this.updateWidget(title, message, applicationName, SchemeEngine.parsePairList(launchParams), script);
+	}
+	
+	public void fetchLabels(String appContext, final Pair labels)
+	{
+		super.fetchLabels(appContext, SchemeEngine.parsePairList(labels));
 	}
 
 	public boolean launchApplication(String applicationName, final Pair launchParams, final String script)

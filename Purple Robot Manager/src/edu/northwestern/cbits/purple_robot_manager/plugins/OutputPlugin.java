@@ -358,6 +358,8 @@ public abstract class OutputPlugin
 
 						objectArray.put(locObject);
 					}
+					else if (o instanceof String)
+						objectArray.put(o.toString());
 					else
 						Log.e("PRM", "LIST OBJ: " + o.getClass().getCanonicalName() + " IN " + key);
 				}
