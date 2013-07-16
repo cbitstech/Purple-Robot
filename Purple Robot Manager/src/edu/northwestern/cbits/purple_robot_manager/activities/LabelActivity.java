@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TreeMap;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,10 +43,8 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
-import edu.emory.mathcs.backport.java.util.Collections;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
-import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 
 @SuppressLint("SimpleDateFormat")
@@ -60,8 +59,6 @@ public class LabelActivity extends SherlockFragmentActivity
 	private String _labelContext = null;
 	
 	private HashMap<String, Object> _values = new HashMap<String, Object>();
-	
-	private boolean _customInited = false;
 
 	protected void onCreate(Bundle savedInstanceState)
     {
@@ -151,7 +148,6 @@ public class LabelActivity extends SherlockFragmentActivity
 		
 		e.commit();
 	}
-
 	
 	protected void onNewIntent(Intent intent)
 	{
@@ -190,23 +186,35 @@ public class LabelActivity extends SherlockFragmentActivity
         final AutoCompleteTextView value = (AutoCompleteTextView) this.findViewById(R.id.text_value_text);
         final AutoCompleteTextView label = (AutoCompleteTextView) this.findViewById(R.id.text_label_text);
 
-		if (extras.containsKey(LabelActivity.LABEL_DEFINITIONS) && this._customInited == false)
+		if (extras.containsKey(LabelActivity.LABEL_DEFINITIONS))
 		{
 			label.setVisibility(View.GONE);
 			value.setVisibility(View.GONE);
+
+			LinearLayout labelLayout = (LinearLayout) this.findViewById(R.id.layout_label);
 			
+			labelLayout.removeAllViews();
+
 			Bundle definitions = extras.getBundle(LabelActivity.LABEL_DEFINITIONS);
 			
-			ArrayList<String> fields = new ArrayList<String>();
-			fields.addAll(definitions.keySet());
-			Collections.sort(fields);
+			TreeMap<String,String> sortedMap = new TreeMap<String,String>();			
 			
-			LinearLayout labelLayout = (LinearLayout) this.findViewById(R.id.layout_label);
+			for (String key : definitions.keySet())
+			{
+				Bundle field = definitions.getBundle(key);
+
+				String fieldName = field.getString(key, key);
+				double weight = field.getDouble("weight", 0.0);
+				
+				sortedMap.put(weight + "_" + fieldName, fieldName);
+			}
 
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 			
-			for (String field : fields)
+			for (String field : sortedMap.navigableKeySet())
 			{
+				field = sortedMap.get(field);
+				
 				Bundle fieldDef = definitions.getBundle(field);
 
 				final TextView fieldName = new TextView(this);
@@ -241,6 +249,8 @@ public class LabelActivity extends SherlockFragmentActivity
 					seekBar.setKeyProgressIncrement((int) step);
 					
 					seekBar.setProgress((int) lastValue);
+					
+					me._values.put(fieldLabel, Float.valueOf(lastValue));
 					
 					seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
 					{
@@ -290,6 +300,9 @@ public class LabelActivity extends SherlockFragmentActivity
 							}
 						}
 						
+						if (lastValue != null)
+							me._values.put(fieldLabel, lastValue);
+						
 						radios.setOnCheckedChangeListener(new OnCheckedChangeListener()
 						{
 							public void onCheckedChanged(RadioGroup radios, int checkId) 
@@ -301,7 +314,7 @@ public class LabelActivity extends SherlockFragmentActivity
 									me._values.put(fieldLabel, button.getText());
 								}
 								else
-									me._values.clear();
+									me._values.remove(fieldLabel);
 							}
 						});
 						
@@ -310,8 +323,6 @@ public class LabelActivity extends SherlockFragmentActivity
 					}
 				}
 			}
-			
-			this._customInited = true;
 		}
 		else
 		{
