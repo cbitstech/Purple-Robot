@@ -15,6 +15,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.OrientationEventListener;
 
 public class WidgetIntentService extends IntentService 
@@ -41,7 +42,11 @@ public class WidgetIntentService extends IntentService
 
 	protected void onHandleIntent(Intent intent) 
 	{
+		Log.e("PN", "RECVED 22 INTENT: " + intent);
+		
 		final WidgetIntentService me = this;
+		
+		Log.e("PN", "FOO 1");
 		
 		if (WidgetIntentService._orientation == null)
 		{
@@ -61,6 +66,8 @@ public class WidgetIntentService extends IntentService
 			
 //			WidgetIntentService._orientation.enable();
 		}
+
+		Log.e("PN", "FOO 2");
 
 		if (intent.hasExtra("identifier"))
 		{
@@ -108,7 +115,9 @@ public class WidgetIntentService extends IntentService
 				e.printStackTrace();
 			}
 		}
-		
+
+		Log.e("PN", "FOO 3");
+
 		if (ACTION_BOOT.equals(intent.getAction()))
 		{
 			String[] identifiers = IdentifiersManager.fetchIdentifiers(this);
@@ -131,6 +140,8 @@ public class WidgetIntentService extends IntentService
 			
 			for (int widgetId : widgetIds)
 			{
+				Log.e("PR", "REFRESHING WIDGET 1 " + widgetId + " FOR " + identifier);
+				
 				this.refreshWidget(widgetId, intent);
 			}
 
@@ -150,9 +161,13 @@ public class WidgetIntentService extends IntentService
 			
 			for (int id : widgetIds)
 			{
+				Log.e("PR", "REFRESHING WIDGET 2 " + widgetId + " FOR " + identifier);
+
 				this.refreshWidget(id, intent);
 			}
 		}
+
+		Log.e("PN", "FOO 4");
 	}
 	
 	@SuppressWarnings("unchecked")
