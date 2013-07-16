@@ -24,6 +24,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.util.DisplayMetrics;
+import android.util.Log;
 
 public abstract class PurpleWidgetProvider extends AppWidgetProvider 
 {
@@ -148,7 +149,7 @@ public abstract class PurpleWidgetProvider extends AppWidgetProvider
         bitmapOptions.inPreferredConfig=Bitmap.Config.ARGB_8888;//optional
 
 		input = PurpleWidgetProvider.inputStreamForUri(context,  imageUri);
-
+		
 		Bitmap bitmap = BitmapFactory.decodeStream(input, null, bitmapOptions);
         input.close();
 
