@@ -1161,6 +1161,7 @@ public abstract class BaseScriptEngine
 	{
 		Intent labelIntent = new Intent();
 		labelIntent.setClass(this._context, LabelActivity.class);
+		labelIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
 		labelIntent.putExtra(LabelActivity.LABEL_CONTEXT, appContext);
 		labelIntent.putExtra(LabelActivity.TIMESTAMP, ((double) System.currentTimeMillis()));
@@ -1176,8 +1177,6 @@ public abstract class BaseScriptEngine
 			for (String labelKey : labelMap.keySet())
 			{
 				Object o = labelMap.get(labelKey);
-
-				Log.e("PR", "[LABELS] " + labelKey + " : " + o.getClass());
 
 				if (o instanceof String)
 					labelBundle.putString(labelKey, o.toString());
