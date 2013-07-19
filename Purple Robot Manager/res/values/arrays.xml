@@ -9,6 +9,8 @@
     </array>
 
    	<array name="probe_classes">
+        <!-- <item>features.AccelerometerFrequencyFeature</item> -->
+
         <item>builtin.AccelerometerProbe</item>
         <item>builtin.AddressBookDistancesProbe</item>
         <item>builtin.BatteryProbe</item>
