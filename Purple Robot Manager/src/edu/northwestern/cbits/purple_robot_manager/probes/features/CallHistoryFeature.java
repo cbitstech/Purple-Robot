@@ -12,7 +12,6 @@ import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.provider.CallLog;
 import android.telephony.PhoneNumberUtils;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;

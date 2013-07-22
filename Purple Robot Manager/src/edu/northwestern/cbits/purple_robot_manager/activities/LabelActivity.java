@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.TreeMap;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,6 +22,8 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.WindowManager.LayoutParams;
 import android.widget.ArrayAdapter;
@@ -43,6 +44,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
+import edu.emory.mathcs.backport.java.util.Collections;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
@@ -197,13 +199,13 @@ public class LabelActivity extends SherlockFragmentActivity
 
 			Bundle definitions = extras.getBundle(LabelActivity.LABEL_DEFINITIONS);
 			
-			TreeMap<String,String> sortedMap = new TreeMap<String,String>();			
+			HashMap<String, String> sortedMap = new HashMap<String, String>();			
 			
 			for (String key : definitions.keySet())
 			{
 				Bundle field = definitions.getBundle(key);
 
-				String fieldName = field.getString(key, key);
+				String fieldName = field.getString("name");
 				double weight = field.getDouble("weight", 0.0);
 				
 				sortedMap.put(weight + "_" + fieldName, fieldName);
@@ -211,7 +213,17 @@ public class LabelActivity extends SherlockFragmentActivity
 
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 			
-			for (String field : sortedMap.navigableKeySet())
+			ArrayList<String> keyList = new ArrayList<String>();
+			
+			for (String key : sortedMap.keySet())
+			{
+				if (key != null)
+					keyList.add(key);
+			}
+			
+			Collections.sort(keyList);
+			
+			for (String field : keyList)
 			{
 				field = sortedMap.get(field);
 				
@@ -322,6 +334,48 @@ public class LabelActivity extends SherlockFragmentActivity
 						labelLayout.addView(scroller);
 					}
 				}
+				else if (fieldType.equalsIgnoreCase("text"))
+				{
+					AutoCompleteTextView textField = new AutoCompleteTextView(this);
+
+					if (fieldDef.containsKey("placeholder"))
+						textField.setHint(fieldDef.getString("placeholder"));
+
+					String valuesList = prefs.getString("label_field_" + field + "_saved_values", "");
+					
+					ArrayList<String> savedValues = new ArrayList<String>();
+					
+					for (String saved : valuesList.split(";"))
+						savedValues.add(saved);
+					
+					ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, savedValues);
+					textField.setAdapter(adapter);
+					textField.setThreshold(1);
+					
+					params = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+					params.setMargins(8, 8, 8, 8);
+					textField.setLayoutParams(params);
+					
+					textField.addTextChangedListener(new TextWatcher()
+					{
+						public void afterTextChanged(Editable s) 
+						{
+							me._values.put(fieldLabel, s.toString());
+						}
+
+						public void beforeTextChanged(CharSequence s, int start, int count, int after) 
+						{
+
+						}
+
+						public void onTextChanged(CharSequence s, int start, int before, int count) 
+						{
+
+						}
+					});
+
+					labelLayout.addView(textField);
+				}
 			}
 		}
 		else
@@ -410,7 +464,31 @@ public class LabelActivity extends SherlockFragmentActivity
 	    				if (value instanceof Float)
 	    					e.putFloat("label_field_" + key, ((Float) value).floatValue());
 	    				else
+	    				{
 	    					e.putString("label_field_" + key, value.toString());
+	    					
+	    					String valuesList = prefs.getString("label_field_" + key + "_saved_values", "");
+	    					
+	    					ArrayList<String> savedValues = new ArrayList<String>();
+	    					
+	    					for (String saved : valuesList.split(";"))
+	    						savedValues.add(saved);
+	    					
+	    					savedValues.remove(value.toString());
+	    					savedValues.add(0, value.toString());
+	    					
+	    					StringBuffer sb = new StringBuffer();
+	    					
+	    					for (String savedValue : savedValues)
+	    					{
+	    						if (sb.length() > 0)
+	    							sb.append(";");
+	    						
+	    						sb.append(savedValue);
+	    					}
+	    					
+	    					e.putString("label_field_" + key + "_saved_values", sb.toString());
+	    				}
     				}
     				
         	        e.commit();
