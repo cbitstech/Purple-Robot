@@ -27,7 +27,6 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 
 import com.github.mustachejava.DefaultMustacheFactory;
