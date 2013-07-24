@@ -46,56 +46,9 @@ public class PurpleRobotApplication extends Application
 			if (value instanceof String)
 			{
 				if ("config_json_url".equals(key))
-				{
-					Uri uri = Uri.parse(value.toString());
-					
-					Builder builder = new Builder();
-					
-					builder.scheme(uri.getScheme());
-					builder.encodedAuthority(uri.getAuthority());
-
-					if (uri.getPath() != null)
-						builder.encodedPath(uri.getPath());
-					
-					if (uri.getFragment() != null)
-						builder.encodedFragment(uri.getFragment());
-					
-					String query = uri.getQuery();
-					
-					ArrayList<String> keys = new ArrayList<String>();
-
-					if (query != null)
-					{
-						String[] params = query.split("&");
-						
-						for (String param : params)
-						{
-							String[] components = param.split("=");
-							
-							keys.add(components[0]);
-						}
-					}
-					
-					for (String param : keys)
-					{
-						if ("user_id".equals(key))
-						{
-							// Don't keep existing User ID. Use value set in prefs...
-						}
-						else
-							builder.appendQueryParameter(param, uri.getQueryParameter(param));
-					}
-
-					String userId = EncryptionManager.getInstance().getUserId(PurpleRobotApplication.getAppContext());
-					
-					builder.appendQueryParameter("user_id", userId);
-
-					Uri newUri = builder.build();
-					
-					value = newUri.toString();
-				}
-
-				e.putString(key, value.toString());
+					EncryptionManager.getInstance().setConfigUri(context, Uri.parse(value.toString()));
+				else
+					e.putString(key, value.toString());
 			}
 			else if (value instanceof Boolean)
 				e.putBoolean(key, ((Boolean) value).booleanValue());

@@ -13,7 +13,6 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.CodeViewerActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -161,8 +160,6 @@ public abstract class Trigger
 		{
 			public boolean onPreferenceChange(Preference preference, Object newValue) 
 			{
-				Log.e("FC", "NEW TRIGGER VALUE: " + newValue + " (" + preference.getKey() + ")");
-				
 				return true;
 			}
 		});

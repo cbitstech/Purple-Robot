@@ -10,6 +10,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -26,6 +27,8 @@ import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.net.Uri;
+import android.net.Uri.Builder;
 import android.preference.PreferenceManager;
 import android.util.Base64;
 import edu.emory.mathcs.backport.java.util.Arrays;
@@ -34,6 +37,7 @@ import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 public class EncryptionManager 
 {
 	private static final String CRYPTO_ALGORITHM = "AES/CBC/PKCS5Padding";
+	private static final String JSON_CONFIGURATION_URL = "config_json_url";
 
 	private static final EncryptionManager _instance = new EncryptionManager();
     
@@ -346,5 +350,81 @@ public class EncryptionManager
 		}
 		
 		return false;
+	}
+
+	public void setConfigUri(Context context, Uri jsonConfigUri) 
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		Editor e = prefs.edit();
+		
+		if (jsonConfigUri != null)
+			e.putString(EncryptionManager.JSON_CONFIGURATION_URL, jsonConfigUri.toString());
+		else
+			e.remove(EncryptionManager.JSON_CONFIGURATION_URL);
+		
+		e.commit();
+	}
+	
+	public Uri getConfigUri(Context context)
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		
+		String uriString = prefs.getString(EncryptionManager.JSON_CONFIGURATION_URL, null);
+		
+		if (uriString != null)
+		{
+			Uri uri = Uri.parse(uriString);
+
+			Builder builder = new Builder();
+
+			builder.scheme(uri.getScheme());
+			builder.encodedAuthority(uri.getAuthority());
+
+			if (uri.getPath() != null)
+				builder.encodedPath(uri.getPath());
+
+			if (uri.getFragment() != null)
+				builder.encodedFragment(uri.getFragment());
+
+			String query = uri.getQuery();
+
+			ArrayList<String> keys = new ArrayList<String>();
+
+			if (query != null)
+			{
+				String[] params = query.split("&");
+
+				for (String param : params)
+				{
+					String[] components = param.split("=");
+
+					keys.add(components[0]);
+				}
+			}
+
+			for (String key : keys)
+			{
+				if ("user_id".equals(key))
+				{
+					// Save id - don't keep in URL...
+					
+					Editor e = prefs.edit();
+					e.putString("config_user_id", uri.getQueryParameter(key));
+					e.commit();
+				}
+				else
+					builder.appendQueryParameter(key, uri.getQueryParameter(key));
+			}
+			
+			builder.appendQueryParameter("user_id", this.getUserId(context));
+			
+			uri = builder.build();
+			
+			this.setConfigUri(context, uri);
+			
+			return uri;
+		}
+		
+		return null;
 	}
 }
