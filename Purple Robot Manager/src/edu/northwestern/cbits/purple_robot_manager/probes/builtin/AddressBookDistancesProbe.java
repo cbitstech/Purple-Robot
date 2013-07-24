@@ -27,7 +27,6 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.StructuredPostal;
-import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.db.DistancesProvider;
@@ -226,8 +225,6 @@ public class AddressBookDistancesProbe extends Probe
 		
 		if (this._listener != null)
 		{
-			Log.e("PR", "CLEARING LISTENER");
-			
 			locationManager.removeUpdates(this._listener);
 			this._listener = null;
 		}

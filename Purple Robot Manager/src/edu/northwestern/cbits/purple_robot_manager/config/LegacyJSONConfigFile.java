@@ -33,7 +33,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.net.Uri;
-import android.net.Uri.Builder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -54,7 +53,6 @@ public class LegacyJSONConfigFile
 	public static final String USER_HASH = "user_hash";
 	public static final String JSON_CONFIGURATION = "json_configuration_contents";
 	public static final String JSON_PROBE_SETTINGS = "probe_settings";
-	public static final String JSON_CONFIGURATION_URL = "config_json_url";
 	public static final String JSON_LAST_UPDATE = "json_configuration_last_update";
 	public static final String JSON_LAST_HASH = "json_configuration_last_update_hash";
 	public static final String FEATURES = "features";
@@ -66,79 +64,28 @@ public class LegacyJSONConfigFile
 
 	private static LegacyJSONConfigFile _sharedFile = null;
 
-	public static void updateFromOnline(final Context context, final Uri uri)
+	public static void updateFromOnline(final Context context)
 	{
 		Runnable r = new Runnable()
 		{
 			public void run()
 			{
 				Runnable next = null;
+
+				final EncryptionManager encryption = EncryptionManager.getInstance();
+				
+				Uri uri = encryption.getConfigUri(context);
 				
 				if (uri != null && uri.toString().trim().length() > 0)
 				{
-					final EncryptionManager encryption = EncryptionManager.getInstance();
-
-					Uri newUri = uri;
-					
 					try
 					{
-						String userId = encryption.getUserId(context);
-						String existingId = uri.getQueryParameter("user_id");
+						Log.e("PR", "USING CONFIG URI " + uri);
 						
-						if (existingId == null || existingId.equals(userId) == false)
-						{
-							Builder builder = new Builder();
-							
-							builder.scheme(uri.getScheme());
-							builder.encodedAuthority(uri.getAuthority());
-
-							if (uri.getPath() != null)
-								builder.encodedPath(uri.getPath());
-							
-							if (uri.getFragment() != null)
-								builder.encodedFragment(uri.getFragment());
-							
-							String query = uri.getQuery();
-							
-							ArrayList<String> keys = new ArrayList<String>();
-
-							if (query != null)
-							{
-								
-								String[] params = query.split("&");
-								
-								for (String param : params)
-								{
-									String[] components = param.split("=");
-									
-									keys.add(components[0]);
-								}
-							}
-							
-							for (String key : keys)
-							{
-								if ("user_id".equals(key))
-								{
-									// Don't keep existing User ID. Use value set in prefs...
-								}
-								else
-									builder.appendQueryParameter(key, uri.getQueryParameter(key));
-							}
-
-							builder.appendQueryParameter("user_id", userId);
-
-							newUri = builder.build();
-						}
-						
-						Log.e("PR", "USING CONFIG URI " + newUri);
-						
-						URL u = new URL(newUri.toString());
+						URL u = new URL(uri.toString());
 
 						final SharedPreferences prefs = LegacyJSONConfigFile.getPreferences(context);
 						Editor edit = prefs.edit();
-
-						edit.putString(LegacyJSONConfigFile.JSON_CONFIGURATION_URL, u.toString());
-						edit.commit();
 
 						HttpURLConnection conn = (HttpURLConnection) u.openConnection();
 						
@@ -399,11 +346,10 @@ public class LegacyJSONConfigFile
 		
 		if (prefs.getBoolean(LegacyJSONConfigFile.FIRST_RUN, true))
 		{
+			EncryptionManager.getInstance().setConfigUri(context, Uri.parse(context.getString(R.string.json_config_url)));
+
 			Editor e = prefs.edit();
-
-			e.putString(LegacyJSONConfigFile.JSON_CONFIGURATION_URL, context.getString(R.string.json_config_url));
 			e.putBoolean(LegacyJSONConfigFile.FIRST_RUN, false);
-
 			e.commit();
 		}
 
@@ -634,10 +580,7 @@ public class LegacyJSONConfigFile
 				{
 					Editor edit = prefs.edit();
 
-					String uriString = prefs.getString(LegacyJSONConfigFile.JSON_CONFIGURATION_URL, null);
-
-					if (uriString != null)
-						LegacyJSONConfigFile.updateFromOnline(context, Uri.parse(uriString));
+					LegacyJSONConfigFile.updateFromOnline(context);
 
 					edit.putLong(LegacyJSONConfigFile.JSON_LAST_UPDATE, now);
 					edit.commit();
