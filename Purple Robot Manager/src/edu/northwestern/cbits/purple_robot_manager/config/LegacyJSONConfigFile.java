@@ -74,14 +74,12 @@ public class LegacyJSONConfigFile
 
 				final EncryptionManager encryption = EncryptionManager.getInstance();
 				
-				Uri uri = encryption.getConfigUri(context);
+				Uri uri = encryption.getConfigUri(context, null);
 				
 				if (uri != null && uri.toString().trim().length() > 0)
 				{
 					try
 					{
-						Log.e("PR", "USING CONFIG URI " + uri);
-						
 						URL u = new URL(uri.toString());
 
 						final SharedPreferences prefs = LegacyJSONConfigFile.getPreferences(context);

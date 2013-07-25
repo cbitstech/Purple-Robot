@@ -365,7 +365,7 @@ public class EncryptionManager
 		e.commit();
 	}
 	
-	public Uri getConfigUri(Context context)
+	public Uri getConfigUri(Context context, String newUserId)
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		
@@ -409,7 +409,12 @@ public class EncryptionManager
 					// Save id - don't keep in URL...
 					
 					Editor e = prefs.edit();
-					e.putString("config_user_id", uri.getQueryParameter(key));
+					
+					if (newUserId == null)
+						e.putString("config_user_id", uri.getQueryParameter(key));
+					else
+						e.putString("config_user_id", newUserId);
+						
 					e.commit();
 				}
 				else
@@ -426,5 +431,16 @@ public class EncryptionManager
 		}
 		
 		return null;
+	}
+
+	public void setUserId(Context context, String userId) 
+	{
+		this.getConfigUri(context, userId);
+
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+		Editor e = prefs.edit();
+		e.putString("config_user_id", userId);
+		e.commit();
 	}
 }

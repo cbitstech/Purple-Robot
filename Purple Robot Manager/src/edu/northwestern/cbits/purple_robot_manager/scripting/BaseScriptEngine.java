@@ -548,10 +548,7 @@ public abstract class BaseScriptEngine
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
 		
-		Editor e = prefs.edit();
-		e.putString("config_user_id", userId);
-		
-		e.commit();
+		EncryptionManager.getInstance().setUserId(this._context, userId);
 		
 		this.refreshConfigUrl();
 	}
