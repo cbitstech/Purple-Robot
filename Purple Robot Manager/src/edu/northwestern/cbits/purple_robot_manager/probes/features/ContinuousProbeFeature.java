@@ -29,7 +29,7 @@ public abstract class ContinuousProbeFeature extends Feature
 		{
 			SharedPreferences prefs = Probe.getPreferences(context);
 
-			if (prefs.getBoolean("config_feature_" + this.featureKey() + "_enabled", true))
+			if (prefs.getBoolean("config_feature_" + this.featureKey() + "_enabled", false))
 			{
 				if (this._receiver == null)
 				{

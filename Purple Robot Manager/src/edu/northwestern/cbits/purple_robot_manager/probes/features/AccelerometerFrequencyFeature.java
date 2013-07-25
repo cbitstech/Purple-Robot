@@ -1,5 +1,6 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.features;
 
+import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.AccelerometerProbe;
 import android.content.Context;
 
@@ -12,7 +13,7 @@ public class AccelerometerFrequencyFeature extends XYZBasicFrequencyFeature
 
 	protected String summary(Context context) 
 	{
-		return "tODO";
+		return context.getString(R.string.summary_accelerator_frequencies_feature_desc);
 	}
 
 	public String name(Context context) 
@@ -27,6 +28,6 @@ public class AccelerometerFrequencyFeature extends XYZBasicFrequencyFeature
 
 	public String title(Context context) 
 	{
-		return "jjg Goodness";
+		return context.getString(R.string.title_accelerator_frequencies_feature);
 	}
 }

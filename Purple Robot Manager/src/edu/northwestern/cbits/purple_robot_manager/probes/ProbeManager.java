@@ -39,6 +39,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TelephonyProbe
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.VisibleSatelliteProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.WifiAccessPointsProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.AccelerometerBasicStatisticsFeature;
+import edu.northwestern.cbits.purple_robot_manager.probes.features.AccelerometerFrequencyFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.CallHistoryFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.DeviceInUseFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.GyroscopeBasicStatisticsFeature;
@@ -339,6 +340,13 @@ public class ProbeManager
 			else if (probe instanceof TemperatureProbeBasicStatisticsFeature)
 			{
 				TemperatureProbeBasicStatisticsFeature stats = (TemperatureProbeBasicStatisticsFeature) probe;
+
+				if (stats.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof AccelerometerFrequencyFeature)
+			{
+				AccelerometerFrequencyFeature stats = (AccelerometerFrequencyFeature) probe;
 
 				if (stats.name(context).equalsIgnoreCase(name))
 					found = true;

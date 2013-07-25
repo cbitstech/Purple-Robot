@@ -639,6 +639,15 @@
     <string name="summary_accelerator_statistics_feature_desc">Provides basic descriptive statistics for incoming accelerometer data.</string>
     <string name="summary_accelerator_statistics_feature" formatted="false">Std. Dev: %.2f (X), %.2f (Y), %.2f (Z)</string>
 
+    <!-- Accelerometer Frequencies Probe -->
+    <string name="title_accelerator_frequencies_feature">Accelerometer Frequencies</string>
+    <string name="summary_accelerator_frequencies_feature_desc">Provides basic frequency analyses for incoming accelerometer data.</string>
+    <string name="title_enable_interpolated_probe">Retain interpolated values</string>
+    <string name="title_enable_bandpass_probe">Retain bandpass component</string>
+    <string name="title_enable_lowpass_probe">Retain lowpass component</string>
+
+    <string name="summary_frequency_statistics_feature" formatted="false">Peak Hz: %.1f, %.1f, %.1f\nMagnitude: %.2f, %.2f, %.2f</string>
+    
     <!-- Gyroscope Statistics Probe -->
     <string name="title_gyroscope_statistics_feature">Gyroscope Statistics</string>
     <string name="summary_gyroscope_statistics_feature_desc">Provides basic descriptive statistics for incoming gyroscope data.</string>
