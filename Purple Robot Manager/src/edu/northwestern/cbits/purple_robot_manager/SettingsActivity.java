@@ -16,6 +16,7 @@ import android.preference.PreferenceScreen;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
@@ -34,6 +35,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 	protected static final String USER_HASH_KEY = "config_user_hash";
 	public static final String CHECK_UPDATES_KEY = "config_hockey_update";
 	public static final String TRIGGERS_SCREEN_KEY = "config_triggers_screen";
+	public static final String MODELS_SCREEN_KEY = "config_models_screen";
 
 	public void onCreate(Bundle savedInstanceState)
     {
@@ -76,7 +78,12 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 
         PreferenceCategory triggerCategory = (PreferenceCategory) prefs.findPreference("config_settings_trigger_category");
         triggerCategory.addPreference(triggersScreen);
-        
+
+        PreferenceScreen modelsScreen = ModelManager.getInstance(this).buildPreferenceScreen(this);
+
+        PreferenceCategory modelCategory = (PreferenceCategory) prefs.findPreference("config_settings_models_category");
+        modelCategory.addPreference(modelsScreen);
+
         Preference archive = prefs.findPreference(ZIP_ARCHIVES_KEY);
         archive.setOnPreferenceClickListener(this);
 

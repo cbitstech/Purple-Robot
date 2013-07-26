@@ -546,8 +546,6 @@ public abstract class BaseScriptEngine
 
 	public void setUserId(String userId)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
-		
 		EncryptionManager.getInstance().setUserId(this._context, userId);
 		
 		this.refreshConfigUrl();
