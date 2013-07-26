@@ -11,8 +11,9 @@
     <string name="toast_incorrect_password">Incorrect password. Please try again.</string>
 	<string name="error_js" formatted="false">Javascript Error: %s&#8230;</string>
 
-    <string name="title_preference_triggers_screen">Triggers</string>
+    <string name="title_preference_triggers_screen">Trigger Configuration</string>
     <string name="title_preference_triggers_category">Available Triggers</string>
+    <string name="title_enable_model">Enable Model</string>
     
     <string name="label_unknown_context">Unknown Context</string>
     <string name="menu_label_label">Add label</string>
@@ -27,7 +28,8 @@
 
     <string name="config_probes_category_label">Probes</string>
     <string name="config_triggers_category_label">Triggers</string>
-
+    <string name="config_models_category_label">Learned Models</string>
+    
 	<string name="type_trigger_unknown">Unknown Trigger</string>
 	<string name="type_trigger_probe">Probe Trigger</string>
 	<string name="type_trigger_datetime">Time-Based Trigger</string>
@@ -157,13 +159,21 @@
 
     <string name="title_preference_probes_screen">Probe Configuration</string>
     <string name="title_preference_probes_global_category">Application Options</string>
-
     <string name="title_preference_probes_enable_probes">Enable Probes</string>
-
-    <string name="name_anonymous_trigger">Anonymous Trigger</string>
-    
     <string name="title_preference_probes_available_category">Available Probes</string>
 
+    <string name="title_preference_models_screen">Model Configuration</string>
+    <string name="title_preference_models_global_category">Application Options</string>
+    <string name="title_preference_models_enable_models">Enable Models</string>
+    <string name="title_preference_models_available_category">Available Models</string>
+
+    <string name="summary_model_unknown">Unknown model. (Summary not yet implemented.)</string>
+
+    <string name="title_noise_model">Noise Model</string>
+    <string name="summary_noise_model_desc">Generates a random number when requested.</string>
+    
+    <string name="name_anonymous_trigger">Anonymous Trigger</string>
+    
     <string name="title_enable_probe">Enable Probe</string>
     <string name="config_notifications_category_label">Sensors &amp; Probes</string>
 

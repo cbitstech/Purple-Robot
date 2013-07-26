@@ -1,7 +1,6 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,7 +13,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.net.Uri;
-import android.net.Uri.Builder;
 import android.preference.PreferenceManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
