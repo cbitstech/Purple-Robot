@@ -1,20 +1,24 @@
 package edu.northwestern.cbits.purple_robot_manager.models;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 
+import org.apache.commons.io.FileUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.net.Uri;
+import android.preference.PreferenceManager;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
-import android.content.Context;
-import android.net.Uri;
 
 public abstract class TrainedModel extends Model 
 {
@@ -35,6 +39,35 @@ public abstract class TrainedModel extends Model
 		{
 			public void run() 
 			{
+				String hash = EncryptionManager.getInstance().createHash(context, me._source.toString());
+				
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+				File internalStorage = context.getFilesDir();
+
+				if (prefs.getBoolean("config_external_storage", false))
+					internalStorage = context.getExternalFilesDir(null);
+
+				if (internalStorage != null && !internalStorage.exists())
+					internalStorage.mkdirs();
+
+				File modelsFolder = new File(internalStorage, "persisted_models");
+
+				if (modelsFolder != null && !modelsFolder.exists())
+					modelsFolder.mkdirs();
+				
+				String contents = null;
+				File cachedModel = new File(modelsFolder, hash);
+				
+				try 
+				{
+					contents = FileUtils.readFileToString(cachedModel);
+				}
+				catch (IOException e) 
+				{
+
+				}
+				
 				try 
 				{
 					URL u = new URL(me._source.toString());
@@ -50,14 +83,7 @@ public abstract class TrainedModel extends Model
 
 			        in.close();
 			        
-			        JSONObject json = new JSONObject(sb.toString());
-			        
-			        me._name = json.getString("class");
-			        me._accuracy = json.getDouble("accuracy");
-			        
-			        me.generateModel(context, json.getString("model"));
-			        
-			        me._inited = true;
+			        contents = sb.toString();
 				} 
 				catch (MalformedURLException e) 
 				{
@@ -67,9 +93,30 @@ public abstract class TrainedModel extends Model
 				{
 					LogManager.getInstance(context).logException(e);
 				} 
-				catch (JSONException e) 
+				
+				if (contents != null)
 				{
-					LogManager.getInstance(context).logException(e);
+					try
+					{
+				        JSONObject json = new JSONObject(contents);
+				        
+				        me._name = json.getString("class");
+				        me._accuracy = json.getDouble("accuracy");
+				        
+				        me.generateModel(context, json.getString("model"));
+
+				        FileUtils.writeStringToFile(cachedModel, contents);
+
+				        me._inited = true;
+					}
+					catch (JSONException e) 
+					{
+						LogManager.getInstance(context).logException(e);
+					} 
+					catch (IOException e) 
+					{
+						LogManager.getInstance(context).logException(e);
+					}
 				}
 			}
 		};
@@ -102,7 +149,7 @@ public abstract class TrainedModel extends Model
 	{
 		if (this._inited == false)
 			return;
-		
+
 		final TrainedModel me = this;
 		
 		Runnable r = new Runnable()
@@ -110,7 +157,7 @@ public abstract class TrainedModel extends Model
 			public void run() 
 			{
 				Object value = me.evaluateModel(context, snapshot);
-				
+
 				if (value == null)
 				{
 					

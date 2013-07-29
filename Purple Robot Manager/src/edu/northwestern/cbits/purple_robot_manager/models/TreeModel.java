@@ -68,7 +68,6 @@ public class TreeModel extends TrainedModel
 	{
 		synchronized(this)
 		{
-			String nodeId = node.getId().getId();
 			String nodeLabel = node.getAttribute("label").replaceAll("_", "");
 	
 			List<Edge> testEdges = new ArrayList<Edge>();
@@ -125,10 +124,16 @@ public class TreeModel extends TrainedModel
 						{
 							double edgeQuantity = Double.parseDouble(edgeValue);
 							
-							if ("<=".equals(operation) && testValue <= edgeQuantity)
-								nextNode = edge.getTarget().getNode();
-							else if (">".equals(operation)  && testValue > edgeQuantity)
-								nextNode = edge.getTarget().getNode();
+							if ("<=".equals(operation))
+							{
+								if (testValue <= edgeQuantity)
+									nextNode = edge.getTarget().getNode();
+							}
+							else if (">".equals(operation))
+							{
+								if (testValue > edgeQuantity)
+									nextNode = edge.getTarget().getNode();
+							}
 							else
 								Log.e("PR", "UNKNOWN OP: -" + operation + "-");
 						}
@@ -142,6 +147,8 @@ public class TreeModel extends TrainedModel
 							else if (valueString.equalsIgnoreCase(edgeValue))
 								nextNode = edge.getTarget().getNode();
 						}
+						else
+							Log.e("PR", "UNKNOWN OP: -" + operation + "-");
 					}
 					
 					if (nextNode != null)
