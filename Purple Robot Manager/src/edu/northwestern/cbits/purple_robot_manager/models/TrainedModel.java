@@ -22,7 +22,7 @@ public abstract class TrainedModel extends Model
 	protected String _sourceHash = null;
 	protected boolean _inited = false;
 	protected String _name = null;
-	protected double _accuracy = Double.MIN_VALUE;
+	protected double _accuracy = 0.0;
 	
 	public TrainedModel(final Context context, Uri uri) 
 	{
@@ -55,7 +55,7 @@ public abstract class TrainedModel extends Model
 			        me._name = json.getString("class");
 			        me._accuracy = json.getDouble("accuracy");
 			        
-			        me.generateModel(json.getString("model"));
+			        me.generateModel(context, json.getString("model"));
 			        
 			        me._inited = true;
 				} 
@@ -88,8 +88,6 @@ public abstract class TrainedModel extends Model
 		return context.getString(R.string.summary_model_unknown);
 	}
 
-	protected abstract void generateModel(String modelString); 
-
 	public String getPreferenceKey() 
 	{
 		return this._sourceHash;
@@ -111,9 +109,13 @@ public abstract class TrainedModel extends Model
 		{
 			public void run() 
 			{
-				Object value = me.evaluateModel(snapshot);
+				Object value = me.evaluateModel(context, snapshot);
 				
-				if (value instanceof Double)
+				if (value == null)
+				{
+					
+				}
+				else if (value instanceof Double)
 				{
 					Double doubleValue = (Double) value;
 
@@ -126,8 +128,8 @@ public abstract class TrainedModel extends Model
 		
 		Thread t = new Thread(r);
 		t.start();
-
 	}
 
-	protected abstract Object evaluateModel(HashMap<String, Object> snapshot);
+	protected abstract void generateModel(Context context, String modelString); 
+	protected abstract Object evaluateModel(Context context, HashMap<String, Object> snapshot);
 }
