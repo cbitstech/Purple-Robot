@@ -39,8 +39,7 @@ public class ModelManager extends BroadcastReceiver
 		LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(context);
 		localManager.registerReceiver(this, intentFilter);
 
-//        this._models.add(new NoiseModel());
-		this._models.add(new TreeModel(context, Uri.parse("http://dashboard.cbits.northwestern.edu/media/brain/stats/1568_f0210f21-7204-4109-8706-835e09d0d641")));
+		this._models.add(new TreeModel(context, Uri.parse("http://dashboard.cbits.northwestern.edu/media/brain/stats/1644_8e437c44-bc46-4fbd-929a-0c66ed528d6f")));
     }
 
 	public static ModelManager getInstance(Context context) 
