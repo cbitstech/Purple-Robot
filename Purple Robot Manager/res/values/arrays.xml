@@ -9,8 +9,6 @@
     </array>
 
    	<array name="probe_classes">
-        <!-- <item>features.AccelerometerFrequencyFeature</item> -->
-
         <item>builtin.AccelerometerProbe</item>
         <item>builtin.AddressBookDistancesProbe</item>
         <item>builtin.BatteryProbe</item>
@@ -48,6 +46,9 @@
         <item>features.TemperatureProbeBasicStatisticsFeature</item>
                 
         <item>builtin.RandomNoiseProbe</item>
+
+        <item>features.AccelerometerFrequencyFeature</item>
+        
         <item>LabelProbe</item>
         
         <!-- <item>builtin.BluetoothReceiverProbe</item> -->
@@ -87,6 +88,22 @@
        	<item>2 minutes</item>
     </string-array>
 
+	<string-array name="frequency_probe_duration_values">
+        <item>0</item>
+        <item>5</item>
+        <item>15</item>
+        <item>60</item>
+        <item>120</item>
+   	</string-array>
+
+	<string-array name="frequency_probe_duration_labels">
+        <item>Continuous</item>
+        <item>5 seconds</item>
+        <item>15 seconds</item>
+        <item>1 minute</item>
+       	<item>2 minutes</item>
+    </string-array>
+	
 	<string-array name="probe_period_values">
         <item>5</item>
         <item>10</item>

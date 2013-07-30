@@ -49,8 +49,9 @@ import com.actionbarsherlock.view.MenuItem;
 import edu.northwestern.cbits.purple_robot_manager.activities.DiagnosticActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.LabelActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
-import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
+import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
@@ -117,6 +118,7 @@ public class StartActivity extends SherlockActivity
 		super.onCreate(savedInstanceState);
 
 		LogManager.getInstance(this);
+		ModelManager.getInstance(this);
 		
 		SharedPreferences sharedPrefs = this.getPreferences(this);
 
@@ -267,6 +269,11 @@ public class StartActivity extends SherlockActivity
         		}
         		else if (value.containsKey(Feature.FEATURE_VALUE))
         			formattedValue = value.get(Feature.FEATURE_VALUE).toString();
+        		else if (value.containsKey("PREDICTION") && value.containsKey("MODEL_NAME"))
+        		{
+        			formattedValue = value.get("PREDICTION").toString();
+        			displayName = value.getString("MODEL_NAME");
+        		}
         		
 
         		nameField.setText(displayName + " (" + sdf.format(sensorDate) + ")");
@@ -370,7 +377,9 @@ public class StartActivity extends SherlockActivity
 			jsonConfigUri = b.build();
 		}
 
-		LegacyJSONConfigFile.updateFromOnline(this, jsonConfigUri);
+		EncryptionManager.getInstance().setConfigUri(this, jsonConfigUri);
+
+		LegacyJSONConfigFile.updateFromOnline(this);
 	}
 
 	protected void onResume()
