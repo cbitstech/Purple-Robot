@@ -431,12 +431,12 @@ public class HttpUploadPlugin extends OutputPlugin
 								String jsonString = json.toString();
 
 								int jsonSize = jsonString.toString().getBytes("UTF-8").length;
-
+								
 								if (i > 0 && jsonSize > maxUploadSize)
 								{
 									// Skip until connection is better...
 								}
-								else if (jsonSize + tally < maxUploadSize)
+								else if (i == 0 || jsonSize + tally < maxUploadSize)
 								{
 									tally += jsonSize;
 
@@ -493,7 +493,6 @@ public class HttpUploadPlugin extends OutputPlugin
 								
 								throw new Exception(me.getContext().getString(R.string.error_empty_payload));
 							}
-							
 							
 							JSONObject jsonMessage = new JSONObject();
 

@@ -7,6 +7,9 @@
         android:key="config_settings_trigger_category"
         android:title="@string/config_triggers_category_label" />
     <PreferenceCategory
+        android:key="config_settings_models_category"
+        android:title="@string/config_models_category_label" />
+    <PreferenceCategory
         android:title="@string/config_notifications_category">
         <!-- <RingtonePreference
             android:title="@string/config_notification_sound_label"
