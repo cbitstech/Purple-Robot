@@ -25,7 +25,7 @@ public abstract class Model
 	public abstract String getPreferenceKey();
 	public abstract String title(Context context);
 	public abstract String summary(Context context);
-	
+
 	public void enable(Context context)
 	{
 		String key = this.getPreferenceKey();
@@ -50,6 +50,7 @@ public abstract class Model
 		e.commit();
 	}
 
+	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{
 		PreferenceManager manager = activity.getPreferenceManager();
@@ -92,7 +93,7 @@ public abstract class Model
 		return Model._lastEnabled;
 	}
 	
-	protected void transmitPrediction(Context context, double prediction) 
+	protected void transmitPrediction(Context context, double prediction, double accuracy) 
 	{
 		Bundle bundle = new Bundle();
 		bundle.putString("PROBE", this.name(context));
@@ -103,13 +104,14 @@ public abstract class Model
 		this.transmitData(context, bundle);
 	}
 
-	protected void transmitPrediction(Context context, String prediction) 
+	protected void transmitPrediction(Context context, String prediction, double accuracy) 
 	{
 		Bundle bundle = new Bundle();
 		bundle.putString("PROBE", this.name(context));
 		bundle.putDouble("TIMESTAMP", ((double) System.currentTimeMillis()) / 1000);
 		bundle.putString("PREDICTION", prediction);
 		bundle.putBoolean("FROM_MODEL", true);
+		bundle.putDouble("ACCURACY", accuracy);
 
 		this.transmitData(context, bundle);
 	}

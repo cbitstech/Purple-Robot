@@ -17,6 +17,7 @@ public class DiskSpaceCheck extends SanityCheck
 		return context.getString(R.string.name_sanity_disk_space);
 	}
 
+	@SuppressWarnings("deprecation")
 	public void runCheck(Context context) 
 	{
 		File cache = context.getCacheDir();

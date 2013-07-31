@@ -109,6 +109,7 @@ public abstract class Trigger
 		// Default implementation does nothing...
 	}
 
+	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(final PreferenceActivity activity) 
 	{
 		PreferenceManager manager = activity.getPreferenceManager();
