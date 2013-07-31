@@ -158,6 +158,7 @@ public class LabelActivity extends SherlockFragmentActivity
 		this.setIntent(intent);
 	}
 
+	@SuppressWarnings("deprecation")
 	protected void onResume()
 	{
 		super.onResume();

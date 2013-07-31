@@ -26,8 +26,9 @@ public abstract class TrainedModel extends Model
 	protected String _sourceHash = null;
 	protected boolean _inited = false;
 	protected String _name = null;
+
 	protected double _accuracy = 0.0;
-	
+
 	public TrainedModel(final Context context, Uri uri) 
 	{
 		this._source = uri;
@@ -166,10 +167,10 @@ public abstract class TrainedModel extends Model
 				{
 					Double doubleValue = (Double) value;
 
-					me.transmitPrediction(context, doubleValue.doubleValue());
+					me.transmitPrediction(context, doubleValue.doubleValue(), me._accuracy);
 				}
 				else
-					me.transmitPrediction(context, value.toString());
+					me.transmitPrediction(context, value.toString(), me._accuracy);
 			}
 		};
 		

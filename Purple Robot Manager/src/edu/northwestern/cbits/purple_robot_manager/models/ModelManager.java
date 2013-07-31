@@ -52,6 +52,7 @@ public class ModelManager extends BroadcastReceiver
     	return ModelManager._instance;
     }
 
+	@SuppressWarnings("deprecation")
 	public PreferenceScreen buildPreferenceScreen(PreferenceActivity settingsActivity) 
 	{
 		PreferenceManager manager = settingsActivity.getPreferenceManager();
@@ -135,5 +136,16 @@ public class ModelManager extends BroadcastReceiver
 
 			model.predict(context, snapshot);
 		}
+	}
+
+	public Model fetchModel(Context context, String name) 
+	{
+		for (Model model : this._models)
+		{
+			if (name.equals(model.name(context)))
+				return model;
+		}
+
+		return null;
 	}
 }

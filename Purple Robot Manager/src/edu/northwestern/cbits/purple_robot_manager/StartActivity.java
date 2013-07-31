@@ -51,6 +51,7 @@ import edu.northwestern.cbits.purple_robot_manager.activities.LabelActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
+import edu.northwestern.cbits.purple_robot_manager.models.Model;
 import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -211,7 +212,7 @@ public class StartActivity extends SherlockActivity
         		final String sensorName = StartActivity._probeNames.get(position);
 
         		final Probe probe = ProbeManager.probeForName(sensorName, me);
-
+        		
         		final Bundle value = StartActivity._probeValues.get(sensorName);
         		Date sensorDate = StartActivity._probeDates.get(sensorName);
 
@@ -222,23 +223,37 @@ public class StartActivity extends SherlockActivity
 						Intent intent = null;
 
 						if (probe != null)
+						{
 							intent = probe.viewIntent(me);
 
-						if (intent == null)
-						{
-							Intent dataIntent = new Intent(me, ProbeViewerActivity.class);
-
-							dataIntent.putExtra("probe_name", sensorName);
-							dataIntent.putExtra("probe_bundle", value);
-
-							me.startActivity(dataIntent);
+							if (intent == null)
+							{
+								Intent dataIntent = new Intent(me, ProbeViewerActivity.class);
+	
+								dataIntent.putExtra("probe_name", sensorName);
+								dataIntent.putExtra("probe_bundle", value);
+	
+								me.startActivity(dataIntent);
+							}
+							else
+							{
+								intent.putExtra("probe_name", sensorName);
+								intent.putExtra("probe_bundle", value);
+	
+								me.startActivity(intent);
+							}
 						}
 						else
 						{
-							intent.putExtra("probe_name", sensorName);
-							intent.putExtra("probe_bundle", value);
+							Model model = ModelManager.getInstance(me).fetchModel(me, sensorName);
 
-							me.startActivity(intent);
+							Intent dataIntent = new Intent(me, ProbeViewerActivity.class);
+
+							dataIntent.putExtra("probe_name", model.title(me));
+							dataIntent.putExtra("probe_bundle", value);
+							dataIntent.putExtra("is_model", true);
+
+							me.startActivity(dataIntent);
 						}
 					}
     			});
@@ -274,7 +289,6 @@ public class StartActivity extends SherlockActivity
         			formattedValue = value.get("PREDICTION").toString();
         			displayName = value.getString("MODEL_NAME");
         		}
-        		
 
         		nameField.setText(displayName + " (" + sdf.format(sensorDate) + ")");
         		valueField.setText(formattedValue);

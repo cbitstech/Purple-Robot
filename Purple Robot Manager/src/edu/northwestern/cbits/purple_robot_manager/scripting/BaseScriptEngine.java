@@ -798,6 +798,7 @@ public abstract class BaseScriptEngine
 		return false;
 	}
 
+	@SuppressWarnings("deprecation")
 	protected boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen, Map<String,Object> launchParams, final String script)
 	{
 		try

@@ -34,7 +34,7 @@ public class NoiseModel extends Model
 			public void run() 
 			{
 				SecureRandom random = new SecureRandom();
-				me.transmitPrediction(context, random.nextDouble());
+				me.transmitPrediction(context, random.nextDouble(), random.nextDouble());
 			}
 		};
 		
