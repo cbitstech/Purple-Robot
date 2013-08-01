@@ -49,7 +49,7 @@ public abstract class Probe
 	public static SharedPreferences getPreferences(Context context)
 	{
 		if (Probe._preferences == null)
-			Probe._preferences = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+			Probe._preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		
 		return Probe._preferences;
 	}

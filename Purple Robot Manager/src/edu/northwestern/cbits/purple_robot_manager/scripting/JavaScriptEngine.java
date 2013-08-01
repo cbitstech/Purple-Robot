@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.config.JSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.Feature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.JavascriptFeature;
 
@@ -334,5 +335,12 @@ public class JavaScriptEngine extends BaseScriptEngine
 			return JavaScriptEngine.mapToNative(this._jsContext, this._scope, trigger);
 		
 		return null;
+	}
+	
+	public NativeObject models()
+	{
+		Map<String, Object> modelMap = ModelManager.getInstance(this._context).models(this._context);
+
+		return JavaScriptEngine.mapToNative(this._jsContext, this._scope, modelMap);
 	}
 }
