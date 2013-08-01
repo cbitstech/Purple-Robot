@@ -49,6 +49,7 @@ import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.LabelActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
@@ -1141,4 +1142,24 @@ public abstract class BaseScriptEngine
 		
 		this._context.startActivity(labelIntent);
 	}		
+	
+	public void addModel(String jsonUrl)
+	{
+		ModelManager.getInstance(this._context).addModel(jsonUrl);
+	}
+	
+	public void deleteModel(String jsonUrl)
+	{
+		ModelManager.getInstance(this._context).deleteModel(jsonUrl);
+	}
+
+	public void enableModel(String jsonUrl)
+	{
+		ModelManager.getInstance(this._context).enableModel(jsonUrl);
+	}
+
+	public void disableModel(String jsonUrl)
+	{
+		ModelManager.getInstance(this._context).disableModel(jsonUrl);
+	}
 }
