@@ -19,33 +19,36 @@ public abstract class XYZContinuousProbeFeature extends ContinuousProbeFeature
 	
 	protected void processData(Context context, Bundle dataBundle) 
 	{
-		if (dataBundle.containsKey("EVENT_TIMESTAMP") &&
-			dataBundle.containsKey("X") &&
-			dataBundle.containsKey("Y") &&
-			dataBundle.containsKey("Z"))
+		if (this.isEnabled(context))
 		{
-			double[] incomingTimes = dataBundle.getDoubleArray("EVENT_TIMESTAMP");
-			float[] incomingX = dataBundle.getFloatArray("X");
-			float[] incomingY = dataBundle.getFloatArray("Y");
-			float[] incomingZ = dataBundle.getFloatArray("Z");
-			
-			for (int i = 0; i < incomingTimes.length; i++)
+			if (dataBundle.containsKey("EVENT_TIMESTAMP") &&
+				dataBundle.containsKey("X") &&
+				dataBundle.containsKey("Y") &&
+				dataBundle.containsKey("Z"))
 			{
-				if (index + i > BUFFER_SIZE)
-					this._filled = true;
+				double[] incomingTimes = dataBundle.getDoubleArray("EVENT_TIMESTAMP");
+				float[] incomingX = dataBundle.getFloatArray("X");
+				float[] incomingY = dataBundle.getFloatArray("Y");
+				float[] incomingZ = dataBundle.getFloatArray("Z");
 				
-				int bufferIndex = (index + i) % BUFFER_SIZE;
+				for (int i = 0; i < incomingTimes.length; i++)
+				{
+					if (index + i > BUFFER_SIZE)
+						this._filled = true;
+					
+					int bufferIndex = (index + i) % BUFFER_SIZE;
+		
+					timestamp[bufferIndex] = incomingTimes[i];
+					x[bufferIndex] = incomingX[i];
+					y[bufferIndex] = incomingY[i];
+					z[bufferIndex] = incomingZ[i];
+				}
+				
+				index += incomingTimes.length;
 	
-				timestamp[bufferIndex] = incomingTimes[i];
-				x[bufferIndex] = incomingX[i];
-				y[bufferIndex] = incomingY[i];
-				z[bufferIndex] = incomingZ[i];
+				if (this._filled)
+					this.analyzeBuffers(context);
 			}
-			
-			index += incomingTimes.length;
-
-			if (this._filled)
-				this.analyzeBuffers(context);
 		}
 	}
 }

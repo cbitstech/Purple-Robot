@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.util.Slugify;
 
 public class RegressionModel extends TrainedModel 
@@ -139,6 +140,8 @@ public class RegressionModel extends TrainedModel
 				requiredKeys.remove(key);
 			}
 		}
+		
+		Log.e("PR", "REQD KEYS: " + requiredKeys);
 		
 		return Double.valueOf(prediction);
 	}

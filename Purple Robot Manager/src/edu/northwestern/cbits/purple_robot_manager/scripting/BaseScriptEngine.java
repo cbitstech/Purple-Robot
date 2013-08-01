@@ -740,10 +740,13 @@ public abstract class BaseScriptEngine
 
 	protected boolean updateTrigger(String triggerId, Map<String, Object> params)
 	{
+		Log.e("PR", "1");
 		boolean found = false;
 		
 		params.put("identifier", triggerId);
-		
+
+		Log.e("PR", "2");
+
 		for (Trigger trigger : TriggerManager.getInstance(this._context).triggersForId(triggerId))
 		{
 			trigger.updateFromMap(this._context, params);
@@ -751,15 +754,21 @@ public abstract class BaseScriptEngine
 			found = true;
 		}
 
+		Log.e("PR", "3");
+
 		if (found == false)
 		{
 			Trigger t = Trigger.parse(this._context, params);
+
+			Log.e("PR", "3.5 " + t);
 
 			TriggerManager.getInstance(this._context).addTrigger(this._context, t);
 
 			found = true;
 		}
 
+		Log.e("PR", "4 " + found);
+		
 		return found;
 	}
 
