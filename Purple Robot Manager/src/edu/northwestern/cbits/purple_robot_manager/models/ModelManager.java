@@ -109,9 +109,6 @@ public class ModelManager extends BroadcastReceiver
 	public void onReceive(Context context, Intent intent) 
 	{
 		Bundle extras = intent.getExtras();
-		
-		if (extras.containsKey("FROM_MODEL"))
-			return;
 
 		String[] nameComponents = extras.getString("PROBE").split("\\.");
 		
@@ -132,6 +129,9 @@ public class ModelManager extends BroadcastReceiver
 				this._milieu.put(slug, extras.get(key));
 			}
 		}
+
+		if (extras.containsKey("FROM_MODEL"))
+			return;
 
 		for (Model model : this.allModels(context))
 		{
@@ -225,5 +225,10 @@ public class ModelManager extends BroadcastReceiver
 		}
 		
 		return modelMap;
+	}
+
+	public Map<String, Object> readings(Context context)
+	{
+		return this._milieu;
 	}
 }

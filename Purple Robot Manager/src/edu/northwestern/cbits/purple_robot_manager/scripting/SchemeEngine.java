@@ -119,7 +119,7 @@ public class SchemeEngine extends BaseScriptEngine
 		Map<String, Object> paramsMap = SchemeEngine.parsePairList(parameters);
 		paramsMap.put("identifier", triggerId);
 		
-		return this.updateTrigger(triggerId, paramsMap);
+		return super.updateTrigger(triggerId, paramsMap);
 	}
 
 	public boolean updateTrigger(Pair parameters)

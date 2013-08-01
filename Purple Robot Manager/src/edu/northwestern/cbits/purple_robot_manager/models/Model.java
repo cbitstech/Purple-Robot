@@ -208,7 +208,7 @@ public abstract class Model
 	protected void transmitPrediction(Context context, double prediction, double accuracy) 
 	{
 		Bundle bundle = new Bundle();
-		bundle.putString("PROBE", this.name(context));
+		bundle.putString("PROBE", this.title(context));
 		bundle.putDouble("TIMESTAMP", ((double) System.currentTimeMillis()) / 1000);
 		bundle.putDouble("PREDICTION", prediction);
 		bundle.putBoolean("FROM_MODEL", true);
@@ -219,7 +219,7 @@ public abstract class Model
 	protected void transmitPrediction(Context context, String prediction, double accuracy) 
 	{
 		Bundle bundle = new Bundle();
-		bundle.putString("PROBE", this.name(context));
+		bundle.putString("PROBE", this.title(context));
 		bundle.putDouble("TIMESTAMP", ((double) System.currentTimeMillis()) / 1000);
 		bundle.putString("PREDICTION", prediction);
 		bundle.putBoolean("FROM_MODEL", true);
