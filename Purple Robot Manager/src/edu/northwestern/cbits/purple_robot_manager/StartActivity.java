@@ -26,6 +26,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Editable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -195,6 +196,15 @@ public class StartActivity extends SherlockActivity
     			});
     		}
     	};
+    	
+    	LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(me);
+
+    	IntentFilter filter = new IntentFilter();
+
+    	filter.addAction(StartActivity.UPDATE_DISPLAY);
+    	filter.addAction(StartActivity.UPDATE_MESSAGE);
+
+    	broadcastManager.registerReceiver(this._receiver, filter);
 
         final SimpleDateFormat sdf = new SimpleDateFormat("MMM d, H:mm:ss");
 
@@ -245,7 +255,7 @@ public class StartActivity extends SherlockActivity
 						}
 						else
 						{
-							Model model = ModelManager.getInstance(me).fetchModel(me, sensorName);
+							Model model = ModelManager.getInstance(me).fetchModelByName(me, sensorName);
 
 							Intent dataIntent = new Intent(me, ProbeViewerActivity.class);
 
@@ -298,15 +308,6 @@ public class StartActivity extends SherlockActivity
         };
 
         listView.setAdapter(adapter);
-
-    	LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(me);
-
-    	IntentFilter filter = new IntentFilter();
-
-    	filter.addAction(StartActivity.UPDATE_DISPLAY);
-    	filter.addAction(StartActivity.UPDATE_MESSAGE);
-
-    	broadcastManager.registerReceiver(this._receiver, filter);
     	
     	LegacyJSONConfigFile.getSharedFile(this.getApplicationContext());
     }
