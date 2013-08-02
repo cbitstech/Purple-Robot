@@ -78,7 +78,7 @@ public class WifiAccessPointsProbe extends Probe
 	{
 		if (super.isEnabled(context) == false)
 		{
-			if (this._receiver == null)
+			if (this._receiver != null)
 			{
 				context.unregisterReceiver(this._receiver);
 				this._receiver = null;
@@ -302,6 +302,7 @@ public class WifiAccessPointsProbe extends Probe
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{
 		PreferenceManager manager = activity.getPreferenceManager();

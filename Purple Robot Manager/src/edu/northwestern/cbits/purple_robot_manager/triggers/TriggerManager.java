@@ -188,6 +188,7 @@ public class TriggerManager
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	public PreferenceScreen buildPreferenceScreen(PreferenceActivity settingsActivity)
 	{
 		PreferenceManager manager = settingsActivity.getPreferenceManager();

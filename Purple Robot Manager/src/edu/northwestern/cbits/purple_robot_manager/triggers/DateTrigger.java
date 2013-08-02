@@ -397,6 +397,7 @@ public class DateTrigger extends Trigger
 		return false;
 	}
 	
+	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity) 
 	{
 		PreferenceScreen screen = super.preferenceScreen(activity);

@@ -15,6 +15,7 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.NativeArray;
+import org.mozilla.javascript.NativeJSON;
 import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
@@ -24,6 +25,7 @@ import android.os.Bundle;
 import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.config.JSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.Feature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.JavascriptFeature;
 
@@ -42,6 +44,7 @@ public class JavaScriptEngine extends BaseScriptEngine
 		return this.runScript(script, null, null);
 	}
 
+	@SuppressWarnings("unchecked")
 	public Object runScript(String script, String extrasName, Object extras) throws EvaluatorException, EcmaError
 	{
 		this._jsContext = Context.enter();
@@ -49,16 +52,18 @@ public class JavaScriptEngine extends BaseScriptEngine
 
 		this._scope = _jsContext.initStandardObjects();
 
-		/* if (extras instanceof JSONObject)
-		{
-			JSONObject json = (JSONObject) extras;
-
-			extras = new JsonParser().parse(json.toString());
-		} */
-
 		Object thisWrapper = Context.javaToJS(this, this._scope);
 		ScriptableObject.putProperty(this._scope, "PurpleRobot", thisWrapper);
+		
+		if (extras instanceof Map<?, ?>)
+		{
+			extras = JavaScriptEngine.mapToNative(this._jsContext, this._scope, (Map<String, Object>) extras);
+			
+			extras = NativeJSON.stringify(this._jsContext, this._scope, extras, null, null);
+		}
 
+		Log.e("PR", "JS EXTRAS: " + extras);
+		
 		if (extras != null && extrasName != null)
 			script = "var " + extrasName + " = " + extras.toString() + "; " + script;
 
@@ -334,5 +339,19 @@ public class JavaScriptEngine extends BaseScriptEngine
 			return JavaScriptEngine.mapToNative(this._jsContext, this._scope, trigger);
 		
 		return null;
+	}
+	
+	public NativeObject models()
+	{
+		Map<String, Object> modelMap = ModelManager.getInstance(this._context).models(this._context);
+
+		return JavaScriptEngine.mapToNative(this._jsContext, this._scope, modelMap);
+	}
+
+	public NativeObject readings()
+	{
+		Map<String, Object> readings = ModelManager.getInstance(this._context).readings(this._context);
+
+		return JavaScriptEngine.mapToNative(this._jsContext, this._scope, readings);
 	}
 }

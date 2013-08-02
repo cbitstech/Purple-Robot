@@ -13,7 +13,7 @@ public class AccelerometerBasicStatisticsFeature extends XYZBasicStatisticsFeatu
 
 	protected String summary(Context context) 
 	{
-		return context.getString(R.string.title_accelerator_frequencies_feature);
+		return context.getString(R.string.summary_accelerator_statistics_feature_desc);
 	}
 
 	public String name(Context context) 

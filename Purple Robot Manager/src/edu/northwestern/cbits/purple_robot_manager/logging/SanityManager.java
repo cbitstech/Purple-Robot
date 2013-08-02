@@ -48,7 +48,7 @@ public class SanityManager
 		return SanityManager._sharedInstance;
 	}
 	
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "deprecation" })
 	public void refreshState() 
 	{
 		this._errors.clear();

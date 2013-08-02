@@ -15,10 +15,10 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.preference.PreferenceManager;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public abstract class TrainedModel extends Model 
 {
@@ -26,8 +26,14 @@ public abstract class TrainedModel extends Model
 	protected String _sourceHash = null;
 	protected boolean _inited = false;
 	protected String _name = null;
+
 	protected double _accuracy = 0.0;
-	
+
+	public Uri uri() 
+	{
+		return this._source;
+	}
+
 	public TrainedModel(final Context context, Uri uri) 
 	{
 		this._source = uri;
@@ -41,7 +47,7 @@ public abstract class TrainedModel extends Model
 			{
 				String hash = EncryptionManager.getInstance().createHash(context, me._source.toString());
 				
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				SharedPreferences prefs = Probe.getPreferences(context);
 
 				File internalStorage = context.getFilesDir();
 
@@ -147,7 +153,7 @@ public abstract class TrainedModel extends Model
 	
 	public void predict(final Context context, final HashMap<String, Object> snapshot) 
 	{
-		if (this._inited == false)
+		if (this._inited == false || this.enabled(context) == false)
 			return;
 
 		final TrainedModel me = this;
@@ -166,10 +172,10 @@ public abstract class TrainedModel extends Model
 				{
 					Double doubleValue = (Double) value;
 
-					me.transmitPrediction(context, doubleValue.doubleValue());
+					me.transmitPrediction(context, doubleValue.doubleValue(), me._accuracy);
 				}
 				else
-					me.transmitPrediction(context, value.toString());
+					me.transmitPrediction(context, value.toString(), me._accuracy);
 			}
 		};
 		
