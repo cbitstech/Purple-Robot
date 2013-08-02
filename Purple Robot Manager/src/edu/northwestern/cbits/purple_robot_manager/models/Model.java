@@ -245,5 +245,5 @@ public abstract class Model
 	}
 
 	public abstract void predict(Context context, HashMap<String, Object> snapshot);
-	protected abstract String name(Context context);
+	public abstract String name(Context context);
 }

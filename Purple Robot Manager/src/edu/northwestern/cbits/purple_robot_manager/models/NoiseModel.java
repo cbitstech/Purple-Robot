@@ -42,7 +42,7 @@ public class NoiseModel extends Model
 		t.start();
 	}
 
-	protected String name(Context context) 
+	public String name(Context context) 
 	{
 		return "edu.northwestern.cbits.purple_robot_manager.models.NoiseModel";
 	}

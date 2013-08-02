@@ -141,8 +141,6 @@ public class RegressionModel extends TrainedModel
 			}
 		}
 		
-		Log.e("PR", "REQD KEYS: " + requiredKeys);
-		
 		return Double.valueOf(prediction);
 	}
 }
