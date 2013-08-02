@@ -27,11 +27,6 @@ public class TriggerOutputPlugin extends OutputPlugin
 	{
 		Context context = this.getContext();
 
-		LegacyJSONConfigFile jsonConfig = LegacyJSONConfigFile.getSharedFile(context);
-
-		if (jsonConfig == null)
-			return;
-
 		synchronized(this)
 		{
 			List<Trigger> triggers = new ArrayList<Trigger>();
@@ -45,7 +40,7 @@ public class TriggerOutputPlugin extends OutputPlugin
 	
 					try
 					{
-						if (probeTrigger.matches(context, OutputPlugin.jsonForBundle(intent.getExtras())))
+						if (probeTrigger.matchesProbe(intent.getExtras().getString("PROBE")) &&  probeTrigger.matches(context, OutputPlugin.jsonForBundle(intent.getExtras())))
 							trigger.execute(context, false);
 					}
 					catch (JSONException e)

@@ -39,6 +39,7 @@ public class JsonScriptRequestHandler implements HttpRequestHandler
 		this._context = context;
 	}
 
+	@SuppressWarnings("deprecation")
 	public void handle(HttpRequest request, HttpResponse response, HttpContext argument) throws HttpException, IOException 
 	{
     	response.setStatusCode(HttpStatus.SC_OK);

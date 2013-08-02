@@ -1,19 +1,32 @@
 package edu.northwestern.cbits.purple_robot_manager.models;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.UUID;
+
+import org.apache.commons.io.FileUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
+import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public abstract class Model 
@@ -25,7 +38,92 @@ public abstract class Model
 	public abstract String getPreferenceKey();
 	public abstract String title(Context context);
 	public abstract String summary(Context context);
-	
+
+	public static Model modelForUrl(Context context, String jsonUrl) 
+	{
+		String hash = EncryptionManager.getInstance().createHash(context, jsonUrl);
+		
+		SharedPreferences prefs = Probe.getPreferences(context);
+
+		File internalStorage = context.getFilesDir();
+
+		if (prefs.getBoolean("config_external_storage", false))
+			internalStorage = context.getExternalFilesDir(null);
+
+		if (internalStorage != null && !internalStorage.exists())
+			internalStorage.mkdirs();
+
+		File modelsFolder = new File(internalStorage, "persisted_models");
+
+		if (modelsFolder != null && !modelsFolder.exists())
+			modelsFolder.mkdirs();
+		
+		String contents = null;
+		File cachedModel = new File(modelsFolder, hash);
+		
+		try 
+		{
+			contents = FileUtils.readFileToString(cachedModel);
+		}
+		catch (IOException e) 
+		{
+
+		}
+		
+		try 
+		{
+			URL u = new URL(jsonUrl);
+
+	        BufferedReader in = new BufferedReader(new InputStreamReader(u.openStream()));
+	        
+	        StringBuffer sb = new StringBuffer();
+	        
+	        String inputLine = null;
+	        
+	        while ((inputLine = in.readLine()) != null)
+	        	sb.append(inputLine);
+
+	        in.close();
+	        
+	        contents = sb.toString();
+		} 
+		catch (MalformedURLException e) 
+		{
+			LogManager.getInstance(context).logException(e);
+		} 
+		catch (IOException e) 
+		{
+			LogManager.getInstance(context).logException(e);
+		} 
+		
+		if (contents != null)
+		{
+			try
+			{
+		        JSONObject json = new JSONObject(contents);
+		        
+		        String type = json.getString("model_type");
+		        
+		        if ("regression".equals(type))
+		        	return new RegressionModel(context, Uri.parse(jsonUrl));
+		        if ("decision-tree".equals(type))
+		        	return new TreeModel(context, Uri.parse(jsonUrl));
+		        
+			}
+			catch (JSONException e) 
+			{
+				LogManager.getInstance(context).logException(e);
+			} 
+		}
+		
+		return null;
+	}
+
+	public Uri uri() 
+	{
+		return null;
+	}
+
 	public void enable(Context context)
 	{
 		String key = this.getPreferenceKey();
@@ -49,7 +147,22 @@ public abstract class Model
 		
 		e.commit();
 	}
+	
+	public boolean enabled(Context context) 
+	{
+		if (ModelManager.getInstance(context).enabled(context))
+		{
+			String key = this.getPreferenceKey();
+	
+			SharedPreferences prefs = Probe.getPreferences(context);
+			
+			return prefs.getBoolean("config_model_" + key + "_enabled", Model.DEFAULT_ENABLED);
+		}
+		
+		return false;
+	}
 
+	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{
 		PreferenceManager manager = activity.getPreferenceManager();
@@ -92,10 +205,10 @@ public abstract class Model
 		return Model._lastEnabled;
 	}
 	
-	protected void transmitPrediction(Context context, double prediction) 
+	protected void transmitPrediction(Context context, double prediction, double accuracy) 
 	{
 		Bundle bundle = new Bundle();
-		bundle.putString("PROBE", this.name(context));
+		bundle.putString("PROBE", this.title(context));
 		bundle.putDouble("TIMESTAMP", ((double) System.currentTimeMillis()) / 1000);
 		bundle.putDouble("PREDICTION", prediction);
 		bundle.putBoolean("FROM_MODEL", true);
@@ -103,13 +216,14 @@ public abstract class Model
 		this.transmitData(context, bundle);
 	}
 
-	protected void transmitPrediction(Context context, String prediction) 
+	protected void transmitPrediction(Context context, String prediction, double accuracy) 
 	{
 		Bundle bundle = new Bundle();
-		bundle.putString("PROBE", this.name(context));
+		bundle.putString("PROBE", this.title(context));
 		bundle.putDouble("TIMESTAMP", ((double) System.currentTimeMillis()) / 1000);
 		bundle.putString("PREDICTION", prediction);
 		bundle.putBoolean("FROM_MODEL", true);
+		bundle.putDouble("ACCURACY", accuracy);
 
 		this.transmitData(context, bundle);
 	}

@@ -22,6 +22,7 @@ public abstract class Feature extends Probe
 		return context.getString(R.string.probe_features_category);
 	}
 
+	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{
 		PreferenceManager manager = activity.getPreferenceManager();

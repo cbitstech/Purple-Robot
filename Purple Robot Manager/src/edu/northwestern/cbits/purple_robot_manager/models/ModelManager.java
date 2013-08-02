@@ -3,11 +3,13 @@ package edu.northwestern.cbits.purple_robot_manager.models;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -25,6 +27,7 @@ public class ModelManager extends BroadcastReceiver
 {
 	private static ModelManager _instance = null;
 
+	private Context _context = null;
 	private List<Model> _models = new ArrayList<Model>();
 	private HashMap<String, Object> _milieu = new HashMap<String, Object>();
 	
@@ -33,13 +36,16 @@ public class ModelManager extends BroadcastReceiver
         if (ModelManager._instance != null)
             throw new IllegalStateException("Already instantiated");
 
+        this._context = context.getApplicationContext();
+        
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction(Probe.PROBE_READING);
 		
 		LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(context);
 		localManager.registerReceiver(this, intentFilter);
 
-		this._models.add(new TreeModel(context, Uri.parse("http://dashboard.cbits.northwestern.edu/media/brain/stats/1644_8e437c44-bc46-4fbd-929a-0c66ed528d6f")));
+//		this._models.add(new TreeModel(this._context, Uri.parse("http://dashboard.cbits.northwestern.edu/media/brain/stats/1644_8e437c44-bc46-4fbd-929a-0c66ed528d6f")));
+//		this._models.add(new RegressionModel(this._context, Uri.parse("http://dashboard.cbits.northwestern.edu/media/brain/stats/1706_7570d91e-b6dc-4b2b-96f8-2b86e5924d66")));
     }
 
 	public static ModelManager getInstance(Context context) 
@@ -52,6 +58,7 @@ public class ModelManager extends BroadcastReceiver
     	return ModelManager._instance;
     }
 
+	@SuppressWarnings("deprecation")
 	public PreferenceScreen buildPreferenceScreen(PreferenceActivity settingsActivity) 
 	{
 		PreferenceManager manager = settingsActivity.getPreferenceManager();
@@ -102,9 +109,6 @@ public class ModelManager extends BroadcastReceiver
 	public void onReceive(Context context, Intent intent) 
 	{
 		Bundle extras = intent.getExtras();
-		
-		if (extras.containsKey("FROM_MODEL"))
-			return;
 
 		String[] nameComponents = extras.getString("PROBE").split("\\.");
 		
@@ -118,11 +122,16 @@ public class ModelManager extends BroadcastReceiver
 			}
 			else
 			{
-				String readingName = Slugify.slugify((probeName + " " + key).toLowerCase()).replaceAll("-", "_");
+				String slug = (probeName + " " + key).toLowerCase().replaceAll("_", " ");
 				
-				this._milieu.put(readingName, extras.get(key));
+				slug = Slugify.slugify(slug).replaceAll("-", "_");
+
+				this._milieu.put(slug, extras.get(key));
 			}
 		}
+
+		if (extras.containsKey("FROM_MODEL"))
+			return;
 
 		for (Model model : this.allModels(context))
 		{
@@ -132,8 +141,94 @@ public class ModelManager extends BroadcastReceiver
 			{
 				snapshot.putAll(this._milieu);
 			}
-
-			model.predict(context, snapshot);
+			
+			if (model != null)
+				model.predict(context, snapshot);
 		}
+	}
+
+	public Model fetchModel(Context context, String name) 
+	{
+		for (Model model : this._models)
+		{
+			if (name.equals(model.name(context)))
+				return model;
+		}
+
+		return null;
+	}
+
+	public void addModel(String jsonUrl) 
+	{
+		this.deleteModel(jsonUrl);
+		
+		Model m = Model.modelForUrl(this._context, jsonUrl);
+		
+		if (m != null)
+			this._models.add(m);
+	}
+
+	public void deleteModel(String jsonUrl) 
+	{
+		synchronized(this._models)
+		{
+			List<Model> toRemove = new ArrayList<Model>();
+			
+			for (Model model : this._models)
+			{
+				Uri uri = model.uri();
+				
+				if (uri != null && uri.toString().equals(jsonUrl))
+					toRemove.add(model);
+			}
+			
+			this._models.removeAll(toRemove);
+		}
+	}
+
+	public void enableModel(String jsonUrl) 
+	{
+		for (Model model : this._models)
+		{
+			Uri uri = model.uri();
+			
+			if (uri != null && uri.toString().equals(jsonUrl))
+				model.enable(this._context);
+		}
+	}
+
+	public void disableModel(String jsonUrl) 
+	{
+		for (Model model : this._models)
+		{
+			Uri uri = model.uri();
+			
+			if (uri != null && uri.toString().equals(jsonUrl))
+				model.disable(this._context);
+		}
+	}
+
+	public boolean enabled(Context context) 
+	{
+		SharedPreferences prefs = Probe.getPreferences(context);
+
+		return prefs.getBoolean("config_models_enabled", Model.DEFAULT_ENABLED);
+	}
+	
+	public Map<String, Object> models(Context context)
+	{
+		HashMap<String, Object> modelMap = new HashMap<String, Object>();
+		
+		for (Model m : this._models)
+		{
+			modelMap.put(m.title(context), "" + m.uri());
+		}
+		
+		return modelMap;
+	}
+
+	public Map<String, Object> readings(Context context)
+	{
+		return this._milieu;
 	}
 }

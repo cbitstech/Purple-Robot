@@ -37,6 +37,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 	public static final String TRIGGERS_SCREEN_KEY = "config_triggers_screen";
 	public static final String MODELS_SCREEN_KEY = "config_models_screen";
 
+	@SuppressWarnings("deprecation")
 	public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);

@@ -3,25 +3,34 @@ package edu.northwestern.cbits.purple_robot_manager.triggers;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.mozilla.javascript.EcmaError;
+
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
 import android.content.Context;
+import android.util.Log;
 
 public class ProbeTrigger extends Trigger
 {
 	public static final String TYPE_NAME = "probe";
 	private static final String TRIGGER_TEST = "test";
-	private static final String TRIGGER_FREQUENCY = "frequency";
+	private static final String TRIGGER_PROBE = "probe";
 
-	private static long _lastUpdate = 0;
-
+	private String _probe = null;
 	private String _test = null;
-	private long _frequency = 0;
+	
+	private long _lastUpdate = 0;
 
 	public ProbeTrigger(Context context, Map<String, Object> map)
 	{
 		super(context, map);
-		
+
+		Log.e("PR", "CREATE PROBE TRIGGER! " + map);
+
 		this.updateFromMap(context, map);
 	}
 
@@ -34,35 +43,58 @@ public class ProbeTrigger extends Trigger
 			ProbeTrigger probeTrigger = (ProbeTrigger) trigger;
 		
 			this._test = probeTrigger._test;
-			this._frequency = probeTrigger._frequency;
 		}
 	}
 	
 	public boolean matches(Context context, Object object)
 	{
-		if (this._test == null)
-			return false;
-
 		long now = System.currentTimeMillis();
-
-		if (now - this._frequency < ProbeTrigger._lastUpdate)
-			return false;
 		
+		if (this._test == null || now - this._lastUpdate < 5000)
+			return false;
+
+		this._lastUpdate = now;
+		
+		Log.e("PR", "T: " + this._test);
+
 		HashMap<String, Object> objects = new HashMap<String, Object>();
 		
-		objects.put("probeInfo", object);
-
-		Object result = BaseScriptEngine.runScript(context, this._test, objects);
-
-		ProbeTrigger._lastUpdate = now;
-
-		if (result instanceof Boolean)
+		if (object instanceof JSONObject)
 		{
-			Boolean boolResult = (Boolean) result;
-
-			return boolResult.booleanValue();
+			JSONObject json = (JSONObject) object;
+			
+			JSONArray names = json.names();
+			
+			for (int i = 0; i < names.length(); i++)
+			{
+				try 
+				{
+					String name = names.getString(i);
+					objects.put(name, json.get(name));
+				}
+				catch (JSONException e) 
+				{
+					LogManager.getInstance(context).logException(e);
+				}
+			}
 		}
-
+		
+		try
+		{
+			Object result = BaseScriptEngine.runScript(context, this._test, objects);
+	
+			if (result instanceof Boolean)
+			{
+				Boolean boolResult = (Boolean) result;
+	
+				return boolResult.booleanValue();
+			}
+		}
+		catch (Throwable e)
+		{
+			LogManager.getInstance(context).logException(e);
+		}
+		
 		return false;
 	}
 	
@@ -71,7 +103,7 @@ public class ProbeTrigger extends Trigger
 		Map<String, Object> config = super.configuration(context);
 		
 		config.put(ProbeTrigger.TRIGGER_TEST, this._test);
-		config.put(ProbeTrigger.TRIGGER_FREQUENCY, this._frequency);
+		config.put(ProbeTrigger.TRIGGER_PROBE, this._probe);
 		config.put("type", ProbeTrigger.TYPE_NAME);
 		
 		return config;
@@ -84,8 +116,8 @@ public class ProbeTrigger extends Trigger
 			if (map.containsKey(ProbeTrigger.TRIGGER_TEST))
 				this._test = map.get(ProbeTrigger.TRIGGER_TEST).toString();
 			
-			if (map.containsKey(ProbeTrigger.TRIGGER_FREQUENCY))
-				this._frequency = ((Long) map.get(ProbeTrigger.TRIGGER_FREQUENCY)).longValue();
+			if (map.containsKey(ProbeTrigger.TRIGGER_PROBE))
+				this._probe = map.get(ProbeTrigger.TRIGGER_PROBE).toString();
 
 			return true;
 		}
@@ -96,5 +128,13 @@ public class ProbeTrigger extends Trigger
 	public void refresh(Context context) 
 	{
 		// Nothing to do for this trigger type...
+	}
+
+	public boolean matchesProbe(String probeName) 
+	{
+		if (this._probe != null && this._probe .equals(probeName))
+			return true;
+		
+		return false;
 	}
 }

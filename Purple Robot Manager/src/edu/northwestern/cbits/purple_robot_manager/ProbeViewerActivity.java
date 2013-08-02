@@ -13,6 +13,7 @@ import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 
+@SuppressWarnings("deprecation")
 public class ProbeViewerActivity extends PreferenceActivity
 {
 	private String _probeName = null;
@@ -28,25 +29,34 @@ public class ProbeViewerActivity extends PreferenceActivity
         this._probeName = bundle.getString("probe_name");
         this._probeBundle = bundle.getBundle("probe_bundle");
 
-        this._probe = ProbeManager.probeForName(this._probeName, this);
-
-        if (this._probe != null)
+        if (bundle.getBoolean("is_model", false))
         {
-	        Bundle formattedBundle = this._probe.formattedBundle(this, this._probeBundle);
+            PreferenceScreen screen = this.screenForBundle(this._probeName, this._probeBundle);
 
-	        if (formattedBundle != null)
+            this.setPreferenceScreen(screen);
+        }
+        else
+        {
+	        this._probe = ProbeManager.probeForName(this._probeName, this);
+	
+	        if (this._probe != null)
 	        {
-	            PreferenceScreen screen = this.screenForBundle(this._probe.title(this), formattedBundle);
-
-	            screen.addPreference(this.screenForBundle(this.getString(R.string.display_raw_data), this._probeBundle));
-
-	    		this.setPreferenceScreen(screen);
-	        }
-	        else
-	        {
-	            PreferenceScreen screen = this.screenForBundle(this._probe.title(this), this._probeBundle);
-
-	            this.setPreferenceScreen(screen);
+		        Bundle formattedBundle = this._probe.formattedBundle(this, this._probeBundle);
+	
+		        if (formattedBundle != null)
+		        {
+		            PreferenceScreen screen = this.screenForBundle(this._probe.title(this), formattedBundle);
+	
+		            screen.addPreference(this.screenForBundle(this.getString(R.string.display_raw_data), this._probeBundle));
+	
+		    		this.setPreferenceScreen(screen);
+		        }
+		        else
+		        {
+		            PreferenceScreen screen = this.screenForBundle(this._probe.title(this), this._probeBundle);
+	
+		            this.setPreferenceScreen(screen);
+		        }
 	        }
         }
     }

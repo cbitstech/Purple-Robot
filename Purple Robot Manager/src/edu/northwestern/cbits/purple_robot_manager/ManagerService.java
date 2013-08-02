@@ -62,6 +62,7 @@ public class ManagerService extends IntentService
 		super(name);
 	}
 
+	@SuppressWarnings("deprecation")
 	protected void onHandleIntent(Intent intent)
 	{
 		if (UPLOAD_LOGS_INTENT.equalsIgnoreCase(intent.getAction()))

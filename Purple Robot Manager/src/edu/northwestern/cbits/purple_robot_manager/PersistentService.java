@@ -29,6 +29,7 @@ public class PersistentService extends Service
 		return null;
 	}
 
+	@SuppressWarnings("deprecation")
 	public void onCreate()
 	{
 		super.onCreate();
