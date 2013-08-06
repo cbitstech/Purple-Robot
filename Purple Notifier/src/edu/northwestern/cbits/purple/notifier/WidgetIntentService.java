@@ -42,11 +42,9 @@ public class WidgetIntentService extends IntentService
 
 	protected void onHandleIntent(Intent intent) 
 	{
-		Log.e("PN", "RECVED 22 INTENT: " + intent);
+		Log.e("PN", "RECV INTENT: " + intent);
 		
 		final WidgetIntentService me = this;
-		
-		Log.e("PN", "FOO 1");
 		
 		if (WidgetIntentService._orientation == null)
 		{
@@ -66,8 +64,6 @@ public class WidgetIntentService extends IntentService
 			
 //			WidgetIntentService._orientation.enable();
 		}
-
-		Log.e("PN", "FOO 2");
 
 		if (intent.hasExtra("identifier"))
 		{
@@ -115,8 +111,6 @@ public class WidgetIntentService extends IntentService
 				e.printStackTrace();
 			}
 		}
-
-		Log.e("PN", "FOO 3");
 
 		if (ACTION_BOOT.equals(intent.getAction()))
 		{
@@ -166,8 +160,6 @@ public class WidgetIntentService extends IntentService
 				this.refreshWidget(id, intent);
 			}
 		}
-
-		Log.e("PN", "FOO 4");
 	}
 	
 	@SuppressWarnings("unchecked")

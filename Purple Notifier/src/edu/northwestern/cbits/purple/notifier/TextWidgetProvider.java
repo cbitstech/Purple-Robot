@@ -4,6 +4,7 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.RemoteViews;
 
@@ -18,6 +19,18 @@ public class TextWidgetProvider extends PurpleWidgetProvider
 		
 		Bundle extras = intent.getExtras();
 		AppWidgetManager widgets = AppWidgetManager.getInstance(context);
+		
+		String titleColor = "#ffffff";
+		String messageColor = "#ffffff";
+		
+		if (extras.containsKey("title_color"))
+			titleColor = extras.getString("title_color");
+
+		if (extras.containsKey("message_color"))
+			messageColor = extras.getString("message_color");
+
+		remoteViews.setTextColor(R.id.widget_text_title_text, Color.parseColor(titleColor));
+		remoteViews.setTextColor(R.id.widget_text_message_text, Color.parseColor(messageColor));
 
 		String title = extras.getString("title");
 		String message = extras.getString("message");

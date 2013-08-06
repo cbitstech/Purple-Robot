@@ -73,6 +73,13 @@ public class SmallBadgeWidgetProvider extends PurpleWidgetProvider
 			remoteViews.setImageViewResource(R.id.widget_small_badge_image, R.drawable.ic_launcher);
 		}
 
+		String titleColor = "#ffffff";
+		
+		if (extras.containsKey("title_color"))
+			titleColor = extras.getString("title_color");
+
+		remoteViews.setTextColor(R.id.widget_small_badge_title_text, Color.parseColor(titleColor));
+		
 		remoteViews.setTextViewText(R.id.widget_small_badge_title_text, title);
 		
 		Intent tapIntent = new Intent(WidgetIntentService.WIDGET_ACTION);

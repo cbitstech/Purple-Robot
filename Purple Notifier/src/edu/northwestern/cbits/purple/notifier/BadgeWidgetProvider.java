@@ -74,6 +74,18 @@ public class BadgeWidgetProvider extends PurpleWidgetProvider
 			remoteViews.setImageViewResource(R.id.widget_badge_image, R.drawable.ic_launcher);
 		}
 
+		String titleColor = "#ffffff";
+		String messageColor = "#ffffff";
+		
+		if (extras.containsKey("title_color"))
+			titleColor = extras.getString("title_color");
+
+		if (extras.containsKey("message_color"))
+			messageColor = extras.getString("message_color");
+
+		remoteViews.setTextColor(R.id.widget_badge_title_text, Color.parseColor(titleColor));
+		remoteViews.setTextColor(R.id.widget_badge_message_text, Color.parseColor(messageColor));
+
 		remoteViews.setTextViewText(R.id.widget_badge_title_text, title);
 		remoteViews.setTextViewText(R.id.widget_badge_message_text, message);
 		
