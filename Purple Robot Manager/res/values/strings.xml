@@ -610,6 +610,12 @@
     <string name="summary_device_active">Device currently active</string>
     <string name="summary_device_inactive">Device curently inactive</string>
 
+    <!-- Google Places Feature -->
+    <string name="title_google_places_feature">Google Places</string>
+    <string name="summary_google_places_feature_desc">Counts the number of nearby location types.</string>
+    <string name="summary_google_places" formatted="false">Most frequent place type: %s (%d)</string>
+    <string name="feature_google_places_radius_label">Search radius</string>
+    
     <!-- Running Software Probe -->
     <string name="title_running_software_probe">Running Software Probe</string>
     <string name="summary_running_software_probe_desc">Details about the apps the device is currently running.</string>

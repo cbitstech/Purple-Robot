@@ -504,5 +504,123 @@
         <item>Every 12 hours</item>
         <item>Every day</item>
    	</string-array>
-   		
+   	
+	<string-array name="google_places_types">
+	    <item>accounting</item>
+		<item>airport</item>
+		<item>amusement_park</item>
+		<item>aquarium</item>
+		<item>art_gallery</item>
+		<item>atm</item>
+		<item>bakery</item>
+		<item>bank</item>
+		<item>bar</item>
+		<item>beauty_salon</item>
+		<item>bicycle_store</item>
+		<item>book_store</item>
+		<item>bowling_alley</item>
+		<item>bus_station</item>
+		<item>cafe</item>
+		<item>campground</item>
+		<item>campground</item>
+		<item>car_dealer</item>
+		<item>car_rental</item>
+		<item>car_repair</item>
+		<item>car_wash</item>
+		<item>casino</item>
+		<item>cemetery</item>
+		<item>church</item>
+		<item>city_hall</item>
+		<item>clothing_store</item>
+		<item>convenience_store</item>
+		<item>courthouse</item>
+		<item>dentist</item>
+		<item>department_store</item>
+		<item>doctor</item>
+		<item>electrician</item>
+		<item>electronics_store</item>
+		<item>embassy</item>
+		<item>establishment</item>
+		<item>finance</item>
+		<item>fire_station</item>
+		<item>florist</item>
+		<item>food</item>
+		<item>funeral_home</item>
+		<item>furniture_store</item>
+		<item>gas_station</item>
+		<item>general_contractor</item>
+		<item>grocery_or_supermarket</item>
+		<item>gym</item>
+		<item>hair_care</item>
+		<item>hardware_store</item>
+		<item>health</item>
+		<item>hindu_temple</item>
+		<item>home_goods_store</item>
+		<item>hospital</item>
+		<item>insurance_agency</item>
+		<item>jewelry_store</item>
+		<item>laundry</item>
+		<item>lawyer</item>
+		<item>library</item>
+		<item>liquor_store</item>
+		<item>local_government_office</item>
+		<item>locksmith</item>
+		<item>lodging</item>
+		<item>meal_delivery</item>
+		<item>meal_takeaway</item>
+		<item>mosque</item>
+		<item>movie_rental</item>
+		<item>movie_theater</item>
+		<item>moving_company</item>
+		<item>museum</item>
+		<item>night_club</item>
+		<item>painter</item>
+		<item>park</item>
+		<item>parking</item>
+		<item>pet_store</item>
+		<item>pharmacy</item>
+		<item>physiotherapist</item>
+		<item>place_of_worship</item>
+		<item>plumber</item>
+		<item>police</item>
+		<item>post_office</item>
+		<item>real_estate_agency</item>
+		<item>restaurant</item>
+		<item>roofing_contractor</item>
+		<item>rv_park</item>
+		<item>school</item>
+		<item>shoe_store</item>
+		<item>shopping_mall</item>
+		<item>spa</item>
+		<item>stadium</item>
+		<item>storage</item>
+		<item>store</item>
+		<item>subway_station</item>
+		<item>synagogue</item>
+		<item>taxi_stand</item>
+		<item>train_station</item>
+		<item>travel_agency</item>
+		<item>university</item>
+		<item>veterinary_care</item>
+		<item>zoo</item>
+	</string-array>
+
+	<string-array name="feature_google_places_labels">
+        <item>100 meters</item>
+        <item>250 meters</item>
+        <item>500 meters</item>
+       	<item>1000 meters</item>
+       	<item>5000 meters</item>
+       	<item>10000 meters</item>
+	</string-array>
+
+	<string-array name="feature_google_places_values">
+        <item>100</item>
+        <item>250</item>
+        <item>500</item>
+       	<item>1000</item>
+       	<item>5000</item>
+       	<item>10000</item>
+   	</string-array>
+			
 </resources>
