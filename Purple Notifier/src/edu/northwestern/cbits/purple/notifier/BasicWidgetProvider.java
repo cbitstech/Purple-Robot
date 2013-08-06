@@ -6,8 +6,10 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 public class BasicWidgetProvider extends PurpleWidgetProvider
@@ -50,6 +52,18 @@ public class BasicWidgetProvider extends PurpleWidgetProvider
 			}
 		}
 
+		String titleColor = "#ffffff";
+		String messageColor = "#ffffff";
+		
+		if (extras.containsKey("title_color"))
+			titleColor = extras.getString("title_color");
+
+		if (extras.containsKey("message_color"))
+			messageColor = extras.getString("message_color");
+		
+		remoteViews.setTextColor(R.id.widget_basic_title_text, Color.parseColor(titleColor));
+		remoteViews.setTextColor(R.id.widget_basic_message_text, Color.parseColor(messageColor));
+		
 		remoteViews.setTextViewText(R.id.widget_basic_title_text, title);
 		remoteViews.setTextViewText(R.id.widget_basic_message_text, message);
 		

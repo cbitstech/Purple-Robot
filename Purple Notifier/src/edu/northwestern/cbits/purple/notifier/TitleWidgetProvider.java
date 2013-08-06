@@ -24,8 +24,13 @@ public class TitleWidgetProvider extends PurpleWidgetProvider
 		AppWidgetManager widgets = AppWidgetManager.getInstance(context);
 
 		String title = extras.getString("title");
+		
+		String titleColor = "#ffffff";
+		
+		if (extras.containsKey("title_color"))
+			titleColor = extras.getString("title_color");
 
-		Bitmap b = PurpleWidgetProvider.bitmapForText(context, title, MINIMUM_WIDTH, MINIMUM_HEIGHT, "#ffffff");
+		Bitmap b = PurpleWidgetProvider.bitmapForText(context, title, MINIMUM_WIDTH, MINIMUM_HEIGHT, titleColor);
 		
 		remoteViews.setImageViewBitmap(R.id.widget_title_title_text, b);
 
