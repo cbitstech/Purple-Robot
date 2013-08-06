@@ -52,7 +52,6 @@ public class DeviceInUseFeature extends Feature
 			return context.getResources().getString(R.string.summary_device_active);
 		else
 			return context.getResources().getString(R.string.summary_device_inactive);
-
 	}
 
 	public boolean isEnabled(Context context)

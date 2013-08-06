@@ -68,6 +68,7 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{
 		PreferenceManager manager = activity.getPreferenceManager();
