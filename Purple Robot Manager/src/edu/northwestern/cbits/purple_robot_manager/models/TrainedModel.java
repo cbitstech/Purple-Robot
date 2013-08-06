@@ -146,7 +146,7 @@ public abstract class TrainedModel extends Model
 		return this._sourceHash;
 	}
 	
-	protected String name(Context context) 
+	public String name(Context context) 
 	{
 		return this._source.toString();
 	}

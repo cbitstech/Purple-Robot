@@ -3,7 +3,10 @@ package edu.northwestern.cbits.purple_robot_manager.plugins;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.StartActivity;
+import edu.northwestern.cbits.purple_robot_manager.models.Model;
+import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class AppDisplayPlugin extends OutputPlugin
@@ -30,9 +33,17 @@ public class AppDisplayPlugin extends OutputPlugin
 		else
 		{
 			Intent displayIntent = new Intent(StartActivity.UPDATE_DISPLAY);
-			displayIntent.putExtra(StartActivity.DISPLAY_PROBE_NAME, extras.getString("PROBE"));
-			displayIntent.putExtra(StartActivity.DISPLAY_PROBE_VALUE, extras);
+			
+			if (extras.containsKey("FROM_MODEL"))
+			{
+				Model m = ModelManager.getInstance(this.getContext()).fetchModelByTitle(this.getContext(), extras.getString("PROBE"));
+				displayIntent.putExtra(StartActivity.DISPLAY_PROBE_NAME, m.name(this.getContext()));
+			}
+			else
+				displayIntent.putExtra(StartActivity.DISPLAY_PROBE_NAME, extras.getString("PROBE"));
 
+			displayIntent.putExtra(StartActivity.DISPLAY_PROBE_VALUE, extras);
+			
 			LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this.getContext());
 			manager.sendBroadcast(displayIntent);
 		}

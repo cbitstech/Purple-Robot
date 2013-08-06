@@ -5,7 +5,7 @@ import android.os.Bundle;
 
 public abstract class XYZContinuousProbeFeature extends ContinuousProbeFeature 
 {
-	protected static int BUFFER_SIZE = 1024;
+	protected static int BUFFER_SIZE = 512;
 	
 	protected float[] x = new float[BUFFER_SIZE];
 	protected float[] y = new float[BUFFER_SIZE];
