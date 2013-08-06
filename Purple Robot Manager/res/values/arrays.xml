@@ -44,7 +44,8 @@
         <item>features.PressureProbeBasicStatisticsFeature</item>
         <item>features.ProximityProbeBasicStatisticsFeature</item>
         <item>features.TemperatureProbeBasicStatisticsFeature</item>
-                
+        <item>features.GooglePlacesFeature</item>
+        
         <item>builtin.RandomNoiseProbe</item>
 
         <item>features.AccelerometerFrequencyFeature</item>

@@ -43,6 +43,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.features.Accelerometer
 import edu.northwestern.cbits.purple_robot_manager.probes.features.AccelerometerFrequencyFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.CallHistoryFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.DeviceInUseFeature;
+import edu.northwestern.cbits.purple_robot_manager.probes.features.GooglePlacesFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.GyroscopeBasicStatisticsFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.JavascriptFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.LightProbeBasicStatisticsFeature;
@@ -350,6 +351,13 @@ public class ProbeManager
 				AccelerometerFrequencyFeature stats = (AccelerometerFrequencyFeature) probe;
 
 				if (stats.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof GooglePlacesFeature)
+			{
+				GooglePlacesFeature places = (GooglePlacesFeature) probe;
+
+				if (places.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 
