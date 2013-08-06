@@ -29,8 +29,6 @@ public class ProbeTrigger extends Trigger
 	{
 		super(context, map);
 
-		Log.e("PR", "CREATE PROBE TRIGGER! " + map);
-
 		this.updateFromMap(context, map);
 	}
 
@@ -55,8 +53,6 @@ public class ProbeTrigger extends Trigger
 
 		this._lastUpdate = now;
 		
-		Log.e("PR", "T: " + this._test);
-
 		HashMap<String, Object> objects = new HashMap<String, Object>();
 		
 		if (object instanceof JSONObject)

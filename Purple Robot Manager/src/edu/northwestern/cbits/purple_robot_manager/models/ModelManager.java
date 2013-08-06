@@ -18,6 +18,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -147,7 +148,7 @@ public class ModelManager extends BroadcastReceiver
 		}
 	}
 
-	public Model fetchModel(Context context, String name) 
+	public Model fetchModelByName(Context context, String name) 
 	{
 		for (Model model : this._models)
 		{
@@ -230,5 +231,19 @@ public class ModelManager extends BroadcastReceiver
 	public Map<String, Object> readings(Context context)
 	{
 		return this._milieu;
+	}
+
+	public Model fetchModelByTitle(Context context, String name) 
+	{
+		if (name == null)
+			return null;
+		
+		for (Model m : this._models)
+		{
+			if (name.equals(m.title(context)))
+				return m;
+		}
+		
+		return null;
 	}
 }
