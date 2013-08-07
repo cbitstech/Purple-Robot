@@ -35,6 +35,9 @@ public abstract class Model
 	private static long _lastEnabledCheck = 0;
 	private static boolean _lastEnabled = false;
 
+	private Object _latestPrediction = null;
+	private double _latestAccuracy = 0.0;
+
 	public abstract String getPreferenceKey();
 	public abstract String title(Context context);
 	public abstract String summary(Context context);
@@ -214,6 +217,22 @@ public abstract class Model
 		bundle.putBoolean("FROM_MODEL", true);
 
 		this.transmitData(context, bundle);
+
+		this._latestPrediction = Double.valueOf(prediction);
+		this._latestAccuracy = accuracy;
+	}
+
+	public HashMap<String, Object> latestPrediction(Context context) 
+	{
+		HashMap<String, Object> prediction = new HashMap<String, Object>();
+		
+		prediction.put("prediction", this._latestPrediction);
+		prediction.put("accuracy", this._latestAccuracy);
+		prediction.put("type", this.modelType());
+		prediction.put("title", this.title(context));
+		prediction.put("url", this.name(context).replace("\\/", "/"));
+		
+		return prediction;
 	}
 
 	protected void transmitPrediction(Context context, String prediction, double accuracy) 
@@ -226,6 +245,9 @@ public abstract class Model
 		bundle.putDouble("ACCURACY", accuracy);
 
 		this.transmitData(context, bundle);
+		
+		this._latestPrediction = prediction;
+		this._latestAccuracy = accuracy;
 	}
 
 	protected void transmitData(Context context, Bundle data) 
@@ -246,4 +268,5 @@ public abstract class Model
 
 	public abstract void predict(Context context, HashMap<String, Object> snapshot);
 	public abstract String name(Context context);
+	public abstract String modelType();
 }

@@ -46,4 +46,9 @@ public class NoiseModel extends Model
 	{
 		return "edu.northwestern.cbits.purple_robot_manager.models.NoiseModel";
 	}
+	
+	public String modelType() 
+	{
+		return "noise";
+	}
 }

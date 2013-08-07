@@ -270,13 +270,19 @@ public class JavaScriptEngine extends BaseScriptEngine
 		return params;
 	}
 
+	@SuppressWarnings("unchecked")
 	private static NativeObject mapToNative(Context context, Scriptable scope, Map<String, Object> map)
 	{
 		NativeObject obj = (NativeObject) context.newObject(scope);
 				
 		for (String key : map.keySet())
 		{
-			obj.put(key, obj, map.get(key));
+			Object value = map.get(key);
+			
+			if (value instanceof Map)
+				value = JavaScriptEngine.mapToNative(context, scope, (Map<String, Object>) value);
+			
+			obj.put(key, obj, value);
 		}
 		
 		return obj;
@@ -353,5 +359,12 @@ public class JavaScriptEngine extends BaseScriptEngine
 		Map<String, Object> readings = ModelManager.getInstance(this._context).readings(this._context);
 
 		return JavaScriptEngine.mapToNative(this._jsContext, this._scope, readings);
+	}
+	
+	public NativeObject predictions()
+	{
+		Map<String, Object> predictions = ModelManager.getInstance(this._context).predictions(this._context);
+		
+		return JavaScriptEngine.mapToNative(this._jsContext, this._scope, predictions);
 	}
 }

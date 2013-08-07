@@ -246,4 +246,16 @@ public class ModelManager extends BroadcastReceiver
 		
 		return null;
 	}
+
+	public Map<String, Object> predictions(Context context) 
+	{
+		HashMap<String, Object> predictions = new HashMap<String, Object>();
+
+		for (Model m : this._models)
+		{
+			predictions.put(m.title(context), m.latestPrediction(context));
+		}
+		
+		return predictions;
+	}
 }
