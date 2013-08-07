@@ -159,4 +159,9 @@ public class TreeModel extends TrainedModel
 		
 		return null;
 	}
+	
+	public String modelType() 
+	{
+		return "decision-tree";
+	}
  }
