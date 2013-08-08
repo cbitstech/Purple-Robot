@@ -7,7 +7,6 @@ import org.json.JSONException;
 
 import android.content.Context;
 import android.content.Intent;
-import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.triggers.ProbeTrigger;

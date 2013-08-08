@@ -3,7 +3,6 @@ package edu.northwestern.cbits.purple_robot_manager.plugins;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.StartActivity;
 import edu.northwestern.cbits.purple_robot_manager.models.Model;
 import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;

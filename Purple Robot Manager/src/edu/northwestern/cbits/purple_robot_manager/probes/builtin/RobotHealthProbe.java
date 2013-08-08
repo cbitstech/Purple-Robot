@@ -182,6 +182,7 @@ public class RobotHealthProbe extends Probe
 
 							Runnable r = new Runnable()
 							{
+								@SuppressWarnings("deprecation")
 								public void run()
 								{
 									if (me._checking)
@@ -462,6 +463,7 @@ public class RobotHealthProbe extends Probe
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{
 		PreferenceManager manager = activity.getPreferenceManager();

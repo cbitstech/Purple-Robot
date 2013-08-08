@@ -92,6 +92,7 @@ public class NetworkProbe extends Probe
 						
 						Runnable r = new Runnable()
 						{
+							@SuppressWarnings("deprecation")
 							public void run() 
 							{
 								Bundle bundle = new Bundle();
@@ -226,6 +227,7 @@ public class NetworkProbe extends Probe
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{
 		PreferenceManager manager = activity.getPreferenceManager();
