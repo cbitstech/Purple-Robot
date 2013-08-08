@@ -48,6 +48,7 @@ public class DateCalendarProbe extends Probe
 		return context.getResources().getString(R.string.probe_environment_category);
 	}
 
+	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity) 
 	{
 		PreferenceManager manager = activity.getPreferenceManager();

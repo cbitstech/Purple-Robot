@@ -124,6 +124,7 @@ public class RandomNoiseProbe extends Probe
 		return String.format(context.getResources().getString(R.string.summary_random_noise_probe), noise);
 	}
 
+	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{
 		PreferenceManager manager = activity.getPreferenceManager();

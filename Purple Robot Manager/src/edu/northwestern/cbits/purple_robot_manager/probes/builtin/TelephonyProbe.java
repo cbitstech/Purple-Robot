@@ -110,6 +110,7 @@ public class TelephonyProbe extends Probe
 		e.commit();
 	}
 
+	@SuppressWarnings("deprecation")
 	public boolean isEnabled(final Context context)
 	{
 		SharedPreferences prefs = Probe.getPreferences(context);

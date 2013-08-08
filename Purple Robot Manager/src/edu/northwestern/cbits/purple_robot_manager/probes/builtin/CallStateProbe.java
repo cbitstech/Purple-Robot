@@ -161,6 +161,7 @@ public class CallStateProbe extends Probe
 		e.commit();
 	}
 
+	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{
 		PreferenceManager manager = activity.getPreferenceManager();

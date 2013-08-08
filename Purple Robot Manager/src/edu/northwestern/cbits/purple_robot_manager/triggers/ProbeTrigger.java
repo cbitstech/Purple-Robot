@@ -6,13 +6,10 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.mozilla.javascript.EcmaError;
-
-import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
-import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
 import android.content.Context;
-import android.util.Log;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
 public class ProbeTrigger extends Trigger
 {
