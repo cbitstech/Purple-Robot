@@ -45,6 +45,7 @@
         <item>features.ProximityProbeBasicStatisticsFeature</item>
         <item>features.TemperatureProbeBasicStatisticsFeature</item>
         <item>features.GooglePlacesFeature</item>
+        <item>features.FitBitApiFeature</item>
         
         <item>builtin.RandomNoiseProbe</item>
 
