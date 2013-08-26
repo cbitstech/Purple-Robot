@@ -26,6 +26,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Editable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -411,18 +412,45 @@ public class StartActivity extends SherlockActivity
 		if (StartActivity._statusMessage != null)
 			this.getSupportActionBar().setSubtitle(StartActivity._statusMessage);
 
-		Uri jsonConfigUri = this.getIntent().getData();
+		Uri incomingUri = this.getIntent().getData();
 
 		SharedPreferences prefs = this.getPreferences(this);
 
         final String savedPassword = prefs.getString("config_password", null);
 
-        if (jsonConfigUri != null)
+        Log.e("PR", "URI: " + incomingUri);
+        
+        if (incomingUri != null)
         {
-        	if (savedPassword == null || savedPassword.equals(""))
-        		this.setJsonUri(jsonConfigUri);
+        	if (incomingUri.getScheme().equals("http"))
+        	{
+        		Log.e("PR", "GOT OAUTH URL: " + incomingUri);
+        		
+        		List<String> segments = incomingUri.getPathSegments();
+        		
+        		if (segments.get(0).equals("oauth"))
+        		{
+        			String tokenFor = segments.get(1);
+        					
+        			String token = incomingUri.getQueryParameter("oauth_token");
+        			String verifier = incomingUri.getQueryParameter("oauth_verifier");
+        			
+        			Editor e = prefs.edit();
+        			
+        			Log.e("PR", "SETTING " + "oauth" + tokenFor + "_token = " + token);
+        			
+        			e.putString("oauth_" + tokenFor + "_token", token);
+        			e.putString("oauth_" + tokenFor + "_verifier", verifier);
+        			e.commit();
+        		}
+        	}
         	else
-        		Toast.makeText(this, R.string.error_json_set_uri_password, Toast.LENGTH_LONG).show();
+        	{
+	        	if (savedPassword == null || savedPassword.equals(""))
+	        		this.setJsonUri(incomingUri);
+	        	else
+	        		Toast.makeText(this, R.string.error_json_set_uri_password, Toast.LENGTH_LONG).show();
+        	}
         }
 
         this._isPaused = false;

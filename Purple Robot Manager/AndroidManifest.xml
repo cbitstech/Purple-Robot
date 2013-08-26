@@ -95,6 +95,8 @@
             	<category android:name="android.intent.category.BROWSABLE" />
             	<data android:scheme="cbits-prm" />
             	<data android:scheme="cbits-pr" />
+            	<data android:scheme="cbits-oauth" />
+	            <data android:scheme="http"	android:host="purplerobot" android:pathPrefix="/oauth/" />
 	        </intent-filter>
         </activity>
 		<activity android:name=".activities.DiagnosticActivity" android:label="@string/app_name" android:theme="@style/Theme.Sherlock" />
