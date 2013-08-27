@@ -422,35 +422,10 @@ public class StartActivity extends SherlockActivity
         
         if (incomingUri != null)
         {
-        	if (incomingUri.getScheme().equals("http"))
-        	{
-        		Log.e("PR", "GOT OAUTH URL: " + incomingUri);
-        		
-        		List<String> segments = incomingUri.getPathSegments();
-        		
-        		if (segments.get(0).equals("oauth"))
-        		{
-        			String tokenFor = segments.get(1);
-        					
-        			String token = incomingUri.getQueryParameter("oauth_token");
-        			String verifier = incomingUri.getQueryParameter("oauth_verifier");
-        			
-        			Editor e = prefs.edit();
-        			
-        			Log.e("PR", "SETTING " + "oauth" + tokenFor + "_token = " + token);
-        			
-        			e.putString("oauth_" + tokenFor + "_token", token);
-        			e.putString("oauth_" + tokenFor + "_verifier", verifier);
-        			e.commit();
-        		}
-        	}
+        	if (savedPassword == null || savedPassword.equals(""))
+        		this.setJsonUri(incomingUri);
         	else
-        	{
-	        	if (savedPassword == null || savedPassword.equals(""))
-	        		this.setJsonUri(incomingUri);
-	        	else
-	        		Toast.makeText(this, R.string.error_json_set_uri_password, Toast.LENGTH_LONG).show();
-        	}
+        		Toast.makeText(this, R.string.error_json_set_uri_password, Toast.LENGTH_LONG).show();
         }
 
         this._isPaused = false;
