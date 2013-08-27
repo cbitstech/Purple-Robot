@@ -3,9 +3,9 @@ package edu.northwestern.cbits.purple_robot_manager.oauth;
 import org.scribe.builder.api.DefaultApi10a;
 import org.scribe.model.Token;
 
-public class FitBitApi extends DefaultApi10a 
+public class FitbitApi extends DefaultApi10a 
 {
-	public FitBitApi()
+	public FitbitApi()
 	{
 		super();
 	}

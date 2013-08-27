@@ -3,6 +3,9 @@ package edu.northwestern.cbits.purple_robot_manager.logging;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -166,6 +169,40 @@ public class SanityManager
     	}
     	
 		return R.drawable.action_about;
+	}
+	
+	public void addAlert(int level, String name, String message)
+	{
+		boolean alert = false;
+		
+		if (level == SanityCheck.WARNING && this._warnings.containsKey(name) == false)
+		{
+			this._warnings.put(name, message);
+			alert = true;
+		}
+		else if (this._warnings.containsKey(name) == false)
+		{
+			this._errors.put(name, message);
+			alert = true;
+		}
+		
+		if (alert)
+		{
+		    Intent pebbleIntent = new Intent("com.getpebble.action.SEND_NOTIFICATION");
+	
+		    HashMap<String, String> data = new HashMap<String, String>();
+		    data.put("title", name);
+		    data.put("body", message);
+	
+		    JSONObject jsonData = new JSONObject(data);
+		    String notificationData = new JSONArray().put(jsonData).toString();
+	
+		    pebbleIntent.putExtra("messageType", "PEBBLE_ALERT");
+		    pebbleIntent.putExtra("sender", this._context.getString(R.string.app_name));
+		    pebbleIntent.putExtra("notificationData", notificationData);
+	
+		    this._context.sendBroadcast(pebbleIntent);
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
