@@ -95,10 +95,16 @@
             	<category android:name="android.intent.category.BROWSABLE" />
             	<data android:scheme="cbits-prm" />
             	<data android:scheme="cbits-pr" />
-            	<data android:scheme="cbits-oauth" />
-	            <data android:scheme="http"	android:host="purplerobot" android:pathPrefix="/oauth/" />
 	        </intent-filter>
         </activity>
+		<activity android:name=".activities.OAuthActivity" android:label="@string/app_name">
+            <intent-filter>
+		        <action android:name="android.intent.action.VIEW" />
+        	    <category android:name="android.intent.category.DEFAULT" />
+            	<category android:name="android.intent.category.BROWSABLE" />
+	            <data android:scheme="cbits-oauth"	android:host="purplerobot" android:pathPrefix="/oauth/" />
+	        </intent-filter>
+	    </activity>
 		<activity android:name=".activities.DiagnosticActivity" android:label="@string/app_name" android:theme="@style/Theme.Sherlock" />
 		<activity android:name=".activities.LocationProbeActivity" android:label="@string/app_name" android:theme="@style/Theme.Sherlock" />
 		<activity android:name=".activities.WebkitActivity" android:label="@string/app_name" android:theme="@style/Theme.Sherlock" />
