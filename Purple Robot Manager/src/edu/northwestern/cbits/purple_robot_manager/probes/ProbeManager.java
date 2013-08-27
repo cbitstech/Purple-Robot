@@ -42,7 +42,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.features.Accelerometer
 import edu.northwestern.cbits.purple_robot_manager.probes.features.AccelerometerFrequencyFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.CallHistoryFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.DeviceInUseFeature;
-import edu.northwestern.cbits.purple_robot_manager.probes.features.FitBitApiFeature;
+import edu.northwestern.cbits.purple_robot_manager.probes.features.FitbitApiFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.GooglePlacesFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.GyroscopeBasicStatisticsFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.JavascriptFeature;
@@ -360,9 +360,9 @@ public class ProbeManager
 				if (places.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
-			else if (probe instanceof FitBitApiFeature)
+			else if (probe instanceof FitbitApiFeature)
 			{
-				FitBitApiFeature fitbit = (FitBitApiFeature) probe;
+				FitbitApiFeature fitbit = (FitbitApiFeature) probe;
 
 				if (fitbit.name(context).equalsIgnoreCase(name))
 					found = true;
