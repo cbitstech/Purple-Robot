@@ -131,8 +131,6 @@ public class DateTrigger extends Trigger
 									}
 								}
 							} 
-							
-							current += hour;
 						}
 						catch (NullPointerException e)
 						{
@@ -142,6 +140,8 @@ public class DateTrigger extends Trigger
 						{
 							LogManager.getInstance(context).logException(e);
 						}
+
+						current += hour;
 					}
 
 					synchronized(me._upcomingFireDates)
