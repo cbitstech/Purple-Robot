@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android" 
+    xmlns:robot="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/menu_cancel"
         android:title="@string/menu_cancel"
-        android:showAsAction="always"
+        robot:showAsAction="always"
         android:icon="@drawable/action_cancel" />
     <item android:id="@+id/menu_accept_label"
         android:title="@string/menu_accept_label"
-        android:showAsAction="always"
+        robot:showAsAction="always"
         android:icon="@drawable/action_accept" />
 </menu>
