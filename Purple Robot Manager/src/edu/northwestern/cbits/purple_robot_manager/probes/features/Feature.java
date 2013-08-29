@@ -21,7 +21,7 @@ public abstract class Feature extends Probe
 	{
 		return context.getString(R.string.probe_features_category);
 	}
-
+	
 	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{
@@ -34,11 +34,16 @@ public abstract class Feature extends Probe
 		CheckBoxPreference enabled = new CheckBoxPreference(activity);
 		enabled.setTitle(R.string.title_enable_probe);
 		enabled.setKey("config_feature_" + this.featureKey() + "_enabled");
-		enabled.setDefaultValue(true);
+		enabled.setDefaultValue(this.defaultEnabled());
 
 		screen.addPreference(enabled);
 
 		return screen;
+	}
+
+	protected boolean defaultEnabled() 
+	{
+		return true;
 	}
 
 	protected abstract String summary(Context context);

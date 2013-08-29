@@ -94,6 +94,12 @@
 	        android:text="@string/pr_errors_label"
 	        android:textIsSelectable="true"
 	        android:textAppearance="?android:attr/textAppearanceSmall" />
+   	    <LinearLayout
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:orientation="vertical"
+	        android:id="@+id/pr_error_list" 
+	        android:visibility="gone" />"
 	    <TextView
 	        android:id="@+id/pr_error_none_value"
 	        android:text="@string/pr_errors_none_label"
@@ -103,25 +109,6 @@
 	        android:paddingBottom="0dp"
 	        android:textIsSelectable="true"
 	        android:textAppearance="?android:attr/textAppearanceMedium" />
-	    <TextView
-	        android:id="@+id/pr_error_errors_value"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:paddingBottom="0dp"
-	        android:textColor="#FF4444"
-	        android:visibility="gone"
-	        android:textIsSelectable="true"
-	        android:textAppearance="?android:attr/textAppearanceMedium" />
-	    <TextView
-	        android:id="@+id/pr_error_warnings_value"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:textColor="#FFBB33"
-	        android:paddingBottom="0dp"
-	        android:visibility="gone"
-	        android:textIsSelectable="true"
-	        android:textAppearance="?android:attr/textAppearanceMedium" />
-	    
 	    <TextView
 	        android:paddingTop="10dp"
 	        android:layout_width="wrap_content"

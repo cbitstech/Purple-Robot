@@ -65,6 +65,7 @@ public class FitbitApiFeature extends Feature
 	protected static final String GOAL_SCORE_RATIO = "GOAL_SCORE_RATIO";
 
 	private long _lastUpdate = 0;
+	private long _lastFetch = 0;
 
 	private String _token = null;
 	private String _secret = null;
@@ -94,7 +95,7 @@ public class FitbitApiFeature extends Feature
 		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
-		e.putBoolean("config_probe_fitbit_api_enabled", true);
+		e.putBoolean("config_feature_fitbit_api_enabled", true);
 		e.commit();
 	}
 
@@ -103,141 +104,158 @@ public class FitbitApiFeature extends Feature
 		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
-		e.putBoolean("config_probe_fitbit_api_enabled", false);
+		e.putBoolean("config_feature_fitbit_api_enabled", false);
 		e.commit();
 	}
 	
 	public boolean isEnabled(final Context context)
 	{
+		SharedPreferences prefs = Probe.getPreferences(context);
+		
 		if (super.isEnabled(context))
 		{
-			SharedPreferences prefs = Probe.getPreferences(context);
-
 			if (prefs.getBoolean("config_feature_fitbit_api_enabled", false))
 			{
 				long now = System.currentTimeMillis();
 				
-				if (now - this._lastUpdate > 1000 * 60 * 30)
+				if (now - this._lastUpdate > 1000 * 60)
 				{
+					this._lastUpdate = now;
+
+					final FitbitApiFeature me = this;
+
 					this._token = prefs.getString("oauth_fitbit_token", null);
 					this._secret = prefs.getString("oauth_fitbit_secret", null);
 
+    				final String title = context.getString(R.string.title_fitbit_check);
+    				final SanityManager sanity = SanityManager.getInstance(context);
+
         			if (this._token == null || this._secret == null)
         			{
-        				String title = context.getString(R.string.title_fitbit_check);
         				String message = context.getString(R.string.message_fitbit_check);
         				
-        				SanityManager.getInstance(context).addAlert(SanityCheck.WARNING, title, message);
+        				Runnable action = new Runnable()
+        				{
+							public void run() 
+							{
+								me.fetchAuth(context);
+							}
+        				};
+        				
+        				sanity.addAlert(SanityCheck.WARNING, title, message, action);
         			}
 					else
 					{
-						this._lastUpdate = now;
+						sanity.clearAlert(title);
 
-						Token accessToken = new Token(this._token, this._secret);
-
-	                	ServiceBuilder builder = new ServiceBuilder();
-	                	builder = builder.provider(FitbitApi.class);
-	                	builder = builder.apiKey(FitbitApiFeature.CONSUMER_KEY);
-	                	builder = builder.apiSecret(FitbitApiFeature.CONSUMER_SECRET);
-	                	
-	                	final OAuthService service = builder.build();
-	                	
-	                	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-	                	
-	                	String dateString = sdf.format(new Date());
-
-						final OAuthRequest request = new OAuthRequest(Verb.GET, "https://api.fitbit.com/1/user/-/activities/date/" + dateString + ".json");
-						service.signRequest(accessToken, request);
-
-						final FitbitApiFeature me = this;
-
-						Runnable r = new Runnable()
+						if (now - this._lastFetch > 1000 * 60 * 5)
 						{
-							public void run() 
+							this._lastFetch = now;
+							
+							Token accessToken = new Token(this._token, this._secret);
+	
+		                	ServiceBuilder builder = new ServiceBuilder();
+		                	builder = builder.provider(FitbitApi.class);
+		                	builder = builder.apiKey(FitbitApiFeature.CONSUMER_KEY);
+		                	builder = builder.apiSecret(FitbitApiFeature.CONSUMER_SECRET);
+		                	
+		                	final OAuthService service = builder.build();
+		                	
+		                	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		                	
+		                	String dateString = sdf.format(new Date());
+	
+							final OAuthRequest request = new OAuthRequest(Verb.GET, "https://api.fitbit.com/1/user/-/activities/date/" + dateString + ".json");
+							service.signRequest(accessToken, request);
+	
+							Runnable r = new Runnable()
 							{
-								Response response = request.send();
-								
-								try 
+								public void run() 
 								{
-									JSONObject body = new JSONObject(response.getBody());
-
-									JSONObject summary = body.getJSONObject("summary");
+									Response response = request.send();
 									
-									Bundle bundle = new Bundle();
-									bundle.putString("PROBE", me.name(context));
-									bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
-									
-									long veryActive = summary.getLong("veryActiveMinutes");
-									long fairlyActive = summary.getLong("fairlyActiveMinutes");
-									long lightlyActive = summary.getLong("lightlyActiveMinutes");
-									long sedentary = summary.getLong("sedentaryMinutes");
-									
-									long total = veryActive + fairlyActive + lightlyActive + sedentary;
-									
-									bundle.putLong(FitbitApiFeature.VERY_ACTIVE_MINUTES, veryActive);
-									bundle.putLong(FitbitApiFeature.FAIRLY_ACTIVE_MINUTES, fairlyActive);
-									bundle.putLong(FitbitApiFeature.LIGHTLY_ACTIVE_MINUTES, lightlyActive);
-									bundle.putLong(FitbitApiFeature.SEDENTARY_MINUTES, sedentary);
-
-									bundle.putDouble(FitbitApiFeature.VERY_ACTIVE_RATIO, (double) veryActive / (double) total);
-									bundle.putDouble(FitbitApiFeature.FAIRLY_ACTIVE_RATIO, (double) fairlyActive / (double) total);
-									bundle.putDouble(FitbitApiFeature.LIGHTLY_ACTIVE_RATIO, (double) lightlyActive / (double) total);
-									bundle.putDouble(FitbitApiFeature.SEDENTARY_RATIO, (double) sedentary / (double) total);
-									
-									long steps = summary.getLong("steps");
-									bundle.putLong(FitbitApiFeature.STEPS, steps);
-
-									long caloriesOut = summary.getLong("caloriesOut");
-									bundle.putLong(FitbitApiFeature.CALORIES_OUT, caloriesOut);
-									bundle.putLong(FitbitApiFeature.CALORIES_BMR, summary.getLong("caloriesBMR"));
-									bundle.putLong(FitbitApiFeature.MARGINAL_CALORIES, summary.getLong("marginalCalories"));
-									bundle.putLong(FitbitApiFeature.ACTIVITY_CALORIES, summary.getLong("activityCalories"));
-									
-									long score = summary.getLong("activeScore");
-									bundle.putLong(FitbitApiFeature.ACTIVE_SCORE, score);
-									
-									JSONArray activities = summary.getJSONArray("distances");
-									
-									long distance = 0;
-									
-									for (int i = 0; i < activities.length(); i++)
+									try 
 									{
-										JSONObject activity = activities.getJSONObject(i);
+										JSONObject body = new JSONObject(response.getBody());
+	
+										JSONObject summary = body.getJSONObject("summary");
 										
-										if ("total".equals(activity.getString("activity")))
-											distance = activity.getLong("distance");
+										Bundle bundle = new Bundle();
+										bundle.putString("PROBE", me.name(context));
+										bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+										
+										long veryActive = summary.getLong("veryActiveMinutes");
+										long fairlyActive = summary.getLong("fairlyActiveMinutes");
+										long lightlyActive = summary.getLong("lightlyActiveMinutes");
+										long sedentary = summary.getLong("sedentaryMinutes");
+										
+										long total = veryActive + fairlyActive + lightlyActive + sedentary;
+										
+										bundle.putLong(FitbitApiFeature.VERY_ACTIVE_MINUTES, veryActive);
+										bundle.putLong(FitbitApiFeature.FAIRLY_ACTIVE_MINUTES, fairlyActive);
+										bundle.putLong(FitbitApiFeature.LIGHTLY_ACTIVE_MINUTES, lightlyActive);
+										bundle.putLong(FitbitApiFeature.SEDENTARY_MINUTES, sedentary);
+	
+										bundle.putDouble(FitbitApiFeature.VERY_ACTIVE_RATIO, (double) veryActive / (double) total);
+										bundle.putDouble(FitbitApiFeature.FAIRLY_ACTIVE_RATIO, (double) fairlyActive / (double) total);
+										bundle.putDouble(FitbitApiFeature.LIGHTLY_ACTIVE_RATIO, (double) lightlyActive / (double) total);
+										bundle.putDouble(FitbitApiFeature.SEDENTARY_RATIO, (double) sedentary / (double) total);
+										
+										long steps = summary.getLong("steps");
+										bundle.putLong(FitbitApiFeature.STEPS, steps);
+	
+										long caloriesOut = summary.getLong("caloriesOut");
+										bundle.putLong(FitbitApiFeature.CALORIES_OUT, caloriesOut);
+										bundle.putLong(FitbitApiFeature.CALORIES_BMR, summary.getLong("caloriesBMR"));
+										bundle.putLong(FitbitApiFeature.MARGINAL_CALORIES, summary.getLong("marginalCalories"));
+										bundle.putLong(FitbitApiFeature.ACTIVITY_CALORIES, summary.getLong("activityCalories"));
+										
+										long score = summary.getLong("activeScore");
+										bundle.putLong(FitbitApiFeature.ACTIVE_SCORE, score);
+										
+										JSONArray activities = summary.getJSONArray("distances");
+										
+										long distance = 0;
+										
+										for (int i = 0; i < activities.length(); i++)
+										{
+											JSONObject activity = activities.getJSONObject(i);
+											
+											if ("total".equals(activity.getString("activity")))
+												distance = activity.getLong("distance");
+										}
+										
+										bundle.putLong(FitbitApiFeature.TOTAL_DISTANCE, distance);
+	
+										JSONObject goals = body.getJSONObject("goals");
+										
+										long goalDistance = goals.getLong("distance");
+										long goalSteps = goals.getLong("steps");
+										long goalCalories = goals.getLong("caloriesOut");
+										long goalScore = goals.getLong("activeScore");
+	
+										bundle.putLong(FitbitApiFeature.GOAL_DISTANCE, goalDistance);
+										bundle.putLong(FitbitApiFeature.GOAL_STEPS, goalSteps);
+										bundle.putLong(FitbitApiFeature.GOAL_CALORIES, goalCalories);
+										bundle.putLong(FitbitApiFeature.GOAL_SCORE, goalScore);
+	
+										bundle.putDouble(FitbitApiFeature.GOAL_DISTANCE_RATIO, (double) distance / (double) goalDistance);
+										bundle.putDouble(FitbitApiFeature.GOAL_STEPS_RATIO, (double) steps / (double) goalSteps);
+										bundle.putDouble(FitbitApiFeature.GOAL_CALORIES_RATIO, (double) caloriesOut / (double) goalCalories);
+										bundle.putDouble(FitbitApiFeature.GOAL_SCORE_RATIO, (double) score / (double) goalScore);
+										
+										me.transmitData(context, bundle);
+									} 
+									catch (JSONException e) 
+									{
+										e.printStackTrace();
 									}
-									
-									bundle.putLong(FitbitApiFeature.TOTAL_DISTANCE, distance);
-
-									JSONObject goals = body.getJSONObject("goals");
-									
-									long goalDistance = goals.getLong("distance");
-									long goalSteps = goals.getLong("steps");
-									long goalCalories = goals.getLong("caloriesOut");
-									long goalScore = goals.getLong("activeScore");
-
-									bundle.putLong(FitbitApiFeature.GOAL_DISTANCE, goalDistance);
-									bundle.putLong(FitbitApiFeature.GOAL_STEPS, goalSteps);
-									bundle.putLong(FitbitApiFeature.GOAL_CALORIES, goalCalories);
-									bundle.putLong(FitbitApiFeature.GOAL_SCORE, goalScore);
-
-									bundle.putDouble(FitbitApiFeature.GOAL_DISTANCE_RATIO, (double) distance / (double) goalDistance);
-									bundle.putDouble(FitbitApiFeature.GOAL_STEPS_RATIO, (double) steps / (double) goalSteps);
-									bundle.putDouble(FitbitApiFeature.GOAL_CALORIES_RATIO, (double) caloriesOut / (double) goalCalories);
-									bundle.putDouble(FitbitApiFeature.GOAL_SCORE_RATIO, (double) score / (double) goalScore);
-									
-									me.transmitData(context, bundle);
-								} 
-								catch (JSONException e) 
-								{
-									e.printStackTrace();
 								}
-							}
-						};
-						
-						Thread t = new Thread(r);
-						t.start();
+							};
+							
+							Thread t = new Thread(r);
+							t.start();
+						}
 					}
 				}
 				
@@ -247,7 +265,28 @@ public class FitbitApiFeature extends Feature
 
 		return false;
 	}
+
+	protected boolean defaultEnabled() 
+	{
+		return false;
+	}
 	
+	private void fetchAuth(Context context)
+	{
+        Intent intent = new Intent(context, OAuthActivity.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		
+		intent.putExtra(OAuthActivity.CONSUMER_KEY, CONSUMER_KEY);
+		intent.putExtra(OAuthActivity.CONSUMER_SECRET, CONSUMER_SECRET);
+		intent.putExtra(OAuthActivity.REQUEST_TOKEN_URL, REQUEST_TOKEN_URL);
+		intent.putExtra(OAuthActivity.ACCESS_TOKEN_URL, ACCESS_TOKEN_URL);
+		intent.putExtra(OAuthActivity.AUTHORIZE_URL, AUTHORIZE_URL);
+		intent.putExtra(OAuthActivity.REQUESTER, "fitbit");
+		intent.putExtra(OAuthActivity.CALLBACK_URL, "cbits-oauth://purplerobot/oauth/fitbit");
+		
+		context.startActivity(intent);
+	}
+
 	public PreferenceScreen preferenceScreen(final PreferenceActivity activity)
 	{
 		final PreferenceScreen screen = super.preferenceScreen(activity);
@@ -265,22 +304,13 @@ public class FitbitApiFeature extends Feature
 		logoutPreference.setTitle(R.string.title_logout_fitbit_probe);
 		logoutPreference.setSummary(R.string.summary_logout_fitbit_probe);
 
+		final FitbitApiFeature me = this;
+
 		authPreference.setOnPreferenceClickListener(new OnPreferenceClickListener()
 		{
 			public boolean onPreferenceClick(Preference preference) 
 			{
-		        Intent intent = new Intent(activity, OAuthActivity.class);
-				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				
-				intent.putExtra(OAuthActivity.CONSUMER_KEY, CONSUMER_KEY);
-				intent.putExtra(OAuthActivity.CONSUMER_SECRET, CONSUMER_SECRET);
-				intent.putExtra(OAuthActivity.REQUEST_TOKEN_URL, REQUEST_TOKEN_URL);
-				intent.putExtra(OAuthActivity.ACCESS_TOKEN_URL, ACCESS_TOKEN_URL);
-				intent.putExtra(OAuthActivity.AUTHORIZE_URL, AUTHORIZE_URL);
-				intent.putExtra(OAuthActivity.REQUESTER, "fitbit");
-				intent.putExtra(OAuthActivity.CALLBACK_URL, "cbits-oauth://purplerobot/oauth/fitbit");
-				
-				activity.startActivity(intent);
+				me.fetchAuth(activity);
 				
 				screen.addPreference(logoutPreference);
 				screen.removePreference(authPreference);
@@ -288,8 +318,6 @@ public class FitbitApiFeature extends Feature
 				return true;
 			}
 		});
-
-		final FitbitApiFeature me = this;
 		
 		logoutPreference.setOnPreferenceClickListener(new OnPreferenceClickListener()
 		{
@@ -321,7 +349,7 @@ public class FitbitApiFeature extends Feature
 			screen.addPreference(authPreference);
 		else
 			screen.addPreference(logoutPreference);
-
+		
 		return screen;
 	}
 	

@@ -18,6 +18,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -108,56 +111,85 @@ public class DiagnosticActivity extends ActionBarActivity
 		}
 		
 		TextView okText = (TextView) this.findViewById(R.id.pr_error_none_value);
-		TextView errorText = (TextView) this.findViewById(R.id.pr_error_errors_value);
-		TextView warnText = (TextView) this.findViewById(R.id.pr_error_warnings_value);
+		LinearLayout errorList = (LinearLayout) this.findViewById(R.id.pr_error_list);
+		errorList.removeAllViews();
 		
-		SanityManager sanity = SanityManager.getInstance(this);
+		final SanityManager sanity = SanityManager.getInstance(this);
 		
 		if (sanity.getErrorLevel() != SanityCheck.OK)
 		{
+			errorList.setVisibility(View.VISIBLE);
 			okText.setVisibility(View.GONE);
 			
 			Map<String, String> errors = sanity.errors();
 			
 			if (errors.size() > 0)
 			{
-				errorText.setVisibility(View.VISIBLE);
-				errorText.setText(DiagnosticActivity.constructErrorLines(errors));
+				errorList.setVisibility(View.VISIBLE);
+				
+				for (String error : errors.keySet())
+				{
+					TextView errorLine = new TextView(this);
+					errorLine.setText(errors.get(error));
+					errorLine.setTextColor(0xffff4444);
+					errorLine.setTextIsSelectable(true);
+					errorLine.setTextSize(18);
+					
+					LinearLayout.LayoutParams layout = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+					layout.setMargins(0, 0, 0, 10);
+					errorLine.setLayoutParams(layout);
+					
+					final String errorKey = error; 
+					
+					errorLine.setOnClickListener(new OnClickListener()
+					{
+						public void onClick(View view) 
+						{
+							sanity.runActionForAlert(errorKey);
+						}
+						
+					});
+					
+					errorList.addView(errorLine);
+				}
 			}
-			else
-				errorText.setVisibility(View.GONE);
-
-			Map<String, String> warnings = sanity.warnings();
 			
+			Map<String, String> warnings = sanity.warnings();
+
 			if (warnings.size() > 0)
 			{
-				warnText.setVisibility(View.VISIBLE);
-				warnText.setText(DiagnosticActivity.constructErrorLines(warnings));
+				for (String error : warnings.keySet())
+				{
+					TextView errorLine = new TextView(this);
+					errorLine.setText(warnings.get(error));
+					errorLine.setTextColor(0xffffbb33);
+					errorLine.setTextIsSelectable(true);
+					errorLine.setTextSize(18);
+					
+					LinearLayout.LayoutParams layout = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+					layout.setMargins(0, 0, 0, 10);
+					errorLine.setLayoutParams(layout);
+					
+					final String errorKey = error; 
+					
+					errorLine.setOnClickListener(new OnClickListener()
+					{
+						public void onClick(View view) 
+						{
+							sanity.runActionForAlert(errorKey);
+						}
+						
+					});
+
+					errorList.addView(errorLine);
+				}
 			}
-			else
-				warnText.setVisibility(View.GONE);
 		}
 		else
 		{
+			errorList.setVisibility(View.GONE);
 			okText.setVisibility(View.VISIBLE);
-			errorText.setVisibility(View.GONE);
-			warnText.setVisibility(View.GONE);
 		}
-	}
-	
-	private static String constructErrorLines(Map<String, String> errors)
-	{
-		StringBuffer sb = new StringBuffer();
-		
-		for (String key : errors.keySet())
-		{
-			if (sb.length() > 0)
-				sb.append(System.getProperty("line.separator"));
-			
-			sb.append(key + ": " + errors.get(key));
-		}
-		
-		return sb.toString();
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu)
