@@ -3,6 +3,7 @@ package edu.northwestern.cbits.purple_robot_manager.activities;
 import java.util.List;
 
 import org.scribe.builder.ServiceBuilder;
+import org.scribe.exceptions.OAuthException;
 import org.scribe.model.Token;
 import org.scribe.model.Verifier;
 import org.scribe.oauth.OAuthService;
@@ -65,20 +66,27 @@ public class OAuthActivity extends Activity
 	        	{
 					public void run() 
 					{
-						Token token = service.getRequestToken();
-						
-						Editor e = prefs.edit();
-						e.putString("request_token_" + requester, token.getToken());
-						e.putString("request_secret_" + requester, token.getSecret());
-						e.commit();
-	
-						String url = service.getAuthorizationUrl(token);
-		    	        
-		    	        Intent intent = new Intent(Intent.ACTION_VIEW);
-		    	        intent.setData(Uri.parse(url));
-		    	        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-	
-		    	        me.startActivity(intent);
+						try
+						{
+							Token token = service.getRequestToken();
+							
+							Editor e = prefs.edit();
+							e.putString("request_token_" + requester, token.getToken());
+							e.putString("request_secret_" + requester, token.getSecret());
+							e.commit();
+		
+							String url = service.getAuthorizationUrl(token);
+			    	        
+			    	        Intent intent = new Intent(Intent.ACTION_VIEW);
+			    	        intent.setData(Uri.parse(url));
+			    	        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		
+			    	        me.startActivity(intent);
+						}
+						catch (OAuthException e)
+						{
+							e.printStackTrace();
+						}
 					}
 	        	};
 	        	

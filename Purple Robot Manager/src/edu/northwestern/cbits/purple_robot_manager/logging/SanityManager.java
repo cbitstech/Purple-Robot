@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.StartActivity;
@@ -26,8 +27,12 @@ public class SanityManager
 	
 	private HashMap<String, String> _errors = new HashMap<String, String>();
 	private HashMap<String, String> _warnings = new HashMap<String, String>();
+	private HashMap<String, Runnable> _actions = new HashMap<String, Runnable>();
 	
 	private int _lastStatus = -1;
+
+	private String _lastTitle = null;
+	private String _lastMessage = null;
 	
 	public SanityManager(Context context) 
 	{
@@ -54,13 +59,9 @@ public class SanityManager
 	@SuppressWarnings({ "rawtypes", "deprecation" })
 	public void refreshState() 
 	{
-		this._errors.clear();
-		this._warnings.clear();
-		
 		String packageName = this.getClass().getPackage().getName();
 		
 		String[] checkClasses = this._context.getResources().getStringArray(R.array.sanity_check_classes);
-		String title = null;
 
 		for (String className : checkClasses)
 		{
@@ -93,17 +94,11 @@ public class SanityManager
 					int error = check.getErrorLevel();
 					
 					if (error == SanityCheck.ERROR)
-					{
-						title = check.getErrorMessage();
-						this._errors.put(check.name(this._context), title);
-					}
+						this.addAlert(SanityCheck.ERROR, check.name(this._context), check.getErrorMessage(), null);
 					else if (error == SanityCheck.WARNING)
-					{
-						if (title == null)
-							title = check.getErrorMessage();
-
-						this._warnings.put(check.name(this._context), check.getErrorMessage());
-					}
+						this.addAlert(SanityCheck.WARNING, check.name(this._context), check.getErrorMessage(), null);
+					else
+						this.clearAlert(check.name(this._context));
 				}
 				catch (InstantiationException e) 
 				{
@@ -130,18 +125,40 @@ public class SanityManager
 
 			int icon = R.drawable.ic_note_normal;
 			
+			String title = null;
+			String message = null;
+			
 			if (this.getErrorLevel() == SanityCheck.ERROR)
+			{
 				icon = R.drawable.ic_note_error;
+				
+				for (String key : this._errors.keySet())
+				{
+					title = key;
+					message = this._errors.get(key);
+				}
+			}				
 			else if (this.getErrorLevel() == SanityCheck.WARNING)
+			{
 				icon = R.drawable.ic_note_warning;
+
+				for (String key : this._warnings.keySet())
+				{
+					title = key;
+					message = this._warnings.get(key);
+				}
+			}
 			
 			if (title == null)
+			{
 				title = this._context.getString(R.string.pr_errors_none_label);
-
+				message = this._context.getString(R.string.pr_errors_none_label);
+			}
+			
 			Notification note = new Notification(icon, title, System.currentTimeMillis());
 
 			PendingIntent contentIntent = PendingIntent.getActivity(this._context, 0, new Intent(this._context, StartActivity.class), Notification.FLAG_ONGOING_EVENT);
-			note.setLatestEventInfo(this._context, title, title, contentIntent);
+			note.setLatestEventInfo(this._context, title, message, contentIntent);
 			note.flags = Notification.FLAG_ONGOING_EVENT;
 
 			noteManager.notify(12345, note);
@@ -171,7 +188,7 @@ public class SanityManager
 		return R.drawable.action_about;
 	}
 	
-	public void addAlert(int level, String name, String message)
+	public void addAlert(int level, String name, String message, Runnable action)
 	{
 		boolean alert = false;
 		
@@ -186,22 +203,46 @@ public class SanityManager
 			alert = true;
 		}
 		
+		if (action != null)
+			this._actions.put(name, action);
+		
 		if (alert)
 		{
-		    Intent pebbleIntent = new Intent("com.getpebble.action.SEND_NOTIFICATION");
+			if (name.equals(this._lastTitle) && message.equals(this._lastMessage))
+			{
+				
+			}
+			else
+			{
+			    Intent pebbleIntent = new Intent("com.getpebble.action.SEND_NOTIFICATION");
+		
+			    HashMap<String, String> data = new HashMap<String, String>();
+			    data.put("title", name);
+			    data.put("body", message);
+		
+			    JSONObject jsonData = new JSONObject(data);
+			    String notificationData = new JSONArray().put(jsonData).toString();
+		
+			    pebbleIntent.putExtra("messageType", "PEBBLE_ALERT");
+			    pebbleIntent.putExtra("sender", this._context.getString(R.string.app_name));
+			    pebbleIntent.putExtra("notificationData", notificationData);
+		
+			    this._context.sendBroadcast(pebbleIntent);
+			    
+			    this._lastMessage = message;
+			    this._lastTitle = name;
+			}
+		}
+	}
 	
-		    HashMap<String, String> data = new HashMap<String, String>();
-		    data.put("title", name);
-		    data.put("body", message);
-	
-		    JSONObject jsonData = new JSONObject(data);
-		    String notificationData = new JSONArray().put(jsonData).toString();
-	
-		    pebbleIntent.putExtra("messageType", "PEBBLE_ALERT");
-		    pebbleIntent.putExtra("sender", this._context.getString(R.string.app_name));
-		    pebbleIntent.putExtra("notificationData", notificationData);
-	
-		    this._context.sendBroadcast(pebbleIntent);
+	public void runActionForAlert(String name)
+	{
+		Runnable r = this._actions.get(name);
+		
+		if (r != null)
+		{
+			Thread t = new Thread(r);
+			t.start();
 		}
 	}
 	
@@ -217,4 +258,10 @@ public class SanityManager
 		return (Map<String, String>) this._warnings.clone();
 	}
 
+	public void clearAlert(String title) 
+	{
+		this._warnings.remove(title);
+		this._errors.remove(title);
+		this._actions.remove(title);
+	}
 }
