@@ -132,7 +132,6 @@ public class DiagnosticActivity extends ActionBarActivity
 					TextView errorLine = new TextView(this);
 					errorLine.setText(errors.get(error));
 					errorLine.setTextColor(0xffff4444);
-					errorLine.setTextIsSelectable(true);
 					errorLine.setTextSize(18);
 					
 					LinearLayout.LayoutParams layout = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
@@ -163,7 +162,6 @@ public class DiagnosticActivity extends ActionBarActivity
 					TextView errorLine = new TextView(this);
 					errorLine.setText(warnings.get(error));
 					errorLine.setTextColor(0xffffbb33);
-					errorLine.setTextIsSelectable(true);
 					errorLine.setTextSize(18);
 					
 					LinearLayout.LayoutParams layout = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);

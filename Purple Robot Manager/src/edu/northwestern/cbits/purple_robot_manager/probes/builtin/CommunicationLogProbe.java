@@ -8,6 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
@@ -15,6 +16,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
+import android.preference.Preference;
+import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
@@ -23,6 +26,7 @@ import android.provider.CallLog.Calls;
 import android.telephony.PhoneNumberUtils;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.probes.AddressBookLabelActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
@@ -101,6 +105,8 @@ public class CommunicationLogProbe extends Probe
 					
 					if (now - this._lastCheck  > freq)
 					{
+						AddressBookLabelActivity.check(context);
+
 						Bundle bundle = new Bundle();
 						bundle.putString("PROBE", this.name(context));
 						bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
@@ -283,7 +289,7 @@ public class CommunicationLogProbe extends Probe
 	}
 
 	@SuppressWarnings("deprecation")
-	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+	public PreferenceScreen preferenceScreen(final PreferenceActivity activity)
 	{
 		PreferenceManager manager = activity.getPreferenceManager();
 
@@ -314,6 +320,26 @@ public class CommunicationLogProbe extends Probe
 		hash.setSummary(R.string.config_probe_communication_hash_summary);
 
 		screen.addPreference(hash);
+
+		Preference calibrate = new Preference(activity);
+		calibrate.setTitle(R.string.config_probe_calibrate_title);
+		calibrate.setOnPreferenceClickListener(new OnPreferenceClickListener()
+		{
+			public boolean onPreferenceClick(Preference pref) 
+			{
+				Intent intent = new Intent(activity, AddressBookLabelActivity.class);
+				activity.startActivity(intent);
+
+    			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
+    			Editor e = prefs.edit();
+    			e.remove("last_address_book_calibration");
+    			e.commit();
+
+				return true;
+			}
+		});
+		
+		screen.addPreference(calibrate);
 
 		return screen;
 	}
