@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android" 
+    xmlns:robot="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/menu_diagnostic_item"
         android:title="@string/menu_diagnostic_label"
-        android:showAsAction="always"
+        robot:showAsAction="always"
         android:icon="@drawable/action_error" />
     <item android:id="@+id/menu_settings_item"
         android:title="@string/menu_settings_label" 
-        android:showAsAction="never" />
+        robot:showAsAction="never" />
     <item android:id="@+id/menu_upload_item"
         android:title="@string/menu_upload_label"
-        android:showAsAction="never" />
+        robot:showAsAction="never" />
     <item android:id="@+id/menu_label_item"
         android:title="@string/menu_label_label"
-        android:showAsAction="never" />
+        robot:showAsAction="never" />
 </menu>

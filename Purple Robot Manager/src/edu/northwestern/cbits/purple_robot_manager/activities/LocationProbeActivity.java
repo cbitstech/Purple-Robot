@@ -18,14 +18,14 @@ import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.util.DisplayMetrics;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockMapActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.MapController;
@@ -40,7 +40,7 @@ import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
 
 @SuppressLint("SimpleDateFormat")
-public class LocationProbeActivity extends SherlockMapActivity
+public class LocationProbeActivity extends ActionBarActivity
 {
 	private String _subtitle = null;
 	private double _selectedTimestamp = 0;
@@ -323,7 +323,7 @@ public class LocationProbeActivity extends SherlockMapActivity
 
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-        MenuInflater inflater = this.getSupportMenuInflater();
+        MenuInflater inflater = this.getMenuInflater();
         inflater.inflate(R.menu.menu_probe_activity, menu);
 
         return true;

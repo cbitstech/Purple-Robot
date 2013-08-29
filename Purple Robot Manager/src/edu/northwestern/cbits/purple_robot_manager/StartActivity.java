@@ -25,8 +25,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -39,13 +44,6 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-
 import edu.northwestern.cbits.purple_robot_manager.activities.DiagnosticActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.LabelActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
@@ -58,7 +56,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.Feature;
 
-public class StartActivity extends SherlockActivity
+public class StartActivity extends ActionBarActivity
 {
 	public static final String UPDATE_MESSAGE = "UPDATE_LIST_MESSAGE";
 	public static final String DISPLAY_MESSAGE = "DISPLAY_MESSAGE";
@@ -474,7 +472,7 @@ public class StartActivity extends SherlockActivity
 
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-        MenuInflater inflater = this.getSupportMenuInflater();
+        MenuInflater inflater = this.getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
 
         this._menu = menu;

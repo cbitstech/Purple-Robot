@@ -22,8 +22,13 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager.LayoutParams;
 import android.widget.ArrayAdapter;
@@ -37,20 +42,13 @@ import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
-
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-
 import edu.emory.mathcs.backport.java.util.Collections;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 
 @SuppressLint("SimpleDateFormat")
-public class LabelActivity extends SherlockFragmentActivity
+public class LabelActivity extends ActionBarActivity
 {
 	public static final String TIMESTAMP = "LABEL TIMESTAMP";
 	public static final String LABEL_CONTEXT = "LABEL_CONTEXT";
@@ -428,7 +426,7 @@ public class LabelActivity extends SherlockFragmentActivity
 
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-        MenuInflater inflater = this.getSupportMenuInflater();
+        MenuInflater inflater = this.getMenuInflater();
         inflater.inflate(R.menu.menu_label_activity, menu);
 
         return true;
