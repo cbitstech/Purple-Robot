@@ -623,5 +623,15 @@
        	<item>5000</item>
        	<item>10000</item>
    	</string-array>
-			
+
+	<string-array name="contact_groups">
+        <item>Significant Other</item>
+        <item>Friend</item>
+        <item>Family</item>
+       	<item>Coworker</item>
+       	<item>Acquaintance</item>
+       	<item>Customer</item>
+       	<item>Client</item>
+       	<item>Stranger</item>
+  	</string-array>
 </resources>

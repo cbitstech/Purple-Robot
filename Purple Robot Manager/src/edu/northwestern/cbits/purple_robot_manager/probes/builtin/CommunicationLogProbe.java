@@ -27,6 +27,7 @@ import android.telephony.PhoneNumberUtils;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.probes.AddressBookLabelActivity;
+import edu.northwestern.cbits.purple_robot_manager.calibration.ContactCalibrationHelper;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
@@ -48,6 +49,8 @@ public class CommunicationLogProbe extends Probe
 	private static final String RECENT_CALLER = "RECENT_CALLER";
 	private static final String RECENT_TIME = "RECENT_TIME";
 	private static final String RECENT_NUMBER = "RECENT_NUMBER";
+	private static final String NUMBER_GROUP = "NUMBER_GROUP";
+	private static final String RECENT_GROUP = "RECENT_GROUP";
 
 	private static final boolean DEFAULT_ENABLED = true;
 
@@ -105,7 +108,7 @@ public class CommunicationLogProbe extends Probe
 					
 					if (now - this._lastCheck  > freq)
 					{
-						AddressBookLabelActivity.check(context);
+						ContactCalibrationHelper.check(context);
 
 						Bundle bundle = new Bundle();
 						bundle.putString("PROBE", this.name(context));
@@ -136,6 +139,14 @@ public class CommunicationLogProbe extends Probe
 
 								if (numberName == null)
 									numberName = phoneNumber;
+								
+								String group = ContactCalibrationHelper.getGroup(context, numberName, false);
+								
+								if (group == null)
+									group = ContactCalibrationHelper.getGroup(context, phoneNumber, true);
+
+								if (group != null)
+									contactBundle.putString(CommunicationLogProbe.NUMBER_GROUP, group);
 
 								if (doHash)
 								{
@@ -193,6 +204,14 @@ public class CommunicationLogProbe extends Probe
 
 							if (recentNumber != null)
 								bundle.putString(CommunicationLogProbe.RECENT_NUMBER, recentNumber);
+
+							String group = ContactCalibrationHelper.getGroup(context, recentName, false);
+							
+							if (group == null)
+								group = ContactCalibrationHelper.getGroup(context, recentNumber, true);
+
+							if (group != null)
+								bundle.putString(CommunicationLogProbe.RECENT_GROUP, group);
 
 							if (recentTimestamp > 0)
 								bundle.putLong(CommunicationLogProbe.RECENT_TIME, recentTimestamp);
@@ -329,11 +348,6 @@ public class CommunicationLogProbe extends Probe
 			{
 				Intent intent = new Intent(activity, AddressBookLabelActivity.class);
 				activity.startActivity(intent);
-
-    			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
-    			Editor e = prefs.edit();
-    			e.remove("last_address_book_calibration");
-    			e.commit();
 
 				return true;
 			}
