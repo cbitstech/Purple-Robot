@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.scribe.builder.ServiceBuilder;
+import org.scribe.exceptions.OAuthException;
 import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;
 import org.scribe.model.Token;
@@ -172,10 +173,10 @@ public class FitbitApiFeature extends Feature
 							{
 								public void run() 
 								{
-									Response response = request.send();
-									
 									try 
 									{
+										Response response = request.send();
+
 										JSONObject body = new JSONObject(response.getBody());
 	
 										JSONObject summary = body.getJSONObject("summary");
@@ -247,6 +248,10 @@ public class FitbitApiFeature extends Feature
 										me.transmitData(context, bundle);
 									} 
 									catch (JSONException e) 
+									{
+										e.printStackTrace();
+									}
+									catch (OAuthException e)
 									{
 										e.printStackTrace();
 									}
