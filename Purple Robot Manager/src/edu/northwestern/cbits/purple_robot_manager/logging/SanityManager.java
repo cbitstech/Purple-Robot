@@ -227,7 +227,7 @@ public class SanityManager
 			    pebbleIntent.putExtra("sender", this._context.getString(R.string.app_name));
 			    pebbleIntent.putExtra("notificationData", notificationData);
 		
-			    this._context.sendBroadcast(pebbleIntent);
+			    // this._context.sendBroadcast(pebbleIntent);
 			    
 			    this._lastMessage = message;
 			    this._lastTitle = name;

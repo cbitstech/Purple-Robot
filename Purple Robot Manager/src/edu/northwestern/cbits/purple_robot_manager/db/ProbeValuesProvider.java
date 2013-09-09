@@ -294,7 +294,7 @@ public class ProbeValuesProvider
 	
 					cursor.close();
 	
-					SQLiteStatement delete = this._database.compileStatement("delete from " + tableName + " where " + ProbeValuesProvider.ID + " not in (select " + ProbeValuesProvider.ID + " from " + tableName + " order by " + ProbeValuesProvider.TIMESTAMP + " desc limit 500);");
+					SQLiteStatement delete = this._database.compileStatement("delete from " + tableName + " where " + ProbeValuesProvider.ID + " not in (select " + ProbeValuesProvider.ID + " from " + tableName + " order by " + ProbeValuesProvider.TIMESTAMP + " desc limit 2048);");
 					delete.execute();
 	
 					cursor = this._database.query(tableName, null, null, null, null, null, null);
