@@ -902,7 +902,12 @@
 	<string name="title_address_book_label_check">Friends &amp; Family Info Needed</string>	
 	<string name="message_address_book_label_check">Please provide some information about your friends and family to help the system function better.</string>	
 	<string name="contact_group_label_unknown">Unknown</string>	
-						
+
+	<!-- Location Label Activity -->
+	<string name="title_location_label">Places Calibrator</string>	
+	<string name="title_location_label_check">Location Info Needed</string>	
+	<string name="message_location_label_check">Please provide some information about places you have visited to help the system function better.</string>	
+							
 <!--<string name="name_sanity_last_upload_never">Sensor data has not ever been uploaded.</string>
    	<string name="name_sanity_last_upload_error">Sensor data has not been uploaded in the last day.</string>
     <string name="name_sanity_last_upload_warning">Sensor data has not been uploaded in the last 12 hours.</string>
