@@ -104,6 +104,7 @@ public class DBSCAN
 	public class Cluster
 	{
 		private HashSet<Point> _points = new HashSet<Point>();
+		private String _name = null;
 		
 		public void addPoint(Point p)
 		{
@@ -135,6 +136,16 @@ public class DBSCAN
 		public void clear()
 		{
 			this._points.clear();
+		}
+
+		public String getName() 
+		{
+			return this._name;
+		}
+
+		public void setName(String name) 
+		{
+			this._name = name;
 		}
 	}
 	
