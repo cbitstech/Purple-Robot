@@ -903,11 +903,14 @@
 	<string name="message_address_book_label_check">Please provide some information about your friends and family to help the system function better.</string>	
 	<string name="contact_group_label_unknown">Unknown</string>	
 
+	<string name="google_places_browser_key"></string>
+
 	<!-- Location Label Activity -->
 	<string name="title_location_label">Places Calibrator</string>	
 	<string name="title_location_desc">Tap a colored box to zoom into a cluster.</string>	
 	<string name="title_location_label_check">Location Info Needed</string>	
 	<string name="message_location_label_check">Please provide some information about places you have visited to help the system function better.</string>	
+
 	<string name="title_place_unknown">Unknown Place (Tap to Label&#8230;)</string>	
     <string name="title_place_count" formatted="false">%d coordinates logged</string>
     <string name="menu_label_cluster">Choose a Label</string>
