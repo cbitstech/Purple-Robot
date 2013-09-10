@@ -634,4 +634,18 @@
        	<item>Client</item>
        	<item>Stranger</item>
   	</string-array>
+
+	<string-array name="place_groups">
+        <item>Home</item>
+        <item>Work</item>
+        <item>School</item>
+       	<item>Family</item>
+       	<item>In Transit</item>
+       	<item>Church or Other Place of Worship</item>
+       	<item>Dining</item>
+       	<item>Park</item>
+       	<item>Gym or Other Athletic Facility</item>
+       	<item>Shopping</item>
+       	<item>Other Recreational Facility</item>
+	</string-array>
 </resources>
