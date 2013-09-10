@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
+import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
@@ -40,7 +41,7 @@ import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
 
 @SuppressLint("SimpleDateFormat")
-public class LocationProbeActivity extends ActionBarActivity
+public class LocationProbeActivity extends MapActivity
 {
 	private String _subtitle = null;
 	private double _selectedTimestamp = 0;
@@ -81,9 +82,9 @@ public class LocationProbeActivity extends ActionBarActivity
 			{
 				public void run()
 				{
-					ActionBar actionBar = me._activity.getSupportActionBar();
-
-					actionBar.setSubtitle(String.format(me._activity.getString(R.string.display_date_item_count), sdf.format(d), me._activity._subtitle));
+//					ActionBar actionBar = me._activity.getSupportActionBar();
+//
+//					actionBar.setSubtitle(String.format(me._activity.getString(R.string.display_date_item_count), sdf.format(d), me._activity._subtitle));
 
 					me._activity._selectedTimestamp = (double) timestamp;
 				}
@@ -301,7 +302,7 @@ public class LocationProbeActivity extends ActionBarActivity
 		PointOverlay pointOverlay = new PointOverlay(d, locations, this);
 		overlays.add(pointOverlay);
 
-		this.getSupportActionBar().setTitle(R.string.title_location_history);
+//		this.getSupportActionBar().setTitle(R.string.title_location_history);
 
 		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
 
@@ -313,7 +314,7 @@ public class LocationProbeActivity extends ActionBarActivity
 		else
 			this._subtitle = startDate + " (" + locations.size() + ")";
 
-		this.getSupportActionBar().setSubtitle(this._subtitle);
+//		this.getSupportActionBar().setSubtitle(this._subtitle);
 	}
 
 	protected boolean isRouteDisplayed()
