@@ -21,7 +21,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.activities.LocationProbeActivity;
+import edu.northwestern.cbits.purple_robot_manager.activities.probes.LocationProbeActivity;
 import edu.northwestern.cbits.purple_robot_manager.calibration.LocationCalibrationHelper;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;

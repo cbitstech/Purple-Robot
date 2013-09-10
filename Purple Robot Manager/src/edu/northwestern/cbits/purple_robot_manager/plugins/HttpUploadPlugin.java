@@ -223,6 +223,8 @@ public class HttpUploadPlugin extends OutputPlugin
 
 	public void processIntent(Intent intent)
 	{
+		final SharedPreferences prefs = HttpUploadPlugin.getPreferences(this.getContext());
+
 		if (OutputPlugin.FORCE_UPLOAD.equals(intent.getAction()))
 		{
 			this._lastUpload = 0;
@@ -243,7 +245,7 @@ public class HttpUploadPlugin extends OutputPlugin
 			Thread t = new Thread(r);
 			t.start();
 		}
-		else
+		else if (prefs.getBoolean("config_enable_data_server", false))
 		{
 			try
 			{
@@ -292,6 +294,8 @@ public class HttpUploadPlugin extends OutputPlugin
 				LogManager.getInstance(this.getContext()).logException(e);
 			}
 		}
+		else
+			Log.e("PR", "SKIPPING PERSIST");
 	}
 
 	@SuppressLint("NewApi")
