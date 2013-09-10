@@ -1,5 +1,5 @@
 <resources>
-    <string name="sensor_upload_url">https://165.124.171.88/prImporter</string>
+    <string name="sensor_upload_url">https://app2.cbits.northwestern.edu/prImporter</string>
     <string name="json_config_url">http://mohrlab.northwestern.edu/robot/</string>
     <string name="app_name">Purple Robot</string>
 
