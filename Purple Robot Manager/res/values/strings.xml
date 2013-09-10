@@ -902,6 +902,8 @@
 	<string name="title_address_book_label_check">Friends &amp; Family Info Needed</string>	
 	<string name="message_address_book_label_check">Please provide some information about your friends and family to help the system function better.</string>	
 	<string name="contact_group_label_unknown">Unknown</string>	
+	
+	<string name="google_places_browser_key"></string>
 						
 <!--<string name="name_sanity_last_upload_never">Sensor data has not ever been uploaded.</string>
    	<string name="name_sanity_last_upload_error">Sensor data has not been uploaded in the last day.</string>
