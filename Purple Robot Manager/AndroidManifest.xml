@@ -105,8 +105,9 @@
 	            <data android:scheme="cbits-oauth"	android:host="purplerobot" android:pathPrefix="/oauth/" />
 	        </intent-filter>
 	    </activity>
+		<activity android:name=".activities.probes.LocationLabelActivity" android:label="@string/app_name" android:theme="@style/Theme.AppCompat" />
 		<activity android:name=".activities.probes.AddressBookLabelActivity" android:label="@string/app_name" android:theme="@style/Theme.AppCompat" />
-		<activity android:name=".activities.DiagnosticActivity" android:label="@string/app_name" android:theme="@style/Theme.AppCompat" />
+				<activity android:name=".activities.DiagnosticActivity" android:label="@string/app_name" android:theme="@style/Theme.AppCompat" />
 		<activity android:name=".activities.LocationProbeActivity" android:label="@string/app_name" android:theme="@style/Theme.AppCompat" />
 		<activity android:name=".activities.WebkitActivity" android:label="@string/app_name" android:theme="@style/Theme.AppCompat" />
 		<activity android:name=".activities.WebkitLandscapeActivity" android:label="@string/app_name" android:screenOrientation="landscape" android:theme="@style/Theme.AppCompat" />
