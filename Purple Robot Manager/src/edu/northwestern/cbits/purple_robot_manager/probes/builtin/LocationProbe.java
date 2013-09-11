@@ -25,6 +25,7 @@ import edu.northwestern.cbits.purple_robot_manager.activities.probes.LocationPro
 import edu.northwestern.cbits.purple_robot_manager.calibration.LocationCalibrationHelper;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
+import edu.northwestern.cbits.purple_robot_manager.util.DBSCAN;
 
 public class LocationProbe extends Probe implements LocationListener
 {
@@ -41,6 +42,7 @@ public class LocationProbe extends Probe implements LocationListener
 	public static final String LONGITUDE_KEY = LONGITUDE;
 	public static final String LATITUDE_KEY = LATITUDE;
 	public static final String DB_TABLE = "location_probe";
+	private static final String CLUSTER = "CLUSTER";
 
 	private static final boolean DEFAULT_ENABLED = true;
 
@@ -244,6 +246,12 @@ public class LocationProbe extends Probe implements LocationListener
 
 		bundle.putDouble(LocationProbe.LATITUDE, location.getLatitude());
 		bundle.putDouble(LocationProbe.LONGITUDE, location.getLongitude());
+		
+		String cluster = DBSCAN.inCluster(this._context, location.getLatitude(), location.getLongitude());
+		
+		if (cluster != null)
+			bundle.putString(LocationProbe.CLUSTER, cluster);
+			
 		bundle.putString(LocationProbe.PROVIDER, location.getProvider());
 
 		if (location.hasAccuracy())

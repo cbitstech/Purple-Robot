@@ -294,8 +294,6 @@ public class HttpUploadPlugin extends OutputPlugin
 				LogManager.getInstance(this.getContext()).logException(e);
 			}
 		}
-		else
-			Log.e("PR", "SKIPPING PERSIST");
 	}
 
 	@SuppressLint("NewApi")
