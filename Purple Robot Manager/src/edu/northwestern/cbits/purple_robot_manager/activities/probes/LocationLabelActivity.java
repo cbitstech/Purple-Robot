@@ -50,18 +50,18 @@ public class LocationLabelActivity extends ActionBarActivity
 
         this.setContentView(R.layout.layout_location_label_activity);
         
-        DBSCAN dbscan = new DBSCAN(0.00075, 3);
+        DBSCAN dbscan = new DBSCAN(this, DBSCAN.DISTANCE, DBSCAN.POPULATION);
 
 		Cursor cursor = ProbeValuesProvider.getProvider(this).retrieveValues(this, LocationProbe.DB_TABLE, LocationProbe.databaseSchema());
 
 		while (cursor.moveToNext())
 		{
-			dbscan.addPoint(dbscan.new Point(cursor.getDouble(cursor.getColumnIndex(LocationProbe.LATITUDE_KEY)), cursor.getDouble(cursor.getColumnIndex(LocationProbe.LONGITUDE_KEY))));
+			dbscan.addPoint(new Point(cursor.getDouble(cursor.getColumnIndex(LocationProbe.LATITUDE_KEY)), cursor.getDouble(cursor.getColumnIndex(LocationProbe.LONGITUDE_KEY))));
 		}
 
 		cursor.close();
 		
-		this._clusters.addAll(dbscan.calculate());
+		this._clusters.addAll(dbscan.calculate(this));
 		
 		Collections.sort(this._clusters, new Comparator<Cluster>()
 		{
@@ -122,7 +122,7 @@ public class LocationLabelActivity extends ActionBarActivity
 					break;
 			}
 			
-			for (Point p : cluster.getPoints())
+			for (Point p : cluster.getPoints(20))
 			{
 				CircleOptions options = new CircleOptions();
 				options.center(new LatLng(p.x(), p.y()));
@@ -296,6 +296,8 @@ public class LocationLabelActivity extends ActionBarActivity
 		ListView list = (ListView) this.findViewById(R.id.list_view);
 		list.setAdapter(list.getAdapter());
 
+		DBSCAN.persistClusters(this, this._clusters, DBSCAN.DISTANCE, DBSCAN.POPULATION);
+		
         return true;
     }
 
