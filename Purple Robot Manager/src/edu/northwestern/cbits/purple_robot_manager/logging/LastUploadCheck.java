@@ -23,6 +23,14 @@ public class LastUploadCheck extends SanityCheck
 
 	public void runCheck(Context context) 
 	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+		if (prefs.getBoolean("config_enable_data_server", false) == false)
+		{
+			this._errorLevel = SanityCheck.OK;
+			return;
+		}
+		
 		OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(context, HttpUploadPlugin.class);
 		
 		if (plugin instanceof HttpUploadPlugin)
@@ -38,8 +46,6 @@ public class LastUploadCheck extends SanityCheck
 		}
 		
 		long now = System.currentTimeMillis();
-
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		
 		long lastUploadTime = prefs.getLong("http_last_upload", 0);
 		

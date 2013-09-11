@@ -30,14 +30,17 @@ public class ConfigurationCheck extends SanityCheck
 			return;
 		}
 
-		long upload = Long.parseLong(prefs.getString("config_http_upload_interval", "0"));
-		
-		if (upload > 0 && upload < 300000)
+		if (prefs.getBoolean("config_enable_data_server", false))
 		{
-			this._errorLevel = SanityCheck.WARNING;
-			this._errorMessage = context.getString(R.string.name_sanity_configuration_upload_warning);
+			long upload = Long.parseLong(prefs.getString("config_http_upload_interval", "0"));
 			
-			return;
+			if (upload > 0 && upload < 300000)
+			{
+				this._errorLevel = SanityCheck.WARNING;
+				this._errorMessage = context.getString(R.string.name_sanity_configuration_upload_warning);
+				
+				return;
+			}
 		}
 
 		this._errorLevel = SanityCheck.OK;
