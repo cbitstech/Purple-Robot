@@ -27,6 +27,13 @@ public class UploadProgressCheck extends SanityCheck
 	public void runCheck(Context context) 
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+		if (prefs.getBoolean("config_enable_data_server", false) == false)
+		{
+			this._errorLevel = SanityCheck.OK;
+			return;
+		}
+		
 		Editor e = prefs.edit();
 
 		if (this._inited == false)
