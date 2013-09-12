@@ -17,10 +17,13 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
+import android.preference.Preference;
+import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.probes.LocationLabelActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.probes.LocationProbeActivity;
 import edu.northwestern.cbits.purple_robot_manager.calibration.LocationCalibrationHelper;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
@@ -123,7 +126,7 @@ public class LocationProbe extends Probe implements LocationListener
 	}
 	
 	@SuppressWarnings("deprecation")
-	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+	public PreferenceScreen preferenceScreen(final PreferenceActivity activity)
 	{
 		PreferenceManager manager = activity.getPreferenceManager();
 
@@ -148,6 +151,21 @@ public class LocationProbe extends Probe implements LocationListener
 		duration.setTitle(R.string.probe_frequency_label);
 
 		screen.addPreference(duration);
+
+		Preference calibrate = new Preference(activity);
+		calibrate.setTitle(R.string.config_probe_calibrate_title);
+		calibrate.setOnPreferenceClickListener(new OnPreferenceClickListener()
+		{
+			public boolean onPreferenceClick(Preference pref) 
+			{
+				Intent intent = new Intent(activity, LocationLabelActivity.class);
+				activity.startActivity(intent);
+
+				return true;
+			}
+		});
+		
+		screen.addPreference(calibrate);
 
 		return screen;
 	}

@@ -3,19 +3,31 @@ package edu.northwestern.cbits.purple_robot_manager.calibration;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.preference.PreferenceManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.probes.LocationLabelActivity;
+import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
 
 public class LocationCalibrationHelper 
 {
 	public static void check(final Context context) 
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+		
+		long lastCalibration = prefs.getLong("last_location_calibration", 0);
+		long now = System.currentTimeMillis();
 
-		if (prefs.contains("last_location_calibration") == false)
+		Cursor cursor = ProbeValuesProvider.getProvider(context).retrieveValues(context, LocationProbe.DB_TABLE, LocationProbe.databaseSchema());
+
+		int count = cursor.getCount();
+
+		cursor.close();
+
+		if (now - lastCalibration > (1000 * 60 * 60 * 24 * 30) && count > 500)
 		{
 			final SanityManager sanity = SanityManager.getInstance(context);
 
