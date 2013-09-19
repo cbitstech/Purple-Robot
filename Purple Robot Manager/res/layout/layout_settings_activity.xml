@@ -273,5 +273,8 @@
 		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_funder_nih" />
 	        </Preference>
 		</PreferenceScreen>
+		<Preference android:title="@string/title_mail_app_schema"
+	    	android:key="config_dump_json">
+        </Preference>
 	</PreferenceCategory>
 </PreferenceScreen>
