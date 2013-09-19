@@ -1,18 +1,42 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
+
+import javax.crypto.CipherOutputStream;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.parser.Parser;
+
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.Resources.NotFoundException;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
+import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
+import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -36,6 +60,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 	public static final String CHECK_UPDATES_KEY = "config_hockey_update";
 	public static final String TRIGGERS_SCREEN_KEY = "config_triggers_screen";
 	public static final String MODELS_SCREEN_KEY = "config_models_screen";
+	private static final String DUMP_JSON_KEY = "config_dump_json";
 
 	@SuppressWarnings("deprecation")
 	public void onCreate(Bundle savedInstanceState)
@@ -90,7 +115,10 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 
         Preference delete = prefs.findPreference(DELETE_ARCHIVES_KEY);
         delete.setOnPreferenceClickListener(this);
-        
+
+        Preference dump = prefs.findPreference(DUMP_JSON_KEY);
+        dump.setOnPreferenceClickListener(this);
+
         CheckBoxPreference update = (CheckBoxPreference) prefs.findPreference(CHECK_UPDATES_KEY);
         update.setOnPreferenceChangeListener(this);
 
@@ -107,6 +135,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 		LogManager.getInstance(this).log("settings_exited", null);
 	}
 
+	@SuppressWarnings("deprecation")
 	public boolean onPreferenceClick(Preference preference)
 	{
         if (HAPTIC_PATTERN_KEY.equals(preference.getKey()))
@@ -168,8 +197,128 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
         		return true;
         	}
         }
+        else if (DUMP_JSON_KEY.equals(preference.getKey()))
+        {
+        	try 
+        	{
+            	JSONObject root = new JSONObject();
+
+            	ApplicationInfo info = this.getApplicationInfo();
+            	root.put("name", this.getString(info.labelRes)); 
+            
+            	PackageInfo pkgInfo = this.getPackageManager().getPackageInfo(info.packageName, 0); 
+
+            	root.put("package_name", pkgInfo.packageName); 
+            	root.put("version", pkgInfo.versionCode); 
+            	root.put("version_name", pkgInfo.versionName); 
+
+       			JSONObject config = this.dumpJson(this.getPreferenceScreen());
+            	root.put("configuration", config); 
+            	
+            	File cacheDir = this.getExternalCacheDir();
+            	File configJsonFile = new File(cacheDir, "config.json");
+            	
+        		FileOutputStream fout = new FileOutputStream(configJsonFile);
+
+        		fout.write(root.toString(2).getBytes(Charset.defaultCharset()));
+
+        		fout.flush();
+        		fout.close();
+        		
+        		Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+        		emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, this.getString(R.string.message_mail_app_schema));
+        		emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, this.getString(R.string.subject_mail_app_schema));
+        		emailIntent.setType("text/plain");
+
+        		Uri uri = Uri.fromFile(configJsonFile);
+        		emailIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        		this.startActivity(emailIntent);
+			}
+        	catch (JSONException e) 
+        	{
+				e.printStackTrace();
+			}
+        	catch (NameNotFoundException e) 
+        	{
+				e.printStackTrace();
+			} 
+        	catch (FileNotFoundException e) 
+        	{
+				e.printStackTrace();
+			} 
+        	catch (IOException e) 
+        	{
+				e.printStackTrace();
+			}
+        }
 
         return false;
+	}
+
+	private JSONObject dumpJson(Preference preference) throws JSONException 
+	{
+		JSONObject prefJson = new JSONObject();
+		
+		if (preference.getKey() != null)
+			prefJson.put("key", preference.getKey());
+
+		if (preference.getTitle() != null)
+			prefJson.put("title", preference.getTitle());
+
+		if (preference.getSummary() != null)
+			prefJson.put("summary", preference.getSummary());
+
+		if (preference instanceof PreferenceGroup)
+		{
+			PreferenceGroup group = (PreferenceGroup) preference;
+			
+			prefJson.put("type", "group");
+			
+			JSONArray children = new JSONArray();
+			
+			for (int i = 0; i < group.getPreferenceCount(); i++)
+			{
+				JSONObject child = this.dumpJson(group.getPreference(i));
+				
+				if (child != null)
+					children.put(child);
+			}
+
+			prefJson.put("children", children);
+		}
+		else if (preference instanceof CheckBoxPreference)
+		{
+			CheckBoxPreference check = (CheckBoxPreference) preference;
+			prefJson.put("type", "boolean");
+		}
+		else if (preference instanceof EditTextPreference)
+		{
+			EditTextPreference text = (EditTextPreference) preference;
+			prefJson.put("type", "string");
+		}
+		else if (preference instanceof ListPreference)
+		{
+			ListPreference list = (ListPreference) preference;
+			prefJson.put("type", "list");
+			
+			JSONArray entries = new JSONArray();
+			
+			for (CharSequence cs : list.getEntries())
+				entries.put(cs);
+
+			prefJson.put("labels", entries);
+
+			JSONArray values = new JSONArray();
+			
+			for (CharSequence cs : list.getEntryValues())
+				values.put(cs);
+
+			prefJson.put("values", values);
+		}
+		else
+			prefJson = null;
+		
+		return prefJson;
 	}
 
 	public boolean onPreferenceChange(Preference pref, Object value) 
