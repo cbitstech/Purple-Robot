@@ -156,6 +156,7 @@
         <item>900</item>
         <item>1800</item>
         <item>3600</item>
+        <item>-1</item>
     </string-array>
 
 	<string-array name="json_refresh_interval_labels">
@@ -167,7 +168,8 @@
         <item>15 minutes</item>
         <item>30 minutes</item>
         <item>1 hour</item>
-    </string-array>
+        <item>Never</item>
+   	</string-array>
 
 	<string-array name="vibrator_pattern_values">
         <item>vibrator_blip</item>

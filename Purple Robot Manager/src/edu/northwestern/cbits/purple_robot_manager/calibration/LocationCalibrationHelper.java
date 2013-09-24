@@ -26,8 +26,8 @@ public class LocationCalibrationHelper
 		int count = cursor.getCount();
 
 		cursor.close();
-
-		if (now - lastCalibration > (1000 * 60 * 60 * 24 * 30) && count > 500)
+		
+		if (now - lastCalibration > (1000L * 60 * 60 * 24 * 30) && count > 500)
 		{
 			final SanityManager sanity = SanityManager.getInstance(context);
 

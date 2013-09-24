@@ -326,7 +326,7 @@ public class ManagerService extends IntentService
 			TriggerManager.getInstance(this).nudgeTriggers(this);
 		}
 		else if (REFRESH_CONFIGURATION.equals(intent.getAction()))
-			LegacyJSONConfigFile.update(this);
+			LegacyJSONConfigFile.update(this, false);
 	}
 
 	public static void setupPeriodicCheck(final Context context)

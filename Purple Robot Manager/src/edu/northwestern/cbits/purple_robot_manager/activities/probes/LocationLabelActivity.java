@@ -5,9 +5,11 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import android.content.Context;
+import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -87,6 +89,10 @@ public class LocationLabelActivity extends ActionBarActivity
 		
 		this.getSupportActionBar().setTitle(R.string.title_location_label);
 		this.getSupportActionBar().setSubtitle(R.string.title_location_desc);
+		
+		Editor e = PreferenceManager.getDefaultSharedPreferences(this).edit();
+		e.putLong("last_location_calibration", System.currentTimeMillis());
+		e.commit();
     }
 	
 	protected void onResume()

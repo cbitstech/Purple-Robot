@@ -355,7 +355,7 @@ public class LegacyJSONConfigFile
 		if (LegacyJSONConfigFile._sharedFile == null)
 		{
 			LegacyJSONConfigFile._sharedFile = new LegacyJSONConfigFile(context, null);
-			LegacyJSONConfigFile.update(context);
+			LegacyJSONConfigFile.update(context, false);
 		}
 
 		return LegacyJSONConfigFile._sharedFile;
@@ -559,7 +559,7 @@ public class LegacyJSONConfigFile
 		return slug.toLowerCase(Locale.ENGLISH);
 	}
 
-	public static void update(final Context context)
+	public static void update(final Context context, final boolean force)
 	{
 		Runnable r = new Runnable()
 		{
@@ -573,7 +573,7 @@ public class LegacyJSONConfigFile
 
 				int interval = Integer.parseInt(prefs.getString("config_json_refresh_interval", "3600"));
 				
-				if (now - lastUpdate > 1000 * interval)
+				if (force || (interval > 0 && now - lastUpdate > 1000 * interval))
 				{
 					Editor edit = prefs.edit();
 
