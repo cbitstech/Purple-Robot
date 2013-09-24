@@ -24,7 +24,7 @@ import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
 public class DBSCAN 
 {
-	public static final int POPULATION = 5;
+	public static final int POPULATION = 10;
 	public static final double DISTANCE = 0.001;
 	private double _minDistance = 0;
 	private int _minPopulation = 0;

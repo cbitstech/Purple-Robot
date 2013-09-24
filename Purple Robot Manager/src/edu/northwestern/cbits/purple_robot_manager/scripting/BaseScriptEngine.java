@@ -488,7 +488,7 @@ public abstract class BaseScriptEngine
 		
 		EncryptionManager.getInstance().setConfigUri(this._context, Uri.parse(newUrl));
 		
-		LegacyJSONConfigFile.update(this._context);
+		LegacyJSONConfigFile.update(this._context, true);
 	}
 	
 	public void setPassword(String password)
@@ -540,7 +540,7 @@ public abstract class BaseScriptEngine
 		editor.putLong(LegacyJSONConfigFile.JSON_LAST_UPDATE, 0);
 		editor.commit();
 		
-		LegacyJSONConfigFile.update(this._context);
+		LegacyJSONConfigFile.update(this._context, true);
 
 		ProbeManager.nudgeProbes(this._context);
 	}

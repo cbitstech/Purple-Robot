@@ -162,7 +162,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 			editor.putString(LegacyJSONConfigFile.JSON_LAST_HASH, "");
 
 			editor.commit();
-			LegacyJSONConfigFile.update(this);
+			LegacyJSONConfigFile.update(this, true);
 
 			ProbeManager.nudgeProbes(this);
 
