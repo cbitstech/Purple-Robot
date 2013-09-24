@@ -77,6 +77,11 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 		return i;
 	}
 
+	public String probeCategory(Context context)
+	{
+		return context.getString(R.string.probe_sensor_category);
+	}
+
 	public String contentSubtitle(Context context)
 	{
 		Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(context, LightProbe.DB_TABLE, this.databaseSchema());
@@ -233,11 +238,6 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 	public int getTitleResource()
 	{
 		return R.string.title_light_probe;
-	}
-
-	public int getCategoryResource()
-	{
-		return R.string.probe_environment_category;
 	}
 
 	public boolean isEnabled(Context context)

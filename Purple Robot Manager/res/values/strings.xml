@@ -138,8 +138,8 @@
     <string name="config_show_background">Enable Background Image</string>
     <string name="summary_show_background">When probes are disabled, specifies whether to display the default placeholder image or to leave the area empty.</string>
 
-    <string name="config_mute_warnings">Mute Status Check Notifications</string>
-    <string name="summary_mute_warnings">Do not display Purple Robot staus checks as status notifications.</string>
+    <string name="config_mute_warnings">Mute Status Notifications</string>
+    <string name="summary_mute_warnings">Do not display sanity check notifications.</string>
     
     <string name="error_json_set_uri">Unable to automatically set configuration from the web. Please verify that the configuration file is valid and reachable from the public Internet.</string>
     <string name="error_json_set_uri_password">Unable to automatically set configuration from the web while the password is set.</string>
@@ -204,14 +204,14 @@
     <string name="title_rotation_vector_probe">Rotation Vector Probe</string>
     <string name="summary_rotation_vector_probe_desc">The rotation vector represents the orientation of the device as a combination of an angle and an axis, in which the device has rotated through an angle θ around an axis &lt;x, y, z&gt;.</string>
 
-    <string name="probe_unknown_category">Uncategorized</string>
+    <!-- <string name="probe_unknown_category">Uncategorized</string>
     <string name="probe_positioning_category">Positioning</string>
     <string name="probe_motion_category">Motion</string>
     <string name="probe_social_category">Social</string>
     <string name="probe_device_interaction_category">Device Interaction</string>
     <string name="probe_device_category">Device</string>
     <string name="probe_environment_category">Device</string>
-    <string name="probe_features_category">Features</string>
+    <string name="probe_features_category">Features</string> -->
 
     <string name="title_contact_probe">Contact Probe</string>
     <string name="summary_contact_probe_desc">Detailed information about the contacts available to the device. Sensitive information is one way hashed to ensure user privacy.</string>
@@ -915,12 +915,21 @@
     <string name="title_place_count" formatted="false">%d coordinates logged</string>
     <string name="menu_label_cluster">Choose a Label</string>
         
+    <string name="config_special_category">Special Options &amp; Actions</string>
    	<string name="title_mail_app_schema">E-mail App Configuration Schema</string>
    	<string name="message_mail_app_schema">Please see the attached file for the app configuration schema.</string>
    	<string name="subject_mail_app_schema">Purple Robot Configuration Schema</string>
    		<!--<string name="name_sanity_last_upload_never">Sensor data has not ever been uploaded.</string>
    	<string name="name_sanity_last_upload_error">Sensor data has not been uploaded in the last day.</string>
     <string name="name_sanity_last_upload_warning">Sensor data has not been uploaded in the last 12 hours.</string> -->    
+
+    <string name="probe_device_info_category">Device Information &amp; Configuration Probes</string>
+    <string name="probe_external_services_category">External Services Probes</string>
+    <string name="probe_other_devices_category">External Devices Probes</string>
+    <string name="probe_external_environment_category">External Environment Probes</string>
+    <string name="probe_misc_category">Miscellaneous Probes</string>
+    <string name="probe_personal_info_category">Personal Information Probes</string>
+    <string name="probe_sensor_category">Hardware Sensor Probes</string>
 </resources>
 
 

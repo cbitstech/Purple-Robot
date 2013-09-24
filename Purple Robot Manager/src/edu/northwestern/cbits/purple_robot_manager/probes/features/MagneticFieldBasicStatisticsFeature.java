@@ -11,6 +11,11 @@ public class MagneticFieldBasicStatisticsFeature extends XYZBasicStatisticsFeatu
 		return "magnetic_statistics";
 	}
 
+	public String probeCategory(Context context)
+	{
+		return context.getString(R.string.probe_sensor_category);
+	}
+
 	protected String summary(Context context) 
 	{
 		return context.getString(R.string.summary_gyroscope_statistics_feature_desc);

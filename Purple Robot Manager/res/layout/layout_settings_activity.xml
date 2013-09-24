@@ -9,8 +9,7 @@
     <PreferenceCategory
         android:key="config_settings_models_category"
         android:title="@string/config_models_category_label" />
-    <PreferenceCategory
-        android:title="@string/config_notifications_category">
+    <PreferenceCategory android:title="@string/config_notifications_category">
         <!-- <RingtonePreference
             android:title="@string/config_notification_sound_label"
             android:summary="@string/config_notification_sound_summary"
@@ -37,8 +36,7 @@
         	android:key="config_mute_warnings"
 			android:defaultValue="false"/>
        	</PreferenceCategory>
-    <PreferenceCategory
-        android:title="@string/config_application_category">
+    <PreferenceCategory android:title="@string/config_application_category">
     	<CheckBoxPreference
 	   	    android:title="@string/config_show_background"
    		    android:summary="@string/summary_show_background"
@@ -50,8 +48,7 @@
         	android:key="config_hockey_update"
       		android:defaultValue="true"/>
    		</PreferenceCategory>
-    <PreferenceCategory
-        android:title="@string/config_network_category">
+    <PreferenceCategory android:title="@string/config_network_category">
     	<PreferenceScreen android:title="@string/title_http_upload_section">
 			<CheckBoxPreference
 				android:title="@string/title_http_upload_enabled"
@@ -273,6 +270,8 @@
 		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_funder_nih" />
 	        </Preference>
 		</PreferenceScreen>
+	</PreferenceCategory>
+    <PreferenceCategory android:title="@string/config_special_category">
 		<Preference android:title="@string/title_mail_app_schema"
 	    	android:key="config_dump_json">
         </Preference>

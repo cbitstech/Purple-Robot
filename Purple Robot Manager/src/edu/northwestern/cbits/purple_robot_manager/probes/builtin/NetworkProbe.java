@@ -49,7 +49,7 @@ public class NetworkProbe extends Probe
 
 	public String probeCategory(Context context)
 	{
-		return context.getResources().getString(R.string.probe_environment_category);
+		return context.getResources().getString(R.string.probe_device_info_category);
 	}
 
 	public void enable(Context context)

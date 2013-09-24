@@ -42,6 +42,11 @@ public class JavascriptFeature extends Feature
 		throw new RuntimeException("Invalid constructor. Please use JavascriptFeature(scriptName) instead...");
 	}
 
+	public String probeCategory(Context context) 
+	{
+		return context.getResources().getString(R.string.probe_misc_category);
+	}
+
 	public JavascriptFeature(String title, String name, String script, String formatter, List<String> sources, boolean embedded)
 	{
 		this._name = name;

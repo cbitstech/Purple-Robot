@@ -44,6 +44,11 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 
 	private int _lastFrequency = -1;
 
+	public String probeCategory(Context context)
+	{
+		return context.getString(R.string.probe_sensor_category);
+	}
+
 	public Bundle formattedBundle(Context context, Bundle bundle)
 	{
 		Bundle formatted = super.formattedBundle(context, bundle);
@@ -111,11 +116,6 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 	public int getTitleResource()
 	{
 		return R.string.title_temperature_probe;
-	}
-
-	public int getCategoryResource()
-	{
-		return R.string.probe_environment_category;
 	}
 
 	@SuppressWarnings("deprecation")

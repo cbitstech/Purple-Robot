@@ -32,7 +32,7 @@ public class ScreenProbe extends Probe
 	{
 		return ScreenProbe.NAME;
 	}
-
+	
 	public String title(Context context)
 	{
 		return context.getString(R.string.title_screen_probe);
@@ -40,7 +40,7 @@ public class ScreenProbe extends Probe
 
 	public String probeCategory(Context context)
 	{
-		return context.getResources().getString(R.string.probe_environment_category);
+		return context.getResources().getString(R.string.probe_device_info_category);
 	}
 
 	public boolean isEnabled(Context context)

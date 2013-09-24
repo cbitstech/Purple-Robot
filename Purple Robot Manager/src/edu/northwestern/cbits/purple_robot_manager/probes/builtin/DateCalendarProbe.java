@@ -43,9 +43,9 @@ public class DateCalendarProbe extends Probe
 		return context.getString(R.string.title_date_calendar_probe);
 	}
 
-	public String probeCategory(Context context) 
+	public String probeCategory(Context context)
 	{
-		return context.getResources().getString(R.string.probe_environment_category);
+		return context.getResources().getString(R.string.probe_personal_info_category);
 	}
 
 	@SuppressWarnings("deprecation")

@@ -15,6 +15,11 @@ public class PressureProbeBasicStatisticsFeature extends UnivariateContinuousPro
 	{
 		return "pressure_statistics";
 	}
+	
+	public String probeCategory(Context context)
+	{
+		return context.getString(R.string.probe_sensor_category);
+	}
 
 	protected String summary(Context context) 
 	{

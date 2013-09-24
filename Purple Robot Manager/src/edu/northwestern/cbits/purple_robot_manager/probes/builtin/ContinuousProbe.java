@@ -158,7 +158,6 @@ public abstract class ContinuousProbe extends Probe
 	public abstract int getTitleResource();
 	public abstract int getSummaryResource();
 
-	public abstract int getCategoryResource();
 	public abstract String getPreferenceKey();
 
 	protected abstract boolean passesThreshold(SensorEvent event);
@@ -176,11 +175,6 @@ public abstract class ContinuousProbe extends Probe
 	public String summary(Context context)
 	{
 		return context.getString(this.getSummaryResource());
-	}
-
-	public String probeCategory(Context context)
-	{
-		return context.getResources().getString(this.getCategoryResource());
 	}
 
 	protected void transmitData(Bundle data)

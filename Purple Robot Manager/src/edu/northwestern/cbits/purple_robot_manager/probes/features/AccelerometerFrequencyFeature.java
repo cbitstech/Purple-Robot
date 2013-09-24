@@ -11,6 +11,11 @@ public class AccelerometerFrequencyFeature extends XYZBasicFrequencyFeature
 		return "accelerometer_frequency";
 	}
 
+	public String probeCategory(Context context)
+	{
+		return context.getString(R.string.probe_sensor_category);
+	}
+
 	protected String summary(Context context) 
 	{
 		return context.getString(R.string.summary_accelerator_frequencies_feature_desc);

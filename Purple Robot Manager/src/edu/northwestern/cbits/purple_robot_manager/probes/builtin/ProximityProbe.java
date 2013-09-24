@@ -68,6 +68,11 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 
 	private int _lastFrequency = -1;
 
+	public String probeCategory(Context context)
+	{
+		return context.getString(R.string.probe_sensor_category);
+	}
+
 	public Intent viewIntent(Context context)
 	{
 		Intent i = new Intent(context, WebkitLandscapeActivity.class);
@@ -227,11 +232,6 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 	public int getTitleResource()
 	{
 		return R.string.title_proximity_probe;
-	}
-
-	public int getCategoryResource()
-	{
-		return R.string.probe_environment_category;
 	}
 
 	public boolean isEnabled(Context context)

@@ -78,6 +78,11 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 
 		return i;
 	}
+	
+	public String probeCategory(Context context)
+	{
+		return context.getString(R.string.probe_sensor_category);
+	}
 
 	public String contentSubtitle(Context context)
 	{
@@ -224,11 +229,6 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 	public int getTitleResource()
 	{
 		return R.string.title_pressure_probe;
-	}
-
-	public int getCategoryResource()
-	{
-		return R.string.probe_environment_category;
 	}
 
 	public boolean isEnabled(Context context)

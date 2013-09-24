@@ -64,6 +64,11 @@ public class CallHistoryFeature extends Feature
 		return context.getString(R.string.summary_call_history_feature_desc);
 	}
 
+	public String probeCategory(Context context)
+	{
+		return context.getResources().getString(R.string.probe_personal_info_category);
+	}
+
 	public void enable(Context context) 
 	{
 		SharedPreferences prefs = Probe.getPreferences(context);
