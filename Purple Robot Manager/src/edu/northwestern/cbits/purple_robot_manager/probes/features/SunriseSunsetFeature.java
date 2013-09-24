@@ -59,6 +59,11 @@ public class SunriseSunsetFeature extends Feature
 		return context.getResources().getString(stringId, diff);
 	}
 
+	public String probeCategory(Context context)
+	{
+		return context.getString(R.string.probe_external_environment_category);
+	}
+
 	protected String featureKey() 
 	{
 		return SunriseSunsetFeature.FEATURE_KEY;

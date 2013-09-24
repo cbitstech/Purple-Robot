@@ -45,7 +45,7 @@ public class CallStateProbe extends Probe
 
 	public String probeCategory(Context context)
 	{
-		return context.getResources().getString(R.string.probe_environment_category);
+		return context.getResources().getString(R.string.probe_device_info_category);
 	}
 
 	public boolean isEnabled(Context context)

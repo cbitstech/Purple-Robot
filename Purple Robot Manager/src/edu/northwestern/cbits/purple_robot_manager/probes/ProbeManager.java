@@ -388,9 +388,31 @@ public class ProbeManager
 		screen.setTitle(R.string.title_preference_probes_screen);
 		screen.setKey(SettingsActivity.PROBES_SCREEN_KEY);
 
+		HashMap<String, ArrayList<PreferenceScreen>> probeMap = new HashMap<String, ArrayList<PreferenceScreen>>();
+		
+		for (Probe probe : ProbeManager.allProbes(settingsActivity))
+		{
+			PreferenceScreen probeScreen = probe.preferenceScreen(settingsActivity);
+
+			if (probeScreen != null)
+			{
+				String key = probe.probeCategory(settingsActivity);
+				
+				ArrayList<PreferenceScreen> screens = new ArrayList<PreferenceScreen>();
+				
+				if (probeMap.containsKey(key))
+					screens = probeMap.get(key);
+				else
+					probeMap.put(key, screens);
+				
+				screens.add(probeScreen);
+			}
+		}
+
 		PreferenceCategory globalCategory = new PreferenceCategory(settingsActivity);
+
 		globalCategory.setTitle(R.string.title_preference_probes_global_category);
-		globalCategory.setKey("key_available_probes");
+		globalCategory.setKey("config_all_probes_options");
 
 		screen.addPreference(globalCategory);
 
@@ -403,16 +425,34 @@ public class ProbeManager
 
 		PreferenceCategory probesCategory = new PreferenceCategory(settingsActivity);
 		probesCategory.setTitle(R.string.title_preference_probes_available_category);
-		probesCategory.setKey("key_available_probes");
+		probesCategory.setKey("config_all_probes_list");
 
 		screen.addPreference(probesCategory);
-
-		for (Probe probe : ProbeManager.allProbes(settingsActivity))
+	
+		ArrayList<String> probeCategories = new ArrayList<String>();
+		probeCategories.add(settingsActivity.getString(R.string.probe_sensor_category));
+		probeCategories.add(settingsActivity.getString(R.string.probe_device_info_category));
+		probeCategories.add(settingsActivity.getString(R.string.probe_other_devices_category));
+		probeCategories.add(settingsActivity.getString(R.string.probe_external_environment_category));
+		probeCategories.add(settingsActivity.getString(R.string.probe_personal_info_category));
+		probeCategories.add(settingsActivity.getString(R.string.probe_external_services_category));
+		probeCategories.add(settingsActivity.getString(R.string.probe_misc_category));
+		
+		for (String key : probeMap.keySet())
 		{
-			PreferenceScreen probeScreen = probe.preferenceScreen(settingsActivity);
-
-			if (probeScreen != null)
-				screen.addPreference(probeScreen);
+			if (probeCategories.contains(key) == false)
+				probeCategories.add(key);
+		}
+		
+		for (String key : probeCategories)
+		{
+			PreferenceScreen probesScreen = manager.createPreferenceScreen(settingsActivity);
+			probesScreen.setTitle(key);
+			
+			for (PreferenceScreen probeScreen : probeMap.get(key))
+				probesScreen.addPreference(probeScreen);
+			
+			probesCategory.addPreference(probesScreen);
 		}
 
 		return screen;

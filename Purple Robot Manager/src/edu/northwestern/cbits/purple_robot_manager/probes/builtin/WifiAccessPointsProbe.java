@@ -59,7 +59,7 @@ public class WifiAccessPointsProbe extends Probe
 
 	public String probeCategory(Context context)
 	{
-		return context.getResources().getString(R.string.probe_environment_category);
+		return context.getResources().getString(R.string.probe_other_devices_category);
 	}
 	
 /*	private boolean fetchEnabled(Context context)

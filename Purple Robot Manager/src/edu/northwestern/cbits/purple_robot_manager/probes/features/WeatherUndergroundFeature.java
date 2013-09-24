@@ -43,6 +43,11 @@ public class WeatherUndergroundFeature extends Feature
 
 	private boolean _isInited = false;
 	private boolean _isEnabled = false;
+	
+	public String probeCategory(Context context)
+	{
+		return context.getString(R.string.probe_external_environment_category);
+	}
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{

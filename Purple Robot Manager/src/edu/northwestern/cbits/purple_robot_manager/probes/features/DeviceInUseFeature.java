@@ -44,6 +44,11 @@ public class DeviceInUseFeature extends Feature
 		return context.getString(R.string.summary_device_use_feature_desc);
 	}
 
+	public String probeCategory(Context context)
+	{
+		return context.getResources().getString(R.string.probe_device_info_category);
+	}
+
 	public String summarizeValue(Context context, Bundle bundle)
 	{
 		boolean inUse = bundle.getBoolean(DeviceInUseFeature.DEVICE_ACTIVE);

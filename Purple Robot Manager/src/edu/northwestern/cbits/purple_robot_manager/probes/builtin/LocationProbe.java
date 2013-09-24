@@ -57,6 +57,11 @@ public class LocationProbe extends Probe implements LocationListener
 	private long _lastCache = 0;
 	private Location _lastLocation = null;
 
+	public String probeCategory(Context context)
+	{
+		return context.getString(R.string.probe_sensor_category);
+	}
+
 	public Intent viewIntent(Context context)
 	{
 		try
@@ -233,11 +238,6 @@ public class LocationProbe extends Probe implements LocationListener
 	public String title(Context context)
 	{
 		return context.getString(R.string.title_location_probe);
-	}
-
-	public String probeCategory(Context context)
-	{
-		return context.getResources().getString(R.string.probe_environment_category);
 	}
 
 	public String name(Context context)

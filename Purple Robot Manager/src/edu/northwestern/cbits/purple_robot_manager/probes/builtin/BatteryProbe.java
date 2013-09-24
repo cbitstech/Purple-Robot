@@ -53,6 +53,11 @@ public class BatteryProbe extends Probe
 
 		return i;
 	}
+	
+	public String probeCategory(Context context)
+	{
+		return context.getResources().getString(R.string.probe_device_info_category);
+	}
 
 	public String contentSubtitle(Context context)
 	{
@@ -148,11 +153,6 @@ public class BatteryProbe extends Probe
 	public String title(Context context)
 	{
 		return context.getString(R.string.title_battery_probe);
-	}
-
-	public String probeCategory(Context context)
-	{
-		return context.getResources().getString(R.string.probe_environment_category);
 	}
 
 	public Bundle formattedBundle(Context context, Bundle bundle)

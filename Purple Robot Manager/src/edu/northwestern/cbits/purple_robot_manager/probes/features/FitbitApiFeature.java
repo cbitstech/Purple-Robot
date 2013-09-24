@@ -81,6 +81,11 @@ public class FitbitApiFeature extends Feature
 		return context.getString(R.string.summary_fitbit_api_feature_desc);
 	}
 
+	public String probeCategory(Context context)
+	{
+		return context.getResources().getString(R.string.probe_external_services_category);
+	}
+
 	public String name(Context context) 
 	{
 		return "edu.northwestern.cbits.purple_robot_manager.probes.features.FitBitApiFeature";

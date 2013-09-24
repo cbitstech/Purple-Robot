@@ -26,7 +26,7 @@ public class LabelProbe extends Probe
 
 	public String probeCategory(Context context) 
 	{
-		return context.getResources().getString(R.string.probe_environment_category);
+		return context.getResources().getString(R.string.probe_misc_category);
 	}
 
 	public PreferenceScreen preferenceScreen(PreferenceActivity settingsActivity) 

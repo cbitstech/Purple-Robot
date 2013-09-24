@@ -82,6 +82,11 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 		return i;
 	}
 
+	public String probeCategory(Context context)
+	{
+		return context.getString(R.string.probe_sensor_category);
+	}
+
 	public String contentSubtitle(Context context)
 	{
 		Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(context, AccelerometerProbe.DB_TABLE, this.databaseSchema());
@@ -253,11 +258,6 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 	public int getTitleResource()
 	{
 		return R.string.title_accelerometer_probe;
-	}
-
-	public int getCategoryResource()
-	{
-		return R.string.probe_environment_category;
 	}
 
 	public boolean isEnabled(Context context)

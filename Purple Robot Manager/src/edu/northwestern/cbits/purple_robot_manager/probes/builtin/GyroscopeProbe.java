@@ -91,6 +91,11 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 		return map;
 	}
 	
+	public String probeCategory(Context context)
+	{
+		return context.getString(R.string.probe_sensor_category);
+	}
+
 	public void updateFromMap(Context context, Map<String, Object> params) 
 	{
 		super.updateFromMap(context, params);
@@ -275,11 +280,6 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 	public int getTitleResource()
 	{
 		return R.string.title_gyroscope_probe;
-	}
-
-	public int getCategoryResource()
-	{
-		return R.string.probe_environment_category;
 	}
 
 	public boolean isEnabled(Context context)

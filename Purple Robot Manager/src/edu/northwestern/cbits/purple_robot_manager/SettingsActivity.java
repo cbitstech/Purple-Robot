@@ -6,23 +6,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import javax.crypto.CipherOutputStream;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.parser.Parser;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.res.Resources.NotFoundException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -36,7 +29,6 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -272,6 +264,9 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 		{
 			PreferenceGroup group = (PreferenceGroup) preference;
 			
+			if (group.getPreferenceCount() == 0)
+				return null;
+			
 			prefJson.put("type", "group");
 			
 			JSONArray children = new JSONArray();
@@ -287,15 +282,9 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 			prefJson.put("children", children);
 		}
 		else if (preference instanceof CheckBoxPreference)
-		{
-			CheckBoxPreference check = (CheckBoxPreference) preference;
 			prefJson.put("type", "boolean");
-		}
 		else if (preference instanceof EditTextPreference)
-		{
-			EditTextPreference text = (EditTextPreference) preference;
 			prefJson.put("type", "string");
-		}
 		else if (preference instanceof ListPreference)
 		{
 			ListPreference list = (ListPreference) preference;

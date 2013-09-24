@@ -49,6 +49,11 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 		return map;
 	}
 	
+	public String probeCategory(Context context)
+	{
+		return context.getString(R.string.probe_external_environment_category);
+	}
+	
 	public void updateFromMap(Context context, Map<String, Object> params) 
 	{
 		super.updateFromMap(context, params);
@@ -181,12 +186,6 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 	{
 		return context.getString(R.string.title_visible_satellite_probe);
 	}
-
-	public String probeCategory(Context context)
-	{
-		return context.getResources().getString(R.string.probe_environment_category);
-	}
-
 
 	@SuppressWarnings("unchecked")
 	public void onGpsStatusChanged(int event)

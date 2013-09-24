@@ -17,11 +17,6 @@ public abstract class Feature extends Probe
 
 	protected abstract String featureKey();
 
-	public String probeCategory(Context context)
-	{
-		return context.getString(R.string.probe_features_category);
-	}
-	
 	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{

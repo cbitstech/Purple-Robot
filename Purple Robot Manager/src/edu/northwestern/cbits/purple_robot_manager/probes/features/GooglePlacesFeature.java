@@ -58,6 +58,11 @@ public class GooglePlacesFeature extends Feature
 		return context.getString(R.string.title_google_places_feature);
 	}
 
+	public String probeCategory(Context context)
+	{
+		return context.getResources().getString(R.string.probe_external_services_category);
+	}
+
 	public void enable(Context context) 
 	{
 		SharedPreferences prefs = Probe.getPreferences(context);
