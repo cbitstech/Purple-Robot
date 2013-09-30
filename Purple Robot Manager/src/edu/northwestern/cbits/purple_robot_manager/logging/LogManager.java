@@ -47,8 +47,6 @@ import android.net.http.AndroidHttpClient;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.mixpanel.android.mpmetrics.MixpanelAPI;
-
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.WiFiHelper;
@@ -64,7 +62,6 @@ public class LogManager
 	private static final String ALTITUDE = "altitude";
 	private static final String TIME_DRIFT = "time_drift";
 	
-	private static final String MIXPANEL_PREFIX = "log://mixpanel/?token=";
 	private static final String LOG_QUEUE = "pending_log_queue";
 	private static final String CONTENT_OBJECT = "content_object";
 	private static final String USER_ID = "user_id";
@@ -224,109 +221,82 @@ public class LogManager
 			{
 				JSONArray pendingEvents = new JSONArray(prefs.getString(LogManager.LOG_QUEUE, "[]"));
 				
-				if (endpointUri.startsWith(LogManager.MIXPANEL_PREFIX))
+				try 
 				{
-					String token = endpointUri.substring(LogManager.MIXPANEL_PREFIX.length());
+					URI siteUri = new URI(endpointUri);
+				
+					AndroidHttpClient androidClient = AndroidHttpClient.newInstance("Purple Robot", this._context);
+
+					SchemeRegistry registry = new SchemeRegistry();
+					registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
 					
-					MixpanelAPI api = MixpanelAPI.getInstance(this._context, token);
+					SSLSocketFactory socketFactory = SSLSocketFactory.getSocketFactory();
 					
+					if (prefs.getBoolean("config_http_liberal_ssl", true))
+					{
+				        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+				        trustStore.load(null, null);
+
+				        socketFactory = new LiberalSSLSocketFactory(trustStore);								
+					}
+
+					registry.register(new Scheme("https", socketFactory, 443));
+					
+					SingleClientConnManager mgr = new SingleClientConnManager(androidClient.getParams(), registry);
+					HttpClient httpClient = new DefaultHttpClient(mgr, androidClient.getParams());
+
+					androidClient.close();
+
 					for (int i = 0; i < pendingEvents.length(); i++)
 					{
 						JSONObject event = pendingEvents.getJSONObject(i);
 						
-						String eventType = event.getString(LogManager.EVENT_TYPE);
-						long time = event.getLong(LogManager.TIMESTAMP);
+						HttpPost httpPost = new HttpPost(siteUri);
 						
-						event.remove(LogManager.EVENT_TYPE);
-						event.remove(LogManager.TIMESTAMP);
-						event.remove(LogManager.CONTENT_OBJECT);
+						List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+						nameValuePairs.add(new BasicNameValuePair("logJSON", event.toString()));
+						nameValuePairs.add(new BasicNameValuePair("json", event.toString()));
+						HttpEntity entity = new UrlEncodedFormEntity(nameValuePairs, HTTP.US_ASCII);
+
+						httpPost.setEntity(entity);
 						
-						event.put("time", time);
+						httpClient.execute(httpPost);
+						HttpResponse response = httpClient.execute(httpPost);
+
+						HttpEntity httpEntity = response.getEntity();
 						
-						api.track(eventType, event);
+						Log.e("PR-LOGGING", "Log upload result: " + EntityUtils.toString(httpEntity));
 					}
 					
-					api.flush();
+					mgr.shutdown();
 				}
-				else
+				catch (URISyntaxException e) 
 				{
-					try 
-					{
-						URI siteUri = new URI(endpointUri);
-					
-						AndroidHttpClient androidClient = AndroidHttpClient.newInstance("Purple Robot", this._context);
-
-						SchemeRegistry registry = new SchemeRegistry();
-						registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-						
-						SSLSocketFactory socketFactory = SSLSocketFactory.getSocketFactory();
-						
-						if (prefs.getBoolean("config_http_liberal_ssl", true))
-						{
-					        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-					        trustStore.load(null, null);
-
-					        socketFactory = new LiberalSSLSocketFactory(trustStore);								
-						}
-
-						registry.register(new Scheme("https", socketFactory, 443));
-						
-						SingleClientConnManager mgr = new SingleClientConnManager(androidClient.getParams(), registry);
-						HttpClient httpClient = new DefaultHttpClient(mgr, androidClient.getParams());
-
-						androidClient.close();
-
-						for (int i = 0; i < pendingEvents.length(); i++)
-						{
-							JSONObject event = pendingEvents.getJSONObject(i);
-							
-							HttpPost httpPost = new HttpPost(siteUri);
-							
-							List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-							nameValuePairs.add(new BasicNameValuePair("logJSON", event.toString()));
-							nameValuePairs.add(new BasicNameValuePair("json", event.toString()));
-							HttpEntity entity = new UrlEncodedFormEntity(nameValuePairs, HTTP.US_ASCII);
-
-							httpPost.setEntity(entity);
-							
-							httpClient.execute(httpPost);
-							HttpResponse response = httpClient.execute(httpPost);
-
-							HttpEntity httpEntity = response.getEntity();
-							
-							Log.e("PR-LOGGING", "Log upload result: " + EntityUtils.toString(httpEntity));
-						}
-						
-						mgr.shutdown();
-					}
-					catch (URISyntaxException e) 
-					{
-						e.printStackTrace();
-					} 
-					catch (KeyStoreException e) 
-					{
-						e.printStackTrace();
-					} 
-					catch (NoSuchAlgorithmException e) 
-					{
-						e.printStackTrace();
-					}
-					catch (CertificateException e) 
-					{
-						e.printStackTrace();
-					} 
-					catch (IOException e) 
-					{
-						e.printStackTrace();
-					} 
-					catch (KeyManagementException e) 
-					{
-						e.printStackTrace();
-					}
-					catch (UnrecoverableKeyException e) 
-					{
-						e.printStackTrace();
-					}
+					e.printStackTrace();
+				} 
+				catch (KeyStoreException e) 
+				{
+					e.printStackTrace();
+				} 
+				catch (NoSuchAlgorithmException e) 
+				{
+					e.printStackTrace();
+				}
+				catch (CertificateException e) 
+				{
+					e.printStackTrace();
+				} 
+				catch (IOException e) 
+				{
+					e.printStackTrace();
+				} 
+				catch (KeyManagementException e) 
+				{
+					e.printStackTrace();
+				}
+				catch (UnrecoverableKeyException e) 
+				{
+					e.printStackTrace();
 				}
 				
 				Editor e = prefs.edit();
