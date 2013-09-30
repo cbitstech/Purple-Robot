@@ -46,6 +46,7 @@ import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.ScheduleManager;
 import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
+import edu.northwestern.cbits.purple_robot_manager.activities.DialogBackgroundActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.LabelActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -849,7 +850,7 @@ public abstract class BaseScriptEngine
 
 	public void showNativeDialog(String title, String message, String confirmTitle, String cancelTitle, String confirmScript, String cancelScript)
 	{
-		Intent intent = new Intent(this._context, DialogActivity.class);
+		Intent intent = new Intent(this._context, DialogBackgroundActivity.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
 		intent.putExtra(DialogActivity.DIALOG_TITLE, title);

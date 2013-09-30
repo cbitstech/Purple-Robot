@@ -8,6 +8,7 @@ import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -163,6 +164,8 @@ public class DialogActivity extends Activity
         }
         else
             cancelButton.setVisibility(View.GONE);
-        	
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+        	this.setFinishOnTouchOutside(false);
     }
 }

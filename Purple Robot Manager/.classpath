@@ -20,7 +20,6 @@
 	<classpathentry exported="true" kind="lib" path="libs/js.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/jscheme-7.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/jsoup-1.7.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/MixpanelAPI.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/sunrise.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
