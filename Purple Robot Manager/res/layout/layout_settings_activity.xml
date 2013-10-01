@@ -46,7 +46,7 @@
 	   	    android:title="@string/config_hockey_update"
    		    android:summary="@string/summary_hockey_update"
         	android:key="config_hockey_update"
-      		android:defaultValue="true"/>
+      		android:defaultValue="false"/>
    		</PreferenceCategory>
     <PreferenceCategory android:title="@string/config_network_category">
     	<PreferenceScreen android:title="@string/title_http_upload_section">

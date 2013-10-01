@@ -13,6 +13,8 @@ import edu.northwestern.cbits.purple_robot_manager.util.Slugify;
 
 public class RegressionModel extends TrainedModel 
 {
+	public static final String TYPE = "linear-regression";
+
 	private double _intercept = 0.0;
 	
 	private Map<String, Double> _coefficients = new HashMap<String, Double>();
@@ -145,6 +147,6 @@ public class RegressionModel extends TrainedModel
 
 	public String modelType() 
 	{
-		return "linear-regression";
+		return RegressionModel.TYPE;
 	}
 }

@@ -107,9 +107,11 @@ public abstract class Model
 		        
 		        String type = json.getString("model_type");
 		        
-		        if ("regression".equals(type))
+		        if (RegressionModel.TYPE.equals(type))
 		        	return new RegressionModel(context, Uri.parse(jsonUrl));
-		        if ("decision-tree".equals(type))
+		        else if (TreeModel.TYPE.equals(type))
+		        	return new TreeModel(context, Uri.parse(jsonUrl));
+		        else if (SvmModel.TYPE.equals(type))
 		        	return new TreeModel(context, Uri.parse(jsonUrl));
 		        
 			}
