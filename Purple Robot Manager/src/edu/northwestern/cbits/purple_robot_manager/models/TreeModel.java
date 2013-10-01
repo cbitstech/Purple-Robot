@@ -22,6 +22,8 @@ import android.util.Log;
 
 public class TreeModel extends TrainedModel 
 {
+	public static final String TYPE = "decision-tree";
+	
 	private Graph _tree = null;
 	
 	public TreeModel(Context context, Uri uri) 
@@ -162,6 +164,6 @@ public class TreeModel extends TrainedModel
 	
 	public String modelType() 
 	{
-		return "decision-tree";
+		return TreeModel.TYPE;
 	}
  }

@@ -123,7 +123,7 @@ public class StartActivity extends ActionBarActivity
 
 		if (this.getPackageManager().getInstallerPackageName(this.getPackageName()) == null) 
 		{
-			if (sharedPrefs.getBoolean(SettingsActivity.CHECK_UPDATES_KEY, true))
+			if (sharedPrefs.getBoolean(SettingsActivity.CHECK_UPDATES_KEY, false))
 				UpdateManager.register(this, "7550093e020b1a4a6df90f1e9dde68b6");
 		}
 

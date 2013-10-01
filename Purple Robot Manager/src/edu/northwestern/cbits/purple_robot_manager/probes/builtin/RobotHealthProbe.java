@@ -71,6 +71,9 @@ public class RobotHealthProbe extends Probe
 	private static final boolean DEFAULT_ENABLED = true;
 	private static final boolean DEFAULT_SCHEME = true;
 	private static final boolean DEFAULT_JAVASCRIPT = true;
+	private static final Object INCLUDE_JSON = "include_json";
+	private static final Object INCLUDE_SCHEME = "include_scheme";
+	
 
 	private long _lastOffset = 0;
 	private long _lastTimeCheck = 0;
@@ -447,20 +450,35 @@ public class RobotHealthProbe extends Probe
 	public void updateFromMap(Context context, Map<String, Object> params) 
 	{
 		super.updateFromMap(context, params);
-		
+
+		SharedPreferences prefs = Probe.getPreferences(context);
+		Editor e = prefs.edit();
+
 		if (params.containsKey(Probe.PROBE_FREQUENCY))
 		{
 			Object frequency = params.get(Probe.PROBE_FREQUENCY);
 			
 			if (frequency instanceof Long)
-			{
-				SharedPreferences prefs = Probe.getPreferences(context);
-				Editor e = prefs.edit();
-				
 				e.putString("config_probe_robot_frequency", frequency.toString());
-				e.commit();
-			}
 		}
+
+		if (params.containsKey(RobotHealthProbe.INCLUDE_SCHEME))
+		{
+			Object include = params.get(RobotHealthProbe.INCLUDE_SCHEME);
+			
+			if (include instanceof Boolean)
+				e.putBoolean("config_probe_robot_scheme_config", ((Boolean) include).booleanValue());
+		}
+
+		if (params.containsKey(RobotHealthProbe.INCLUDE_JSON))
+		{
+			Object include = params.get(RobotHealthProbe.INCLUDE_JSON);
+			
+			if (include instanceof Boolean)
+				e.putBoolean("config_probe_robot_json_config", ((Boolean) include).booleanValue());
+		}
+
+		e.commit();
 	}
 
 	@SuppressWarnings("deprecation")

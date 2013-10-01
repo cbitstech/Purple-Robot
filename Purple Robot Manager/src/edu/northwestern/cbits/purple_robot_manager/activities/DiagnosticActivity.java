@@ -1,5 +1,10 @@
 package edu.northwestern.cbits.purple_robot_manager.activities;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
@@ -24,6 +29,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.config.SchemeConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
@@ -303,6 +309,20 @@ public class DiagnosticActivity extends ActionBarActivity
 	         		intent.setType("message/rfc822");
 	         		intent.putExtra(Intent.EXTRA_SUBJECT, this.getString(R.string.email_diagnostic_subject));
 	         		intent.putExtra(Intent.EXTRA_TEXT, message.toString());
+
+	         		SchemeConfigFile scheme = new SchemeConfigFile(this);
+
+	            	File cacheDir = this.getExternalCacheDir();
+	            	File configFile = new File(cacheDir, "config.scm");
+	            	
+	        		FileOutputStream fout = new FileOutputStream(configFile);
+
+	        		fout.write(scheme.toString().getBytes(Charset.defaultCharset()));
+
+	        		fout.flush();
+	        		fout.close();
+	        		
+	        		intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(configFile));
 	
 	         		this.startActivity(intent);
          		}
@@ -313,7 +333,15 @@ public class DiagnosticActivity extends ActionBarActivity
          			mailIntent.putExtra(Intent.EXTRA_TEXT, message.toString());
 
          			this.startActivity(mailIntent);
-         		}
+         		} 
+         		catch (FileNotFoundException e) 
+         		{
+					e.printStackTrace();
+				} 
+         		catch (IOException e) 
+         		{
+					e.printStackTrace();
+				}
          		
     			break;
     	}
