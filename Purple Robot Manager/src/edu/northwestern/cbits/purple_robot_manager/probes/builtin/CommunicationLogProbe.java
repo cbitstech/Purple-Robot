@@ -254,7 +254,7 @@ public class CommunicationLogProbe extends Probe
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
-		int count = bundle.getInt(CommunicationLogProbe.CALL_TOTAL_COUNT);
+		int count = (int) bundle.getDouble(CommunicationLogProbe.CALL_TOTAL_COUNT);
 
 		return String.format(context.getResources().getString(R.string.summary_call_log_probe), count);
 	}
@@ -399,11 +399,11 @@ public class CommunicationLogProbe extends Probe
 
 		formatted.putString(context.getString(R.string.display_calls_recent_time_title), d.toString());
 
-		formatted.putInt(context.getString(R.string.display_calls_incoming_count_title), bundle.getInt(CommunicationLogProbe.CALL_INCOMING_COUNT));
-		formatted.putInt(context.getString(R.string.display_calls_missed_count_title), bundle.getInt(CommunicationLogProbe.CALL_MISSED_COUNT));
-		formatted.putInt(context.getString(R.string.display_calls_outgoing_count_title), bundle.getInt(CommunicationLogProbe.CALL_OUTGOING_COUNT));
-		formatted.putInt(context.getString(R.string.display_sms_incoming_count_title), bundle.getInt(CommunicationLogProbe.SMS_INCOMING_COUNT));
-		formatted.putInt(context.getString(R.string.display_sms_outgoing_count_title), bundle.getInt(CommunicationLogProbe.SMS_OUTGOING_COUNT));
+		formatted.putInt(context.getString(R.string.display_calls_incoming_count_title), (int) bundle.getDouble(CommunicationLogProbe.CALL_INCOMING_COUNT));
+		formatted.putInt(context.getString(R.string.display_calls_missed_count_title), (int) bundle.getDouble(CommunicationLogProbe.CALL_MISSED_COUNT));
+		formatted.putInt(context.getString(R.string.display_calls_outgoing_count_title), (int) bundle.getDouble(CommunicationLogProbe.CALL_OUTGOING_COUNT));
+		formatted.putInt(context.getString(R.string.display_sms_incoming_count_title), (int) bundle.getDouble(CommunicationLogProbe.SMS_INCOMING_COUNT));
+		formatted.putInt(context.getString(R.string.display_sms_outgoing_count_title), (int) bundle.getDouble(CommunicationLogProbe.SMS_OUTGOING_COUNT));
 
 
 		ArrayList<String> keys = new ArrayList<String>();

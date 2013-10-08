@@ -229,7 +229,7 @@ public class WifiAccessPointsProbe extends Probe
 
 		@SuppressWarnings("unchecked")
 		ArrayList<Bundle> array = (ArrayList<Bundle>) bundle.get(WifiAccessPointsProbe.ACCESS_POINTS);
-		int count = bundle.getInt(WifiAccessPointsProbe.ACCESS_POINT_COUNT);
+		int count = (int) bundle.getDouble(WifiAccessPointsProbe.ACCESS_POINT_COUNT);
 
 		Bundle devicesBundle = this.bundleForNetworksArray(context, array);
 
@@ -237,8 +237,8 @@ public class WifiAccessPointsProbe extends Probe
 		
 		formatted.putString(context.getString(R.string.display_current_ssid_title), bundle.getString(WifiAccessPointsProbe.CURRENT_SSID));
 		formatted.putString(context.getString(R.string.display_current_bssid_title), bundle.getString(WifiAccessPointsProbe.CURRENT_BSSID));
-		formatted.putInt(context.getString(R.string.display_current_speed_title), bundle.getInt(WifiAccessPointsProbe.CURRENT_LINK_SPEED));
-		formatted.putInt(context.getString(R.string.display_current_rssi_title), bundle.getInt(WifiAccessPointsProbe.CURRENT_RSSI));
+		formatted.putInt(context.getString(R.string.display_current_speed_title), (int) bundle.getDouble(WifiAccessPointsProbe.CURRENT_LINK_SPEED));
+		formatted.putInt(context.getString(R.string.display_current_rssi_title), (int) bundle.getDouble(WifiAccessPointsProbe.CURRENT_RSSI));
 
 		return formatted;
 	}
@@ -265,7 +265,7 @@ public class WifiAccessPointsProbe extends Probe
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
-		int count = bundle.getInt(WifiAccessPointsProbe.ACCESS_POINT_COUNT);
+		int count = (int) bundle.getDouble(WifiAccessPointsProbe.ACCESS_POINT_COUNT);
 
 		return String.format(context.getResources().getString(R.string.summary_wifi_probe), count);
 	}

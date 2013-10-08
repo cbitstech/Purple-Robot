@@ -1,11 +1,8 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.CrashManagerListener;
@@ -13,6 +10,7 @@ import net.hockeyapp.android.UpdateManager;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,11 +18,15 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.database.ContentObserver;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
@@ -33,10 +35,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
@@ -67,19 +68,14 @@ public class StartActivity extends ActionBarActivity
 
 	private BroadcastReceiver _receiver = null;
 
-	private static List<String> _probeNames = new ArrayList<String>();
-	private static Map<String, Bundle> _probeValues = new HashMap<String, Bundle>();
-	private static Map<String, Date> _probeDates = new HashMap<String, Date>();
-
 	private static String _statusMessage = null;
-
-	private boolean _isPaused = true;
-	private long _lastUpdate = 0;
 
 	private SharedPreferences prefs = null;
 	protected String _lastProbe = "";
 	
 	private Menu _menu = null;
+	
+	private ContentObserver _observer = null;
 
 	private static OnSharedPreferenceChangeListener _prefListener = new OnSharedPreferenceChangeListener()
     {
@@ -142,37 +138,11 @@ public class StartActivity extends ActionBarActivity
     	{
     		public void onReceive(Context context, final Intent intent)
     		{
-    			final long now = System.currentTimeMillis();
-
     			me.runOnUiThread(new Runnable()
     			{
     				public void run()
     				{
-		    			if (StartActivity.UPDATE_DISPLAY.equals(intent.getAction()))
-		    			{
-			    			String name = intent.getStringExtra(DISPLAY_PROBE_NAME);
-
-			    			if (name != null && !me._lastProbe.equals(name))
-				    		{
-				    			Bundle value = intent.getBundleExtra(DISPLAY_PROBE_VALUE);
-
-				    			if (StartActivity._probeNames.contains(name))
-				    				StartActivity._probeNames.remove(name);
-
-				    			StartActivity._probeNames.add(0, name);
-				    			StartActivity._probeValues.put(name, value);
-				    			StartActivity._probeDates.put(name, new Date());
-
-				    			if (me._isPaused == false && now - 5000 > me._lastUpdate)
-				    			{
-					    			me._lastUpdate = now;
-			    					me.refreshList();
-				    			}
-
-				    			me._lastProbe = name;
-				    		}
-		    			}
-		    			else if (StartActivity.UPDATE_MESSAGE.equals(intent.getAction()))
+		    			if (StartActivity.UPDATE_MESSAGE.equals(intent.getAction()))
 		    			{
 		    				final String message = intent.getStringExtra(StartActivity.DISPLAY_MESSAGE);
 
@@ -198,79 +168,34 @@ public class StartActivity extends ActionBarActivity
 
     	IntentFilter filter = new IntentFilter();
 
-    	filter.addAction(StartActivity.UPDATE_DISPLAY);
     	filter.addAction(StartActivity.UPDATE_MESSAGE);
 
     	broadcastManager.registerReceiver(this._receiver, filter);
 
         final SimpleDateFormat sdf = new SimpleDateFormat("MMM d, H:mm:ss");
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.layout_probe_row, StartActivity._probeNames)
+        Cursor c = this.getContentResolver().query(RobotContentProvider.RECENT_PROBE_VALUES, null, null, null, "recorded DESC");
+        
+        final CursorAdapter adapter = new CursorAdapter(this, c, true)
         {
-        	public View getView(final int position, View convertView, ViewGroup parent)
-        	{
-        		if (convertView == null)
-        		{
-        			LayoutInflater inflater = (LayoutInflater) me.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-        			convertView = inflater.inflate(R.layout.layout_probe_row, null);
-        		}
-
-        		final String sensorName = StartActivity._probeNames.get(position);
+			public void bindView(View view, Context context, Cursor cursor) 
+			{
+        		final String sensorName = cursor.getString(cursor.getColumnIndex("source"));
 
         		final Probe probe = ProbeManager.probeForName(sensorName, me);
         		
-        		final Bundle value = StartActivity._probeValues.get(sensorName);
-        		Date sensorDate = StartActivity._probeDates.get(sensorName);
-
-        		convertView.setOnClickListener(new OnClickListener()
-    			{
-					public void onClick(View v)
-					{
-						Intent intent = null;
-
-						if (probe != null)
-						{
-							intent = probe.viewIntent(me);
-
-							if (intent == null)
-							{
-								Intent dataIntent = new Intent(me, ProbeViewerActivity.class);
-	
-								dataIntent.putExtra("probe_name", sensorName);
-								dataIntent.putExtra("probe_bundle", value);
-	
-								me.startActivity(dataIntent);
-							}
-							else
-							{
-								intent.putExtra("probe_name", sensorName);
-								intent.putExtra("probe_bundle", value);
-	
-								me.startActivity(intent);
-							}
-						}
-						else
-						{
-							Model model = ModelManager.getInstance(me).fetchModelByName(me, sensorName);
-
-							Intent dataIntent = new Intent(me, ProbeViewerActivity.class);
-
-							dataIntent.putExtra("probe_name", model.title(me));
-							dataIntent.putExtra("probe_bundle", value);
-							dataIntent.putExtra("is_model", true);
-
-							me.startActivity(dataIntent);
-						}
-					}
-    			});
-
-        		TextView nameField = (TextView) convertView.findViewById(R.id.text_sensor_name);
-        		TextView valueField = (TextView) convertView.findViewById(R.id.text_sensor_value);
+        		Date sensorDate = new Date(cursor.getLong(cursor.getColumnIndex("recorded")) * 1000);
+        		
+        		TextView nameField = (TextView) view.findViewById(R.id.text_sensor_name);
+        		TextView valueField = (TextView) view.findViewById(R.id.text_sensor_value);
 
         		String formattedValue = sensorName;
 
-        		String displayName = sensorName;
+        		String displayName = formattedValue;
+
+        		String jsonString = cursor.getString(cursor.getColumnIndex("value"));
+        		
+        		Bundle value = OutputPlugin.bundleForJson(jsonString);
 
         		if (probe != null && value != null)
         		{
@@ -299,61 +224,77 @@ public class StartActivity extends ActionBarActivity
 
         		nameField.setText(displayName + " (" + sdf.format(sensorDate) + ")");
         		valueField.setText(formattedValue);
+			}
 
-        		return convertView;
-        	}
+			public View newView(Context context, Cursor cursor, ViewGroup parent)
+			{
+    			LayoutInflater inflater = (LayoutInflater) me.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+    			View view = inflater.inflate(R.layout.layout_probe_row, null);
+
+    			this.bindView(view, context, cursor);
+    			
+				return view;
+			}
         };
-
+        
         listView.setAdapter(adapter);
+        
+        listView.setOnItemClickListener(new OnItemClickListener()
+        {
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) 
+			{
+				Uri uri = ContentUris.withAppendedId(RobotContentProvider.RECENT_PROBE_VALUES, id);
+				
+				Cursor c = me.getContentResolver().query(uri, null, null, null, null);
+				
+				if (c.moveToNext())
+				{
+					String sensorName = c.getString(c.getColumnIndex("source"));
+	        		String jsonString = c.getString(c.getColumnIndex("value"));
+	        		Bundle value = OutputPlugin.bundleForJson(jsonString);
+					
+					final Probe probe = ProbeManager.probeForName(sensorName, me);
+
+					if (probe != null)
+					{
+						Intent intent = probe.viewIntent(me);
+
+						if (intent == null)
+						{
+							Intent dataIntent = new Intent(me, ProbeViewerActivity.class);
+
+							dataIntent.putExtra("probe_name", sensorName);
+							dataIntent.putExtra("probe_bundle", value);
+
+							me.startActivity(dataIntent);
+						}
+						else
+						{
+							intent.putExtra("probe_name", sensorName);
+							intent.putExtra("probe_bundle", value);
+
+							me.startActivity(intent);
+						}
+					}
+					else
+					{
+						Model model = ModelManager.getInstance(me).fetchModelByName(me, sensorName);
+
+						Intent dataIntent = new Intent(me, ProbeViewerActivity.class);
+
+						dataIntent.putExtra("probe_name", model.title(me));
+						dataIntent.putExtra("probe_bundle", value);
+						dataIntent.putExtra("is_model", true);
+
+						me.startActivity(dataIntent);
+					}
+				}
+			}
+        });
     	
     	LegacyJSONConfigFile.getSharedFile(this.getApplicationContext());
     }
-
-	public void refreshList()
-	{
-		final StartActivity me = this;
-
-		Runnable r = new Runnable()
-		{
-			public void run()
-			{
-				SharedPreferences prefs = me.getPreferences(me);
-
-		        boolean probesEnabled = prefs.getBoolean("config_probes_enabled", false);
-
-		        if (probesEnabled)
-		        {
-	    			Runnable rr = new Runnable()
-	    			{
-						public void run()
-						{
-			    	        ListView listView = (ListView) me.findViewById(R.id.list_probes);
-
-			    	        ListAdapter adapter = listView.getAdapter();
-
-			    	        if (adapter instanceof BaseAdapter)
-			    			{
-			    	        	BaseAdapter baseAdapter = (BaseAdapter) adapter;
-
-			    	        	baseAdapter.notifyDataSetChanged();
-			    	        }
-
-			    	        listView.invalidateViews();
-
-			    	        me.getSupportActionBar().setTitle(String.format(me.getResources().getString(R.string.title_probes_count), StartActivity._probeNames.size()));
-			    	        
-			    	        me.updateAlertIcon();
-						}
-	    			};
-
-	    			me.runOnUiThread(rr);
-		        }
-			}
-		};
-
-		Thread t = new Thread(r);
-		t.start();
-	}
 
 	protected void onDestroy()
 	{
@@ -367,8 +308,6 @@ public class StartActivity extends ActionBarActivity
 	{
 		super.onPause();
 
-		this._isPaused = true;
-
         ListView listView = (ListView) this.findViewById(R.id.list_probes);
 		
 		boolean probesEnabled = (listView.getVisibility() == View.VISIBLE);
@@ -376,6 +315,12 @@ public class StartActivity extends ActionBarActivity
 		HashMap <String, Object> payload = new HashMap<String, Object>();
 		payload.put("probes_enabled", probesEnabled);
 		LogManager.getInstance(this).log("main_ui_dismissed", payload);
+		
+        if (this._observer != null)
+        {
+        	this.getContentResolver().unregisterContentObserver(this._observer);
+        	this._observer = null;
+        }
 	}
 
 	private void setJsonUri(Uri jsonConfigUri)
@@ -423,9 +368,7 @@ public class StartActivity extends ActionBarActivity
         		Toast.makeText(this, R.string.error_json_set_uri_password, Toast.LENGTH_LONG).show();
         }
 
-        this._isPaused = false;
-
-        ListView listView = (ListView) this.findViewById(R.id.list_probes);
+        final ListView listView = (ListView) this.findViewById(R.id.list_probes);
         ImageView logoView = (ImageView) this.findViewById(R.id.logo_view);
         logoView.setBackgroundColor(Color.WHITE);
         
@@ -452,12 +395,42 @@ public class StartActivity extends ActionBarActivity
         
         if (showBackground == false)
         	logoView.setVisibility(View.GONE);
-
-        this.refreshList();
         
 		HashMap <String, Object> payload = new HashMap<String, Object>();
 		payload.put("probes_enabled", probesEnabled);
 		LogManager.getInstance(this).log("main_ui_shown", payload);
+
+		final StartActivity me = this;
+
+        if (this._observer == null)
+        {
+        	this._observer = new ContentObserver(new Handler())
+        	{
+        		public void onChange(boolean selfChange, Uri uri)
+        		{
+        			ListAdapter listAdapter = listView.getAdapter();
+
+    		        Cursor c = listView.getContext().getContentResolver().query(RobotContentProvider.RECENT_PROBE_VALUES, null, null, null, "recorded DESC");
+
+        			if (listAdapter instanceof CursorAdapter)
+        			{
+        				CursorAdapter adapter = (CursorAdapter) listAdapter;
+
+        				adapter.changeCursor(c);
+        			}
+        			
+	    	        me.getSupportActionBar().setTitle(String.format(me.getResources().getString(R.string.title_probes_count), c.getCount()));
+	    	        me.updateAlertIcon();
+        		};
+        		
+        		 public void onChange(boolean selfChange) 
+        		 {
+        		     this.onChange(selfChange, null);
+        		 }
+        	};
+        }
+        
+        this.getContentResolver().registerContentObserver(RobotContentProvider.RECENT_PROBE_VALUES, true, this._observer);
 	}
 	
 	private void updateAlertIcon()

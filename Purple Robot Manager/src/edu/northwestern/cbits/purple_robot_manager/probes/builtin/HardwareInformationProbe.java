@@ -171,7 +171,7 @@ public class HardwareInformationProbe extends Probe
 
 		@SuppressWarnings("unchecked")
 		ArrayList<Bundle> array = (ArrayList<Bundle>) bundle.get(HardwareInformationProbe.DEVICES);
-		int count = bundle.getInt(HardwareInformationProbe.DEVICES_COUNT);
+		int count = (int) bundle.getDouble(HardwareInformationProbe.DEVICES_COUNT);
 
 		Bundle devicesBundle = this.bundleForDevicesArray(context, array);
 

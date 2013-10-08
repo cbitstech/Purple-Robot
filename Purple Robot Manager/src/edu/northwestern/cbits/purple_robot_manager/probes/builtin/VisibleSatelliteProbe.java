@@ -309,7 +309,7 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
-		int count = bundle.getInt("SATELLITE_COUNT");
+		int count = (int) bundle.getDouble("SATELLITE_COUNT");
 		float snr = bundle.getFloat("AVERAGE_SIGNAL_RATIO");
 
 		return String.format(context.getResources().getString(R.string.summary_satellite_probe), count, snr);
@@ -379,7 +379,7 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 
 		@SuppressWarnings("unchecked")
 		ArrayList<Bundle> array = (ArrayList<Bundle>) bundle.get("SATELLITES");
-		int count = bundle.getInt("SATELLITE_COUNT");
+		int count = (int) bundle.getDouble("SATELLITE_COUNT");
 
 		Bundle satsBundle = this.bundleForSatelliteArray(context, array);
 

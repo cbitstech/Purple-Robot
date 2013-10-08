@@ -119,7 +119,7 @@ public class RandomNoiseProbe extends Probe
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
-		float noise = bundle.getFloat(RandomNoiseProbe.NOISE_VALUE);
+		double noise = bundle.getDouble(RandomNoiseProbe.NOISE_VALUE);
 
 		return String.format(context.getResources().getString(R.string.summary_random_noise_probe), noise);
 	}
