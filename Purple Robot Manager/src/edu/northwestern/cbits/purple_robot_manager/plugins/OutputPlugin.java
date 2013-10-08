@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -419,5 +420,85 @@ public abstract class OutputPlugin
 //		String jsonString = JsonUtils.getGson().toJson(values);
 
 		return json;
+	}
+	@SuppressWarnings("rawtypes")
+	public static Bundle bundleForJson(String jsonString) 
+	{
+		Bundle bundle = new Bundle();
+		
+		try 
+		{
+			JSONObject json = new JSONObject(jsonString);
+
+			Iterator keys = json.keys();
+			
+			while (keys.hasNext())
+			{
+				String key = keys.next().toString();
+				
+				Object o = json.get(key);
+				
+				if (o instanceof Double)
+					bundle.putDouble(key, ((Double) o).doubleValue());
+				else if (o instanceof Float)
+					bundle.putDouble(key, ((Float) o).doubleValue());
+				else if (o instanceof Long)
+					bundle.putDouble(key, ((Long) o).doubleValue());
+				else if (o instanceof Integer)
+					bundle.putDouble(key, ((Integer) o).doubleValue());
+				else if (o instanceof Boolean)
+					bundle.putBoolean(key, ((Boolean) o).booleanValue());
+				else if (o instanceof String)
+					bundle.putString(key, o.toString());
+				else if (o instanceof JSONArray)
+				{
+					JSONArray child = (JSONArray) o;
+					
+					if (child.length() > 0)
+					{
+						Object nextChild = child.get(0);
+						
+						if (nextChild instanceof String)
+						{
+							String[] strings = new String[child.length()];
+							
+							for (int i = 0; i < strings.length; i++)
+								strings[i] = child.getString(i);
+							
+							bundle.putStringArray(key, strings);
+						}
+						else if (nextChild instanceof Double)
+						{
+							double[] doubles = new double[child.length()];
+							
+							for (int i = 0; i < doubles.length; i++)
+								doubles[i] = child.getDouble(i);
+							
+							bundle.putDoubleArray(key, doubles);
+						}
+						else if (nextChild instanceof JSONObject)
+						{
+							ArrayList<Bundle> bundles = new ArrayList<Bundle>();
+							
+							for (int i = 0; i < child.length(); i++)
+								bundles.add(OutputPlugin.bundleForJson(child.getJSONObject(i).toString()));
+							
+							bundle.putParcelableArrayList(key, bundles);
+						}
+					}
+				}
+				else if (o instanceof JSONObject)
+				{
+					JSONObject child = (JSONObject) o;
+					bundle.putBundle(key, OutputPlugin.bundleForJson(child.toString()));
+				}
+			}
+		}
+		catch (JSONException e) 
+		{
+			e.printStackTrace();
+		}
+
+		return bundle;
 	}
 }

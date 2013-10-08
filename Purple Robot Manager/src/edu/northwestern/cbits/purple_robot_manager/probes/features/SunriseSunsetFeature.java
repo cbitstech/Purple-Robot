@@ -38,8 +38,8 @@ public class SunriseSunsetFeature extends Feature
 	{
 		long now = System.currentTimeMillis();
 		
-		long sunrise = bundle.getLong(SunriseSunsetFeature.SUNRISE);
-		long sunset = bundle.getLong(SunriseSunsetFeature.SUNSET);
+		long sunrise = (long) bundle.getDouble(SunriseSunsetFeature.SUNRISE);
+		long sunset = (long) bundle.getDouble(SunriseSunsetFeature.SUNSET);
 		
 		long diff = (now - sunset) / (60 * 1000);
 		

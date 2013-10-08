@@ -205,7 +205,7 @@ public class RunningSoftwareProbe extends Probe
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
-		int count = bundle.getInt(RunningSoftwareProbe.RUNNING_TASK_COUNT);
+		int count = (int) bundle.getDouble(RunningSoftwareProbe.RUNNING_TASK_COUNT);
 
 		return String.format(context.getResources().getString(R.string.summary_running_software_probe), count);
 	}
@@ -239,7 +239,7 @@ public class RunningSoftwareProbe extends Probe
 
 		ArrayList<Bundle> array = (ArrayList<Bundle>) bundle.get(RunningSoftwareProbe.RUNNING_TASKS);
 
-		int count = bundle.getInt(RunningSoftwareProbe.RUNNING_TASK_COUNT);
+		int count = (int) bundle.getDouble(RunningSoftwareProbe.RUNNING_TASK_COUNT);
 
 		Bundle tasksBundle = this.bundleForTaskArray(context, array);
 

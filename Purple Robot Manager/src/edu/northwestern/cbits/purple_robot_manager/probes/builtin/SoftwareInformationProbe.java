@@ -140,7 +140,7 @@ public class SoftwareInformationProbe extends Probe
 	public String summarizeValue(Context context, Bundle bundle)
 	{
 		String release = bundle.getString(SoftwareInformationProbe.RELEASE);
-		int count = bundle.getInt(SoftwareInformationProbe.INSTALLED_APP_COUNT);
+		int count = (int) bundle.getDouble(SoftwareInformationProbe.INSTALLED_APP_COUNT);
 
 		return String.format(context.getResources().getString(R.string.summary_software_info_probe), release, count);
 	}
@@ -172,7 +172,7 @@ public class SoftwareInformationProbe extends Probe
 
 		@SuppressWarnings("unchecked")
 		ArrayList<Bundle> array = (ArrayList<Bundle>) bundle.get(SoftwareInformationProbe.INSTALLED_APPS);
-		int count = bundle.getInt(SoftwareInformationProbe.INSTALLED_APP_COUNT);
+		int count = (int) bundle.getDouble(SoftwareInformationProbe.INSTALLED_APP_COUNT);
 
 		Bundle appsBundle = this.bundleForAppArray(context, array);
 

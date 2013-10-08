@@ -124,9 +124,9 @@ public class DateCalendarProbe extends Probe
 	
 	public String summarizeValue(Context context, Bundle bundle)
 	{
-		int month = bundle.getInt(DateCalendarProbe.MONTH);
-		int week = bundle.getInt(DateCalendarProbe.WEEK_OF_MONTH);
-		int day = bundle.getInt(DateCalendarProbe.DAY_OF_WEEK);
+		int month = (int) bundle.getDouble(DateCalendarProbe.MONTH);
+		int week = (int) bundle.getDouble(DateCalendarProbe.WEEK_OF_MONTH);
+		int day = (int) bundle.getDouble(DateCalendarProbe.DAY_OF_WEEK);
 
 		return String.format(context.getResources().getString(R.string.summary_date_calendar_probe), month, week, day);
 	}

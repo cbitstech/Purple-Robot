@@ -1,0 +1,3 @@
+<resources>
+    <string name="create_recent_probe_values_sql">CREATE TABLE IF NOT EXISTS recent_probe_values(_id INTEGER PRIMARY KEY, source TEXT, recorded INTEGER DEFAULT 0, value TEXT);</string>
+</resources>

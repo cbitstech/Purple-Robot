@@ -503,11 +503,11 @@ public class AddressBookDistancesProbe extends Probe
 
 		formatted.putString(context.getString(R.string.display_calls_recent_time_title), d.toString());
 
-		formatted.putInt(context.getString(R.string.display_calls_incoming_count_title), bundle.getInt(AddressBookDistancesProbe.CALL_INCOMING_COUNT));
-		formatted.putInt(context.getString(R.string.display_calls_missed_count_title), bundle.getInt(AddressBookDistancesProbe.CALL_MISSED_COUNT));
-		formatted.putInt(context.getString(R.string.display_calls_outgoing_count_title), bundle.getInt(AddressBookDistancesProbe.CALL_OUTGOING_COUNT));
-		formatted.putInt(context.getString(R.string.display_sms_incoming_count_title), bundle.getInt(AddressBookDistancesProbe.SMS_INCOMING_COUNT));
-		formatted.putInt(context.getString(R.string.display_sms_outgoing_count_title), bundle.getInt(AddressBookDistancesProbe.SMS_OUTGOING_COUNT));
+		formatted.putInt(context.getString(R.string.display_calls_incoming_count_title), (int) bundle.getDouble(AddressBookDistancesProbe.CALL_INCOMING_COUNT));
+		formatted.putInt(context.getString(R.string.display_calls_missed_count_title), (int) bundle.getDouble(AddressBookDistancesProbe.CALL_MISSED_COUNT));
+		formatted.putInt(context.getString(R.string.display_calls_outgoing_count_title), (int) bundle.getDouble(AddressBookDistancesProbe.CALL_OUTGOING_COUNT));
+		formatted.putInt(context.getString(R.string.display_sms_incoming_count_title), (int) bundle.getDouble(AddressBookDistancesProbe.SMS_INCOMING_COUNT));
+		formatted.putInt(context.getString(R.string.display_sms_outgoing_count_title), (int) bundle.getDouble(AddressBookDistancesProbe.SMS_OUTGOING_COUNT));
 
 
 		ArrayList<String> keys = new ArrayList<String>();

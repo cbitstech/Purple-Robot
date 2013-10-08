@@ -160,10 +160,10 @@ public class BatteryProbe extends Probe
 		Bundle formatted = super.formattedBundle(context, bundle);
 
 		formatted.putString(context.getString(R.string.battery_tech_label), bundle.getString(BatteryManager.EXTRA_TECHNOLOGY));
-		formatted.putInt(context.getString(R.string.battery_temp_label), bundle.getInt(BatteryManager.EXTRA_TEMPERATURE, -1));
-		formatted.putInt(context.getString(R.string.battery_volt_label), bundle.getInt(BatteryManager.EXTRA_VOLTAGE, -1));
+		formatted.putInt(context.getString(R.string.battery_temp_label), (int) bundle.getDouble(BatteryManager.EXTRA_TEMPERATURE, -1));
+		formatted.putInt(context.getString(R.string.battery_volt_label), (int) bundle.getDouble(BatteryManager.EXTRA_VOLTAGE, -1));
 
-		int status = bundle.getInt(BatteryManager.EXTRA_STATUS, BatteryManager.BATTERY_STATUS_UNKNOWN);
+		int status = (int) bundle.getDouble(BatteryManager.EXTRA_STATUS, BatteryManager.BATTERY_STATUS_UNKNOWN);
 
 		switch (status)
 		{
@@ -183,7 +183,7 @@ public class BatteryProbe extends Probe
 				formatted.putString(context.getString(R.string.battery_status_label), context.getString(R.string.battery_status_unknown));
 		}
 
-		int health = bundle.getInt(BatteryManager.EXTRA_HEALTH, BatteryManager.BATTERY_HEALTH_UNKNOWN);
+		int health = (int) bundle.getDouble(BatteryManager.EXTRA_HEALTH, BatteryManager.BATTERY_HEALTH_UNKNOWN);
 
 		switch (health)
 		{
@@ -209,7 +209,7 @@ public class BatteryProbe extends Probe
 				formatted.putString(context.getString(R.string.battery_health_label), context.getString(R.string.battery_health_unknown));
 		}
 
-		int source = bundle.getInt(BatteryManager.EXTRA_PLUGGED, 0);
+		int source = (int) bundle.getDouble(BatteryManager.EXTRA_PLUGGED, 0);
 
 		switch (source)
 		{
@@ -253,8 +253,8 @@ public class BatteryProbe extends Probe
 
 						Map<String, Object> values = new HashMap<String, Object>();
 
-						values.put(BatteryProbe.BATTERY_KEY, Double.valueOf(bundle.getInt(BatteryManager.EXTRA_LEVEL)));
-						values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(Double.valueOf(bundle.getLong("TIMESTAMP"))));
+						values.put(BatteryProbe.BATTERY_KEY, bundle.getInt(BatteryManager.EXTRA_LEVEL));
+						values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(bundle.getLong("TIMESTAMP")));
 
 						ProbeValuesProvider.getProvider(context).insertValue(context, BatteryProbe.DB_TABLE, me.databaseSchema(), values);
 					}
@@ -301,9 +301,9 @@ public class BatteryProbe extends Probe
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
-		String status = this.getStatus(context, bundle.getInt(BatteryManager.EXTRA_STATUS));
+		String status = this.getStatus(context, (int) bundle.getDouble(BatteryManager.EXTRA_STATUS));
 
-		int level = bundle.getInt(BatteryManager.EXTRA_LEVEL);
+		int level = (int) bundle.getDouble(BatteryManager.EXTRA_LEVEL);
 
 		return String.format(context.getResources().getString(R.string.summary_battery_probe), level, status);
 	}
@@ -333,7 +333,7 @@ public class BatteryProbe extends Probe
 
 		@SuppressWarnings("unchecked")
 		ArrayList<Bundle> array = (ArrayList<Bundle>) bundle.get(HardwareInformationProbe.DEVICES);
-		int count = bundle.getInt(HardwareInformationProbe.DEVICES_COUNT);
+		int count = (int) bundle.getDouble(HardwareInformationProbe.DEVICES_COUNT);
 
 		Bundle devicesBundle = this.bundleForDevicesArray(context, array);
 

@@ -433,7 +433,7 @@ public class BluetoothDevicesProbe extends Probe
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
-		int count = bundle.getInt(BluetoothDevicesProbe.DEVICES_COUNT);
+		int count = (int) bundle.getDouble(BluetoothDevicesProbe.DEVICES_COUNT);
 
 		return String.format(context.getResources().getString(R.string.summary_bluetooth_probe), count);
 	}
@@ -476,7 +476,7 @@ public class BluetoothDevicesProbe extends Probe
 
 		@SuppressWarnings("unchecked")
 		ArrayList<Bundle> array = (ArrayList<Bundle>) bundle.get(BluetoothDevicesProbe.DEVICES);
-		int count = bundle.getInt(BluetoothDevicesProbe.DEVICES_COUNT);
+		int count = (int) bundle.getDouble(BluetoothDevicesProbe.DEVICES_COUNT);
 
 		Bundle devicesBundle = this.bundleForDevicesArray(context, array);
 

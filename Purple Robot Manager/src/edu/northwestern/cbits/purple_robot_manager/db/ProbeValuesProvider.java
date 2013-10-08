@@ -242,9 +242,16 @@ public class ProbeValuesProvider
 
 						if (ProbeValuesProvider.REAL_TYPE.equals(type))
 						{
-							Double d = (Double) values.get(key);
-
-							toInsert.put(key, d);
+							try
+							{
+								Double d = (Double) values.get(key);
+								toInsert.put(key, d);
+							}
+							catch (ClassCastException e)
+							{
+								Integer i = (Integer) values.get(key);
+								toInsert.put(key, i.doubleValue());
+							}
 						}
 						else if (ProbeValuesProvider.INTEGER_TYPE.equals(type))
 						{
