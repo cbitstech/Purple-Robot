@@ -54,7 +54,7 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 		Bundle formatted = super.formattedBundle(context, bundle);
 
 		double[] eventTimes = bundle.getDoubleArray("EVENT_TIMESTAMP");
-		float[] temp = bundle.getFloatArray("TEMPERATURE");
+		double[] temp = bundle.getDoubleArray("TEMPERATURE");
 
 		ArrayList<String> keys = new ArrayList<String>();
 
@@ -311,7 +311,7 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
-		float temperature = bundle.getFloatArray("TEMPERATURE")[0];
+		double temperature = bundle.getDoubleArray("TEMPERATURE")[0];
 
 		return String.format(context.getResources().getString(R.string.summary_temperature_probe), temperature);
 	}

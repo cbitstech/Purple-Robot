@@ -170,7 +170,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 		Bundle formatted = super.formattedBundle(context, bundle);
 
 		double[] eventTimes = bundle.getDoubleArray("EVENT_TIMESTAMP");
-		float[] distance = bundle.getFloatArray("DISTANCE");
+		double[] distance = bundle.getDoubleArray("DISTANCE");
 
 		ArrayList<String> keys = new ArrayList<String>();
 
@@ -448,7 +448,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
-		float distance = bundle.getFloatArray("DISTANCE")[0];
+		double distance = bundle.getDoubleArray("DISTANCE")[0];
 
 		return String.format(context.getResources().getString(R.string.summary_proximity_value_probe), distance);
 	}
