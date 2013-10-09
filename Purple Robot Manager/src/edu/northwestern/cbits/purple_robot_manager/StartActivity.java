@@ -1,5 +1,6 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -212,7 +213,11 @@ public class StartActivity extends ActionBarActivity
         			Bundle sensor = value.getBundle("SENSOR");
 
         			if (sensor != null && sensor.containsKey("POWER"))
-        				formattedValue += " (" + sensor.getFloat("POWER") + " mA)";
+        			{
+        		        DecimalFormat df = new DecimalFormat("#.##");
+
+        		        formattedValue += " (" + df.format(sensor.getDouble("POWER")) + " mA)";
+        			}
         		}
         		else if (value.containsKey(Feature.FEATURE_VALUE))
         			formattedValue = value.get(Feature.FEATURE_VALUE).toString();

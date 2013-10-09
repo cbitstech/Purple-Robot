@@ -192,9 +192,9 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 		Bundle formatted = super.formattedBundle(context, bundle);
 
 		double[] eventTimes = bundle.getDoubleArray("EVENT_TIMESTAMP");
-		float[] x = bundle.getFloatArray("X");
-		float[] y = bundle.getFloatArray("Y");
-		float[] z = bundle.getFloatArray("Z");
+		double[] x = bundle.getDoubleArray("X");
+		double[] y = bundle.getDoubleArray("Y");
+		double[] z = bundle.getDoubleArray("Z");
 
 		ArrayList<String> keys = new ArrayList<String>();
 
@@ -500,9 +500,9 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
-		float xReading = bundle.getFloatArray("X")[0];
-		float yReading = bundle.getFloatArray("Y")[0];
-		float zReading = bundle.getFloatArray("Z")[0];
+		double xReading = bundle.getDoubleArray("X")[0];
+		double yReading = bundle.getDoubleArray("Y")[0];
+		double zReading = bundle.getDoubleArray("Z")[0];
 
 		return String.format(context.getResources().getString(R.string.summary_accelerator_probe), xReading, yReading, zReading);
 	}

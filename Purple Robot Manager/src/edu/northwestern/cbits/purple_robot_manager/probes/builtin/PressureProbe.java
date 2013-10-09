@@ -167,8 +167,8 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 		Bundle formatted = super.formattedBundle(context, bundle);
 
 		double[] eventTimes = bundle.getDoubleArray("EVENT_TIMESTAMP");
-		float[] altitudes = bundle.getFloatArray(ALTITUDE_KEY);
-		float[] pressures = bundle.getFloatArray(PRESSURE_KEY);
+		double[] altitudes = bundle.getDoubleArray(ALTITUDE_KEY);
+		double[] pressures = bundle.getDoubleArray(PRESSURE_KEY);
 
 		ArrayList<String> keys = new ArrayList<String>();
 
@@ -474,8 +474,8 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
-		float pressure = bundle.getFloatArray(PressureProbe.PRESSURE_KEY)[0];
-		float altitude = bundle.getFloatArray(PressureProbe.ALTITUDE_KEY)[0];
+		double pressure = bundle.getDoubleArray(PressureProbe.PRESSURE_KEY)[0];
+		double altitude = bundle.getDoubleArray(PressureProbe.ALTITUDE_KEY)[0];
 
 		return String.format(context.getResources().getString(R.string.summary_pressure_probe), pressure, altitude);
 	}

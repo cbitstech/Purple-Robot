@@ -68,7 +68,7 @@ public abstract class XYZBasicFrequencyFeature extends ContinuousProbeFeature
 		}
 	}
 	
-	private void appendValues(float xs[], float ys[], float zs[], double[] ts)
+	private void appendValues(double[] incomingX, double[] incomingY, double[] incomingZ, double[] ts)
 	{
 		if (this._currentIndex + ts.length > BUFFER_SIZE)
 		{
@@ -86,9 +86,9 @@ public abstract class XYZBasicFrequencyFeature extends ContinuousProbeFeature
 
 			for (int i = 0; i < ts.length; i++)
 			{
-				_xValues[offset + i] = (double) xs[i];
-				_yValues[offset + i] = (double) ys[i];
-				_zValues[offset + i] = (double) zs[i];
+				_xValues[offset + i] = (double) incomingX[i];
+				_yValues[offset + i] = (double) incomingY[i];
+				_zValues[offset + i] = (double) incomingZ[i];
 				_timestamps[offset + i] = ts[i] / 1000;
 			}
 			
@@ -98,9 +98,9 @@ public abstract class XYZBasicFrequencyFeature extends ContinuousProbeFeature
 		{
 			for (int i = 0; i < ts.length; i++)
 			{
-				_xValues[this._currentIndex + i] = (double) xs[i];
-				_yValues[this._currentIndex + i] = (double) ys[i];
-				_zValues[this._currentIndex + i] = (double) zs[i];
+				_xValues[this._currentIndex + i] = (double) incomingX[i];
+				_yValues[this._currentIndex + i] = (double) incomingY[i];
+				_zValues[this._currentIndex + i] = (double) incomingZ[i];
 				_timestamps[this._currentIndex + i] = ts[i] / 1000;
 			}
 
@@ -181,9 +181,9 @@ public abstract class XYZBasicFrequencyFeature extends ContinuousProbeFeature
 			dataBundle.containsKey("Z"))
 		{
 			double[] incomingTimes = dataBundle.getDoubleArray("EVENT_TIMESTAMP");
-			float[] incomingX = dataBundle.getFloatArray("X");
-			float[] incomingY = dataBundle.getFloatArray("Y");
-			float[] incomingZ = dataBundle.getFloatArray("Z");
+			double[] incomingX = dataBundle.getDoubleArray("X");
+			double[] incomingY = dataBundle.getDoubleArray("Y");
+			double[] incomingZ = dataBundle.getDoubleArray("Z");
 			
 			this.appendValues(incomingX, incomingY, incomingZ, incomingTimes);
 			

@@ -176,7 +176,7 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 		Bundle formatted = super.formattedBundle(context, bundle);
 
 		double[] eventTimes = bundle.getDoubleArray("EVENT_TIMESTAMP");
-		float[] lux = bundle.getFloatArray("LUX");
+		double[] lux = bundle.getDoubleArray("LUX");
 
 		ArrayList<String> keys = new ArrayList<String>();
 
@@ -455,7 +455,7 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
-		float lux = bundle.getFloatArray("LUX")[0];
+		double lux = bundle.getDoubleArray("LUX")[0];
 
 		return String.format(context.getResources().getString(R.string.summary_light_probe), lux);
 	}
