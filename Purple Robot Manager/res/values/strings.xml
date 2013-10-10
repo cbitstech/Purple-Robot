@@ -204,6 +204,9 @@
     <string name="title_rotation_vector_probe">Rotation Vector Probe</string>
     <string name="summary_rotation_vector_probe_desc">The rotation vector represents the orientation of the device as a combination of an angle and an axis, in which the device has rotated through an angle θ around an axis &lt;x, y, z&gt;.</string>
 
+    <string name="probe_wakelock_title">Wake Lock</string>
+    <string name="probe_wakelock_summary">A wake lock overrides the power management of the system. An active wake lock will consume more power rapidly.</string>
+
     <!-- <string name="probe_unknown_category">Uncategorized</string>
     <string name="probe_positioning_category">Positioning</string>
     <string name="probe_motion_category">Motion</string>
