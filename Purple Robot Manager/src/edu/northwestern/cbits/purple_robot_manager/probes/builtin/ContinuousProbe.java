@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -15,6 +16,8 @@ import android.content.SharedPreferences.Editor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
@@ -34,6 +37,9 @@ public abstract class ContinuousProbe extends Probe
 	protected static final String DEFAULT_FREQUENCY = "0";
 
 	private PendingIntent _intent = null;
+	
+	private WakeLock _wakeLock = null;
+	private int _wakeLockLevel = -1;
 
 	protected Context _context = null;
 
@@ -88,6 +94,17 @@ public abstract class ContinuousProbe extends Probe
 
 		screen.addPreference(duration);
 
+		ListPreference wakelock = new ListPreference(activity);
+		wakelock.setKey("config_probe_" + key + "_wakelock");
+		wakelock.setEntryValues(R.array.wakelock_values);
+		wakelock.setEntries(R.array.wakelock_labels);
+		wakelock.setTitle(R.string.probe_wakelock_title);
+		wakelock.setSummary(R.string.probe_wakelock_summary);
+		wakelock.setDefaultValue("-1");
+
+		screen.addPreference(wakelock);
+
+		
 		return screen;
 	}
 
@@ -192,9 +209,16 @@ public abstract class ContinuousProbe extends Probe
 		}
 	}
 	
+	@SuppressLint("Wakelock")
 	public boolean isEnabled(Context context)
 	{
 		boolean enabled = super.isEnabled(context);
+		
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+		String key = this.getPreferenceKey();
+		
+		int wakeLevel = Integer.parseInt(prefs.getString("config_probe_" + key + "_wakelock", "-1"));
 
 		if (enabled)
 		{
@@ -206,14 +230,43 @@ public abstract class ContinuousProbe extends Probe
 				
 				am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 250, this._intent);
 			}
+			
+			if (wakeLevel != this._wakeLockLevel)
+			{
+				if (this._wakeLock != null)
+				{
+					this._wakeLock.release();
+					
+					this._wakeLock = null;
+				}
+				
+				this._wakeLockLevel = wakeLevel;
+			}
+			
+			if (this._wakeLockLevel != -1 && this._wakeLock == null)
+			{
+				PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+				
+				this._wakeLock = pm.newWakeLock(this._wakeLockLevel, "key");
+				this._wakeLock.acquire();
+			}
 		}
-		else if (this._intent != null)
+		else
 		{
-			AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-			
-			am.cancel(this._intent);
-			
-			this._intent = null;
+			if (this._intent != null)
+			{
+				AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+				
+				am.cancel(this._intent);
+				
+				this._intent = null;
+			}
+
+			if (this._wakeLock != null)
+			{
+				this._wakeLock.release();
+				this._wakeLock = null;
+			}
 		}
 		
 		return enabled;
