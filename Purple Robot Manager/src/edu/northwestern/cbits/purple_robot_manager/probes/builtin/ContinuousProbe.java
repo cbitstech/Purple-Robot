@@ -103,7 +103,6 @@ public abstract class ContinuousProbe extends Probe
 		wakelock.setDefaultValue("-1");
 
 		screen.addPreference(wakelock);
-
 		
 		return screen;
 	}
