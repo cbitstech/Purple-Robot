@@ -32,7 +32,8 @@
         <item>builtin.TemperatureProbe</item>
         <item>builtin.VisibleSatelliteProbe</item>
         <item>builtin.WifiAccessPointsProbe</item>
-
+        <item>builtin.AudioFeaturesProbe</item>
+        
         <item>features.DeviceInUseFeature</item>
         <item>features.CallHistoryFeature</item>
         <item>features.WeatherUndergroundFeature</item>

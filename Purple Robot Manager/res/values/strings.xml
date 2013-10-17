@@ -933,6 +933,11 @@
     <string name="probe_misc_category">Miscellaneous Probes</string>
     <string name="probe_personal_info_category">Personal Information Probes</string>
     <string name="probe_sensor_category">Hardware Sensor Probes</string>
+    
+    <!-- Audio features probe -->
+    <string name="title_audio_features_probe">Audio Features Probe</string>
+    <string name="summary_audio_features_probe_desc">Extracts information about the audible environment at regular intervals.</string>
+    <string name="summary_audio_features_probe" formatted="false">Strongest frequency %.2f Hz</string>
 </resources>
 
 
