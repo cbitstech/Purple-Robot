@@ -29,6 +29,10 @@ import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
 public abstract class OutputPlugin
 {
+	private ArrayList<Intent> _pendingIntents = new ArrayList<Intent>();
+	
+	private boolean _isProcessing = false;
+	
 	public static final String PAYLOAD = "edu.northwestern.cbits.purple_robot.OUTPUT_EVENT_PLUGIN";
 	public static final String OUTPUT_EVENT = "edu.northwestern.cbits.purple_robot.OUTPUT_EVENT";
 	public static final String LOG_EVENT = "edu.northwestern.cbits.purple_robot.LOG_EVENT";
@@ -149,11 +153,55 @@ public abstract class OutputPlugin
 	{
 		return OutputPlugin._pluginClasses;
 	}
-
-	public void process(Intent intent)
+	
+	public void process(final Intent intent)
 	{
 		if (this.shouldRespond(intent.getAction()))
-			this.processIntent(intent);
+		{
+			synchronized(this._pendingIntents)
+			{
+				this._pendingIntents.add(intent);
+			}
+			
+			if (this._isProcessing == false)
+			{
+				final OutputPlugin me = this;
+				
+				Runnable r = new Runnable()
+				{
+					public void run() 
+					{
+						me._isProcessing = true;
+						
+						while (me._pendingIntents.size() > 0)
+						{
+							Intent nextIntent = null;
+	
+							synchronized(me._pendingIntents)
+							{
+								if (me._pendingIntents.size() > 0)
+									nextIntent = me._pendingIntents.remove(0);
+							}
+							
+							if (nextIntent != null)
+								me.processIntent(nextIntent);
+						}
+						
+						me._isProcessing = false;
+					}
+				};
+	
+				try
+				{
+					Thread t = new Thread(r);
+					t.start();
+				}
+				catch (OutOfMemoryError e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 	public static Map<String,Object> getValues(final Bundle bundle)
