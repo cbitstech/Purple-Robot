@@ -71,7 +71,7 @@ public class AudioFeaturesProbe extends Probe
 		{
 			SharedPreferences prefs = Probe.getPreferences(context);
 
-			if (prefs.getBoolean("config_probe_network_enabled", AudioFeaturesProbe.DEFAULT_ENABLED))
+			if (prefs.getBoolean("config_probe_audio_feature_enabled", AudioFeaturesProbe.DEFAULT_ENABLED))
 			{
 				Runnable r = new Runnable()
 				{

@@ -186,9 +186,6 @@ public class StartActivity extends ActionBarActivity
         		final Probe probe = ProbeManager.probeForName(sensorName, me);
         		
         		Date sensorDate = new Date(cursor.getLong(cursor.getColumnIndex("recorded")) * 1000);
-        		
-        		TextView nameField = (TextView) view.findViewById(R.id.text_sensor_name);
-        		TextView valueField = (TextView) view.findViewById(R.id.text_sensor_value);
 
         		String formattedValue = sensorName;
 
@@ -227,8 +224,14 @@ public class StartActivity extends ActionBarActivity
         			displayName = value.getString("MODEL_NAME");
         		}
 
-        		nameField.setText(displayName + " (" + sdf.format(sensorDate) + ")");
-        		valueField.setText(formattedValue);
+				String name = displayName + " (" + sdf.format(sensorDate) + ")";
+				String display = formattedValue;
+
+        		TextView nameField = (TextView) view.findViewById(R.id.text_sensor_name);
+        		TextView valueField = (TextView) view.findViewById(R.id.text_sensor_value);
+
+        		nameField.setText(name);
+        		valueField.setText(display);
 			}
 
 			public View newView(Context context, Cursor cursor, ViewGroup parent)

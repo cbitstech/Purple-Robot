@@ -25,6 +25,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.AudioFeaturesP
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.BatteryProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.BluetoothDevicesProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CallStateProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CommunicationEventProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CommunicationLogProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.DateCalendarProbe;
@@ -373,6 +374,13 @@ public class ProbeManager
 				AudioFeaturesProbe audio = (AudioFeaturesProbe) probe;
 
 				if (audio.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof CommunicationEventProbe)
+			{
+				CommunicationEventProbe comm = (CommunicationEventProbe) probe;
+
+				if (comm.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 

@@ -374,7 +374,7 @@ public abstract class BaseScriptEngine
 		key = namespace + " - " + key;
 
 		if (value != null)
-			editor.putString(key,  value.toString());
+			editor.putString(key, value.toString());
 		else
 			editor.remove(key);
 
@@ -848,9 +848,11 @@ public abstract class BaseScriptEngine
 		return false;
 	}
 
-	public void showNativeDialog(String title, String message, String confirmTitle, String cancelTitle, String confirmScript, String cancelScript)
+	public void showNativeDialog(final String title, final String message, final String confirmTitle, final String cancelTitle, final String confirmScript, final String cancelScript)
 	{
-		Intent intent = new Intent(this._context, DialogBackgroundActivity.class);
+		final Context context = this._context;
+		
+		Intent intent = new Intent(context, DialogBackgroundActivity.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
 		intent.putExtra(DialogActivity.DIALOG_TITLE, title);
@@ -864,7 +866,7 @@ public abstract class BaseScriptEngine
 		if (cancelScript != null && "".equals(cancelScript.trim()) == false)
 			intent.putExtra(DialogActivity.DIALOG_CANCEL_SCRIPT, cancelScript);
 
-		this._context.startActivity(intent);
+		context.startActivity(intent);
 	}
 
 	public boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen)
@@ -1037,6 +1039,7 @@ public abstract class BaseScriptEngine
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
 		
 		ArrayList<String> list = new ArrayList<String>();
+		list.add("");
 		
 		try 
 		{
@@ -1064,6 +1067,9 @@ public abstract class BaseScriptEngine
 		Map<String, ?> all = prefs.getAll();
 		
 		String prefix = namespace + " - " + BaseScriptEngine.SCRIPT_ENGINE_PERSISTENCE_PREFIX;
+		
+		if (namespace.length() == 0)
+			prefix = BaseScriptEngine.SCRIPT_ENGINE_PERSISTENCE_PREFIX;
 		
 		for (String key : all.keySet())
 		{
