@@ -80,62 +80,85 @@ public class AudioFeaturesProbe extends Probe
 					{
 						int bufferSize = AudioRecord.getMinBufferSize(44100, AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT);
 						
-						AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, 44100, AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize);
-						recorder.startRecording();
+						AudioRecord recorder = null;
 						
-						short[] buffer = new short[bufferSize];
-						
-						int index = 0;
-						
-						int read = 0;
-						
-						while (index < me.samples.length && 0 <= (read = recorder.read(buffer, 0, bufferSize)))
+						int[] rates = new int[] { 44100, 22050, 11025, 8000 };
+
+						for (int rate : rates)
 						{
-							for (int i = 0; i < read; i++)
+							if (recorder == null)
 							{
-								if (index < me.samples.length)
+								AudioRecord newRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC, rate, AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize);
+								
+								if (newRecorder.getState() == AudioRecord.STATE_INITIALIZED)
+									recorder = newRecorder;
+									
+								else
+									newRecorder.release();
+							}
+						}						
+						
+						if (recorder != null)
+						{
+							recorder.startRecording();
+							
+							short[] buffer = new short[bufferSize];
+							
+							int index = 0;
+							
+							int read = 0;
+							
+							while (index < me.samples.length && 0 <= (read = recorder.read(buffer, 0, bufferSize)))
+							{
+								for (int i = 0; i < read; i++)
 								{
-									me.samples[index] = (double) buffer[i];
-									index += 1;
+									if (index < me.samples.length)
+									{
+										me.samples[index] = (double) buffer[i];
+										index += 1;
+									}
 								}
 							}
-						}
+		
+							recorder.stop();
+
+							Bundle bundle = new Bundle();
+							bundle.putString("PROBE", me.name(context));
+							bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+							bundle.putInt("SAMPLE_RATE", recorder.getSampleRate());
+
+							recorder.release();
+
+							FastFourierTransformer fft = new FastFourierTransformer(DftNormalization.STANDARD);
+							
+							Complex[] values = fft.transform(me.samples, TransformType.FORWARD);
+							
+							double maxFrequency = 0;
+							double maxMagnitude = 0;
+							
+							double minMagnitude = Double.MAX_VALUE;
 	
-						recorder.stop();
-						recorder.release();
-						
-						FastFourierTransformer fft = new FastFourierTransformer(DftNormalization.STANDARD);
-						
-						Complex[] values = fft.transform(me.samples, TransformType.FORWARD);
-						
-						double maxFrequency = 0;
-						double maxMagnitude = 0;
-						
-						double minMagnitude = Double.MAX_VALUE;
-
-						for (int i = 0; i < values.length / 2; i++) 
-						{
-							Complex value = values[i];
-							
-							double magnitude = value.abs();
-							
-							if (magnitude > maxMagnitude)
+							for (int i = 0; i < values.length / 2; i++) 
 							{
-								maxMagnitude = magnitude;
-								maxFrequency = (i * 44100.0) / (double) me.samples.length;
+								Complex value = values[i];
+								
+								double magnitude = value.abs();
+								
+								if (magnitude > maxMagnitude)
+								{
+									maxMagnitude = magnitude;
+									maxFrequency = (i * 44100.0) / (double) me.samples.length;
+								}
+	
+								if (magnitude < minMagnitude)
+									minMagnitude = magnitude;
 							}
-
-							if (magnitude < minMagnitude)
-								minMagnitude = magnitude;
+							
+							
+							bundle.putDouble("FREQUENCY", maxFrequency);
+							
+							me.transmitData(context, bundle);
 						}
-						
-						Bundle bundle = new Bundle();
-						bundle.putString("PROBE", me.name(context));
-						bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
-						
-						bundle.putDouble("FREQUENCY", maxFrequency);
-						
-						me.transmitData(context, bundle);
 					}
 				};
 				
