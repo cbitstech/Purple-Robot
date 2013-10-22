@@ -196,18 +196,14 @@ public class RunningSoftwareProbe extends Probe
 			LogManager.getInstance(context).logException(ex);
 		}
 		
-		Log.e("PR", "CATEGORY: " + category);
-
 		if (category == null)
 			category = context.getString(R.string.app_category_unknown);
-		else
-		{
-			Editor e = prefs.edit();
-			
-			e.putString(key, category);
-			
-			e.commit();
-		}
+
+		Editor e = prefs.edit();
+		
+		e.putString(key, category);
+		
+		e.commit();
 		
 		return category;
 	}

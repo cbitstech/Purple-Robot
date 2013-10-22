@@ -21,6 +21,7 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.AddressBookDistancesProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ApplicationLaunchProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.AudioFeaturesProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.BatteryProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.BluetoothDevicesProbe;
@@ -381,6 +382,13 @@ public class ProbeManager
 				CommunicationEventProbe comm = (CommunicationEventProbe) probe;
 
 				if (comm.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof ApplicationLaunchProbe)
+			{
+				ApplicationLaunchProbe apps = (ApplicationLaunchProbe) probe;
+
+				if (apps.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 
