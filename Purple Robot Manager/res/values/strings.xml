@@ -948,6 +948,9 @@
     
     <string name="config_dialog_count_label" formatted="false">Maximum No. of Stacked Dialogs</string>
     <string name="config_dialog_count_message" formatted="false">Limits the number of dialog views that will stack upon each other before older dialogs are deleted.</string>
+    
+    <string name="title_application_launch_probe">Application Launch Events</string>
+    <string name="summary_app_launch_probe" formatted="false">%s (%s)</string>
 </resources>
 
 
