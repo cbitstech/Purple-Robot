@@ -24,7 +24,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.util.DisplayMetrics;
-import android.util.Log;
 
 public abstract class PurpleWidgetProvider extends AppWidgetProvider 
 {
@@ -170,6 +169,8 @@ public abstract class PurpleWidgetProvider extends AppWidgetProvider
 
 	public static Bitmap badgedBitmapForUri(Context context, Uri imageUri, String badge, double fillRatio, int color) throws IOException 
 	{
+		badge = badge.trim();
+		
 		Bitmap b = PurpleWidgetProvider.bitmapForUri(context, imageUri);
 		
 		Bitmap badged = Bitmap.createBitmap(b.getWidth(), b.getHeight(), Bitmap.Config.ARGB_8888);
@@ -183,25 +184,31 @@ public abstract class PurpleWidgetProvider extends AppWidgetProvider
         textPaint.setTextAlign(Paint.Align.CENTER);
 
         Rect bounds = new Rect();
-        textPaint.getTextBounds(badge, 0, badge.length(), bounds);
         
-        while (bounds.width() < (b.getWidth() * fillRatio) && bounds.height() < (b.getHeight() * fillRatio))
+        if (badge.length() > 0)
         {
-        	textPaint.setTextSize(textPaint.getTextSize() + 1);
-
-        	textPaint.getTextBounds(badge, 0, badge.length(), bounds);
+	        textPaint.getTextBounds(badge, 0, badge.length(), bounds);
+	
+	        while (bounds.width() < (b.getWidth() * fillRatio) && bounds.height() < (b.getHeight() * fillRatio))
+	        {
+	        	textPaint.setTextSize(textPaint.getTextSize() + 1);
+	
+	        	textPaint.getTextBounds(badge, 0, badge.length(), bounds);
+	        }
+	
+	        while (bounds.width() > (b.getWidth() * fillRatio) || bounds.height() > (b.getHeight() * fillRatio))
+	        {
+	        	textPaint.setTextSize(textPaint.getTextSize() - 1);
+	
+	        	textPaint.getTextBounds(badge, 0, badge.length(), bounds);
+	        }
         }
 
-        while (bounds.width() > (b.getWidth() * fillRatio) || bounds.height() > (b.getHeight() * fillRatio))
-        {
-        	textPaint.setTextSize(textPaint.getTextSize() - 1);
+    	c.drawBitmap(b, 0, 0, textPaint);
+        
+        if (badge.length() > 0)
+            c.drawText(badge, b.getWidth() / 2, (b.getHeight() / 2) + (bounds.height() / 2), textPaint);
 
-        	textPaint.getTextBounds(badge, 0, badge.length(), bounds);
-        }
-
-        c.drawBitmap(b, 0, 0, textPaint);
-        c.drawText(badge, b.getWidth() / 2, (b.getHeight() / 2) + (bounds.height() / 2), textPaint);
-		
 		return badged;
 	}
 
@@ -212,6 +219,11 @@ public abstract class PurpleWidgetProvider extends AppWidgetProvider
 
 	public static Bitmap bitmapForText(Context context, String text, int width, int height, String color, boolean verticalCenter, boolean horizontalCenter) 
 	{
+		text = text.trim();
+		
+		if (text.length() == 0)
+			return null;
+		
 		DisplayMetrics metrics = context.getResources().getDisplayMetrics();
 
 		float floatWidth = width * metrics.density;

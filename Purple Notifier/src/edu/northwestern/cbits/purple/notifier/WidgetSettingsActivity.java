@@ -4,11 +4,10 @@ import android.app.Activity;
 import android.appwidget.AppWidgetManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 
-import com.actionbarsherlock.app.SherlockPreferenceActivity;
-
-public abstract class WidgetSettingsActivity extends SherlockPreferenceActivity 
+public abstract class WidgetSettingsActivity extends PreferenceActivity 
 {
 	protected int _widgetId = Integer.MAX_VALUE;
 	

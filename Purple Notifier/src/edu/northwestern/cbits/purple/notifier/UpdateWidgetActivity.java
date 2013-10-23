@@ -5,11 +5,10 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
+import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 
-import com.actionbarsherlock.app.SherlockPreferenceActivity;
-
-public class UpdateWidgetActivity extends SherlockPreferenceActivity implements OnPreferenceClickListener
+public class UpdateWidgetActivity extends PreferenceActivity implements OnPreferenceClickListener
 {
 	public void onCreate(Bundle savedInstanceState)
     {
@@ -27,7 +26,7 @@ public class UpdateWidgetActivity extends SherlockPreferenceActivity implements 
 		
 		String identifier = this.getIntent().getStringExtra("identifier");
 		
-		this.getSupportActionBar().setTitle(identifier);
+		this.setTitle(identifier);
 	}
 
 	public boolean onPreferenceClick(Preference preference) 
