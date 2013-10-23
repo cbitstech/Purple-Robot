@@ -7,7 +7,7 @@
     <string name="menu_update_label">Update Widgets</string>
     
     <string name="menu_remove_label">Remove Identifier</string>
-    <string name="menu_update_label">Update Widget</string>
+    <!--  <string name="menu_update_label">Update Widget</string> -->
     
     <string name="prompt_new_identifier">Add Identifier</string>
     <string name="message_new_identifier">Please add a new unique identifier.</string>

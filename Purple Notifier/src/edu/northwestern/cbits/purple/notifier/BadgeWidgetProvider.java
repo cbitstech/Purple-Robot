@@ -35,7 +35,7 @@ public class BadgeWidgetProvider extends PurpleWidgetProvider
 			color = Color.parseColor(extras.getString("color"));
 
 		double ratio = 0.75;
-		
+
 		if (extras.containsKey("fill"))
 		{
 			try
@@ -52,7 +52,7 @@ public class BadgeWidgetProvider extends PurpleWidgetProvider
 			ratio = 0.25;
 		
 		Uri imageUri = null;
-		
+
 		try
 		{
 			if (image.trim().length() > 0)
@@ -76,7 +76,7 @@ public class BadgeWidgetProvider extends PurpleWidgetProvider
 
 		String titleColor = "#ffffff";
 		String messageColor = "#ffffff";
-		
+
 		if (extras.containsKey("title_color"))
 			titleColor = extras.getString("title_color");
 
