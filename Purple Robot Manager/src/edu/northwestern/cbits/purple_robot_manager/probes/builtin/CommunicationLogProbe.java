@@ -386,6 +386,9 @@ public class CommunicationLogProbe extends Probe
 
 		ArrayList<Bundle> array = (ArrayList<Bundle>) bundle.get(CommunicationLogProbe.PHONE_CALLS);
 
+		if (array == null)
+			array = new ArrayList<Bundle>();
+		
 		int count = array.size();
 
 		Bundle callsBundle = this.bundleForCallArray(context, array);

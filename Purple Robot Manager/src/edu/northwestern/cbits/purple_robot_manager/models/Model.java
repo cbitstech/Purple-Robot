@@ -111,8 +111,6 @@ public abstract class Model
 		        	return new RegressionModel(context, Uri.parse(jsonUrl));
 		        else if (TreeModel.TYPE.equals(type))
 		        	return new TreeModel(context, Uri.parse(jsonUrl));
-		        else if (SvmModel.TYPE.equals(type))
-		        	return new TreeModel(context, Uri.parse(jsonUrl));
 		        
 			}
 			catch (JSONException e) 
