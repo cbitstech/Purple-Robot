@@ -235,10 +235,6 @@
 	   		    android:summary="@string/summary_third_gson">
 		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_gson" />
 	        </Preference>
-   	        <Preference android:title="@string/title_third_guava"
-	   		    android:summary="@string/summary_third_guava">
-		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_guava" />
-	        </Preference>
    	        <Preference android:title="@string/title_third_jmdns"
 	   		    android:summary="@string/summary_third_jmdns">
 		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_jmdns" />

@@ -772,10 +772,6 @@
     <string name="summary_third_gson">Google (Apache License 2.0)</string>
     <string name="url_third_gson">https://code.google.com/p/google-gson/</string>
     
-    <string name="title_third_guava">Guava</string>
-    <string name="summary_third_guava">Google (Apache License 2.0)</string>
-    <string name="url_third_guava">https://code.google.com/p/guava-libraries/</string>
-    
     <string name="title_third_jmdns">JmDNS</string>
     <string name="summary_third_jmdns">Arthur van Hoff, Rich Blair, Pierre Frisch, et al. (Apache License 2.0)</string>
     <string name="url_third_jmdns">http://jmdns.sourceforge.net/</string>
