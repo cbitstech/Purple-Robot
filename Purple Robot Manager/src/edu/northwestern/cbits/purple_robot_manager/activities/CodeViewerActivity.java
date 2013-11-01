@@ -32,6 +32,7 @@ public class CodeViewerActivity extends ActionBarActivity
         getWindow().setLayout(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
     }
 	
+	@SuppressWarnings("resource")
 	protected void onResume()
 	{
 		super.onResume();
