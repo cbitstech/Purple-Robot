@@ -343,8 +343,34 @@ public class StartActivity extends ActionBarActivity
 		}
 
 		EncryptionManager.getInstance().setConfigUri(this, jsonConfigUri);
+		
+		final StartActivity me = this;
+		
+		Runnable r = new Runnable()
+		{
+			public void run() 
+			{
+				try 
+				{
+					Thread.sleep(500);
+				}
+				catch (InterruptedException e) 
+				{
 
-		LegacyJSONConfigFile.updateFromOnline(this);
+				}
+				
+				me.runOnUiThread(new Runnable()
+				{
+					public void run() 
+					{
+						LegacyJSONConfigFile.updateFromOnline(me);
+					}
+				});
+			}
+		};
+		
+		Thread t = new Thread(r);
+		t.start();
 	}
 
 	protected void onResume()

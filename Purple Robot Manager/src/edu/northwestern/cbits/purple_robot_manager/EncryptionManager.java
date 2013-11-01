@@ -363,6 +363,7 @@ public class EncryptionManager
 			e.remove(EncryptionManager.JSON_CONFIGURATION_URL);
 		
 		e.commit();
+		
 	}
 	
 	public Uri getConfigUri(Context context, String newUserId)
