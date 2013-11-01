@@ -24,6 +24,7 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.WiFiHelper;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -125,14 +126,14 @@ public class RunningSoftwareProbe extends Probe
 									bundle.putInt(RunningSoftwareProbe.RUNNING_TASK_COUNT, running.size());
 			
 									me.transmitData(context, bundle);
-								
-									me._lastCheck = now;
 								}
 							}
 						};
 						
 						Thread t = new Thread(r);
 						t.start();
+
+						me._lastCheck = now;
 					}
 				}
 
@@ -162,18 +163,24 @@ public class RunningSoftwareProbe extends Probe
 		
 		try 
 		{
-			Document doc = Jsoup.connect("https://play.google.com/store/apps/details?id=" + packageName).get();
+			String url = "https://play.google.com/store/apps/details?id=" + packageName;
+			
+			Log.e("PR", "LOOKING UP " + url);
+			
+			Document doc = Jsoup.connect(url).get();
 
-			Element detailsTab = doc.select("div#details-tab-1").first();
+			Element detailsTab = doc.select("a.category").first();
 			
 			if (detailsTab != null)
 			{
-				Elements links = detailsTab.select("a[href]");
+				Elements spans = detailsTab.select("span");
 				
-				for (Element link : links)
+				for (Element span : spans)
 				{
-					if (link.attr("href").startsWith("/store/apps/category/"))
-						category = link.text();
+					category = span.text();
+					
+//					if (link.attr("href").startsWith("/store/apps/category/"))
+//						category = link.text();
 				}
 			}
 		}
@@ -188,17 +195,15 @@ public class RunningSoftwareProbe extends Probe
 		{
 			LogManager.getInstance(context).logException(ex);
 		}
-
+		
 		if (category == null)
 			category = context.getString(R.string.app_category_unknown);
-		else
-		{
-			Editor e = prefs.edit();
-			
-			e.putString(key, category);
-			
-			e.commit();
-		}
+
+		Editor e = prefs.edit();
+		
+		e.putString(key, category);
+		
+		e.commit();
 		
 		return category;
 	}

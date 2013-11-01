@@ -8,8 +8,10 @@ import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager.LayoutParams;
@@ -34,21 +36,25 @@ public class DialogActivity extends Activity
 
         this.setContentView(R.layout.layout_dialog_activity);
 
-        getWindow().setLayout(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        this.getWindow().setLayout(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         
-        while (DialogActivity._dialogStack.size() > 4)
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        
+        int stackSize = Integer.parseInt(prefs.getString("config_dialog_count", "4"));
+        
+        DialogActivity._dialogStack.add(this);
+
+        while (stackSize > 0 && DialogActivity._dialogStack.size() > stackSize)
         {
         	DialogActivity activity = DialogActivity._dialogStack.remove(0);
         	
         	activity.finish();
         }
-        
-        DialogActivity._dialogStack.add(this);
     }
 	
-	protected void onStop()
+	protected void onDestroy ()
 	{
-		super.onStop();
+		super.onDestroy();
 		
 		DialogActivity._dialogStack.remove(this);
 	}

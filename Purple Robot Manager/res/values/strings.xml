@@ -929,6 +929,24 @@
     <string name="probe_misc_category">Miscellaneous Probes</string>
     <string name="probe_personal_info_category">Personal Information Probes</string>
     <string name="probe_sensor_category">Hardware Sensor Probes</string>
+    
+    <!-- Audio features probe -->
+    <string name="title_audio_features_probe">Audio Features Probe</string>
+    <string name="summary_audio_features_probe_desc">Extracts information about the audible environment at regular intervals.</string>
+    <string name="summary_audio_features_probe" formatted="false">Strongest frequency %.2f Hz</string>
+
+    <!-- Comm. events probe -->
+    <string name="title_communication_event_probe">Communication Events Probe</string>
+    <string name="summary_communication_event_probe_desc">Logs phone calls and text messages as sensor events.</string>
+    <string name="summary_communication_events_phone_type">Phone Call</string>
+    <string name="summary_communication_events_sms_type">Text Message</string>
+    <string name="summary_communication_events_probe" formatted="false">Last %s: %s (%s)</string>
+    
+    <string name="config_dialog_count_label" formatted="false">Maximum No. of Stacked Dialogs</string>
+    <string name="config_dialog_count_message" formatted="false">Limits the number of dialog views that will stack upon each other before older dialogs are deleted.</string>
+    
+    <string name="title_application_launch_probe">Application Launch Events</string>
+    <string name="summary_app_launch_probe" formatted="false">%s (%s)</string>
 </resources>
 
 

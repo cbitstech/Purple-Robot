@@ -25,22 +25,22 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.app.ActionBarActivity;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockListActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-
-public class MainActivity extends SherlockListActivity 
+public class MainActivity extends ActionBarActivity 
 {
 	private String _contextLabel = null;
 	
@@ -175,12 +175,14 @@ public class MainActivity extends SherlockListActivity
         	}
         };
         
-        this.setListAdapter(adapter);
+        ListView list = (ListView) this.findViewById(android.R.id.list);
+        
+        list.setAdapter(adapter);
  	}
 	
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-        MenuInflater inflater = this.getSupportMenuInflater();
+        MenuInflater inflater = this.getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
 
         return true;
