@@ -96,6 +96,40 @@ public class LegacyJSONConfigFile
 
 						Editor edit = prefs.edit();
 
+						
+						X509TrustManager trust = new X509TrustManager() 
+						{
+							public java.security.cert.X509Certificate[] getAcceptedIssuers() 
+							{
+								return new java.security.cert.X509Certificate[] {};
+							}
+
+							public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException 
+							{
+								
+							}
+
+							public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException 
+							{
+		                    
+							}
+						};
+
+						TrustManager[] trustAllCerts = { trust };
+
+						SSLContext sc = null;
+
+						try 
+						{
+							sc = SSLContext.getInstance("TLS");
+							sc.init(null, trustAllCerts, new java.security.SecureRandom());
+						}
+						catch (Exception e) 
+						{
+							e.printStackTrace();
+						}
+
+						
 						HttpURLConnection conn = (HttpURLConnection) u.openConnection();
 						
 						if (conn instanceof HttpsURLConnection)
@@ -104,6 +138,8 @@ public class LegacyJSONConfigFile
 							
 							if (prefs.getBoolean("config_http_liberal_ssl", true))
 							{
+								conns.setSSLSocketFactory(sc.getSocketFactory());
+
 								conns.setHostnameVerifier(new HostnameVerifier()
 								{
 									public boolean verify(String hostname, SSLSession session) 
@@ -111,38 +147,6 @@ public class LegacyJSONConfigFile
 										return true;
 									}
 								});
-
-								X509TrustManager trust = new X509TrustManager() 
-								{
-									public java.security.cert.X509Certificate[] getAcceptedIssuers() 
-									{
-										return new java.security.cert.X509Certificate[] {};
-									}
-
-									public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException 
-									{
-										
-									}
-
-									public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException 
-									{
-				                    
-									}
-								};
-
-								TrustManager[] trustAllCerts = { trust };
-
-								try 
-								{
-									SSLContext sc = SSLContext.getInstance("TLS");
-									sc.init(null, trustAllCerts, new java.security.SecureRandom());
-				                      
-									conns.setSSLSocketFactory(sc.getSocketFactory());
-								}
-								catch (Exception e) 
-								{
-									e.printStackTrace();
-								}
 							}
 						}
 						
@@ -153,6 +157,24 @@ public class LegacyJSONConfigFile
 							conn.disconnect();
 							
 							conn = (HttpURLConnection) newUrl.openConnection();
+							
+							if (conn instanceof HttpsURLConnection)
+							{
+								HttpsURLConnection conns = (HttpsURLConnection) conn;
+								
+								if (prefs.getBoolean("config_http_liberal_ssl", true))
+								{
+									conns.setSSLSocketFactory(sc.getSocketFactory());
+
+									conns.setHostnameVerifier(new HostnameVerifier()
+									{
+										public boolean verify(String hostname, SSLSession session) 
+										{
+											return true;
+										}
+									});
+								}
+							}
 						}
 						
 						BufferedInputStream bin = new BufferedInputStream(conn.getInputStream());
