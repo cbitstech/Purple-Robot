@@ -68,6 +68,7 @@ public class LocalHttpServer
             HttpRequestHandlerRegistry reqistry = new HttpRequestHandlerRegistry();
             reqistry.register("/json/submit", new JsonScriptRequestHandler(context));
             reqistry.register("/json/store", new JsonStoreRequestHandler(context));
+            reqistry.register("/json/variables.json", new JsonVariablesRequestHandler(context));
             reqistry.register("*", new StaticContentRequestHandler(context));
             
             this.httpService = new HttpService(httpproc, new DefaultConnectionReuseStrategy(), new DefaultHttpResponseFactory());

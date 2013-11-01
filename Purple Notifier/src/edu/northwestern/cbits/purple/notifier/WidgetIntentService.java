@@ -15,7 +15,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.OrientationEventListener;
 
 public class WidgetIntentService extends IntentService 
@@ -39,11 +38,9 @@ public class WidgetIntentService extends IntentService
 	{
 		super(name);
 	}
-
+	
 	protected void onHandleIntent(Intent intent) 
 	{
-		Log.e("PN", "RECV INTENT: " + intent);
-		
 		final WidgetIntentService me = this;
 		
 		if (WidgetIntentService._orientation == null)
@@ -61,8 +58,6 @@ public class WidgetIntentService extends IntentService
 					}
 				}
 			};
-			
-//			WidgetIntentService._orientation.enable();
 		}
 
 		if (intent.hasExtra("identifier"))
@@ -134,8 +129,6 @@ public class WidgetIntentService extends IntentService
 			
 			for (int widgetId : widgetIds)
 			{
-				Log.e("PR", "REFRESHING WIDGET 1 " + widgetId + " FOR " + identifier);
-				
 				this.refreshWidget(widgetId, intent);
 			}
 
@@ -155,8 +148,6 @@ public class WidgetIntentService extends IntentService
 			
 			for (int id : widgetIds)
 			{
-				Log.e("PR", "REFRESHING WIDGET 2 " + widgetId + " FOR " + identifier);
-
 				this.refreshWidget(id, intent);
 			}
 		}
@@ -223,7 +214,7 @@ public class WidgetIntentService extends IntentService
 			this.unregisterIdentifier(widgetId);
 			return;
 		}
-		
+
 		if (BasicWidgetProvider.NAME.equals(widget))
 			BasicWidgetProvider.setupWidget(this, widgetId, intent);
 		else if (TextWidgetProvider.NAME.equals(widget))
@@ -249,7 +240,7 @@ public class WidgetIntentService extends IntentService
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		
 		String idList = prefs.getString(key, "");
-		
+
 		ArrayList<String> identifiers = new ArrayList<String>();
 		
 		String[] tokens = idList.split(";");

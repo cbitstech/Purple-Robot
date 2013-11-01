@@ -30,6 +30,7 @@ public class ModelManager extends BroadcastReceiver
 	private Context _context = null;
 	private List<Model> _models = new ArrayList<Model>();
 	private HashMap<String, Object> _milieu = new HashMap<String, Object>();
+	private HashMap<String, String> _keyCache = new HashMap<String, String>();
 	
     private ModelManager(Context context) 
     {
@@ -122,10 +123,18 @@ public class ModelManager extends BroadcastReceiver
 			}
 			else
 			{
-				String slug = (probeName + " " + key).toLowerCase().replaceAll("_", " ");
+				String probeKey = probeName + " " + key;
 				
-				slug = Slugify.slugify(slug).replaceAll("-", "_");
-
+				String slug = this._keyCache.get(probeKey);
+				
+				if (slug == null)
+				{
+					slug = probeKey.toLowerCase().replaceAll("_", " ");
+					slug = Slugify.slugify(slug).replaceAll("-", "_");
+					
+					this._keyCache.put(probeKey, slug);
+				}
+				
 				this._milieu.put(slug, extras.get(key));
 			}
 		}

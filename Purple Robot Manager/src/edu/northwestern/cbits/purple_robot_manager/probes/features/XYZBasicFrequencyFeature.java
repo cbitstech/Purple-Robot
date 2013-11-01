@@ -20,6 +20,7 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 // import android.util.Log;
 import edu.emory.mathcs.backport.java.util.Arrays;
 import edu.emory.mathcs.backport.java.util.Collections;
@@ -68,8 +69,10 @@ public abstract class XYZBasicFrequencyFeature extends ContinuousProbeFeature
 		}
 	}
 	
-	private void appendValues(double[] incomingX, double[] incomingY, double[] incomingZ, double[] ts)
+	private void appendValues(float[] incomingX, float[] incomingY, float[] incomingZ, double[] ts)
 	{
+		Log.e("PR", "INCOMING: " + incomingX + " " + incomingY + " " + incomingZ + " " + ts);
+
 		if (this._currentIndex + ts.length > BUFFER_SIZE)
 		{
 			int shift = this._currentIndex + ts.length - BUFFER_SIZE;
@@ -181,9 +184,10 @@ public abstract class XYZBasicFrequencyFeature extends ContinuousProbeFeature
 			dataBundle.containsKey("Z"))
 		{
 			double[] incomingTimes = dataBundle.getDoubleArray("EVENT_TIMESTAMP");
-			double[] incomingX = dataBundle.getDoubleArray("X");
-			double[] incomingY = dataBundle.getDoubleArray("Y");
-			double[] incomingZ = dataBundle.getDoubleArray("Z");
+			
+			float[] incomingX = dataBundle.getFloatArray("X");
+			float[] incomingY = dataBundle.getFloatArray("Y");
+			float[] incomingZ = dataBundle.getFloatArray("Z");
 			
 			this.appendValues(incomingX, incomingY, incomingZ, incomingTimes);
 			

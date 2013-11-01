@@ -15,6 +15,7 @@
         <item>builtin.BluetoothDevicesProbe</item>
         <item>builtin.CallStateProbe</item>
         <item>builtin.CommunicationLogProbe</item>
+        <item>builtin.CommunicationEventProbe</item>
         <item>builtin.DateCalendarProbe</item>
         <item>builtin.GyroscopeProbe</item>
         <item>builtin.HardwareInformationProbe</item>
@@ -32,7 +33,9 @@
         <item>builtin.TemperatureProbe</item>
         <item>builtin.VisibleSatelliteProbe</item>
         <item>builtin.WifiAccessPointsProbe</item>
-
+        <item>builtin.AudioFeaturesProbe</item>
+        <item>builtin.ApplicationLaunchProbe</item>
+        
         <item>features.DeviceInUseFeature</item>
         <item>features.CallHistoryFeature</item>
         <item>features.WeatherUndergroundFeature</item>
@@ -667,5 +670,42 @@
        	<item>10</item>
        	<item>26</item>
    	</string-array>
-		
+   	
+	<string-array name="dialog_count_labels">
+        <item>1 dialog view</item>
+        <item>2 dialog views</item>
+        <item>3 dialog views</item>
+        <item>4 dialog views</item>
+		<item>5 dialog view</item>
+		<item>6 dialog view</item>
+ 	    <item>7 dialog view</item>
+ 	    <item>8 dialog view</item>
+		<item>Unlimited dialog views</item>
+  	</string-array>
+
+	<string-array name="dialog_count_values">
+        <item>1</item>
+        <item>2</item>
+       	<item>3</item>
+       	<item>4</item>
+        <item>5</item>
+        <item>6</item>
+       	<item>7</item>
+       	<item>8</item>
+       	<item>0</item>
+	</string-array>
+
+	<string-array name="probe_app_launch_frequency_labels">
+        <item>10 times per second</item>
+        <item>Every second</item>
+        <item>Every 5 seconds</item>
+        <item>Every 10 seconds</item>
+  	</string-array>
+
+	<string-array name="probe_app_launch_frequency_values">
+        <item>100</item>
+        <item>1000</item>
+       	<item>5000</item>
+       	<item>10000</item>
+s	</string-array>
 </resources>

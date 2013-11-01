@@ -21,9 +21,12 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.AddressBookDistancesProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ApplicationLaunchProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.AudioFeaturesProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.BatteryProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.BluetoothDevicesProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CallStateProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CommunicationEventProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CommunicationLogProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.DateCalendarProbe;
@@ -365,6 +368,27 @@ public class ProbeManager
 				FitbitApiFeature fitbit = (FitbitApiFeature) probe;
 
 				if (fitbit.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof AudioFeaturesProbe)
+			{
+				AudioFeaturesProbe audio = (AudioFeaturesProbe) probe;
+
+				if (audio.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof CommunicationEventProbe)
+			{
+				CommunicationEventProbe comm = (CommunicationEventProbe) probe;
+
+				if (comm.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof ApplicationLaunchProbe)
+			{
+				ApplicationLaunchProbe apps = (ApplicationLaunchProbe) probe;
+
+				if (apps.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 
