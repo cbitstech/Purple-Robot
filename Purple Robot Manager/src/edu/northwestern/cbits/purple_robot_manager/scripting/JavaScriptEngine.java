@@ -62,12 +62,8 @@ public class JavaScriptEngine extends BaseScriptEngine
 			extras = NativeJSON.stringify(this._jsContext, this._scope, extras, null, null);
 		}
 
-		Log.e("PR", "JS EXTRAS: " + extras);
-		
 		if (extras != null && extrasName != null)
 			script = "var " + extrasName + " = " + extras.toString() + "; " + script;
-
-		Log.e("PR", "SCRIPT: " + script);
 
 		return this._jsContext.evaluateString(this._scope, script, "<engine>", 1, null);
 	}
@@ -80,6 +76,7 @@ public class JavaScriptEngine extends BaseScriptEngine
 		return LogManager.getInstance(this._context).log(event, new HashMap<String, Object>());
 	}
 
+	@SuppressWarnings("resource")
 	public boolean loadLibrary(String libraryName)
 	{
 		if (this._jsContext != null && this._scope != null)

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -224,6 +225,28 @@ public class DateTrigger extends Trigger
 			
 			if (map.containsKey(DateTrigger.DATETIME_END))
 				this._end = map.get(DateTrigger.DATETIME_END).toString();
+			
+			if (this._start != null && this._start.equals(this._end))
+			{
+				try 
+				{
+					SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
+				
+					Date start = sdf.parse(this._start);
+					
+					long time = start.getTime();
+					
+					time += 60 * 1000;
+					
+					Date end = new Date(time);
+					
+					this._end = sdf.format(end);
+				}
+				catch (ParseException e) 
+				{
+					LogManager.getInstance(context).logException(e);
+				}
+			}
 
 			if (map.containsKey(DateTrigger.DATETIME_REPEATS))
 				this._repeats = map.get(DateTrigger.DATETIME_REPEATS).toString();

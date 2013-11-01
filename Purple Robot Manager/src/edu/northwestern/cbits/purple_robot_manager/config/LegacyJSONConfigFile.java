@@ -10,6 +10,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -18,6 +20,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,6 +37,7 @@ import org.mozilla.javascript.RhinoException;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -57,12 +67,13 @@ public class LegacyJSONConfigFile
 	public static final String FEATURES = "features";
 	private static final String JSON_INIT_SCRIPT = "init_script";
 
-	private static SharedPreferences prefs = null;
-
 	private JSONObject parameters = null;
 
 	private static LegacyJSONConfigFile _sharedFile = null;
 
+	private static SharedPreferences prefs;
+
+	@SuppressLint("DefaultLocale")
 	public static void updateFromOnline(final Context context)
 	{
 		Runnable r = new Runnable()
@@ -82,9 +93,58 @@ public class LegacyJSONConfigFile
 						URL u = new URL(uri.toString());
 
 						final SharedPreferences prefs = LegacyJSONConfigFile.getPreferences(context);
+
 						Editor edit = prefs.edit();
 
 						HttpURLConnection conn = (HttpURLConnection) u.openConnection();
+						
+						if (conn instanceof HttpsURLConnection)
+						{
+							HttpsURLConnection conns = (HttpsURLConnection) conn;
+							
+							if (prefs.getBoolean("config_http_liberal_ssl", true))
+							{
+								conns.setHostnameVerifier(new HostnameVerifier()
+								{
+									public boolean verify(String hostname, SSLSession session) 
+									{
+										return true;
+									}
+								});
+
+								X509TrustManager trust = new X509TrustManager() 
+								{
+									public java.security.cert.X509Certificate[] getAcceptedIssuers() 
+									{
+										return new java.security.cert.X509Certificate[] {};
+									}
+
+									public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException 
+									{
+										
+									}
+
+									public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException 
+									{
+				                    
+									}
+								};
+
+								TrustManager[] trustAllCerts = { trust };
+
+								try 
+								{
+									SSLContext sc = SSLContext.getInstance("TLS");
+									sc.init(null, trustAllCerts, new java.security.SecureRandom());
+				                      
+									conns.setSSLSocketFactory(sc.getSocketFactory());
+								}
+								catch (Exception e) 
+								{
+									e.printStackTrace();
+								}
+							}
+						}
 						
 						for (int z = 0; z < 16 && conn.getHeaderField("Location") != null; z++)
 						{
