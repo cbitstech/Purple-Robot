@@ -205,8 +205,6 @@ public class RobotHealthProbe extends Probe
 
 //									String[] archivesNames = archiveFolder.list();
 
-//									Log.e("PR", "CC " + archivesNames.length);
-
 //									archiveCount = archivesNames.length;
 	
 /*									if (archiveCount < 2048)
