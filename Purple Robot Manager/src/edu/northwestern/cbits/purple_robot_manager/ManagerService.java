@@ -104,11 +104,10 @@ public class ManagerService extends IntentService
 		}
 		else if (UPDATE_WIDGETS.equalsIgnoreCase(intent.getAction()))
 		{
-			Intent broadcast = new Intent("edu.northwestern.cbits.purple.UPDATE_WIDGETS");
+			Intent broadcast = new Intent("edu.northwestern.cbits.purple.UPDATE_WIDGET");
 			broadcast.putExtras(intent.getExtras());
 			
-			this.sendBroadcast(broadcast);
-//			this.startService(broadcast);
+			this.startService(broadcast);
 		}
 		else if (HAPTIC_PATTERN_INTENT.equalsIgnoreCase(intent.getAction()))
 		{

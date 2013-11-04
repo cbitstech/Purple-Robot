@@ -165,8 +165,6 @@ public class RunningSoftwareProbe extends Probe
 		{
 			String url = "https://play.google.com/store/apps/details?id=" + packageName;
 			
-			Log.e("PR", "LOOKING UP " + url);
-			
 			Document doc = Jsoup.connect(url).get();
 
 			Element detailsTab = doc.select("a.category").first();
@@ -178,9 +176,6 @@ public class RunningSoftwareProbe extends Probe
 				for (Element span : spans)
 				{
 					category = span.text();
-					
-//					if (link.attr("href").startsWith("/store/apps/category/"))
-//						category = link.text();
 				}
 			}
 		}

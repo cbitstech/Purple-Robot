@@ -7,6 +7,8 @@ public class NotifierReceiver extends BroadcastReceiver
 {
 	public void onReceive(Context context, Intent intent) 
 	{
+        intent = new Intent(WidgetIntentService.ACTION_BOOT);
+		
 		context.startService(intent);
 	}
 }
