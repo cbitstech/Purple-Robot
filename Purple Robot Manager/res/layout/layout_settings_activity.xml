@@ -258,10 +258,6 @@
 	   		    android:summary="@string/summary_third_sunrise">
 		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_sunrise" />
 	        </Preference>
-   	        <Preference android:title="@string/title_third_mustache"
-	   		    android:summary="@string/summary_third_mustache">
-		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_mustache" />
-	        </Preference>
    	        <Preference android:title="@string/title_slugify"
 	   		    android:summary="@string/summary_slugify">
 		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_slugify" />

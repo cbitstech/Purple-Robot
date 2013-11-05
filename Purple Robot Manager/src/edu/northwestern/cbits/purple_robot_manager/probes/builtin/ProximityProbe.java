@@ -1,8 +1,6 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,11 +26,6 @@ import android.os.SystemClock;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
-
-import com.github.mustachejava.DefaultMustacheFactory;
-import com.github.mustachejava.Mustache;
-import com.github.mustachejava.MustacheFactory;
-
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
@@ -140,18 +133,10 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 
 			JSONObject json = c.highchartsJson(activity);
 
-			HashMap<String, Object> scope = new HashMap<String, Object>();
-			scope.put("highchart_json", json.toString());
-			scope.put("highchart_count", count);
+			template = template.replace("{{{ highchart_json }}}", json.toString());
+			template = template.replace("{{{ highchart_count }}}", "" + count);
 
-			StringWriter writer = new StringWriter();
-
-		    MustacheFactory mf = new DefaultMustacheFactory();
-		    Mustache mustache = mf.compile(new StringReader(template), "template");
-		    mustache.execute(writer, scope);
-		    writer.flush();
-
-		    return writer.toString();
+		    return template;
 		}
 		catch (IOException e)
 		{
