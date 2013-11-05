@@ -98,7 +98,7 @@ public class OAuthActivity extends Activity
     	{
     		Uri incomingUri = this.getIntent().getData();
 
-        	if ("cbits-oauth".equals(incomingUri.getScheme()))
+        	if ("http".equals(incomingUri.getScheme()))
         	{
         		List<String> segments = incomingUri.getPathSegments();
         		

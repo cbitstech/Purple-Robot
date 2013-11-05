@@ -890,7 +890,7 @@
 	<string name="title_logout_fitbit_probe">Log Out of Fitbit</string>	
 	<string name="summary_logout_fitbit_probe">Tap to clear your Fitbit login information and revoke access to this device.</string>	
 	<string name="toast_fitbit_logout">Logged out of Fitbit.</string>	
-    <string name="summary_fitbit" formatted="false">Steps: %d, Goal Progress: %.2f%% Complete</string>
+    <string name="summary_fitbit" formatted="false">Steps: %.0f, Goal Progress: %.2f%% Complete</string>
 	<string name="title_fitbit_check">Fitbit feature requires authorization</string>	
 	<string name="message_fitbit_check">Please login to the Fitbit website from the settings to grant Purple Robot access to your Fitbit account.</string>	
 
