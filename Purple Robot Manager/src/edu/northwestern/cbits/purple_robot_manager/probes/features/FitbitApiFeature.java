@@ -183,7 +183,7 @@ public class FitbitApiFeature extends Feature
 										Response response = request.send();
 
 										JSONObject body = new JSONObject(response.getBody());
-	
+
 										JSONObject summary = body.getJSONObject("summary");
 										
 										Bundle bundle = new Bundle();
@@ -238,17 +238,14 @@ public class FitbitApiFeature extends Feature
 										long goalDistance = goals.getLong("distance");
 										long goalSteps = goals.getLong("steps");
 										long goalCalories = goals.getLong("caloriesOut");
-										long goalScore = goals.getLong("activeScore");
 	
 										bundle.putLong(FitbitApiFeature.GOAL_DISTANCE, goalDistance);
 										bundle.putLong(FitbitApiFeature.GOAL_STEPS, goalSteps);
 										bundle.putLong(FitbitApiFeature.GOAL_CALORIES, goalCalories);
-										bundle.putLong(FitbitApiFeature.GOAL_SCORE, goalScore);
 	
 										bundle.putDouble(FitbitApiFeature.GOAL_DISTANCE_RATIO, (double) distance / (double) goalDistance);
 										bundle.putDouble(FitbitApiFeature.GOAL_STEPS_RATIO, (double) steps / (double) goalSteps);
 										bundle.putDouble(FitbitApiFeature.GOAL_CALORIES_RATIO, (double) caloriesOut / (double) goalCalories);
-										bundle.putDouble(FitbitApiFeature.GOAL_SCORE_RATIO, (double) score / (double) goalScore);
 										
 										me.transmitData(context, bundle);
 									} 
@@ -292,7 +289,7 @@ public class FitbitApiFeature extends Feature
 		intent.putExtra(OAuthActivity.ACCESS_TOKEN_URL, ACCESS_TOKEN_URL);
 		intent.putExtra(OAuthActivity.AUTHORIZE_URL, AUTHORIZE_URL);
 		intent.putExtra(OAuthActivity.REQUESTER, "fitbit");
-		intent.putExtra(OAuthActivity.CALLBACK_URL, "cbits-oauth://purplerobot/oauth/fitbit");
+		intent.putExtra(OAuthActivity.CALLBACK_URL, "http://purplerobot/oauth/fitbit");
 		
 		context.startActivity(intent);
 	}
@@ -366,7 +363,7 @@ public class FitbitApiFeature extends Feature
 	
 	public String summarizeValue(Context context, Bundle bundle)
 	{
-		long steps = bundle.getLong(FitbitApiFeature.STEPS);
+		double steps = bundle.getDouble(FitbitApiFeature.STEPS);
 		double progress = bundle.getDouble(FitbitApiFeature.GOAL_STEPS_RATIO) * 100;
 
 		return String.format(context.getResources().getString(R.string.summary_fitbit), steps, progress);
