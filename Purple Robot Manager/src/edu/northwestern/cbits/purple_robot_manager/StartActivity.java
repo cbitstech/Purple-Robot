@@ -333,7 +333,9 @@ public class StartActivity extends ActionBarActivity
 
 	private void setJsonUri(Uri jsonConfigUri)
 	{
-		if (jsonConfigUri.getScheme().equals("cbits-prm") || jsonConfigUri.getScheme().equals("cbits-pr"))
+		if (jsonConfigUri.getScheme().equals("http") || jsonConfigUri.getScheme().equals("https"))
+			jsonConfigUri = Uri.parse(jsonConfigUri.toString().replace("//pr-config/", "//"));
+		else if (jsonConfigUri.getScheme().equals("cbits-prm") || jsonConfigUri.getScheme().equals("cbits-pr"))
 		{
 			Uri.Builder b = jsonConfigUri.buildUpon();
 

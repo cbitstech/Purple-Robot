@@ -289,7 +289,7 @@ public class FitbitApiFeature extends Feature
 		intent.putExtra(OAuthActivity.ACCESS_TOKEN_URL, ACCESS_TOKEN_URL);
 		intent.putExtra(OAuthActivity.AUTHORIZE_URL, AUTHORIZE_URL);
 		intent.putExtra(OAuthActivity.REQUESTER, "fitbit");
-		intent.putExtra(OAuthActivity.CALLBACK_URL, "http://purplerobot/oauth/fitbit");
+		intent.putExtra(OAuthActivity.CALLBACK_URL, "http://pr-oauth/oauth/fitbit");
 		
 		context.startActivity(intent);
 	}
