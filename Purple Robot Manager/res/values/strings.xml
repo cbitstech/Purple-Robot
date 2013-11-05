@@ -788,11 +788,6 @@
     <string name="summary_third_sunrise">Mike Reedell (Apache License 2.0)</string>
     <string name="url_third_sunrise">https://github.com/mikereedell/sunrisesunsetlib-java</string>
 
-    <string name="title_third_mustache">mustache.java</string>
-    <string name="summary_third_mustache">RightTime, Inc. (Apache License 2.0)</string>
-    <string name="url_third_mustache">https://github.com/spullara/mustache.java</string>
-
-
     <string name="title_slugify">slugify</string>
     <string name="summary_slugify">Danny Trunk (GPL License)</string>
     <string name="url_slugify">https://github.com/slugify/slugify</string>

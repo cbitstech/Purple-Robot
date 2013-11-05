@@ -1,18 +1,12 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.github.mustachejava.DefaultMustacheFactory;
-import com.github.mustachejava.Mustache;
-import com.github.mustachejava.MustacheFactory;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -119,19 +113,10 @@ public class BatteryProbe extends Probe
 
 			JSONObject json = c.highchartsJson(activity);
 
-			HashMap<String, Object> scope = new HashMap<String, Object>();
-			scope.put("highchart_json", json.toString());
-			scope.put("highchart_count", count);
+			template = template.replace("{{{ highchart_json }}}", json.toString());
+			template = template.replace("{{{ highchart_count }}}", "" + count);
 
-			StringWriter writer = new StringWriter();
-
-		    MustacheFactory mf = new DefaultMustacheFactory();
-		    Mustache mustache = mf.compile(new StringReader(template), "template");
-		    mustache.execute(writer, scope);
-		    writer.flush();
-
-		    return writer.toString();
-
+		    return template;
 		}
 		catch (IOException e)
 		{

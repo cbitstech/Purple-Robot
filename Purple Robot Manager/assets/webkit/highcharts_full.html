@@ -23,17 +23,13 @@
 				var plotWidth = plotCount * 10;
 				var chartWidth = $("div#container").width();
 
-				console.log("PLOT WIDTH: " + plotWidth + " -- " + chartWidth);
-
 				if (plotWidth > chartWidth)
 				{
-					console.log("EXPAND: " + plotWidth);
 					$("div#container").css("width", plotWidth + "px");
 					$("div#container").css("right", "");
 				}
 				else
 				{
-					console.log("RETAIN: " + plotWidth);
 					$("div#container").css("width", "");
 					$("div#container").css("right", "0px");
 				}
@@ -50,9 +46,6 @@
 					var minY = this.yAxis[0].translate(extremes.min);
 					var maxY = this.yAxis[0].translate(extremes.max);
 
-				    console.log("X: " + pixel + " -- " + maxY + " - " + minY);
-					console.log("1");
-
 					$("#myPath").remove();
 
 				    this.renderer.rect(pixel, 5, 1, (maxY - minY), 1).attr(
@@ -62,8 +55,6 @@
 					    "stroke-width": 1,
 					    "id": "myPath"
 				    }).add();
-
-					console.log("2");
 				};
 
 				var i = 0;
