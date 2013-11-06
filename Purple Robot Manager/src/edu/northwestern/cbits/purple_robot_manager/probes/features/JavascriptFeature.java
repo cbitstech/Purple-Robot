@@ -138,6 +138,9 @@ public class JavascriptFeature extends Feature
 
 			if (s.hasNext())
 		    	script = s.next();
+			
+			s.close();
+			jsStream.close();
 		}
 		catch (IOException e)
 		{

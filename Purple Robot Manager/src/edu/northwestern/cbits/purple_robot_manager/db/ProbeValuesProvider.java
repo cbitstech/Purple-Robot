@@ -249,8 +249,16 @@ public class ProbeValuesProvider
 							}
 							catch (ClassCastException e)
 							{
-								Integer i = (Integer) values.get(key);
-								toInsert.put(key, i.doubleValue());
+								try
+								{
+									Float f = (Float) values.get(key);
+									toInsert.put(key, f.doubleValue());
+								}
+								catch (ClassCastException ee)
+								{
+									Integer i = (Integer) values.get(key);
+									toInsert.put(key, i.doubleValue());
+								}
 							}
 						}
 						else if (ProbeValuesProvider.INTEGER_TYPE.equals(type))

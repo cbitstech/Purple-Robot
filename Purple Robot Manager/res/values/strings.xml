@@ -265,11 +265,13 @@
     <string name="title_missing_timestamp">Select a Time</string>
     <string name="message_missing_timestamp">Please select a timestamp from the timeline to proceed.</string>
 
+    <string name="summary_gravity_probe" formatted="false">%.2f X, %.2f Y, %.2f Z</string>
     <string name="summary_accelerator_probe" formatted="false">%.2f X, %.2f Y, %.2f Z</string>
     <string name="summary_gyroscope_probe" formatted="false">%.2f X, %.2f Y, %.2f Z</string>
     <string name="summary_magnetic_probe" formatted="false">%.1f X, %.1f Y, %.1f Z</string>
     <string name="summary_wifi_probe" formatted="false">Visible Access Points: %d</string>
     <string name="summary_battery_probe" formatted="false">%d%% charged (%s)</string>
+    <string name="summary_step_counter_probe" formatted="false">%d steps taken since last restart</string>
     <string name="summary_contact_probe" formatted="false">%d contacts in address book</string>
     <string name="summary_location_probe" formatted="false">%.4f, %.4f</string>
     <string name="summary_hardware_info_probe" formatted="false">%s: %s</string>
@@ -382,6 +384,8 @@
     <string name="display_gyroscope_reading" formatted="false">X %.3f, Y %.3f, Z %.3f</string>
     <string name="display_accelerometer_readings">Accelerometer Measurements</string>
 
+    <string name="display_gravity_readings">Gravity Measurements</string>
+    
     <string name="display_light_readings">Light Measurements</string>
     <string name="display_light_reading" formatted="false">%.3f lux</string>
 
@@ -470,6 +474,9 @@
 	<string name="battery_level_label">Battery Charge Level</string>
     <string name="battery_time_label">Time</string>
 
+    <string name="step_count_label">Battery Charge Level</string>
+    <string name="step_count_time_label">Time</string>
+    
     <string name="battery_status_label">Battery Status</string>
     <string name="battery_tech_label">Battery Technology</string>
     <string name="battery_temp_label">Current Temperature</string>
@@ -539,6 +546,10 @@
     <string name="title_accelerometer_probe">Accelerometer Probe</string>
     <string name="summary_accelerometer_probe_desc">Measures the acceleration applied to the device. All values are in SI units (m/s^2).</string>
 
+    <!-- Gravity Probe -->
+    <string name="title_gravity_probe">Gravity Probe</string>
+    <string name="summary_gravity_probe_desc">Measures the gravitational force applied to the device. All values are in SI units (m/s^2).</string>
+    
     <!-- Gyroscope Probe -->
     <string name="title_gyroscope_probe">Gyroscope Probe</string>
     <string name="summary_gyroscope_probe_desc">Measures angular speed around each axis.</string>
@@ -569,6 +580,10 @@
     <string name="title_battery_probe">Battery Probe</string>
     <string name="summary_battery_probe_desc">Information about the type and current state of the battery in the device.</string>
 
+    <!-- Step Counter Probe -->
+    <string name="title_step_counter_probe">Step Counter Probe</string>
+    <string name="summary_step_counter_probe_desc">Counts the number of steps taken since the last restart.</string>
+    
     <!-- Bluetooth Devices Probe -->
     <string name="title_bluetooth_probe">Visible Bluetooth Probe</string>
     <string name="summary_bluetooth_probe_desc">Detects Bluetooth devices within range.</string>

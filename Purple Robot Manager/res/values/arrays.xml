@@ -55,6 +55,9 @@
         <item>features.AccelerometerFrequencyFeature</item>
         
         <item>LabelProbe</item>
+
+        <item>builtin.GravityProbe</item>
+        <item>builtin.StepCounterProbe</item>
         
         <!-- <item>builtin.BluetoothReceiverProbe</item> -->
         <!-- <item>builtin.ZeroconfProbe</item> -->
