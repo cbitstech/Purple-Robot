@@ -30,6 +30,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CommunicationE
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CommunicationLogProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.DateCalendarProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.GravityProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.HardwareInformationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.NetworkProbe;
@@ -38,6 +39,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RobotHealthPro
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RunningSoftwareProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ScreenProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.SoftwareInformationProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.StepCounterProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TelephonyProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.VisibleSatelliteProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.WifiAccessPointsProbe;
@@ -389,6 +391,20 @@ public class ProbeManager
 				ApplicationLaunchProbe apps = (ApplicationLaunchProbe) probe;
 
 				if (apps.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof GravityProbe)
+			{
+				GravityProbe gravity = (GravityProbe) probe;
+
+				if (gravity.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof StepCounterProbe)
+			{
+				StepCounterProbe steps = (StepCounterProbe) probe;
+
+				if (steps.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 
