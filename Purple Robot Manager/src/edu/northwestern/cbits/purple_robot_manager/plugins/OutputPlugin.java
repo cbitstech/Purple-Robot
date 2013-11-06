@@ -227,7 +227,7 @@ public abstract class OutputPlugin
 		for (String key : values.keySet())
 		{
 			Object value = values.get(key);
-
+			
 			if (value == null || key == null)
 			{
 				// Skip
@@ -516,6 +516,15 @@ public abstract class OutputPlugin
 							bundle.putStringArray(key, strings);
 						}
 						else if (nextChild instanceof Double)
+						{
+							double[] doubles = new double[child.length()];
+							
+							for (int i = 0; i < doubles.length; i++)
+								doubles[i] = child.getDouble(i);
+							
+							bundle.putDoubleArray(key, doubles);
+						}
+						else if (nextChild instanceof Integer)
 						{
 							double[] doubles = new double[child.length()];
 							

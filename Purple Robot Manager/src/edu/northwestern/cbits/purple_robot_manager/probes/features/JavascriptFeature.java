@@ -134,12 +134,14 @@ public class JavascriptFeature extends Feature
 
 			// http://stackoverflow.com/questions/309424/read-convert-an-inputstream-to-a-string
 
-			Scanner s = new Scanner(jsStream).useDelimiter("\\A");
+			Scanner js = new Scanner(jsStream);
+			Scanner s = js.useDelimiter("\\A");
 
 			if (s.hasNext())
 		    	script = s.next();
 			
 			s.close();
+			js.close();
 			jsStream.close();
 		}
 		catch (IOException e)

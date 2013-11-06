@@ -26,6 +26,7 @@ import android.os.SystemClock;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
@@ -45,7 +46,7 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 
 	public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.LightProbe";
 
-	private static int BUFFER_SIZE = 512;
+	private static int BUFFER_SIZE = 128;
 
 	private static String[] fieldNames = { LIGHT_KEY };
 
@@ -161,7 +162,7 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 		Bundle formatted = super.formattedBundle(context, bundle);
 
 		double[] eventTimes = bundle.getDoubleArray("EVENT_TIMESTAMP");
-		double[] lux = bundle.getDoubleArray("LUX");
+		float[] lux = bundle.getFloatArray("LUX");
 
 		ArrayList<String> keys = new ArrayList<String>();
 
@@ -233,14 +234,14 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 
     	SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
 		Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_LIGHT);
-    	
+
         if (super.isEnabled(context))
         {
         	if (prefs.getBoolean("config_probe_light_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
         	{
-				int frequency = Integer.parseInt(prefs.getString("config_probe_light_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
+            	int frequency = Integer.parseInt(prefs.getString("config_probe_light_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
 
-				if (this._lastFrequency  != frequency)
+				if (this._lastFrequency != frequency)
 				{
 					sensors.unregisterListener(this, sensor);
 	                
@@ -248,9 +249,6 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 	                {
 	                	case SensorManager.SENSOR_DELAY_FASTEST:
 		                	sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST, null);
-	                		break;
-	                	case SensorManager.SENSOR_DELAY_GAME:
-		                	sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME, null);
 	                		break;
 	                	case SensorManager.SENSOR_DELAY_UI:
 		                	sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI, null);
@@ -297,10 +295,10 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 		}
 
 		double value = event.values[0];
-
+		
 		boolean passes = false;
 
-		if (Math.abs(value - this._lastValue) > this.lastThreshold)
+		if (Math.abs(value - this._lastValue) >= this.lastThreshold)
 			passes = true;
 		
 		if (passes)
@@ -400,7 +398,12 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 
 					for (int i = 0; i < fieldNames.length; i++)
 					{
-						data.putFloatArray(fieldNames[i], valueBuffer[i]);
+						double[] values = new double[valueBuffer[i].length];
+						
+						for (int j = 0; j < values.length; j++)
+							values[j] = valueBuffer[i][j];
+						
+						data.putDoubleArray(fieldNames[i], values);
 					}
 
 					this.transmitData(data);
@@ -440,8 +443,8 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
-		double lux = bundle.getDoubleArray("LUX")[0];
-
+		double lux = bundle.getDoubleArray(LIGHT_KEY)[0];
+		
 		return String.format(context.getResources().getString(R.string.summary_light_probe), lux);
 	}
 
