@@ -199,6 +199,9 @@
     <string name="summary_gravity_probe_desc">A three dimensional vector indicating the direction and magnitude of gravity. Units are m/s^2. The coordinate system is the same as is used by the acceleration sensor.</string>
 
     <string name="title_linear_acceleration_probe">Linear Acceleration Probe</string>
+    <string name="summary_linear_acceleration_probe_desc">A three dimensional vector indicating the direction and magnitude of acceleration stripped of the gravity component. Units are m/s^2. The coordinate system is the same as is used by the acceleration sensor.</string>
+    
+    <string name="title_linear_acceleration_probe">Linear Acceleration Probe</string>
     <string name="summary_linear_acceleration_probe_desc">Records a three dimensional vector indicating acceleration along each device axis, not including gravity. All values have units of m/s^2. The coordinate system is the same as is used by the acceleration sensor.</string>
 
     <string name="title_rotation_vector_probe">Rotation Vector Probe</string>
@@ -265,6 +268,8 @@
     <string name="title_missing_timestamp">Select a Time</string>
     <string name="message_missing_timestamp">Please select a timestamp from the timeline to proceed.</string>
 
+    <string name="summary_rotation_probe" formatted="false">%.2f X, %.2f Y, %.2f Z, %.2f Cosine</string>
+    <string name="summary_linear_acceleration_probe" formatted="false">%.2f X, %.2f Y, %.2f Z</string>
     <string name="summary_gravity_probe" formatted="false">%.2f X, %.2f Y, %.2f Z</string>
     <string name="summary_accelerator_probe" formatted="false">%.2f X, %.2f Y, %.2f Z</string>
     <string name="summary_gyroscope_probe" formatted="false">%.2f X, %.2f Y, %.2f Z</string>
@@ -288,7 +293,8 @@
     <string name="summary_call_log_probe" formatted="false">%d logged calls</string>
     <string name="summary_installed_apps_probe" formatted="false">%d installed apps</string>
     <string name="summary_telephony_probe" formatted="false">Network Operator: %s (%s)</string>
-    <string name="summary_temperature_probe" formatted="false">%.2f degrees</string>
+    <string name="summary_temperature_probe" formatted="false">%.2f&#176;C / %.2f&#176;F / %.2f&#176;K</string>
+    <string name="summary_humidity_probe" formatted="false">%.2f%% ambient humidity</string>
     <string name="summary_satellite_probe" formatted="false">Visible Satellites: %d (%.2f Avg. SNR)</string>
     <string name="summary_running_software_probe" formatted="false">%d active applications</string>
 
@@ -384,7 +390,9 @@
     <string name="display_gyroscope_reading" formatted="false">X %.3f, Y %.3f, Z %.3f</string>
     <string name="display_accelerometer_readings">Accelerometer Measurements</string>
 
+    <string name="display_rotation_readings">Rotation Vector Measurements</string>
     <string name="display_gravity_readings">Gravity Measurements</string>
+    <string name="display_linear_acceleration_readings">Linear Acceleration Measurements</string>
     
     <string name="display_light_readings">Light Measurements</string>
     <string name="display_light_reading" formatted="false">%.3f lux</string>
@@ -394,7 +402,10 @@
 
     <string name="display_temperature_readings">Temperature Measurements</string>
     <string name="display_temperature_reading" formatted="false">%.3f degrees</string>
-
+    
+    <string name="display_humidity_readings">Humidity Measurements</string>
+    <string name="display_humidity_reading" formatted="false">%.3f%% relative humidity</string>
+    
     <string name="display_battery_health_label">Battery Health</string>
     <string name="display_battery_health_cold">Cold</string>
 	<string name="display_battery_health_dead">Dead</string>
@@ -550,6 +561,18 @@
     <string name="title_gravity_probe">Gravity Probe</string>
     <string name="summary_gravity_probe_desc">Measures the gravitational force applied to the device. All values are in SI units (m/s^2).</string>
     
+    <!-- Rotation Vector Probe -->
+    <string name="title_rotation_probe">Rotation Vector Probe</string>
+    <string name="summary_rotation_probe_desc">Measures the orientation of the device as a combination of an angle and an axis, in which the device has rotated through an angle &#920; around an axis [x, y, z].</string>
+
+    <!-- Geomagnetic Rotation Vector Probe -->
+    <string name="title_geomagnetic_rotation_probe">Geomagnetic Rotation Vector Probe</string>
+    <string name="summary_geomagnetic_rotation_probe_desc">Identical to the rotation vector probe, but uses a magnetometer instead of using a gyroscope. This uses less power than the probe, because it doesn\'t use the gyroscope. However, it is more noisy and will work best outdoors.</string>
+    
+    <!-- Linear Acceleration Probe -->
+    <string name="title_linear_acceleration_probe">Linear Acceleration Probe</string>
+    <string name="summary_linear_acceleration_probe_desc">Measures the acceleration applied to the device (minus the gravity). All values are in SI units (m/s^2).</string>
+
     <!-- Gyroscope Probe -->
     <string name="title_gyroscope_probe">Gyroscope Probe</string>
     <string name="summary_gyroscope_probe_desc">Measures angular speed around each axis.</string>
@@ -574,8 +597,12 @@
     
     <!-- Temperature Probe -->
     <string name="title_temperature_probe">Temperature Probe</string>
-    <string name="summary_temperature_probe_desc">Used to record temperature. Implementation depends on the device and does not exist on all devices. Some will record temperature of battery, others temperature of CPU or environment.</string>
+    <string name="summary_temperature_probe_desc">Used to record temperature.</string>
 
+    <!-- Humidity Probe -->
+    <string name="title_humidity_probe">Ambient Humidity Probe</string>
+    <string name="summary_humidity_probe_desc">Used to record ambient humidity.</string>
+    
     <!-- Battery Probe -->
     <string name="title_battery_probe">Battery Probe</string>
     <string name="summary_battery_probe_desc">Information about the type and current state of the battery in the device.</string>
@@ -957,6 +984,8 @@
     
     <string name="title_application_launch_probe">Application Launch Events</string>
     <string name="summary_app_launch_probe" formatted="false">%s (%s)</string>
+    
+    <string name="available_sensors_label">Available Hardware Sensors</string>
 </resources>
 
 
