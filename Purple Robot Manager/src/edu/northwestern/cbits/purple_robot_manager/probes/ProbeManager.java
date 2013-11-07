@@ -21,6 +21,7 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.AddressBookDistancesProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.AmbientHumidityProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ApplicationLaunchProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.AudioFeaturesProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.BatteryProbe;
@@ -30,17 +31,21 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CommunicationE
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CommunicationLogProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.DateCalendarProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.GeomagneticRotationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.GravityProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.HardwareInformationProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LinearAccelerationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.NetworkProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RandomNoiseProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RobotHealthProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RotationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RunningSoftwareProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ScreenProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.SoftwareInformationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.StepCounterProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TelephonyProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TemperatureProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.VisibleSatelliteProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.WifiAccessPointsProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.AccelerometerBasicStatisticsFeature;
@@ -344,6 +349,13 @@ public class ProbeManager
 				if (stats.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
+			else if (probe instanceof TemperatureProbe)
+			{
+				TemperatureProbe temp = (TemperatureProbe) probe;
+
+				if (temp.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
 			else if (probe instanceof TemperatureProbeBasicStatisticsFeature)
 			{
 				TemperatureProbeBasicStatisticsFeature stats = (TemperatureProbeBasicStatisticsFeature) probe;
@@ -405,6 +417,34 @@ public class ProbeManager
 				StepCounterProbe steps = (StepCounterProbe) probe;
 
 				if (steps.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof LinearAccelerationProbe)
+			{
+				LinearAccelerationProbe linear = (LinearAccelerationProbe) probe;
+
+				if (linear.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof GeomagneticRotationProbe)
+			{
+				GeomagneticRotationProbe rotation = (GeomagneticRotationProbe) probe;
+
+				if (rotation.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof RotationProbe)
+			{
+				RotationProbe rotation = (RotationProbe) probe;
+
+				if (rotation.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof AmbientHumidityProbe)
+			{
+				AmbientHumidityProbe humid = (AmbientHumidityProbe) probe;
+
+				if (humid.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 

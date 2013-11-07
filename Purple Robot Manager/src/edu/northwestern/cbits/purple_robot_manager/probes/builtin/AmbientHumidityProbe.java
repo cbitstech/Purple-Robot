@@ -24,15 +24,15 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("SimpleDateFormat")
-public class TemperatureProbe extends ContinuousProbe implements SensorEventListener
+public class AmbientHumidityProbe extends ContinuousProbe implements SensorEventListener
 {
-	private static final String DEFAULT_THRESHOLD = "1.0";
+	private static final String DEFAULT_THRESHOLD = "5.0";
 
-	public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.TemperatureProbe";
+	public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.AmbientHumidityProbe";
 
 	private static int BUFFER_SIZE = 32;
 
-	private static String[] fieldNames = { "TEMPERATURE" };
+	private static String[] fieldNames = { "HUMIDITY" };
 
 	private double _lastValue = Double.MAX_VALUE;
 
@@ -56,11 +56,11 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 		Bundle formatted = super.formattedBundle(context, bundle);
 
 		double[] eventTimes = bundle.getDoubleArray("EVENT_TIMESTAMP");
-		double[] temp = bundle.getDoubleArray("TEMPERATURE");
+		double[] humidity = bundle.getDoubleArray("HUMIDITY");
 
 		ArrayList<String> keys = new ArrayList<String>();
 
-		if (temp != null && eventTimes != null)
+		if (humidity != null && eventTimes != null)
 		{
 			SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.display_date_format));
 
@@ -70,7 +70,7 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 
 				for (int i = 0; i < eventTimes.length; i++)
 				{
-					String formatString = String.format(context.getString(R.string.display_temperature_reading), temp[i]);
+					String formatString = String.format(context.getString(R.string.display_humidity_reading), humidity[i]);
 
 					double time = eventTimes[i];
 
@@ -86,11 +86,11 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 				if (keys.size() > 0)
 					readings.putStringArrayList("KEY_ORDER", keys);
 
-				formatted.putBundle(context.getString(R.string.display_temperature_readings), readings);
+				formatted.putBundle(context.getString(R.string.display_humidity_readings), readings);
 			}
 			else if (eventTimes.length > 0)
 			{
-				String formatString = String.format(context.getString(R.string.display_temperature_reading), temp[0]);
+				String formatString = String.format(context.getString(R.string.display_humidity_reading), humidity[0]);
 
 				double time = eventTimes[0];
 
@@ -107,38 +107,37 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 	{
 		SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
 
-		return Long.parseLong(prefs.getString("config_probe_temperature_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
+		return Long.parseLong(prefs.getString("config_probe_humidity_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
 	}
 
 	public String name(Context context)
 	{
-		return TemperatureProbe.NAME;
+		return AmbientHumidityProbe.NAME;
 	}
 
 	public int getTitleResource()
 	{
-		return R.string.title_temperature_probe;
+		return R.string.title_humidity_probe;
 	}
 
 	@SuppressLint("InlinedApi")
-	@SuppressWarnings("deprecation")
 	public boolean isEnabled(Context context)
 	{
+		if (Build.VERSION.SDK_INT < 14)
+			return false;
+
     	SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
     	this._context = context.getApplicationContext();
 
     	SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-		Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_TEMPERATURE);
-
-		if (Build.VERSION.SDK_INT >= 14)
-			sensor = sensors.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
+		Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY);
 
         if (super.isEnabled(context))
         {
-    		if (prefs.getBoolean("config_probe_temperature_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
+    		if (prefs.getBoolean("config_probe_humidity_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
         	{
-				int frequency = Integer.parseInt(prefs.getString("config_probe_temperature_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
+				int frequency = Integer.parseInt(prefs.getString("config_probe_humidity_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
 
 				if (this._lastFrequency  != frequency)
 				{
@@ -191,7 +190,7 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 		if (now - this.lastThresholdLookup > 5000)
 		{
 			SharedPreferences prefs = Probe.getPreferences(this._context);
-			this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_temperature_threshold", TemperatureProbe.DEFAULT_THRESHOLD));
+			this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_humidity_threshold", AmbientHumidityProbe.DEFAULT_THRESHOLD));
 			
 			this.lastThresholdLookup = now;
 		}
@@ -231,7 +230,7 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 				SharedPreferences prefs = Probe.getPreferences(context);
 				Editor e = prefs.edit();
 				
-				e.putString("config_probe_temperature_threshold", threshold.toString());
+				e.putString("config_probe_humidity_threshold", threshold.toString());
 				e.commit();
 			}
 		}
@@ -242,10 +241,10 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 		PreferenceScreen screen = super.preferenceScreen(activity);
 
 		ListPreference threshold = new ListPreference(activity);
-		threshold.setKey("config_probe_temperature_threshold");
-		threshold.setDefaultValue(TemperatureProbe.DEFAULT_THRESHOLD);
-		threshold.setEntryValues(R.array.probe_temperature_threshold);
-		threshold.setEntries(R.array.probe_temperature_threshold_labels);
+		threshold.setKey("config_probe_humidity_threshold");
+		threshold.setDefaultValue(AmbientHumidityProbe.DEFAULT_THRESHOLD);
+		threshold.setEntryValues(R.array.probe_humidity_threshold);
+		threshold.setEntries(R.array.probe_humidity_threshold_labels);
 		threshold.setTitle(R.string.probe_noise_threshold_label);
 		threshold.setSummary(R.string.probe_noise_threshold_summary);
 
@@ -313,20 +312,18 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 
 	public String getPreferenceKey()
 	{
-		return "temperature_built_in";
+		return "humidity_built_in";
 	}
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
-		double celsius = bundle.getDoubleArray("TEMPERATURE")[0];
-		double faren = (celsius * 1.8) + 32;
-		double kelvin = celsius + 273.15;
+		double humidity = bundle.getDoubleArray("HUMIDITY")[0];
 
-		return String.format(context.getResources().getString(R.string.summary_temperature_probe), celsius, faren, kelvin);
+		return String.format(context.getResources().getString(R.string.summary_humidity_probe), humidity);
 	}
 
 	public int getSummaryResource()
 	{
-		return R.string.summary_temperature_probe_desc;
+		return R.string.summary_humidity_probe_desc;
 	}
 }

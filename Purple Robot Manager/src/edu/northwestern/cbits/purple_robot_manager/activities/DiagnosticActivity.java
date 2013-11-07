@@ -11,10 +11,13 @@ import java.util.Map;
 
 import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -194,6 +197,21 @@ public class DiagnosticActivity extends ActionBarActivity
 			errorList.setVisibility(View.GONE);
 			okText.setVisibility(View.VISIBLE);
 		}
+		
+		TextView sensorsList = (TextView) this.findViewById(R.id.available_sensors_value);
+		StringBuffer sb = new StringBuffer();
+
+    	SensorManager sensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
+    	
+    	for (Sensor s : sensorManager.getSensorList(Sensor.TYPE_ALL))
+    	{
+    		if (sb.length() > 0)
+    			sb.append("\n");
+    		
+    		sb.append(s.getName());
+    	}
+    	
+    	sensorsList.setText(sb.toString());
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu)
@@ -302,6 +320,26 @@ public class DiagnosticActivity extends ActionBarActivity
         			LogManager.getInstance(this).logException(e);
         		}
 
+         		message.append(newline);
+         		message.append(newline);
+
+         		message.append(this.getString(R.string.available_sensors_label));
+         		message.append(newline);
+
+         		StringBuffer sb = new StringBuffer();
+         		
+            	SensorManager sensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
+            	
+            	for (Sensor s : sensorManager.getSensorList(Sensor.TYPE_ALL))
+            	{
+            		if (sb.length() > 0)
+            			sb.append("\n");
+            		
+            		sb.append(s.getName());
+            	}
+            	
+            	message.append(sb.toString());
+         		
          		try
          		{
 	         		Intent intent = new Intent(Intent.ACTION_SEND);
