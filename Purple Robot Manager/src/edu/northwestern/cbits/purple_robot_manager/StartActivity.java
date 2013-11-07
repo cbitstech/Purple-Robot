@@ -495,16 +495,20 @@ public class StartActivity extends ActionBarActivity
     {
         switch (item.getItemId())
     	{
-    		case R.id.menu_label_item:
-    			Intent labelIntent = new Intent();
-    			labelIntent.setClass(this, LabelActivity.class);
-
-    			labelIntent.putExtra(LabelActivity.LABEL_CONTEXT, "Home Screen");
-    			labelIntent.putExtra(LabelActivity.TIMESTAMP, ((double) System.currentTimeMillis()));
-    			
-    			this.startActivity(labelIntent);
-
-    			break;
+			case R.id.menu_snapshot_item:
+				Toast.makeText(this, "tOdO: sEnSoR SnApShOT", Toast.LENGTH_LONG).show();
+		
+				break;
+			case R.id.menu_label_item:
+				Intent labelIntent = new Intent();
+				labelIntent.setClass(this, LabelActivity.class);
+		
+				labelIntent.putExtra(LabelActivity.LABEL_CONTEXT, "Home Screen");
+				labelIntent.putExtra(LabelActivity.TIMESTAMP, ((double) System.currentTimeMillis()));
+				
+				this.startActivity(labelIntent);
+		
+				break;
     		case R.id.menu_upload_item:
     			LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(this);
     			Intent intent = new Intent(OutputPlugin.FORCE_UPLOAD);

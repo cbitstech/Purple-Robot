@@ -18,6 +18,8 @@
     <string name="label_unknown_context">Unknown Context</string>
     <string name="menu_label_label">Add label</string>
     <string name="title_label_probe">Most Recent Label</string>
+    
+    <string name="menu_snapshot_label">Take probes snapshot</string>
 
     <string name="label_trigger_fire_now">Fire now</string>
     <string name="label_trigger_fire_now_desc">Execute trigger\'s action immediately</string>

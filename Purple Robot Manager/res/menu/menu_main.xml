@@ -5,6 +5,10 @@
         android:title="@string/menu_diagnostic_label"
         robot:showAsAction="always"
         android:icon="@drawable/action_error" />
+    <item android:id="@+id/menu_snapshot_item"
+        android:title="@string/menu_snapshot_label"
+        robot:showAsAction="never"
+        android:icon="@drawable/action_snapshot" />
     <item android:id="@+id/menu_settings_item"
         android:title="@string/menu_settings_label" 
         robot:showAsAction="never" />
