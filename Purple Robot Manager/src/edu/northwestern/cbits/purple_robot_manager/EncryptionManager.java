@@ -318,35 +318,37 @@ public class EncryptionManager
 	
 	public boolean persistEncryptedString(Context context, String key, String value)
 	{
-		if (value != null)
+		try 
 		{
-			try 
+			SharedPreferences prefs = EncryptionManager.getPreferences(context);
+			Editor edit = prefs.edit();
+
+			key = this.createHash(context, key);
+
+			if (value != null)
 			{
 				byte[] encoded = this.encryptCipher(context, true).doFinal(value.getBytes("UTF-8"));
 				
 				String baseEncoded = Base64.encodeToString(encoded, Base64.DEFAULT);
 				
-				key = this.createHash(context, key);
-
-				SharedPreferences prefs = EncryptionManager.getPreferences(context);
-				Editor edit = prefs.edit();
-
 				edit.putString(key, baseEncoded);
-				
-				return edit.commit();
 			}
-			catch (IllegalBlockSizeException e) 
-			{
-				LogManager.getInstance(context).logException(e);
-			} 
-			catch (BadPaddingException e) 
-			{
-				LogManager.getInstance(context).logException(e);
-			} 
-			catch (UnsupportedEncodingException e) 
-			{
-				LogManager.getInstance(context).logException(e);
-			}
+			else
+				edit.remove(key);
+
+			return edit.commit();
+		}
+		catch (IllegalBlockSizeException e) 
+		{
+			LogManager.getInstance(context).logException(e);
+		} 
+		catch (BadPaddingException e) 
+		{
+			LogManager.getInstance(context).logException(e);
+		} 
+		catch (UnsupportedEncodingException e) 
+		{
+			LogManager.getInstance(context).logException(e);
 		}
 		
 		return false;

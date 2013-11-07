@@ -72,6 +72,7 @@ public class StaticContentRequestHandler implements HttpRequestHandler
         	final InputStream in = this._context.getAssets().open(path);
 
             response.setStatusCode(HttpStatus.SC_OK);
+            response.setHeader("Access-Control-Allow-Origin", "*");
 
             EntityTemplate body = new EntityTemplate(new ContentProducer() 
             {

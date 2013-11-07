@@ -59,7 +59,7 @@ import edu.northwestern.cbits.purple_robot_manager.widget.PurpleRobotAppWidgetPr
 
 public abstract class BaseScriptEngine 
 {
-	protected static String SCRIPT_ENGINE_PERSISTENCE_PREFIX = "purple_robot_script_persist_prefix_";
+	public static String SCRIPT_ENGINE_PERSISTENCE_PREFIX = "purple_robot_script_persist_prefix_";
 	protected static String SCRIPT_ENGINE_NAMESPACES = "purple_robot_script_namespaces";
 
 	private static final int NOTIFICATION_ID = 1;
