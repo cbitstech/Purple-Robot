@@ -1,0 +1,46 @@
+<html>
+	<head>
+		<title>POST Test Interface | Purple Robot</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	</head>
+	<body style="margin: 1em; font-family: Roboto, 'Droid Sans', sans-serif; overflow-y: scroll; overflow-x: hidden;">
+		<h3>POST Test Interface</h3>
+		<p>Use the form below to test Purple Robot's built-in web-based POST interface.</p>
+		<form action="/store" method="POST">
+			<center>
+				<div style="width: 90%; text-align: left;">
+					<p>
+						<strong>Encrypt</strong><br />
+						<input type="text" name="encrypt" value="true" style="width: 100%; text-align: left;"><br />
+						Encrypts the value if <code>true</code>, plaintext otherwise.
+					</p>
+					<p>
+						<strong>Namespace</strong><br />
+						<input type="text" name="namespace" value="" style="width: 100%; text-align: left;"><br />
+						Leave empty to store in the default namespace.
+					</p>
+					<p>
+						<strong>value_one</strong><br />
+						<input type="text" name="value_one" value="" style="width: 100%; text-align: left;">
+					</p>
+					<p>
+						<strong>value_two</strong><br />
+						<input type="text" name="value_two" value="" style="width: 100%; text-align: left;">
+					</p>
+					<p>
+						<strong>value_three</strong><br />
+						<input type="text" name="value_three" value="" style="width: 100%; text-align: left;">
+					</p>
+					<p>
+						<strong>value_etc</strong><br />
+						<input type="text" name="value_etc" value="" style="width: 100%; text-align: left;">
+					</p>
+				</div>
+				<br />
+				<button style="width: 85%; margin-top: 1em; margin-bottom: 1em; padding: 1em;">
+					<strong>POST Values</strong>
+				</button>
+			</center>
+		</form>
+	</body>
+</html>

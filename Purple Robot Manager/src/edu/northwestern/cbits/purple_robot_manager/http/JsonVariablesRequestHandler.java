@@ -27,61 +27,68 @@ public class JsonVariablesRequestHandler implements HttpRequestHandler
 		
 		this._context = context;
 	}
+	
+	public static JSONObject fetchStoredValues(Context context)
+	{
+		JSONObject obj = new JSONObject();
+		
+    	SchemeEngine engine = new SchemeEngine(context, null);
+    	
+    	for (String ns : engine.fetchNamespaces())
+    	{
+    		JSONObject nsObject = new JSONObject();
+    		
+    		Map<String, Object> nsMap = engine.fetchNamespaceMap(ns);
+    		
+    		for (String key : nsMap.keySet())
+    		{
+    			try 
+    			{
+					nsObject.put(key, nsMap.get(key));
+				}
+    			catch (JSONException e) 
+    			{
+					e.printStackTrace();
+				}
+    		}
+    		
+    		try 
+    		{
+				obj.put(ns, nsObject);
+			} 
+    		catch (JSONException e) 
+    		{
+				e.printStackTrace();
+			}
+    	}
+	
+		return obj;
+	}
 
 	public void handle(HttpRequest request, HttpResponse response, HttpContext argument) throws HttpException, IOException 
 	{
     	response.setStatusCode(HttpStatus.SC_OK);
 		
-        	JSONObject obj = new JSONObject();
-        	
-        	SchemeEngine engine = new SchemeEngine(this._context, null);
-        	
-        	for (String ns : engine.fetchNamespaces())
-        	{
-        		JSONObject nsObject = new JSONObject();
-        		
-        		Map<String, Object> nsMap = engine.fetchNamespaceMap(ns);
-        		
-        		for (String key : nsMap.keySet())
-        		{
-        			try 
-        			{
-						nsObject.put(key, nsMap.get(key));
-					}
-        			catch (JSONException e) 
-        			{
-						e.printStackTrace();
-					}
-        		}
-        		
-        		try 
-        		{
-					obj.put(ns, nsObject);
-				} 
-        		catch (JSONException e) 
-        		{
-					e.printStackTrace();
-				}
-        	}
-        	
-			try 
-			{
-				StringEntity body = new StringEntity(obj.toString(2));
-	            body.setContentType("application/json");
+    	JSONObject obj = JsonVariablesRequestHandler.fetchStoredValues(this._context);
 
-	            response.setEntity(body);
-			} 
-			catch (JSONException e) 
-			{
-				e.printStackTrace();
+    	try 
+		{
+			StringEntity body = new StringEntity(obj.toString(2));
+            body.setContentType("application/json");
 
-		        response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-		        
-		        StringEntity body = new StringEntity(this._context.getString(R.string.error_malformed_request));
-		        body.setContentType("text/plain");
+            response.setEntity(body);
+		} 
+		catch (JSONException e) 
+		{
+			e.printStackTrace();
 
-		        response.setEntity(body);
+	        response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+	        
+	        StringEntity body = new StringEntity(this._context.getString(R.string.error_malformed_request));
+	        body.setContentType("text/plain");
 
-			}
+	        response.setEntity(body);
+
+		}
 	}
 }
