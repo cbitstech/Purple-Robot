@@ -57,6 +57,7 @@ import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.Feature;
+import edu.northwestern.cbits.purple_robot_manager.snapshots.SnapshotsActivity;
 
 public class StartActivity extends ActionBarActivity
 {
@@ -496,7 +497,9 @@ public class StartActivity extends ActionBarActivity
         switch (item.getItemId())
     	{
 			case R.id.menu_snapshot_item:
-				Toast.makeText(this, "tOdO: sEnSoR SnApShOT", Toast.LENGTH_LONG).show();
+				Intent snapIntent = new Intent(this, SnapshotsActivity.class);
+				
+				this.startActivity(snapIntent);
 		
 				break;
 			case R.id.menu_label_item:
