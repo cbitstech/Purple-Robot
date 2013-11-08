@@ -19,8 +19,13 @@
     <string name="menu_label_label">Add label</string>
     <string name="title_label_probe">Most Recent Label</string>
     
-    <string name="menu_snapshot_label">Take probes snapshot</string>
-
+    <string name="title_snapshots">Snapshots</string>
+    <string name="menu_snapshot_label">Snapshots</string>
+    <string name="title_take_snapshot">Take snapshot</string>
+    <string name="snapshot_user_initiated">User Initiated</string>
+    <string name="snapshot_desc" formatted="false">%s (%d probes)</string>
+    <string name="snapshot_single_desc" formatted="false">%s (1 probe)</string>
+    
     <string name="label_trigger_fire_now">Fire now</string>
     <string name="label_trigger_fire_now_desc">Execute trigger\'s action immediately</string>
     <string name="label_trigger_show_action">Inspect action</string>
