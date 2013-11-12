@@ -64,8 +64,11 @@ public class JavaScriptEngine extends BaseScriptEngine
 
 		if (extras != null && extrasName != null)
 			script = "var " + extrasName + " = " + extras.toString() + "; " + script;
+		
+		if (script.length() >= 128)
+			Log.e("PR", "LAST 128 CHARS: " + script.substring(script.length() - 128));
 
-		return this._jsContext.evaluateString(this._scope, script, "<engine>", 1, null);
+		return this._jsContext.evaluateString(this._scope, script, "<engine>", 0, null);
 	}
 	
 	public boolean log(String event, NativeObject params)
@@ -363,5 +366,26 @@ public class JavaScriptEngine extends BaseScriptEngine
 		Map<String, Object> predictions = ModelManager.getInstance(this._context).predictions(this._context);
 		
 		return JavaScriptEngine.mapToNative(this._jsContext, this._scope, predictions);
+	}
+	
+	public NativeObject fetchWidget(String identifier)
+	{
+		Map<String, Object> map = super.fetchWidget(identifier);
+		
+		return JavaScriptEngine.mapToNative(this._jsContext, this._scope, map);
+	}
+
+	public NativeArray widgets()
+	{
+		List<String> widgets = super.widgets();
+			
+		String[] values = new String[widgets.size()];
+			
+		for (int i = 0; i < widgets.size(); i++)
+		{
+			values[i] = widgets.get(i);
+		}
+			
+		return new NativeArray(values);
 	}
 }

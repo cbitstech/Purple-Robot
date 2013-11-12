@@ -891,6 +891,80 @@ public abstract class BaseScriptEngine
 		}
 		
 		this._context.startService(intent);
+		
+		if (parameters.containsKey("identifier"))
+		{
+			String identifier = parameters.get("identifier").toString();
+			
+			JSONObject params = new JSONObject();
+			
+			for (String key : parameters.keySet())
+			{
+				try 
+				{
+					params.put(key, parameters.get(key).toString());
+				} 
+				catch (JSONException e) 
+				{
+					LogManager.getInstance(this._context).logException(e);
+				}
+			}
+			
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+			
+			Editor e = prefs.edit();
+			e.putString("WIDGET_UPDATE_" + identifier, params.toString());
+			e.commit();
+		}
+	}
+	
+	protected Map<String, Object> fetchWidget(String identifier)
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+		
+		String key = "WIDGET_UPDATE_" + identifier;
+		
+		Map<String, Object> params = new HashMap<String, Object>();
+		
+		if (prefs.contains(key))
+		{
+			try 
+			{
+				JSONObject json = new JSONObject(prefs.getString(key, "{}"));
+				
+				JSONArray names = json.names();
+				
+				for (int i = 0; i < names.length(); i++)
+				{
+					String name = names.getString(i);
+					
+					params.put(name, json.get(name));
+				}
+			}
+			catch (JSONException e) 
+			{
+				LogManager.getInstance(this._context).logException(e);
+			}
+		}
+		
+		return params;
+	}
+	
+	protected List<String> widgets()
+	{
+		String prefix = "WIDGET_UPDATE_";
+
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+		
+		ArrayList<String> widgets = new ArrayList<String>();
+		
+		for (String key : prefs.getAll().keySet())
+		{
+			if (key.startsWith(prefix))
+				widgets.add(key.substring(prefix.length()));
+		}
+		
+		return widgets;
 	}
 	
 	public void scheduleScript(String identifier, String dateString, String action)
