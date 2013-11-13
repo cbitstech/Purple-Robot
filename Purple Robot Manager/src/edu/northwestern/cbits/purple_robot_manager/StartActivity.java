@@ -31,6 +31,7 @@ import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -290,13 +291,18 @@ public class StartActivity extends ActionBarActivity
 					{
 						Model model = ModelManager.getInstance(me).fetchModelByName(me, sensorName);
 
-						Intent dataIntent = new Intent(me, ProbeViewerActivity.class);
-
-						dataIntent.putExtra("probe_name", model.title(me));
-						dataIntent.putExtra("probe_bundle", value);
-						dataIntent.putExtra("is_model", true);
-
-						me.startActivity(dataIntent);
+						if (model != null)
+						{
+							Intent dataIntent = new Intent(me, ProbeViewerActivity.class);
+							
+							dataIntent.putExtra("probe_name", model.title(me));
+							dataIntent.putExtra("probe_bundle", value);
+							dataIntent.putExtra("is_model", true);
+	
+							me.startActivity(dataIntent);
+						}
+						else
+							Log.e("PR", "Looking for model named " + sensorName);
 					}
 				}
 			}

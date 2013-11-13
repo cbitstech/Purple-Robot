@@ -1,12 +1,10 @@
 <html>
 	<head>
-		<title>POST Test Interface | Purple Robot</title>
+		<title>Test Interface | Purple Robot</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	</head>
 	<body style="margin: 1em; font-family: Roboto, 'Droid Sans', sans-serif; overflow-y: scroll; overflow-x: hidden;">
-		<h3>POST Test Interface</h3>
-		<p>Use the form below to test Purple Robot's built-in web-based POST interface.</p>
-		<form action="/store" method="POST">
+		<form>
 			<center>
 				<div style="width: 90%; text-align: left;">
 					<p>
@@ -20,27 +18,50 @@
 						Leave empty to store in the default namespace.
 					</p>
 					<p>
-						<strong>value_one</strong><br />
-						<input type="text" name="value_one" value="" style="width: 100%; text-align: left;">
+						<strong>Key</strong><br />
+						<input type="text" name="key" value="" style="width: 100%; text-align: left;">
 					</p>
 					<p>
-						<strong>value_two</strong><br />
-						<input type="text" name="value_two" value="" style="width: 100%; text-align: left;">
-					</p>
-					<p>
-						<strong>value_three</strong><br />
-						<input type="text" name="value_three" value="" style="width: 100%; text-align: left;">
-					</p>
-					<p>
-						<strong>value_etc</strong><br />
-						<input type="text" name="value_etc" value="" style="width: 100%; text-align: left;">
+						<strong>Value</strong><br />
+						<input type="text" name="value" value="" style="width: 100%; text-align: left;">
 					</p>
 				</div>
 				<br />
-				<button style="width: 85%; margin-top: 1em; margin-bottom: 1em; padding: 1em;">
-					<strong>POST Values</strong>
+				<button style="width: 85%; margin-top: 1em; margin-bottom: 1em; padding: 1em;" onclick="post(); return false;">
+					<strong>Persist</strong>
 				</button>
 			</center>
 		</form>
+		<script>
+			function post() {
+				var params = {
+					encrypt: document.getElementsByName("encrypt")[0].value,
+					namespace: document.getElementsByName("namespace")[0].value
+				};
+			
+				var key = document.getElementsByName("key")[0].value;
+				var value = document.getElementsByName("value")[0].value;
+			
+				params[key] = value;
+
+				var form = document.createElement("form");
+    			form.setAttribute("method", "post");
+    			form.setAttribute("action", "/store");
+
+    			for(var key in params) {
+        			if(params.hasOwnProperty(key)) {
+            			var hiddenField = document.createElement("input");
+	            		hiddenField.setAttribute("type", "hidden");
+    	        		hiddenField.setAttribute("name", key);
+        	    		hiddenField.setAttribute("value", params[key]);
+
+		    	        form.appendChild(hiddenField);
+        			}
+	    		}
+
+			    document.body.appendChild(form);
+    			form.submit();
+			}
+		</script>
 	</body>
 </html>
