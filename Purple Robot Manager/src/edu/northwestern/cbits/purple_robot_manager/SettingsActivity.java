@@ -5,11 +5,15 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -29,8 +33,11 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
+import edu.northwestern.cbits.purple_robot_manager.db.DistancesProvider;
+import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
@@ -53,6 +60,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 	public static final String TRIGGERS_SCREEN_KEY = "config_triggers_screen";
 	public static final String MODELS_SCREEN_KEY = "config_models_screen";
 	private static final String DUMP_JSON_KEY = "config_dump_json";
+	private static final String RESET_KEY = "config_reset";
 
 	@SuppressWarnings("deprecation")
 	public void onCreate(Bundle savedInstanceState)
@@ -116,6 +124,9 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 
         ListPreference listUpdate = (ListPreference) prefs.findPreference(RINGTONE_KEY);
         listUpdate.setOnPreferenceChangeListener(this);
+
+        Preference reset = prefs.findPreference(RESET_KEY);
+        reset.setOnPreferenceClickListener(this);
 
         LogManager.getInstance(me).log("settings_visited", null);
     }
@@ -212,7 +223,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
             	
         		FileOutputStream fout = new FileOutputStream(configJsonFile);
 
-        		fout.write(root.toString(2).getBytes(Charset.defaultCharset()));
+        		fout.write(root.toString(2).getBytes(Charset.defaultCharset().name()));
 
         		fout.flush();
         		fout.close();
@@ -242,6 +253,62 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
         	{
 				e.printStackTrace();
 			}
+        }
+        else if (RESET_KEY.equals(preference.getKey()))
+        {
+        	Log.e("PR", "CLICKED RESET");
+        	
+        	final SettingsActivity me = this;
+        	
+        	AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        	
+        	builder = builder.setTitle(R.string.title_clear_configuration);
+        	builder = builder.setMessage(R.string.message_clear_configuration);
+        	
+        	builder = builder.setPositiveButton(R.string.button_clear_yes, new OnClickListener()
+        	{
+				public void onClick(DialogInterface dialog, int which) 
+				{
+					SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(me);
+					Editor e = prefs.edit();
+
+					Map<String, ?> prefMap = prefs.getAll();
+					
+					for (String key : prefMap.keySet())
+					{
+						e.remove(key);
+					}
+					
+					e.commit();
+					
+					me.startService(new Intent(PersistentService.NUDGE_PROBES));
+					
+					TriggerManager.getInstance(me).removeAllTriggers();
+					TriggerManager.getInstance(me).refreshTriggers(me);
+					HttpUploadPlugin.clearFiles(me);
+					
+					String where = "_id != -1";
+					
+					me.getContentResolver().delete(RobotContentProvider.RECENT_PROBE_VALUES, where, null);
+					me.getContentResolver().delete(RobotContentProvider.SNAPSHOTS, where, null);
+					me.getContentResolver().delete(DistancesProvider.CONTENT_URI, where, null);
+					
+					ProbeValuesProvider.getProvider(me).clear(me);
+					
+					android.os.Process.killProcess(android.os.Process.myPid());
+				}
+        	});
+        	
+        	builder = builder.setNegativeButton(R.string.button_clear_no, new OnClickListener()
+        	{
+				public void onClick(DialogInterface dialog, int which) 
+				{
+					// TODO Auto-generated method stub
+					
+				}
+        	});
+        	
+        	builder.create().show();
         }
 
         return false;
