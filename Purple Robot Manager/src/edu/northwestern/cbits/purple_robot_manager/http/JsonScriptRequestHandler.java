@@ -120,7 +120,7 @@ public class JsonScriptRequestHandler implements HttpRequestHandler
         }
 	}
 
-	private static JSONCommand commandForJson(JSONObject arguments, Context context) 
+	public static JSONCommand commandForJson(JSONObject arguments, Context context) 
 	{
 		try 
 		{
