@@ -175,7 +175,11 @@
    		<Preference android:title="@string/config_refresh_json_label"
             android:key="config_json_refresh_manually"
             android:defaultValue="0" />
-    </PreferenceCategory>
+   		<Preference android:title="@string/config_reset_label"
+            android:summary="@string/config_reset_summary"
+            android:key="config_reset"
+            android:defaultValue="0" />
+	</PreferenceCategory>
 	<PreferenceCategory android:title="@string/title_acknowledgements_section">
 		<PreferenceScreen android:title="@string/title_third_party_libraries">
 	   		<Preference android:title="@string/title_third_actionbarsherlock"
