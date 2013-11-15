@@ -121,7 +121,14 @@
     <string name="config_json_url_message">Please enter the URL for the application configuration file.</string>
 
     <string name="config_refresh_json_label">Refresh Configuration</string>
+    <string name="config_reset_label">Reset Configuration</string>
+    <string name="config_reset_summary">Clears ALL configuration settings and returns Purple Robot to it\'s original state.</string>
 
+    <string name="title_clear_configuration">Clear configuration?</string>
+    <string name="message_clear_configuration">Are you sure you want to clear the configuration? This will remove ALL settings, triggers, snapshots, and device readings.</string>
+    <string name="button_clear_yes">Yes</string>
+    <string name="button_clear_no">No</string>
+    
     <string name="config_vibrator_pattern_label">Haptic Feedback Pattern</string>
     <string name="config_vibrator_pattern_message">Default pattern used to provide haptic feedback (vibrations) for events.</string>
 
