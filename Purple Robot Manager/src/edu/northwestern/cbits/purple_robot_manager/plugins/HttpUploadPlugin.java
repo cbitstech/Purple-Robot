@@ -35,6 +35,7 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLPeerUnverifiedException;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -1195,5 +1196,27 @@ public class HttpUploadPlugin extends OutputPlugin
 			filenames = new String[0];
 		
 		return filenames.length;
+	}
+
+	public static void clearFiles(Context context) 
+	{
+		try 
+		{
+			File internalStorage = context.getFilesDir();
+			File internalFolder = new File(internalStorage, CACHE_DIR);
+			
+			if (internalFolder.exists())
+				FileUtils.deleteDirectory(internalFolder);
+
+			File externalStorage = context.getExternalFilesDir(null);
+			File externalFolder = new File(externalStorage, CACHE_DIR);
+		
+			if (externalFolder.exists())
+				FileUtils.deleteDirectory(externalFolder);
+		} 
+		catch (IOException e) 
+		{
+			LogManager.getInstance(context).logException(e);
+		}
 	}
 }

@@ -63,7 +63,7 @@ public class RobotContentProvider extends ContentProvider
 		}
 		catch (NullPointerException e)
 		{
-			// Logger.logThrowable(e);
+			LogManager.getInstance(this.getContext()).logException(e);
 		}
 
 		switch(this._uriMatcher.match(uri))

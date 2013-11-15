@@ -326,6 +326,33 @@ public class ProbeValuesProvider
 		c.close();
 	}
 
+	public void clear(Context context)
+	{
+		String tableSelect = "select name from sqlite_master where type='table';";
+
+		Cursor c = this._database.rawQuery(tableSelect, null);
+
+		ArrayList<String> names = new ArrayList<String>();
+		
+		while (c.moveToNext())
+			names.add(c.getString(c.getColumnIndex("name")));
+
+		c.close();
+
+		for (String name : names)
+		{
+			try
+			{
+				SQLiteStatement delete = this._database.compileStatement("delete from " + name + " where (_id != -1)");
+				delete.execute();
+			}
+			catch (SQLException e)
+			{
+				LogManager.getInstance(context).logException(e);
+			}
+		}
+	}
+
 	public Cursor retrieveValues(Context context, String name, Map<String, String> schema)
 	{
 		Cursor c = null;
