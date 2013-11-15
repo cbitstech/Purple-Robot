@@ -1,15 +1,25 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+
+import edu.northwestern.cbits.purple_robot_manager.http.JsonScriptRequestHandler;
 import edu.northwestern.cbits.purple_robot_manager.http.LocalHttpServer;
+import edu.northwestern.cbits.purple_robot_manager.http.commands.JSONCommand;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
@@ -21,6 +31,7 @@ import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 public class PersistentService extends Service
 {
 	public static final String NUDGE_PROBES = "purple_robot_manager_nudge_probe";
+	public static final String SCRIPT_ACTION = "edu.northwestern.cbits.purplerobot.run_script";
 	
 	private LocalHttpServer _httpServer = new LocalHttpServer();
 
@@ -54,6 +65,71 @@ public class PersistentService extends Service
 
 		if (prefs.getBoolean("config_http_server_enabled", true))
 			this._httpServer.start(this);
+		
+		BroadcastReceiver scriptReceiver = new BroadcastReceiver()
+		{
+			public void onReceive(Context context, Intent intent) 
+			{
+				if (intent.hasExtra("response_mode"))
+				{
+					if ("activity".equals(intent.getStringExtra("response_mode")))
+					{
+						if (intent.hasExtra("package_name") && intent.hasExtra("activity_class"))
+						{
+							String pkgName = intent.getStringExtra("package_name");
+							String clsName = intent.getStringExtra("activity_class");
+
+							Intent response = new Intent();
+							response.setComponent(new ComponentName(pkgName, clsName));
+							response.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+							
+							if (intent.hasExtra("command"))
+							{
+					            try 
+					            {
+					            	JSONObject arguments = new JSONObject();
+					            	
+					            	for (String key : intent.getExtras().keySet())
+					            	{
+					            		arguments.put(key, intent.getStringExtra(key));
+					            	}
+
+					                JSONCommand cmd = JsonScriptRequestHandler.commandForJson(arguments, context);
+					                
+					                JSONObject result = cmd.execute(context);
+
+					                response.putExtra("full_payload", result.toString(2));
+					                
+					                JSONArray names = result.names();
+					                
+					                for (int i = 0; i < names.length(); i++)
+					                {
+					                	String name = names.getString(i);
+
+					                	response.putExtra(name, result.getString(name));
+					                }
+					                
+									response.putExtra("full_payload", result.toString(2));
+					    		}
+					            catch (JSONException e) 
+					            {
+					            	e.printStackTrace();
+					            	
+									response.putExtra("error", e.toString());
+					            }
+							}
+
+							context.startActivity(response);
+						}						
+					}
+				}
+			}
+		};
+		
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(PersistentService.SCRIPT_ACTION);
+		
+		this.registerReceiver(scriptReceiver, filter);
 	}
 
 	public int onStartCommand(Intent intent, int flags, int startId)
