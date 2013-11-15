@@ -41,23 +41,6 @@
         	
         	document.addEventListener("deviceready", function()
         	{
-   				console.log("Sending broadcast...");
-
-		    	window.plugins.webintent.sendBroadcast({
-        		    'action': 'edu.northwestern.cbits.purplerobot.run_script',
-            		'extras': {
-            			'command': 'execute_script',
-    					'script': '1 + 2 + 3;',
-    					'response_mode': 'activity',
-    					'activity_class': 'edu.northwestern.cbits.phonegap.TestActivity',
-    					'package_name': 'edu.northwestern.cbits.phonegap'
-            		}
-       			}, function() {
-       				console.log("Broadcast sent.");
-       			}, function() {
-       				console.log("Error sending broadcast.");
-				});
-				
 				window.plugins.webintent.onNewIntent(function(intentName) 
 				{
 					console.log("New intent via " + intentName + "...");
@@ -77,6 +60,23 @@
 				    function() {
 		    			console.log("ERROR LOOKING FOR PAYLOAD");
 				    });
+				});
+
+   				console.log("Sending broadcast...");
+
+		    	window.plugins.webintent.sendBroadcast({
+        		    'action': 'edu.northwestern.cbits.purplerobot.run_script',
+            		'extras': {
+            			'command': 'execute_script',
+    					'script': '1 + 2 + 3;',
+    					'response_mode': 'activity',
+    					'activity_class': 'edu.northwestern.cbits.phonegap.TestActivity',
+    					'package_name': 'edu.northwestern.cbits.phonegap'
+            		}
+       			}, function() {
+       				console.log("Broadcast sent.");
+       			}, function() {
+       				console.log("Error sending broadcast.");
 				});
         	}, false);
         </script>
