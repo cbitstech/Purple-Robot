@@ -25,6 +25,7 @@
     <string name="snapshot_user_initiated">User Initiated</string>
     <string name="snapshot_desc" formatted="false">%s (%d probes)</string>
     <string name="snapshot_single_desc" formatted="false">%s (1 probe)</string>
+    <string name="snapshot_probe_count" formatted="false">%d probes</string>
     
     <string name="label_trigger_fire_now">Fire now</string>
     <string name="label_trigger_fire_now_desc">Execute trigger\'s action immediately</string>

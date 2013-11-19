@@ -8,6 +8,7 @@ import org.json.JSONException;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.widget.CursorAdapter;
@@ -18,6 +19,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -94,6 +97,17 @@ public class SnapshotsActivity extends ActionBarActivity
 				return view;
 			}
         };
+        
+        listView.setOnItemClickListener(new OnItemClickListener()
+        {
+			public void onItemClick(AdapterView<?> listView, View view1, int which, long id) 
+			{
+				Intent intent = new Intent(me, SnapshotActivity.class);
+				intent.putExtra("id", id);
+				
+				me.startActivity(intent);
+			}
+        });
         
         listView.setAdapter(adapter);
 	}
