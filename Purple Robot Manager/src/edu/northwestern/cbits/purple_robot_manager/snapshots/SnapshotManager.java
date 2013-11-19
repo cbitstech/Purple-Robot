@@ -76,6 +76,7 @@ public class SnapshotManager
 		
 		ContentValues values = new ContentValues();
 		
+		values.put("_id", now);
 		values.put("source", source);
 		values.put("recorded", now);
 		values.put("value", snapshot.toString());
