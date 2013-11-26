@@ -1014,6 +1014,14 @@
     <string name="summary_app_launch_probe" formatted="false">%s (%s)</string>
     
     <string name="available_sensors_label">Available Hardware Sensors</string>
+
+    <string name="title_facebook_probe">Facebook Probe</string>
+    <string name="summary_facebook_probe_desc">Collects profile &amp; behavioral data from Facebook.</string>
+    <string name="config_probe_facebook_hash_title">Obfuscate Details</string>
+    <string name="config_probe_facebook_hash_summary">Hashes recipient and profile data to obfuscate personally-identitifiable information.</string>
+    <string name="config_probe_facebook_encrypt_title">Encrypt Message Contents</string>
+    <string name="config_probe_facebook_encrypt_summary">Encrypts the contents of outgoing messages and posts to your Facebook wall.</string>
+    
 </resources>
 
 
