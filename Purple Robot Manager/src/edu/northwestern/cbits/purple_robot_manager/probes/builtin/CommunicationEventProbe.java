@@ -7,6 +7,7 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,6 +18,7 @@ import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
+import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
@@ -24,7 +26,7 @@ import android.preference.PreferenceScreen;
 import android.provider.CallLog;
 import android.provider.CallLog.Calls;
 import android.telephony.PhoneNumberUtils;
-
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.probes.AddressBookLabelActivity;
@@ -47,8 +49,11 @@ public class CommunicationEventProbe extends Probe
 	private static final String NAME = "NAME";
 	private static final String TIMESTAMP = "COMM_TIMESTAMP";
 	private static final String DURATION = "DURATION";
+	private static final String MESSAGE_BODY = "MESSAGE_BODY";
 
 	private static final boolean DEFAULT_ENABLED = true;
+	private static final boolean DEFAULT_RETRIEVE = false;
+	private static final boolean DEFAULT_ENCRYPT = true;
 
 	private long _lastCheck = 0;
 
@@ -223,6 +228,11 @@ public class CommunicationEventProbe extends Probe
 
 							while (c.moveToNext())
 							{
+								for (int j = 0; j < c.getColumnCount(); j++)
+								{
+									Log.e("PR", "[" + j + "] " + c.getColumnName(j) + " ::: " + c.getString(j));
+								}
+
 								Bundle bundle = new Bundle();
 								bundle.putString("PROBE", this.name(context));
 								bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
@@ -260,6 +270,19 @@ public class CommunicationEventProbe extends Probe
 									newRecent = callTime;
 
 								bundle.putString(CommunicationEventProbe.DIRECTION, CommunicationEventProbe.OUTGOING);
+
+								boolean retrieve = prefs.getBoolean("config_probe_communication_event_retrieve_data", CommunicationEventProbe.DEFAULT_RETRIEVE);
+								boolean encrypt = prefs.getBoolean("config_probe_communication_event_encrypt_data", CommunicationEventProbe.DEFAULT_ENCRYPT);
+								
+								if (retrieve)
+								{
+									String body = c.getString(c.getColumnIndex("body"));
+									
+									if (encrypt)
+										body = em.encryptString(context, body);
+									
+									bundle.putString(CommunicationEventProbe.MESSAGE_BODY, body);
+								}
 
 								this.transmitData(context, bundle);
 							}
@@ -386,6 +409,42 @@ public class CommunicationEventProbe extends Probe
 
 		screen.addPreference(hash);
 
+		CheckBoxPreference retrieve = new CheckBoxPreference(activity);
+		retrieve.setKey("config_probe_communication_event_retrieve_data");
+		retrieve.setDefaultValue(CommunicationEventProbe.DEFAULT_RETRIEVE);
+		retrieve.setTitle(R.string.config_probe_communication_retrieve_title);
+		retrieve.setSummary(R.string.config_probe_communication_retrieve_summary);
+		
+		retrieve.setOnPreferenceChangeListener(new OnPreferenceChangeListener()
+		{
+			public boolean onPreferenceChange(Preference arg0, Object newValue) 
+			{
+				Boolean b = (Boolean) newValue;
+				
+				if (b)
+				{
+					AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+					builder = builder.setTitle(R.string.config_probe_communication_retrieve_warning_title);
+					builder = builder.setMessage(R.string.config_probe_communication_retrieve_warning);
+					builder = builder.setPositiveButton(R.string.button_continue, null);
+					
+					builder.create().show();
+				}
+					
+				return true;
+			}
+		});
+
+		screen.addPreference(retrieve);
+
+		CheckBoxPreference encrypt = new CheckBoxPreference(activity);
+		encrypt.setKey("config_probe_communication_event_encrypt_data");
+		encrypt.setDefaultValue(CommunicationEventProbe.DEFAULT_ENCRYPT);
+		encrypt.setTitle(R.string.config_probe_communication_encrypt_title);
+		encrypt.setSummary(R.string.config_probe_communication_encrypt_summary);
+
+		screen.addPreference(encrypt);
+ 
 		Preference calibrate = new Preference(activity);
 		calibrate.setTitle(R.string.config_probe_calibrate_title);
 		calibrate.setOnPreferenceClickListener(new OnPreferenceClickListener()

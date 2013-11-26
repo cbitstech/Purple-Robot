@@ -109,6 +109,17 @@
     <string name="config_probe_communication_hash_title">Obfuscate Call Details</string>
     <string name="config_probe_communication_hash_summary">When set, the app will hash the name and phone numbers observed when collecting that data.</string>
 
+    <string name="config_probe_communication_retrieve_title">Retrieve Message Contents</string>
+    <string name="config_probe_communication_retrieve_summary">Transmits message text with event metadata.</string>
+    <string name="config_probe_communication_retrieve_warning_title">Privacy Warning</string>
+    <string name="config_probe_communication_retrieve_warning">Setting this option to true will transmit the contents of outgoing messages (sent from this device) to the server automatically. This option should only be enabled under extremely rigorous oversight by an authorized privacy official or institutional review board.</string>
+    
+    <string name="config_probe_communication_encrypt_title">Encrypt Message Contents</string>
+    <string name="config_probe_communication_encrypt_summary">Encrypts any transmitted message contents before sending to the server.</string>
+    
+    <string name="config_probe_communication_retrieve_warning_title">Privacy Warning</string>
+    <string name="config_probe_communication_retrieve_warning">Setting this option to true will transmit the contents of your messages to the server automatically. This option should only be enabled under extremely rigorous oversight by an authorized privacy official or institutional review board.</string>
+    
     <string name="config_probe_bluetooth_hash_title">Obfuscate Device Details</string>
     <string name="config_probe_bluetooth_hash_summary">When set, the app will hash the caller\'s name and phone number when collecting that data.</string>
     
@@ -129,6 +140,8 @@
     <string name="message_clear_configuration">Are you sure you want to clear the configuration? This will remove ALL settings, triggers, snapshots, and device readings.</string>
     <string name="button_clear_yes">Yes</string>
     <string name="button_clear_no">No</string>
+    
+    <string name="button_continue">Continue</string>
     
     <string name="config_vibrator_pattern_label">Haptic Feedback Pattern</string>
     <string name="config_vibrator_pattern_message">Default pattern used to provide haptic feedback (vibrations) for events.</string>
