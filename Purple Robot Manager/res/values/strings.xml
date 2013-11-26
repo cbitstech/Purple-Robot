@@ -1021,7 +1021,11 @@
     <string name="config_probe_facebook_hash_summary">Hashes recipient and profile data to obfuscate personally-identitifiable information.</string>
     <string name="config_probe_facebook_encrypt_title">Encrypt Message Contents</string>
     <string name="config_probe_facebook_encrypt_summary">Encrypts the contents of outgoing messages and posts to your Facebook wall.</string>
-    
+
+    <string name="title_facebook_check">Facebook Login Required</string>	
+	<string name="message_facebook_check">Please login to Facebook to complete the setup of the Facebook Probe.</string>	
+    <string name="facebook_app_id">266981220119291</string>	
+	
 </resources>
 
 

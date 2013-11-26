@@ -31,6 +31,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CommunicationE
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CommunicationLogProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.DateCalendarProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.FacebookProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.GeomagneticRotationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.GravityProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.HardwareInformationProbe;
@@ -445,6 +446,13 @@ public class ProbeManager
 				AmbientHumidityProbe humid = (AmbientHumidityProbe) probe;
 
 				if (humid.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof FacebookProbe)
+			{
+				FacebookProbe facebook = (FacebookProbe) probe;
+
+				if (facebook.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 
