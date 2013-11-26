@@ -316,6 +316,15 @@ public class EncryptionManager
 		return null;
 	}
 	
+	public String encryptString(Context context, String value) throws IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException
+	{
+		byte[] encoded = this.encryptCipher(context, true).doFinal(value.getBytes("UTF-8"));
+		
+		String baseEncoded = Base64.encodeToString(encoded, Base64.DEFAULT);
+
+		return baseEncoded;
+	}
+	
 	public boolean persistEncryptedString(Context context, String key, String value)
 	{
 		try 
