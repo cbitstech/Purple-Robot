@@ -35,6 +35,8 @@ public abstract class Probe
 	public static final String DEFAULT_FREQUENCY = "300000";
 	public static final boolean DEFAULT_HASH_DATA = true;
 
+	public static final String ENCRYPT_DATA = "encrypt_data";
+
 	public abstract String name(Context context);
 	public abstract String title(Context context);
 	public abstract String probeCategory(Context context);

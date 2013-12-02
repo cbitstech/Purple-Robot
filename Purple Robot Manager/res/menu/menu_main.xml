@@ -9,13 +9,13 @@
         android:title="@string/menu_snapshot_label"
         robot:showAsAction="never"
         android:icon="@drawable/action_snapshot" />
-    <item android:id="@+id/menu_settings_item"
-        android:title="@string/menu_settings_label" 
-        robot:showAsAction="never" />
     <item android:id="@+id/menu_upload_item"
         android:title="@string/menu_upload_label"
         robot:showAsAction="never" />
     <item android:id="@+id/menu_label_item"
         android:title="@string/menu_label_label"
+        robot:showAsAction="never" />
+    <item android:id="@+id/menu_settings_item"
+        android:title="@string/menu_settings_label" 
         robot:showAsAction="never" />
 </menu>
