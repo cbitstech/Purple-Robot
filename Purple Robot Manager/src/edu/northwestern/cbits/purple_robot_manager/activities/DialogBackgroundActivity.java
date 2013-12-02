@@ -1,6 +1,5 @@
 package edu.northwestern.cbits.purple_robot_manager.activities;
 
-import edu.northwestern.cbits.purple_robot_manager.DialogActivity;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import android.app.Activity;
 import android.content.Intent;

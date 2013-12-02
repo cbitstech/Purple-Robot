@@ -1,36 +1,21 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
-import android.preference.Preference;
-import android.preference.Preference.OnPreferenceChangeListener;
-import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.provider.CallLog;
-import android.provider.CallLog.Calls;
-import android.telephony.PhoneNumberUtils;
-import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.activities.probes.AddressBookLabelActivity;
-import edu.northwestern.cbits.purple_robot_manager.calibration.ContactCalibrationHelper;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
@@ -266,21 +251,6 @@ public class FacebookProbe extends Probe
 		encrypt.setSummary(R.string.config_probe_facebook_encrypt_summary);
 
 		screen.addPreference(encrypt);
- 
-		Preference calibrate = new Preference(activity);
-		calibrate.setTitle(R.string.config_probe_calibrate_title);
-		calibrate.setOnPreferenceClickListener(new OnPreferenceClickListener()
-		{
-			public boolean onPreferenceClick(Preference pref) 
-			{
-				Intent intent = new Intent(activity, AddressBookLabelActivity.class);
-				activity.startActivity(intent);
-
-				return true;
-			}
-		});
-		
-		screen.addPreference(calibrate);
 
 		return screen;
 	}

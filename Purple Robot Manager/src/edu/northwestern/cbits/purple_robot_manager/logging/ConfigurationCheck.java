@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 
 public class ConfigurationCheck extends SanityCheck 
 {
@@ -29,6 +30,8 @@ public class ConfigurationCheck extends SanityCheck
 			
 			return;
 		}
+		
+		HttpUploadPlugin.fixUploadPreference(context);
 
 		if (prefs.getBoolean("config_enable_data_server", false))
 		{

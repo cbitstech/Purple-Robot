@@ -1,11 +1,9 @@
-package edu.northwestern.cbits.purple_robot_manager;
+package edu.northwestern.cbits.purple_robot_manager.activities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
-import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,6 +15,9 @@ import android.view.View.OnClickListener;
 import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.TextView;
+import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
 public class DialogActivity extends Activity
 {
@@ -75,6 +76,7 @@ public class DialogActivity extends Activity
 		LogManager.getInstance(this).log("dialog_dismissed", payload);
 	}
 
+	@SuppressLint("NewApi")
 	protected void onResume()
 	{
 		super.onResume();

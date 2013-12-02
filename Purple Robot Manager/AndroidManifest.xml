@@ -90,7 +90,7 @@
 				<action android:name="purple_robot_sensor_wake" />
 			</intent-filter>
 		</service>
-		<activity android:name=".StartActivity" android:label="@string/app_name" android:launchMode="singleTask"
+		<activity android:name="edu.northwestern.cbits.purple_robot_manager.activities.StartActivity" android:label="@string/app_name" android:launchMode="singleTask"
 		    android:theme="@style/Theme.AppCompat">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -144,14 +144,14 @@
 		<activity android:name="edu.northwestern.cbits.purple_robot_manager.activities.probes.LocationProbeActivity" android:label="@string/app_name" android:theme="@style/Theme.AppCompat" />
 		<activity android:name=".activities.WebkitActivity" android:label="@string/app_name" android:theme="@style/Theme.AppCompat" />
 		<activity android:name=".activities.WebkitLandscapeActivity" android:label="@string/app_name" android:screenOrientation="landscape" android:theme="@style/Theme.AppCompat" />
-		<activity android:name=".SettingsActivity" android:label="@string/app_name" />
-		<activity android:name=".DialogActivity" android:label="@string/app_name" android:theme="@android:style/Theme.Dialog" />
+		<activity android:name="edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity" android:label="@string/app_name" />
+		<activity android:name="edu.northwestern.cbits.purple_robot_manager.activities.DialogActivity" android:label="@string/app_name" android:theme="@android:style/Theme.Dialog" />
 		<activity android:name=".activities.DialogBackgroundActivity" android:label="@string/app_name" android:theme="@style/Theme.AppCompat" />
 		<activity android:name=".activities.LabelActivity" android:label="@string/app_name" android:theme="@style/Theme.AppCompat" />
 		<activity android:name=".activities.CodeViewerActivity" android:label="@string/app_name" android:theme="@style/Theme.AppCompat" />
 		<activity android:name=".snapshots.SnapshotsActivity" android:label="@string/app_name" android:theme="@style/Theme.AppCompat" />
 		<activity android:name=".snapshots.SnapshotActivity" android:label="@string/app_name" android:theme="@style/Theme.AppCompat" />
-		<activity android:name=".ProbeViewerActivity" android:label="@string/app_name" />
+		<activity android:name="edu.northwestern.cbits.purple_robot_manager.activities.ProbeViewerActivity" android:label="@string/app_name" />
 		<activity android:name="net.hockeyapp.android.UpdateActivity" />
 	</application>
 </manifest>
