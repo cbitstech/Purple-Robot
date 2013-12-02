@@ -63,6 +63,8 @@
         <item>builtin.GeomagneticRotationProbe</item>
         <item>builtin.AmbientHumidityProbe</item>
         
+        <item>builtin.FacebookProbe</item>
+        
         <!-- <item>builtin.BluetoothReceiverProbe</item> -->
         <!-- <item>builtin.ZeroconfProbe</item> -->
    	</array>
