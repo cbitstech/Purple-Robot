@@ -106,7 +106,7 @@ public class FacebookProbe extends Probe
 				synchronized(this)
 				{
 					long freq = Long.parseLong(prefs.getString("config_probe_facebook_frequency", Probe.DEFAULT_FREQUENCY));
-					final boolean doHash = prefs.getBoolean("config_probe_facebook_hash_data", Probe.DEFAULT_HASH_DATA);
+					final boolean doHash = prefs.getBoolean("config_probe_facebook_encrypt_data", FacebookProbe.DEFAULT_ENCRYPT);
 					
 					if (now - this._lastCheck  > freq)
 					{
@@ -311,8 +311,8 @@ public class FacebookProbe extends Probe
 		long freq = Long.parseLong(prefs.getString("config_probe_facebook_frequency", Probe.DEFAULT_FREQUENCY));
 		map.put(Probe.PROBE_FREQUENCY, freq);
 		
-		boolean hash = prefs.getBoolean("config_probe_facebook_hash_data", Probe.DEFAULT_HASH_DATA);
-		map.put(Probe.HASH_DATA, hash);
+		boolean hash = prefs.getBoolean("config_probe_facebook_encrypt_data", FacebookProbe.DEFAULT_ENCRYPT);
+		map.put(Probe.ENCRYPT_DATA, hash);
 
 		return map;
 	}
@@ -374,14 +374,6 @@ public class FacebookProbe extends Probe
 		duration.setDefaultValue(Probe.DEFAULT_FREQUENCY);
 
 		screen.addPreference(duration);
-
-		CheckBoxPreference hash = new CheckBoxPreference(activity);
-		hash.setKey("config_probe_facebook_hash_data");
-		hash.setDefaultValue(Probe.DEFAULT_HASH_DATA);
-		hash.setTitle(R.string.config_probe_facebook_hash_title);
-		hash.setSummary(R.string.config_probe_facebook_hash_summary);
-
-		screen.addPreference(hash);
 
 		CheckBoxPreference encrypt = new CheckBoxPreference(activity);
 		encrypt.setKey("config_probe_facebook_encrypt_data");
