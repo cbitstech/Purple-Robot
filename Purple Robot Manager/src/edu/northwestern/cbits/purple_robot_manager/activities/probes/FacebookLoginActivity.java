@@ -8,6 +8,8 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 
 import com.facebook.Session;
+import com.facebook.SessionDefaultAudience;
+import com.facebook.SessionLoginBehavior;
 import com.facebook.SessionState;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -16,6 +18,8 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.FacebookProbe;
 
 public class FacebookLoginActivity extends ActionBarActivity 
 {
+	private boolean _inited = false;
+	
 	protected void onCreate(Bundle savedInstanceState)
     {
 		super.onCreate(savedInstanceState);
@@ -26,16 +30,37 @@ public class FacebookLoginActivity extends ActionBarActivity
 	protected void onResume()
 	{
 		super.onResume();
+		
+		if (this._inited)
+			return;
+		
+		this._inited = true;
 
 		final FacebookLoginActivity me = this;
+        
+		Session.Builder builder = new Session.Builder(this);
 		
-		Session.openActiveSession(this, true, new Session.StatusCallback() 
+		Session session = builder.setApplicationId("266981220119291").build();
+		
+		session.addCallback(new Session.StatusCallback() 
 		{
 	        public void call(Session session, SessionState state, Exception exception) 
 	        {
-	        	me.onSessionStateChange(session, state, exception);
+	        	if (SessionState.OPENED == state || SessionState.OPENED_TOKEN_UPDATED == state)
+		        	me.onSessionStateChange(session, state, exception);
+	        	else
+	        		session.addCallback(this);
 	        }
 		});
+				
+		Session.OpenRequest request = new Session.OpenRequest(this);
+		request.setPermissions("read_stream");
+		request.setLoginBehavior(SessionLoginBehavior.SSO_WITH_FALLBACK);
+		request.setDefaultAudience(SessionDefaultAudience.ONLY_ME);
+		
+		Session.setActiveSession(session);
+		
+		session.openForRead(request);
 	}
 
 	private void onSessionStateChange(Session session, SessionState state, Exception exception) 
@@ -51,6 +76,8 @@ public class FacebookLoginActivity extends ActionBarActivity
 			{
 		        public void call(Session session, SessionState state, Exception exception) 
 		        {
+		        	session = Session.getActiveSession();
+
 		        	me.onSessionStateChange(session, state, exception);
 		        }
 			});
@@ -61,25 +88,29 @@ public class FacebookLoginActivity extends ActionBarActivity
 
 	public void onActivityResult(int requestCode, int resultCode, Intent data) 
 	{
-          super.onActivityResult(requestCode, resultCode, data);
-
-          Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
+		super.onActivityResult(requestCode, resultCode, data);
+		
+		if (Session.getActiveSession() != null)
+	  		Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
 	}
 
 	private void go(Session session) 
 	{
 		String token = session.getAccessToken();
-
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);	
-		Editor e = prefs.edit();
-		e.putString(FacebookProbe.TOKEN, token);
-		e.commit();
-
-		SanityManager sanity = SanityManager.getInstance(this);
 		
-		sanity.clearAlert(this.getString(R.string.title_facebook_check));
+		if (token != null && token.trim().length() > 0)
+		{
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);	
+			Editor e = prefs.edit();
+			e.putString(FacebookProbe.TOKEN, token);
+			e.commit();
 
-		sanity.refreshState();
+			SanityManager sanity = SanityManager.getInstance(this);
+			
+			sanity.clearAlert(this.getString(R.string.title_facebook_check));
+
+			sanity.refreshState();
+		}
 
 		this.finish();
     }

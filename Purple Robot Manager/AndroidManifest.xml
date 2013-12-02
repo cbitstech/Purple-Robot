@@ -139,7 +139,7 @@
 	            <data android:scheme="http"	android:host="pr-oauth" android:pathPrefix="/oauth/" />
 	        </intent-filter>
 	    </activity>
-		<activity android:name=".activities.probes.FacebookLoginActivity" android:label="@string/app_name" android:theme="@style/Theme.AppCompat" />
+		<activity android:name=".activities.probes.FacebookLoginActivity" android:label="@string/app_name" android:theme="@style/Theme.AppCompat" android:launchMode="singleTask" />
 		<activity android:name=".activities.probes.LocationLabelActivity" android:label="@string/app_name" android:theme="@style/Theme.AppCompat" />
 		<activity android:name=".activities.probes.AddressBookLabelActivity" android:label="@string/app_name" android:theme="@style/Theme.AppCompat" />
 		<activity android:name=".activities.DiagnosticActivity" android:label="@string/app_name" android:theme="@style/Theme.AppCompat" />

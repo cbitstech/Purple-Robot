@@ -17,15 +17,17 @@ import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
+import android.preference.Preference;
+import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 
 import com.facebook.AccessToken;
 import com.facebook.HttpMethod;
@@ -40,6 +42,7 @@ import com.facebook.model.GraphUser;
 import edu.emory.mathcs.backport.java.util.Collections;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.probes.FacebookLoginActivity;
 import edu.northwestern.cbits.purple_robot_manager.calibration.FacebookCalibrationHelper;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -108,25 +111,25 @@ public class FacebookProbe extends Probe
 					if (now - this._lastCheck  > freq)
 					{
 						FacebookCalibrationHelper.check(context);
-		
-						if (prefs.contains(FacebookProbe.TOKEN))
+
+						String token = prefs.getString(FacebookProbe.TOKEN, "");
+
+						if (token != null && token.trim().length() > 0)
 						{
-							String token = prefs.getString(FacebookProbe.TOKEN, "");
-							
 							final FacebookProbe me = this;
 		
 							AccessToken accessToken = AccessToken.createFromExistingAccessToken(token, null, null, null, null);
 							
+							me._lastCheck = now;
+
 							Session.openActiveSessionWithAccessToken(context, accessToken, new Session.StatusCallback()
 							{
 								public void call(final Session session, SessionState state, Exception exception) 
 								{
-									Request.newMyFriendsRequest(session, new Request.GraphUserListCallback() 
+									Request friendRequest = Request.newMyFriendsRequest(session, new Request.GraphUserListCallback() 
 									{
 										public void onCompleted(List<GraphUser> users, Response response) 
 										{
-											me._lastCheck = now;
-
 											if (users == null)
 												return;
 												
@@ -140,107 +143,127 @@ public class FacebookProbe extends Probe
 												bundle.putString("PROBE", me.name(context));
 												bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
 												bundle.putInt("FRIEND_COUNT", users.size());
-			
-												Request statuses = new Request(session, "/me/posts", null, HttpMethod.GET, new Request.Callback() 
+
+												final ArrayList<GraphObject> items = new ArrayList<GraphObject>();
+
+												Request statuses = new Request(session, "/me/statuses", null, HttpMethod.GET, new Request.Callback() 
 												{
 													@SuppressLint("SimpleDateFormat")
 													public void onCompleted(Response response) 
 													{
-														long newRecent = mostRecent;
-
-														SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+														final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
 														GraphObject obj = response.getGraphObject();
 														
-														int hour = 0;
-														
-														GraphObjectList<GraphObject> rawPosts = obj.getPropertyAsList("data", GraphObject.class);
-														
-														ArrayList<GraphObject> posts = new ArrayList<GraphObject>();
-														
-														for (GraphObject object : rawPosts)
+														try
 														{
-															posts.add(object);
-														}
-														
-														Collections.sort(posts, new Comparator<GraphObject>()
-														{
-															public int compare(GraphObject one, GraphObject two) 
+															GraphObjectList<GraphObject> rawPosts = obj.getPropertyAsList("data", GraphObject.class);
+															
+															for (GraphObject object : rawPosts)
 															{
-																String oneTime = one.getProperty("created_time").toString();
-																String twoTime = two.getProperty("created_time").toString();
-																
-																return oneTime.compareTo(twoTime);
+																items.add(object);
 															}
-														});
-														
-														for (GraphObject object : posts)
-														{
-															try 
+
+															Request posts = new Request(session, "/me/posts", null, HttpMethod.GET, new Request.Callback() 
 															{
-																Date created = sdf.parse(object.getProperty("created_time").toString());
-																
-																long postTime = created.getTime();
-																
-																if (now - postTime < 60 * 60 * 1000)
-																	hour += 1;
-																
-																if (postTime > mostRecent)
+																public void onCompleted(Response response) 
 																{
-																	Log.e("PR", "GOT: " + object);
-																	Log.e("PR", "CREATED: " + created);
+																	GraphObject obj = response.getGraphObject();
 
-																	Bundle eventBundle = new Bundle();
-																	eventBundle.putString("PROBE", FacebookEventsProbe.PROBE_NAME);
-																	eventBundle.putLong("TIMESTAMP", postTime / 1000);
-																	eventBundle.putString("TYPE", object.getProperty("type").toString());
-
-																	String message = object.getProperty("message").toString();
+																	GraphObjectList<GraphObject> rawPosts = obj.getPropertyAsList("data", GraphObject.class);
 																	
-																	try 
-																	{	
-																		if (doHash)
-																			message = em.encryptString(context, message);
-
-																		eventBundle.putString("MESSAGE", message);
-																	}
-																	catch (IllegalBlockSizeException e) 
+																	for (GraphObject object : rawPosts)
 																	{
-																		LogManager.getInstance(context).logException(e);
-																	} 
-																	catch (BadPaddingException e) 
-																	{
-																		LogManager.getInstance(context).logException(e);
-																	} 
-																	catch (UnsupportedEncodingException e) 
-																	{
-																		LogManager.getInstance(context).logException(e);
+																		items.add(object);
 																	}
 
-																	eventBundle.putBoolean("IS_OBFUSCATED", doHash);
-																	me.transmitData(context, eventBundle);
+																	Collections.sort(items, new Comparator<GraphObject>()
+																	{
+																		public int compare(GraphObject one, GraphObject two) 
+																		{
+																			String oneTime = one.getProperty("updated_time").toString();
+																			String twoTime = two.getProperty("updated_time").toString();
+																			
+																			return oneTime.compareTo(twoTime);
+																		}
+																	});
 																	
-																	if (postTime > newRecent)
-																		newRecent = postTime;
+																	long newRecent = mostRecent;
+																	int hour = 0;
+
+																	for (GraphObject object : items)
+																	{
+																		try 
+																		{
+																			Date created = sdf.parse(object.getProperty("created_time").toString());
+																			
+																			long postTime = created.getTime();
+																			
+																			if (now - postTime < 60 * 60 * 1000)
+																				hour += 1;
+																			
+																			if (postTime > mostRecent)
+																			{
+																				Bundle eventBundle = new Bundle();
+																				eventBundle.putString("PROBE", FacebookEventsProbe.PROBE_NAME);
+																				eventBundle.putLong("TIMESTAMP", postTime / 1000);
+																				eventBundle.putString("TYPE", object.getProperty("type").toString());
+			
+																				String message = object.getProperty("message").toString();
+																				
+																				try 
+																				{	
+																					if (doHash)
+																						message = em.encryptString(context, message);
+			
+																					eventBundle.putString("MESSAGE", message);
+																				}
+																				catch (IllegalBlockSizeException e) 
+																				{
+																					LogManager.getInstance(context).logException(e);
+																				} 
+																				catch (BadPaddingException e) 
+																				{
+																					LogManager.getInstance(context).logException(e);
+																				} 
+																				catch (UnsupportedEncodingException e) 
+																				{
+																					LogManager.getInstance(context).logException(e);
+																				}
+			
+																				eventBundle.putBoolean("IS_OBFUSCATED", doHash);
+																				me.transmitData(context, eventBundle);
+																				
+																				if (postTime > newRecent)
+																					newRecent = postTime;
+																			}
+																		} 
+																		catch (ParseException e) 
+																		{
+																			LogManager.getInstance(context).logException(e);
+																		}
+																		catch (NullPointerException e) 
+																		{
+																			LogManager.getInstance(context).logException(e);
+																		}
+																	}
+																	
+																	Editor e = prefs.edit();
+																	e.putLong("config_probe_facebook_recent", newRecent);
+																	e.commit();
+			
+																	bundle.putInt(FacebookProbe.HOUR_COUNT, hour);
+																	
+																	me.transmitData(context, bundle);
 																}
-															} 
-															catch (ParseException e) 
-															{
-																LogManager.getInstance(context).logException(e);
-															}
-															catch (NullPointerException e) 
-															{
-																LogManager.getInstance(context).logException(e);
-															}
+															});
+															
+															posts.executeAsync();
 														}
-														
-														Editor e = prefs.edit();
-														e.putLong("config_probe_facebook_recent", newRecent);
-														e.commit();
-
-														bundle.putInt(FacebookProbe.HOUR_COUNT, hour);
-														
-														me.transmitData(context, bundle);
+														catch (NullPointerException e)
+														{
+															LogManager.getInstance(context).logException(e);
+														}
 													}
 												});
 												
@@ -251,7 +274,13 @@ public class FacebookProbe extends Probe
 												LogManager.getInstance(context).logException(e);
 											}
 										}
-									}).executeAsync();
+									});
+									
+							        Bundle params = new Bundle();
+							        params.putString("fields", "id");
+							        friendRequest.setParameters(params);
+
+    								friendRequest.executeAsync();
 								}
 							});
 						}
@@ -361,6 +390,21 @@ public class FacebookProbe extends Probe
 		encrypt.setSummary(R.string.config_probe_facebook_encrypt_summary);
 
 		screen.addPreference(encrypt);
+
+        Preference calibrate = new Preference(activity);
+        calibrate.setTitle(R.string.config_probe_calibrate_title);
+        calibrate.setOnPreferenceClickListener(new OnPreferenceClickListener()
+        {
+            public boolean onPreferenceClick(Preference pref) 
+            {
+        		Intent intent = new Intent(activity, FacebookLoginActivity.class);
+                activity.startActivity(intent);
+
+                return true;
+            }
+        });
+        
+        screen.addPreference(calibrate);
 
 		return screen;
 	}
