@@ -1015,6 +1015,8 @@
     
     <string name="available_sensors_label">Available Hardware Sensors</string>
 
+    <string name="title_facebook_events_probe">Recent Facebook Events Probe</string>
+    
     <string name="title_facebook_probe">Facebook Probe</string>
     <string name="summary_facebook_probe_desc">Collects profile &amp; behavioral data from Facebook.</string>
     <string name="config_probe_facebook_hash_title">Obfuscate Details</string>
@@ -1025,7 +1027,10 @@
     <string name="title_facebook_check">Facebook Login Required</string>	
 	<string name="message_facebook_check">Please login to Facebook to complete the setup of the Facebook Probe.</string>	
     <string name="facebook_app_id">266981220119291</string>	
-	
+    
+    <string name="facebook_count_desc" formatted="false">%d Post(s) in the Last Hour, %d Friends</string>	
+    <string name="facebook_event_obfuscated_desc" formatted="false">Obfuscated: %s (%s)</string>	
+    <string name="facebook_event_clear_desc" formatted="false">%s (%s)</string>	
 </resources>
 
 

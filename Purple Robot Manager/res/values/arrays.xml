@@ -64,6 +64,7 @@
         <item>builtin.AmbientHumidityProbe</item>
         
         <item>builtin.FacebookProbe</item>
+        <item>builtin.FacebookEventsProbe</item>
         
         <!-- <item>builtin.BluetoothReceiverProbe</item> -->
         <!-- <item>builtin.ZeroconfProbe</item> -->
