@@ -25,6 +25,8 @@ public class LastUploadCheck extends SanityCheck
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
+		HttpUploadPlugin.fixUploadPreference(context);
+
 		if (prefs.getBoolean("config_enable_data_server", false) == false)
 		{
 			this._errorLevel = SanityCheck.OK;

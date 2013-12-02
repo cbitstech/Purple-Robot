@@ -81,8 +81,8 @@ import edu.emory.mathcs.backport.java.util.Arrays;
 import edu.emory.mathcs.backport.java.util.Collections;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.StartActivity;
 import edu.northwestern.cbits.purple_robot_manager.WiFiHelper;
+import edu.northwestern.cbits.purple_robot_manager.activities.StartActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.LiberalSSLSocketFactory;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -221,11 +221,40 @@ public class HttpUploadPlugin extends OutputPlugin
 
 		return activeActions;
 	}
+	
+	public static void fixUploadPreference(Context context)
+	{
+		final SharedPreferences prefs = HttpUploadPlugin.getPreferences(context);
+
+		try
+		{
+			prefs.getBoolean("config_enable_data_server", false);
+		}
+		catch (ClassCastException e)
+		{
+			String doUpload = prefs.getString("config_enable_data_server", "");
+			
+			Editor editor = prefs.edit();
+
+			if ("true".equalsIgnoreCase(doUpload))
+			{
+				editor.putBoolean("config_enable_data_server", true);
+			}
+			else
+			{
+				editor.putBoolean("config_enable_data_server", false);
+			}
+			
+			editor.commit();
+		}
+	}
 
 	public void processIntent(Intent intent)
 	{
 		final SharedPreferences prefs = HttpUploadPlugin.getPreferences(this.getContext());
 
+		HttpUploadPlugin.fixUploadPreference(this.getContext());
+		
 		if (OutputPlugin.FORCE_UPLOAD.equals(intent.getAction()))
 		{
 			this._lastUpload = 0;
@@ -312,7 +341,9 @@ public class HttpUploadPlugin extends OutputPlugin
 			this._uploading = true;
 
 			final SharedPreferences prefs = HttpUploadPlugin.getPreferences(this.getContext());
-
+			
+			HttpUploadPlugin.fixUploadPreference(this.getContext());
+			
 			if (prefs.getBoolean("config_enable_data_server", false) == false)
 			{
 				this._uploading = false;

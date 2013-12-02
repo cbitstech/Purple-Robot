@@ -73,6 +73,8 @@ public class DiagnosticActivity extends ActionBarActivity
 		else
 			probeStatus.setText(R.string.probe_status_disabled);
 
+		HttpUploadPlugin.fixUploadPreference(this);
+		
 		boolean uploadEnabled = prefs.getBoolean("config_enable_data_server", false);
 		
 		if (uploadEnabled)
@@ -256,6 +258,8 @@ public class DiagnosticActivity extends ActionBarActivity
          		message.append(this.getString(R.string.upload_status_label));
          		message.append(newline);
 
+        		HttpUploadPlugin.fixUploadPreference(this);
+
         		boolean uploadEnabled = prefs.getBoolean("config_enable_data_server", false);
         		
         		if (uploadEnabled)
@@ -355,7 +359,7 @@ public class DiagnosticActivity extends ActionBarActivity
 	            	
 	        		FileOutputStream fout = new FileOutputStream(configFile);
 
-	        		fout.write(scheme.toString().getBytes(Charset.defaultCharset()));
+	        		fout.write(scheme.toString().getBytes(Charset.defaultCharset().name()));
 
 	        		fout.flush();
 	        		fout.close();

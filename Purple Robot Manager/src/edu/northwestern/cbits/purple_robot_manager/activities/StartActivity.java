@@ -1,4 +1,4 @@
-package edu.northwestern.cbits.purple_robot_manager;
+package edu.northwestern.cbits.purple_robot_manager.activities;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -47,8 +47,10 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import edu.northwestern.cbits.purple_robot_manager.activities.DiagnosticActivity;
-import edu.northwestern.cbits.purple_robot_manager.activities.LabelActivity;
+import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
+import edu.northwestern.cbits.purple_robot_manager.ManagerService;
+import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.RobotContentProvider;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;

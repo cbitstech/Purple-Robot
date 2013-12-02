@@ -1,4 +1,4 @@
-package edu.northwestern.cbits.purple_robot_manager;
+package edu.northwestern.cbits.purple_robot_manager.activities;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -35,6 +35,10 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.util.Log;
 import android.widget.Toast;
+import edu.northwestern.cbits.purple_robot_manager.ManagerService;
+import edu.northwestern.cbits.purple_robot_manager.PersistentService;
+import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.RobotContentProvider;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.db.DistancesProvider;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
@@ -54,7 +58,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 	public static final String RINGTONE_KEY = "config_default_notification_sound";
 	public static final String ZIP_ARCHIVES_KEY = "config_mail_archives";
 	public static final String DELETE_ARCHIVES_KEY = "config_delete_archives";
-	static final CharSequence USER_ID_KEY = "config_user_id";
+	public static final CharSequence USER_ID_KEY = "config_user_id";
 	protected static final String USER_HASH_KEY = "config_user_hash";
 	public static final String CHECK_UPDATES_KEY = "config_hockey_update";
 	public static final String TRIGGERS_SCREEN_KEY = "config_triggers_screen";
@@ -66,6 +70,8 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 	public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+		HttpUploadPlugin.fixUploadPreference(this);
 
         this.addPreferencesFromResource(R.layout.layout_settings_activity);
 

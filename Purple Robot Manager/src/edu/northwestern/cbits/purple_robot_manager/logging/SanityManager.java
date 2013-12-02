@@ -17,7 +17,7 @@ import android.preference.PreferenceManager;
 
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.StartActivity;
+import edu.northwestern.cbits.purple_robot_manager.activities.StartActivity;
 
 public class SanityManager 
 {

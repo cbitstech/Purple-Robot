@@ -6,6 +6,7 @@ import java.util.Iterator;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
