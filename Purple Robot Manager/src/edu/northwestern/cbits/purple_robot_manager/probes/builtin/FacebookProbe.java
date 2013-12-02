@@ -1,5 +1,6 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
+import java.util.List;
 import java.util.Map;
 
 import org.json.JSONException;
@@ -14,8 +15,21 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
+
+import com.facebook.AccessToken;
+import com.facebook.HttpMethod;
+import com.facebook.Request;
+import com.facebook.Response;
+import com.facebook.Session;
+import com.facebook.SessionState;
+import com.facebook.model.GraphObject;
+import com.facebook.model.GraphObjectList;
+import com.facebook.model.GraphUser;
+
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.calibration.FacebookCalibrationHelper;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
@@ -24,6 +38,8 @@ public class FacebookProbe extends Probe
 	private static final boolean DEFAULT_ENABLED = false;
 	private static final boolean DEFAULT_RETRIEVE = false;
 	private static final boolean DEFAULT_ENCRYPT = true;
+
+	public static final String TOKEN = "facebook_auth_token";
 
 	private long _lastCheck = 0;
 
@@ -62,13 +78,13 @@ public class FacebookProbe extends Probe
 		e.commit();
 	}
 
-	public boolean isEnabled(Context context)
+	public boolean isEnabled(final Context context)
 	{
-		SharedPreferences prefs = Probe.getPreferences(context);
+		final SharedPreferences prefs = Probe.getPreferences(context);
 
 		if (super.isEnabled(context))
 		{
-			long now = System.currentTimeMillis();
+			final long now = System.currentTimeMillis();
 
 			if (prefs.getBoolean("config_probe_facebook_enabled", FacebookProbe.DEFAULT_ENABLED))
 			{
@@ -79,32 +95,70 @@ public class FacebookProbe extends Probe
 					
 					if (now - this._lastCheck  > freq)
 					{
-						long mostRecent = prefs.getLong("config_probe_facebook_recent", 0);
-						long newRecent = mostRecent;
-
-						try
+						FacebookCalibrationHelper.check(context);
+		
+						if (prefs.contains(FacebookProbe.TOKEN))
 						{
-							EncryptionManager em = EncryptionManager.getInstance();
+							String token = prefs.getString(FacebookProbe.TOKEN, "");
 							
-							Bundle bundle = new Bundle();
-							bundle.putString("PROBE", this.name(context));
-							bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
-
-							this.transmitData(context, bundle);
-
+							final FacebookProbe me = this;
+		
+							AccessToken accessToken = AccessToken.createFromExistingAccessToken(token, null, null, null, null);
+							
+							Session.openActiveSessionWithAccessToken(context, accessToken, new Session.StatusCallback()
+							{
+								public void call(final Session session, SessionState state, Exception exception) 
+								{
+									Request.newMyFriendsRequest(session, new Request.GraphUserListCallback() 
+									{
+										public void onCompleted(List<GraphUser> users, Response response) 
+										{
+											long mostRecent = prefs.getLong("config_probe_facebook_recent", 0);
+											long newRecent = mostRecent;
+				
+											try
+											{
+												EncryptionManager em = EncryptionManager.getInstance();
+					
+												final Bundle bundle = new Bundle();
+												bundle.putString("PROBE", me.name(context));
+												bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+												bundle.putInt("FRIEND_COUNT", users.size());
+			
+												Request statuses = new Request(session, "/me/posts", null, HttpMethod.GET, new Request.Callback() 
+												{
+													public void onCompleted(Response response) 
+													{
+														GraphObject obj = response.getGraphObject();
+														
+														GraphObjectList<GraphObject> posts = obj.getPropertyAsList("data", GraphObject.class);
+														
+														for (GraphObject object : posts)
+														{
+															Log.e("PR", "GOT: " + object.getProperty("message"));
+														}
+														
+														me.transmitData(context, bundle);
+													}
+												});
+												
+												statuses.executeAsync();
+											}
+											catch (Exception e)
+											{
+												LogManager.getInstance(context).logException(e);
+											}
+				
+											me._lastCheck = now;
+				
+											Editor e = prefs.edit();
+											e.putLong("config_probe_facebook_recent", newRecent);
+											e.commit();
+										}
+									}).executeAsync();
+								}
+							});
 						}
-						catch (Exception e)
-						{
-							// Broken call & SMS databases on several devices... Ignoring.
-
-							LogManager.getInstance(context).logException(e);
-						}
-
-						this._lastCheck = now;
-						
-						Editor e = prefs.edit();
-						e.putLong("config_probe_facebook_recent", newRecent);
-						e.commit();
 					}
 				}
 
