@@ -28,7 +28,7 @@ public class FacebookEventsProbe extends Probe
 
 	public String probeCategory(Context context) 
 	{
-		return context.getResources().getString(R.string.probe_personal_info_category);
+		return context.getResources().getString(R.string.probe_external_services_category);
 	}
 
 	public PreferenceScreen preferenceScreen(PreferenceActivity settingsActivity) 
