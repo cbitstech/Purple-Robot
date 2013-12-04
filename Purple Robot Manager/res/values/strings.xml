@@ -1032,10 +1032,21 @@
     <string name="facebook_event_obfuscated_desc" formatted="false">Obfuscated: %s (%s)</string>	
     <string name="facebook_event_clear_desc" formatted="false">%s (%s)</string>	
 
+   	<!-- Twitter API Feature -->
     <string name="title_twitter_probe">Twitter Probe</string>
     <string name="summary_twitter_probe_desc">Collects profile data &amp; tweets from Twitter.</string>
     <string name="config_probe_twitter_encrypt_title">Encrypt Tweet Contents</string>
     <string name="config_probe_twitter_encrypt_summary">Encrypts the contents of posted tweets.</string>
+
+	<string name="title_authenticate_twitter_probe">Login to Twitter</string>	
+	<string name="summary_authenticate_twitter_probe">Tap to go to the Twitter website and login to give this device access to your tweets.</string>	
+	<string name="title_logout_twitter_probe">Log Out of Twitter</string>	
+	<string name="summary_logout_twitter_probe">Tap to clear your Twitter login information and revoke access to this device.</string>	
+	<string name="toast_twitter_logout">Logged out of Twitter.</string>	
+	<string name="title_twitter_check">Twitter probe requires authorization</string>	
+	<string name="message_twitter_check">Please login to the Twitter website from the settings to grant Purple Robot access to your Twitter account.</string>	
+    
+    
     
 </resources>
 

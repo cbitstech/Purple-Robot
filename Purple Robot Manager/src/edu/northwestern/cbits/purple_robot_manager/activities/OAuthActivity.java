@@ -17,6 +17,8 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.oauth.FitbitApi;
+import edu.northwestern.cbits.purple_robot_manager.oauth.TwitterApi;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TwitterProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.FitbitApiFeature;
 
 public class OAuthActivity extends Activity
@@ -51,7 +53,9 @@ public class OAuthActivity extends Activity
         	
         	if ("fitbit".equals(requester))
         		apiClass = FitbitApi.class;
-        	
+        	else if ("twitter".equals(requester))
+        		apiClass = TwitterApi.class;
+
         	if (apiClass != null)
         	{
 	        	ServiceBuilder builder = new ServiceBuilder();
@@ -121,6 +125,12 @@ public class OAuthActivity extends Activity
             			apiClass = FitbitApi.class;
             			consumerKey = FitbitApiFeature.CONSUMER_KEY;
             			consumerSecret = FitbitApiFeature.CONSUMER_SECRET;
+        			}
+        			else if ("twitter".equals(requester))
+        			{
+            			apiClass = TwitterApi.class;
+            			consumerKey = TwitterProbe.CONSUMER_KEY;
+            			consumerSecret = TwitterProbe.CONSUMER_SECRET;
         			}
         			
         			if (apiClass != null && consumerKey != null && consumerSecret != null)
