@@ -48,6 +48,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.SoftwareInform
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.StepCounterProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TelephonyProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TemperatureProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TwitterProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.VisibleSatelliteProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.WifiAccessPointsProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.AccelerometerBasicStatisticsFeature;
@@ -384,6 +385,13 @@ public class ProbeManager
 				FitbitApiFeature fitbit = (FitbitApiFeature) probe;
 
 				if (fitbit.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof TwitterProbe)
+			{
+				TwitterProbe twitter = (TwitterProbe) probe;
+
+				if (twitter.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 			else if (probe instanceof AudioFeaturesProbe)

@@ -1,38 +1,64 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
+import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 import java.util.Map;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import twitter4j.Query;
-import twitter4j.QueryResult;
-import twitter4j.Status;
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
+import org.scribe.builder.ServiceBuilder;
+import org.scribe.exceptions.OAuthException;
+import org.scribe.model.OAuthRequest;
+import org.scribe.model.Response;
+import org.scribe.model.Token;
+import org.scribe.model.Verb;
+import org.scribe.oauth.OAuthService;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
+import android.preference.Preference;
+import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
+import android.widget.Toast;
+import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.OAuthActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
+import edu.northwestern.cbits.purple_robot_manager.oauth.TwitterApi;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class TwitterProbe extends Probe
 {
+	public static final String CONSUMER_KEY = "q2JL6t5LenW1f8DPFqag";
+	public static final String CONSUMER_SECRET = "zsB6bELsZfj47kRHvXfinvBSgbddTzq7vgyqg5E3jn0";
+	private static final String REQUEST_TOKEN_URL = "https://api.twitter.com/oauth/access_token";
+	private static final String ACCESS_TOKEN_URL = "https://api.twitter.com/oauth/access_token";
+	private static final String AUTHORIZE_URL = "https://api.twitter.com/oauth/authorize";
+
 	private static final boolean DEFAULT_ENABLED = false;
-	private static final boolean DEFAULT_ENCRYPT = true;
+	private static final boolean DEFAULT_ENCRYPT = false;
 
 	protected static final String HOUR_COUNT = "HOUR_COUNT";
 
 	private long _lastCheck = 0;
+	
+	private String _token = null;
+	private String _secret = null;
 
 	public String name(Context context)
 	{
@@ -79,39 +105,144 @@ public class TwitterProbe extends Probe
 
 			if (prefs.getBoolean("config_probe_twitter_enabled", TwitterProbe.DEFAULT_ENABLED))
 			{
-				Log.e("PR", "GRABBING TWEETS");
-				
 				synchronized(this)
 				{
 					long freq = Long.parseLong(prefs.getString("config_probe_twitter_frequency", Probe.DEFAULT_FREQUENCY));
 					final boolean doEncrypt = prefs.getBoolean("config_probe_twitter_encrypt_data", TwitterProbe.DEFAULT_ENCRYPT);
 					
-					if (false && now - this._lastCheck  > freq)
+					final EncryptionManager em = EncryptionManager.getInstance();
+					
+					if (now - this._lastCheck  > freq)
 					{
 						final TwitterProbe me = this;
-						
-						try
-						{
-							Twitter twitter = TwitterFactory.getSingleton();
-							
-						    Query query = new Query("source:twitter4j yusukey");
-						    QueryResult result = twitter.search(query);
-						    
-						    for (Status status : result.getTweets()) 
-						    {
-						        Log.e("PR", "TWITTER @" + status.getUser().getScreenName() + ":" + status.getText());
-						    }
-							
-						}
-						catch (TwitterException e)
-						{
-							LogManager.getInstance(context).logException(e);
-						}
-						catch (IllegalStateException e)
-						{
-							LogManager.getInstance(context).logException(e);
-						}
 
+						this._token = prefs.getString("oauth_twitter_token", null);
+						this._secret = prefs.getString("oauth_twitter_secret", null);
+
+	    				final String title = context.getString(R.string.title_twitter_check);
+	    				final SanityManager sanity = SanityManager.getInstance(context);
+
+	        			if (this._token == null || this._secret == null)
+	        			{
+	        				String message = context.getString(R.string.message_twitter_check);
+	        				
+	        				Runnable action = new Runnable()
+	        				{
+								public void run() 
+								{
+									me.fetchAuth(context);
+								}
+	        				};
+	        				
+	        				sanity.addAlert(SanityCheck.WARNING, title, message, action);
+	        			}
+						else
+						{
+							sanity.clearAlert(title);
+
+							Token accessToken = new Token(this._token, this._secret);
+							
+		                	ServiceBuilder builder = new ServiceBuilder();
+		                	builder = builder.provider(TwitterApi.class);
+		                	builder = builder.apiKey(TwitterProbe.CONSUMER_KEY);
+		                	builder = builder.apiSecret(TwitterProbe.CONSUMER_SECRET);
+		                	
+		                	final OAuthService service = builder.build();
+		                	
+							final OAuthRequest request = new OAuthRequest(Verb.GET, "https://api.twitter.com/1.1/statuses/user_timeline.json");
+							service.signRequest(accessToken, request);
+	
+							Runnable r = new Runnable()
+							{
+								public void run() 
+								{
+									try 
+									{
+										SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss ZZZZZ yyyy", Locale.ENGLISH);
+										sdf.setLenient(true);
+
+										long mostRecent = 0; // prefs.getLong("config_twitter_most_recent", 0);
+										
+										Response response = request.send();
+
+										JSONArray tweets = new JSONArray(response.getBody());
+										
+										for (int i = (tweets.length() - 1); i >= 0; i--)
+										{
+											JSONObject tweet = tweets.getJSONObject(i);
+											
+											long tweetTime = sdf.parse(tweet.getString("created_at")).getTime();
+
+											if (tweetTime > mostRecent)
+											{
+												Bundle eventBundle = new Bundle();
+												eventBundle.putString("PROBE", me.name(context));
+												eventBundle.putLong("TIMESTAMP", tweetTime / 1000);
+												eventBundle.putString("LANGUAGE", tweet.getString("lang"));
+												eventBundle.putInt("FAVORITE_COUNT", tweet.getInt("favorite_count"));
+												eventBundle.putInt("RETWEET_COUNT", tweet.getInt("retweet_count"));
+												eventBundle.putLong("TWEET_ID", tweet.getLong("id"));
+												eventBundle.putString("SOURCE", tweet.getString("source"));
+												
+												JSONObject user = tweet.getJSONObject("user");
+												
+												eventBundle.putString("SCREENNAME", user.getString("screen_name"));
+												
+												String respondent = tweet.getString("in_reply_to_screen_name");
+												
+												if (respondent != null)
+													eventBundle.putString("RESPONDENT", respondent);
+												
+												String message = tweet.getString("text");
+
+												try 
+												{	
+													if (doEncrypt)
+														message = em.encryptString(context, message);
+
+													eventBundle.putString("CONTENT", message);
+												}
+												catch (IllegalBlockSizeException e) 
+												{
+													LogManager.getInstance(context).logException(e);
+												} 
+												catch (BadPaddingException e) 
+												{
+													LogManager.getInstance(context).logException(e);
+												} 
+												catch (UnsupportedEncodingException e) 
+												{
+													LogManager.getInstance(context).logException(e);
+												}
+
+												eventBundle.putBoolean("IS_OBFUSCATED", doEncrypt);
+												me.transmitData(context, eventBundle);
+											}
+										}
+										
+										Editor e = prefs.edit();
+										e.putLong("config_twitter_most_recent", System.currentTimeMillis());
+										e.commit();
+									} 
+									catch (JSONException e) 
+									{
+										e.printStackTrace();
+									}
+									catch (OAuthException e)
+									{
+										e.printStackTrace();
+									} 
+									catch (ParseException e) 
+									{
+										e.printStackTrace();
+									}
+								}
+							};
+							
+							Thread t = new Thread(r);
+							t.start();
+						}
+	        			
 						me._lastCheck = now;
 					}
 				}
@@ -123,14 +254,29 @@ public class TwitterProbe extends Probe
 		return false;
 	}
 
-/*	public String summarizeValue(Context context, Bundle bundle)
+	private void fetchAuth(Context context)
 	{
-		double count = bundle.getDouble("HOUR_COUNT", 0);
-		double friends = bundle.getDouble("FRIEND_COUNT", 0);
+        Intent intent = new Intent(context, OAuthActivity.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		
-		return String.format(context.getResources().getString(R.string.facebook_count_desc), (int) count, (int) friends);
+		intent.putExtra(OAuthActivity.CONSUMER_KEY, CONSUMER_KEY);
+		intent.putExtra(OAuthActivity.CONSUMER_SECRET, CONSUMER_SECRET);
+		intent.putExtra(OAuthActivity.REQUEST_TOKEN_URL, REQUEST_TOKEN_URL);
+		intent.putExtra(OAuthActivity.ACCESS_TOKEN_URL, ACCESS_TOKEN_URL);
+		intent.putExtra(OAuthActivity.AUTHORIZE_URL, AUTHORIZE_URL);
+		intent.putExtra(OAuthActivity.REQUESTER, "twitter");
+		intent.putExtra(OAuthActivity.CALLBACK_URL, "http://pr-oauth/oauth/twitter");
+		
+		context.startActivity(intent);
 	}
-*/
+
+	public String summarizeValue(Context context, Bundle bundle)
+	{
+		String screenname = bundle.getString("SCREENNAME");
+		String message = bundle.getString("CONTENT");
+		
+		return "@" + screenname + ": " + message;
+	}
 	
 	public Map<String, Object> configuration(Context context)
 	{
@@ -185,9 +331,14 @@ public class TwitterProbe extends Probe
 	{
 		PreferenceManager manager = activity.getPreferenceManager();
 
-		PreferenceScreen screen = manager.createPreferenceScreen(activity);
+		final PreferenceScreen screen = manager.createPreferenceScreen(activity);
 		screen.setTitle(this.title(activity));
 		screen.setSummary(R.string.summary_twitter_probe_desc);
+
+		final SharedPreferences prefs = Probe.getPreferences(activity);
+
+		String token = prefs.getString("oauth_twitter_token", null);
+		String secret = prefs.getString("oauth_twitter_secret", null);
 
 		CheckBoxPreference enabled = new CheckBoxPreference(activity);
 		enabled.setTitle(R.string.title_enable_probe);
@@ -213,23 +364,58 @@ public class TwitterProbe extends Probe
 
 		screen.addPreference(encrypt);
 
-/* TODO: Enable w/ optional OAuth...
- * 
-        Preference calibrate = new Preference(activity);
-        calibrate.setTitle(R.string.config_probe_calibrate_title);
-        calibrate.setOnPreferenceClickListener(new OnPreferenceClickListener()
-        {
-            public boolean onPreferenceClick(Preference pref) 
-            {
-        		Intent intent = new Intent(activity, FacebookLoginActivity.class);
-                activity.startActivity(intent);
+		final Preference authPreference = new Preference(activity);
+		authPreference.setTitle(R.string.title_authenticate_twitter_probe);
+		authPreference.setSummary(R.string.summary_authenticate_twitter_probe);
 
-                return true;
-            }
-        });
-        
-        screen.addPreference(calibrate);
-*/
+		final TwitterProbe me = this;
+		
+		final Preference logoutPreference = new Preference(activity);
+		logoutPreference.setTitle(R.string.title_logout_twitter_probe);
+		logoutPreference.setSummary(R.string.summary_logout_twitter_probe);
+
+		authPreference.setOnPreferenceClickListener(new OnPreferenceClickListener()
+		{
+			public boolean onPreferenceClick(Preference preference) 
+			{
+				me.fetchAuth(activity);
+				
+				screen.addPreference(logoutPreference);
+				screen.removePreference(authPreference);
+
+				return true;
+			}
+		});
+		
+		logoutPreference.setOnPreferenceClickListener(new OnPreferenceClickListener()
+		{
+			public boolean onPreferenceClick(Preference preference) 
+			{
+				Editor e = prefs.edit();
+				e.remove("oauth_twitter_token");
+				e.remove("oauth_twitter_secret");
+				e.commit();
+				
+				screen.addPreference(authPreference);
+				screen.removePreference(logoutPreference);
+				
+				activity.runOnUiThread(new Runnable()
+				{
+					public void run() 
+					{
+						Toast.makeText(activity, activity.getString(R.string.toast_twitter_logout), Toast.LENGTH_LONG).show();
+					}
+				});
+
+				return true;
+			}
+		});
+		
+		if (token == null || secret == null)
+			screen.addPreference(authPreference);
+		else
+			screen.addPreference(logoutPreference);
+
 		return screen;
 	}
 

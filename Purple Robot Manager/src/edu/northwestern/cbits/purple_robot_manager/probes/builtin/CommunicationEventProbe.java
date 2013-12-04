@@ -7,6 +7,7 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -26,7 +27,6 @@ import android.preference.PreferenceScreen;
 import android.provider.CallLog;
 import android.provider.CallLog.Calls;
 import android.telephony.PhoneNumberUtils;
-import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.probes.AddressBookLabelActivity;
@@ -228,11 +228,6 @@ public class CommunicationEventProbe extends Probe
 
 							while (c.moveToNext())
 							{
-								for (int j = 0; j < c.getColumnCount(); j++)
-								{
-									Log.e("PR", "[" + j + "] " + c.getColumnName(j) + " ::: " + c.getString(j));
-								}
-
 								Bundle bundle = new Bundle();
 								bundle.putString("PROBE", this.name(context));
 								bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
@@ -311,6 +306,7 @@ public class CommunicationEventProbe extends Probe
 		return false;
 	}
 
+	@SuppressLint("SimpleDateFormat")
 	public String summarizeValue(Context context, Bundle bundle)
 	{
 		String name = bundle.getString(CommunicationEventProbe.NAME);
