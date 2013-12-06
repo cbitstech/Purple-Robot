@@ -11,6 +11,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
@@ -28,6 +30,7 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -59,6 +62,29 @@ public class DateTrigger extends Trigger
 	private long _lastFireCalcDate = 0;
 	private List<Date> _upcomingFireDates = new ArrayList<Date>();
 	
+	private static List<Runnable> pendingRefreshes = new ArrayList<Runnable>();
+	private static boolean isRefreshing = false;
+	
+	private abstract class RefreshRunnable implements Runnable
+	{
+		private String _identifier = null;
+		
+		public RefreshRunnable(String identifier)
+		{
+			this._identifier = identifier;
+		}
+		
+	    public int hashCode() 
+	    {
+	        return new HashCodeBuilder(17, 31).append(this._identifier).toHashCode();
+	    }
+
+	    public boolean equals(Object obj) 
+	    {
+	    	return obj.hashCode() == this.hashCode();
+	    }
+	}
+	
 	static
 	{
 		try
@@ -70,8 +96,56 @@ public class DateTrigger extends Trigger
 			LogManager.getInstance(null).logException(e);
 		}
 	}
-	
+
 	public void refresh(final Context context) 
+	{
+		final DateTrigger me = this;
+		
+		RefreshRunnable r = new RefreshRunnable(this.identifier())
+		{
+			public void run() 
+			{
+				me.refreshTrigger(context);
+			}
+		};
+		
+		if (DateTrigger.pendingRefreshes.contains(r) == false)
+			DateTrigger.pendingRefreshes.add(r);
+		
+		if (DateTrigger.isRefreshing == false)
+		{
+			DateTrigger.isRefreshing = true; 
+			
+			Runnable s = new Runnable()
+			{
+				public void run() 
+				{
+					Log.e("PR", "-------- PENDING REFRESHES: " + DateTrigger.pendingRefreshes.size());
+					
+					if (DateTrigger.pendingRefreshes.size() > 0)
+					{
+						Runnable r = DateTrigger.pendingRefreshes.remove(0);
+
+						Log.e("PR", "RUNNING: " + DateTrigger.pendingRefreshes.size());
+
+						r.run();
+						
+						System.gc();
+
+						this.run();
+					}
+					else
+						DateTrigger.isRefreshing = false;
+				}
+			};
+			
+			Thread t = new Thread(s, "Trigger Refresh");
+			t.start();
+			t.setName("Trigger Refresh");
+		}
+	}
+
+	public void refreshTrigger(final Context context) 
 	{
 		long now = System.currentTimeMillis();
 		
@@ -79,82 +153,83 @@ public class DateTrigger extends Trigger
 		{
 			this._lastFireCalcDate = now;
 			
-			final DateTrigger me = this;
+			this.refreshCalendar(context);
 			
-			Runnable r = new Runnable()
+			if (this._calendar == null)
+				return;
+			
+			ArrayList<Date> upcoming = new ArrayList<Date>();
+			
+			long current = now;
+
+			long maxCount = 64;
+
+			long hour = 1000 * 60 * 60;
+			
+			Date currentDate = new Date(now);
+
+			while (current - now < (hour * 24) && upcoming.size() < maxCount)
 			{
-				public void run() 
+				DateTime from = new DateTime(new Date(current));
+				DateTime to = new DateTime(new Date(current + (hour / 4)));
+
+				Log.e("PR", "FIND TRIGGER TIMES (" + this.identifier() + ") " + (current - now) / hour);
+				
+				try
 				{
-					me.refreshCalendar(context);
-					
-					if (me._calendar == null)
-						return;
-					
-					ArrayList<Date> upcoming = new ArrayList<Date>();
-					
-					long now = System.currentTimeMillis();
-					long current = now;
-					
-					long maxCount = 64;
+					Period period = new Period(from, to);
 
-					long hour = 1000 * 60 * 60;
-					
-					Date currentDate = new Date(now);
-
-					while (current - now < (hour * 48) && upcoming.size() < maxCount)
+					Log.e("PR", "1 ");
+					for (Object o : this._calendar.getComponents("VEVENT"))
 					{
-						DateTime from = new DateTime(new Date(current));
-						DateTime to = new DateTime(new Date(current + (hour)));
+						Component c = (Component) o;
+						Log.e("PR", "1.0");
+	
+						Log.e("PR", "1.1");
+						PeriodList l = c.calculateRecurrenceSet(period);
 
-						try
+						Log.e("PR", "1.2 " + l.size() + " periods");
+
+						for (Object po : l)
 						{
-							Period period = new Period(from, to);
-			
-							for (Object o : me._calendar.getComponents("VEVENT"))
+							if (po instanceof Period)
 							{
-								Component c = (Component) o;
-			
-								PeriodList l = c.calculateRecurrenceSet(period);
+								Period p = (Period) po;
 								
-								for (Object po : l)
+								Date start = p.getRangeStart();
+								
+								if (start.after(currentDate))
 								{
-									if (po instanceof Period)
-									{
-										Period p = (Period) po;
-										
-										Date start = p.getRangeStart();
-										
-										if (start.after(currentDate))
-										{
-											if (upcoming.contains(start) == false)
-												upcoming.add(start);
-										}
-									}
+									if (upcoming.contains(start) == false)
+										upcoming.add(start);
 								}
-							} 
+							}
 						}
-						catch (NullPointerException e)
-						{
-							
-						}
-						catch (IllegalArgumentException e)
-						{
-							LogManager.getInstance(context).logException(e);
-						}
+						
+						Log.e("PR", "1.3 " + l.size() + " periods");
+					} 
 
-						current += hour;
-					}
-
-					synchronized(me._upcomingFireDates)
-					{
-						me._upcomingFireDates.clear();
-						me._upcomingFireDates.addAll(upcoming);
-					}
+					Log.e("PR", "2");
 				}
-			};
-			
-			Thread t = new Thread(r);
-			t.start();
+				catch (NullPointerException e)
+				{
+					
+				}
+				catch (IllegalArgumentException e)
+				{
+					LogManager.getInstance(context).logException(e);
+				}
+
+				Log.e("PR", "DONE TRIGGER TIMES (" + this.identifier() + ") " + (current - now) / hour);
+
+				current += (hour / 4);
+			}
+
+			synchronized(this._upcomingFireDates)
+			{
+				this._upcomingFireDates.clear();
+				this._upcomingFireDates.addAll(upcoming);
+			}
 		}
 	}
 
@@ -193,7 +268,6 @@ public class DateTrigger extends Trigger
 	{
 		if (this._icalString == null)
 			return;
-		
 
 		try
 		{
@@ -295,6 +369,8 @@ public class DateTrigger extends Trigger
 
 	public Period getPeriod(Context context, long timestamp)
 	{
+		System.gc();
+
 		if (timestamp - this.lastUpdate > 300000)
 		{
 			periodList = null;

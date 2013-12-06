@@ -3,6 +3,7 @@ package edu.northwestern.cbits.purple_robot_manager.logging;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
@@ -28,7 +29,7 @@ public class UploadProgressCheck extends SanityCheck
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-		HttpUploadPlugin.fixUploadPreference(context);
+		PurpleRobotApplication.fixPreferences(context);
 
 		if (prefs.getBoolean("config_enable_data_server", false) == false)
 		{

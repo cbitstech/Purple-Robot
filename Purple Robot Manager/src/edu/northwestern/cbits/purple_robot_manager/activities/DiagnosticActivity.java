@@ -31,6 +31,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
+import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.config.SchemeConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -73,7 +74,7 @@ public class DiagnosticActivity extends ActionBarActivity
 		else
 			probeStatus.setText(R.string.probe_status_disabled);
 
-		HttpUploadPlugin.fixUploadPreference(this);
+		PurpleRobotApplication.fixPreferences(this);
 		
 		boolean uploadEnabled = prefs.getBoolean("config_enable_data_server", false);
 		
@@ -258,7 +259,7 @@ public class DiagnosticActivity extends ActionBarActivity
          		message.append(this.getString(R.string.upload_status_label));
          		message.append(newline);
 
-        		HttpUploadPlugin.fixUploadPreference(this);
+        		PurpleRobotApplication.fixPreferences(this);
 
         		boolean uploadEnabled = prefs.getBoolean("config_enable_data_server", false);
         		

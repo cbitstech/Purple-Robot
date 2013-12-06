@@ -37,6 +37,7 @@ import android.util.Log;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.PersistentService;
+import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.RobotContentProvider;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
@@ -71,7 +72,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
     {
         super.onCreate(savedInstanceState);
 
-		HttpUploadPlugin.fixUploadPreference(this);
+		PurpleRobotApplication.fixPreferences(this);
 
         this.addPreferencesFromResource(R.layout.layout_settings_activity);
 

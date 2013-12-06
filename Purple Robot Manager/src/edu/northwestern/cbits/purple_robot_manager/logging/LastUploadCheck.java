@@ -6,6 +6,7 @@ import java.io.FilenameFilter;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
@@ -25,7 +26,7 @@ public class LastUploadCheck extends SanityCheck
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-		HttpUploadPlugin.fixUploadPreference(context);
+		PurpleRobotApplication.fixPreferences(context);
 
 		if (prefs.getBoolean("config_enable_data_server", false) == false)
 		{

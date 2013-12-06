@@ -2,6 +2,7 @@ package edu.northwestern.cbits.purple_robot_manager;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -15,6 +16,7 @@ import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 
 public class PurpleRobotApplication extends Application
 {
@@ -86,7 +88,21 @@ public class PurpleRobotApplication extends Application
         				else if ("ListPreference".equals(name))
         					map.put(key, prefs.getString(key, null));
         				else if ("CheckBoxPreference".equals(name))
-        					map.put(key, prefs.getBoolean(key, false));
+        				{
+        					try
+        					{
+            					map.put(key, prefs.getBoolean(key, false));
+        					}
+        					catch (ClassCastException e)
+        					{
+        						String value = prefs.getString(key, null);
+        						
+        						if (value != null && "true".equals(value.toLowerCase(Locale.ENGLISH)))
+        							map.put(key, Boolean.valueOf(true));
+        						else
+        							map.put(key, Boolean.valueOf(false));
+        					}
+        				}
         				else if ("Preference".equals(name))
         					map.put(key, prefs.getString(key, null));
         			}
@@ -107,6 +123,28 @@ public class PurpleRobotApplication extends Application
 		map.put("config_probes_enabled", Boolean.valueOf(prefs.getBoolean("config_probes_enabled", false)));
 		
 		return map;
+	}
+
+	public static void fixPreferences(Context context) 
+	{
+		Map<String, Object> values = PurpleRobotApplication.configuration(context);
+		
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		Editor e = prefs.edit();
+		
+		for (String key : values.keySet())
+		{
+			Object value = values.get(key);
+			
+			if (value instanceof Boolean)
+			{
+				Boolean boolValue = (Boolean) value;
+				
+				e.putBoolean(key, boolValue.booleanValue());
+			}
+		}
+		
+		e.commit();
 	}
 }
 
