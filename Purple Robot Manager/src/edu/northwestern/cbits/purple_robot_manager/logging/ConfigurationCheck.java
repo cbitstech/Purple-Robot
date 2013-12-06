@@ -3,8 +3,8 @@ package edu.northwestern.cbits.purple_robot_manager.logging;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;
 import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 
 public class ConfigurationCheck extends SanityCheck 
 {
@@ -31,7 +31,7 @@ public class ConfigurationCheck extends SanityCheck
 			return;
 		}
 		
-		HttpUploadPlugin.fixUploadPreference(context);
+		PurpleRobotApplication.fixPreferences(context);
 
 		if (prefs.getBoolean("config_enable_data_server", false))
 		{
