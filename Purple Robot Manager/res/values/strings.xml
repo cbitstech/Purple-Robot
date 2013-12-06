@@ -1045,9 +1045,16 @@
 	<string name="toast_twitter_logout">Logged out of Twitter.</string>	
 	<string name="title_twitter_check">Twitter probe requires authorization</string>	
 	<string name="message_twitter_check">Please login to the Twitter website from the settings to grant Purple Robot access to your Twitter account.</string>	
-    
-    
-    
+
+	<string name="label_trigger_original_start">Original Start Date String</string>	
+	<string name="label_trigger_original_end">Original End Date String</string>	
+	<string name="label_trigger_start">Effective Start Date String</string>	
+	<string name="label_trigger_end">Effective End Date String</string>	
+	
+	<string name="label_trigger_repeat">Repeat Specification</string>	
+	<string name="label_trigger_random">Random Specification</string>	
+	<string name="label_trigger_is_random">True</string>	
+	<string name="label_trigger_not_random">False</string>	
 </resources>
 
 

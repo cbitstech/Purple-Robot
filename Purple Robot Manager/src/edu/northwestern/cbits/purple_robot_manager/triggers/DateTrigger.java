@@ -53,6 +53,8 @@ public class DateTrigger extends Trigger
 	private boolean _random = false;
 	private String _start = null;
 	private String _end = null;
+	private String _originalStart = null;
+	private String _originalEnd = null;
 	private String _repeats = null;
 	
 	private Calendar _calendar = null;
@@ -81,6 +83,9 @@ public class DateTrigger extends Trigger
 
 	    public boolean equals(Object obj) 
 	    {
+	    	if (obj == null)
+	    		return false;
+	    	
 	    	return obj.hashCode() == this.hashCode();
 	    }
 	}
@@ -120,15 +125,14 @@ public class DateTrigger extends Trigger
 			{
 				public void run() 
 				{
-					Log.e("PR", "-------- PENDING REFRESHES: " + DateTrigger.pendingRefreshes.size());
-					
+					Log.e("FC", "REMAINING " + DateTrigger.pendingRefreshes.size());
+
 					if (DateTrigger.pendingRefreshes.size() > 0)
 					{
 						Runnable r = DateTrigger.pendingRefreshes.remove(0);
-
-						Log.e("PR", "RUNNING: " + DateTrigger.pendingRefreshes.size());
-
-						r.run();
+						
+						if (r != null)
+							r.run();
 						
 						System.gc();
 
@@ -168,27 +172,20 @@ public class DateTrigger extends Trigger
 			
 			Date currentDate = new Date(now);
 
-			while (current - now < (hour * 24) && upcoming.size() < maxCount)
+			while (current - now < (hour * 48) && upcoming.size() < maxCount)
 			{
 				DateTime from = new DateTime(new Date(current));
-				DateTime to = new DateTime(new Date(current + (hour / 4)));
+				DateTime to = new DateTime(new Date(current + hour));
 
-				Log.e("PR", "FIND TRIGGER TIMES (" + this.identifier() + ") " + (current - now) / hour);
-				
 				try
 				{
-					Period period = new Period(from, to);
-
-					Log.e("PR", "1 ");
 					for (Object o : this._calendar.getComponents("VEVENT"))
 					{
 						Component c = (Component) o;
-						Log.e("PR", "1.0");
-	
-						Log.e("PR", "1.1");
-						PeriodList l = c.calculateRecurrenceSet(period);
 
-						Log.e("PR", "1.2 " + l.size() + " periods");
+						Period period = new Period(from, to);
+
+						PeriodList l = c.calculateRecurrenceSet(period);
 
 						for (Object po : l)
 						{
@@ -205,11 +202,7 @@ public class DateTrigger extends Trigger
 								}
 							}
 						}
-						
-						Log.e("PR", "1.3 " + l.size() + " periods");
 					} 
-
-					Log.e("PR", "2");
 				}
 				catch (NullPointerException e)
 				{
@@ -220,9 +213,7 @@ public class DateTrigger extends Trigger
 					LogManager.getInstance(context).logException(e);
 				}
 
-				Log.e("PR", "DONE TRIGGER TIMES (" + this.identifier() + ") " + (current - now) / hour);
-
-				current += (hour / 4);
+				current += hour;
 			}
 
 			synchronized(this._upcomingFireDates)
@@ -296,16 +287,55 @@ public class DateTrigger extends Trigger
 		{
 			if (map.containsKey(DateTrigger.DATETIME_START))
 				this._start = map.get(DateTrigger.DATETIME_START).toString();
-			
 			if (map.containsKey(DateTrigger.DATETIME_END))
 				this._end = map.get(DateTrigger.DATETIME_END).toString();
 			
+			this._originalStart = this._start;
+			this._originalEnd = this._end;
+
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
+			
+			long now = System.currentTimeMillis();
+			
+			try 
+			{
+				Date startDate = sdf.parse(this._start);
+
+				long startTime = startDate.getTime();
+				
+				while (now - startTime > (180 * 24 * 60 * 60 * 1000))
+				{
+					startTime += (24 * 60 * 60 * 1000);
+				}
+
+				Date endDate = sdf.parse(this._end);
+
+				long endTime = endDate.getTime();
+				
+				while (endTime - now > (180 * 24 * 60 * 60 * 1000))
+				{
+					endTime -= (24 * 60 * 60 * 1000);
+				}
+				
+				if (startTime > endTime)
+				{
+					long holder = startTime;
+					startTime = endTime;
+					endTime = holder;
+				}
+				
+				this._start = sdf.format(new Date(startTime));
+				this._end = sdf.format(new Date(endTime));
+			} 
+			catch (ParseException ee) 
+			{
+				ee.printStackTrace();
+			}
+				
 			if (this._start != null && this._start.equals(this._end))
 			{
 				try 
 				{
-					SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
-				
 					Date start = sdf.parse(this._start);
 					
 					long time = start.getTime();
@@ -503,11 +533,10 @@ public class DateTrigger extends Trigger
 
 		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss, yyyy-MM-dd");
 
-		SharedPreferences prefs =  PreferenceManager.getDefaultSharedPreferences(activity);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 
 		Preference lastFire = new Preference(activity);
 		lastFire.setSummary(R.string.label_trigger_last_fire);
-		lastFire.setOrder(0);
 		
 		String key = "last_fired_" + this.identifier();
 		long lastFireTime = prefs.getLong(key, 0);
@@ -531,7 +560,6 @@ public class DateTrigger extends Trigger
 	
 				PreferenceScreen upcomingScreen = manager.createPreferenceScreen(activity);
 				upcomingScreen.setSummary(R.string.label_trigger_upcoming_fires);
-				upcomingScreen.setOrder(0);
 	
 				if (this._upcomingFireDates.size() == 1)
 					upcomingScreen.setTitle(R.string.label_trigger_upcoming_fire_summary);
@@ -551,13 +579,47 @@ public class DateTrigger extends Trigger
 			else
 			{
 				Preference upcomingFires = new Preference(activity);
-				upcomingFires.setOrder(0);
 				
 				upcomingFires.setSummary(R.string.label_trigger_upcoming_fires);
 				upcomingFires.setTitle(R.string.label_trigger_upcoming_fires_none);
 				
 				screen.addPreference(upcomingFires);
 			}
+
+			Preference originalStartString = new Preference(activity);
+			originalStartString.setSummary(R.string.label_trigger_original_start);
+			originalStartString.setTitle(this._originalStart);
+			screen.addPreference(originalStartString);
+
+			Preference originalEndString = new Preference(activity);
+			originalEndString.setSummary(R.string.label_trigger_original_end);
+			originalEndString.setTitle(this._originalEnd);
+			screen.addPreference(originalEndString);
+
+			Preference startString = new Preference(activity);
+			startString.setSummary(R.string.label_trigger_start);
+			startString.setTitle(this._start);
+			screen.addPreference(startString);
+
+			Preference endString = new Preference(activity);
+			endString.setSummary(R.string.label_trigger_end);
+			endString.setTitle(this._end);
+			screen.addPreference(endString);
+
+			Preference repeatString = new Preference(activity);
+			repeatString.setSummary(R.string.label_trigger_repeat);
+			repeatString.setTitle(this._repeats);
+			screen.addPreference(repeatString);
+
+			Preference randomString = new Preference(activity);
+			randomString.setSummary(R.string.label_trigger_random);
+			
+			if (this._random)
+				randomString.setTitle(R.string.label_trigger_is_random);
+			else
+				randomString.setTitle(R.string.label_trigger_not_random);
+			
+			screen.addPreference(randomString);
 		}	
 		
 		return screen;
