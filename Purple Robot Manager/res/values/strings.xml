@@ -303,38 +303,38 @@
     <string name="summary_gyroscope_probe" formatted="false">%.2f X, %.2f Y, %.2f Z</string>
     <string name="summary_magnetic_probe" formatted="false">%.1f X, %.1f Y, %.1f Z</string>
     <string name="summary_wifi_probe" formatted="false">Visible Access Points: %d</string>
-    <string name="summary_battery_probe" formatted="false">%d%% charged (%s)</string>
-    <string name="summary_step_counter_probe" formatted="false">%d steps taken since last restart</string>
-    <string name="summary_contact_probe" formatted="false">%d contacts in address book</string>
+    <string name="summary_battery_probe" formatted="false">%d%% Charged (%s)</string>
+    <string name="summary_step_counter_probe" formatted="false">%d Steps Taken Since Last Restart</string>
+    <string name="summary_contact_probe" formatted="false">%d Contacts in Address Book</string>
     <string name="summary_location_probe" formatted="false">%.4f, %.4f</string>
     <string name="summary_hardware_info_probe" formatted="false">%s: %s</string>
-    <string name="summary_software_info_probe" formatted="false">Android %s: %d packages</string>
+    <string name="summary_software_info_probe" formatted="false">Android %s: %d Packages</string>
     <string name="summary_orientation_probe" formatted="false">Azimuth: %.1f, Pitch: %.1f, Roll: %.1f</string>
     <string name="summary_activity_probe" formatted="false">High Activity: %d, Low Activity: %d</string>
     <string name="summary_cell_probe" formatted="false">Cell Tower ID: %s</string>
-    <string name="summary_light_probe" formatted="false">%.2f lux units</string>
-    <string name="summary_bookmarks_probe" formatted="false">%d bookmarks</string>
+    <string name="summary_light_probe" formatted="false">%.2f Lux Units</string>
+    <string name="summary_bookmarks_probe" formatted="false">%d Bookmarks</string>
     <string name="summary_pressure_probe" formatted="false">%.2f mb (Alt: %.2f m)</string>
-    <string name="summary_searches_probe" formatted="false">%d searches</string>
-    <string name="summary_files_probe" formatted="false">%d files</string>
+    <string name="summary_searches_probe" formatted="false">%d Searches</string>
+    <string name="summary_files_probe" formatted="false">%d Files</string>
     <string name="summary_proximity_value_probe" formatted="false">Distance: %.1f</string>
-    <string name="summary_call_log_probe" formatted="false">%d logged calls</string>
-    <string name="summary_installed_apps_probe" formatted="false">%d installed apps</string>
+    <string name="summary_call_log_probe" formatted="false">%d Logged Calls</string>
+    <string name="summary_installed_apps_probe" formatted="false">%d Installed Apps</string>
     <string name="summary_telephony_probe" formatted="false">Network Operator: %s (%s)</string>
     <string name="summary_temperature_probe" formatted="false">%.2f&#176;C / %.2f&#176;F / %.2f&#176;K</string>
-    <string name="summary_humidity_probe" formatted="false">%.2f%% ambient humidity</string>
+    <string name="summary_humidity_probe" formatted="false">%.2f%% Ambient Humidity</string>
     <string name="summary_satellite_probe" formatted="false">Visible Satellites: %d (%.2f Avg. SNR)</string>
-    <string name="summary_running_software_probe" formatted="false">%d active applications</string>
+    <string name="summary_running_software_probe" formatted="false">%d Active Applications</string>
 
     <string name="summary_bluetooth_probe" formatted="false">Visible Bluetooth Devices: %d</string>
     <string name="summary_call_state_probe" formatted="false">Current Call State: %s</string>
 
     <string name="summary_javascript_feature" formatted="false">%s: %s</string>
 
-    <string name="summary_sms_probe" formatted="false">%d messages</string>
-    <string name="summary_tasks_probe" formatted="false">%d running tasks</string>
-    <string name="summary_android_version_probe" formatted="false">Android version %s</string>
-    <string name="summary_time_offset_probe" formatted="false">%.2f second offset from time servers.</string>
+    <string name="summary_sms_probe" formatted="false">%d Messages</string>
+    <string name="summary_tasks_probe" formatted="false">%d Running Tasks</string>
+    <string name="summary_android_version_probe" formatted="false">Android Version %s</string>
+    <string name="summary_time_offset_probe" formatted="false">%.2f Second Offset From Time Servers</string>
     <string name="summary_robot_probe" formatted="false">%.2f CPU, %d Files Pending (%.2f MB, %ds)</string>
 
     <string name="display_calls_list_title" formatted="false">%d Phone Calls</string>
@@ -680,13 +680,13 @@
     <!-- Device In Use Feature -->
     <string name="title_device_use_feature">Device In Use</string>
     <string name="summary_device_use_feature_desc">Indicates whether the device is in use.</string>
-    <string name="summary_device_active">Device currently active</string>
-    <string name="summary_device_inactive">Device curently inactive</string>
+    <string name="summary_device_active">Device Currently Active</string>
+    <string name="summary_device_inactive">Device Curently Inactive</string>
 
     <!-- Google Places Feature -->
     <string name="title_google_places_feature">Google Places</string>
     <string name="summary_google_places_feature_desc">Counts the number of nearby location types.</string>
-    <string name="summary_google_places" formatted="false">Most frequent place type: %s (%d)</string>
+    <string name="summary_google_places" formatted="false">Most Frequent Place Type: %s (%d)</string>
     <string name="feature_google_places_radius_label">Search radius</string>
     
     <!-- Running Software Probe -->
@@ -765,9 +765,9 @@
     <string name="app_category_unknown">Unknown</string>
     <string name="app_category_bundled">Bundled</string>
     
-    <string name="summary_after_sunset_probe" formatted="false">Night: %d minute(s) after sunset</string>
-    <string name="summary_before_sunrise_probe" formatted="false">Night: %d minute(s) before sunrise</string>
-    <string name="summary_before_sunset_probe" formatted="false">Day: %d minute(s) before sunset</string>
+    <string name="summary_after_sunset_probe" formatted="false">Night: %d Minute(s) After Sunset</string>
+    <string name="summary_before_sunrise_probe" formatted="false">Night: %d Minute(s) Before Sunrise</string>
+    <string name="summary_before_sunset_probe" formatted="false">Day: %d Minute(s) Before Sunset</string>
 
     <string name="summary_sunrise_sunset_feature_desc">Calculates whether it is day or night and the times for sunrise and sunset.</string>
     <string name="title_sunrise_sunset_feature">Sunrise &amp; Sunset Feature</string>

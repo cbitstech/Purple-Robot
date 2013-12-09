@@ -3,14 +3,14 @@ package edu.northwestern.cbits.purple_robot_manager.logging;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;
-import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
-import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
+import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;
+import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
+import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
 
 public class UploadProgressCheck extends SanityCheck 
 {
@@ -48,9 +48,7 @@ public class UploadProgressCheck extends SanityCheck
 
 			e.commit();
 		}
-		this._inited = true;
-		this._inited = true;
-		this._inited = true;
+
 		long now = System.currentTimeMillis();
 		
 		final HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance.pluginForClass(context, HttpUploadPlugin.class);
