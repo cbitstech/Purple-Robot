@@ -72,7 +72,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
     {
         super.onCreate(savedInstanceState);
 
-		PurpleRobotApplication.fixPreferences(this);
+		PurpleRobotApplication.fixPreferences(this, true);
 
         this.addPreferencesFromResource(R.layout.layout_settings_activity);
 

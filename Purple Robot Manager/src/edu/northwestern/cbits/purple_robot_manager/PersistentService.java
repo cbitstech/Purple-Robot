@@ -14,9 +14,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-
 import edu.northwestern.cbits.purple_robot_manager.activities.StartActivity;
 import edu.northwestern.cbits.purple_robot_manager.http.JsonScriptRequestHandler;
 import edu.northwestern.cbits.purple_robot_manager.http.LocalHttpServer;
@@ -24,8 +24,8 @@ import edu.northwestern.cbits.purple_robot_manager.http.commands.JSONCommand;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
+import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
-import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RandomNoiseProbe;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
@@ -60,7 +60,13 @@ public class PersistentService extends Service
 		AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
 
 		PendingIntent pi = PendingIntent.getService(this, 0, new Intent(PersistentService.NUDGE_PROBES), PendingIntent.FLAG_UPDATE_CURRENT);
-		alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 15000, pi);
+		
+		long now = System.currentTimeMillis();
+		
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+			alarmManager.setExact(AlarmManager.RTC_WAKEUP, now + 15000, pi);
+		else
+			alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 15000, pi);
 
 		OutputPlugin.loadPluginClasses(this);
 
@@ -137,9 +143,13 @@ public class PersistentService extends Service
 	{
 		if (intent != null)
 		{
-			if (NUDGE_PROBES.equals(intent.getAction()))
+			String action = intent.getAction();
+			
+			if (NUDGE_PROBES.equals(action))
 			{
-				ProbeManager.nudgeProbes(this);
+				if (Probe.probesEnabled(this))
+					ProbeManager.nudgeProbes(this);
+
 				TriggerManager.getInstance(this).refreshTriggers(this);
 				ScheduleManager.runOverdueScripts(this);
 
@@ -150,12 +160,19 @@ public class PersistentService extends Service
 					HttpUploadPlugin http = (HttpUploadPlugin) plugin;
 					http.uploadPendingObjects();
 				}
-			}
-			else if (ContinuousProbe.WAKE_ACTION.equals(intent.getAction()))
-			{
 				
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+				{
+					AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+
+					PendingIntent pi = PendingIntent.getService(this, 0, new Intent(PersistentService.NUDGE_PROBES), PendingIntent.FLAG_UPDATE_CURRENT);
+
+					long now = System.currentTimeMillis();
+
+					alarmManager.setExact(AlarmManager.RTC_WAKEUP, now + 15000, pi);
+				}
 			}
-			else if (RandomNoiseProbe.ACTION.equals(intent.getAction()) && RandomNoiseProbe.instance != null)
+			else if (RandomNoiseProbe.ACTION.equals(action) && RandomNoiseProbe.instance != null)
 				RandomNoiseProbe.instance.isEnabled(this);
 		}
 

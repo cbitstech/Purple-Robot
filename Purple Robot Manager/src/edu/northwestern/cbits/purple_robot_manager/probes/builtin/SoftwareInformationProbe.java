@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -108,12 +109,19 @@ public class SoftwareInformationProbe extends Probe
 	
 							for (ApplicationInfo info : infos)
 							{
-								Bundle appBundle = new Bundle();
-	
-								appBundle.putString(SoftwareInformationProbe.APP_NAME, info.loadLabel(pm).toString());
-								appBundle.putString(SoftwareInformationProbe.PACKAGE_NAME, info.packageName);
-	
-								installed.add(appBundle);
+								try
+								{
+									Bundle appBundle = new Bundle();
+		
+									appBundle.putString(SoftwareInformationProbe.APP_NAME, info.loadLabel(pm).toString());
+									appBundle.putString(SoftwareInformationProbe.PACKAGE_NAME, info.packageName);
+		
+									installed.add(appBundle);
+								}
+								catch (Resources.NotFoundException e)
+								{
+									
+								}
 							}
 	
 							bundle.putParcelableArrayList(SoftwareInformationProbe.INSTALLED_APPS, installed);

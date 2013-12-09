@@ -74,7 +74,7 @@ public class DiagnosticActivity extends ActionBarActivity
 		else
 			probeStatus.setText(R.string.probe_status_disabled);
 
-		PurpleRobotApplication.fixPreferences(this);
+		PurpleRobotApplication.fixPreferences(this, true);
 		
 		boolean uploadEnabled = prefs.getBoolean("config_enable_data_server", false);
 		
@@ -259,7 +259,7 @@ public class DiagnosticActivity extends ActionBarActivity
          		message.append(this.getString(R.string.upload_status_label));
          		message.append(newline);
 
-        		PurpleRobotApplication.fixPreferences(this);
+        		PurpleRobotApplication.fixPreferences(this, true);
 
         		boolean uploadEnabled = prefs.getBoolean("config_enable_data_server", false);
         		

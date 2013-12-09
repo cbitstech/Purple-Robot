@@ -31,7 +31,7 @@ public class ConfigurationCheck extends SanityCheck
 			return;
 		}
 		
-		PurpleRobotApplication.fixPreferences(context);
+		PurpleRobotApplication.fixPreferences(context, false);
 
 		if (prefs.getBoolean("config_enable_data_server", false))
 		{

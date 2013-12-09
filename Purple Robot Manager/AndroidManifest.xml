@@ -88,7 +88,6 @@
 			<intent-filter>
 				<action android:name="purple_robot_manager_nudge_probe" />
 				<action android:name="purple_robot_generate_noise" />
-				<action android:name="purple_robot_sensor_wake" />
 			</intent-filter>
 		</service>
 		<activity android:name="edu.northwestern.cbits.purple_robot_manager.activities.StartActivity" android:label="@string/app_name" android:launchMode="singleTask"
