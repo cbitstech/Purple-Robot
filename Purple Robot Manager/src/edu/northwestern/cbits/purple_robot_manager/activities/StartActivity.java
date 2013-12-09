@@ -183,59 +183,74 @@ public class StartActivity extends ActionBarActivity
         
         final CursorAdapter adapter = new CursorAdapter(this, c, true)
         {
-			public void bindView(View view, Context context, Cursor cursor) 
+			public void bindView(final View view, Context context, Cursor cursor) 
 			{
         		final String sensorName = cursor.getString(cursor.getColumnIndex("source"));
 
         		final Probe probe = ProbeManager.probeForName(sensorName, me);
         		
-        		Date sensorDate = new Date(cursor.getLong(cursor.getColumnIndex("recorded")) * 1000);
+        		final Date sensorDate = new Date(cursor.getLong(cursor.getColumnIndex("recorded")) * 1000);
 
-        		String formattedValue = sensorName;
-
-        		String displayName = formattedValue;
-
-        		String jsonString = cursor.getString(cursor.getColumnIndex("value"));
+        		final String jsonString = cursor.getString(cursor.getColumnIndex("value"));
         		
-        		Bundle value = OutputPlugin.bundleForJson(jsonString);
-
-        		if (probe != null && value != null)
+        		Runnable r = new Runnable()
         		{
-        			try
-        			{
-        				displayName = probe.title(me);
-        				formattedValue = probe.summarizeValue(me, value);
-        			}
-        			catch (Exception e)
-        			{
-        				LogManager.getInstance(me).logException(e);
-        			}
+					public void run() 
+					{
+		        		Bundle value = OutputPlugin.bundleForJson(jsonString);
 
-        			Bundle sensor = value.getBundle("SENSOR");
+		        		String formattedValue = sensorName;
+		        				
+		        		String displayName = formattedValue;
 
-        			if (sensor != null && sensor.containsKey("POWER"))
-        			{
-        		        DecimalFormat df = new DecimalFormat("#.##");
+		        		if (probe != null && value != null)
+		        		{
+		        			try
+		        			{
+		        				displayName = probe.title(me);
+		        				formattedValue = probe.summarizeValue(me, value);
+		        			}
+		        			catch (Exception e)
+		        			{
+		        				LogManager.getInstance(me).logException(e);
+		        			}
 
-        		        formattedValue += " (" + df.format(sensor.getDouble("POWER")) + " mA)";
-        			}
-        		}
-        		else if (value.containsKey(Feature.FEATURE_VALUE))
-        			formattedValue = value.get(Feature.FEATURE_VALUE).toString();
-        		else if (value.containsKey("PREDICTION") && value.containsKey("MODEL_NAME"))
-        		{
-        			formattedValue = value.get("PREDICTION").toString();
-        			displayName = value.getString("MODEL_NAME");
-        		}
+		        			Bundle sensor = value.getBundle("SENSOR");
 
-				String name = displayName + " (" + sdf.format(sensorDate) + ")";
-				String display = formattedValue;
+		        			if (sensor != null && sensor.containsKey("POWER"))
+		        			{
+		        		        DecimalFormat df = new DecimalFormat("#.##");
 
-        		TextView nameField = (TextView) view.findViewById(R.id.text_sensor_name);
-        		TextView valueField = (TextView) view.findViewById(R.id.text_sensor_value);
+		        		        formattedValue += " (" + df.format(sensor.getDouble("POWER")) + " mA)";
+		        			}
+		        		}
+		        		else if (value.containsKey(Feature.FEATURE_VALUE))
+		        			formattedValue = value.get(Feature.FEATURE_VALUE).toString();
+		        		else if (value.containsKey("PREDICTION") && value.containsKey("MODEL_NAME"))
+		        		{
+		        			formattedValue = value.get("PREDICTION").toString();
+		        			displayName = value.getString("MODEL_NAME");
+		        		}
 
-        		nameField.setText(name);
-        		valueField.setText(display);
+						final String name = displayName + " (" + sdf.format(sensorDate) + ")";
+						final String display = formattedValue;
+
+		        		me.runOnUiThread(new Runnable()
+		        		{
+							public void run() 
+							{
+				        		TextView nameField = (TextView) view.findViewById(R.id.text_sensor_name);
+				        		TextView valueField = (TextView) view.findViewById(R.id.text_sensor_value);
+
+				        		nameField.setText(name);
+				        		valueField.setText(display);
+							}
+		        		});
+					}
+        		};
+        		
+        		Thread t = new Thread(r);
+        		t.start();
 			}
 
 			public View newView(Context context, Cursor cursor, ViewGroup parent)
