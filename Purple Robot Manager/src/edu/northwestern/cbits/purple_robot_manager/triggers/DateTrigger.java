@@ -130,8 +130,6 @@ public class DateTrigger extends Trigger
 						if (r != null)
 							r.run();
 						
-						System.gc();
-
 						this.run();
 					}
 					else
@@ -296,19 +294,18 @@ public class DateTrigger extends Trigger
 			try 
 			{
 				Date startDate = sdf.parse(this._start);
-
-				long startTime = startDate.getTime();
-				
-				while (now - startTime > (180 * 24 * 60 * 60 * 1000))
-				{
-					startTime += (24 * 60 * 60 * 1000);
-				}
-
 				Date endDate = sdf.parse(this._end);
 
+				long startTime = startDate.getTime();
 				long endTime = endDate.getTime();
 				
-				while (endTime - now > (180 * 24 * 60 * 60 * 1000))
+				while ((now - startTime) > (180 * 24 * 60 * 60 * 1000L))
+				{
+					startTime += (24 * 60 * 60 * 1000);
+					endTime += (24 * 60 * 60 * 1000);
+				}
+			
+				while ((endTime - now) > (180 * 24 * 60 * 60 * 1000L))
 				{
 					endTime -= (24 * 60 * 60 * 1000);
 				}
@@ -395,8 +392,6 @@ public class DateTrigger extends Trigger
 
 	public Period getPeriod(Context context, long timestamp)
 	{
-		System.gc();
-
 		if (timestamp - this.lastUpdate > 300000)
 		{
 			periodList = null;
