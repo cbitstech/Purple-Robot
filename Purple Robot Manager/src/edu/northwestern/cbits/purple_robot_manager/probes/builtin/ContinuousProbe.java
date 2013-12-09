@@ -7,8 +7,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -29,15 +27,11 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public abstract class ContinuousProbe extends Probe
 {
-	public static final String WAKE_ACTION = "purple_robot_sensor_wake";
-
 	protected static final String PROBE_THRESHOLD = "threshold";
 
 	protected static final boolean DEFAULT_ENABLED = false;
 	protected static final String DEFAULT_FREQUENCY = "0";
 
-	private PendingIntent _intent = null;
-	
 	private WakeLock _wakeLock = null;
 	private int _wakeLockLevel = -1;
 
@@ -221,15 +215,6 @@ public abstract class ContinuousProbe extends Probe
 
 		if (enabled)
 		{
-			if (this._intent == null)
-			{
-				this._intent = PendingIntent.getService(context, 0, new Intent(ContinuousProbe.WAKE_ACTION), PendingIntent.FLAG_UPDATE_CURRENT);
-
-				AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-				
-				am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 250, this._intent);
-			}
-			
 			if (wakeLevel != this._wakeLockLevel)
 			{
 				if (this._wakeLock != null)
@@ -252,15 +237,6 @@ public abstract class ContinuousProbe extends Probe
 		}
 		else
 		{
-			if (this._intent != null)
-			{
-				AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-				
-				am.cancel(this._intent);
-				
-				this._intent = null;
-			}
-
 			if (this._wakeLock != null)
 			{
 				this._wakeLock.release();

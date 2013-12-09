@@ -16,11 +16,11 @@ import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
-import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 
 public class PurpleRobotApplication extends Application
 {
     private static Context _context;
+    private static long _lastFix = 0;
 
     public void onCreate()
     {
@@ -125,26 +125,36 @@ public class PurpleRobotApplication extends Application
 		return map;
 	}
 
-	public static void fixPreferences(Context context) 
+	public static void fixPreferences(Context context, boolean force) 
 	{
-		Map<String, Object> values = PurpleRobotApplication.configuration(context);
+		if (force)
+			PurpleRobotApplication._lastFix = 0;
 		
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		Editor e = prefs.edit();
+		long now = System.currentTimeMillis();
 		
-		for (String key : values.keySet())
+		if (now - PurpleRobotApplication._lastFix > 60000)
 		{
-			Object value = values.get(key);
+			Map<String, Object> values = PurpleRobotApplication.configuration(context);
 			
-			if (value instanceof Boolean)
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+			Editor e = prefs.edit();
+			
+			for (String key : values.keySet())
 			{
-				Boolean boolValue = (Boolean) value;
+				Object value = values.get(key);
 				
-				e.putBoolean(key, boolValue.booleanValue());
+				if (value instanceof Boolean)
+				{
+					Boolean boolValue = (Boolean) value;
+					
+					e.putBoolean(key, boolValue.booleanValue());
+				}
 			}
-		}
 		
-		e.commit();
+			e.commit();
+			
+			PurpleRobotApplication._lastFix = now;
+		}
 	}
 }
 

@@ -46,6 +46,7 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
+import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
@@ -95,7 +96,6 @@ public class LegacyJSONConfigFile
 						final SharedPreferences prefs = LegacyJSONConfigFile.getPreferences(context);
 
 						Editor edit = prefs.edit();
-
 						
 						X509TrustManager trust = new X509TrustManager() 
 						{
@@ -194,6 +194,8 @@ public class LegacyJSONConfigFile
 						
 						String oldHash = prefs.getString(LegacyJSONConfigFile.JSON_LAST_HASH, "");
 						final String newHash = encryption.createHash(context, scriptString);
+						
+						PurpleRobotApplication.fixPreferences(context, true);
 
 						if (conn.getContentType().toLowerCase().startsWith("text/x-scheme") || scriptString.toLowerCase().startsWith("(begin "))
 						{

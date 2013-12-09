@@ -95,6 +95,22 @@ public abstract class Probe
 		}
 	}
 
+	public static boolean probesEnabled(Context context)
+	{
+		long now = System.currentTimeMillis();
+		
+		if (now - Probe._lastEnabledCheck > 10000)
+		{
+			Probe._lastEnabledCheck = now;
+
+			SharedPreferences prefs = Probe.getPreferences(context);
+
+			Probe._lastEnabled = prefs.getBoolean("config_probes_enabled", false);
+		}
+		
+		return Probe._lastEnabled;
+	}
+
 	public boolean isEnabled(Context context)
 	{
 		long now = System.currentTimeMillis();

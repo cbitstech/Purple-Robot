@@ -268,7 +268,7 @@ public class EncryptionManager
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-		byte[] buffer = new byte[1024];
+		byte[] buffer = new byte[2048];
 		int read = 0;
 
 		while ((read = cin.read(buffer, 0, buffer.length)) != -1)

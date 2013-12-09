@@ -1,7 +1,9 @@
 package edu.northwestern.cbits.purple_robot_manager.calibration;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +22,8 @@ import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 
 public class ContactCalibrationHelper 
 {
+	private static Map<String, String> _cache = new HashMap<String, String>();
+	
 	public static void check(final Context context) 
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
@@ -60,14 +64,23 @@ public class ContactCalibrationHelper
 
 		if (isPhone)
 		{
-			String numbersOnly = key.replaceAll("[^\\d]", "");
+			String newKey = ContactCalibrationHelper._cache.get(key);
 			
-			if (numbersOnly.length() == 10)
-				numbersOnly = "1" + numbersOnly;
-			else if (numbersOnly.length() == 11)
-				numbersOnly = numbersOnly.substring(1);
+			if (newKey == null)
+			{
+				String numbersOnly = key.replaceAll("[^\\d]", "");
+				
+				if (numbersOnly.length() == 10)
+					numbersOnly = "1" + numbersOnly;
+				else if (numbersOnly.length() == 11)
+					numbersOnly = numbersOnly.substring(1);
+				
+				newKey = PhoneNumberUtils.formatNumber(numbersOnly);
+				
+				ContactCalibrationHelper._cache.put(key, newKey);
+			}
 			
-			key = PhoneNumberUtils.formatNumber(numbersOnly);
+			key = newKey;
 		}
 		
 		return prefs.getString("contact_calibration_" + key + "_group", null);

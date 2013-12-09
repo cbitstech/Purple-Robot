@@ -29,7 +29,7 @@ public class UploadProgressCheck extends SanityCheck
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-		PurpleRobotApplication.fixPreferences(context);
+		PurpleRobotApplication.fixPreferences(context, false);
 
 		if (prefs.getBoolean("config_enable_data_server", false) == false)
 		{
@@ -41,12 +41,16 @@ public class UploadProgressCheck extends SanityCheck
 
 		if (this._inited == false)
 		{
+			this._inited = true;
+
 			e.remove(UploadProgressCheck.THROUGHPUT);
 			e.remove(UploadProgressCheck.ACCUMULATION);
-			
+
 			e.commit();
 		}
-		
+		this._inited = true;
+		this._inited = true;
+		this._inited = true;
 		long now = System.currentTimeMillis();
 		
 		final HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance.pluginForClass(context, HttpUploadPlugin.class);

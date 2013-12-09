@@ -208,38 +208,43 @@ public class FacebookProbe extends Probe
 																				
 																				if (postTime > mostRecent)
 																				{
-																					Bundle eventBundle = new Bundle();
-																					eventBundle.putString("PROBE", FacebookEventsProbe.PROBE_NAME);
-																					eventBundle.putLong("TIMESTAMP", postTime / 1000);
-																					eventBundle.putString("TYPE", object.getProperty("type").toString());
+																					Object o = object.getProperty("message");
+
+																					if (o != null)
+																					{
+																						Bundle eventBundle = new Bundle();
+																						eventBundle.putString("PROBE", FacebookEventsProbe.PROBE_NAME);
+																						eventBundle.putLong("TIMESTAMP", postTime / 1000);
+																						eventBundle.putString("TYPE", object.getProperty("type").toString());
 				
-																					String message = object.getProperty("message").toString();
-																					
-																					try 
-																					{	
-																						if (doHash)
-																							message = em.encryptString(context, message);
-				
-																						eventBundle.putString("MESSAGE", message);
+																						String message = o.toString();
+																						
+																						try 
+																						{	
+																							if (doHash)
+																								message = em.encryptString(context, message);
+					
+																							eventBundle.putString("MESSAGE", message);
+																						}
+																						catch (IllegalBlockSizeException e) 
+																						{
+																							LogManager.getInstance(context).logException(e);
+																						} 
+																						catch (BadPaddingException e) 
+																						{
+																							LogManager.getInstance(context).logException(e);
+																						} 
+																						catch (UnsupportedEncodingException e) 
+																						{
+																							LogManager.getInstance(context).logException(e);
+																						}
+					
+																						eventBundle.putBoolean("IS_OBFUSCATED", doHash);
+																						me.transmitData(context, eventBundle);
+																						
+																						if (postTime > newRecent)
+																							newRecent = postTime;
 																					}
-																					catch (IllegalBlockSizeException e) 
-																					{
-																						LogManager.getInstance(context).logException(e);
-																					} 
-																					catch (BadPaddingException e) 
-																					{
-																						LogManager.getInstance(context).logException(e);
-																					} 
-																					catch (UnsupportedEncodingException e) 
-																					{
-																						LogManager.getInstance(context).logException(e);
-																					}
-				
-																					eventBundle.putBoolean("IS_OBFUSCATED", doHash);
-																					me.transmitData(context, eventBundle);
-																					
-																					if (postTime > newRecent)
-																						newRecent = postTime;
 																				}
 																			}
 																		} 

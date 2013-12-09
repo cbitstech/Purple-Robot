@@ -11,8 +11,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.builder.HashCodeBuilder;
-
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
@@ -22,6 +20,8 @@ import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.PeriodList;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -30,8 +30,6 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
-
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
@@ -120,13 +118,9 @@ public class DateTrigger extends Trigger
 			{
 				public void run() 
 				{
-					Log.e("PR", "-------- PENDING REFRESHES: " + DateTrigger.pendingRefreshes.size());
-					
 					if (DateTrigger.pendingRefreshes.size() > 0)
 					{
 						Runnable r = DateTrigger.pendingRefreshes.remove(0);
-
-						Log.e("PR", "RUNNING: " + DateTrigger.pendingRefreshes.size());
 
 						r.run();
 						
@@ -172,23 +166,16 @@ public class DateTrigger extends Trigger
 			{
 				DateTime from = new DateTime(new Date(current));
 				DateTime to = new DateTime(new Date(current + (hour / 4)));
-
-				Log.e("PR", "FIND TRIGGER TIMES (" + this.identifier() + ") " + (current - now) / hour);
 				
 				try
 				{
 					Period period = new Period(from, to);
 
-					Log.e("PR", "1 ");
 					for (Object o : this._calendar.getComponents("VEVENT"))
 					{
 						Component c = (Component) o;
-						Log.e("PR", "1.0");
-	
-						Log.e("PR", "1.1");
-						PeriodList l = c.calculateRecurrenceSet(period);
 
-						Log.e("PR", "1.2 " + l.size() + " periods");
+						PeriodList l = c.calculateRecurrenceSet(period);
 
 						for (Object po : l)
 						{
@@ -205,11 +192,7 @@ public class DateTrigger extends Trigger
 								}
 							}
 						}
-						
-						Log.e("PR", "1.3 " + l.size() + " periods");
 					} 
-
-					Log.e("PR", "2");
 				}
 				catch (NullPointerException e)
 				{
@@ -219,8 +202,6 @@ public class DateTrigger extends Trigger
 				{
 					LogManager.getInstance(context).logException(e);
 				}
-
-				Log.e("PR", "DONE TRIGGER TIMES (" + this.identifier() + ") " + (current - now) / hour);
 
 				current += (hour / 4);
 			}

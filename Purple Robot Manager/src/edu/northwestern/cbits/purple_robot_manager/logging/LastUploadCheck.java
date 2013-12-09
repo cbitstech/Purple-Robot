@@ -26,7 +26,7 @@ public class LastUploadCheck extends SanityCheck
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-		PurpleRobotApplication.fixPreferences(context);
+		PurpleRobotApplication.fixPreferences(context, false);
 
 		if (prefs.getBoolean("config_enable_data_server", false) == false)
 		{
