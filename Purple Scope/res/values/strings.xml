@@ -5,6 +5,7 @@
     <string name="menu_start">Start Profiling</string>
     <string name="menu_pause">Pause Profiling</string>
     <string name="menu_reset">Reset</string>
+    <string name="menu_save">Send to External Storage</string>
     
     <string name="resource_cpu">CPU Load</string>
     <string name="resource_battery">Battery Level</string>

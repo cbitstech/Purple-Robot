@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" 
     xmlns:robot="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/reset_button"
-        android:title="@string/menu_reset"
-        robot:showAsAction="always" />
     <item android:id="@+id/play_button"
         android:title="@string/menu_start"
         robot:showAsAction="always"
@@ -13,4 +10,11 @@
         robot:showAsAction="always"
         android:visible="false"
         android:icon="@drawable/ic_action_pause_over_video" />
+    <item android:id="@+id/save_button"
+        android:title="@string/menu_save"
+        robot:showAsAction="never"
+        android:icon="@drawable/ic_action_sd_storage" />
+    <item android:id="@+id/reset_button"
+        android:title="@string/menu_reset"
+        robot:showAsAction="never" />
 </menu>
