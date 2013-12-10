@@ -13,13 +13,14 @@ public class PerformanceContentProvider extends ContentProvider
 	public static final String AUTHORITY = "edu.northwestern.cbits.purplescope.content";
 
 	private static final int PERFORMANCE_VALUE_LIST = 1;
-	private static final int PERFORMANCE_VALUE = 2;
 
 	private static final String PERFORMANCE_VALUES_TABLE = "performance_values";
 
 	private static final int DATABASE_VERSION = 1;
-	private static final String DATABASE = "performance_values.db";
+	public static final String DATABASE = "performance_values.db";
 
+	public final static Uri PERFORMANCE_VALUES = Uri.parse("content://" + AUTHORITY + "/" + PERFORMANCE_VALUES_TABLE);
+	
 	private UriMatcher _uriMatcher = null;
 	private SQLiteOpenHelper _openHelper = null;
 	
@@ -34,9 +35,6 @@ public class PerformanceContentProvider extends ContentProvider
 			case PerformanceContentProvider.PERFORMANCE_VALUE_LIST:
 				result = db.delete(PerformanceContentProvider.PERFORMANCE_VALUES_TABLE, selection, selectionArgs);
 				break;
-			case PerformanceContentProvider.PERFORMANCE_VALUE:
-				result = db.delete(PerformanceContentProvider.PERFORMANCE_VALUES_TABLE, selection, selectionArgs);
-				break;
 		}
 
 		return result;
@@ -48,8 +46,6 @@ public class PerformanceContentProvider extends ContentProvider
 		{
 			case PerformanceContentProvider.PERFORMANCE_VALUE_LIST:
 				return "vnd.android.cursor.dir/vnd.edu.northwestern.cbits.purplescope.performance_value";
-			case PerformanceContentProvider.PERFORMANCE_VALUE:
-				return "vnd.android.cursor.item/vnd.edu.northwestern.cbits.purplescope.performance_value";
 		}
 		
 		return null;
@@ -75,7 +71,6 @@ public class PerformanceContentProvider extends ContentProvider
 		this._uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
 		this._uriMatcher.addURI(PerformanceContentProvider.AUTHORITY, PerformanceContentProvider.PERFORMANCE_VALUES_TABLE, PerformanceContentProvider.PERFORMANCE_VALUE_LIST);
-		this._uriMatcher.addURI(PerformanceContentProvider.AUTHORITY, PerformanceContentProvider.PERFORMANCE_VALUES_TABLE + "/#", PerformanceContentProvider.PERFORMANCE_VALUE);
 
 		final PerformanceContentProvider me = this;
 
