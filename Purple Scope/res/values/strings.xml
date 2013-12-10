@@ -3,6 +3,8 @@
     <string name="app_name">Purple Scope</string>
 
     <string name="menu_start">Start Profiling</string>
+    <string name="menu_pause">Pause Profiling</string>
+    <string name="menu_reset">Reset</string>
     
     <string name="resource_cpu">CPU Load</string>
     <string name="resource_battery">Battery Level</string>
@@ -10,4 +12,7 @@
     <string name="resource_memory_funf">Memory Usage: Funf Journal </string>
     <string name="resource_disk_robot">Disk Usage: Purple Robot </string>
     <string name="resource_disk_funf">Disk Usage: Funf Journal </string>
+
+    <string name="create_performance_values_table">CREATE TABLE IF NOT EXISTS performance_values(_id INTEGER PRIMARY KEY, source TEXT, recorded INTEGER DEFAULT 0, value TEXT);</string>
+    
 </resources>
