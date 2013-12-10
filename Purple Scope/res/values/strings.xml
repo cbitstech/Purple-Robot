@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Purple Scope</string>
+
+    <string name="menu_start">Start Profiling</string>
+    
+    <string name="resource_cpu">CPU Load</string>
+    <string name="resource_battery">Battery Level</string>
+    <string name="resource_memory_robot">Memory Usage: Purple Robot </string>
+    <string name="resource_memory_funf">Memory Usage: Funf Journal </string>
+    <string name="resource_disk_robot">Disk Usage: Purple Robot </string>
+    <string name="resource_disk_funf">Disk Usage: Funf Journal </string>
+</resources>
