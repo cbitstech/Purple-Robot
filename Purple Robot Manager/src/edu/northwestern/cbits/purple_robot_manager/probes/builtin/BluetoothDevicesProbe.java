@@ -441,6 +441,9 @@ public class BluetoothDevicesProbe extends Probe
 	private Bundle bundleForDevicesArray(Context context, ArrayList<Bundle> objects)
 	{
 		Bundle bundle = new Bundle();
+		
+		if (objects == null)
+			return bundle;
 
 		for (Bundle value : objects)
 		{

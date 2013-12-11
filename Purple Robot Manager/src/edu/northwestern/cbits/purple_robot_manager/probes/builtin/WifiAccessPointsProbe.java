@@ -76,7 +76,11 @@ public class WifiAccessPointsProbe extends Probe
 
 	public boolean isEnabled(Context context)
 	{
-		if (super.isEnabled(context) == false)
+		SharedPreferences prefs = Probe.getPreferences(context);
+
+		boolean enabled = prefs.getBoolean("config_probe_wifi_enabled", WifiAccessPointsProbe.DEFAULT_ENABLED);
+		
+		if (super.isEnabled(context) == false || enabled == false)
 		{
 			if (this._receiver != null)
 			{
@@ -86,8 +90,6 @@ public class WifiAccessPointsProbe extends Probe
 
 			return false;
 		}
-		
-		SharedPreferences prefs = Probe.getPreferences(context);
 
 		final WifiAccessPointsProbe me = this;
 		
