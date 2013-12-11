@@ -25,6 +25,5 @@
 				<action android:name="scope_end_sampling" />
 			</intent-filter>
 	    </service>
-		
 	</application>
 </manifest>
