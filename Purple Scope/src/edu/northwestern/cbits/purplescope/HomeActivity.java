@@ -179,12 +179,12 @@ public class HomeActivity extends ActionBarActivity
 	{
 		String cpu = this.getString(R.string.resource_cpu);
 		String battery = this.getString(R.string.resource_battery);
-		// String robotMemory = this.getString(R.string.resource_memory_robot);
-		// String funfMemory = this.getString(R.string.resource_memory_funf);
+		String robotMemory = this.getString(R.string.resource_memory_robot);
+		String funfMemory = this.getString(R.string.resource_memory_funf);
 		// String robotDisk = this.getString(R.string.resource_disk_robot);
 		// String funfDisk = this.getString(R.string.resource_disk_funf);
 
-		String[] resources = { cpu, battery }; // , robotMemory, funfMemory }; // , robotDisk, funfDisk };
+		String[] resources = { cpu, battery, robotMemory, funfMemory }; // , robotDisk, funfDisk };
 		
 		return resources;
 	}

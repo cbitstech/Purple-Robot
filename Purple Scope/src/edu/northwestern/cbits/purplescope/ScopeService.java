@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.PendingIntent;
@@ -15,6 +17,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.BatteryManager;
 import android.os.Build;
+import android.os.Debug.MemoryInfo;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 
@@ -25,7 +28,10 @@ public class ScopeService extends IntentService
 	public static final String END_SAMPLING = "scope_end_sampling";
 	public static final String TIMESTAMP = "timestamp";
 	public static final String DURATION = "duration";
-	protected static final String SESSION_NAME = "session_name";
+	public static final String SESSION_NAME = "session_name";
+	
+	private static final String PURPLE_ROBOT_PACKAGE = "edu.northwestern.cbits.purple_robot_manager";
+	private static final String FUNF_PACKAGE = "edu.mit.media.funf.journal";
 
 	private static boolean _running = false;
 	private static long _timestamp = 0;
@@ -217,16 +223,41 @@ public class ScopeService extends IntentService
 		    }
 		}
 
-		if (ScopeService._robotMemoryEnabled)
+		if (ScopeService._robotMemoryEnabled || ScopeService._funfMemoryEnabled)
 		{
-			// public MemoryInfo[] getProcessMemoryInfo (int[] pids)
-		}
+			ActivityManager activities = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
+	
+			for (RunningAppProcessInfo proc : activities.getRunningAppProcesses())
+			{
+				if (ScopeService._robotMemoryEnabled && ScopeService.PURPLE_ROBOT_PACKAGE.equals(proc.processName))
+				{
+					int[] pids = { proc.pid };
+					
+					MemoryInfo[] memoryStats = activities.getProcessMemoryInfo(pids);
 
-		if (ScopeService._funfMemoryEnabled)
-		{
-			
-		}
+			        ContentValues values = new ContentValues();
+			        values.put("source", "robot_memory_pss");
+			        values.put("recorded", System.currentTimeMillis());
+			        values.put("value", "" + this.totalMemory(memoryStats[0]));
 
+			        this.getContentResolver().insert(PerformanceContentProvider.PERFORMANCE_VALUES, values);
+				}
+				else if (ScopeService._funfMemoryEnabled && ScopeService.FUNF_PACKAGE.equals(proc.processName))
+				{
+					int[] pids = { proc.pid };
+					
+					MemoryInfo[] memoryStats = activities.getProcessMemoryInfo(pids);
+
+			        ContentValues values = new ContentValues();
+			        values.put("source", "funf_memory_pss");
+			        values.put("recorded", System.currentTimeMillis());
+			        values.put("value", "" + this.totalMemory(memoryStats[0]));
+
+			        this.getContentResolver().insert(PerformanceContentProvider.PERFORMANCE_VALUES, values);
+				}
+			}
+		}
+		
 		if (ScopeService._batteryEnabled)
 		{
 			if (ScopeService._batteryReceiver == null)
@@ -235,14 +266,17 @@ public class ScopeService extends IntentService
 				{
 					public void onReceive(Context context, Intent intent)
 					{
-						int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-
-				        ContentValues values = new ContentValues();
-				        values.put("source", "battery_level");
-				        values.put("recorded", System.currentTimeMillis());
-				        values.put("value", "" + level);
-				        
-				        context.getContentResolver().insert(PerformanceContentProvider.PERFORMANCE_VALUES, values);
+						if (ScopeService._batteryEnabled)
+						{
+							int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+	
+					        ContentValues values = new ContentValues();
+					        values.put("source", "battery_level");
+					        values.put("recorded", System.currentTimeMillis());
+					        values.put("value", "" + level);
+					        
+					        context.getContentResolver().insert(PerformanceContentProvider.PERFORMANCE_VALUES, values);
+						}
 					}
 				};
 
@@ -254,5 +288,10 @@ public class ScopeService extends IntentService
 			this.getApplicationContext().unregisterReceiver(ScopeService._batteryReceiver);
 			ScopeService._batteryReceiver = null;
 		}
+	}
+
+	private int totalMemory(MemoryInfo memoryInfo) 
+	{
+		return memoryInfo.getTotalPss();
 	}
 }
