@@ -38,6 +38,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.GravityProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.HardwareInformationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.InstagramProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LinearAccelerationProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LinkedInProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.NetworkProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RandomNoiseProbe;
@@ -477,6 +478,13 @@ public class ProbeManager
 				InstagramProbe instagram = (InstagramProbe) probe;
 
 				if (instagram.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof LinkedInProbe)
+			{
+				LinkedInProbe linkedin = (LinkedInProbe) probe;
+
+				if (linkedin.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 
