@@ -33,7 +33,6 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.PersistentService;
@@ -263,8 +262,6 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
         }
         else if (RESET_KEY.equals(preference.getKey()))
         {
-        	Log.e("PR", "CLICKED RESET");
-        	
         	final SettingsActivity me = this;
         	
         	AlertDialog.Builder builder = new AlertDialog.Builder(this);

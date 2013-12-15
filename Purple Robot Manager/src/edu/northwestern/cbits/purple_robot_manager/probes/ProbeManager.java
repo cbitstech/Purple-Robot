@@ -36,6 +36,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.FacebookProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.GeomagneticRotationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.GravityProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.HardwareInformationProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.InstagramProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LinearAccelerationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.NetworkProbe;
@@ -469,6 +470,13 @@ public class ProbeManager
 				FacebookEventsProbe facebook = (FacebookEventsProbe) probe;
 
 				if (facebook.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof InstagramProbe)
+			{
+				InstagramProbe instagram = (InstagramProbe) probe;
+
+				if (instagram.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 

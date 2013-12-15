@@ -1,9 +1,14 @@
 package edu.northwestern.cbits.purple_robot_manager.activities;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import org.scribe.builder.ServiceBuilder;
+import org.scribe.builder.api.DefaultApi10a;
+import org.scribe.builder.api.DefaultApi20;
 import org.scribe.exceptions.OAuthException;
+import org.scribe.model.OAuthConfig;
 import org.scribe.model.Token;
 import org.scribe.model.Verifier;
 import org.scribe.oauth.OAuthService;
@@ -15,9 +20,12 @@ import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.oauth.FitbitApi;
+import edu.northwestern.cbits.purple_robot_manager.oauth.InstagramApi;
 import edu.northwestern.cbits.purple_robot_manager.oauth.TwitterApi;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.InstagramProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TwitterProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.FitbitApiFeature;
 
@@ -25,9 +33,6 @@ public class OAuthActivity extends Activity
 {
 	public static final String CONSUMER_KEY = "CONSUMER_KEY";
 	public static final String CONSUMER_SECRET = "CONSUMER_SECRET";
-	public static final String REQUEST_TOKEN_URL = "REQUEST_TOKEN_URL";
-	public static final String ACCESS_TOKEN_URL = "ACCESS_TOKEN_URL";
-	public static final String AUTHORIZE_URL = "AUTHORIZE_URL";
 	public static final String CALLBACK_URL = "CALLBACK_URL";
 	public static final String REQUESTER = "REQUESTER";
 
@@ -49,12 +54,16 @@ public class OAuthActivity extends Activity
         	final String callbackUrl = extras.getString(OAuthActivity.CALLBACK_URL);
         	final String requester = extras.getString(OAuthActivity.REQUESTER);
 
-        	Class apiClass = null;
+        	Class api = null;
         	
         	if ("fitbit".equals(requester))
-        		apiClass = FitbitApi.class;
+        		api = FitbitApi.class;
         	else if ("twitter".equals(requester))
-        		apiClass = TwitterApi.class;
+        		api = TwitterApi.class;
+        	else if ("instagram".equalsIgnoreCase(requester))
+        		api = InstagramApi.class;
+        	
+        	final Class apiClass = api;
 
         	if (apiClass != null)
         	{
@@ -66,26 +75,63 @@ public class OAuthActivity extends Activity
 	        	
 	        	final OAuthService service = builder.build();
 	        	
+	        	final OAuthConfig config = new OAuthConfig(consumerKey, consumerSecret);
+	        	
 	        	Runnable r = new Runnable()
 	        	{
 					public void run() 
 					{
 						try
 						{
-							Token token = service.getRequestToken();
-							
-							Editor e = prefs.edit();
-							e.putString("request_token_" + requester, token.getToken());
-							e.putString("request_secret_" + requester, token.getSecret());
-							e.commit();
-		
-							String url = service.getAuthorizationUrl(token);
-			    	        
-			    	        Intent intent = new Intent(Intent.ACTION_VIEW);
-			    	        intent.setData(Uri.parse(url));
-			    	        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		
-			    	        me.startActivity(intent);
+							if (DefaultApi20.class.isAssignableFrom(apiClass))
+							{
+								Constructor constructor = apiClass.getConstructors()[0];
+								
+								try 
+								{
+									DefaultApi20 api = (DefaultApi20) constructor.newInstance();
+									
+									String url = api.getAuthorizationUrl(config);
+									
+									Intent intent = new Intent(Intent.ACTION_VIEW);
+									intent.setData(Uri.parse(url));
+									
+									me.startActivity(intent);
+								}
+								catch (InstantiationException e) 
+								{
+									e.printStackTrace();
+								} 
+								catch (IllegalAccessException e) 
+								{
+									e.printStackTrace();
+								} 
+								catch (IllegalArgumentException e) 
+								{
+									e.printStackTrace();
+								}
+								catch (InvocationTargetException e) 
+								{
+									e.printStackTrace();
+								}
+							}
+							else if (DefaultApi10a.class.isAssignableFrom(apiClass))
+							{
+								Token token = service.getRequestToken();
+								
+								Editor e = prefs.edit();
+								e.putString("request_token_" + requester, token.getToken());
+								e.putString("request_secret_" + requester, token.getSecret());
+								e.commit();
+			
+								String url = service.getAuthorizationUrl(token);
+				    	        
+				    	        Intent intent = new Intent(Intent.ACTION_VIEW);
+				    	        intent.setData(Uri.parse(url));
+				    	        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			
+				    	        me.startActivity(intent);
+							}
 						}
 						catch (OAuthException e)
 						{
@@ -112,6 +158,9 @@ public class OAuthActivity extends Activity
         					
         			String verifier = incomingUri.getQueryParameter("oauth_verifier");
         			
+        			if (verifier == null)
+        				verifier = incomingUri.getQueryParameter("code");
+        			
         			final Token requestToken = new Token(prefs.getString("request_token_" + requester, ""), prefs.getString("request_secret_" + requester, ""));
         			
         			final Verifier v = new Verifier(verifier);
@@ -119,6 +168,7 @@ public class OAuthActivity extends Activity
         			Class apiClass = null;
         			String consumerKey = null;
         			String consumerSecret = null;
+        			String callback = null;
         			
         			if ("fitbit".equals(requester))
         			{
@@ -132,6 +182,13 @@ public class OAuthActivity extends Activity
             			consumerKey = TwitterProbe.CONSUMER_KEY;
             			consumerSecret = TwitterProbe.CONSUMER_SECRET;
         			}
+        			else if ("instagram".equals(requester))
+        			{
+            			apiClass = InstagramApi.class;
+            			consumerKey = InstagramProbe.CONSUMER_KEY;
+            			consumerSecret = InstagramProbe.CONSUMER_SECRET;
+            			callback = InstagramProbe.CALLBACK;
+        			}
         			
         			if (apiClass != null && consumerKey != null && consumerSecret != null)
         			{
@@ -140,24 +197,50 @@ public class OAuthActivity extends Activity
 		            	builder = builder.apiKey(consumerKey);
 		            	builder = builder.apiSecret(consumerSecret);
 		            	
+		            	if (callback != null)
+		            		builder = builder.callback(callback);
+		            	
 		            	final OAuthService service = builder.build();
+
+		            	Runnable r = null;
 		            	
-		            	Runnable r = new Runnable()
-		            	{
-							public void run() 
-							{
-			                	Token accessToken = service.getAccessToken(requestToken, v);
-			                	
-			                	Editor e = prefs.edit();
-			                	e.putString("oauth_" + requester + "_secret", accessToken.getSecret());
-			                	e.putString("oauth_" + requester + "_token", accessToken.getToken());
-			                	
-			                	e.commit();
-			                	
-			                	SanityManager.getInstance(me).refreshState();
-							}
-		            	};
-		            	
+		            	if (DefaultApi20.class.isAssignableFrom(apiClass))
+						{
+			            	r = new Runnable()
+			            	{
+								public void run() 
+								{
+				                	Token accessToken = service.getAccessToken(null, v);
+				                	
+				                	Editor e = prefs.edit();
+				                	e.putString("oauth_" + requester + "_secret", accessToken.getSecret());
+				                	e.putString("oauth_" + requester + "_token", accessToken.getToken());
+				                	
+				                	e.commit();
+				                	
+				                	SanityManager.getInstance(me).refreshState();
+								}
+			            	};
+						}
+						else if (DefaultApi10a.class.isAssignableFrom(apiClass))
+						{
+			            	r = new Runnable()
+			            	{
+								public void run() 
+								{
+				                	Token accessToken = service.getAccessToken(requestToken, v);
+				                	
+				                	Editor e = prefs.edit();
+				                	e.putString("oauth_" + requester + "_secret", accessToken.getSecret());
+				                	e.putString("oauth_" + requester + "_token", accessToken.getToken());
+				                	
+				                	e.commit();
+				                	
+				                	SanityManager.getInstance(me).refreshState();
+								}
+			            	};
+						}
+
 		            	Thread t = new Thread(r);
 		            	t.start();
         			}
