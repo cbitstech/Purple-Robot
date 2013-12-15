@@ -1046,6 +1046,20 @@
 	<string name="title_twitter_check">Twitter probe requires authorization</string>	
 	<string name="message_twitter_check">Please login to the Twitter website from the settings to grant Purple Robot access to your Twitter account.</string>	
 
+	<!-- Instagram API Feature -->
+    <string name="title_instagram_probe">Instagram Probe</string>
+    <string name="summary_instagram_probe_desc">Collects profile data &amp; posts from Instagram.</string>
+    <string name="config_probe_instagram_encrypt_title">Encrypt Instagram Contents</string>
+    <string name="config_probe_instagram_encrypt_summary">Encrypts the contents of data retrieved from Instagram.</string>
+
+	<string name="title_authenticate_instagram_probe">Login to Instagram</string>	
+	<string name="summary_authenticate_instagram_probe">Tap to go to the Instagram website and login to give this device access to your tweets.</string>	
+	<string name="title_logout_instagram_probe">Log Out of Instagram</string>	
+	<string name="summary_logout_instagram_probe">Tap to clear your Instagram login information and revoke access to this device.</string>	
+	<string name="toast_instagram_logout">Logged out of Instagram.</string>	
+	<string name="title_instagram_check">Instagram probe requires authorization</string>	
+	<string name="message_instagram_check">Please login to the Instagram website from the settings to grant Purple Robot access to your Instagram account.</string>	
+	
 	<string name="label_trigger_original_start">Original Start Date String</string>	
 	<string name="label_trigger_original_end">Original End Date String</string>	
 	<string name="label_trigger_start">Effective Start Date String</string>	

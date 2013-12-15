@@ -35,9 +35,6 @@ public class FitbitApiFeature extends Feature
 {
 	public static final String CONSUMER_KEY = "7bc8998f319c43eb99c72f3e3d63dbd9";
 	public static final String CONSUMER_SECRET = "85c9ef8be7c14d668b4b9bf782f1c0b5";
-	private static final String REQUEST_TOKEN_URL = "https://api.fitbit.com/oauth/request_token";
-	private static final String ACCESS_TOKEN_URL = "https://api.fitbit.com/oauth/access_token";
-	private static final String AUTHORIZE_URL = "http://www.fitbit.com/oauth/authorize";
 
 	protected static final String VERY_ACTIVE_MINUTES = "VERY_ACTIVE_MINUTES";
 	protected static final String LIGHTLY_ACTIVE_MINUTES = "LIGHTLY_ACTIVE_MINUTES";
@@ -285,9 +282,6 @@ public class FitbitApiFeature extends Feature
 		
 		intent.putExtra(OAuthActivity.CONSUMER_KEY, CONSUMER_KEY);
 		intent.putExtra(OAuthActivity.CONSUMER_SECRET, CONSUMER_SECRET);
-		intent.putExtra(OAuthActivity.REQUEST_TOKEN_URL, REQUEST_TOKEN_URL);
-		intent.putExtra(OAuthActivity.ACCESS_TOKEN_URL, ACCESS_TOKEN_URL);
-		intent.putExtra(OAuthActivity.AUTHORIZE_URL, AUTHORIZE_URL);
 		intent.putExtra(OAuthActivity.REQUESTER, "fitbit");
 		intent.putExtra(OAuthActivity.CALLBACK_URL, "http://pr-oauth/oauth/fitbit");
 		
