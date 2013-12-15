@@ -7,6 +7,8 @@ import java.util.List;
 import org.scribe.builder.ServiceBuilder;
 import org.scribe.builder.api.DefaultApi10a;
 import org.scribe.builder.api.DefaultApi20;
+import org.scribe.builder.api.LinkedInApi;
+import org.scribe.builder.api.TwitterApi;
 import org.scribe.exceptions.OAuthException;
 import org.scribe.model.OAuthConfig;
 import org.scribe.model.Token;
@@ -24,8 +26,8 @@ import android.preference.PreferenceManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.oauth.FitbitApi;
 import edu.northwestern.cbits.purple_robot_manager.oauth.InstagramApi;
-import edu.northwestern.cbits.purple_robot_manager.oauth.TwitterApi;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.InstagramProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LinkedInProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TwitterProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.FitbitApiFeature;
 
@@ -59,9 +61,11 @@ public class OAuthActivity extends Activity
         	if ("fitbit".equals(requester))
         		api = FitbitApi.class;
         	else if ("twitter".equals(requester))
-        		api = TwitterApi.class;
+        		api = TwitterApi.SSL.class;
         	else if ("instagram".equalsIgnoreCase(requester))
         		api = InstagramApi.class;
+        	else if ("linkedin".equalsIgnoreCase(requester))
+        		api = LinkedInApi.class;
         	
         	final Class apiClass = api;
 
@@ -178,7 +182,7 @@ public class OAuthActivity extends Activity
         			}
         			else if ("twitter".equals(requester))
         			{
-            			apiClass = TwitterApi.class;
+            			apiClass = TwitterApi.SSL.class;
             			consumerKey = TwitterProbe.CONSUMER_KEY;
             			consumerSecret = TwitterProbe.CONSUMER_SECRET;
         			}
@@ -189,6 +193,13 @@ public class OAuthActivity extends Activity
             			consumerSecret = InstagramProbe.CONSUMER_SECRET;
             			callback = InstagramProbe.CALLBACK;
         			}
+                	else if ("linkedin".equalsIgnoreCase(requester))
+                	{
+            			apiClass = LinkedInApi.class;
+            			consumerKey = LinkedInProbe.CONSUMER_KEY;
+            			consumerSecret = LinkedInProbe.CONSUMER_SECRET;
+            			callback = LinkedInProbe.CALLBACK;
+                	}
         			
         			if (apiClass != null && consumerKey != null && consumerSecret != null)
         			{
