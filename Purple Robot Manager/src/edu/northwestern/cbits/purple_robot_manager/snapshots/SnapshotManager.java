@@ -89,7 +89,18 @@ public class SnapshotManager
 	
 	public long[] snapshotTimes()
 	{
-		return null;
+		Cursor c = this._context.getContentResolver().query(RobotContentProvider.SNAPSHOTS, null, null, null, "recorded");
+		
+		long[] times = new long[c.getCount()];
+		
+		for (int i = 0; c.moveToNext(); i++)
+		{
+			times[i] = c.getLong(c.getColumnIndex("recorded"));
+		}
+		
+		c.close();
+
+		return times;
 	}
 	
 	public JSONObject jsonForTime(long time)

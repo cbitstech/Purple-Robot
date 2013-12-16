@@ -327,6 +327,30 @@ public class JavaScriptEngine extends BaseScriptEngine
 		return new NativeArray(values);
 	}
 
+	public NativeArray fetchSnapshotIds()
+	{
+		List<String> snapshotIds = super.fetchSnapshotIds();
+			
+		String[] values = new String[snapshotIds.size()];
+			
+		for (int i = 0; i < snapshotIds.size(); i++)
+		{
+			values[i] = snapshotIds.get(i);
+		}
+			
+		return new NativeArray(values);
+	}
+
+	public NativeObject fetchSnapshot(String timestamp)
+	{
+		Map<String, Object> snapshot = super.fetchTrigger(timestamp);
+		
+		if (snapshot != null)
+			return JavaScriptEngine.mapToNative(this._jsContext, this._scope, snapshot);
+		
+		return null;
+	}
+
 	public NativeObject fetchNamespace(String namespace)
 	{
 		Map<String, Object> map = super.fetchNamespaceMap(namespace);
