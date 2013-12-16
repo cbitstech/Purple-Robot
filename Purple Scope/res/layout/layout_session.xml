@@ -6,7 +6,7 @@
     <LinearLayout android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-		<TextView android:text="Sampling Session Duration"
+		<TextView android:text="@string/sampling_duration_label"
 			android:textStyle="bold"
 			android:textSize="14sp"
 			android:gravity="left"
@@ -16,7 +16,7 @@
 		<TextView android:id="@+id/duration_text"
 			android:textStyle="bold"
 			android:textSize="12sp"
-			android:text="00:00"
+			android:text="@string/zero_hour"
 			android:layout_margin="8dp"
 			android:layout_weight="1"
 			android:gravity="right"
@@ -32,7 +32,7 @@
 	<EditText android:id="@+id/session_name"
 		android:textSize="14sp"
 		android:layout_margin="8dp"
-		android:hint="Session Name (Required)"
+		android:hint="@string/session_name"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content" />
 </LinearLayout>

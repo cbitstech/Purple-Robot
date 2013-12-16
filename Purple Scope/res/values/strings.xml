@@ -15,5 +15,17 @@
     <string name="resource_disk_funf">Disk Usage: Funf Journal </string>
 
     <string name="create_performance_values_table">CREATE TABLE IF NOT EXISTS performance_values(_id INTEGER PRIMARY KEY, source TEXT, recorded INTEGER DEFAULT 0, value TEXT);</string>
-    
+
+    <string name="sampling_duration_label">Sampling Session Duration</string>
+    <string name="session_name">Session Name (Required)</string>
+    <string name="zero_hour">00:00</string>
+    <string name="begin_session">Begin Session</string>
+    <string name="database_available">The database is now available on accessible storage.</string>
+    <string name="database_error">Error encountered copying the database to accessible storage.</string>
+    <string name="clear_database">Clear Database?</string>
+    <string name="clear_database">Clear Database?</string>
+    <string name="confirm_clear">Are you sure you want to clear existing performance readings from the database?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="delete_count" formatted="false">%d record(s) cleared.</string>
 </resources>
