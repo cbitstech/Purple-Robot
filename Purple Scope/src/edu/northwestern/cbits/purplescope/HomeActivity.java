@@ -241,9 +241,9 @@ public class HomeActivity extends ActionBarActivity
 			final EditText name = (EditText) sessionView.findViewById(R.id.session_name);
 			
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder = builder.setTitle("Begin Session");
+			builder = builder.setTitle(R.string.begin_session);
 			builder = builder.setView(sessionView);
-			builder = builder.setPositiveButton("Begin Session", new DialogInterface.OnClickListener() 
+			builder = builder.setPositiveButton(R.string.begin_session, new DialogInterface.OnClickListener() 
 			{
 				public void onClick(DialogInterface dialog, int which) 
 				{
@@ -288,32 +288,32 @@ public class HomeActivity extends ActionBarActivity
     			
 				FileUtils.copyFileToDirectory(new File(databases, PerformanceContentProvider.DATABASE), externalDir);
 
-				Toast.makeText(this, "The database is now available on accessible storage.", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, R.string.database_available, Toast.LENGTH_LONG).show();
 			}
     		catch (IOException e) 
     		{
 				e.printStackTrace();
 
-				Toast.makeText(this, "Error encountered copying the database to accessible storage.", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, R.string.database_error, Toast.LENGTH_LONG).show();
 			}
     	}
     	else if (item.getItemId() == R.id.reset_button)
     	{
     		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    		builder = builder.setTitle("Clear Database?");
-    		builder = builder.setMessage("Are you sure you want to clear existing performance readings from the database?");
+    		builder = builder.setTitle(R.string.clear_database);
+    		builder = builder.setMessage(R.string.confirm_clear);
 
-    		builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() 
+    		builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() 
     		{
 				public void onClick(DialogInterface arg0, int arg1) 
 				{
 					int deleted = me.getContentResolver().delete(PerformanceContentProvider.PERFORMANCE_VALUES, "_id != -1", null);
 					
-					Toast.makeText(me, deleted + " records cleared.", Toast.LENGTH_LONG).show();
+					Toast.makeText(me, me.getString(R.string.delete_count, deleted), Toast.LENGTH_LONG).show();
 				}
 			});
     		
-    		builder.setNegativeButton("No", new DialogInterface.OnClickListener() 
+    		builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() 
     		{
 				public void onClick(DialogInterface arg0, int arg1) 
 				{
