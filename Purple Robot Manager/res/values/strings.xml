@@ -1083,6 +1083,13 @@
 	<string name="label_trigger_random">Random Specification</string>	
 	<string name="label_trigger_is_random">True</string>	
 	<string name="label_trigger_not_random">False</string>	
+
+	<!-- Activity Detection Probe -->
+
+	<string name="title_activity_detection_probe">Activity Detection Probe</string>	
+	<string name="summary_activity_detection_probe_desc">Uses Google Play services to categorize the user\'s activity based on sensor readings.</string>	
+	<string name="summary_activity_detection_probe" formatted="false">Most Likely Activity: %s (%.2f)</string>	
+			
 </resources>
 
 

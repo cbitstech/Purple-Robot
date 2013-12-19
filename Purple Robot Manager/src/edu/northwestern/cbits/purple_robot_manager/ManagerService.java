@@ -10,6 +10,7 @@ import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ActivityDetectionProbe;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
@@ -41,7 +42,9 @@ public class ManagerService extends IntentService
 	public static String APPLICATION_LAUNCH_INTENT_URL = "purple_robot_manager_widget_launch_url";
 	public static String APPLICATION_LAUNCH_INTENT_PARAMETERS = "purple_robot_manager_widget_launch_parameters";
 	public static String APPLICATION_LAUNCH_INTENT_POSTSCRIPT = "purple_robot_manager_widget_launch_postscript";
-	
+
+	public static String GOOGLE_PLAY_ACTIVITY_DETECTED = "purple_robot_manager_google_play_activity_detected";
+
 	public static String HAPTIC_PATTERN_INTENT = "purple_robot_manager_haptic_pattern";
 	public static String HAPTIC_PATTERN_NAME = "purple_robot_manager_haptic_pattern_name";
 	public static String RINGTONE_INTENT = "purple_robot_manager_ringtone";
@@ -66,7 +69,11 @@ public class ManagerService extends IntentService
 	@SuppressWarnings("deprecation")
 	protected void onHandleIntent(Intent intent)
 	{
-		if (UPLOAD_LOGS_INTENT.equalsIgnoreCase(intent.getAction()))
+		String action = intent.getAction();
+		
+		if (GOOGLE_PLAY_ACTIVITY_DETECTED.equalsIgnoreCase(action))
+			ActivityDetectionProbe.activityDetected(this, intent);
+		if (UPLOAD_LOGS_INTENT.equalsIgnoreCase(action))
 		{
 			final ManagerService me = this;
 			
@@ -88,7 +95,7 @@ public class ManagerService extends IntentService
 				System.gc();
 			}
 		}
-		else if (REFRESH_ERROR_STATE_INTENT.equalsIgnoreCase(intent.getAction()))
+		else if (REFRESH_ERROR_STATE_INTENT.equalsIgnoreCase(action))
 		{
 			final ManagerService me = this;
 			
@@ -103,14 +110,14 @@ public class ManagerService extends IntentService
 			Thread t = new Thread(r);
 			t.start();
 		}
-		else if (UPDATE_WIDGETS.equalsIgnoreCase(intent.getAction()))
+		else if (UPDATE_WIDGETS.equalsIgnoreCase(action))
 		{
 			Intent broadcast = new Intent("edu.northwestern.cbits.purple.UPDATE_WIDGET");
 			broadcast.putExtras(intent.getExtras());
 			
 			this.startService(broadcast);
 		}
-		else if (HAPTIC_PATTERN_INTENT.equalsIgnoreCase(intent.getAction()))
+		else if (HAPTIC_PATTERN_INTENT.equalsIgnoreCase(action))
 		{
 			String pattern = intent.getStringExtra(HAPTIC_PATTERN_NAME);
 
@@ -135,7 +142,7 @@ public class ManagerService extends IntentService
 			v.cancel();
 			v.vibrate(longSpec, -1);
 		}
-		else if (RINGTONE_INTENT.equalsIgnoreCase(intent.getAction()))
+		else if (RINGTONE_INTENT.equalsIgnoreCase(action))
 		{
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -259,7 +266,7 @@ public class ManagerService extends IntentService
 				}
 			}
 		}
-		else if (APPLICATION_LAUNCH_INTENT.equalsIgnoreCase(intent.getAction()))
+		else if (APPLICATION_LAUNCH_INTENT.equalsIgnoreCase(action))
 		{
 			if (intent.hasExtra(APPLICATION_LAUNCH_INTENT_PACKAGE))
 			{
@@ -322,11 +329,11 @@ public class ManagerService extends IntentService
 				}
 			}
 		}
-		else if (PERIODIC_CHECK_INTENT.equals(intent.getAction()))
+		else if (PERIODIC_CHECK_INTENT.equals(action))
 		{
 			TriggerManager.getInstance(this).nudgeTriggers(this);
 		}
-		else if (REFRESH_CONFIGURATION.equals(intent.getAction()))
+		else if (REFRESH_CONFIGURATION.equals(action))
 			LegacyJSONConfigFile.update(this, false);
 	}
 
