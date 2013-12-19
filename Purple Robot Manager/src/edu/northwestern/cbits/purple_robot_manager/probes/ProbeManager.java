@@ -20,6 +20,7 @@ import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ActivityDetectionProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.AddressBookDistancesProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.AmbientHumidityProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ApplicationLaunchProbe;
@@ -485,6 +486,13 @@ public class ProbeManager
 				LinkedInProbe linkedin = (LinkedInProbe) probe;
 
 				if (linkedin.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof ActivityDetectionProbe)
+			{
+				ActivityDetectionProbe activity = (ActivityDetectionProbe) probe;
+
+				if (activity.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 
