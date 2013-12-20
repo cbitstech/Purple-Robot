@@ -1,5 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager.snapshots;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
@@ -13,11 +15,16 @@ import org.json.JSONObject;
 
 import android.content.ContentUris;
 import android.database.Cursor;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
@@ -50,6 +57,10 @@ import edu.northwestern.cbits.purple_robot_manager.probes.features.Feature;
 public class SnapshotActivity extends ActionBarActivity 
 {
 	private String _nextPayload = null;
+
+	private String _audioPath = null;
+
+	private boolean _isPlaying = false;
 	
 	protected void onCreate(Bundle savedInstanceState)
     {
@@ -76,6 +87,16 @@ public class SnapshotActivity extends ActionBarActivity
         	long recorded = c.getLong(c.getColumnIndex("recorded"));
         	String jsonString = c.getString(c.getColumnIndex("value"));
 
+        	this._audioPath = c.getString(c.getColumnIndex("audio_file"));
+        	
+        	if (this._audioPath != null)
+        	{
+	        	File f = new File(this._audioPath);
+	
+	        	if (f.exists() == false)
+	        		this._audioPath = null;
+        	}
+        	
             this.getSupportActionBar().setTitle(source + ": " + sdf.format(new Date(recorded)));
 
 			try 
@@ -226,7 +247,7 @@ public class SnapshotActivity extends ActionBarActivity
         
         JSONObject item = (JSONObject) listView.getItemAtPosition(0);
 
-		try 
+        try 
 		{
 			this.displayProbe(item);
 		} 
@@ -295,4 +316,65 @@ public class SnapshotActivity extends ActionBarActivity
    			webView.loadData(this._nextPayload, "text/html", null);
 		} 
 	}
+	
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+
+		MenuInflater inflater = this.getMenuInflater();
+        inflater.inflate(R.menu.menu_snapshot, menu);
+
+        if (this._audioPath == null)
+        {
+        	MenuItem menuItem = menu.findItem(R.id.menu_play_snapshot_item);
+        	menuItem.setVisible(false);
+        }
+        
+        return true;
+	}
+
+    public boolean onOptionsItemSelected(final MenuItem item)
+    {
+    	final SnapshotActivity me = this;
+    	
+        switch (item.getItemId())
+    	{
+			case R.id.menu_play_snapshot_item:
+				if (this._isPlaying  == false)
+				{
+					this._isPlaying = true;
+					item.setVisible(false);
+					
+					MediaPlayer player = new MediaPlayer();
+			        
+					try 
+			        {
+						player.setDataSource(this._audioPath);
+						
+						player.setOnCompletionListener(new OnCompletionListener()
+						{
+							public void onCompletion(MediaPlayer player) 
+							{
+								player.release();
+								
+								me._isPlaying = false;
+								item.setVisible(true);
+
+							}
+						});
+						
+						player.prepare();
+						player.start();
+			        } 
+					catch (IOException e) 
+					{
+						this._isPlaying = false;
+					}
+				}
+
+				break;
+		}
+
+    	return true;
+    }
+
 }

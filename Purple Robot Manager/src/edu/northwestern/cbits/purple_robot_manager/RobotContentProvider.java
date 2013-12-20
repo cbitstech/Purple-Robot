@@ -22,7 +22,7 @@ public class RobotContentProvider extends ContentProvider
 	private static final int SNAPSHOT_LIST = 3;
 	private static final int SNAPSHOT = 4;
 
-	private static final int DATABASE_VERSION = 2;
+	private static final int DATABASE_VERSION = 3;
 	private static final String DATABASE = "purple_robot.db";
 
 	private static final String RECENT_PROBE_VALUES_TABLE = "recent_probe_values";
@@ -113,6 +113,8 @@ public class RobotContentProvider extends ContentProvider
 						db.execSQL(me.getContext().getString(R.string.create_recent_probe_values_sql));
 					case 1:
 						db.execSQL(me.getContext().getString(R.string.create_snapshots_sql));
+					case 2:
+						db.execSQL(me.getContext().getString(R.string.db_update_snapshots_add_audio));
 					default:
 						break;
 				}

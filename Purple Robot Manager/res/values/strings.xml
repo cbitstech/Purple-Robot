@@ -1107,6 +1107,14 @@
 	<string name="summary_activity_detection_probe_desc">Uses Google Play services to categorize the user\'s activity based on sensor readings.</string>	
 	<string name="summary_activity_detection_probe" formatted="false">Most Likely Activity: %s (%.2f)</string>	
 			
+	
+	<!-- Snapshot Activity -->
+	<string name="menu_play_snapshot_label">Play Snapshot Audio</string>
+	
+	<string name="config_snapshots_category">Snapshots</string>
+	<string name="title_record_snapshot_audio">Record Snapshot Audio</string>
+	<string name="summary_record_snapshot_audio">When checked, records 5 seconds of audio from the microphone immediately after a snapshot is created.</string>
+	<string name="toast_recording_audio">Recording snapshot audio&#8230;</string>
 </resources>
 
 

@@ -1,4 +1,6 @@
 <resources>
     <string name="create_recent_probe_values_sql">CREATE TABLE IF NOT EXISTS recent_probe_values(_id INTEGER PRIMARY KEY, source TEXT, recorded INTEGER DEFAULT 0, value TEXT);</string>
+    
     <string name="create_snapshots_sql">CREATE TABLE IF NOT EXISTS snapshots(_id INTEGER PRIMARY KEY, source TEXT, recorded INTEGER DEFAULT 0, value TEXT);</string>
+    <string name="db_update_snapshots_add_audio">ALTER TABLE snapshots ADD COLUMN audio_file TEXT;</string>
 </resources>
