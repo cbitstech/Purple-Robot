@@ -1060,7 +1060,7 @@
 	<string name="title_instagram_check">Instagram probe requires authorization</string>	
 	<string name="message_instagram_check">Please login to the Instagram website from the settings to grant Purple Robot access to your Instagram account.</string>	
 
-	<!-- Instagram API Feature -->
+	<!-- LinkedIn API Feature -->
     <string name="title_linkedin_probe">LinkedIn Probe</string>
     <string name="summary_linkedin_probe_desc">Collects profile data &amp; posts from LinkedIn.</string>
     <string name="config_probe_linkedin_encrypt_title">Encrypt LinkedIn Contents</string>
@@ -1073,7 +1073,24 @@
 	<string name="toast_linkedin_logout">Logged out of LinkedIn.</string>	
 	<string name="title_linkedin_check">LinkedIn probe requires authorization</string>	
 	<string name="message_linkedin_check">Please login to the LinkedIn website from the settings to grant Purple Robot access to your LinkedIn account.</string>	
-		
+
+	<!-- Foursquare API Feature -->
+    <string name="title_foursquare_probe">Foursquare Probe</string>
+    <string name="summary_foursquare_probe_desc">Collects activity from Foursquare as well as names for current locations.</string>
+    <string name="config_probe_foursquare_encrypt_title">Encrypt Foursquare Contents</string>
+    <string name="config_probe_foursquare_encrypt_summary">Encrypts the contents of data retrieved from Foursquare.</string>
+
+	<string name="title_authenticate_foursquare_probe">Login to Foursquare</string>	
+	<string name="summary_authenticate_foursquare_probe">Tap to go to the Foursquare website and login to give this device access to your activity.</string>	
+	<string name="title_logout_foursquare_probe">Log Out of Foursquare</string>	
+	<string name="summary_logout_foursquare_probe">Tap to clear your Foursquare login information and revoke access to this device.</string>	
+	<string name="toast_foursquare_logout">Logged out of Foursquare.</string>	
+	<string name="title_foursquare_check">Foursquare probe requires authorization</string>	
+	<string name="message_foursquare_check">Please login to the Foursquare website from the settings to grant Purple Robot access to your Foursquare account.</string>	
+	<string name="config_probe_foursquare_pull_title">Fetch Foursquare Activity</string>	
+	<string name="config_probe_foursquare_pull_summary">Retrieves check-ins and other acctivity from your account.</string>	
+	<string name="summary_foursquare_checkin_summary" formatted="false">Most Recent Venue: %s</string>	
+	
 	<string name="label_trigger_original_start">Original Start Date String</string>	
 	<string name="label_trigger_original_end">Original End Date String</string>	
 	<string name="label_trigger_start">Effective Start Date String</string>	

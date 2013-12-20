@@ -7,6 +7,7 @@ import java.util.List;
 import org.scribe.builder.ServiceBuilder;
 import org.scribe.builder.api.DefaultApi10a;
 import org.scribe.builder.api.DefaultApi20;
+import org.scribe.builder.api.Foursquare2Api;
 import org.scribe.builder.api.LinkedInApi;
 import org.scribe.builder.api.TwitterApi;
 import org.scribe.exceptions.OAuthException;
@@ -22,10 +23,11 @@ import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.oauth.FitbitApi;
 import edu.northwestern.cbits.purple_robot_manager.oauth.InstagramApi;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.FoursquareProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.InstagramProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LinkedInProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TwitterProbe;
@@ -66,6 +68,8 @@ public class OAuthActivity extends Activity
         		api = InstagramApi.class;
         	else if ("linkedin".equalsIgnoreCase(requester))
         		api = LinkedInApi.class;
+        	else if ("foursquare".equalsIgnoreCase(requester))
+        		api = Foursquare2Api.class;
         	
         	final Class apiClass = api;
 
@@ -78,8 +82,8 @@ public class OAuthActivity extends Activity
 	        	builder = builder.callback(callbackUrl);
 	        	
 	        	final OAuthService service = builder.build();
-	        	
-	        	final OAuthConfig config = new OAuthConfig(consumerKey, consumerSecret);
+
+	        	final OAuthConfig config = new OAuthConfig(consumerKey, consumerSecret, callbackUrl, null, null, null);
 	        	
 	        	Runnable r = new Runnable()
 	        	{
@@ -200,6 +204,13 @@ public class OAuthActivity extends Activity
             			consumerSecret = LinkedInProbe.CONSUMER_SECRET;
             			callback = LinkedInProbe.CALLBACK;
                 	}
+                	else if ("foursquare".equalsIgnoreCase(requester))
+                	{
+            			apiClass = Foursquare2Api.class;
+            			consumerKey = FoursquareProbe.CONSUMER_KEY;
+            			consumerSecret = FoursquareProbe.CONSUMER_SECRET;
+            			callback = FoursquareProbe.CALLBACK;
+                	}
         			
         			if (apiClass != null && consumerKey != null && consumerSecret != null)
         			{
@@ -226,6 +237,10 @@ public class OAuthActivity extends Activity
 				                	Editor e = prefs.edit();
 				                	e.putString("oauth_" + requester + "_secret", accessToken.getSecret());
 				                	e.putString("oauth_" + requester + "_token", accessToken.getToken());
+				                	
+				                	Log.e("PR", "SETTING TOKEN: " + accessToken.getToken());
+				                	Log.e("PR", "SETTING SECRET: " + accessToken.getSecret());
+				                	Log.e("PR", "SETTING: " + requester);
 				                	
 				                	e.commit();
 				                	
