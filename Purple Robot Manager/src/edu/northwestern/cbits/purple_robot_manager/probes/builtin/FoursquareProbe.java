@@ -1,9 +1,14 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,7 +46,7 @@ public class FoursquareProbe extends Probe
 	public static final String CONSUMER_SECRET = "O1N4EAXORJSLT50PSUOSYYIONS0MCQMWAKK1I1ZLSP0TIKGU";
 	public static final String CALLBACK = "http://purple.robot.com/oauth/foursquare";
 
-	private static final boolean DEFAULT_ENABLED = false;
+	static final boolean DEFAULT_ENABLED = false;
 	private static final boolean DEFAULT_PULL_ACTIVITY = false;
 
 	protected static final String HOUR_COUNT = "HOUR_COUNT";
@@ -420,5 +425,84 @@ public class FoursquareProbe extends Probe
 	public void updateFromJSON(Context context, JSONObject json) throws JSONException
 	{
 		// TODO Auto-generated method stub
+	}
+
+	public static void annotate(Context context, Bundle bundle) 
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+		if (prefs.getBoolean("config_probe_foursquare_enabled", FoursquareProbe.DEFAULT_ENABLED))
+		{
+			String urlString = "https://api.foursquare.com/v2/venues/search?client_id=" + FoursquareProbe.CONSUMER_KEY + "&client_secret=" + FoursquareProbe.CONSUMER_SECRET + "&v=20130815&ll=";
+			
+			double latitude = bundle.getDouble(LocationProbe.LATITUDE);
+			double longitude = bundle.getDouble(LocationProbe.LONGITUDE);
+			
+			urlString += latitude + "," + longitude;
+			
+			try 
+			{
+				URL u = new URL(urlString);
+
+				InputStream in = u.openStream();
+
+				String jsonString = IOUtils.toString(in);
+				
+				in.close();
+				
+				JSONObject respJson = new JSONObject(jsonString);
+
+				JSONArray venues = respJson.getJSONObject("response").getJSONArray("venues");
+				
+				if (venues.length() > 0)
+				{
+					JSONObject venue = venues.getJSONObject(0);
+					
+					bundle.putString("FOURSQUARE_NAME", venue.getString("name"));
+
+					JSONObject location = venue.getJSONObject("location");
+					
+					if (location.has("address"))
+						bundle.putString("FOURSQUARE_ADDRESS", location.getString("address"));
+					
+					if (location.has("city"))
+						bundle.putString("FOURSQUARE_CITY", location.getString("city"));
+
+					if (location.has("state"))
+						bundle.putString("FOURSQUARE_STATE", location.getString("state"));
+					
+					if (location.has("postalCode"))
+						bundle.putString("FOURSQUARE_POSTAL_CODE", location.getString("postalCode"));
+					
+					bundle.putString("FOURSQUARE_COUNTRY", location.getString("cc"));
+					bundle.putString("FOURSQUARE_VENUE_ID", venue.getString("id"));
+					
+					if (venue.has("url"))
+						bundle.putString("FOURSQUARE_VENUE_URL", venue.getString("url"));
+					
+					JSONArray categories = venue.getJSONArray("categories");
+					
+					for (int j = 0; j < categories.length(); j++)
+					{
+						JSONObject category = categories.getJSONObject(j);
+						
+						if (category.getBoolean("primary"))
+							bundle.putString("FOURSQUARE_VENUE_CATEGORY", category.getString("name"));
+					}
+				}
+			}
+			catch (MalformedURLException e) 
+			{
+				e.printStackTrace();
+			} 
+			catch (IOException e) 
+			{
+				e.printStackTrace();
+			} 
+			catch (JSONException e) 
+			{
+				e.printStackTrace();
+			}
+		}
 	}
 }

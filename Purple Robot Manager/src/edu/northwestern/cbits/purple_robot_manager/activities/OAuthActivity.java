@@ -23,7 +23,6 @@ import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.oauth.FitbitApi;
 import edu.northwestern.cbits.purple_robot_manager.oauth.InstagramApi;
@@ -237,10 +236,6 @@ public class OAuthActivity extends Activity
 				                	Editor e = prefs.edit();
 				                	e.putString("oauth_" + requester + "_secret", accessToken.getSecret());
 				                	e.putString("oauth_" + requester + "_token", accessToken.getToken());
-				                	
-				                	Log.e("PR", "SETTING TOKEN: " + accessToken.getToken());
-				                	Log.e("PR", "SETTING SECRET: " + accessToken.getSecret());
-				                	Log.e("PR", "SETTING: " + requester);
 				                	
 				                	e.commit();
 				                	
