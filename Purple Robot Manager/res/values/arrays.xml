@@ -69,6 +69,7 @@
         <item>builtin.TwitterProbe</item>
         <item>builtin.InstagramProbe</item>
         <item>builtin.LinkedInProbe</item>
+        <item>builtin.FoursquareProbe</item>
         
         <!-- <item>builtin.BluetoothReceiverProbe</item> -->
         <!-- <item>builtin.ZeroconfProbe</item> -->

@@ -34,6 +34,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProb
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.DateCalendarProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.FacebookEventsProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.FacebookProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.FoursquareProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.GeomagneticRotationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.GravityProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.HardwareInformationProbe;
@@ -486,6 +487,13 @@ public class ProbeManager
 				LinkedInProbe linkedin = (LinkedInProbe) probe;
 
 				if (linkedin.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof FoursquareProbe)
+			{
+				FoursquareProbe foursquare = (FoursquareProbe) probe;
+
+				if (foursquare.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 			else if (probe instanceof ActivityDetectionProbe)
