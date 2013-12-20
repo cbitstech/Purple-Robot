@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -61,6 +62,14 @@ public class SnapshotsActivity extends ActionBarActivity
 			public void bindView(View view, Context context, Cursor cursor) 
 			{
         		final String source = cursor.getString(cursor.getColumnIndex("source"));
+        		final String audioFile = cursor.getString(cursor.getColumnIndex("audio_file"));
+        		
+        		ImageView micIcon = (ImageView) view.findViewById(R.id.mic_icon);
+        		
+        		if (audioFile != null)
+        			micIcon.setVisibility(View.VISIBLE);
+        		else
+        			micIcon.setVisibility(View.GONE);
         		
         		Date date = new Date(cursor.getLong(cursor.getColumnIndex("recorded")));
 
@@ -129,7 +138,7 @@ public class SnapshotsActivity extends ActionBarActivity
 			case R.id.menu_snapshot:
 				String label = this.getString(R.string.snapshot_user_initiated);
 				
-				SnapshotManager.getInstance(this).takeSnapshot(label, new Runnable()
+				SnapshotManager.getInstance(this).takeSnapshot(this, label, new Runnable()
 				{
 					public void run() 
 					{

@@ -9,6 +9,13 @@
     <PreferenceCategory
         android:key="config_settings_models_category"
         android:title="@string/config_models_category_label" />
+    <PreferenceCategory android:title="@string/config_snapshots_category">
+    	<CheckBoxPreference
+	   	    android:title="@string/title_record_snapshot_audio"
+   		    android:summary="@string/summary_record_snapshot_audio"
+        	android:key="config_record_snapshot_audio"
+			android:defaultValue="false"/>
+	</PreferenceCategory>
     <PreferenceCategory android:title="@string/config_notifications_category">
         <!-- <RingtonePreference
             android:title="@string/config_notification_sound_label"
