@@ -257,7 +257,7 @@ public class LocationProbe extends Probe implements LocationListener
 
 		this._lastTransmit = now;
 
-		Bundle bundle = new Bundle();
+		final Bundle bundle = new Bundle();
 
 		bundle.putString("PROBE", this.name(this._context));
 		bundle.putLong("TIMESTAMP", now / 1000);
@@ -311,8 +311,21 @@ public class LocationProbe extends Probe implements LocationListener
 					this._lastLocation = new Location(location);
 				}
 			}
+			
+			final LocationProbe me = this;
+			
+			Runnable r = new Runnable()
+			{
+				public void run() 
+				{
+					FoursquareProbe.annotate(me._context, bundle);
 
-			this.transmitData(this._context, bundle);
+					me.transmitData(me._context, bundle);
+				}
+			};
+			
+			Thread t = new Thread(r);
+			t.start();
 		}
 	}
 
