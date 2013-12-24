@@ -51,13 +51,16 @@ public class SnapshotManager
     	return SnapshotManager._instance;
     }
 	
-	public void takeSnapshot(Context context, String source, final Runnable r)
+	public void takeSnapshot(Context context, String source, final Runnable r) throws EmptySnapshotException
 	{
 		final long now = System.currentTimeMillis();
 		
         Cursor cursor = this._context.getContentResolver().query(RobotContentProvider.RECENT_PROBE_VALUES, null, null, null, "recorded DESC");
         
         JSONArray snapshot = new JSONArray();
+        
+        if (cursor.getCount() == 0)
+        	throw new EmptySnapshotException();
         
         while (cursor.moveToNext())
         {

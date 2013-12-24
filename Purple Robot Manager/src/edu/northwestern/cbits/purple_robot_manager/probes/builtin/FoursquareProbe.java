@@ -234,6 +234,10 @@ public class FoursquareProbe extends Probe
 												e.commit();
 											}
 										} 
+										catch (IllegalStateException e) 
+										{
+											e.printStackTrace();
+										} 
 										catch (OAuthException e)
 										{
 											e.printStackTrace();

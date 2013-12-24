@@ -13,6 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.content.ContentUris;
 import android.database.Cursor;
 import android.media.MediaPlayer;
@@ -62,6 +63,7 @@ public class SnapshotActivity extends ActionBarActivity
 
 	private boolean _isPlaying = false;
 	
+	@SuppressLint("SimpleDateFormat")
 	protected void onCreate(Bundle savedInstanceState)
     {
 		super.onCreate(savedInstanceState);
@@ -244,16 +246,23 @@ public class SnapshotActivity extends ActionBarActivity
 		super.onResume();
 		
 		ListView listView = (ListView) this.findViewById(R.id.list_probes);
-        
-        JSONObject item = (JSONObject) listView.getItemAtPosition(0);
-
-        try 
+		
+		try
 		{
-			this.displayProbe(item);
-		} 
-		catch (JSONException e) 
+	        JSONObject item = (JSONObject) listView.getItemAtPosition(0);
+	
+	        try 
+			{
+				this.displayProbe(item);
+			} 
+			catch (JSONException e) 
+			{
+				LogManager.getInstance(this).logException(e);
+			}
+		}
+		catch (IndexOutOfBoundsException e)
 		{
-			LogManager.getInstance(this).logException(e);
+			this.finish();
 		}
 	}
 	
