@@ -24,6 +24,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.RobotContentProvider;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -138,19 +139,26 @@ public class SnapshotsActivity extends ActionBarActivity
 			case R.id.menu_snapshot:
 				String label = this.getString(R.string.snapshot_user_initiated);
 				
-				SnapshotManager.getInstance(this).takeSnapshot(this, label, new Runnable()
+				try 
 				{
-					public void run() 
+					SnapshotManager.getInstance(this).takeSnapshot(this, label, new Runnable()
 					{
-						me.runOnUiThread(new Runnable()
+						public void run() 
 						{
-							public void run() 
+							me.runOnUiThread(new Runnable()
 							{
-								me.refresh();
-							}
-						});
-					}
-				});
+								public void run() 
+								{
+									me.refresh();
+								}
+							});
+						}
+					});
+				} 
+				catch (EmptySnapshotException e) 
+				{
+					Toast.makeText(this, R.string.empty_snapshot_error, Toast.LENGTH_SHORT).show();
+				}
 
 				break;
 		}

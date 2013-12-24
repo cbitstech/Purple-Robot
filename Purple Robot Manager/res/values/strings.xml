@@ -1115,6 +1115,8 @@
 	<string name="title_record_snapshot_audio">Record Snapshot Audio</string>
 	<string name="summary_record_snapshot_audio">When checked, records 5 seconds of audio from the microphone immediately after a snapshot is created.</string>
 	<string name="toast_recording_audio">Recording snapshot audio&#8230;</string>
+
+	<string name="empty_snapshot_error">No sensor data to associate with snapshot&#8230;</string>
 </resources>
 
 
