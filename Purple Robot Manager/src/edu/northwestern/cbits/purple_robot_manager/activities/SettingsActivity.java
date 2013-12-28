@@ -174,6 +174,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 			LegacyJSONConfigFile.update(this, true);
 
 			ProbeManager.nudgeProbes(this);
+			TriggerManager.getInstance(this).refreshTriggers(this);
 
             return true;
         }

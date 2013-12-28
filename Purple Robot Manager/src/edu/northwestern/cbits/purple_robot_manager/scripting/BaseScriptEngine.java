@@ -745,7 +745,6 @@ public abstract class BaseScriptEngine
 		boolean found = false;
 		
 		params.put("identifier", triggerId);
-
 		for (Trigger trigger : TriggerManager.getInstance(this._context).triggersForId(triggerId))
 		{
 			trigger.updateFromMap(this._context, params);
@@ -761,7 +760,7 @@ public abstract class BaseScriptEngine
 
 			found = true;
 		}
-		
+
 		return found;
 	}
 
@@ -1198,13 +1197,17 @@ public abstract class BaseScriptEngine
 
 	// TODO: Eventually add to documentation...
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void fetchLabels(String appContext, Map<String, Object> labels) 
+	public void fetchLabels(String appContext, String instructions, Map<String, Object> labels) 
 	{
 		Intent labelIntent = new Intent();
 		labelIntent.setClass(this._context, LabelActivity.class);
 		labelIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
 		labelIntent.putExtra(LabelActivity.LABEL_CONTEXT, appContext);
+
+		if (instructions != null)
+			labelIntent.putExtra(LabelActivity.INSTRUCTIONS, instructions);
+
 		labelIntent.putExtra(LabelActivity.TIMESTAMP, ((double) System.currentTimeMillis()));
 
 		Bundle labelsBundle = new Bundle();

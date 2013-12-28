@@ -54,6 +54,7 @@ public class LabelActivity extends ActionBarActivity
 	public static final String LABEL_CONTEXT = "LABEL_CONTEXT";
 	public static final String LABEL_KEY = "LABEL_KEY";
 	public static final String LABEL_DEFINITIONS = "LABEL_DEFINITIONS";
+	public static final String INSTRUCTIONS = "LABEL_INSTRUCTIONS";
 
 	private double _timestamp = 0;
 	private String _labelContext = null;
@@ -174,6 +175,13 @@ public class LabelActivity extends ActionBarActivity
         	this._labelContext = this.getString(R.string.label_unknown_context);
 
 		ActionBar actionBar = this.getSupportActionBar();
+
+        if (extras.containsKey(LabelActivity.INSTRUCTIONS))
+        {
+    		final TextView instructions = (TextView) this.findViewById(R.id.text_label_message);
+    		
+    		instructions.setText(extras.getString(LabelActivity.INSTRUCTIONS));
+        }
 
         final TextView contextText = (TextView) this.findViewById(R.id.text_label_context);
         contextText.setText(String.format(this.getString(R.string.label_context), this._labelContext));
@@ -398,8 +406,8 @@ public class LabelActivity extends ActionBarActivity
 	        value.requestFocus();
 		}
 
+        actionBar.setTitle(this._labelContext);
         actionBar.setSubtitle(sdf.format(d));
-        actionBar.setTitle(R.string.title_confirm_label);
         
 		payload.put("label_time", this._timestamp);
 		payload.put("label_context", this._labelContext);

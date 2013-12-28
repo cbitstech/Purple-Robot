@@ -336,7 +336,7 @@ public class FacebookProbe extends Probe
 
 	public void updateFromMap(Context context, Map<String, Object> params) 
 	{
-/*		super.updateFromMap(context, params);
+		super.updateFromMap(context, params);
 		
 		if (params.containsKey(Probe.PROBE_FREQUENCY))
 		{
@@ -347,24 +347,26 @@ public class FacebookProbe extends Probe
 				SharedPreferences prefs = Probe.getPreferences(context);
 				Editor e = prefs.edit();
 				
-				e.putString("config_probe_communication_event_frequency", frequency.toString());
+				e.putString("config_probe_facebook_frequency", frequency.toString());
 				e.commit();
 			}
 		}
-
-		if (params.containsKey(Probe.HASH_DATA))
+		
+		if (params.containsKey(Probe.ENCRYPT_DATA))
 		{
-			Object hash = params.get(Probe.HASH_DATA);
+			Object encrypt = params.get(Probe.ENCRYPT_DATA);
 			
-			if (hash instanceof Boolean)
+			if ( encrypt instanceof Boolean)
 			{
+				Boolean encryptBoolean = (Boolean)  encrypt;
+				
 				SharedPreferences prefs = Probe.getPreferences(context);
 				Editor e = prefs.edit();
 				
-				e.putBoolean("config_probe_communication_event_hash_data", ((Boolean) hash).booleanValue());
+				e.putBoolean("config_probe_facebook_encrypt_data", encryptBoolean.booleanValue());
 				e.commit();
 			}
-		} */
+		}
 	}
 
 	@SuppressWarnings("deprecation")

@@ -15,6 +15,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteStatement;
 import edu.northwestern.cbits.purple_robot_manager.db.filters.Filter;
 import edu.northwestern.cbits.purple_robot_manager.db.filters.FrequencyThrottleFilter;
@@ -143,9 +144,9 @@ public class ProbeValuesProvider
 
 		    tableExists = true;
 		}
-		catch (Exception e)
+		catch (SQLiteException e)
 		{
-			LogManager.getInstance(context).logException(e);
+			// LogManager.getInstance(context).logException(e);
 		}
 		finally
 		{

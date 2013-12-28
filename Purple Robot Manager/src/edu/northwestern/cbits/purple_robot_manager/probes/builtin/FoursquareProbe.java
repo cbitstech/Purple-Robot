@@ -302,7 +302,7 @@ public class FoursquareProbe extends Probe
 
 	public void updateFromMap(Context context, Map<String, Object> params) 
 	{
-/*		super.updateFromMap(context, params);
+		super.updateFromMap(context, params);
 		
 		if (params.containsKey(Probe.PROBE_FREQUENCY))
 		{
@@ -313,24 +313,26 @@ public class FoursquareProbe extends Probe
 				SharedPreferences prefs = Probe.getPreferences(context);
 				Editor e = prefs.edit();
 				
-				e.putString("config_probe_communication_event_frequency", frequency.toString());
+				e.putString("config_probe_foursquare_frequency", frequency.toString());
 				e.commit();
 			}
 		}
-
-		if (params.containsKey(Probe.HASH_DATA))
+		
+		if (params.containsKey(FoursquareProbe.PULL_ACTIVITY))
 		{
-			Object hash = params.get(Probe.HASH_DATA);
+			Object pull = params.get(FoursquareProbe.PULL_ACTIVITY);
 			
-			if (hash instanceof Boolean)
+			if (pull instanceof Boolean)
 			{
+				Boolean pullBoolean = (Boolean) pull;
+				
 				SharedPreferences prefs = Probe.getPreferences(context);
 				Editor e = prefs.edit();
 				
-				e.putBoolean("config_probe_communication_event_hash_data", ((Boolean) hash).booleanValue());
+				e.putBoolean(FoursquareProbe.PULL_ACTIVITY, pullBoolean.booleanValue());
 				e.commit();
 			}
-		} */
+		}
 	}
 
 	@SuppressWarnings("deprecation")
