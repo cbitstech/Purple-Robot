@@ -127,7 +127,7 @@ public class ProbeManager
 		{
 			for (Probe probe : ProbeManager.allProbes(context))
 			{
-				probe.nudge(context);
+				probe.nudge(context.getApplicationContext());
 			}
 		}
 	}

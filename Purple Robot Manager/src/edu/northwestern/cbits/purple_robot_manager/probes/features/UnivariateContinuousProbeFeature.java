@@ -88,21 +88,24 @@ public abstract class UnivariateContinuousProbeFeature extends ContinuousProbeFe
 			double[] incomingTimes = dataBundle.getDoubleArray("EVENT_TIMESTAMP");
 			float[] values = dataBundle.getFloatArray(key);
 			
-			for (int i = 0; i < incomingTimes.length; i++)
+			if (values != null)
 			{
-				if (index + i > BUFFER_SIZE)
-					this._filled = true;
+				for (int i = 0; i < incomingTimes.length; i++)
+				{
+					if (index + i > BUFFER_SIZE)
+						this._filled = true;
+					
+					int bufferIndex = (index + i) % BUFFER_SIZE;
+		
+					timestamp[bufferIndex] = incomingTimes[i];
+					value[bufferIndex] = values[i];
+				}
 				
-				int bufferIndex = (index + i) % BUFFER_SIZE;
+				index += incomingTimes.length;
 	
-				timestamp[bufferIndex] = incomingTimes[i];
-				value[bufferIndex] = values[i];
+				if (this._filled)
+					this.analyzeBuffers(context);
 			}
-			
-			index += incomingTimes.length;
-
-			if (this._filled)
-				this.analyzeBuffers(context);
 		}
 	}
 	

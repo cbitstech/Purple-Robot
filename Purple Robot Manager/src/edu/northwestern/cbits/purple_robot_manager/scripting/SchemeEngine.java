@@ -12,6 +12,7 @@ import jscheme.JScheme;
 import jsint.Evaluator;
 import jsint.Pair;
 import jsint.Symbol;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -29,6 +30,7 @@ public class SchemeEngine extends BaseScriptEngine
 		super(context);
 	}
 
+	@SuppressLint("DefaultLocale")
 	public static boolean canRun(String script) 
 	{
 		script = script.trim();
@@ -48,6 +50,7 @@ public class SchemeEngine extends BaseScriptEngine
 		return false;
 	}
 
+	@SuppressLint("DefaultLocale")
 	public Object evaluateSource(String source)
 	{
 		if (source.trim().toLowerCase().equals("(begin)"))
@@ -117,8 +120,9 @@ public class SchemeEngine extends BaseScriptEngine
 	public boolean updateTrigger(String triggerId, Pair parameters)
 	{
 		Map<String, Object> paramsMap = SchemeEngine.parsePairList(parameters);
+
 		paramsMap.put("identifier", triggerId);
-		
+
 		return super.updateTrigger(triggerId, paramsMap);
 	}
 
@@ -129,10 +133,10 @@ public class SchemeEngine extends BaseScriptEngine
 		if (paramsMap.containsKey("identifier"))
 		{
 			String triggerId = paramsMap.get("identifier").toString();
-			
-			return this.updateTrigger(triggerId, paramsMap);
+
+			return this.updateTrigger(triggerId, parameters);
 		}
-		
+
 		return false;
 	}
 
@@ -329,9 +333,9 @@ public class SchemeEngine extends BaseScriptEngine
 		return this.updateWidget(title, message, applicationName, SchemeEngine.parsePairList(launchParams), script);
 	}
 	
-	public void fetchLabels(String appContext, final Pair labels)
+	public void fetchLabels(String appContext, String instructions, final Pair labels)
 	{
-		super.fetchLabels(appContext, SchemeEngine.parsePairList(labels));
+		super.fetchLabels(appContext, instructions, SchemeEngine.parsePairList(labels));
 	}
 
 	public boolean launchApplication(String applicationName, final Pair launchParams, final String script)

@@ -17,12 +17,15 @@ import org.scribe.model.Verifier;
 import org.scribe.oauth.OAuthService;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.oauth.FitbitApi;
 import edu.northwestern.cbits.purple_robot_manager.oauth.InstagramApi;
@@ -150,6 +153,8 @@ public class OAuthActivity extends Activity
 	        	Thread t = new Thread(r);
 	        	t.start();
         	}
+
+        	this.finish();
     	}
     	else
     	{
@@ -240,6 +245,14 @@ public class OAuthActivity extends Activity
 				                	e.commit();
 				                	
 				                	SanityManager.getInstance(me).refreshState();
+				                	
+				                	me.runOnUiThread(new Runnable()
+				                	{
+										public void run() 
+										{
+						                	me.authSuccess();
+										}
+				                	});
 								}
 			            	};
 						}
@@ -258,6 +271,14 @@ public class OAuthActivity extends Activity
 				                	e.commit();
 				                	
 				                	SanityManager.getInstance(me).refreshState();
+
+				                	me.runOnUiThread(new Runnable()
+				                	{
+										public void run() 
+										{
+						                	me.authSuccess();
+										}
+				                	});
 								}
 			            	};
 						}
@@ -268,7 +289,26 @@ public class OAuthActivity extends Activity
         		}
         	}
     	}
+	}
 
-    	this.finish();
+	protected void authSuccess() 
+	{
+		final OAuthActivity me = this;
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		
+		builder = builder.setTitle(R.string.auth_success_title);
+		builder = builder.setMessage(R.string.auth_success_message);
+		
+		builder = builder.setCancelable(false);
+		builder = builder.setPositiveButton(R.string.auth_success_close, new DialogInterface.OnClickListener() 
+		{
+			public void onClick(DialogInterface dialog, int which) 
+			{
+				me.finish();
+			}
+		});
+		
+		builder.create().show();
 	}
 }

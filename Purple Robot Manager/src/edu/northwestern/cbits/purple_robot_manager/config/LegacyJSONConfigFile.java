@@ -86,7 +86,7 @@ public class LegacyJSONConfigFile
 				final EncryptionManager encryption = EncryptionManager.getInstance();
 				
 				Uri uri = encryption.getConfigUri(context, null);
-				
+
 				if (uri != null && uri.toString().trim().length() > 0)
 				{
 					try
@@ -196,13 +196,15 @@ public class LegacyJSONConfigFile
 						final String newHash = encryption.createHash(context, scriptString);
 						
 						PurpleRobotApplication.fixPreferences(context, true);
-
-						if (conn.getContentType().toLowerCase().startsWith("text/x-scheme") || scriptString.toLowerCase().startsWith("(begin "))
+						
+						if (scriptString.toLowerCase().startsWith("(begin ") || (conn.getContentType() != null && conn.getContentType().toLowerCase().startsWith("text/x-scheme")))
 						{
 							// TODO: Temp code until we get a more flexible parsing system in place...
 
 							if ("".equals(scriptString.trim()))
 								scriptString = "(begin)";
+							
+							oldHash = "";
 							
 							if (oldHash.equals(newHash) == false)
 							{
