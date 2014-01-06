@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -423,10 +420,5 @@ public class CommunicationLogProbe extends Probe
 		formatted.putStringArrayList("KEY_ORDER", keys);
 		
 		return formatted;
-	}
-
-	public void updateFromJSON(Context context, JSONObject json) throws JSONException
-	{
-		// TODO Auto-generated method stub
 	}
 }

@@ -346,9 +346,4 @@ public class BatteryProbe extends Probe
 
 		return screen;
 	}
-
-	public void updateFromJSON(Context context, JSONObject json) throws JSONException
-	{
-		// TODO Auto-generated method stub
-	}
 }

@@ -7,9 +7,6 @@ import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.Map;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -253,10 +250,5 @@ public class NetworkProbe extends Probe
 		screen.addPreference(duration);
 
 		return screen;
-	}
-
-	public void updateFromJSON(Context context, JSONObject json) throws JSONException
-	{
-		// TODO Auto-generated method stub
 	}
 }

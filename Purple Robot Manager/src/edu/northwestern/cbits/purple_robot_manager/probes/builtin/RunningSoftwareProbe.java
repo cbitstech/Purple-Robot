@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -305,10 +303,5 @@ public class RunningSoftwareProbe extends Probe
 		screen.addPreference(duration);
 
 		return screen;
-	}
-
-	public void updateFromJSON(Context context, JSONObject json) throws JSONException
-	{
-		// TODO Auto-generated method stub
 	}
 }

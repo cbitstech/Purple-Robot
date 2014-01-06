@@ -12,9 +12,6 @@ import java.util.Map;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -424,10 +421,5 @@ public class FacebookProbe extends Probe
         screen.addPreference(calibrate);
 
 		return screen;
-	}
-
-	public void updateFromJSON(Context context, JSONObject json) throws JSONException
-	{
-		// TODO Auto-generated method stub
 	}
 }

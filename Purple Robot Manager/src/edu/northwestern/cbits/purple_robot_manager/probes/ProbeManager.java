@@ -5,10 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -73,7 +69,6 @@ import edu.northwestern.cbits.purple_robot_manager.probes.features.WeatherUnderg
 
 public class ProbeManager
 {
-	private static final String PROBE_NAME = "name";
 	private static Map<String, Probe> _cachedProbes = new HashMap<String, Probe>();
 	private static List<Probe> _probeInstances = new ArrayList<Probe>();
 
@@ -592,35 +587,6 @@ public class ProbeManager
 		}
 
 		return screen;
-	}
-
-	public static void updateProbesFromJSON(Context context, JSONArray probeSettings)
-	{
-		if (ProbeManager._inited == false)
-			return;
-
-		for (int i = 0; i < probeSettings.length(); i++)
-		{
-			try
-			{
-				JSONObject json = probeSettings.getJSONObject(i);
-
-				if (json.has(ProbeManager.PROBE_NAME))
-				{
-					String name = json.getString(ProbeManager.PROBE_NAME);
-
-					for (Probe p : ProbeManager.allProbes(context))
-					{
-						if (name.equalsIgnoreCase(p.title(context)))
-							p.updateFromJSON(context, json);
-					}
-				}
-			}
-			catch (JSONException e)
-			{
-				LogManager.getInstance(context).logException(e);
-			}
-		}
 	}
 
 	public static void clearFeatures()

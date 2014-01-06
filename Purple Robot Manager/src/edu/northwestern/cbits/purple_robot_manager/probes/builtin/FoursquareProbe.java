@@ -428,11 +428,6 @@ public class FoursquareProbe extends Probe
 		return screen;
 	}
 
-	public void updateFromJSON(Context context, JSONObject json) throws JSONException
-	{
-		// TODO Auto-generated method stub
-	}
-
 	public static void annotate(Context context, Bundle bundle) 
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);

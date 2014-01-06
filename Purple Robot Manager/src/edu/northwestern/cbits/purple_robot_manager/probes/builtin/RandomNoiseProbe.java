@@ -3,9 +3,6 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 import java.security.SecureRandom;
 import java.util.Map;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -177,12 +174,5 @@ public class RandomNoiseProbe extends Probe
 				e.commit();
 			}
 		}
-	}
-
-
-
-	public void updateFromJSON(Context context, JSONObject json) throws JSONException
-	{
-		// TODO Auto-generated method stub
 	}
 }

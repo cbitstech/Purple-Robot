@@ -1,8 +1,5 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.features;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.Context;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceActivity;
@@ -43,7 +40,7 @@ public abstract class Feature extends Probe
 
 	protected abstract String summary(Context context);
 
-	public void updateFromJSON(Context context, JSONObject json) throws JSONException
+
 	{
 
 	}

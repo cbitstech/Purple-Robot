@@ -1,8 +1,6 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
 import org.apache.commons.lang.StringUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -36,7 +34,7 @@ public class FacebookEventsProbe extends Probe
 		return null;
 	}
 
-	public void updateFromJSON(Context context, JSONObject json) throws JSONException 
+ 
 	{
 
 	}

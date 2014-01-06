@@ -3,9 +3,6 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 import java.util.Map;
 import java.util.UUID;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -148,11 +145,6 @@ public abstract class ContinuousProbe extends Probe
 		return formatted;
 	};
 
-	public void updateFromJSON(Context context, JSONObject json) throws JSONException
-	{
-		// TODO...
-	}
-	
 	public int getResourceFrequencyLabels()
 	{
 		return R.array.probe_continuous_frequency_labels;

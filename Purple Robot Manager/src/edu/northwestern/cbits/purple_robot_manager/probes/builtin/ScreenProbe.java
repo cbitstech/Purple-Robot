@@ -1,8 +1,5 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -154,10 +151,5 @@ public class ScreenProbe extends Probe
 		screen.addPreference(enabled);
 
 		return screen;
-	}
-
-	public void updateFromJSON(Context context, JSONObject json) throws JSONException
-	{
-		// TODO Auto-generated method stub
 	}
 }

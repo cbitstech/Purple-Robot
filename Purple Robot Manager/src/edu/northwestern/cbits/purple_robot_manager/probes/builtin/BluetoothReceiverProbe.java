@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
@@ -179,7 +176,7 @@ public class BluetoothReceiverProbe extends Probe
 		socket.close();
 	}
 
-	public void updateFromJSON(Context context, JSONObject json) throws JSONException
+
 	{
 
 	}

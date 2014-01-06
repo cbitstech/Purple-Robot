@@ -2,9 +2,6 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
 import java.util.Calendar;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -117,7 +114,7 @@ public class DateCalendarProbe extends Probe
 		return false;
 	}
 	
-	public void updateFromJSON(Context context, JSONObject json) throws JSONException 
+ 
 	{
 
 	}

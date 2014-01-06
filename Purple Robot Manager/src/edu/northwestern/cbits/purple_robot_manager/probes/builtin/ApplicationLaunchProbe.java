@@ -2,9 +2,6 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
 import java.util.Map;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningTaskInfo;
 import android.app.AlarmManager;
@@ -241,10 +238,5 @@ public class ApplicationLaunchProbe extends Probe
 		screen.addPreference(duration);
 
 		return screen;
-	}
-
-	public void updateFromJSON(Context context, JSONObject json) throws JSONException
-	{
-		// TODO Auto-generated method stub
 	}
 }
