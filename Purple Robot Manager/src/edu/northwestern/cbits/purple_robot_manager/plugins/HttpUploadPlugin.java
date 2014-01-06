@@ -318,13 +318,13 @@ public class HttpUploadPlugin extends OutputPlugin
 			
 			PurpleRobotApplication.fixPreferences(this.getContext(), false);
 			
-			if (prefs.getBoolean("config_enable_data_server", false) == false)
+			if (this.enableDataServer(prefs) == false)
 			{
 				this._uploading = false;
 				return;
 			}
 
-			if (prefs.getBoolean("config_restrict_data_wifi", true))
+			if (this.restrictToWifi(prefs))
 			{
 				if (WiFiHelper.wifiAvailable(this.getContext()) == false)
 				{
@@ -878,6 +878,46 @@ public class HttpUploadPlugin extends OutputPlugin
 
 			Thread t = new Thread(r);
 			t.start();
+		}
+	}
+
+	private boolean restrictToWifi(SharedPreferences prefs) 
+	{
+		try
+		{
+			return prefs.getBoolean("config_restrict_data_wifi", true);
+		}
+		catch (ClassCastException e)
+		{
+			String enabled = prefs.getString("config_restrict_data_wifi", "true").toLowerCase(Locale.ENGLISH);
+			
+			boolean isRestricted = ("false".equals(enabled) == false); 
+			
+			Editor edit = prefs.edit();
+			edit.putBoolean("config_restrict_data_wifi", isRestricted);
+			edit.commit();
+			
+			return isRestricted;
+		}
+	}
+
+	private boolean enableDataServer(SharedPreferences prefs) 
+	{
+		try
+		{
+			return prefs.getBoolean("config_enable_data_server", false);
+		}
+		catch (ClassCastException e)
+		{
+			String enabled = prefs.getString("config_enable_data_server", "false").toLowerCase(Locale.ENGLISH);
+			
+			boolean isEnabled = ("false".equals(enabled) == false); 
+			
+			Editor edit = prefs.edit();
+			edit.putBoolean("config_enable_data_server", isEnabled);
+			edit.commit();
+			
+			return isEnabled;
 		}
 	}
 

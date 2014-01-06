@@ -306,6 +306,12 @@ public class FacebookProbe extends Probe
 
 				return true;
 			}
+			else
+			{
+				Editor e = prefs.edit();
+				e.remove(FacebookProbe.TOKEN);
+				e.commit();
+			}
 		}
 
 		return false;
