@@ -7,9 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -132,7 +129,7 @@ public abstract class Probe
 		return bundle.toString();
 	}
 
-	public abstract void updateFromJSON(Context context, JSONObject json) throws JSONException;
+//	public abstract void updateFromJSON(Context context, JSONObject json) throws JSONException;
 
 	public Bundle formattedBundle(Context context, Bundle bundle)
 	{

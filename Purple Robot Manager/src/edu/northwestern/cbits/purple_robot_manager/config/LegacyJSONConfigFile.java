@@ -62,7 +62,6 @@ public class LegacyJSONConfigFile
 	public static final String USER_ID = "user_id";
 	public static final String USER_HASH = "user_hash";
 	public static final String JSON_CONFIGURATION = "json_configuration_contents";
-	public static final String JSON_PROBE_SETTINGS = "probe_settings";
 	public static final String JSON_LAST_UPDATE = "json_configuration_last_update";
 	public static final String JSON_LAST_HASH = "json_configuration_last_update_hash";
 	public static final String FEATURES = "features";
@@ -567,20 +566,6 @@ public class LegacyJSONConfigFile
 
 		if (userHash != null)
 			editor.putString("config_user_hash", userHash);
-
-		if (this.parameters.has(LegacyJSONConfigFile.JSON_PROBE_SETTINGS))
-		{
-			try
-			{
-				JSONArray probeSettings = this.parameters.getJSONArray(LegacyJSONConfigFile.JSON_PROBE_SETTINGS);
-
-				ProbeManager.updateProbesFromJSON(context, probeSettings);
-			}
-			catch (JSONException e)
-			{
-				LogManager.getInstance(context).logException(e);
-			}
-		}
 
 		if (this.parameters.has(LegacyJSONConfigFile.FEATURES))
 		{

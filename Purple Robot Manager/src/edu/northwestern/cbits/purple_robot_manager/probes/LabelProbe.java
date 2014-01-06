@@ -1,8 +1,5 @@
 package edu.northwestern.cbits.purple_robot_manager.probes;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
@@ -39,11 +36,6 @@ public class LabelProbe extends Probe
 		return bundle.getString("KEY") + ": " + bundle.getString("VALUE");	
 	}
 
-	public void updateFromJSON(Context context, JSONObject json) throws JSONException 
-	{
-		// TODO Auto-generated method stub
-	}
-	
 	public void enable(Context context) 
 	{
 

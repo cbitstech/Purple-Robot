@@ -220,11 +220,6 @@ public class StepCounterProbe extends Probe implements SensorEventListener
 		return screen;
 	}
 
-	public void updateFromJSON(Context context, JSONObject json) throws JSONException
-	{
-		// TODO Auto-generated method stub
-	}
-
 	public void onAccuracyChanged(Sensor sensor, int accuracy) 
 	{
 

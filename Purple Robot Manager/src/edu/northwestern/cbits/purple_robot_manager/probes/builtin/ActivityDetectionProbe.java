@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -262,11 +259,6 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
 		screen.addPreference(duration);
 
 		return screen;
-	}
-
-	public void updateFromJSON(Context context, JSONObject json) throws JSONException
-	{
-		// TODO Auto-generated method stub
 	}
 
 	public void onConnected(Bundle bundle) 

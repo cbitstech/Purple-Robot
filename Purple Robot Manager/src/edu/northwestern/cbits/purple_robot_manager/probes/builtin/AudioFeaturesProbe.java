@@ -4,8 +4,6 @@ import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.transform.DftNormalization;
 import org.apache.commons.math3.transform.FastFourierTransformer;
 import org.apache.commons.math3.transform.TransformType;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -173,11 +171,6 @@ public class AudioFeaturesProbe extends Probe
 	public String summary(Context context)
 	{
 		return context.getString(R.string.summary_audio_features_probe_desc);
-	}
-
-	public void updateFromJSON(Context context, JSONObject json) throws JSONException 
-	{
-		// TODO
 	}
 
 	public void enable(Context context)

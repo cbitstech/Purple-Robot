@@ -3,9 +3,6 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -228,11 +225,6 @@ public class LocationProbe extends Probe implements LocationListener
 		this._listening = false;
 
 		return false;
-	}
-
-	public void updateFromJSON(Context context, JSONObject json) throws JSONException
-	{
-		// TODO...
 	}
 
 	public String title(Context context)

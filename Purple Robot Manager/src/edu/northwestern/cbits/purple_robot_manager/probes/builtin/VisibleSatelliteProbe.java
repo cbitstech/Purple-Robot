@@ -3,9 +3,6 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 import java.util.ArrayList;
 import java.util.Map;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -175,11 +172,6 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 		locationManager.removeUpdates(this);
 
 		return false;
-	}
-
-	public void updateFromJSON(Context context, JSONObject json) throws JSONException
-	{
-		// TODO...
 	}
 
 	public String title(Context context)
