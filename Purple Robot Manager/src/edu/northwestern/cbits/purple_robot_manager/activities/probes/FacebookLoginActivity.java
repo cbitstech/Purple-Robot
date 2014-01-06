@@ -1,5 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager.activities.probes;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -35,6 +37,11 @@ public class FacebookLoginActivity extends ActionBarActivity
 			return;
 		
 		this._inited = true;
+		
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		Editor e = prefs.edit();
+		e.remove(FacebookProbe.TOKEN);
+		e.commit();
 
 		final FacebookLoginActivity me = this;
         
@@ -96,6 +103,8 @@ public class FacebookLoginActivity extends ActionBarActivity
 
 	private void go(Session session) 
 	{
+		final FacebookLoginActivity me = this;
+
 		String token = session.getAccessToken();
 		
 		if (token != null && token.trim().length() > 0)
@@ -110,8 +119,48 @@ public class FacebookLoginActivity extends ActionBarActivity
 			sanity.clearAlert(this.getString(R.string.title_facebook_check));
 
 			sanity.refreshState();
+			
+			
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			
+			builder = builder.setTitle(R.string.title_facebook_success);
+			builder = builder.setMessage(R.string.message_facebook_success);
+			builder = builder.setPositiveButton(R.string.confirm_facebook_success, new DialogInterface.OnClickListener() 
+			{
+				public void onClick(DialogInterface dialog, int which) 
+				{
+					me.finish();
+				}
+			});
+			
+			builder.create().show();
 		}
+		else
+		{
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			
+			builder = builder.setTitle(R.string.title_facebook_failure);
+			builder = builder.setMessage(R.string.message_facebook_failure);
+			builder = builder.setPositiveButton(R.string.confirm_facebook_success, new DialogInterface.OnClickListener() 
+			{
+				public void onClick(DialogInterface dialog, int which) 
+				{
+					me.finish();
+				}
+			});
 
-		this.finish();
+			builder = builder.setNegativeButton(R.string.confirm_facebook_try_again, new DialogInterface.OnClickListener() 
+			{
+				public void onClick(DialogInterface dialog, int which) 
+				{
+					me.finish();
+					
+					Intent intent = new Intent(me, FacebookLoginActivity.class);
+					me.startActivity(intent);
+				}
+			});
+			
+			builder.create().show();
+		}
     }
 }

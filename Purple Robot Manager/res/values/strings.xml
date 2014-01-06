@@ -1032,6 +1032,13 @@
     <string name="facebook_event_obfuscated_desc" formatted="false">Obfuscated: %s (%s)</string>	
     <string name="facebook_event_clear_desc" formatted="false">%s (%s)</string>	
 
+    <string name="title_facebook_success">Facebook Login Successful!</string>	
+	<string name="message_facebook_success">Purple Robot has sucessfully logged in to Facebook and can now fetch data from the service.</string>	
+    <string name="title_facebook_failure">Facebook Login Failed!</string>	
+	<string name="message_facebook_failure">Purple Robot was unable to log in to Facebook. Please try again.</string>	
+	<string name="confirm_facebook_success">OK</string>	
+	<string name="confirm_facebook_try_again">Try Again</string>	
+    
    	<!-- Twitter API Feature -->
     <string name="title_twitter_probe">Twitter Probe</string>
     <string name="summary_twitter_probe_desc">Collects profile data &amp; tweets from Twitter.</string>
