@@ -222,7 +222,48 @@ public class SnapshotManager
 	
 	public JSONObject jsonForTime(long time)
 	{
-		return null;
+		JSONObject object = new JSONObject();
+		
+		String selection = "recorded = ?";
+		String[] args = { "" + time };
+        
+        Cursor c = this._context.getContentResolver().query(RobotContentProvider.SNAPSHOTS, null, selection, args, null);
+        
+        if (c.moveToNext())
+        {
+        	String source = c.getString(c.getColumnIndex("source"));
+        	long recorded = c.getLong(c.getColumnIndex("recorded"));
+        	String jsonString = c.getString(c.getColumnIndex("value"));
+
+        	String audio = c.getString(c.getColumnIndex("audio_file"));
+        	
+        	if (audio != null)
+        	{
+	        	File f = new File(audio);
+	
+	        	if (f.exists() == false)
+	        		audio = null;
+        	}
+        	
+        	try
+        	{
+	        	object.put("recorded", recorded);
+	        	object.put("source", source);
+	        	
+	        	if (audio != null)
+	        		object.put("audio", audio.replace("\\/", "/"));
+	        	
+	        	object.put("value", new JSONObject(jsonString));
+        	}
+        	catch (JSONException e)
+        	{
+        		LogManager.getInstance(this._context).logException(e);
+        	}
+         }
+        
+        c.close();
+		
+		return object;
 	}
 	
 	public void clearTime(long time)

@@ -1,0 +1,36 @@
+<html>
+	<head>
+		<title>Snapshots | Purple Robot</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<script type="text/javascript" src="/js/date.js"></script>
+		<script type="text/javascript" src="/js/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function() 
+			{
+				$.getJSON("/snapshots.json", function(data)
+				{
+					var list = $("ul#snapshots_list");
+					
+					for (var i = 0; i < data.length; i++)
+					{
+						var item = data[i];
+						var timestamp = item["recorded"];
+						var source = item["source"];
+						var date = new Date(timestamp);
+						
+						list.append("<li><p><a href='snapshot.html?timestamp=" + timestamp + "'>" + source + " (" + date.toString("M/d/yyyy HH:mm") + ")</a></p></li>");
+					}
+					
+					if (data.length == 0)
+						list.append("<p><em>No snapshots recorded, yet.</em></p>");
+				});
+			});
+		</script>
+	</head>
+	<body style="margin: 1em; font-family: Roboto, 'Droid Sans', sans-serif; overflow-y: scroll; overflow-x: hidden;">
+		<h3>Snapshots</h3>
+		<p>The following snapshots are available on this device:</p>
+		
+		<ul id="snapshots_list"></ul>
+	</body>
+</html>

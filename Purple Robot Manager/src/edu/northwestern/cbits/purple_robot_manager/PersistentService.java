@@ -141,6 +141,7 @@ public class PersistentService extends Service
 		this.registerReceiver(scriptReceiver, filter);
 	}
 
+	@SuppressLint("NewApi")
 	public int onStartCommand(Intent intent, int flags, int startId)
 	{
 		if (intent != null)
