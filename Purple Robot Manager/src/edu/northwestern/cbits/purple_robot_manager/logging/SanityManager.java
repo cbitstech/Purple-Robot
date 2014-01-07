@@ -6,6 +6,7 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -13,10 +14,13 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
 
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.DiagnosticActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.StartActivity;
 
 public class SanityManager 
@@ -56,7 +60,8 @@ public class SanityManager
 		return SanityManager._sharedInstance;
 	}
 	
-	@SuppressWarnings({ "rawtypes", "deprecation" })
+	@SuppressWarnings("rawtypes")
+	@SuppressLint("NewApi")
 	public void refreshState() 
 	{
 		String packageName = this.getClass().getPackage().getName();
@@ -117,51 +122,102 @@ public class SanityManager
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
 		
-		if (prefs.getBoolean("config_mute_warnings", false) == false && this.getErrorLevel() != this._lastStatus)
+		if (prefs.getBoolean("config_mute_warnings", false) == false)
 		{
 			this._lastStatus = this.getErrorLevel();
-
-			NotificationManager noteManager = (NotificationManager) this._context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-			int icon = R.drawable.ic_note_normal;
-			
-			String title = null;
-			String message = null;
-			
-			if (this.getErrorLevel() == SanityCheck.ERROR)
-			{
-				icon = R.drawable.ic_note_error;
-				
-				for (String key : this._errors.keySet())
-				{
-					title = key;
-					message = this._errors.get(key);
-				}
-			}				
-			else if (this.getErrorLevel() == SanityCheck.WARNING)
-			{
-				icon = R.drawable.ic_note_warning;
-
-				for (String key : this._warnings.keySet())
-				{
-					title = key;
-					message = this._warnings.get(key);
-				}
-			}
-			
-			if (title == null)
-			{
-				title = this._context.getString(R.string.pr_errors_none_label);
-				message = this._context.getString(R.string.pr_errors_none_label);
-			}
-			
-			Notification note = new Notification(icon, title, System.currentTimeMillis());
+			int issueCount = this._errors.size() + this._warnings.size();
 
 			PendingIntent contentIntent = PendingIntent.getActivity(this._context, 0, new Intent(this._context, StartActivity.class), Notification.FLAG_ONGOING_EVENT);
-			note.setLatestEventInfo(this._context, title, message, contentIntent);
-			note.flags = Notification.FLAG_ONGOING_EVENT;
+			
+			if (this._lastStatus != SanityCheck.OK)
+				contentIntent = PendingIntent.getActivity(this._context, 0, new Intent(this._context, DiagnosticActivity.class), Notification.FLAG_ONGOING_EVENT);
+			
+			NotificationManager noteManager = (NotificationManager) this._context.getSystemService(Context.NOTIFICATION_SERVICE);
+			
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH && this._lastStatus != SanityCheck.OK)
+			{
+				Notification.Builder builder = new Notification.Builder(this._context);
+					
+				builder.setContentIntent(contentIntent);
+				builder.setContentTitle(this._context.getString(R.string.notify_running_title));
+				
+				if (issueCount == 1)
+				{
+					builder.setContentText(this._context.getString(R.string.note_purple_robot_message_single));
+					builder.setTicker(this._context.getString(R.string.note_purple_robot_message_single));
+				}
+				else
+				{
+					builder.setContentText(this._context.getString(R.string.note_purple_robot_message_multiple, issueCount));
+					builder.setTicker(this._context.getString(R.string.note_purple_robot_message_multiple, issueCount));
+				}
+				
+				if (this._lastStatus == SanityCheck.ERROR)
+					builder.setSmallIcon(R.drawable.ic_note_error);
+				else
+					builder.setSmallIcon(R.drawable.ic_note_warning);
+	
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
+				{
+					Notification.InboxStyle style = new Notification.InboxStyle();
+						
+					style = style.setBigContentTitle(this._context.getString(R.string.note_purple_robot_status));
 
-			noteManager.notify(12345, note);
+					if (issueCount == 1)
+						style = style.setSummaryText(this._context.getString(R.string.note_purple_robot_message_single));
+					else
+						style = style.setSummaryText(this._context.getString(R.string.note_purple_robot_message_multiple, issueCount));
+
+					for (String key : this._errors.keySet())
+						style = style.addLine(this._errors.get(key));
+
+					for (String key : this._warnings.keySet())
+						style = style.addLine(this._warnings.get(key));
+
+					builder.setStyle(style);
+
+					Notification note = builder.build();
+					note.flags = Notification.FLAG_ONGOING_EVENT;
+
+					noteManager.notify(12345, note);
+				}
+			}
+			else
+			{
+				NotificationCompat.Builder builder = new NotificationCompat.Builder(this._context);
+
+				builder.setContentTitle(this._context.getString(R.string.notify_running_title));
+				
+				if (this._lastStatus != SanityCheck.OK)
+				{
+					if (issueCount == 1)
+					{
+						builder.setContentText(this._context.getString(R.string.note_purple_robot_message_single));
+						builder.setTicker(this._context.getString(R.string.note_purple_robot_message_single));
+					}
+					else
+					{
+						builder.setContentText(this._context.getString(R.string.note_purple_robot_message_multiple, issueCount));
+						builder.setTicker(this._context.getString(R.string.note_purple_robot_message_multiple, issueCount));
+					}
+					
+					if (this._lastStatus != SanityCheck.ERROR)
+						builder.setSmallIcon(R.drawable.ic_note_error);
+					else
+						builder.setSmallIcon(R.drawable.ic_note_warning);
+				}
+				else
+				{
+					builder.setContentIntent(contentIntent);
+					builder.setContentText(this._context.getString(R.string.pr_errors_none_label));
+					builder.setSmallIcon(R.drawable.ic_note_normal);
+				}
+	
+				Notification note = builder.build();
+				note.flags = Notification.FLAG_ONGOING_EVENT;
+
+				noteManager.notify(12345, note);
+			}
 		}
 	}
 
