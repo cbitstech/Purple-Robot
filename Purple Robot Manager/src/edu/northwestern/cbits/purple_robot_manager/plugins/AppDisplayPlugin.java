@@ -79,22 +79,25 @@ public class AppDisplayPlugin extends OutputPlugin
 			
 			ContentValues toRemove = null;
 			
-			do
+			synchronized(this._valuesQueue)
 			{
-				toRemove = null;
-						
-				for (ContentValues check : this._valuesQueue)
+				do
 				{
-					if (check.getAsString("source").equals(values.getAsString("source")))
-						toRemove = check;
+					toRemove = null;
+					
+					for (ContentValues check : this._valuesQueue)
+					{
+						if (check.getAsString("source").equals(values.getAsString("source")))
+							toRemove = check;
+					}
+					
+					if (toRemove != null)
+						this._valuesQueue.remove(toRemove);
 				}
-				
-				if (toRemove != null)
-					this._valuesQueue.remove(toRemove);
+				while (toRemove != null);
+
+				this._valuesQueue.add(values);
 			}
-			while (toRemove != null);
-			
-			this._valuesQueue.add(values);
 
 			if (System.currentTimeMillis() - this._lastUpdate > 1000)
 			{

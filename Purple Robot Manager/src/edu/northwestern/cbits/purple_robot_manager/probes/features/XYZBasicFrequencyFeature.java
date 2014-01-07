@@ -20,8 +20,6 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
-// import android.util.Log;
 import edu.emory.mathcs.backport.java.util.Arrays;
 import edu.emory.mathcs.backport.java.util.Collections;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -71,8 +69,6 @@ public abstract class XYZBasicFrequencyFeature extends ContinuousProbeFeature
 	
 	private void appendValues(float[] incomingX, float[] incomingY, float[] incomingZ, double[] ts)
 	{
-		Log.e("PR", "INCOMING: " + incomingX + " " + incomingY + " " + incomingZ + " " + ts);
-
 		if (this._currentIndex + ts.length > BUFFER_SIZE)
 		{
 			int shift = this._currentIndex + ts.length - BUFFER_SIZE;
