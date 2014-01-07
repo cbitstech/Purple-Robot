@@ -1128,7 +1128,11 @@
 	<string name="auth_success_title">Great Work!</string>
 	<string name="auth_success_message">You have successfully connected Purple Robot to your online account. Close the browser tab and return to Purple Robot to continue.</string>
 	<string name="auth_success_close">Continue&#8230;</string>
-			
+
+	<string name="note_purple_robot_status">Purple Robot Status</string>
+	<string name="note_purple_robot_message_single">You have 1 action or issue to resolve.</string>
+	<string name="note_purple_robot_message_multiple" formatted="false">You have %d actions or issues to resolve.</string>
+						
 </resources>
 
 

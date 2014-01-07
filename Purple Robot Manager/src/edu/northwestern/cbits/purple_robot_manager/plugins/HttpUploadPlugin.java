@@ -63,7 +63,6 @@ import android.accounts.AccountManager;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Notification;
-// import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -536,8 +535,6 @@ public class HttpUploadPlugin extends OutputPlugin
 
 							jsonMessage.put(CHECKSUM_KEY, checksum);
 							jsonMessage.put(CONTENT_LENGTH_KEY, checksummed.length);
-
-//							NotificationManager noteManager = (NotificationManager) me.getContext().getSystemService(Context.NOTIFICATION_SERVICE);
 
 							AndroidHttpClient androidClient = AndroidHttpClient.newInstance("Purple Robot", me.getContext());
 
