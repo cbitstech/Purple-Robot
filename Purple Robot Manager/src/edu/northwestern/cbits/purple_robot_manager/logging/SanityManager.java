@@ -190,6 +190,8 @@ public class SanityManager
 				
 				if (this._lastStatus != SanityCheck.OK)
 				{
+					contentIntent = PendingIntent.getActivity(this._context, 0, new Intent(this._context, DiagnosticActivity.class), Notification.FLAG_ONGOING_EVENT);
+
 					if (issueCount == 1)
 					{
 						builder.setContentText(this._context.getString(R.string.note_purple_robot_message_single));
@@ -201,18 +203,19 @@ public class SanityManager
 						builder.setTicker(this._context.getString(R.string.note_purple_robot_message_multiple, issueCount));
 					}
 					
-					if (this._lastStatus != SanityCheck.ERROR)
+					if (this._lastStatus != SanityCheck.WARNING)
 						builder.setSmallIcon(R.drawable.ic_note_error);
 					else
 						builder.setSmallIcon(R.drawable.ic_note_warning);
 				}
 				else
 				{
-					builder.setContentIntent(contentIntent);
 					builder.setContentText(this._context.getString(R.string.pr_errors_none_label));
 					builder.setSmallIcon(R.drawable.ic_note_normal);
 				}
-	
+
+				builder.setContentIntent(contentIntent);
+
 				Notification note = builder.build();
 				note.flags = Notification.FLAG_ONGOING_EVENT;
 

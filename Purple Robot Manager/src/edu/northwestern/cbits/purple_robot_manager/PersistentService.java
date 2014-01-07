@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -41,6 +42,7 @@ public class PersistentService extends Service
 		return null;
 	}
 
+	@SuppressLint("NewApi")
 	@SuppressWarnings("deprecation")
 	public void onCreate()
 	{
@@ -51,7 +53,7 @@ public class PersistentService extends Service
 		String title = this.getString(R.string.notify_running_title);
 		String message = this.getString(R.string.notify_running);
 
-		Notification note = new Notification(R.drawable.ic_notify_foreground, title, System.currentTimeMillis());
+		Notification note = new Notification(R.drawable.ic_note_normal, title, System.currentTimeMillis());
 		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, StartActivity.class), Notification.FLAG_ONGOING_EVENT | Notification.FLAG_NO_CLEAR);
 		note.setLatestEventInfo(this, title, message, contentIntent);
 

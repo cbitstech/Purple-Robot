@@ -568,7 +568,7 @@ public class HttpUploadPlugin extends OutputPlugin
 							
 							String title = me.getContext().getString(R.string.notify_upload_data);
 
-							Notification note = new Notification(R.drawable.ic_notify_foreground, title, System.currentTimeMillis());
+							Notification note = new Notification(R.drawable.ic_note_normal, title, System.currentTimeMillis());
 							PendingIntent contentIntent = PendingIntent.getActivity(me.getContext(), 0,
 									new Intent(me.getContext(), StartActivity.class), Notification.FLAG_ONGOING_EVENT);
 
