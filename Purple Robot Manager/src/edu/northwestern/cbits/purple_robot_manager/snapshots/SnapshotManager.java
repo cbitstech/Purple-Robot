@@ -19,6 +19,8 @@ import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.RobotContentProvider;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
+import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 
 public class SnapshotManager 
 {
@@ -220,7 +222,7 @@ public class SnapshotManager
 		return times;
 	}
 	
-	public JSONObject jsonForTime(long time)
+	public JSONObject jsonForTime(long time, boolean includeValues)
 	{
 		JSONObject object = new JSONObject();
 		
@@ -253,7 +255,24 @@ public class SnapshotManager
 	        	if (audio != null)
 	        		object.put("audio", audio.replace("\\/", "/"));
 	        	
-	        	object.put("value", new JSONObject(jsonString));
+	        	if (includeValues)
+	        	{
+	        		JSONArray values = new JSONArray(jsonString);
+	        		
+	        		for (int i = 0; i < values.length(); i++)
+	        		{
+	        			JSONObject value = values.getJSONObject(i);
+	        			
+	        			String name = value.getString("probe");
+	        			
+	        			Probe p = ProbeManager.probeForName(name, this._context);
+	        			
+	        			if (p != null)
+	        				value.put("name", p.title(this._context));
+	        		}
+
+	        		object.put("values", values);
+	        	}
         	}
         	catch (JSONException e)
         	{

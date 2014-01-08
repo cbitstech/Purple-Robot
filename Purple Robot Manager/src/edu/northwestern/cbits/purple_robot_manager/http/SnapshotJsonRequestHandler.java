@@ -39,7 +39,7 @@ public class SnapshotJsonRequestHandler implements HttpRequestHandler
     	
     	for (long timestamp : timestamps)
     	{
-    		snapshots.put(manager.jsonForTime(timestamp));
+    		snapshots.put(manager.jsonForTime(timestamp, false));
     	}
 
         try 
