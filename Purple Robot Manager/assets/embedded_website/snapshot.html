@@ -8,11 +8,142 @@
 			$(document).ready(function() 
 			{
 				var snapshot = SNAPSHOT_PLACEHOLDER;
+				
+				if ("audio" in snapshot)
+				{
+					$("div#play_audio").click(function()
+					{
+						$("div#play_audio").text("Playing...");
+						
+						$.getJSON("/snapshot/audio.html?timestamp=" +  snapshot["recorded"], function(data)
+						{
+							$("div#play_audio").text("Play Audio");
+						});
+					});
+					
+					$("div#play_audio").show();
+				}
+				else
+					$("div#play_audio").hide();
+					
+				var readings = snapshot["values"];
+
+				for (var i = 0; i < readings.length; i++)
+				{
+					var reading = readings[i];
+					
+					var recorded = new Date(reading["recorded"] * 1000);
+					
+					var row = "<div class='reading' id='" + reading["probe"] + "'>";
+					row += "<span class='probe_name'>" + reading["name"] + "</span>";
+					row += "<span class='probe_date'>" + recorded.toString("M/d/yyyy HH:mm") + "</span>";
+					row += "</div>";
+					
+					$("div#readings").append(row);
+				}
+				
+				$("div.reading").click(function()
+				{
+					$("div.reading").removeClass("selected").addClass("clear");
+
+					$(this).removeClass("clear").addClass("selected");
+										
+					var probeName = $(this).attr("id");
+	
+					var values = snapshot["values"];
+					
+					var value = null;
+					
+					for (var i = 0; i < values.length && value == null; i++)
+					{
+						if (probeName == values[i]["probe"])
+							value = values[i];
+					}
+					
+					var display = "<pre>";
+					display += JSON.stringify(value, undefined, 2);
+					display += "</pre>";
+				
+					$("div#display").html(display);
+				});
 			});
 		</script>
+		<style>
+			span.probe_name
+			{
+				font-weight: bold;
+				display: block;
+			}
+
+			span.probe_date
+			{
+				display: block;
+			}
+			
+			div.selected
+			{
+				background-color: #c0c0c0;
+			}
+
+			div.clear
+			{
+				background-color: #ffffff;
+			}
+
+			div.reading
+			{
+				border-bottom: 1px solid #909090;
+				padding: 0.5em;
+			}
+
+			div#display
+			{
+				padding: 0.5em;
+				height: 50%;
+				overflow-y: scroll; 
+				overflow-x: hidden;
+				background-color: #000000;
+				color: #008000;
+				border-bottom: 1px solid #909090;
+			}
+			
+			pre
+			{
+				margin: 0;
+			}
+			
+			div#readings
+			{
+				height: 50%;
+				overflow-y: scroll; 
+			}
+			
+			body
+			{
+				font-size: smaller;
+				margin: 0; 
+				font-family: Roboto, 'Droid Sans', sans-serif; 
+				overflow-y: hidden; 
+				overflow-x: hidden;
+			}
+			
+			div#play_audio
+			{
+			    position: absolute;
+    			top: 0px;
+			    right: 0px;
+			    font-weight: bold;
+			    color: #ff4444;
+			    background-color: #000000;
+			    padding: 0.5em;
+			}
+		</style>
 	</head>
-	<body style="margin: 1em; font-family: Roboto, 'Droid Sans', sans-serif; overflow-y: scroll; overflow-x: hidden;">
-		<h3>Snapshot Details</h3>
-		<p>Coming soon!</p>
+	<body>
+		<div id="display">
+			<pre>Please select a reading to continue...</pre>
+		</div>
+		<div id="readings"></div>
+		<div id="play_audio">Play Audio</div>
 	</body>
 </html>

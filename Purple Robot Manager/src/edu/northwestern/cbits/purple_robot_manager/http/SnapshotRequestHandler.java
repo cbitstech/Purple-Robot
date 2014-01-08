@@ -46,7 +46,7 @@ public class SnapshotRequestHandler implements HttpRequestHandler
 			{
 	            long timestamp = Long.parseLong(u.getQueryParameter("timestamp"));
 	            
-	            JSONObject snapshot = SnapshotManager.getInstance(this._context).jsonForTime(timestamp);
+	            JSONObject snapshot = SnapshotManager.getInstance(this._context).jsonForTime(timestamp, true);
 	            
 				AssetManager am = this._context.getAssets();
 
