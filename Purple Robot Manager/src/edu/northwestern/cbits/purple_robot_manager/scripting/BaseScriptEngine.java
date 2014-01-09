@@ -1022,6 +1022,8 @@ public abstract class BaseScriptEngine
 	{
 		Map<String, Object> values = new HashMap<String, Object>();
 		
+		values.put(key, values);
+		
 		return PurpleRobotApplication.updateFromMap(this._context, values);
 	}
 
