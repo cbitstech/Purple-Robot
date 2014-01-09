@@ -1132,7 +1132,9 @@
 	<string name="note_purple_robot_status">Purple Robot Status</string>
 	<string name="note_purple_robot_message_single">You have 1 action or issue to resolve.</string>
 	<string name="note_purple_robot_message_multiple" formatted="false">You have %d actions or issues to resolve.</string>
-						
+
+	<string name="snapshot_has_audio">Audio Available</string>
+							
 </resources>
 
 
