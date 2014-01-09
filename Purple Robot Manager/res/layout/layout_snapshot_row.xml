@@ -29,6 +29,7 @@
 	        android:textAppearance="?android:attr/textAppearanceSmall" />
 	</LinearLayout>
 	<ImageView android:id="@+id/mic_icon" 
+	    android:contentDescription="@string/snapshot_has_audio"
 	    android:layout_gravity="center_vertical"
         android:layout_margin="8dp"
 	    android:src="@drawable/action_mic"
