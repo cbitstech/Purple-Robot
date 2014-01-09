@@ -364,9 +364,11 @@ public class StartActivity extends ActionBarActivity
 			Uri.Builder b = jsonConfigUri.buildUpon();
 
 			b.scheme("http");
-
+ 
 			jsonConfigUri = b.build();
 		}
+		
+		Log.e("PR", "Setting JSON URI: " + jsonConfigUri);
 
 		EncryptionManager.getInstance().setConfigUri(this, jsonConfigUri);
 		
