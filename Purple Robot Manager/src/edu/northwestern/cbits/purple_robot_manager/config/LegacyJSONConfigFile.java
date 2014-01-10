@@ -205,6 +205,8 @@ public class LegacyJSONConfigFile
 							
 							oldHash = "";
 							
+							edit.putString("scheme_config_contents", scriptString);
+							
 							if (oldHash.equals(newHash) == false)
 							{
 								try

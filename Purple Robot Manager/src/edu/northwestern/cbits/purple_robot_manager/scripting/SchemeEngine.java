@@ -152,7 +152,7 @@ public class SchemeEngine extends BaseScriptEngine
 		return this.updateProbe(map);
 	}
 
-	private static Map<String, Object> parsePairList(Pair pair) 
+	public static Map<String, Object> parsePairList(Pair pair) 
 	{
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		
