@@ -506,6 +506,7 @@
         <item>ConfigurationCheck</item>
         <item>DiskSpaceCheck</item>
         <item>LastUploadCheck</item>
+        <item>SchemeConfigCheck</item>
         <!-- <item>ScriptDurationCheck</item> -->
         <!-- <item>ScriptErrorCheck</item> -->
         <!-- <item>ServerFailureCheck</item> -->

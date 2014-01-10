@@ -7,6 +7,7 @@ import java.io.RandomAccessFile;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Map;
 
 import org.apache.commons.net.ntp.NTPUDPClient;
@@ -32,6 +33,7 @@ import edu.northwestern.cbits.purple_robot_manager.ShutdownReceiver;
 import edu.northwestern.cbits.purple_robot_manager.config.JSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.config.SchemeConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
@@ -373,6 +375,22 @@ public class RobotHealthProbe extends Probe
 
 									bundle.putLong(RobotHealthProbe.LAST_BOOT, prefs.getLong(BootUpReceiver.BOOT_KEY, 0));
 									bundle.putLong(RobotHealthProbe.LAST_HALT, prefs.getLong(ShutdownReceiver.SHUTDOWN_KEY, 0));
+									
+									ArrayList<String> errors = new ArrayList<String>();
+									
+									for (String check : SanityManager.getInstance(context).errors().values())
+										errors.add(check);
+									
+									if (errors.size() > 0)
+										bundle.putStringArrayList("CHECK_ERRORS", errors);
+
+									ArrayList<String> warnings = new ArrayList<String>();
+									
+									for (String check : SanityManager.getInstance(context).warnings().values())
+										warnings.add(check);
+									
+									if (warnings.size() > 0)
+										bundle.putStringArrayList("CHECK_WARNNIGS", warnings);
 
 									me.transmitData(context, bundle);
 

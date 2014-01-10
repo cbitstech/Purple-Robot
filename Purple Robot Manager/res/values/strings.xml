@@ -1134,7 +1134,13 @@
 	<string name="note_purple_robot_message_multiple" formatted="false">You have %d actions or issues to resolve.</string>
 
 	<string name="snapshot_has_audio">Audio Available</string>
-							
+	<string name="name_scheme_config_check">Scheme Config Check</string>
+	
+	<string name="scheme_config_check_missing" formatted="false">Missing configuration value: %s</string>
+	<string name="scheme_config_check_changed" formatted="false">Changed configuration value: %s</string>
+	
+	<string name="title_config_check">Inspect Configuration</string>
+	<string name="summary_config_check">When possible, compare running configuration with network configuration to detect missing or changed values.</string>
 </resources>
 
 

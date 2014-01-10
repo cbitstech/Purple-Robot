@@ -179,6 +179,11 @@
             android:title="@string/config_json_refresh_interval_label"
             android:summary="@string/config_json_refresh_interval_message"
             android:defaultValue="3600" />
+     	<CheckBoxPreference
+      	    android:title="@string/title_config_check"
+      	    android:summary="@string/summary_config_check"
+           	android:key="check_scheme_config"
+           	android:defaultValue="true"/>
    		<Preference android:title="@string/config_refresh_json_label"
             android:key="config_json_refresh_manually"
             android:defaultValue="0" />
