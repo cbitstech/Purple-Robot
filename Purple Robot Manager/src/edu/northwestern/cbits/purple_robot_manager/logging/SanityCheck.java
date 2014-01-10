@@ -28,4 +28,9 @@ public abstract class SanityCheck
 	{
 		return this._errorMessage;
 	}
+
+	public Runnable getAction(Context context) 
+	{
+		return null;
+	}
 }

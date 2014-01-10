@@ -99,9 +99,9 @@ public class SanityManager
 					int error = check.getErrorLevel();
 					
 					if (error == SanityCheck.ERROR)
-						this.addAlert(SanityCheck.ERROR, check.name(this._context), check.getErrorMessage(), null);
+						this.addAlert(SanityCheck.ERROR, check.name(this._context), check.getErrorMessage(), check.getAction(this._context));
 					else if (error == SanityCheck.WARNING)
-						this.addAlert(SanityCheck.WARNING, check.name(this._context), check.getErrorMessage(), null);
+						this.addAlert(SanityCheck.WARNING, check.name(this._context), check.getErrorMessage(), check.getAction(this._context));
 					else
 						this.clearAlert(check.name(this._context));
 				}

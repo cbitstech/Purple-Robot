@@ -11,9 +11,12 @@ import jsint.Evaluator;
 import jsint.Pair;
 import jsint.Symbol;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.scripting.JSONHelper;
 import edu.northwestern.cbits.purple_robot_manager.scripting.SchemeEngine;
 
@@ -105,6 +108,8 @@ public class SchemeConfigCheck extends SanityCheck
 									
 									if (pref != setting)
 									{
+										Log.e("PR", "BOOL MISMATCH " + key + ": " + pref + " =? " + setting);
+										
 										this._errorLevel = SanityCheck.WARNING;
 										this._errorMessage = context.getString(R.string.scheme_config_check_changed, key);
 									}
@@ -113,8 +118,10 @@ public class SchemeConfigCheck extends SanityCheck
 								{
 									String pref = prefs.getString(key, null);
 									
-									if (cfgObject.toString().equals(pref))
+									if (cfgObject.toString().equals(pref) == false)
 									{
+										Log.e("PR", "BOOL MISMATCH " + key + ": " + pref + " =? " + cfgObject);
+
 										this._errorLevel = SanityCheck.WARNING;
 										this._errorMessage = context.getString(R.string.scheme_config_check_changed, key);
 									}
@@ -181,4 +188,21 @@ public class SchemeConfigCheck extends SanityCheck
 
 		return maps;
 	}
+	
+	public Runnable getAction(final Context context) 
+	{
+		Runnable r = new Runnable()
+		{
+			public void run() 
+			{
+				Intent intent = new Intent(context, SettingsActivity.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				
+				context.startActivity(intent);
+			}
+		};
+		
+		return r;
+	}
+
 }
