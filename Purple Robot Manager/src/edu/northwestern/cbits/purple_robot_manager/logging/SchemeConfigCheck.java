@@ -204,5 +204,4 @@ public class SchemeConfigCheck extends SanityCheck
 		
 		return r;
 	}
-
 }

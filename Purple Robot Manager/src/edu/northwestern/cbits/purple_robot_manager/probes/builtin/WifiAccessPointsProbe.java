@@ -195,6 +195,9 @@ public class WifiAccessPointsProbe extends Probe
 	private Bundle bundleForNetworksArray(Context context, ArrayList<Bundle> objects)
 	{
 		Bundle bundle = new Bundle();
+		
+		if (objects == null)
+			objects = new ArrayList<Bundle>();
 
 		for (Bundle value : objects)
 		{
