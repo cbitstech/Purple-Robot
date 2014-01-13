@@ -433,6 +433,14 @@ public abstract class BaseScriptEngine
 		}
 	}
 
+	public void fireTrigger(String triggerId)
+	{
+		for (Trigger trigger : TriggerManager.getInstance(this._context).triggersForId(triggerId))
+		{
+			trigger.execute(this._context, true);
+		}
+	}
+
 	public void disableTrigger(String triggerId)
 	{
 		for (Trigger trigger : TriggerManager.getInstance(this._context).triggersForId(triggerId))

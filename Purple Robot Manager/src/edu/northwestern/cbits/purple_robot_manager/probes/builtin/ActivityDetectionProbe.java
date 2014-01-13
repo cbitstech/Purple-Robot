@@ -270,7 +270,10 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
 		Intent intent = new Intent(ManagerService.GOOGLE_PLAY_ACTIVITY_DETECTED);
         PendingIntent pendingIntent = PendingIntent.getService(this._context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-		ActivityDetectionProbe._activityDetectionClient.requestActivityUpdates(interval, pendingIntent);
+        if (ActivityDetectionProbe._activityDetectionClient.isConnected())
+        	ActivityDetectionProbe._activityDetectionClient.requestActivityUpdates(interval, pendingIntent);
+        else
+        	ActivityDetectionProbe._activityDetectionClient.connect();        	
 	}
 
 	public void onDisconnected() 
