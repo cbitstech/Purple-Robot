@@ -227,18 +227,25 @@ public class DiagnosticActivity extends ActionBarActivity
         return true;
 	}
 
+	public void onBackPressed() 
+	{
+		if (this.isTaskRoot())
+		{
+			Intent intent = new Intent(this, StartActivity.class);
+			this.startActivity(intent);
+		}
+
+		this.finish();
+	}
+
     public boolean onOptionsItemSelected(MenuItem item)
     {
         switch (item.getItemId())
     	{
 		    case android.R.id.home:
-				if (this.isTaskRoot())
-				{
-					Intent intent = new Intent(this, StartActivity.class);
-					this.startActivity(intent);
-				}
-
-				this.finish();
+		    	this.onBackPressed();
+				
+				break;
     		case R.id.menu_email_item:
     			StringBuffer message = new StringBuffer();
 
