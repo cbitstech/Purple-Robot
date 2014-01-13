@@ -57,6 +57,8 @@ public class DiagnosticActivity extends ActionBarActivity
 	{
 		super.onResume();
 		
+		this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		
 		TextView userId = (TextView) this.findViewById(R.id.user_id_value);
 		TextView probeStatus = (TextView) this.findViewById(R.id.probe_status_value);
 		TextView uploadStatus = (TextView) this.findViewById(R.id.upload_status_value);
@@ -229,6 +231,14 @@ public class DiagnosticActivity extends ActionBarActivity
     {
         switch (item.getItemId())
     	{
+		    case android.R.id.home:
+				if (this.isTaskRoot())
+				{
+					Intent intent = new Intent(this, StartActivity.class);
+					this.startActivity(intent);
+				}
+
+				this.finish();
     		case R.id.menu_email_item:
     			StringBuffer message = new StringBuffer();
 
