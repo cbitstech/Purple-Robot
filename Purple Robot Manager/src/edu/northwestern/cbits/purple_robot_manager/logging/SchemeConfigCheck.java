@@ -14,7 +14,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.scripting.JSONHelper;

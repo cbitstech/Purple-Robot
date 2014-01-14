@@ -246,19 +246,19 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 			}
         	catch (JSONException e) 
         	{
-				e.printStackTrace();
+     			LogManager.getInstance(this).logException(e);
 			}
         	catch (NameNotFoundException e) 
         	{
-				e.printStackTrace();
+     			LogManager.getInstance(this).logException(e);
 			} 
         	catch (FileNotFoundException e) 
         	{
-				e.printStackTrace();
+     			LogManager.getInstance(this).logException(e);
 			} 
         	catch (IOException e) 
         	{
-				e.printStackTrace();
+     			LogManager.getInstance(this).logException(e);
 			}
         }
         else if (RESET_KEY.equals(preference.getKey()))
@@ -334,24 +334,29 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 
 		if (preference instanceof PreferenceGroup)
 		{
-			PreferenceGroup group = (PreferenceGroup) preference;
-			
-			if (group.getPreferenceCount() == 0)
+			if ("config_settings_trigger_category".equals(preference.getKey()))
 				return null;
-			
-			prefJson.put("type", "group");
-			
-			JSONArray children = new JSONArray();
-			
-			for (int i = 0; i < group.getPreferenceCount(); i++)
+			else
 			{
-				JSONObject child = this.dumpJson(group.getPreference(i));
+				PreferenceGroup group = (PreferenceGroup) preference;
 				
-				if (child != null)
-					children.put(child);
+				if (group.getPreferenceCount() == 0)
+					return null;
+				
+				prefJson.put("type", "group");
+				
+				JSONArray children = new JSONArray();
+				
+				for (int i = 0; i < group.getPreferenceCount(); i++)
+				{
+					JSONObject child = this.dumpJson(group.getPreference(i));
+					
+					if (child != null)
+						children.put(child);
+				}
+	
+				prefJson.put("children", children);
 			}
-
-			prefJson.put("children", children);
 		}
 		else if (preference instanceof CheckBoxPreference)
 			prefJson.put("type", "boolean");

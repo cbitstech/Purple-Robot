@@ -35,6 +35,7 @@ import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.OAuthActivity;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -218,27 +219,27 @@ public class LinkedInProbe extends Probe
 									} 
 									catch (OAuthException e)
 									{
-										e.printStackTrace();
+						     			LogManager.getInstance(context).logException(e);
 									} 
 									catch (JSONException e) 
 									{
-										e.printStackTrace();
+						     			LogManager.getInstance(context).logException(e);
 									} 
 									catch (IllegalBlockSizeException e) 
 									{
-										e.printStackTrace();
+						     			LogManager.getInstance(context).logException(e);
 									} 
 									catch (BadPaddingException e) 
 									{
-										e.printStackTrace();
+						     			LogManager.getInstance(context).logException(e);
 									} 
 									catch (UnsupportedEncodingException e) 
 									{
-										e.printStackTrace();
+						     			LogManager.getInstance(context).logException(e);
 									} 
 									catch (IllegalStateException e)
 									{
-										e.printStackTrace();
+						     			LogManager.getInstance(context).logException(e);
 									}
 								}
 							};

@@ -22,6 +22,7 @@ import edu.northwestern.cbits.purple_robot_manager.activities.StartActivity;
 import edu.northwestern.cbits.purple_robot_manager.http.JsonScriptRequestHandler;
 import edu.northwestern.cbits.purple_robot_manager.http.LocalHttpServer;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.JSONCommand;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
@@ -122,7 +123,7 @@ public class PersistentService extends Service
 					    		}
 					            catch (JSONException e) 
 					            {
-					            	e.printStackTrace();
+				         			LogManager.getInstance(context).logException(e);
 					            	
 									response.putExtra("error", e.toString());
 					            }

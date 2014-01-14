@@ -322,7 +322,7 @@ public class DateTrigger extends Trigger
 			} 
 			catch (ParseException ee) 
 			{
-				ee.printStackTrace();
+     			LogManager.getInstance(context).logException(ee);
 			}
 				
 			if (this._start != null && this._start.equals(this._end))

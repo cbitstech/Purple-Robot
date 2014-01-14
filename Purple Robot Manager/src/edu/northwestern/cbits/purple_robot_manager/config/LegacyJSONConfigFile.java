@@ -125,7 +125,7 @@ public class LegacyJSONConfigFile
 						}
 						catch (Exception e) 
 						{
-							e.printStackTrace();
+							LogManager.getInstance(context).logException(e);
 						}
 
 						

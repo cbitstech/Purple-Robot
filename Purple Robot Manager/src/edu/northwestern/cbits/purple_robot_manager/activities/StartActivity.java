@@ -197,7 +197,7 @@ public class StartActivity extends ActionBarActivity
         		{
 					public void run() 
 					{
-		        		Bundle value = OutputPlugin.bundleForJson(jsonString);
+		        		Bundle value = OutputPlugin.bundleForJson(me, jsonString);
 
 		        		String formattedValue = sensorName;
 		        				
@@ -279,7 +279,7 @@ public class StartActivity extends ActionBarActivity
 				{
 					String sensorName = c.getString(c.getColumnIndex("source"));
 	        		String jsonString = c.getString(c.getColumnIndex("value"));
-	        		Bundle value = OutputPlugin.bundleForJson(jsonString);
+	        		Bundle value = OutputPlugin.bundleForJson(me, jsonString);
 					
 					final Probe probe = ProbeManager.probeForName(sensorName, me);
 
@@ -367,8 +367,6 @@ public class StartActivity extends ActionBarActivity
  
 			jsonConfigUri = b.build();
 		}
-		
-		Log.e("PR", "Setting JSON URI: " + jsonConfigUri);
 
 		EncryptionManager.getInstance().setConfigUri(this, jsonConfigUri);
 		

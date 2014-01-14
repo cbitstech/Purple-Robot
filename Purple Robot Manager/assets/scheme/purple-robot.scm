@@ -42,4 +42,5 @@
 (define pr-components->date (lambda (action components) (.dateFromComponents PurpleRobot components)))
 (define pr-nth (lambda (index pairs) (.nth PurpleRobot index pairs)))
 (define pr-fetch-label (lambda (context name) (.fetchLabel PurpleRobot context name)))
+(define pr-fetch-labels (lambda (context name labels) (.fetchLabels PurpleRobot context name labels)))
                                     

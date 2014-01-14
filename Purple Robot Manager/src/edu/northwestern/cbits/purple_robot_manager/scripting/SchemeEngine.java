@@ -167,7 +167,13 @@ public class SchemeEngine extends BaseScriptEngine
 				String key = firstPair.first.toString();
 
 				Object value = firstPair.rest();
+				
+				if (value instanceof Symbol)
+				{
+					Symbol symbol = (Symbol) value;
 
+					value = symbol.getGlobalValue();
+				}
 				if (value instanceof Pair)
 				{
 					Pair valuePair = (Pair) value;

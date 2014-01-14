@@ -7,6 +7,7 @@ import org.json.JSONObject;
 
 import edu.northwestern.cbits.purple_robot_manager.RobotContentProvider;
 import edu.northwestern.cbits.purple_robot_manager.activities.StartActivity;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.models.Model;
 import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -74,7 +75,7 @@ public class AppDisplayPlugin extends OutputPlugin
 			}
 			catch (JSONException e) 
 			{
-				e.printStackTrace();
+     			LogManager.getInstance(context).logException(e);
 			}
 			
 			ContentValues toRemove = null;
@@ -135,11 +136,11 @@ public class AppDisplayPlugin extends OutputPlugin
 						}
 						catch (RemoteException e) 
 						{
-							e.printStackTrace();
+		         			LogManager.getInstance(context).logException(e);
 						} 
 						catch (OperationApplicationException e) 
 						{
-							e.printStackTrace();
+		         			LogManager.getInstance(context).logException(e);
 						}
 
 						context.getContentResolver().notifyChange(RobotContentProvider.RECENT_PROBE_VALUES, null);

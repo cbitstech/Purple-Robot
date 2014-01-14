@@ -136,8 +136,6 @@ public class UploadProgressCheck extends SanityCheck
 			} 
 			catch (JSONException ee) 
 			{
-				ee.printStackTrace();
-				
 				LogManager.getInstance(context).logException(ee);
 
 				this._errorLevel = SanityCheck.WARNING;

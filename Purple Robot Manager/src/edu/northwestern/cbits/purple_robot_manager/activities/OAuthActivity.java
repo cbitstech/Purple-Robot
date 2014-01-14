@@ -26,6 +26,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.oauth.FitbitApi;
 import edu.northwestern.cbits.purple_robot_manager.oauth.InstagramApi;
@@ -110,19 +111,19 @@ public class OAuthActivity extends Activity
 								}
 								catch (InstantiationException e) 
 								{
-									e.printStackTrace();
+					     			LogManager.getInstance(me).logException(e);
 								} 
 								catch (IllegalAccessException e) 
 								{
-									e.printStackTrace();
+					     			LogManager.getInstance(me).logException(e);
 								} 
 								catch (IllegalArgumentException e) 
 								{
-									e.printStackTrace();
+					     			LogManager.getInstance(me).logException(e);
 								}
 								catch (InvocationTargetException e) 
 								{
-									e.printStackTrace();
+					     			LogManager.getInstance(me).logException(e);
 								}
 							}
 							else if (DefaultApi10a.class.isAssignableFrom(apiClass))
@@ -145,7 +146,7 @@ public class OAuthActivity extends Activity
 						}
 						catch (OAuthException e)
 						{
-							e.printStackTrace();
+			     			LogManager.getInstance(me).logException(e);
 						}
 					}
 	        	};
