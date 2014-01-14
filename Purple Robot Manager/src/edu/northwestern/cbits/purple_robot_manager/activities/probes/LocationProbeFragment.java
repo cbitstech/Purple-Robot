@@ -18,6 +18,7 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
 
 public class LocationProbeFragment extends SupportMapFragment  
@@ -32,7 +33,7 @@ public class LocationProbeFragment extends SupportMapFragment
 		} 
 		catch (GooglePlayServicesNotAvailableException e) 
 		{
-			e.printStackTrace();
+			LogManager.getInstance(this.getActivity()).logException(e);
 		}
 		
 		List<Location> locations = new ArrayList<Location>();

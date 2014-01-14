@@ -26,6 +26,7 @@ import android.preference.PreferenceScreen;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.OAuthActivity;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.oauth.FitbitApi;
@@ -248,11 +249,11 @@ public class FitbitApiFeature extends Feature
 									} 
 									catch (JSONException e) 
 									{
-										e.printStackTrace();
+					         			LogManager.getInstance(context).logException(e);
 									}
 									catch (OAuthException e)
 									{
-										e.printStackTrace();
+					         			LogManager.getInstance(context).logException(e);
 									}
 								}
 							};

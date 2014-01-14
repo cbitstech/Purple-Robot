@@ -115,7 +115,7 @@ public class RobotHealthProbe extends Probe
 
 	// Source: http://stackoverflow.com/questions/3118234/how-to-get-memory-usage-and-cpu-usage-in-android
 	
-	private float readUsage() 
+	private float readUsage(Context context) 
 	{
 	    try 
 	    {
@@ -152,7 +152,7 @@ public class RobotHealthProbe extends Probe
 	    }
 	    catch (IOException e) 
 	    {
-	        e.printStackTrace();
+ 			LogManager.getInstance(context).logException(e);
 	    }
 
 	    return 0;
@@ -327,7 +327,7 @@ public class RobotHealthProbe extends Probe
 
 									bundle.putLong(RobotHealthProbe.TIME_OFFSET_MS, me._lastOffset);
 									bundle.putLong(RobotHealthProbe.ACTIVE_RUNTIME, System.currentTimeMillis() - ManagerService.startTimestamp);
-									bundle.putFloat(RobotHealthProbe.CPU_USAGE, me.readUsage());
+									bundle.putFloat(RobotHealthProbe.CPU_USAGE, me.readUsage(context));
 									
 									try
 									{

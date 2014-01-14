@@ -36,6 +36,7 @@ import android.preference.PreferenceScreen;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.OAuthActivity;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -236,15 +237,15 @@ public class FoursquareProbe extends Probe
 										} 
 										catch (IllegalStateException e) 
 										{
-											e.printStackTrace();
+							     			LogManager.getInstance(context).logException(e);
 										} 
 										catch (OAuthException e)
 										{
-											e.printStackTrace();
+							     			LogManager.getInstance(context).logException(e);
 										} 
 										catch (JSONException e) 
 										{
-											e.printStackTrace();
+							     			LogManager.getInstance(context).logException(e);
 										} 
 									}
 								};
@@ -494,15 +495,15 @@ public class FoursquareProbe extends Probe
 			}
 			catch (MalformedURLException e) 
 			{
-				e.printStackTrace();
+     			LogManager.getInstance(context).logException(e);
 			} 
 			catch (IOException e) 
 			{
-				e.printStackTrace();
+     			LogManager.getInstance(context).logException(e);
 			} 
 			catch (JSONException e) 
 			{
-				e.printStackTrace();
+     			LogManager.getInstance(context).logException(e);
 			}
 		}
 	}

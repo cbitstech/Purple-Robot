@@ -198,7 +198,7 @@ public abstract class OutputPlugin
 				}
 				catch (OutOfMemoryError e)
 				{
-					e.printStackTrace();
+         			LogManager.getInstance(this._context).logException(e);
 				}
 			}
 		}
@@ -470,7 +470,7 @@ public abstract class OutputPlugin
 		return json;
 	}
 	@SuppressWarnings("rawtypes")
-	public static Bundle bundleForJson(String jsonString) 
+	public static Bundle bundleForJson(final Context context, String jsonString) 
 	{
 		Bundle bundle = new Bundle();
 		
@@ -538,7 +538,7 @@ public abstract class OutputPlugin
 							ArrayList<Bundle> bundles = new ArrayList<Bundle>();
 							
 							for (int i = 0; i < child.length(); i++)
-								bundles.add(OutputPlugin.bundleForJson(child.getJSONObject(i).toString()));
+								bundles.add(OutputPlugin.bundleForJson(context, child.getJSONObject(i).toString()));
 							
 							bundle.putParcelableArrayList(key, bundles);
 						}
@@ -547,13 +547,13 @@ public abstract class OutputPlugin
 				else if (o instanceof JSONObject)
 				{
 					JSONObject child = (JSONObject) o;
-					bundle.putBundle(key, OutputPlugin.bundleForJson(child.toString()));
+					bundle.putBundle(key, OutputPlugin.bundleForJson(context, child.toString()));
 				}
 			}
 		}
 		catch (JSONException e) 
 		{
-			e.printStackTrace();
+ 			LogManager.getInstance(context).logException(e);
 		}
 
 		return bundle;

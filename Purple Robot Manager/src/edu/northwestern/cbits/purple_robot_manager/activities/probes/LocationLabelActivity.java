@@ -36,6 +36,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
 import edu.northwestern.cbits.purple_robot_manager.util.DBSCAN;
 import edu.northwestern.cbits.purple_robot_manager.util.DBSCAN.Cluster;
@@ -84,7 +85,7 @@ public class LocationLabelActivity extends ActionBarActivity
 		} 
 		catch (GooglePlayServicesNotAvailableException e) 
 		{
-			e.printStackTrace();
+			LogManager.getInstance(this).logException(e);
 		}
 		
 		this.getSupportActionBar().setTitle(R.string.title_location_label);

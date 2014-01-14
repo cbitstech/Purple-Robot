@@ -242,13 +242,14 @@ public class LogManager
 
 					registry.register(new Scheme("https", socketFactory, 443));
 					
-					SingleClientConnManager mgr = new SingleClientConnManager(androidClient.getParams(), registry);
-					HttpClient httpClient = new DefaultHttpClient(mgr, androidClient.getParams());
-
-					androidClient.close();
 
 					for (int i = 0; i < pendingEvents.length(); i++)
 					{
+						SingleClientConnManager mgr = new SingleClientConnManager(androidClient.getParams(), registry);
+						HttpClient httpClient = new DefaultHttpClient(mgr, androidClient.getParams());
+
+						androidClient.close();
+
 						JSONObject event = pendingEvents.getJSONObject(i);
 						
 						HttpPost httpPost = new HttpPost(siteUri);
@@ -266,9 +267,9 @@ public class LogManager
 						HttpEntity httpEntity = response.getEntity();
 						
 						Log.e("PR-LOGGING", "Log upload result: " + EntityUtils.toString(httpEntity));
+
+						mgr.shutdown();
 					}
-					
-					mgr.shutdown();
 				}
 				catch (URISyntaxException e) 
 				{

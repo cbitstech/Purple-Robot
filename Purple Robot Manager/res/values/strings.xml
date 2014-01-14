@@ -129,7 +129,7 @@
     <string name="config_http_upload_size_label">HTTP Upload Size</string>
     <string name="config_http_upload_size_summary">Override the default upload payload size with a constant size.</string>
     
-    <string name="config_json_url_label">JSON Configuration URL</string>
+    <string name="config_json_url_label">Configuration URL</string>
     <string name="config_json_url_message">Please enter the URL for the application configuration file.</string>
 
     <string name="config_refresh_json_label">Refresh Configuration</string>

@@ -223,15 +223,15 @@ public class TwitterProbe extends Probe
 									} 
 									catch (JSONException e) 
 									{
-										e.printStackTrace();
+					         			LogManager.getInstance(context).logException(e);
 									}
 									catch (OAuthException e)
 									{
-										e.printStackTrace();
+					         			LogManager.getInstance(context).logException(e);
 									} 
 									catch (ParseException e) 
 									{
-										e.printStackTrace();
+					         			LogManager.getInstance(context).logException(e);
 									}
 								}
 							};

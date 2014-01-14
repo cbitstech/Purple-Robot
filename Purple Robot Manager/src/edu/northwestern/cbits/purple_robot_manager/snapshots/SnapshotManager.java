@@ -191,7 +191,7 @@ public class SnapshotManager
 			        } 
 			        catch (IOException e)
 			        {
-			        	e.printStackTrace();
+	         			LogManager.getInstance(me._context).logException(e);
 			        	
 						me._isRecording = false;
 			        	save.run();

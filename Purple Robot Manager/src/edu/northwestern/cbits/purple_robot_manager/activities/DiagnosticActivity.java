@@ -396,11 +396,11 @@ public class DiagnosticActivity extends ActionBarActivity
          		} 
          		catch (FileNotFoundException e) 
          		{
-					e.printStackTrace();
+         			LogManager.getInstance(this).logException(e);
 				} 
          		catch (IOException e) 
          		{
-					e.printStackTrace();
+         			LogManager.getInstance(this).logException(e);
 				}
          		
     			break;

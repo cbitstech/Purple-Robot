@@ -116,7 +116,7 @@ public class SnapshotActivity extends ActionBarActivity
 			} 
 			catch (JSONException e) 
 			{
-				e.printStackTrace();
+     			LogManager.getInstance(this).logException(e);
 			}
         }
         
@@ -136,7 +136,7 @@ public class SnapshotActivity extends ActionBarActivity
     			
     			try 
     			{
-            		Bundle value = OutputPlugin.bundleForJson(json.getString("value").toString());
+            		Bundle value = OutputPlugin.bundleForJson(me, json.getString("value").toString());
             		String sensorName = json.getString("probe");
             		
             		final Probe probe = ProbeManager.probeForName(sensorName, me);
@@ -187,12 +187,11 @@ public class SnapshotActivity extends ActionBarActivity
 				} 
     			catch (JSONException e) 
     			{
-					e.printStackTrace();
+         			LogManager.getInstance(me).logException(e);
 				}
 
     			return convertView;
     		}
-	
 		};
         
         listView.setOnItemClickListener(new OnItemClickListener()
@@ -218,7 +217,7 @@ public class SnapshotActivity extends ActionBarActivity
 		} 
 		catch (GooglePlayServicesNotAvailableException e) 
 		{
-			e.printStackTrace();
+ 			LogManager.getInstance(this).logException(e);
 		}
 
 		final WebView webView = (WebView) this.findViewById(R.id.json_view);
