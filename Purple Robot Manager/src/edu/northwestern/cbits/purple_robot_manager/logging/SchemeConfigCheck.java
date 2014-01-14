@@ -108,8 +108,6 @@ public class SchemeConfigCheck extends SanityCheck
 									
 									if (pref != setting)
 									{
-										Log.e("PR", "BOOL MISMATCH " + key + ": " + pref + " =? " + setting);
-										
 										this._errorLevel = SanityCheck.WARNING;
 										this._errorMessage = context.getString(R.string.scheme_config_check_changed, key);
 									}
@@ -120,10 +118,19 @@ public class SchemeConfigCheck extends SanityCheck
 									
 									if (cfgObject.toString().equals(pref) == false)
 									{
-										Log.e("PR", "BOOL MISMATCH " + key + ": " + pref + " =? " + cfgObject);
-
-										this._errorLevel = SanityCheck.WARNING;
-										this._errorMessage = context.getString(R.string.scheme_config_check_changed, key);
+										boolean mismatched = true;
+										
+										if ("config_json_url".equals(key))
+										{
+											if (pref.indexOf(cfgObject.toString()) == 0)
+												mismatched = false;
+										}
+										
+										if (mismatched)
+										{
+											this._errorLevel = SanityCheck.WARNING;
+											this._errorMessage = context.getString(R.string.scheme_config_check_changed, key);
+										}
 									}
 								}
 							}
