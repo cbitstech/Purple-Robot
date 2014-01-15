@@ -12,6 +12,7 @@ import com.alexmerz.graphviz.objects.Graph;
 import com.alexmerz.graphviz.objects.Id;
 import com.alexmerz.graphviz.objects.Node;
 
+import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
 import android.content.Context;
@@ -31,9 +32,9 @@ public class TreeModel extends TrainedModel
 		super(context, uri);
 	}
 
-	protected void generateModel(Context context, String modelString) 
+	protected void generateModel(Context context, Object model) 
 	{
-		StringReader reader = new StringReader(modelString);
+		StringReader reader = new StringReader(model.toString());
 		
 		Parser parser = new Parser();
 		
@@ -66,11 +67,15 @@ public class TreeModel extends TrainedModel
 		return this.fetchPrediction(root, this._tree.getEdges(), snapshot);
 	}
 
-	private String fetchPrediction(Node node, List<Edge> edges, HashMap<String, Object> snapshot) 
+	protected String fetchPrediction(Node node, List<Edge> edges, HashMap<String, Object> snapshot) 
 	{
 		synchronized(this)
 		{
 			String nodeLabel = node.getAttribute("label").replaceAll("_", "");
+			
+			String[] tokens = nodeLabel.split(" ");
+			
+			nodeLabel = tokens[tokens.length - 1];
 	
 			List<Edge> testEdges = new ArrayList<Edge>();
 			
@@ -82,13 +87,17 @@ public class TreeModel extends TrainedModel
 			
 			if (testEdges.size() == 0)
 			{
-				int index = nodeLabel.indexOf(" ");
+				String prediction = node.getAttribute("label");
+				
+				int colonIndex = prediction.indexOf(":");
+				
+				prediction = prediction.substring(colonIndex + 1).trim();
 
-				String prediction = nodeLabel;
+				int index = prediction.indexOf(" ");
 
 				if (index != -1)
-					prediction = prediction.substring(0, index);
-				
+					prediction = prediction.substring(0, index).trim();
+
 				return prediction;
 			}
 	
@@ -99,7 +108,7 @@ public class TreeModel extends TrainedModel
 				if (testKey.equalsIgnoreCase(nodeLabel))
 				{
 					Object value = snapshot.get(key);
-
+					
 					double testValue = Double.NaN;
 
 					if (value instanceof Integer)
@@ -115,8 +124,8 @@ public class TreeModel extends TrainedModel
 
 					for (Edge edge : testEdges)
 					{
-						String edgeLabel = edge.getAttribute("label");
-						
+						String edgeLabel = edge.getAttribute("label").trim();
+
 						int index = edgeLabel.indexOf(" ");
 						
 						String operation = edgeLabel.substring(0, index);
@@ -131,9 +140,19 @@ public class TreeModel extends TrainedModel
 								if (testValue <= edgeQuantity)
 									nextNode = edge.getTarget().getNode();
 							}
+							else if (">=".equals(operation))
+							{
+								if (testValue >= edgeQuantity)
+									nextNode = edge.getTarget().getNode();
+							}
 							else if (">".equals(operation))
 							{
 								if (testValue > edgeQuantity)
+									nextNode = edge.getTarget().getNode();
+							}
+							else if ("<".equals(operation))
+							{
+								if (testValue < edgeQuantity)
 									nextNode = edge.getTarget().getNode();
 							}
 							else
@@ -166,4 +185,10 @@ public class TreeModel extends TrainedModel
 	{
 		return TreeModel.TYPE;
 	}
+	
+	public String summary(Context context)
+	{
+		return context.getString(R.string.summary_model_tree);
+	}
+
  }

@@ -3,8 +3,10 @@ package edu.northwestern.cbits.purple_robot_manager.models;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -107,9 +109,13 @@ public class ModelManager extends BroadcastReceiver
 		return models;
 	}
 
+	@SuppressLint("DefaultLocale")
 	public void onReceive(Context context, Intent intent) 
 	{
 		Bundle extras = intent.getExtras();
+
+		if (extras.containsKey("FROM_MODEL"))
+			return;
 
 		String[] nameComponents = extras.getString("PROBE").split("\\.");
 		
@@ -129,7 +135,7 @@ public class ModelManager extends BroadcastReceiver
 				
 				if (slug == null)
 				{
-					slug = probeKey.toLowerCase().replaceAll("_", " ");
+					slug = probeKey.toLowerCase(Locale.getDefault()).replaceAll("_", " ");
 					slug = Slugify.slugify(slug).replaceAll("-", "_");
 					
 					this._keyCache.put(probeKey, slug);
@@ -138,9 +144,6 @@ public class ModelManager extends BroadcastReceiver
 				this._milieu.put(slug, extras.get(key));
 			}
 		}
-
-		if (extras.containsKey("FROM_MODEL"))
-			return;
 
 		for (Model model : this.allModels(context))
 		{

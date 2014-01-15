@@ -196,7 +196,10 @@
     <string name="title_preference_models_available_category">Available Models</string>
 
     <string name="summary_model_unknown">Unknown model. (Summary not yet implemented.)</string>
-
+    <string name="summary_model_forest">Decision Tree Forest</string>
+    <string name="summary_model_tree">Decision Tree</string>
+    <string name="summary_model_regression">Regression Model</string>
+    
     <string name="title_noise_model">Noise Model</string>
     <string name="summary_noise_model_desc">Generates a random number when requested.</string>
     
