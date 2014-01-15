@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import android.content.Context;
 import android.net.Uri;
+import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.util.Slugify;
 
 public class RegressionModel extends TrainedModel 
@@ -25,7 +26,7 @@ public class RegressionModel extends TrainedModel
 		super(context, uri);
 	}
 
-	protected void generateModel(Context context, String modelString) 
+	protected void generateModel(Context context, Object modelString) 
 	{
 		/*
 		08-01 11:39:30.163: E/PR(15876): undefined_feature_value_dt_calmr1 =
@@ -42,7 +43,7 @@ public class RegressionModel extends TrainedModel
 				08-01 11:39:30.163: E/PR(15876):       2.3794
 		*/
 
-		for (String line : modelString.split("[\\r\\n]+"))
+		for (String line : modelString.toString().split("[\\r\\n]+"))
 		{
 			if (line.startsWith("  "))
 			{
@@ -149,4 +150,10 @@ public class RegressionModel extends TrainedModel
 	{
 		return RegressionModel.TYPE;
 	}
+	
+	public String summary(Context context)
+	{
+		return context.getString(R.string.summary_model_regression);
+	}
+
 }

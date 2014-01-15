@@ -15,6 +15,7 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -28,6 +29,7 @@ public abstract class TrainedModel extends Model
 	protected String _name = null;
 
 	protected double _accuracy = 0.0;
+	private long _lastCheck = 0;
 
 	public Uri uri() 
 	{
@@ -109,7 +111,7 @@ public abstract class TrainedModel extends Model
 				        me._name = json.getString("class");
 				        me._accuracy = json.getDouble("accuracy");
 				        
-				        me.generateModel(context, json.getString("model"));
+				        me.generateModel(context, json.get("model"));
 
 				        FileUtils.writeStringToFile(cachedModel, contents);
 
@@ -155,6 +157,15 @@ public abstract class TrainedModel extends Model
 	{
 		if (this._inited == false || this.enabled(context) == false)
 			return;
+		
+		long now = System.currentTimeMillis();
+		
+		if (now - this._lastCheck < 1000)
+		{
+			this._lastCheck = now;
+			
+			return;
+		}
 
 		final TrainedModel me = this;
 		
@@ -164,6 +175,8 @@ public abstract class TrainedModel extends Model
 			{
 				Object value = me.evaluateModel(context, snapshot);
 
+				Log.e("PR", "GOT PREDICTION: " + value);
+				
 				if (value == null)
 				{
 					
@@ -183,6 +196,6 @@ public abstract class TrainedModel extends Model
 		t.start();
 	}
 
-	protected abstract void generateModel(Context context, String modelString); 
+	protected abstract void generateModel(Context context, Object model); 
 	protected abstract Object evaluateModel(Context context, HashMap<String, Object> snapshot);
 }
