@@ -49,6 +49,7 @@ import edu.northwestern.cbits.purple_robot_manager.activities.DialogActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.DialogBackgroundActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.LabelActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
+import edu.northwestern.cbits.purple_robot_manager.activities.WebActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;
@@ -251,6 +252,21 @@ public abstract class BaseScriptEngine
 		}
 
 		return false;
+	}
+	
+	public boolean launchInternalUrl(String urlString)
+	{
+		Intent launchIntent = new Intent(this._context, WebActivity.class);
+		launchIntent.setData(Uri.parse(urlString));
+		launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		
+		this._context.startActivity(launchIntent);
+
+		HashMap <String, Object> payload = new HashMap<String, Object>();
+		payload.put("url", urlString);
+		LogManager.getInstance(this._context).log("launch_internal_url", payload);
+
+		return true;
 	}
 
 	@SuppressLint("DefaultLocale")
