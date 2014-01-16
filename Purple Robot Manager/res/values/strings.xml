@@ -356,6 +356,10 @@
     <string name="menu_new_label">New Label</string>
     <string name="menu_accept_label">Save New Label</string>
     <string name="menu_cancel">Cancel</string>
+    <string name="menu_close">Close</string>
+    <string name="menu_browser">Browser</string>
+
+    <string name="error_missing_uri">Missing or invalid URL. Closing&#8230;</string>
     
     <string name="probe_noise_threshold_label">Noise Threshold</string>
     <string name="probe_noise_threshold_summary">Set the mimimum threshold to determine if a new reading is signal or noise.</string>

@@ -1,5 +1,6 @@
 (define pr-read-url (lambda (url) (.readUrl PurpleRobot url)))
 (define pr-launch-url (lambda (url)  (.launchUrl PurpleRobot url)))
+(define pr-launch-internal-url (lambda (url)  (.launchInternalUrl PurpleRobot url)))
 (define pr-version (lambda () (.version PurpleRobot)))
 (define pr-version-code (lambda () (.versionCode PurpleRobot)))
 (define pr-play-default-tone (lambda () (.playDefaultTone PurpleRobot)))
