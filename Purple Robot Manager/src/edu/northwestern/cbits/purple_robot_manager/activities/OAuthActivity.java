@@ -104,7 +104,7 @@ public class OAuthActivity extends Activity
 									
 									String url = api.getAuthorizationUrl(config);
 									
-									Intent intent = new Intent(Intent.ACTION_VIEW);
+									Intent intent = new Intent(me, OAuthWebActivity.class);
 									intent.setData(Uri.parse(url));
 									
 									me.startActivity(intent);
@@ -137,7 +137,7 @@ public class OAuthActivity extends Activity
 			
 								String url = service.getAuthorizationUrl(token);
 				    	        
-				    	        Intent intent = new Intent(Intent.ACTION_VIEW);
+								Intent intent = new Intent(me, OAuthWebActivity.class);
 				    	        intent.setData(Uri.parse(url));
 				    	        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			
