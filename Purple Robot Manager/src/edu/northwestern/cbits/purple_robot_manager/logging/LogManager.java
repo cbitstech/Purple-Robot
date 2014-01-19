@@ -224,8 +224,6 @@ public class LogManager
 				try 
 				{
 					URI siteUri = new URI(endpointUri);
-				
-					AndroidHttpClient androidClient = AndroidHttpClient.newInstance("Purple Robot", this._context);
 
 					SchemeRegistry registry = new SchemeRegistry();
 					registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
@@ -241,10 +239,11 @@ public class LogManager
 					}
 
 					registry.register(new Scheme("https", socketFactory, 443));
-					
 
 					for (int i = 0; i < pendingEvents.length(); i++)
 					{
+						AndroidHttpClient androidClient = AndroidHttpClient.newInstance("Purple Robot", this._context);
+
 						SingleClientConnManager mgr = new SingleClientConnManager(androidClient.getParams(), registry);
 						HttpClient httpClient = new DefaultHttpClient(mgr, androidClient.getParams());
 
