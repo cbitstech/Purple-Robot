@@ -39,8 +39,6 @@ public abstract class Feature extends Probe
 	}
 
 	protected abstract String summary(Context context);
-
-
 	{
 
 	}
