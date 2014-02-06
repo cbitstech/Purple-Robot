@@ -237,7 +237,11 @@ public class LabelActivity extends ActionBarActivity
 				Bundle fieldDef = definitions.getBundle(field);
 
 				final TextView fieldName = new TextView(this);
-				fieldName.setText(field);
+
+				if (fieldDef.containsKey("prompt"))
+					fieldName.setText(fieldDef.getString("prompt"));
+				else
+					fieldName.setText(field);
 				
 				LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
 				params.setMargins(8, 24, 8, 8);
@@ -249,6 +253,8 @@ public class LabelActivity extends ActionBarActivity
 				
 				final LabelActivity me = this;
 				final String fieldLabel = field;
+				
+				final String fieldPrompt = fieldName.getText().toString();
 				
 				if (fieldType.equalsIgnoreCase("real"))
 				{
@@ -275,7 +281,7 @@ public class LabelActivity extends ActionBarActivity
 					{
 						public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) 
 						{
-							fieldName.setText(fieldLabel + ": " + ((int) (min + progress)));
+							fieldName.setText(fieldPrompt + ": " + ((int) (min + progress)));
 							
 							me._values.put(fieldLabel, Float.valueOf((float) (min + progress)));
 						}
