@@ -39,6 +39,8 @@ public abstract class OutputPlugin
 	public static final String FORCE_UPLOAD = "edu.northwestern.cbits.purple_robot.FORCE_UPLOAD";
 	public static final String DISPLAY_MESSAGE = "edu.northwestern.cbits.purple_robot.DISPLAY_MESSAGE";
 
+	public static final String USE_EXTERNAL_STORAGE = "config_external_storage";
+
 	public abstract String[] respondsTo();
 	public abstract void processIntent(Intent intent);
 
