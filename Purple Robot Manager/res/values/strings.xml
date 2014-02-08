@@ -1153,6 +1153,9 @@
 	<string name="title_streaming_json_upload_enabled">Enable Streaming JSON Uploader</string>
 	<string name="title_streaming_json_upload_section">Streaming JSON Uploader Settings</string>
 
+	<string name="title_streaming_jackson_upload_enabled">Enable Jackson Uploader</string>
+	<string name="title_streaming_jackson_upload_section">Jackson Uploader Settings</string>
+	
 </resources>
 
 

@@ -4,8 +4,19 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import android.annotation.SuppressLint;
+import android.content.ContentProviderOperation;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
+import android.content.OperationApplicationException;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.RemoteException;
+import android.support.v4.content.LocalBroadcastManager;
+
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 
 import edu.northwestern.cbits.purple_robot_manager.RobotContentProvider;
 import edu.northwestern.cbits.purple_robot_manager.activities.StartActivity;
@@ -13,19 +24,6 @@ import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.models.Model;
 import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
-
-import android.annotation.SuppressLint;
-import android.content.ContentProviderOperation;
-import android.content.ContentValues;
-import android.content.Context;
-import android.content.Intent;
-import android.content.OperationApplicationException;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.RemoteException;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.JsonWriter;
 
 public class AppDisplayPlugin extends OutputPlugin
 {
@@ -76,7 +74,19 @@ public class AppDisplayPlugin extends OutputPlugin
 			
 			try 
 			{
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+				JsonFactory factory = new JsonFactory();
+
+				StringWriter outputWriter = new StringWriter();
+
+				JsonGenerator generator = factory.createGenerator(outputWriter);
+				
+				StreamingJacksonUploadPlugin.writeBundle(this.getContext(), generator, extras);
+				generator.close();
+
+				values.put("value", outputWriter.toString());
+
+			
+/*				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
 				{
 					try
 					{
@@ -103,8 +113,9 @@ public class AppDisplayPlugin extends OutputPlugin
 					JSONObject json = OutputPlugin.jsonForBundle(extras);
 					values.put("value",  json.toString());
 				}
+*/
 			}
-			catch (JSONException e) 
+			catch (IOException e) 
 			{
      			LogManager.getInstance(context).logException(e);
 			}
