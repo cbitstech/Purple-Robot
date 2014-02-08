@@ -23,12 +23,14 @@ import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 public class ContactCalibrationHelper 
 {
 	private static Map<String, String> _cache = new HashMap<String, String>();
+	private static SharedPreferences _cachedPrefs = null;
 	
 	public static void check(final Context context) 
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+		if (ContactCalibrationHelper._cachedPrefs == null)
+			ContactCalibrationHelper._cachedPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
 
-		if (prefs.contains("last_address_book_calibration") == false)
+		if (ContactCalibrationHelper._cachedPrefs.contains("last_address_book_calibration") == false)
 		{
 			final SanityManager sanity = SanityManager.getInstance(context);
 
@@ -55,9 +57,10 @@ public class ContactCalibrationHelper
 		if (key == null)
 			return null;
 		
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		if (ContactCalibrationHelper._cachedPrefs == null)
+			ContactCalibrationHelper._cachedPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
 
-		String group = prefs.getString("contact_calibration_" + key + "_group", null);
+		String group = ContactCalibrationHelper._cachedPrefs.getString("contact_calibration_" + key + "_group", null);
 		
 		if (group != null)
 			return group;
@@ -83,14 +86,15 @@ public class ContactCalibrationHelper
 			key = newKey;
 		}
 		
-		return prefs.getString("contact_calibration_" + key + "_group", null);
+		return ContactCalibrationHelper._cachedPrefs.getString("contact_calibration_" + key + "_group", null);
 	}
 
 	public static void setGroup(Context context, String key, String group)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		if (ContactCalibrationHelper._cachedPrefs == null)
+			ContactCalibrationHelper._cachedPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
 		
-		Editor e = prefs.edit();
+		Editor e = ContactCalibrationHelper._cachedPrefs.edit();
 		e.putString("contact_calibration_" + key + "_group", group);
 		e.commit();
 	}

@@ -1,130 +1,111 @@
 package edu.northwestern.cbits.purple_robot_manager.plugins;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.math.BigInteger;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.net.URI;
-import java.net.UnknownHostException;
-import java.security.KeyStore;
-import java.security.MessageDigest;
 import java.security.SecureRandom;
-import java.text.Normalizer;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLPeerUnverifiedException;
-
 import org.apache.commons.io.FileUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.HttpHostConnectException;
-import org.apache.http.conn.scheme.PlainSocketFactory;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.SingleClientConnManager;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.protocol.HTTP;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.app.ActivityManager.RunningTaskInfo;
 import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.content.pm.ApplicationInfo;
 import android.location.Location;
-import android.net.http.AndroidHttpClient;
 import android.net.wifi.ScanResult;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.JsonWriter;
 import android.util.Log;
-import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.WiFiHelper;
-import edu.northwestern.cbits.purple_robot_manager.activities.StartActivity;
-import edu.northwestern.cbits.purple_robot_manager.logging.LiberalSSLSocketFactory;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("NewApi")
-public class StreamingJSONUploadPlugin extends OutputPlugin
+public class StreamingJSONUploadPlugin extends DataUploadPlugin
 {
-	// TODO: Move to superclass...
-	private final static String USER_HASH_KEY = "UserHash";
-	private final static String OPERATION_KEY = "Operation";
-	private final static String PAYLOAD_KEY = "Payload";
-	private final static String CHECKSUM_KEY = "Checksum";
-	private final static String CONTENT_LENGTH_KEY = "ContentLength";
-	private final static String STATUS_KEY = "Status";
-
 	private final static String FILE_EXTENSION = ".streaming";
 	
-	private final static String CACHE_DIR = "streaming_pending_uploads";
-	protected static final String UPLOAD_URI = "streaming_upload_uri";
-	private static final String ENABLED = null;
-	private int _arrayCount = 0;
+	private static final String ENABLED = "config_enable_streaming_json_data_server";
 
 	private JsonWriter _writer = null;
+
+	private long _lastAttempt = 0;
+	private File _currentFile = null;
 	
-	public String[] respondsTo() 
+	private void uploadFiles(final Context context, final SharedPreferences prefs)
 	{
-		String[] activeActions = { Probe.PROBE_READING, OutputPlugin.FORCE_UPLOAD };
-		return activeActions;
+		long now = System.currentTimeMillis();
+		
+		if (now - this._lastAttempt  < 300000)
+			return;
+		
+		this._lastAttempt = now;
+			
+		final StreamingJSONUploadPlugin me = this;
+		
+		Runnable r = new Runnable()
+		{
+			public void run() 
+			{
+				try 
+				{
+					File pendingFolder = me.getPendingFolder();
+					
+					String[] filenames = pendingFolder.list(new FilenameFilter()
+					{
+						public boolean accept(File dir, String filename)
+						{
+							return filename.endsWith(StreamingJSONUploadPlugin.FILE_EXTENSION);
+						}
+					});
+
+					if (filenames == null)
+						filenames = new String[0];
+					
+					if (filenames.length < 2)
+						return;
+					
+					SecureRandom random = new SecureRandom();
+					
+					int index = random.nextInt(filenames.length - 1);
+
+					File payloadFile = new File(pendingFolder, filenames[index]);
+					String payload = FileUtils.readFileToString(payloadFile);
+
+					if (me.transmitPayload(prefs, payload) == DataUploadPlugin.RESULT_SUCCESS)
+					{
+						payloadFile.delete();
+						
+						me._lastAttempt = 0;
+						me.uploadFiles(context, prefs);
+					}
+				}
+				catch (IOException e) 
+				{
+					LogManager.getInstance(context).logException(e);
+					me.broadcastMessage(context.getString(R.string.message_general_error));
+				}
+			}
+		};
+		
+		Thread t = new Thread(r);
+		t.start();
 	}
-	
-	// TODO: Pull into superclass for this and HttpUploadPlugin
-	public File getPendingFolder()
+
+	public void processIntent(final Intent intent) 
 	{
-		SharedPreferences prefs = HttpUploadPlugin.getPreferences(this.getContext());
-
-		File internalStorage = this.getContext().getFilesDir();
-
-		if (prefs.getBoolean(OutputPlugin.USE_EXTERNAL_STORAGE, false))
-			internalStorage = this.getContext().getExternalFilesDir(null);
-
-		if (internalStorage != null && !internalStorage.exists())
-			internalStorage.mkdirs();
-
-		File pendingFolder = new File(internalStorage, StreamingJSONUploadPlugin.CACHE_DIR);
-
-		if (pendingFolder != null && !pendingFolder.exists())
-			pendingFolder.mkdirs();
-
-		return pendingFolder;
-	}
-
-	public void processIntent(Intent intent) 
-	{
-		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getContext());
+		final Context context = this.getContext().getApplicationContext();
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		
 		if (prefs.getBoolean(StreamingJSONUploadPlugin.ENABLED, false) == false)
 			return;
@@ -133,315 +114,55 @@ public class StreamingJSONUploadPlugin extends OutputPlugin
 		
 		if (OutputPlugin.FORCE_UPLOAD.equals(action))
 		{
-			final StreamingJSONUploadPlugin me = this;
+			this._lastAttempt = 0;
 
-			Runnable r = new Runnable()
-			{
-				@SuppressWarnings("deprecation")
-				public void run() 
-				{
-					Context context = me.getContext();
-
-					AndroidHttpClient androidClient = AndroidHttpClient.newInstance("Purple Robot", context);
-
-					try
-					{
-						while (true)
-						{
-							if (me.restrictToWifi(prefs))
-							{
-								if (WiFiHelper.wifiAvailable(context) == false)
-								{
-	//								this._throughput = 0.0;
-	
-									me.broadcastMessage(context.getString(R.string.message_wifi_pending));
-	
-	//								this._lastUpload = now;
-	//								this._uploading = false;
-	
-									return;
-								}
-							}
-	
-							JSONObject jsonMessage = new JSONObject();
-	
-							jsonMessage.put(OPERATION_KEY, "SubmitProbes");
-							
-							File pendingFolder = me.getPendingFolder();
-	
-							String[] filenames = pendingFolder.list(new FilenameFilter()
-							{
-								public boolean accept(File dir, String filename)
-								{
-									return filename.endsWith(StreamingJSONUploadPlugin.FILE_EXTENSION);
-								}
-							});
-	
-							if (filenames == null)
-								filenames = new String[0];
-							
-							if (filenames.length == 0)
-								return;
-							
-							SecureRandom random = new SecureRandom();
-							
-							int index = random.nextInt(filenames.length);
-							
-							String payload = FileUtils.readFileToString(new File(pendingFolder, filenames[index]));
-							
-							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
-								payload = Normalizer.normalize(payload, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
-									
-							payload = payload.replaceAll("\r", "");
-							payload = payload.replaceAll("\n", "");
-							
-							jsonMessage.put(PAYLOAD_KEY, payload);
-	
-							String userHash = EncryptionManager.getInstance().getUserHash(me.getContext());
-	
-							jsonMessage.put(USER_HASH_KEY, userHash);
-	
-							MessageDigest md = MessageDigest.getInstance("MD5");
-							
-							byte[] checksummed = (jsonMessage.get(USER_HASH_KEY).toString() + jsonMessage.get(OPERATION_KEY).toString() + jsonMessage.get(PAYLOAD_KEY).toString()).getBytes("US-ASCII");
-	
-							byte[] digest = md.digest(checksummed);
-	
-							String checksum = (new BigInteger(1, digest)).toString(16);
-	
-							while (checksum.length() < 32)
-								checksum = "0" + checksum;
-	
-							jsonMessage.put(CHECKSUM_KEY, checksum);
-							jsonMessage.put(CONTENT_LENGTH_KEY, checksummed.length);
-	
-							// Liberal HTTPS setup: http://stackoverflow.com/questions/2012497/accepting-a-certificate-for-https-on-android
-	
-					        HostnameVerifier hostnameVerifier = org.apache.http.conn.ssl.SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
-	
-							SchemeRegistry registry = new SchemeRegistry();
-							registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-							
-							SSLSocketFactory socketFactory = SSLSocketFactory.getSocketFactory();
-							
-							if (prefs.getBoolean("config_http_liberal_ssl", true))
-							{
-						        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-						        trustStore.load(null, null);
-	
-						        socketFactory = new LiberalSSLSocketFactory(trustStore);								
-							}
-	
-							registry.register(new Scheme("https", socketFactory, 443));
-							
-							HttpParams params = androidClient.getParams();
-							HttpConnectionParams.setConnectionTimeout(params, 180000);
-							HttpConnectionParams.setSoTimeout(params, 180000);
-							
-							SingleClientConnManager mgr = new SingleClientConnManager(params, registry);
-							HttpClient httpClient = new DefaultHttpClient(mgr, params);
-	
-							HttpsURLConnection.setDefaultHostnameVerifier(hostnameVerifier);
-							
-							String title = me.getContext().getString(R.string.notify_upload_data);
-	
-							Notification note = new Notification(R.drawable.ic_note_normal, title, System.currentTimeMillis());
-							PendingIntent contentIntent = PendingIntent.getActivity(me.getContext(), 0,
-									new Intent(me.getContext(), StartActivity.class), Notification.FLAG_ONGOING_EVENT);
-	
-							note.setLatestEventInfo(me.getContext(), title, title, contentIntent);
-	
-							note.flags = Notification.FLAG_ONGOING_EVENT;
-	
-							String body = null;
-							
-							String uriString = prefs.getString(StreamingJSONUploadPlugin.UPLOAD_URI, me.getContext().getString(R.string.sensor_upload_url));
-
-							URI siteUri = new URI(uriString);
-							
-							HttpPost httpPost = new HttpPost(siteUri);
-
-							String jsonString = jsonMessage.toString();
-
-							List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-							nameValuePairs.add(new BasicNameValuePair("json", jsonString));
-							HttpEntity entity = new UrlEncodedFormEntity(nameValuePairs, HTTP.US_ASCII);
-
-							httpPost.setEntity(entity);
-
-							String uploadMessage = String.format(context.getString(R.string.message_transmit_bytes),
-									(httpPost.getEntity().getContentLength() / 1024));
-							me.broadcastMessage(uploadMessage);
-
-//							noteManager.notify(12345, note);
-							
-							HttpResponse response = httpClient.execute(httpPost);
-
-							HttpEntity httpEntity = response.getEntity();
-
-							String contentHeader = null;
-
-							if (response.containsHeader("Content-Encoding"))
-								contentHeader = response.getFirstHeader("Content-Encoding").getValue();
-
-							if (contentHeader != null && contentHeader.endsWith("gzip"))
-							{
-								BufferedInputStream in = new BufferedInputStream(AndroidHttpClient.getUngzippedContent(httpEntity));
-
-								ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-								int read = 0;
-								byte[] buffer = new byte[1024];
-
-								while ((read = in.read(buffer, 0, buffer.length)) != -1)
-								{
-									out.write(buffer, 0, read);
-								}
-
-								in.close();
-
-								body = out.toString("UTF-8");
-							}
-							else
-								body = EntityUtils.toString(httpEntity);
-
-							JSONObject json = new JSONObject(body);
-
-							String status = json.getString(STATUS_KEY);
-
-							String responsePayload = "";
-
-							if (json.has(PAYLOAD_KEY))
-								responsePayload = json.getString(PAYLOAD_KEY);
-
-							if (status.equals("error") == false)
-							{
-								byte[] responseDigest = md.digest((status + responsePayload).getBytes("UTF-8"));
-								String responseChecksum = (new BigInteger(1, responseDigest)).toString(16);
-
-								while (responseChecksum.length() < 32)
-									responseChecksum = "0" + responseChecksum;
-
-								if (responseChecksum.equals(json.getString(CHECKSUM_KEY)))
-								{
-									String uploadedMessage = String.format(context.getString(R.string.message_upload_successful),
-											(httpPost.getEntity().getContentLength() / 1024));
-									
-									// TODO: Delete file...
-
-									me.broadcastMessage(uploadedMessage);
-								}
-								else
-									me.broadcastMessage(context.getString(R.string.message_checksum_failed));
-							}
-							else
-							{
-								String errorMessage = String.format(context.getString(R.string.message_server_error), status);
-								me.broadcastMessage(errorMessage);
-								
-								return;
-							}
-						}
-					}
-					catch (HttpHostConnectException e)
-					{
-						me.broadcastMessage(context.getString(R.string.message_http_connection_error));
-						LogManager.getInstance(context).logException(e);
-
-						return;
-					}
-					catch (SocketTimeoutException e)
-					{
-						me.broadcastMessage(context.getString(R.string.message_socket_timeout_error));
-						LogManager.getInstance(me.getContext()).logException(e);
-
-						return;
-					}
-					catch (SocketException e)
-					{
-						String errorMessage = String.format(context.getString(R.string.message_socket_error), e.getMessage());
-						me.broadcastMessage(errorMessage);
-						LogManager.getInstance(me.getContext()).logException(e);
-
-						return;
-					}
-					catch (UnknownHostException e)
-					{
-						me.broadcastMessage(context.getString(R.string.message_unreachable_error));
-						LogManager.getInstance(me.getContext()).logException(e);
-					
-						return;
-					}
-					catch (JSONException e)
-					{
-						me.broadcastMessage(context.getString(R.string.message_response_error));
-						LogManager.getInstance(me.getContext()).logException(e);
-
-						return;
-					}
-					catch (SSLPeerUnverifiedException e)
-					{
-						LogManager.getInstance(me.getContext()).logException(e);
-						me.broadcastMessage(context.getString(R.string.message_unverified_server));
-
-						return;
-					}
-					catch (Exception e)
-					{
-						LogManager.getInstance(me.getContext()).logException(e);
-						me.broadcastMessage(context.getString(R.string.message_general_error));
-
-						return;
-					}
-					finally
-					{
-						androidClient.close();
-					}
-				}
-			};
-			
-			Thread t = new Thread(r);
-			t.start();
+			this.uploadFiles(context, prefs);
 		}
 		else if (Probe.PROBE_READING.equals(action))
 		{
 			Bundle extras = intent.getExtras();
 			
-			// TODO: Get rid of verbatim string...
-			if (extras.containsKey("TRANSMIT") && extras.getBoolean("TRANSMIT") == false)
+			if (extras.containsKey(DataUploadPlugin.TRANSMIT_KEY) && extras.getBoolean(DataUploadPlugin.TRANSMIT_KEY) == false)
 				return;
 
 			long now = System.currentTimeMillis();
 
 			try 
 			{
-				if (this._writer != null && this._arrayCount > 16)
+				if (this._currentFile != null)
 				{
-					this._writer.endArray();
-					this._writer.flush();
-					this._writer.close();
-					
-					this._writer = null;
-					this._arrayCount = 0;
+					File f = this._currentFile.getAbsoluteFile();
+				
+					long length = f.length();
+					long modDelta = now - f.lastModified();
+				
+					// TODO: Make configurable...
+					if (this._writer != null && (length > 262144 || modDelta > 60000))
+					{
+						this._writer.endArray();
+						this._writer.flush();
+						this._writer.close();
+						
+						this._writer = null;
+						
+						this._currentFile = null;
+					}
 				}
 				
-				Intent i = new Intent(OutputPlugin.FORCE_UPLOAD);
-				this.process(i);
+				this.uploadFiles(context, prefs);
 
 				if (this._writer == null)
 				{
-					File f = new File(this.getPendingFolder(), now + ".streaming");
+					this._currentFile = new File(this.getPendingFolder(), now + FILE_EXTENSION);
 					
-					BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(f));
+					BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(this._currentFile));
 					this._writer = new JsonWriter(new OutputStreamWriter(out, "UTF-8"));
 					
 					this._writer.beginArray();
-					
-					this._arrayCount = 0;
 				}
 				
 				StreamingJSONUploadPlugin.writeBundle(this.getContext(), this._writer, extras);
-				this._arrayCount += 1;
+				this._writer.flush();
 			} 
 			catch (IOException e) 
 			{
@@ -450,30 +171,8 @@ public class StreamingJSONUploadPlugin extends OutputPlugin
 		}
 	}
 
-	// TODO: Cleanup & move to superclass...
-	
-	protected boolean restrictToWifi(SharedPreferences prefs) 
-	{
-		try
-		{
-			return prefs.getBoolean("config_restrict_data_wifi", true);
-		}
-		catch (ClassCastException e)
-		{
-			String enabled = prefs.getString("config_restrict_data_wifi", "true").toLowerCase(Locale.ENGLISH);
-			
-			boolean isRestricted = ("false".equals(enabled) == false); 
-			
-			Editor edit = prefs.edit();
-			edit.putBoolean("config_restrict_data_wifi", isRestricted);
-			edit.commit();
-			
-			return isRestricted;
-		}
-	}
-
 	@SuppressWarnings("unchecked")
-	private static void writeBundle(Context context, JsonWriter writer, Bundle bundle) 
+	public static void writeBundle(Context context, JsonWriter writer, Bundle bundle) 
 	{
 		try 
 		{

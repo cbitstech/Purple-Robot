@@ -29,6 +29,8 @@ public class CallStateProbe extends Probe
 
 	private boolean _isInited = false;
 	private boolean _isEnabled = false;
+	
+	private long _lastXmit = 0;
 
 	public String name(Context context)
 	{
@@ -77,25 +79,32 @@ public class CallStateProbe extends Probe
 			this._isInited = true;
 		}
 
-		SharedPreferences prefs = Probe.getPreferences(context);
-
 		this._isEnabled = false;
 
 		if (super.isEnabled(context))
 		{
+			SharedPreferences prefs = Probe.getPreferences(context);
+
 			if (prefs.getBoolean("config_probe_call_state_enabled", CallStateProbe.DEFAULT_ENABLED))
 			{
-				TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-
-				Bundle bundle = new Bundle();
-				bundle.putString("PROBE", this.name(context));
-				bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
-
-				bundle.putString(CallStateProbe.CALL_STATE, this.getCallState(tm.getCallState()));
-
-				this.transmitData(context, bundle);
-
-				this._isEnabled = true;
+				long now = System.currentTimeMillis();
+				
+				if (now - this._lastXmit > 60000)
+				{
+					TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+	
+					Bundle bundle = new Bundle();
+					bundle.putString("PROBE", this.name(context));
+					bundle.putLong("TIMESTAMP", now / 1000);
+	
+					bundle.putString(CallStateProbe.CALL_STATE, this.getCallState(tm.getCallState()));
+	
+					this.transmitData(context, bundle);
+	
+					this._isEnabled = true;
+					
+					this._lastXmit = now;
+				}
 			}
 		}
 

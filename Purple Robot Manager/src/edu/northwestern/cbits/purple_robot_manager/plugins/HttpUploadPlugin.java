@@ -226,6 +226,11 @@ public class HttpUploadPlugin extends OutputPlugin
 	{
 		final SharedPreferences prefs = HttpUploadPlugin.getPreferences(this.getContext());
 
+		if (prefs.getBoolean("config_enable_data_server", false) == false)
+			return;
+		
+		Log.e("PR", "HTTP PROCESS INTENT: " + intent);
+		
 		PurpleRobotApplication.fixPreferences(this.getContext(), false);
 		
 		if (OutputPlugin.FORCE_UPLOAD.equals(intent.getAction()))
@@ -248,7 +253,7 @@ public class HttpUploadPlugin extends OutputPlugin
 			Thread t = new Thread(r);
 			t.start();
 		}
-		else if (prefs.getBoolean("config_enable_data_server", false))
+		else
 		{
 			try
 			{

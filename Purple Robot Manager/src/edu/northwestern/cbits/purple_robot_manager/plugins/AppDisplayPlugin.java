@@ -1,5 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager.plugins;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 
 import org.json.JSONException;
@@ -12,15 +14,18 @@ import edu.northwestern.cbits.purple_robot_manager.models.Model;
 import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
+import android.annotation.SuppressLint;
 import android.content.ContentProviderOperation;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.OperationApplicationException;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.JsonWriter;
 
 public class AppDisplayPlugin extends OutputPlugin
 {
@@ -35,6 +40,7 @@ public class AppDisplayPlugin extends OutputPlugin
 		return activeActions;
 	}
 
+	@SuppressLint("NewApi")
 	public void processIntent(final Intent intent)
 	{
 		Bundle extras = intent.getExtras();
@@ -70,8 +76,33 @@ public class AppDisplayPlugin extends OutputPlugin
 			
 			try 
 			{
-				JSONObject json = OutputPlugin.jsonForBundle(extras);
-				values.put("value",  json.toString());
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+				{
+					try
+					{
+						StringWriter outputWriter = new StringWriter();
+						JsonWriter jsonWriter = new JsonWriter(outputWriter);
+						
+						StreamingJSONUploadPlugin.writeBundle(this.getContext(), jsonWriter, extras);
+	
+						jsonWriter.flush();
+						jsonWriter.close();
+						
+						values.put("value", outputWriter.toString());
+					}
+					catch (IOException e) 
+					{
+						LogManager.getInstance(this.getContext()).logException(e);
+						
+						JSONObject json = OutputPlugin.jsonForBundle(extras);
+						values.put("value",  json.toString());
+					}
+				}
+				else
+				{
+					JSONObject json = OutputPlugin.jsonForBundle(extras);
+					values.put("value",  json.toString());
+				}
 			}
 			catch (JSONException e) 
 			{
