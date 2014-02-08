@@ -443,23 +443,23 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 
 					for (int j = 0; j < timeBuffer.length; j++)
 					{
-						Double x = null;
-						Double y = null;
-						Double z = null;
+						double x = Double.NaN;
+						double y = Double.NaN;
+						double z = Double.NaN;
 
 						for (int i = 0; i < fieldNames.length; i++)
 						{
 							if (fieldNames[i].equals(AccelerometerProbe.X_KEY))
-								x = Double.valueOf(valueBuffer[i][j]);
+								x = valueBuffer[i][j];
 							else if (fieldNames[i].equals(AccelerometerProbe.Y_KEY))
-								y = Double.valueOf(valueBuffer[i][j]);
+								y = valueBuffer[i][j];
 							else if (fieldNames[i].equals(AccelerometerProbe.Z_KEY))
-								z = Double.valueOf(valueBuffer[i][j]);
+								z = valueBuffer[i][j];
 						}
 
-						if (x != null && y != null && z != null)
+						if (Double.isNaN(x) == false && Double.isNaN(y) && Double.isNaN(z))
 						{
-							Map<String, Object> values = new HashMap<String, Object>();
+							Map<String, Object> values = new HashMap<String, Object>(4);
 
 							values.put(AccelerometerProbe.X_KEY, x);
 							values.put(AccelerometerProbe.Y_KEY, y);

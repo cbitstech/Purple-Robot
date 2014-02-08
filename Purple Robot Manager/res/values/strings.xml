@@ -391,10 +391,10 @@
     <string name="notify_running">Functioning Normally&#8230;</string>
     <string name="notify_running_title">Application Status</string>
     
-    <string name="title_http_upload_section">HTTP Upload Settings</string>
+    <string name="title_http_upload_section">Adaptive Uploader Setting</string>
     <string name="title_http_upload_uri">HTTP Upload Endpoint</string>
     <string name="summary_http_upload_uri">URL of the HTTP endpoint where sensor data will be logged.</string>
-    <string name="title_http_upload_enabled">Enable HTTP Upload</string>
+    <string name="title_http_upload_enabled">Enable Adaptive Upload</string>
     <string name="title_http_upload_wifi_only">Only Use WiFi Connection</string>
     <string name="summary_http_upload_wifi_only">Disable uploads using cellular and other mobile connection types.</string>
 
@@ -1148,6 +1148,11 @@
 	
 	<string name="title_config_check">Inspect Configuration</string>
 	<string name="summary_config_check">When possible, compare running configuration with network configuration to detect missing or changed values.</string>
+	
+	<string name="title_shared_upload_section">General Data Upload Settings</string>
+	<string name="title_streaming_json_upload_enabled">Enable Streaming JSON Uploader</string>
+	<string name="title_streaming_json_upload_section">Streaming JSON Uploader Settings</string>
+
 </resources>
 
 

@@ -17,12 +17,6 @@
 			android:defaultValue="false"/>
 	</PreferenceCategory>
     <PreferenceCategory android:title="@string/config_notifications_category">
-        <!-- <RingtonePreference
-            android:title="@string/config_notification_sound_label"
-            android:summary="@string/config_notification_sound_summary"
-            android:ringtoneType="notification"
-            android:showSilent="false"
-            android:key="config_default_notification_sound" />  -->
         <ListPreference
 	        android:key="config_default_notification_sound"
 	        android:entries="@array/sound_effect_labels"
@@ -63,20 +57,11 @@
       		android:defaultValue="false"/>
    		</PreferenceCategory>
     <PreferenceCategory android:title="@string/config_network_category">
-    	<PreferenceScreen android:title="@string/title_http_upload_section">
-			<CheckBoxPreference
-				android:title="@string/title_http_upload_enabled"
-	           	android:key="config_enable_data_server"
-	           	android:defaultValue="false"/>
+    	<PreferenceScreen android:title="@string/title_shared_upload_section">
  	        <CheckBoxPreference
 	  	   	    android:title="@string/title_external_storage_enabled"
 	      	    android:summary="@string/summary_external_storage_enabled"
 	          	android:key="config_external_storage"
-	          	android:defaultValue="false"/>
-	  	    <CheckBoxPreference
-	      	    android:title="@string/title_archive_enabled"
-	      	    android:summary="@string/summary_archive_enabled"
-	          	android:key="config_http_archive"
 	          	android:defaultValue="false"/>
 	      	<CheckBoxPreference
 	      	    android:title="@string/title_http_encrypt"
@@ -100,6 +85,17 @@
 	      	    android:summary="@string/summary_http_upload_wifi_only"
 	           	android:key="config_restrict_data_wifi"
 	           	android:defaultValue="true"/>
+     	</PreferenceScreen>	        				    
+		<PreferenceScreen android:title="@string/title_http_upload_section">
+			<CheckBoxPreference
+				android:title="@string/title_http_upload_enabled"
+	           	android:key="config_enable_data_server"
+	           	android:defaultValue="false"/>
+ 	  	    <CheckBoxPreference
+	      	    android:title="@string/title_archive_enabled"
+	      	    android:summary="@string/summary_archive_enabled"
+	          	android:key="config_http_archive"
+	          	android:defaultValue="false"/>
 	        <ListPreference
 	            android:key="config_http_upload_interval"
 	            android:entries="@array/http_upload_interval_labels"
@@ -119,7 +115,13 @@
 				<Preference android:title="@string/title_delete_files" android:key="config_delete_archives" android:defaultValue="0" />
  			</PreferenceScreen>
  		</PreferenceScreen>
-    	<PreferenceScreen android:title="@string/title_log_upload_section">
+    	<PreferenceScreen android:title="@string/title_streaming_json_upload_section">
+			<CheckBoxPreference
+				android:title="@string/title_streaming_json_upload_enabled"
+	           	android:key="config_enable_streaming_json_data_server"
+	           	android:defaultValue="false"/>
+  		</PreferenceScreen>
+   		<PreferenceScreen android:title="@string/title_log_upload_section">
 			<CheckBoxPreference
 				android:title="@string/logging_enabled"
 	           	android:summary="@string/summary_logging_enabled"
