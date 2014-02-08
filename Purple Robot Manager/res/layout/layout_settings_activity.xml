@@ -121,7 +121,13 @@
 	           	android:key="config_enable_streaming_json_data_server"
 	           	android:defaultValue="false"/>
   		</PreferenceScreen>
-   		<PreferenceScreen android:title="@string/title_log_upload_section">
+    	<PreferenceScreen android:title="@string/title_streaming_jackson_upload_section">
+			<CheckBoxPreference
+				android:title="@string/title_streaming_jackson_upload_enabled"
+	           	android:key="config_enable_streaming_jackson_data_server"
+	           	android:defaultValue="false"/>
+  		</PreferenceScreen>
+    			<PreferenceScreen android:title="@string/title_log_upload_section">
 			<CheckBoxPreference
 				android:title="@string/logging_enabled"
 	           	android:summary="@string/summary_logging_enabled"

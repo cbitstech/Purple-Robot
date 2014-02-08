@@ -82,6 +82,7 @@
         <!-- <item>DiagnosticAppDisplayPlugin</item> -->
         <item>HttpUploadPlugin</item>
         <item>StreamingJSONUploadPlugin</item>
+        <item>StreamingJacksonUploadPlugin</item>
         <item>JavascriptFeaturePlugin</item>
     </array>
 
