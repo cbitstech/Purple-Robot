@@ -115,7 +115,10 @@ public class WebActivity extends ActionBarActivity
     		case R.id.menu_open:
     			JavaScriptEngine engine = new JavaScriptEngine(this);
 
-    			engine.launchUrl(this.getIntent().getData().toString());
+    			Uri data = this.getIntent().getData();
+    			
+    			if (data != null)
+    				engine.launchUrl(data.toString());
     			
     			break;
 		}

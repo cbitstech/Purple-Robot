@@ -252,18 +252,25 @@ public class CallHistoryFeature extends Feature
 										
 										for (ContentValues call : calls)
 										{
-											total += 1;
-													
-											if (call.getAsInteger(CallLog.Calls.TYPE) == CallLog.Calls.INCOMING_TYPE)
-												incoming += 1;
-											
-											if (call.getAsInteger(CallLog.Calls.NEW) == 0)
-												acked += 1;
-											
-											double duration = call.getAsDouble(CallLog.Calls.DURATION);
-											
-											durations.add(duration);
-											totalDuration += duration;
+											try
+											{
+												total += 1;
+														
+												if (call.getAsInteger(CallLog.Calls.TYPE) == CallLog.Calls.INCOMING_TYPE)
+													incoming += 1;
+												
+												if (call.getAsInteger(CallLog.Calls.NEW) == 0)
+													acked += 1;
+												
+												double duration = call.getAsDouble(CallLog.Calls.DURATION);
+												
+												durations.add(duration);
+												totalDuration += duration;
+											}
+											catch (NullPointerException e)
+											{
+												
+											}
 										}
 										
 										contactInfo.putDouble(CallHistoryFeature.INCOMING_COUNT, incoming);
