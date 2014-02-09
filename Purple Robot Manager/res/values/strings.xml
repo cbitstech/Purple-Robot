@@ -1155,7 +1155,7 @@
 
 	<string name="title_streaming_jackson_upload_enabled">Enable Jackson Uploader</string>
 	<string name="title_streaming_jackson_upload_section">Jackson Uploader Settings</string>
-	
+	<string name="toast_mail_not_found">Mail client not found. Aborting&#8230;</string>
 </resources>
 
 

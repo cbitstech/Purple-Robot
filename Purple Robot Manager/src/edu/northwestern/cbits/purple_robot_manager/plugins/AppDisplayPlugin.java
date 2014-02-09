@@ -84,36 +84,6 @@ public class AppDisplayPlugin extends OutputPlugin
 				generator.close();
 
 				values.put("value", outputWriter.toString());
-
-			
-/*				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-				{
-					try
-					{
-						StringWriter outputWriter = new StringWriter();
-						JsonWriter jsonWriter = new JsonWriter(outputWriter);
-						
-						StreamingJSONUploadPlugin.writeBundle(this.getContext(), jsonWriter, extras);
-	
-						jsonWriter.flush();
-						jsonWriter.close();
-						
-						values.put("value", outputWriter.toString());
-					}
-					catch (IOException e) 
-					{
-						LogManager.getInstance(this.getContext()).logException(e);
-						
-						JSONObject json = OutputPlugin.jsonForBundle(extras);
-						values.put("value",  json.toString());
-					}
-				}
-				else
-				{
-					JSONObject json = OutputPlugin.jsonForBundle(extras);
-					values.put("value",  json.toString());
-				}
-*/
 			}
 			catch (IOException e) 
 			{

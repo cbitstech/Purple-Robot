@@ -30,6 +30,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -388,11 +389,18 @@ public class DiagnosticActivity extends ActionBarActivity
          		}
          		catch (ActivityNotFoundException e)
          		{
-         			Intent mailIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("mailto:c-karr@northwestern.edu"));
-         			mailIntent.putExtra(Intent.EXTRA_SUBJECT, this.getString(R.string.email_diagnostic_subject));
-         			mailIntent.putExtra(Intent.EXTRA_TEXT, message.toString());
-
-         			this.startActivity(mailIntent);
+         			try
+         			{
+	         			Intent mailIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("mailto:c-karr@northwestern.edu"));
+	         			mailIntent.putExtra(Intent.EXTRA_SUBJECT, this.getString(R.string.email_diagnostic_subject));
+	         			mailIntent.putExtra(Intent.EXTRA_TEXT, message.toString());
+	
+	         			this.startActivity(mailIntent);
+         			}
+         			catch (ActivityNotFoundException ex)
+         			{
+         				Toast.makeText(this, R.string.toast_mail_not_found, Toast.LENGTH_LONG).show();
+         			}
          		} 
          		catch (FileNotFoundException e) 
          		{
