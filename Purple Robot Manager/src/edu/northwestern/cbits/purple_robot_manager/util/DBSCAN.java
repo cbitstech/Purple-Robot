@@ -388,7 +388,7 @@ public class DBSCAN
 
 			FileOutputStream fout = new FileOutputStream(clusterFile);
 			
-			fout.write(toWrite.toString().getBytes(Charset.defaultCharset()));
+			fout.write(toWrite.toString().getBytes(Charset.defaultCharset().name()));
 
 			fout.flush();
 			fout.close();

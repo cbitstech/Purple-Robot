@@ -30,6 +30,10 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
+// NOTE: This plugin is included for the purposes of comparison between 
+// Android's streaming JSON classes and Jackson. The Jackson class is the one
+// under continual development and should be used instead of this one.
+
 @SuppressLint("NewApi")
 public class StreamingJSONUploadPlugin extends DataUploadPlugin
 {

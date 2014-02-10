@@ -111,14 +111,12 @@
 
     <string name="config_probe_communication_retrieve_title">Retrieve Message Contents</string>
     <string name="config_probe_communication_retrieve_summary">Transmits message text with event metadata.</string>
+
     <string name="config_probe_communication_retrieve_warning_title">Privacy Warning</string>
     <string name="config_probe_communication_retrieve_warning">Setting this option to true will transmit the contents of outgoing messages (sent from this device) to the server automatically. This option should only be enabled under extremely rigorous oversight by an authorized privacy official or institutional review board.</string>
     
     <string name="config_probe_communication_encrypt_title">Encrypt Message Contents</string>
     <string name="config_probe_communication_encrypt_summary">Encrypts any transmitted message contents before sending to the server.</string>
-    
-    <string name="config_probe_communication_retrieve_warning_title">Privacy Warning</string>
-    <string name="config_probe_communication_retrieve_warning">Setting this option to true will transmit the contents of your messages to the server automatically. This option should only be enabled under extremely rigorous oversight by an authorized privacy official or institutional review board.</string>
     
     <string name="config_probe_bluetooth_hash_title">Obfuscate Device Details</string>
     <string name="config_probe_bluetooth_hash_summary">When set, the app will hash the caller\'s name and phone number when collecting that data.</string>
@@ -230,15 +228,6 @@
 
     <string name="title_cell_probe">Cell Tower Probe</string>
     <string name="summary_cell_probe_desc">Records identifiers for the current cell tower that the device is connected to.</string>
-
-    <string name="title_gravity_probe">Gravity Probe</string>
-    <string name="summary_gravity_probe_desc">A three dimensional vector indicating the direction and magnitude of gravity. Units are m/s^2. The coordinate system is the same as is used by the acceleration sensor.</string>
-
-    <string name="title_linear_acceleration_probe">Linear Acceleration Probe</string>
-    <string name="summary_linear_acceleration_probe_desc">A three dimensional vector indicating the direction and magnitude of acceleration stripped of the gravity component. Units are m/s^2. The coordinate system is the same as is used by the acceleration sensor.</string>
-    
-    <string name="title_linear_acceleration_probe">Linear Acceleration Probe</string>
-    <string name="summary_linear_acceleration_probe_desc">Records a three dimensional vector indicating acceleration along each device axis, not including gravity. All values have units of m/s^2. The coordinate system is the same as is used by the acceleration sensor.</string>
 
     <string name="title_rotation_vector_probe">Rotation Vector Probe</string>
     <string name="summary_rotation_vector_probe_desc">The rotation vector represents the orientation of the device as a combination of an angle and an axis, in which the device has rotated through an angle θ around an axis &lt;x, y, z&gt;.</string>
@@ -910,7 +899,6 @@
     	    
     <string name="name_sanity_script_error">Script Errors</string>
 	<string name="name_sanity_script_duration">Script Duration</string>
-	<string name="name_sanity_upload_progress">Upload Progress</string>
 
     <string name="name_sanity_server_failure">Server Failures</string>
     <string name="message_clearing_archive">Clearing archive files&#8230;</string>

@@ -51,7 +51,7 @@ public class FacebookEventsProbe extends Probe
 	
 	public String summarizeValue(Context context, Bundle bundle)
 	{
-		String message = bundle.getString("MESSAGE", "");
+		String message = bundle.getString("MESSAGE");
 		String type = bundle.getString("TYPE");
 		
 		boolean obfuscated = bundle.getBoolean("IS_OBFUSCATED");

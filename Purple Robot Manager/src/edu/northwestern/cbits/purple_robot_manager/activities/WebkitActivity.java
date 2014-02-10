@@ -25,6 +25,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.webkit.ConsoleMessage;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -89,6 +90,7 @@ public class WebkitActivity extends ActionBarActivity
 		return null;
 	}
 
+	@JavascriptInterface 
 	public void setValue(String key, String value)
 	{
 		if (key.equals("timestamp"))
