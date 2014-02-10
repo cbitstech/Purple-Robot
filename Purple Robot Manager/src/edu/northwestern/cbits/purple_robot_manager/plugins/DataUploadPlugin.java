@@ -350,7 +350,7 @@ public abstract class DataUploadPlugin extends OutputPlugin
 		catch (Exception e)
 		{
 			LogManager.getInstance(me.getContext()).logException(e);
-			me.broadcastMessage(context.getString(R.string.message_general_error));
+			me.broadcastMessage(context.getString(R.string.message_general_error, e.getMessage()));
 		}
 		finally
 		{

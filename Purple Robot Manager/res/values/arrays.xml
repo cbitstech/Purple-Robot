@@ -81,7 +81,7 @@
         <item>AppDisplayPlugin</item>
         <!-- <item>DiagnosticAppDisplayPlugin</item> -->
         <item>HttpUploadPlugin</item>
-        <item>StreamingJSONUploadPlugin</item>
+        <!-- <item>StreamingJSONUploadPlugin</item> -->
         <item>StreamingJacksonUploadPlugin</item>
         <item>JavascriptFeaturePlugin</item>
     </array>
@@ -466,6 +466,24 @@
         <item>1 hour</item>
    	</string-array>
 
+	<string-array name="streaming_jackson_upload_interval_values">
+        <item>30</item>
+        <item>60</item>
+        <item>300</item>
+        <item>600</item>
+        <item>1800</item>
+        <item>3600</item>
+   	</string-array>
+
+	<string-array name="streaming_jackson_upload_interval_labels">
+        <item>30 seconds</item>
+        <item>1 minute</item>
+        <item>5 minutes</item>
+        <item>10 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+   	</string-array>
+	
 	<string-array name="log_upload_interval_values">
         <item>300</item>
         <item>600</item>
@@ -503,7 +521,29 @@
         <item>1 megabyte</item>
         <item>2 megabytes</item>
    	</string-array>
-   	
+
+	<string-array name="streaming_jackson_upload_size_values">
+        <item>16384</item>
+        <item>32768</item>
+        <item>65536</item>
+        <item>131072</item>
+        <item>262114</item>
+        <item>524288</item>
+        <item>1048576</item>
+        <item>2097152</item>
+   	</string-array>
+
+	<string-array name="streaming_jackson_upload_size_labels">
+        <item>16 kilobytes</item>
+        <item>32 kilobytes</item>
+        <item>64 kilobytes</item>
+        <item>128 kilobytes</item>
+        <item>256 kilobytes</item>
+        <item>512 kilobytes</item>
+        <item>1 megabyte</item>
+        <item>2 megabytes</item>
+   	</string-array>
+		
    	<array name="sanity_check_classes">
         <item>ConfigurationCheck</item>
         <item>DiskSpaceCheck</item>

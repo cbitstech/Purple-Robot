@@ -52,7 +52,8 @@ public class SchemeConfigCheck extends SanityCheck
 			}
 			catch (StackOverflowError e)
 			{
-				LogManager.getInstance(context).logException(e);
+				// Happens on older devices...
+				// LogManager.getInstance(context).logException(e);
 			}
 
 			try 

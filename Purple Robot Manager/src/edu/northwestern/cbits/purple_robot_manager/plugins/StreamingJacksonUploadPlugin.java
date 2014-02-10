@@ -37,6 +37,11 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
 	private final static String FILE_EXTENSION = ".jackson";
 	
 	private static final String ENABLED = "config_enable_streaming_jackson_data_server";
+	private static final String UPLOAD_SIZE = "config_streaming_jackson_upload_size";
+	private static final String UPLOAD_INTERVAL = "config_streaming_jackson_upload_interval";
+
+	private static final String UPLOAD_SIZE_DEFAULT = "262114";
+	private static final String UPLOAD_INTERVAL_DEFAULT = "300";
 
 	private JsonGenerator _generator = null;
 
@@ -47,13 +52,15 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
 	{
 		long now = System.currentTimeMillis();
 		
-		if (now - this._lastAttempt  < 300000)
+		long duration = Long.parseLong(prefs.getString(StreamingJacksonUploadPlugin.UPLOAD_INTERVAL, StreamingJacksonUploadPlugin.UPLOAD_INTERVAL_DEFAULT)) * 1000;
+		
+		if (now - this._lastAttempt < duration)
 			return;
 		
 		this._lastAttempt = now;
 			
 		final StreamingJacksonUploadPlugin me = this;
-		
+
 		Runnable r = new Runnable()
 		{
 			public void run() 
@@ -61,7 +68,7 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
 				try 
 				{
 					File pendingFolder = me.getPendingFolder();
-					
+
 					String[] filenames = pendingFolder.list(new FilenameFilter()
 					{
 						public boolean accept(File dir, String filename)
@@ -75,7 +82,7 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
 					
 					if (filenames.length < 2)
 						return;
-					
+
 					SecureRandom random = new SecureRandom();
 					
 					int index = random.nextInt(filenames.length - 1);
@@ -98,7 +105,7 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
 				}
 			}
 		};
-		
+
 		Thread t = new Thread(r);
 		t.start();
 	}
@@ -136,9 +143,10 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
 				
 					long length = f.length();
 					long modDelta = now - f.lastModified();
+					
+					long size = Long.parseLong(prefs.getString(StreamingJacksonUploadPlugin.UPLOAD_SIZE, StreamingJacksonUploadPlugin.UPLOAD_SIZE_DEFAULT));
 				
-					// TODO: Make configurable...
-					if (this._generator != null && (length > 262144 || modDelta > 60000))
+					if (this._generator != null && (length > size || modDelta > 60000))
 					{
 						this._generator.writeEndArray();
 						this._generator.flush();
