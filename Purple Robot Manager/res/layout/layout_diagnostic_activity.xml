@@ -99,7 +99,7 @@
 	        android:layout_height="wrap_content"
 	        android:orientation="vertical"
 	        android:id="@+id/pr_error_list" 
-	        android:visibility="gone" />"
+	        android:visibility="gone" />
 	    <TextView
 	        android:id="@+id/pr_error_none_value"
 	        android:text="@string/pr_errors_none_label"
