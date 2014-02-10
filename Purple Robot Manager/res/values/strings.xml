@@ -126,8 +126,13 @@
     <string name="config_http_upload_interval_label">HTTP Upload Interval</string>
     <string name="config_http_upload_interval_summary">Override the default upload intervals with a constant interval.</string>
 
+    <string name="config_streaming_jackson_upload_interval_label">JSON Upload Interval</string>
+    <string name="config_streaming_jackson_upload_interval_summary">Interval to pause between upload sessions.</string>
+
     <string name="config_http_upload_size_label">HTTP Upload Size</string>
     <string name="config_http_upload_size_summary">Override the default upload payload size with a constant size.</string>
+    
+    <string name="config_streaming_jackson_upload_size_label">JSON Minimum Upload Size</string>
     
     <string name="config_json_url_label">Configuration URL</string>
     <string name="config_json_url_message">Please enter the URL for the application configuration file.</string>
@@ -392,6 +397,7 @@
     <string name="notify_running_title">Application Status</string>
     
     <string name="title_http_upload_section">Adaptive Uploader Setting</string>
+    <string name="summary_http_upload_section">HTTP uploader that adjusts its behavior in response to available connectivity.</string>
     <string name="title_http_upload_uri">HTTP Upload Endpoint</string>
     <string name="summary_http_upload_uri">URL of the HTTP endpoint where sensor data will be logged.</string>
     <string name="title_http_upload_enabled">Enable Adaptive Upload</string>
@@ -1150,11 +1156,13 @@
 	<string name="summary_config_check">When possible, compare running configuration with network configuration to detect missing or changed values.</string>
 	
 	<string name="title_shared_upload_section">General Data Upload Settings</string>
+	<string name="summary_shared_upload_section">Shared settings used by all data upload plugins.</string>
 	<string name="title_streaming_json_upload_enabled">Enable Streaming JSON Uploader</string>
 	<string name="title_streaming_json_upload_section">Streaming JSON Uploader Settings</string>
 
-	<string name="title_streaming_jackson_upload_enabled">Enable Jackson Uploader</string>
-	<string name="title_streaming_jackson_upload_section">Jackson Uploader Settings</string>
+	<string name="title_streaming_jackson_upload_enabled">Enable JSON Uploader</string>
+	<string name="title_streaming_jackson_upload_section">JSON Uploader Settings</string>
+	<string name="summary_streaming_jackson_upload_section">Beta uploader that improves CPU utilization and battery life. (Beta)</string>
 	<string name="toast_mail_not_found">Mail client not found. Aborting&#8230;</string>
 </resources>
 
