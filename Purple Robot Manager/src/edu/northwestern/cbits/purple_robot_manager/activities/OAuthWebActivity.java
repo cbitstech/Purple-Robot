@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -75,14 +74,11 @@ public class OAuthWebActivity extends ActionBarActivity
         		
     			public boolean shouldOverrideUrlLoading (WebView view, String url)
         		{
-    				Log.e("PR/OA", "URL: " + url);
-    				
         			boolean oauth = false;
-        					
         			
         			if (url.toLowerCase(Locale.getDefault()).startsWith("http://purple.robot.com/oauth"))
         				oauth = true;
-        			else if (url.toLowerCase(Locale.getDefault()).startsWith("http://tech.cbits.northwestern.edu/"))
+        			else if (url.toLowerCase(Locale.getDefault()).startsWith("http://tech.cbits.northwestern.edu/oauth"))
         				oauth = true;
         			else if (url.toLowerCase(Locale.getDefault()).startsWith("http://pr-oauth/oauth"))
         				oauth = true;
@@ -101,8 +97,6 @@ public class OAuthWebActivity extends ActionBarActivity
         			return oauth;
         		}
         	});
-        	
-        	Log.e("PR", "LOADING (1): " + uri);
 
             webView.loadUrl(uri.toString());
         }

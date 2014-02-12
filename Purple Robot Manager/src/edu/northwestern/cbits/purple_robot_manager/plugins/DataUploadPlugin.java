@@ -57,7 +57,6 @@ import edu.northwestern.cbits.purple_robot_manager.WiFiHelper;
 import edu.northwestern.cbits.purple_robot_manager.activities.StartActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.LiberalSSLSocketFactory;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
-import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("NewApi")
 public abstract class DataUploadPlugin extends OutputPlugin
@@ -81,12 +80,6 @@ public abstract class DataUploadPlugin extends OutputPlugin
 	protected static final int RESULT_SUCCESS = 0;
 	protected static final int RESULT_NO_CONNECTION = 1;
 	protected static final int RESULT_ERROR = 2;
-
-	public String[] respondsTo() 
-	{
-		String[] activeActions = { Probe.PROBE_READING, OutputPlugin.FORCE_UPLOAD };
-		return activeActions;
-	}
 	
 	public File getPendingFolder()
 	{

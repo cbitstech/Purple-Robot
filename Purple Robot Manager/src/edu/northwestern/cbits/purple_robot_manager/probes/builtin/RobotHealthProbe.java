@@ -391,6 +391,10 @@ public class RobotHealthProbe extends Probe
 									
 									if (warnings.size() > 0)
 										bundle.putStringArrayList("CHECK_WARNNIGS", warnings);
+									
+									long later = System.currentTimeMillis();
+									
+									bundle.putLong("MEASURE_TIME", later - now);
 
 									me.transmitData(context, bundle);
 
