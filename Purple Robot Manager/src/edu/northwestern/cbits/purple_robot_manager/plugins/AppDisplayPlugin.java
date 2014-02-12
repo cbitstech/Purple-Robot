@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -55,6 +56,8 @@ public class AppDisplayPlugin extends OutputPlugin
 		}
 		else
 		{
+			Log.e("PR", "GOT PROBE: " + extras.getString("PROBE"));
+
 			final ContentValues values = new ContentValues();
 
 			Object ts = extras.get("TIMESTAMP");

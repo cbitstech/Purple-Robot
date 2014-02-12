@@ -26,7 +26,6 @@ import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
-import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RandomNoiseProbe;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
@@ -151,8 +150,7 @@ public class PersistentService extends Service
 			
 			if (NUDGE_PROBES.equals(action))
 			{
-				if (Probe.probesEnabled(this))
-					ProbeManager.nudgeProbes(this);
+				ProbeManager.nudgeProbes(this);
 
 				TriggerManager.getInstance(this).refreshTriggers(this);
 				ScheduleManager.runOverdueScripts(this);

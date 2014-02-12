@@ -26,6 +26,7 @@ import android.os.SystemClock;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
@@ -255,7 +256,7 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 
         if (super.isEnabled(context))
         {
-        	if (prefs.getBoolean("config_probe_accelerometer_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
+    		if (prefs.getBoolean("config_probe_accelerometer_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
         	{
 				int frequency = Integer.parseInt(prefs.getString("config_probe_accelerometer_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
 				
@@ -295,7 +296,7 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
         }
     	else
     	{
-            sensors.unregisterListener(this, sensor);
+    		sensors.unregisterListener(this, sensor);
             this._lastFrequency = -1;
     	}
 

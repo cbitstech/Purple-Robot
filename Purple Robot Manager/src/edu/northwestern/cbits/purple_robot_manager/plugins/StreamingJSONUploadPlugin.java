@@ -45,6 +45,12 @@ public class StreamingJSONUploadPlugin extends DataUploadPlugin
 
 	private long _lastAttempt = 0;
 	private File _currentFile = null;
+
+	public String[] respondsTo() 
+	{
+		String[] activeActions = { Probe.PROBE_READING, OutputPlugin.FORCE_UPLOAD };
+		return activeActions;
+	}
 	
 	private void uploadFiles(final Context context, final SharedPreferences prefs)
 	{
