@@ -44,7 +44,8 @@ public class InstagramProbe extends Probe
 {
 	public static final String CONSUMER_KEY = "47f0718396bc4bafbfad940c7e15ab3b";
 	public static final String CONSUMER_SECRET = "f39d3b9a33b347a2bda462ef5f373935";
-	public static final String CALLBACK = "http://purple.robot.com/oauth/instagram";
+// 	public static final String CALLBACK = "http://purple.robot.com/oauth/instagram";
+	public static final String CALLBACK = "http://tech.cbits.northwestern.edu/oauth/instagram";
 
 	private static final boolean DEFAULT_ENABLED = false;
 	private static final boolean DEFAULT_ENCRYPT = false;

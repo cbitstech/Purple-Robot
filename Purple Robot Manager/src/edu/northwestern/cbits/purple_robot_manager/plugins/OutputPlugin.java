@@ -100,6 +100,8 @@ public abstract class OutputPlugin
 				OutputPlugin.registerPluginClass(pluginClass);
 
 				OutputPlugin plugin = (OutputPlugin) pluginClass.newInstance();
+				
+				Log.e("PR", "PLUGIN: " + plugin.getClass().getCanonicalName());
 
 	            Method method = pluginClass.getDeclaredMethod("respondsTo");
 
