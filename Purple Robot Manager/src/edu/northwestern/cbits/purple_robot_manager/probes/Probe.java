@@ -38,6 +38,7 @@ public abstract class Probe
 	public abstract String title(Context context);
 	public abstract String probeCategory(Context context);
 	public abstract PreferenceScreen preferenceScreen(PreferenceActivity settingsActivity);
+	public abstract String summary(Context context);
 	
 	private static long _lastEnabledCheck = 0;
 	private static boolean _lastEnabled = false;

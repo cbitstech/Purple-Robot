@@ -40,6 +40,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
@@ -322,6 +323,53 @@ public class StartActivity extends ActionBarActivity
 							Log.e("PR", "Looking for model named " + sensorName);
 					}
 				}
+			}
+        });
+        
+        listView.setOnItemLongClickListener(new OnItemLongClickListener()
+        {
+			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) 
+			{
+				Uri uri = ContentUris.withAppendedId(RobotContentProvider.RECENT_PROBE_VALUES, id);
+				
+				Cursor c = me.getContentResolver().query(uri, null, null, null, null);
+				
+				if (c.moveToNext())
+				{
+					String sensorName = c.getString(c.getColumnIndex("source"));
+
+					final Probe probe = ProbeManager.probeForName(sensorName, me);
+
+					AlertDialog.Builder builder = new AlertDialog.Builder(me);
+					boolean inited = false;
+					
+					if (probe != null)
+					{
+						builder = builder.setTitle(probe.title(me));
+						builder = builder.setMessage(probe.summary(me));
+						
+						inited = true;
+					}
+					else
+					{
+						Model model = ModelManager.getInstance(me).fetchModelByName(me, sensorName);
+
+						if (model != null)
+						{
+							builder = builder.setTitle(model.title(me));
+							builder = builder.setMessage(model.summary(me));
+
+							inited = true;
+						}
+						else
+							Log.e("PR", "Looking for model named " + sensorName);
+					}
+					
+					if (inited)
+						builder.create().show();
+				}
+				
+				return true;
 			}
         });
     	
