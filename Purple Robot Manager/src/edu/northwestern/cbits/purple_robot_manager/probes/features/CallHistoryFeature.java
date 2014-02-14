@@ -354,39 +354,15 @@ public class CallHistoryFeature extends Feature
 							LogManager.getInstance(context).logException(e);
 						}
 
-						return true;
 					}
 				}
+
+				return true;
 			}
 		}
 		
 		return false;
 	}
-
-/*	private static ContentValues parseCursor(Cursor cursor) 
-	{
-		ContentValues values = new ContentValues();
-		
-		for (int i = 0; i < cursor.getColumnCount(); i++)
-		{
-			String name = cursor.getColumnName(i);
-			
-			switch(cursor.getType(i))
-			{
-				case Cursor.FIELD_TYPE_FLOAT:
-					values.put(name, cursor.getFloat(i));
-					break;
-				case Cursor.FIELD_TYPE_INTEGER:
-					values.put(name, cursor.getInt(i));
-					break;
-				case Cursor.FIELD_TYPE_STRING:
-					values.put(name, cursor.getString(i));
-					break;
-			}
-		}
-		
-		return values;
-	} */
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{

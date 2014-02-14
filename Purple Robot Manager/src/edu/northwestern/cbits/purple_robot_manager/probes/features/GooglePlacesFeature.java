@@ -43,7 +43,7 @@ public class GooglePlacesFeature extends Feature
 		return "google_places";
 	}
 
-	protected String summary(Context context) 
+	public String summary(Context context) 
 	{
 		return context.getString(R.string.summary_google_places_feature_desc);
 	}

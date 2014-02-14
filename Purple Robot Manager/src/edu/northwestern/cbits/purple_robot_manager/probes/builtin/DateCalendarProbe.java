@@ -114,9 +114,9 @@ public class DateCalendarProbe extends Probe
 		return false;
 	}
 	
- 
+	public String summary(Context context) 
 	{
-
+		return context.getString(R.string.summary_date_calendar_probe_desc);
 	}
 	
 	public String summarizeValue(Context context, Bundle bundle)

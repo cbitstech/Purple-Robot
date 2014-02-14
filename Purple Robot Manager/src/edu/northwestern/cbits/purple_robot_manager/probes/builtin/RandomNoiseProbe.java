@@ -121,6 +121,11 @@ public class RandomNoiseProbe extends Probe
 		return String.format(context.getResources().getString(R.string.summary_random_noise_probe), noise);
 	}
 
+	public String summary(Context context) 
+	{
+		return context.getString(R.string.summary_random_noise_probe_desc);
+	}
+
 	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{

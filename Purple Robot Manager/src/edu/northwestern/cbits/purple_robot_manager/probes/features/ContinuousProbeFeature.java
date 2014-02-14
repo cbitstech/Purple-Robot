@@ -13,7 +13,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 public abstract class ContinuousProbeFeature extends Feature
 {
 	protected abstract String featureKey();
-	protected abstract String summary(Context context);
+	public abstract String summary(Context context);
 
 	public abstract String name(Context context);
 	public abstract String source(Context context);

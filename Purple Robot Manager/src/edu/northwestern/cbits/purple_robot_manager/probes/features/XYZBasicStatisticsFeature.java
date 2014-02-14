@@ -96,7 +96,7 @@ public abstract class XYZBasicStatisticsFeature extends XYZContinuousProbeFeatur
 	}
 
 	protected abstract String featureKey();
-	protected abstract String summary(Context context); 
+	public abstract String summary(Context context); 
 	public abstract String name(Context context);
 	public abstract String source(Context context); 
 	public abstract String title(Context context); 

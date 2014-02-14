@@ -74,7 +74,7 @@ public class FitbitApiFeature extends Feature
 		return "fitbit_api";
 	}
 
-	protected String summary(Context context) 
+	public String summary(Context context) 
 	{
 		return context.getString(R.string.summary_fitbit_api_feature_desc);
 	}

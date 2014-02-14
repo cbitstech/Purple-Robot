@@ -328,6 +328,11 @@ public class BatteryProbe extends Probe
 	};
 */
 
+	public String summary(Context context) 
+	{
+		return context.getString(R.string.summary_battery_probe_desc);
+	}
+
 	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{

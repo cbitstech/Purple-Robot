@@ -409,9 +409,9 @@ public class RobotHealthProbe extends Probe
 						this._lastCheck = now;
 					}
 				}
-			}
 
-			return true;
+				return true;
+			}
 		}
 
 		return false;
@@ -497,6 +497,11 @@ public class RobotHealthProbe extends Probe
 		}
 
 		e.commit();
+	}
+
+	public String summary(Context context) 
+	{
+		return context.getString(R.string.summary_robot_probe_desc);
 	}
 
 	@SuppressWarnings("deprecation")

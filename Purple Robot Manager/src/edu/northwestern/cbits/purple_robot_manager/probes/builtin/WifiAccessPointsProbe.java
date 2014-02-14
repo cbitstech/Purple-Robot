@@ -331,4 +331,9 @@ public class WifiAccessPointsProbe extends Probe
 
 		return screen;
 	}
+
+	public String summary(Context context) 
+	{
+		return context.getString(R.string.summary_wifi_probe_desc);
+	}
 }

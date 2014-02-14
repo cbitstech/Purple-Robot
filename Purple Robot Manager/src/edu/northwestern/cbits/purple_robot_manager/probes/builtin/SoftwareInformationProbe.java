@@ -218,6 +218,11 @@ public class SoftwareInformationProbe extends Probe
 			}
 		}
 	}
+	
+	public String summary(Context context) 
+	{
+		return context.getString(R.string.summary_software_info_probe_desc);
+	}
 
 	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)

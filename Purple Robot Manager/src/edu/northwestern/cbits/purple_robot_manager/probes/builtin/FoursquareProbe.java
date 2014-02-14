@@ -335,6 +335,11 @@ public class FoursquareProbe extends Probe
 			}
 		}
 	}
+	
+	public String summary(Context context) 
+	{
+		return context.getString(R.string.summary_foursquare_probe_desc);
+	}
 
 	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(final PreferenceActivity activity)
