@@ -45,4 +45,9 @@ public class LabelProbe extends Probe
 	{
 
 	}
+
+	public String summary(Context context) 
+	{
+		return "";
+	}
 }

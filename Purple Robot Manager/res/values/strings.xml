@@ -944,7 +944,7 @@
     <string name="create_distances_table">CREATE TABLE IF NOT EXISTS distance_history(_id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, distance REAL, timestamp INTEGER DEFAULT 0);</string>
 
   	<string name="name_sanity_configuration">Purple Robot Configuration</string>
-	<string name="name_sanity_configuration_upload_warning">The HTTP data upload interval is less than 10 minutes. Consider extending this interval to extend battery life. (Settings &#8594; HTTP UPload Settings &#8594;HTTP Upload Interval)</string>
+	<string name="name_sanity_configuration_upload_warning">The HTTP data upload interval is less than 10 minutes. Consider extending this interval to extend battery life. (Settings &#8594; HTTP Upload Settings &#8594;HTTP Upload Interval)</string>
 	<string name="name_sanity_configuration_refresh_warning">The configuration refresh interval is less than 10 minutes. Consider extending this interval to extend battery life. (Settings &#8594; Refresh Interval)</string>
 	
 	
@@ -1152,6 +1152,8 @@
 	<string name="title_streaming_jackson_upload_section">JSON Uploader Settings</string>
 	<string name="summary_streaming_jackson_upload_section">Beta uploader that improves CPU utilization and battery life. (Beta)</string>
 	<string name="toast_mail_not_found">Mail client not found. Aborting&#8230;</string>
+	
+	<string name="checkbox_remember_response">Remember this response.</string>
 </resources>
 
 

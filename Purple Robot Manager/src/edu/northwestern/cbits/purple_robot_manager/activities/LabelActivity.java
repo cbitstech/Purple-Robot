@@ -33,6 +33,8 @@ import android.view.View;
 import android.view.WindowManager.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -55,6 +57,10 @@ public class LabelActivity extends ActionBarActivity
 	public static final String LABEL_KEY = "LABEL_KEY";
 	public static final String LABEL_DEFINITIONS = "LABEL_DEFINITIONS";
 	public static final String INSTRUCTIONS = "LABEL_INSTRUCTIONS";
+	private static final String REMEMBER_LABEL = "label_remember_values";
+	private static final boolean REMEMBER_LABEL_DEFAULT = false;
+	private static final String REMEMBER_LABEL_NAME = "label_remember_name";
+	private static final String REMEMBER_LABEL_VALUE = "label_remember_value";
 
 	private double _timestamp = 0;
 	private String _labelContext = null;
@@ -194,11 +200,15 @@ public class LabelActivity extends ActionBarActivity
 
         final AutoCompleteTextView value = (AutoCompleteTextView) this.findViewById(R.id.text_value_text);
         final AutoCompleteTextView label = (AutoCompleteTextView) this.findViewById(R.id.text_label_text);
+        final CheckBox remember = (CheckBox) this.findViewById(R.id.check_remember_values);
+        
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
 		if (extras.containsKey(LabelActivity.LABEL_DEFINITIONS))
 		{
 			label.setVisibility(View.GONE);
 			value.setVisibility(View.GONE);
+			remember.setVisibility(View.GONE);
 
 			LinearLayout labelLayout = (LinearLayout) this.findViewById(R.id.layout_label);
 			
@@ -217,8 +227,6 @@ public class LabelActivity extends ActionBarActivity
 				
 				sortedMap.put(weight + "_" + fieldName, fieldName);
 			}
-
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 			
 			ArrayList<String> keyList = new ArrayList<String>();
 			
@@ -395,6 +403,41 @@ public class LabelActivity extends ActionBarActivity
 		{
 			label.setVisibility(View.VISIBLE);
 			value.setVisibility(View.VISIBLE);
+			remember.setVisibility(View.VISIBLE);
+
+			boolean rememberLabel = prefs.getBoolean(LabelActivity.REMEMBER_LABEL, LabelActivity.REMEMBER_LABEL_DEFAULT);
+			
+			remember.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+			{
+				public void onCheckedChanged(CompoundButton button, boolean checked) 
+				{
+
+				}
+			});
+
+			remember.setChecked(rememberLabel);
+
+			remember.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+			{
+				public void onCheckedChanged(CompoundButton button, boolean checked) 
+				{
+					Editor e = prefs.edit();
+					e.putBoolean(LabelActivity.REMEMBER_LABEL, checked);
+					e.commit();
+				}
+			});
+
+			if (rememberLabel)
+			{
+				String labelName = prefs.getString(LabelActivity.REMEMBER_LABEL_NAME, null);
+				String labelValue = prefs.getString(LabelActivity.REMEMBER_LABEL_VALUE, null);
+				
+				if (labelName != null)
+					label.setText(labelName);
+				
+				if (labelValue != null)
+					value.setText(labelValue);
+			}
 			
 	        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, this.savedLabels());
 
@@ -453,10 +496,11 @@ public class LabelActivity extends ActionBarActivity
     	{
     		case R.id.menu_accept_label:
     	        Bundle extras = this.getIntent().getExtras();
+
+    	        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
     	        
     			if (extras.containsKey(LabelActivity.LABEL_DEFINITIONS))
     			{
-        	        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         	        Editor e = prefs.edit();
 
         	        for (String key : this._values.keySet())
@@ -518,6 +562,19 @@ public class LabelActivity extends ActionBarActivity
 	
 	    			if (key != null && value != null && key.length() > 0 && value.length() > 0)
 	    			{
+	    				boolean rememberLabel = prefs.getBoolean(LabelActivity.REMEMBER_LABEL, LabelActivity.REMEMBER_LABEL_DEFAULT);
+	    				
+	    				if (rememberLabel)
+	    				{
+	            	        Editor e = prefs.edit();
+
+	            	        e.putString(LabelActivity.REMEMBER_LABEL_NAME, key);
+	            	        e.putString(LabelActivity.REMEMBER_LABEL_VALUE, value);
+	            	        
+	            	        e.commit();
+	    				}
+
+	    				
 	    				JavaScriptEngine js = new JavaScriptEngine(this);
 	    				js.emitReading(key, value);
 	    				
