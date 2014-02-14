@@ -330,6 +330,11 @@ public class LinkedInProbe extends Probe
 		}
 	}
 
+	public String summary(Context context) 
+	{
+		return context.getString(R.string.summary_linkedin_probe_desc);
+	}
+
 	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(final PreferenceActivity activity)
 	{

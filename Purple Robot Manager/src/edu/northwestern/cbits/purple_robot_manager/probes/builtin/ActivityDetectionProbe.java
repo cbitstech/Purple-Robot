@@ -261,6 +261,11 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
 		return screen;
 	}
 
+	public String summary(Context context) 
+	{
+		return context.getString(R.string.summary_activity_detection_probe_desc);
+	}
+
 	public void onConnected(Bundle bundle) 
 	{
 		final SharedPreferences prefs = Probe.getPreferences(this._context);

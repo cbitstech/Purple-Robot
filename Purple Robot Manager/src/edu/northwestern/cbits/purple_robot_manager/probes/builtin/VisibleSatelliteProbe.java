@@ -70,6 +70,11 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 		}
 	}
 
+	public String summary(Context context) 
+	{
+		return context.getString(R.string.summary_visible_satellite_probe_desc);
+	}
+
 	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{

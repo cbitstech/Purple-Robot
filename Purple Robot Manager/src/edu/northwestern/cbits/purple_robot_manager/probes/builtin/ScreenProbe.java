@@ -133,6 +133,10 @@ public class ScreenProbe extends Probe
 		return formatted;
 	};
 
+	public String summary(Context context) 
+	{
+		return context.getString(R.string.summary_screen_probe_desc);
+	}
 
 	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)

@@ -14,6 +14,7 @@ import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -82,6 +83,7 @@ public class StartActivity extends ActionBarActivity
 	private Menu _menu = null;
 	
 	private ContentObserver _observer = null;
+	protected HashMap<String, Boolean> _enabledCache = new HashMap<String, Boolean>();
 
 	private static OnSharedPreferenceChangeListener _prefListener = new OnSharedPreferenceChangeListener()
     {
@@ -204,6 +206,24 @@ public class StartActivity extends ActionBarActivity
 		        				
 		        		String displayName = formattedValue;
 
+		        		boolean enabled = true;
+		        		
+		        		if (probe == null)
+		        			enabled = false;
+		        		else
+		        		{
+		        			Boolean probeEnabled = me._enabledCache.get(sensorName);
+		        			
+		        			if (probeEnabled == null)
+		        			{
+			        			probeEnabled = Boolean.valueOf(probe.isEnabled(me));
+			        			
+			        			me._enabledCache.put(sensorName, probeEnabled);
+		        			}
+		        			
+	        				enabled = probeEnabled.booleanValue();
+		        		}
+		        		
 		        		if (probe != null && value != null)
 		        		{
 		        			try
@@ -236,12 +256,25 @@ public class StartActivity extends ActionBarActivity
 						final String name = displayName + " (" + sdf.format(sensorDate) + ")";
 						final String display = formattedValue;
 
+						final boolean tintProbe = (enabled == false);
+								
 		        		me.runOnUiThread(new Runnable()
 		        		{
 							public void run() 
 							{
 				        		TextView nameField = (TextView) view.findViewById(R.id.text_sensor_name);
 				        		TextView valueField = (TextView) view.findViewById(R.id.text_sensor_value);
+				        		
+				        		if (tintProbe)
+				        		{
+				        			nameField.setTextColor(0xff808080);
+				        			valueField.setTextColor(0xff808080);
+				        		}
+				        		else
+				        		{
+				        			nameField.setTextColor(0xfff3f3f3);
+				        			valueField.setTextColor(0xfff3f3f3);
+				        		}
 
 				        		nameField.setText(name);
 				        		valueField.setText(display);
@@ -326,6 +359,8 @@ public class StartActivity extends ActionBarActivity
 			}
         });
         
+        final String savedPassword = prefs.getString("config_password", null);
+
         listView.setOnItemLongClickListener(new OnItemLongClickListener()
         {
 			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) 
@@ -348,16 +383,73 @@ public class StartActivity extends ActionBarActivity
 						builder = builder.setTitle(probe.title(me));
 						builder = builder.setMessage(probe.summary(me));
 						
+						if (savedPassword == null || savedPassword.trim().length() == 0)
+						{
+							if (probe.isEnabled(me))
+								builder.setPositiveButton(R.string.button_disable, new OnClickListener()
+								{
+									public void onClick(DialogInterface arg0, int arg1)
+									{
+										probe.disable(me);
+										
+										me._enabledCache.clear();
+									}
+								});
+							else
+								builder.setPositiveButton(R.string.button_enable, new OnClickListener()
+								{
+									public void onClick(DialogInterface arg0, int arg1) 
+									{
+										probe.enable(me);
+
+										me._enabledCache.clear();
+									}
+								});
+								
+							builder.setNegativeButton(R.string.button_close, null);
+							
+						}
+						else
+							builder.setPositiveButton(R.string.button_close, null);
+						
 						inited = true;
 					}
 					else
 					{
-						Model model = ModelManager.getInstance(me).fetchModelByName(me, sensorName);
+						final Model model = ModelManager.getInstance(me).fetchModelByName(me, sensorName);
 
 						if (model != null)
 						{
 							builder = builder.setTitle(model.title(me));
 							builder = builder.setMessage(model.summary(me));
+
+							if (savedPassword == null || savedPassword.trim().length() == 0)
+							{
+								if (model.isEnabled(me))
+									builder.setPositiveButton(R.string.button_disable, new OnClickListener()
+									{
+										public void onClick(DialogInterface arg0, int arg1) 
+										{
+											model.disable(me);
+
+											me._enabledCache.clear();
+										}
+									});
+								else
+									builder.setPositiveButton(R.string.button_enable, new OnClickListener()
+									{
+										public void onClick(DialogInterface arg0, int arg1) 
+										{
+											model.enable(me);
+
+											me._enabledCache.clear();
+										}
+									});
+									
+								builder.setNegativeButton(R.string.button_close, null);
+							}
+							else
+								builder.setPositiveButton(R.string.button_close, null);
 
 							inited = true;
 						}
@@ -450,7 +542,7 @@ public class StartActivity extends ActionBarActivity
 	protected void onResume()
 	{
 		super.onResume();
-
+		
 		CrashManager.register(this, "7550093e020b1a4a6df90f1e9dde68b6", new CrashManagerListener()
 		{
 			  public Boolean onCrashesFound()
@@ -458,6 +550,8 @@ public class StartActivity extends ActionBarActivity
 				    return true;
 			  }
 		});
+		
+		this._enabledCache.clear();
 
 		if (StartActivity._statusMessage != null)
 			this.getSupportActionBar().setSubtitle(StartActivity._statusMessage);

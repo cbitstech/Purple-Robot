@@ -321,6 +321,11 @@ public class TwitterProbe extends Probe
 			}
 		}
 	}
+	
+	public String summary(Context context) 
+	{
+		return context.getString(R.string.summary_twitter_probe_desc);
+	}
 
 	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(final PreferenceActivity activity)

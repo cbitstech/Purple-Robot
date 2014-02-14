@@ -69,7 +69,7 @@ public class SunriseSunsetFeature extends Feature
 		return SunriseSunsetFeature.FEATURE_KEY;
 	}
 
-	protected String summary(Context context) 
+	public String summary(Context context) 
 	{
 		return context.getString(R.string.summary_sunrise_sunset_feature_desc);
 	}

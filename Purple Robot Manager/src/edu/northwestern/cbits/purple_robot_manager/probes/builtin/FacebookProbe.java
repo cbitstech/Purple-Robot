@@ -372,6 +372,11 @@ public class FacebookProbe extends Probe
 		}
 	}
 
+	public String summary(Context context) 
+	{
+		return context.getString(R.string.summary_facebook_probe_desc);
+	}
+
 	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(final PreferenceActivity activity)
 	{

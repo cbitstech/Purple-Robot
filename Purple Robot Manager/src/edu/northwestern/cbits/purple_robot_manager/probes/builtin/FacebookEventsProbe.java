@@ -49,6 +49,11 @@ public class FacebookEventsProbe extends Probe
 
 	}
 	
+	public String summary(Context context) 
+	{
+		return context.getString(R.string.title_facebook_events_probe);
+	}
+	
 	public String summarizeValue(Context context, Bundle bundle)
 	{
 		String message = bundle.getString("MESSAGE");

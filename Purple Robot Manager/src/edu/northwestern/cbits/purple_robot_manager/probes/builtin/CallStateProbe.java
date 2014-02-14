@@ -12,6 +12,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
@@ -27,10 +28,8 @@ public class CallStateProbe extends Probe
 
 	private static final boolean DEFAULT_ENABLED = true;
 
-	private boolean _isInited = false;
-	private boolean _isEnabled = false;
-	
 	private long _lastXmit = 0;
+	private BroadcastReceiver _receiver = null;
 
 	public String name(Context context)
 	{
@@ -49,17 +48,21 @@ public class CallStateProbe extends Probe
 
 	public boolean isEnabled(Context context)
 	{
-		if (!this._isInited)
+		if (this._receiver == null)
 		{
 			IntentFilter filter = new IntentFilter(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
 
 			final CallStateProbe me = this;
 
-			BroadcastReceiver receiver = new BroadcastReceiver()
+			this._receiver = new BroadcastReceiver()
 			{
 				public void onReceive(Context context, Intent intent)
 				{
-					if (me._isEnabled)
+					SharedPreferences prefs = Probe.getPreferences(context);
+
+					Log.e("PR", "BCAST CALL STATE: " + prefs.getBoolean("config_probe_call_state_enabled", CallStateProbe.DEFAULT_ENABLED));
+
+					if (prefs.getBoolean("config_probe_call_state_enabled", CallStateProbe.DEFAULT_ENABLED))
 					{
 						TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 
@@ -74,16 +77,14 @@ public class CallStateProbe extends Probe
 				}
 			};
 
-			context.registerReceiver(receiver, filter);
-
-			this._isInited = true;
+			context.registerReceiver(this._receiver, filter);
 		}
-
-		this._isEnabled = false;
 
 		if (super.isEnabled(context))
 		{
 			SharedPreferences prefs = Probe.getPreferences(context);
+
+			Log.e("PR", "CALL STATE: " + prefs.getBoolean("config_probe_call_state_enabled", CallStateProbe.DEFAULT_ENABLED));
 
 			if (prefs.getBoolean("config_probe_call_state_enabled", CallStateProbe.DEFAULT_ENABLED))
 			{
@@ -100,15 +101,18 @@ public class CallStateProbe extends Probe
 					bundle.putString(CallStateProbe.CALL_STATE, this.getCallState(tm.getCallState()));
 	
 					this.transmitData(context, bundle);
-	
-					this._isEnabled = true;
 					
 					this._lastXmit = now;
 				}
+
+				return true;
 			}
 		}
 
-		return this._isEnabled;
+		context.unregisterReceiver(this._receiver);
+		this._receiver = null;
+
+		return false;
 	}
 
 	public Bundle formattedBundle(Context context, Bundle bundle)
@@ -149,22 +153,33 @@ public class CallStateProbe extends Probe
 
 	public void enable(Context context)
 	{
+		Log.e("PR", "ENABLE CALL STATE");
+
 		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_call_state_enabled", true);
-		
 		e.commit();
+
+		Log.e("PR", "NEW CALL STATE: " + prefs.getBoolean("config_probe_call_state_enabled", CallStateProbe.DEFAULT_ENABLED));
 	}
 
 	public void disable(Context context)
 	{
+		Log.e("PR", "DISABLE CALL STATE");
+		
 		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_call_state_enabled", false);
-		
 		e.commit();
+
+		Log.e("PR", "NEW CALL STATE: " + prefs.getBoolean("config_probe_call_state_enabled", CallStateProbe.DEFAULT_ENABLED));
+	}
+	
+	public String summary(Context context) 
+	{
+		return context.getString(R.string.summary_call_state_probe_desc);
 	}
 
 	@SuppressWarnings("deprecation")

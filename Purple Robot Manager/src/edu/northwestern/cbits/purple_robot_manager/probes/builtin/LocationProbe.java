@@ -126,7 +126,12 @@ public class LocationProbe extends Probe implements LocationListener
 			}
 		}
 	}
-	
+
+	public String summary(Context context) 
+	{
+		return context.getString(R.string.summary_location_probe_desc);
+	}
+
 	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(final PreferenceActivity activity)
 	{

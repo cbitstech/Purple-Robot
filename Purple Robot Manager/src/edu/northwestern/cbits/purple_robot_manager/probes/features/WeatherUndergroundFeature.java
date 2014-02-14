@@ -63,7 +63,7 @@ public class WeatherUndergroundFeature extends Feature
 		return WeatherUndergroundFeature.FEATURE_KEY;
 	}
 
-	protected String summary(Context context) 
+	public String summary(Context context) 
 	{
 		return context.getString(R.string.summary_weather_underground_feature_desc);
 	}

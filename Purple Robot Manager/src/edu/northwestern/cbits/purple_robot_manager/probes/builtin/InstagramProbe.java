@@ -326,6 +326,11 @@ public class InstagramProbe extends Probe
 		}
 	}
 
+	public String summary(Context context) 
+	{
+		return context.getString(R.string.summary_instagram_probe_desc);
+	}
+
 	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(final PreferenceActivity activity)
 	{

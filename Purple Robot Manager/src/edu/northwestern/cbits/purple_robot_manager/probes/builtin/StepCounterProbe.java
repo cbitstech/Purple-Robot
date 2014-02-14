@@ -201,6 +201,11 @@ public class StepCounterProbe extends Probe implements SensorEventListener
 		return String.format(context.getResources().getString(R.string.summary_step_counter_probe), (int) steps);
 	}
 
+	public String summary(Context context) 
+	{
+		return context.getString(R.string.summary_step_counter_probe_desc);
+	}
+
 	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{

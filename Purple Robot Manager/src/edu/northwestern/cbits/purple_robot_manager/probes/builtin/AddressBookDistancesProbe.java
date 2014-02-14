@@ -481,6 +481,11 @@ public class AddressBookDistancesProbe extends Probe
 
 		return screen;
 	}
+	
+	public String summary(Context context) 
+	{
+		return context.getString(R.string.summary_distances_probe_desc);
+	}
 
 /*	@SuppressWarnings("unchecked")
 	public Bundle formattedBundle(Context context, Bundle bundle)

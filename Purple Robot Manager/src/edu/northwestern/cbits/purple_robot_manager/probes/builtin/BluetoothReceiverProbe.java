@@ -27,6 +27,11 @@ public class BluetoothReceiverProbe extends Probe
 	{
 		return "Bluetooth test probe";
 	}
+	
+	public String summary(Context context) 
+	{
+		return "";
+	}
 
 	public String title(Context context)
 	{

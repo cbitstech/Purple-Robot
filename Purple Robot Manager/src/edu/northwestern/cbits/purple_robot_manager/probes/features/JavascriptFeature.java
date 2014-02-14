@@ -285,7 +285,7 @@ public class JavascriptFeature extends Feature
 		return b;
 	}
 
-	protected String summary(Context context)
+	public String summary(Context context)
 	{
 		return null;
 	}
