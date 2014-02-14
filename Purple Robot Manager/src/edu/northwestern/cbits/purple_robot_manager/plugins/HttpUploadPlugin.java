@@ -229,8 +229,6 @@ public class HttpUploadPlugin extends OutputPlugin
 		if (prefs.getBoolean("config_enable_data_server", false) == false)
 			return;
 		
-		Log.e("PR", "HTTP PROCESS INTENT: " + intent);
-		
 		PurpleRobotApplication.fixPreferences(this.getContext(), false);
 		
 		if (OutputPlugin.FORCE_UPLOAD.equals(intent.getAction()))

@@ -50,7 +50,7 @@ import android.content.SharedPreferences.Editor;
 import android.net.http.AndroidHttpClient;
 import android.os.Build;
 import android.preference.PreferenceManager;
-import android.util.Log;
+
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.WiFiHelper;
@@ -227,8 +227,6 @@ public abstract class DataUploadPlugin extends OutputPlugin
 
 			String jsonString = jsonMessage.toString();
 			
-//			Log.e("PR", "SENDING : " + jsonString);
-
 			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 			nameValuePairs.add(new BasicNameValuePair("json", jsonString));
 			HttpEntity entity = new UrlEncodedFormEntity(nameValuePairs, HTTP.US_ASCII);
@@ -273,8 +271,6 @@ public abstract class DataUploadPlugin extends OutputPlugin
 			
 			if (index < 0)
 				index = 0;
-			
-			Log.e("PR", "RECV: " + body.substring(index));
 
 			String status = json.getString(STATUS_KEY);
 

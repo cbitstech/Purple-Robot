@@ -59,137 +59,126 @@ public class WifiAccessPointsProbe extends Probe
 		return context.getResources().getString(R.string.probe_other_devices_category);
 	}
 	
-/*	private boolean fetchEnabled(Context context)
+	public boolean isEnabled(Context context)
 	{
 		if (super.isEnabled(context))
 		{
 			SharedPreferences prefs = Probe.getPreferences(context);
 
-			return prefs.getBoolean("config_probe_wifi_enabled", WifiAccessPointsProbe.DEFAULT_ENABLED);
-		}
-		
-		return false;
-	} */
-
-	public boolean isEnabled(Context context)
-	{
-		SharedPreferences prefs = Probe.getPreferences(context);
-
-		boolean enabled = prefs.getBoolean("config_probe_wifi_enabled", WifiAccessPointsProbe.DEFAULT_ENABLED);
-		
-		if (super.isEnabled(context) == false || enabled == false)
-		{
-			if (this._receiver != null)
+			if (prefs.getBoolean("config_probe_wifi_enabled", WifiAccessPointsProbe.DEFAULT_ENABLED))
 			{
-				context.unregisterReceiver(this._receiver);
-				this._receiver = null;
-			}
-
-			return false;
-		}
-
-		final WifiAccessPointsProbe me = this;
-		
-		if (this._receiver == null)
-		{
-			this._receiver = new BroadcastReceiver()
-			{
-				public void onReceive(Context context, Intent intent)
+				final WifiAccessPointsProbe me = this;
+				
+				if (this._receiver == null)
 				{
-					if (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(intent.getAction()))
+					this._receiver = new BroadcastReceiver()
+					{
+						public void onReceive(Context context, Intent intent)
+						{
+							if (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(intent.getAction()))
+							{
+								WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+
+								List<ScanResult> results = wifi.getScanResults();
+
+								Bundle bundle = new Bundle();
+
+								bundle.putString("PROBE", me.name(context));
+								bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+
+								ArrayList<Bundle> accessPoints = new ArrayList<Bundle>();
+
+								if (results != null)
+								{
+									bundle.putInt(WifiAccessPointsProbe.ACCESS_POINT_COUNT, results.size());
+
+									for (ScanResult result : results)
+									{
+										Bundle pointBundle = new Bundle();
+
+										pointBundle.putString(WifiAccessPointsProbe.BSSID, result.BSSID);
+										pointBundle.putString(WifiAccessPointsProbe.SSID, result.SSID);
+										pointBundle.putString(WifiAccessPointsProbe.CAPABILITIES, result.capabilities);
+
+										pointBundle.putInt(WifiAccessPointsProbe.FREQUENCY, result.frequency);
+										pointBundle.putInt(WifiAccessPointsProbe.LEVEL, result.level);
+
+										accessPoints.add(pointBundle);
+									}
+
+								}
+								else
+									bundle.putInt(WifiAccessPointsProbe.ACCESS_POINT_COUNT, 0);
+
+								bundle.putParcelableArrayList(WifiAccessPointsProbe.ACCESS_POINTS, accessPoints);
+
+								WifiInfo wifiInfo = wifi.getConnectionInfo();
+
+								if (wifiInfo != null)
+								{
+									bundle.putString(WifiAccessPointsProbe.CURRENT_BSSID, wifiInfo.getBSSID());
+									bundle.putString(WifiAccessPointsProbe.CURRENT_SSID, wifiInfo.getSSID());
+									bundle.putInt(WifiAccessPointsProbe.CURRENT_LINK_SPEED, wifiInfo.getLinkSpeed());
+									bundle.putInt(WifiAccessPointsProbe.CURRENT_RSSI, wifiInfo.getRssi());
+								}
+
+								me.transmitData(context, bundle);
+							}
+						}
+					};
+
+					IntentFilter filter = new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+					context.registerReceiver(this._receiver, filter);
+				}
+				
+				long now = System.currentTimeMillis();
+				
+				synchronized(this)
+				{
+					long freq = Long.parseLong(prefs.getString("config_probe_wifi_frequency", Probe.DEFAULT_FREQUENCY));
+
+					if (now - this._lastCheck > freq)
 					{
 						WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 
-						List<ScanResult> results = wifi.getScanResults();
-
-						Bundle bundle = new Bundle();
-
-						bundle.putString("PROBE", me.name(context));
-						bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
-
-						ArrayList<Bundle> accessPoints = new ArrayList<Bundle>();
-
-						if (results != null)
+						if (wifi.isWifiEnabled())
 						{
-							bundle.putInt(WifiAccessPointsProbe.ACCESS_POINT_COUNT, results.size());
+							this._lastCheck = now;
+							this._foundNetworks.clear();
 
-							for (ScanResult result : results)
-							{
-								Bundle pointBundle = new Bundle();
-
-								pointBundle.putString(WifiAccessPointsProbe.BSSID, result.BSSID);
-								pointBundle.putString(WifiAccessPointsProbe.SSID, result.SSID);
-								pointBundle.putString(WifiAccessPointsProbe.CAPABILITIES, result.capabilities);
-
-								pointBundle.putInt(WifiAccessPointsProbe.FREQUENCY, result.frequency);
-								pointBundle.putInt(WifiAccessPointsProbe.LEVEL, result.level);
-
-								accessPoints.add(pointBundle);
-							}
-
+							wifi.startScan();
 						}
 						else
+						{
+							Bundle bundle = new Bundle();
+
+							bundle.putString("PROBE", me.name(context));
+							bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
 							bundle.putInt(WifiAccessPointsProbe.ACCESS_POINT_COUNT, 0);
 
-						bundle.putParcelableArrayList(WifiAccessPointsProbe.ACCESS_POINTS, accessPoints);
+							bundle.putParcelableArrayList(WifiAccessPointsProbe.ACCESS_POINTS, new ArrayList<Bundle>());
 
-						WifiInfo wifiInfo = wifi.getConnectionInfo();
+							bundle.putString(WifiAccessPointsProbe.CURRENT_BSSID, "");
+							bundle.putString(WifiAccessPointsProbe.CURRENT_SSID, "");
+							bundle.putInt(WifiAccessPointsProbe.CURRENT_LINK_SPEED, -1);
+							bundle.putInt(WifiAccessPointsProbe.CURRENT_RSSI, -1);
 
-						if (wifiInfo != null)
-						{
-							bundle.putString(WifiAccessPointsProbe.CURRENT_BSSID, wifiInfo.getBSSID());
-							bundle.putString(WifiAccessPointsProbe.CURRENT_SSID, wifiInfo.getSSID());
-							bundle.putInt(WifiAccessPointsProbe.CURRENT_LINK_SPEED, wifiInfo.getLinkSpeed());
-							bundle.putInt(WifiAccessPointsProbe.CURRENT_RSSI, wifiInfo.getRssi());
+							me.transmitData(context, bundle);
 						}
-
-						me.transmitData(context, bundle);
 					}
 				}
-			};
-
-			IntentFilter filter = new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
-			context.registerReceiver(this._receiver, filter);
-		}
-
-		long now = System.currentTimeMillis();
-		
-		synchronized(this)
-		{
-			long freq = Long.parseLong(prefs.getString("config_probe_wifi_frequency", Probe.DEFAULT_FREQUENCY));
-
-			if (now - this._lastCheck > freq)
-			{
-				WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-
-				if (wifi.isWifiEnabled())
-				{
-					this._lastCheck = now;
-					this._foundNetworks.clear();
-
-					wifi.startScan();
-				}
-				else
-				{
-					Bundle bundle = new Bundle();
-
-					bundle.putString("PROBE", me.name(context));
-					bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
-					bundle.putInt(WifiAccessPointsProbe.ACCESS_POINT_COUNT, 0);
-
-					bundle.putParcelableArrayList(WifiAccessPointsProbe.ACCESS_POINTS, new ArrayList<Bundle>());
-
-					bundle.putString(WifiAccessPointsProbe.CURRENT_BSSID, "");
-					bundle.putString(WifiAccessPointsProbe.CURRENT_SSID, "");
-					bundle.putInt(WifiAccessPointsProbe.CURRENT_LINK_SPEED, -1);
-					bundle.putInt(WifiAccessPointsProbe.CURRENT_RSSI, -1);
-
-					me.transmitData(context, bundle);
-				}
+				
+				return true;
 			}
 		}
+		
+		if (this._receiver != null)
+		{
+			context.unregisterReceiver(this._receiver);
+			this._receiver = null;
+		}
 
-		return true;
+		return false;
 	}
 
 	private Bundle bundleForNetworksArray(Context context, ArrayList<Bundle> objects)

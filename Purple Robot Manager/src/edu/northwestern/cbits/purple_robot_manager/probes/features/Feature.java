@@ -1,6 +1,5 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.features;
 
-import android.content.Context;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
