@@ -209,7 +209,7 @@ public class StartActivity extends ActionBarActivity
 		        		boolean enabled = true;
 		        		
 		        		if (probe == null)
-		        			enabled = false;
+		        			enabled = true;
 		        		else
 		        		{
 		        			Boolean probeEnabled = me._enabledCache.get(sensorName);

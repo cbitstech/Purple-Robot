@@ -39,7 +39,7 @@ public class SchemeConfigFile
 	{
 		Map<String, Object> configMap = PurpleRobotApplication.configuration(context);
 		
-		return new Pair(Symbol.intern("ps-update-config"), this.pairsList(configMap));
+		return new Pair(Symbol.intern("pr-update-config"), this.pairsList(configMap));
 	}
 
 	private Pair triggersList(List<Map<String, Object>> configs) 

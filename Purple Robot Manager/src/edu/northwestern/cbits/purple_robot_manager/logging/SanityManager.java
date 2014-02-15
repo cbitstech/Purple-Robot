@@ -25,6 +25,8 @@ import edu.northwestern.cbits.purple_robot_manager.activities.StartActivity;
 
 public class SanityManager 
 {
+	private static final int NOTE_ID = 457284567;
+
 	private static SanityManager _sharedInstance = null;
 	
 	private Context _context = null;
@@ -127,10 +129,10 @@ public class SanityManager
 			this._lastStatus = this.getErrorLevel();
 			int issueCount = this._errors.size() + this._warnings.size();
 
-			PendingIntent contentIntent = PendingIntent.getActivity(this._context, 0, new Intent(this._context, StartActivity.class), Notification.FLAG_ONGOING_EVENT);
+			PendingIntent contentIntent = PendingIntent.getActivity(this._context, SanityManager.NOTE_ID, new Intent(this._context, StartActivity.class), Notification.FLAG_ONGOING_EVENT);
 			
 			if (this._lastStatus != SanityCheck.OK)
-				contentIntent = PendingIntent.getActivity(this._context, 0, new Intent(this._context, DiagnosticActivity.class), Notification.FLAG_ONGOING_EVENT);
+				contentIntent = PendingIntent.getActivity(this._context, SanityManager.NOTE_ID, new Intent(this._context, DiagnosticActivity.class), Notification.FLAG_ONGOING_EVENT);
 			
 			NotificationManager noteManager = (NotificationManager) this._context.getSystemService(Context.NOTIFICATION_SERVICE);
 			
@@ -138,24 +140,24 @@ public class SanityManager
 			{
 				Notification.Builder builder = new Notification.Builder(this._context);
 					
-				builder.setContentIntent(contentIntent);
-				builder.setContentTitle(this._context.getString(R.string.notify_running_title));
+				builder = builder.setContentIntent(contentIntent);
+				builder = builder.setContentTitle(this._context.getString(R.string.notify_running_title));
 				
 				if (issueCount == 1)
 				{
-					builder.setContentText(this._context.getString(R.string.note_purple_robot_message_single));
-					builder.setTicker(this._context.getString(R.string.note_purple_robot_message_single));
+					builder = builder.setContentText(this._context.getString(R.string.note_purple_robot_message_single));
+					builder = builder.setTicker(this._context.getString(R.string.note_purple_robot_message_single));
 				}
 				else
 				{
-					builder.setContentText(this._context.getString(R.string.note_purple_robot_message_multiple, issueCount));
-					builder.setTicker(this._context.getString(R.string.note_purple_robot_message_multiple, issueCount));
+					builder = builder.setContentText(this._context.getString(R.string.note_purple_robot_message_multiple, issueCount));
+					builder = builder.setTicker(this._context.getString(R.string.note_purple_robot_message_multiple, issueCount));
 				}
 				
 				if (this._lastStatus == SanityCheck.ERROR)
-					builder.setSmallIcon(R.drawable.ic_note_error);
+					builder = builder.setSmallIcon(R.drawable.ic_note_error);
 				else
-					builder.setSmallIcon(R.drawable.ic_note_warning);
+					builder = builder.setSmallIcon(R.drawable.ic_note_warning);
 	
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
 				{
@@ -174,19 +176,19 @@ public class SanityManager
 					for (String key : this._warnings.keySet())
 						style = style.addLine(this._warnings.get(key));
 
-					builder.setStyle(style);
+					builder = builder.setStyle(style);
 
 					Notification note = builder.build();
 					note.flags = Notification.FLAG_ONGOING_EVENT;
 
-					noteManager.notify(12345, note);
+					noteManager.notify(SanityManager.NOTE_ID, note);
 				}
 			}
 			else
 			{
 				NotificationCompat.Builder builder = new NotificationCompat.Builder(this._context);
 
-				builder.setContentTitle(this._context.getString(R.string.notify_running_title));
+				builder = builder.setContentTitle(this._context.getString(R.string.notify_running_title));
 				
 				if (this._lastStatus != SanityCheck.OK)
 				{
@@ -194,32 +196,32 @@ public class SanityManager
 
 					if (issueCount == 1)
 					{
-						builder.setContentText(this._context.getString(R.string.note_purple_robot_message_single));
-						builder.setTicker(this._context.getString(R.string.note_purple_robot_message_single));
+						builder = builder.setContentText(this._context.getString(R.string.note_purple_robot_message_single));
+						builder = builder.setTicker(this._context.getString(R.string.note_purple_robot_message_single));
 					}
 					else
 					{
-						builder.setContentText(this._context.getString(R.string.note_purple_robot_message_multiple, issueCount));
-						builder.setTicker(this._context.getString(R.string.note_purple_robot_message_multiple, issueCount));
+						builder = builder.setContentText(this._context.getString(R.string.note_purple_robot_message_multiple, issueCount));
+						builder = builder.setTicker(this._context.getString(R.string.note_purple_robot_message_multiple, issueCount));
 					}
 					
 					if (this._lastStatus != SanityCheck.WARNING)
-						builder.setSmallIcon(R.drawable.ic_note_error);
+						builder = builder.setSmallIcon(R.drawable.ic_note_error);
 					else
-						builder.setSmallIcon(R.drawable.ic_note_warning);
+						builder = builder.setSmallIcon(R.drawable.ic_note_warning);
 				}
 				else
 				{
-					builder.setContentText(this._context.getString(R.string.pr_errors_none_label));
-					builder.setSmallIcon(R.drawable.ic_note_normal);
+					builder = builder.setContentText(this._context.getString(R.string.pr_errors_none_label));
+					builder = builder.setSmallIcon(R.drawable.ic_note_normal);
 				}
 
-				builder.setContentIntent(contentIntent);
+				builder = builder.setContentIntent(contentIntent);
 
 				Notification note = builder.build();
 				note.flags = Notification.FLAG_ONGOING_EVENT;
 
-				noteManager.notify(12345, note);
+				noteManager.notify(SanityManager.NOTE_ID, note);
 			}
 		}
 	}

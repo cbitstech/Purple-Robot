@@ -61,16 +61,14 @@ public class AudioFeaturesProbe extends Probe
 
 	public boolean isEnabled(final Context context)
 	{
-		boolean enabled = super.isEnabled(context);
-
-		final AudioFeaturesProbe me = this;
-		
-		if (enabled)
+		if (super.isEnabled(context))
 		{
 			SharedPreferences prefs = Probe.getPreferences(context);
 
 			if (prefs.getBoolean("config_probe_audio_feature_enabled", AudioFeaturesProbe.DEFAULT_ENABLED))
 			{
+				final AudioFeaturesProbe me = this;
+
 				Runnable r = new Runnable()
 				{
 					@SuppressWarnings("deprecation")
@@ -162,10 +160,12 @@ public class AudioFeaturesProbe extends Probe
 				
 				Thread t = new Thread(r);
 				t.start();
+				
+				return true;
 			}
 		}
 		
-		return enabled;
+		return false;
 	}
 
 	public String summary(Context context)
@@ -199,5 +199,4 @@ public class AudioFeaturesProbe extends Probe
 
 		return String.format(context.getResources().getString(R.string.summary_audio_features_probe), freq);
 	}
-
 }

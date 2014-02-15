@@ -183,7 +183,9 @@ public class SchemeEngine extends BaseScriptEngine
 					if (valuePair.first() instanceof String && valuePair.rest() instanceof Pair)
 					{
 						ArrayList<Object> list = new ArrayList<Object>();
-						
+
+						list.add(valuePair.first());
+
 						Pair restPair = (Pair) valuePair.rest();
 						
 						while (restPair.isEmpty() == false)
