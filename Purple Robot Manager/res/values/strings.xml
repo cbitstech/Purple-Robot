@@ -1143,7 +1143,8 @@
 	
 	<string name="scheme_config_check_missing" formatted="false">Missing configuration value: %s</string>
 	<string name="scheme_config_check_changed" formatted="false">Changed configuration value: %s</string>
-	
+	<string name="scheme_config_invalid_config">Invalid Scheme configuration file</string>
+		
 	<string name="title_config_check">Inspect Configuration</string>
 	<string name="summary_config_check">When possible, compare running configuration with network configuration to detect missing or changed values.</string>
 	

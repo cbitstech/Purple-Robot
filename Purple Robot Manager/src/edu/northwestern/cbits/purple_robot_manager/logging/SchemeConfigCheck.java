@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import jscheme.JScheme;
+import jscheme.SchemeException;
 import jsint.Evaluator;
 import jsint.Pair;
 import jsint.Symbol;
@@ -82,68 +83,78 @@ public class SchemeConfigCheck extends SanityCheck
 				LogManager.getInstance(context).logException(e);
 			}
 			
-			Object sexp = scheme.read(schemeScript);
-			
-			if (sexp instanceof Pair)
+			try
 			{
-				Pair pair = (Pair) sexp;
-
-				List<Map<String, Object>> configs = SchemeConfigCheck.parseConfigMaps(pair);
-
-				if (configs.size() > 0)
+				Object sexp = scheme.read(schemeScript);
+				
+				if (sexp instanceof Pair)
 				{
-					for (Map<String, Object> config : configs)
+					Pair pair = (Pair) sexp;
+	
+					List<Map<String, Object>> configs = SchemeConfigCheck.parseConfigMaps(pair);
+	
+					if (configs.size() > 0)
 					{
-						for (String key : config.keySet())
+						for (Map<String, Object> config : configs)
 						{
-							if (prefs.contains(key))
+							for (String key : config.keySet())
 							{
-								Object cfgObject = config.get(key);
-								
-								if (cfgObject instanceof Boolean)
+								if (prefs.contains(key))
 								{
-									Boolean setting = (Boolean) cfgObject;
+									Object cfgObject = config.get(key);
 									
-									boolean pref = prefs.getBoolean(key, (setting == false));
-									
-									if (pref != setting)
+									if (cfgObject instanceof Boolean)
 									{
-										this._errorLevel = SanityCheck.WARNING;
-										this._errorMessage = context.getString(R.string.scheme_config_check_changed, key);
-									}
-								}
-								else if (cfgObject instanceof String)
-								{
-									String pref = prefs.getString(key, null);
-									
-									if (cfgObject.toString().equals(pref) == false)
-									{
-										boolean mismatched = true;
+										Boolean setting = (Boolean) cfgObject;
 										
-										if ("config_json_url".equals(key))
-										{
-											if (pref.indexOf(cfgObject.toString()) == 0)
-												mismatched = false;
-										}
+										boolean pref = prefs.getBoolean(key, (setting == false));
 										
-										if (mismatched)
+										if (pref != setting)
 										{
 											this._errorLevel = SanityCheck.WARNING;
 											this._errorMessage = context.getString(R.string.scheme_config_check_changed, key);
 										}
 									}
+									else if (cfgObject instanceof String)
+									{
+										String pref = prefs.getString(key, null);
+										
+										if (cfgObject.toString().equals(pref) == false)
+										{
+											boolean mismatched = true;
+											
+											if ("config_json_url".equals(key))
+											{
+												if (pref.indexOf(cfgObject.toString()) == 0)
+													mismatched = false;
+											}
+											
+											if (mismatched)
+											{
+												this._errorLevel = SanityCheck.WARNING;
+												this._errorMessage = context.getString(R.string.scheme_config_check_changed, key);
+											}
+										}
+									}
 								}
-							}
-							else
-							{
-								this._errorLevel = SanityCheck.ERROR;
-								this._errorMessage = context.getString(R.string.scheme_config_check_missing, key);
-								
-								return;
+								else
+								{
+									this._errorLevel = SanityCheck.ERROR;
+									this._errorMessage = context.getString(R.string.scheme_config_check_missing, key);
+									
+									return;
+								}
 							}
 						}
 					}
 				}
+			}
+			catch (SchemeException e)
+			{
+				this._errorLevel = SanityCheck.ERROR;
+				this._errorMessage = context.getString(R.string.scheme_config_invalid_config);
+
+				LogManager.getInstance(context).logException(e);
 			}
 		}
 	}

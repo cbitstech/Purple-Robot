@@ -241,161 +241,164 @@ public class LabelActivity extends ActionBarActivity
 			for (String field : keyList)
 			{
 				field = sortedMap.get(field);
-				
+
 				Bundle fieldDef = definitions.getBundle(field);
-
-				final TextView fieldName = new TextView(this);
-
-				if (fieldDef.containsKey("prompt"))
-					fieldName.setText(fieldDef.getString("prompt"));
-				else
-					fieldName.setText(field);
 				
-				LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
-				params.setMargins(8, 24, 8, 8);
-				fieldName.setLayoutParams(params);
-				
-				labelLayout.addView(fieldName);
-				
-				String fieldType = fieldDef.getString("type");
-				
-				final LabelActivity me = this;
-				final String fieldLabel = field;
-				
-				final String fieldPrompt = fieldName.getText().toString();
-				
-				if (fieldType.equalsIgnoreCase("real"))
+				if (fieldDef != null)
 				{
-					SeekBar seekBar = new SeekBar(this);
+					final TextView fieldName = new TextView(this);
+	
+					if (fieldDef.containsKey("prompt"))
+						fieldName.setText(fieldDef.getString("prompt"));
+					else
+						fieldName.setText(field);
 					
-					params = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
-					params.setMargins(8, 8, 8, 8);
-					seekBar.setLayoutParams(params);
+					LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+					params.setMargins(8, 24, 8, 8);
+					fieldName.setLayoutParams(params);
 					
-					final double min = fieldDef.getDouble("min", 1.0);
-					final double max = fieldDef.getDouble("max", 10.0);
-					double step = fieldDef.getDouble("step", 1.0);
+					labelLayout.addView(fieldName);
 					
-					float lastValue = prefs.getFloat("label_field_" + field, (float) (((min + max) / 2) - min));
+					String fieldType = fieldDef.getString("type");
 					
-					seekBar.setMax((int) (max - min));
-					seekBar.setKeyProgressIncrement((int) step);
+					final LabelActivity me = this;
+					final String fieldLabel = field;
 					
-					seekBar.setProgress((int) lastValue);
+					final String fieldPrompt = fieldName.getText().toString();
 					
-					me._values.put(fieldLabel, Float.valueOf(lastValue));
-					
-					seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
+					if (fieldType.equalsIgnoreCase("real"))
 					{
-						public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) 
-						{
-							fieldName.setText(fieldPrompt + ": " + ((int) (min + progress)));
-							
-							me._values.put(fieldLabel, Float.valueOf((float) (min + progress)));
-						}
-
-						public void onStartTrackingTouch(SeekBar arg0) 
-						{
-
-						}
-
-						public void onStopTrackingTouch(SeekBar seekBar) 
-						{
-							
-						}
-					});
-
-					labelLayout.addView(seekBar);
-				}
-				else if (fieldType.equalsIgnoreCase("nominal"))
-				{
-					if (fieldDef.containsKey("values") && fieldDef.getStringArrayList("values").size() > 0)
-					{
-						ScrollView scroller = new ScrollView(this);
-						params = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, 0, 1);
-						scroller.setLayoutParams(params);
+						SeekBar seekBar = new SeekBar(this);
 						
-						String lastValue = prefs.getString("label_field_" + field, null);
+						params = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+						params.setMargins(8, 8, 8, 8);
+						seekBar.setLayoutParams(params);
 						
-						RadioGroup radios = new RadioGroup(this);
+						final double min = fieldDef.getDouble("min", 1.0);
+						final double max = fieldDef.getDouble("max", 10.0);
+						double step = fieldDef.getDouble("step", 1.0);
 						
-						for (String nominalValue : fieldDef.getStringArrayList("values"))
+						float lastValue = prefs.getFloat("label_field_" + field, (float) (((min + max) / 2) - min));
+						
+						seekBar.setMax((int) (max - min));
+						seekBar.setKeyProgressIncrement((int) step);
+						
+						seekBar.setProgress((int) lastValue);
+						
+						me._values.put(fieldLabel, Float.valueOf(lastValue));
+						
+						seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
 						{
-							RadioButton radio = new RadioButton(this);
-							radio.setText(nominalValue);
-							
-							radios.addView(radio);
-							
-							if (lastValue != null && nominalValue.equalsIgnoreCase(lastValue))
+							public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) 
 							{
-								if (radio.isChecked() == false)
-									radio.toggle();
+								fieldName.setText(fieldPrompt + ": " + ((int) (min + progress)));
+								
+								me._values.put(fieldLabel, Float.valueOf((float) (min + progress)));
 							}
-						}
-						
-						if (lastValue != null)
-							me._values.put(fieldLabel, lastValue);
-						
-						radios.setOnCheckedChangeListener(new OnCheckedChangeListener()
-						{
-							public void onCheckedChanged(RadioGroup radios, int checkId) 
+	
+							public void onStartTrackingTouch(SeekBar arg0) 
 							{
-								if (checkId != -1)
-								{
-									RadioButton button = (RadioButton) radios.findViewById(checkId);
-
-									me._values.put(fieldLabel, button.getText());
-								}
-								else
-									me._values.remove(fieldLabel);
+	
+							}
+	
+							public void onStopTrackingTouch(SeekBar seekBar) 
+							{
+								
 							}
 						});
-						
-						scroller.addView(radios);
-						labelLayout.addView(scroller);
+	
+						labelLayout.addView(seekBar);
 					}
-				}
-				else if (fieldType.equalsIgnoreCase("text"))
-				{
-					AutoCompleteTextView textField = new AutoCompleteTextView(this);
-
-					if (fieldDef.containsKey("placeholder"))
-						textField.setHint(fieldDef.getString("placeholder"));
-
-					String valuesList = prefs.getString("label_field_" + field + "_saved_values", "");
-					
-					ArrayList<String> savedValues = new ArrayList<String>();
-					
-					for (String saved : valuesList.split(";"))
-						savedValues.add(saved);
-					
-					ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, savedValues);
-					textField.setAdapter(adapter);
-					textField.setThreshold(1);
-					
-					params = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
-					params.setMargins(8, 8, 8, 8);
-					textField.setLayoutParams(params);
-					
-					textField.addTextChangedListener(new TextWatcher()
+					else if (fieldType.equalsIgnoreCase("nominal"))
 					{
-						public void afterTextChanged(Editable s) 
+						if (fieldDef.containsKey("values") && fieldDef.getStringArrayList("values").size() > 0)
 						{
-							me._values.put(fieldLabel, s.toString());
+							ScrollView scroller = new ScrollView(this);
+							params = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, 0, 1);
+							scroller.setLayoutParams(params);
+							
+							String lastValue = prefs.getString("label_field_" + field, null);
+							
+							RadioGroup radios = new RadioGroup(this);
+							
+							for (String nominalValue : fieldDef.getStringArrayList("values"))
+							{
+								RadioButton radio = new RadioButton(this);
+								radio.setText(nominalValue);
+								
+								radios.addView(radio);
+								
+								if (lastValue != null && nominalValue.equalsIgnoreCase(lastValue))
+								{
+									if (radio.isChecked() == false)
+										radio.toggle();
+								}
+							}
+							
+							if (lastValue != null)
+								me._values.put(fieldLabel, lastValue);
+							
+							radios.setOnCheckedChangeListener(new OnCheckedChangeListener()
+							{
+								public void onCheckedChanged(RadioGroup radios, int checkId) 
+								{
+									if (checkId != -1)
+									{
+										RadioButton button = (RadioButton) radios.findViewById(checkId);
+	
+										me._values.put(fieldLabel, button.getText());
+									}
+									else
+										me._values.remove(fieldLabel);
+								}
+							});
+							
+							scroller.addView(radios);
+							labelLayout.addView(scroller);
 						}
-
-						public void beforeTextChanged(CharSequence s, int start, int count, int after) 
+					}
+					else if (fieldType.equalsIgnoreCase("text"))
+					{
+						AutoCompleteTextView textField = new AutoCompleteTextView(this);
+	
+						if (fieldDef.containsKey("placeholder"))
+							textField.setHint(fieldDef.getString("placeholder"));
+	
+						String valuesList = prefs.getString("label_field_" + field + "_saved_values", "");
+						
+						ArrayList<String> savedValues = new ArrayList<String>();
+						
+						for (String saved : valuesList.split(";"))
+							savedValues.add(saved);
+						
+						ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, savedValues);
+						textField.setAdapter(adapter);
+						textField.setThreshold(1);
+						
+						params = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+						params.setMargins(8, 8, 8, 8);
+						textField.setLayoutParams(params);
+						
+						textField.addTextChangedListener(new TextWatcher()
 						{
-
-						}
-
-						public void onTextChanged(CharSequence s, int start, int before, int count) 
-						{
-
-						}
-					});
-
-					labelLayout.addView(textField);
+							public void afterTextChanged(Editable s) 
+							{
+								me._values.put(fieldLabel, s.toString());
+							}
+	
+							public void beforeTextChanged(CharSequence s, int start, int count, int after) 
+							{
+	
+							}
+	
+							public void onTextChanged(CharSequence s, int start, int before, int count) 
+							{
+	
+							}
+						});
+	
+						labelLayout.addView(textField);
+					}
 				}
 			}
 		}
