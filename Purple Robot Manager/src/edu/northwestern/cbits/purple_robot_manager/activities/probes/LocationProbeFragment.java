@@ -8,7 +8,6 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapsInitializer;
@@ -18,7 +17,6 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
-import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
 
 public class LocationProbeFragment extends SupportMapFragment  
@@ -27,14 +25,16 @@ public class LocationProbeFragment extends SupportMapFragment
 	{
 		super.onActivityCreated(savedInstanceState);
 		
-		try 
-		{
-			MapsInitializer.initialize(this.getActivity());
-		} 
-		catch (GooglePlayServicesNotAvailableException e) 
-		{
-			LogManager.getInstance(this.getActivity()).logException(e);
-		}
+		MapsInitializer.initialize(this.getActivity());
+
+//		try 
+//		{
+//			MapsInitializer.initialize(this.getActivity());
+//		} 
+//		catch (GooglePlayServicesNotAvailableException e) 
+//		{
+//			LogManager.getInstance(this.getActivity()).logException(e);
+//		}
 		
 		List<Location> locations = new ArrayList<Location>();
 
