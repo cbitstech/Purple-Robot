@@ -140,7 +140,7 @@ public class StartActivity extends ActionBarActivity
         
         final StartActivity me = this;
 
-        ListView listView = (ListView) this.findViewById(R.id.list_probes);
+        final ListView listView = (ListView) this.findViewById(R.id.list_probes);
 
         this._receiver = new BroadcastReceiver()
     	{
@@ -209,7 +209,7 @@ public class StartActivity extends ActionBarActivity
 		        		boolean enabled = true;
 		        		
 		        		if (probe == null)
-		        			enabled = false;
+		        			enabled = true;
 		        		else
 		        		{
 		        			Boolean probeEnabled = me._enabledCache.get(sensorName);
@@ -393,6 +393,8 @@ public class StartActivity extends ActionBarActivity
 										probe.disable(me);
 										
 										me._enabledCache.clear();
+										
+				        				adapter.notifyDataSetChanged();
 									}
 								});
 							else
@@ -403,6 +405,8 @@ public class StartActivity extends ActionBarActivity
 										probe.enable(me);
 
 										me._enabledCache.clear();
+
+										adapter.notifyDataSetChanged();
 									}
 								});
 								
@@ -433,6 +437,8 @@ public class StartActivity extends ActionBarActivity
 											model.disable(me);
 
 											me._enabledCache.clear();
+
+					        				adapter.notifyDataSetChanged();
 										}
 									});
 								else
@@ -443,6 +449,8 @@ public class StartActivity extends ActionBarActivity
 											model.enable(me);
 
 											me._enabledCache.clear();
+											
+					        				adapter.notifyDataSetChanged();
 										}
 									});
 									
