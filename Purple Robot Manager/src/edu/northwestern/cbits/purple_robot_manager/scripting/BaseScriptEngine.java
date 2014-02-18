@@ -65,7 +65,7 @@ public abstract class BaseScriptEngine
 	public static String SCRIPT_ENGINE_PERSISTENCE_PREFIX = "purple_robot_script_persist_prefix_";
 	protected static String SCRIPT_ENGINE_NAMESPACES = "purple_robot_script_namespaces";
 
-	private static final int NOTIFICATION_ID = 1;
+	public static final int NOTIFICATION_ID = (int) System.currentTimeMillis();
 	private static String LOG_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";
 
 	protected Context _context = null;

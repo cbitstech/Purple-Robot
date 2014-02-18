@@ -22,6 +22,7 @@ import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.DiagnosticActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.StartActivity;
+import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
 public class SanityManager 
 {
@@ -179,7 +180,7 @@ public class SanityManager
 					Notification note = builder.build();
 					note.flags = Notification.FLAG_ONGOING_EVENT;
 
-					noteManager.notify(12345, note);
+					noteManager.notify(BaseScriptEngine.NOTIFICATION_ID, note);
 				}
 			}
 			else
@@ -219,7 +220,7 @@ public class SanityManager
 				Notification note = builder.build();
 				note.flags = Notification.FLAG_ONGOING_EVENT;
 
-				noteManager.notify(12345, note);
+				noteManager.notify(BaseScriptEngine.NOTIFICATION_ID, note);
 			}
 		}
 	}
