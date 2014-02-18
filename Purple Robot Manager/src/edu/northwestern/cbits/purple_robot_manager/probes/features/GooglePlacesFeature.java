@@ -34,7 +34,6 @@ public class GooglePlacesFeature extends Feature
 
 	private static String[] EXCLUDED_TYPES = { "establishment" };
 	
-	private boolean _isEnabled = false;
 	private BroadcastReceiver _receiver = null;
 	protected long _lastCheck = 0;
 
@@ -70,11 +69,6 @@ public class GooglePlacesFeature extends Feature
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_google_places_enabled", true);
 		e.commit();
-		
-		this._isEnabled = true;
-		
-		this.isEnabled(context);
-
 	}
 
 	public void disable(Context context) 
@@ -84,97 +78,95 @@ public class GooglePlacesFeature extends Feature
 		Editor e = prefs.edit();
 		e.putBoolean("config_probe_google_places_enabled", false);
 		e.commit();
-		
-		this._isEnabled = false;
-		
-		if (this._receiver != null)
-		{
-			LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(context);
-			localManager.unregisterReceiver(this._receiver);
-		}
 	}
 
 	public boolean isEnabled(Context context)
 	{
+		LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(context);
+
 		if (super.isEnabled(context))
 		{
 			SharedPreferences prefs = Probe.getPreferences(context);
 			
 			if (prefs.getBoolean("config_probe_google_places_enabled", true))
-				this._isEnabled = true;
-		}
-
-		if (this._isEnabled && this._receiver == null)
-		{
-			IntentFilter intentFilter = new IntentFilter(Probe.PROBE_READING);
-
-			final GooglePlacesFeature me = this;
-			
-			this._receiver = new BroadcastReceiver()
 			{
-				public void onReceive(final Context context, Intent intent)
-				{
-					final Bundle extras = intent.getExtras();
+				if (this._receiver == null)
+				{		
+					IntentFilter intentFilter = new IntentFilter(Probe.PROBE_READING);
+
+					final GooglePlacesFeature me = this;
 					
-					long now = System.currentTimeMillis();
-					
-					if (now - me._lastCheck > 300000) // 5 minutes
+					this._receiver = new BroadcastReceiver()
 					{
-						String probeName = extras.getString("PROBE");
-						
-						if (probeName != null && (LocationProbe.NAME.equals(probeName)))
+						public void onReceive(final Context context, Intent intent)
 						{
-							Runnable r = new Runnable()
+							final Bundle extras = intent.getExtras();
+							
+							long now = System.currentTimeMillis();
+							
+							if (now - me._lastCheck > 300000) // 5 minutes
 							{
-								public void run() 
+								String probeName = extras.getString("PROBE");
+								
+								if (probeName != null && (LocationProbe.NAME.equals(probeName)))
 								{
-									try 
+									Runnable r = new Runnable()
 									{
-										Map<String, Integer> place = GooglePlacesFeature.nearestLocation(context, extras.getDouble(LocationProbe.LATITUDE), extras.getDouble(LocationProbe.LONGITUDE));
-	
-										if (me._isEnabled)
+										public void run() 
 										{
-											Bundle bundle = new Bundle();
-											bundle.putString("PROBE", me.name(context));
-											bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
-											
-											if (place != null)
+											try 
 											{
-												for (String key : place.keySet())
+												Map<String, Integer> place = GooglePlacesFeature.nearestLocation(context, extras.getDouble(LocationProbe.LATITUDE), extras.getDouble(LocationProbe.LONGITUDE));
+			
+												Bundle bundle = new Bundle();
+												bundle.putString("PROBE", me.name(context));
+												bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+												
+												if (place != null)
 												{
-													if (Arrays.asList(GooglePlacesFeature.EXCLUDED_TYPES).contains(key) == false)
-														bundle.putInt(key, place.get(key).intValue());
+													for (String key : place.keySet())
+													{
+														if (Arrays.asList(GooglePlacesFeature.EXCLUDED_TYPES).contains(key) == false)
+															bundle.putInt(key, place.get(key).intValue());
+													}
+			
+													me.transmitData(context, bundle);
 												}
-		
-												me.transmitData(context, bundle);
+											} 
+											catch (IOException e) 
+											{
+												LogManager.getInstance(context).logException(e);
+											} 
+											catch (JSONException e) 
+											{
+												LogManager.getInstance(context).logException(e);
 											}
 										}
-									} 
-									catch (IOException e) 
-									{
-										LogManager.getInstance(context).logException(e);
-									} 
-									catch (JSONException e) 
-									{
-										LogManager.getInstance(context).logException(e);
-									}
+									};
+									
+									Thread t = new Thread(r);
+									t.start();
+									
+									me._lastCheck = now;
 								}
-							};
-							
-							Thread t = new Thread(r);
-							t.start();
-							
-							me._lastCheck = now;
+							}
 						}
-					}
-				}
-			};
+					};
 
-			LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(context);
-			localManager.registerReceiver(this._receiver, intentFilter);
+					localManager.registerReceiver(this._receiver, intentFilter);
+				}
+				
+				return true;
+			}
+		}
+		
+		if (this._receiver != null)
+		{
+			localManager.unregisterReceiver(this._receiver);
+			this._receiver = null;
 		}
 
-		return this._isEnabled;
+		return false;
 	}
 
 	protected static Map<String, Integer> nearestLocation(Context context, double latitude, double longitude) throws IOException, JSONException 

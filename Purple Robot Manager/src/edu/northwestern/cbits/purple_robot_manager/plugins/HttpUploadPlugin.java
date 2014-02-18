@@ -229,8 +229,6 @@ public class HttpUploadPlugin extends OutputPlugin
 		if (prefs.getBoolean("config_enable_data_server", false) == false)
 			return;
 		
-		Log.e("PR", "HTTP PROCESS INTENT: " + intent);
-		
 		PurpleRobotApplication.fixPreferences(this.getContext(), false);
 		
 		if (OutputPlugin.FORCE_UPLOAD.equals(intent.getAction()))
@@ -591,6 +589,8 @@ public class HttpUploadPlugin extends OutputPlugin
 
 								URI siteUri = new URI(uriString);
 								
+								Log.e("PR", "SENDING TO " + siteUri);
+								
 								HttpPost httpPost = new HttpPost(siteUri);
 
 								String jsonString = jsonMessage.toString();
@@ -636,6 +636,8 @@ public class HttpUploadPlugin extends OutputPlugin
 								}
 								else
 									body = EntityUtils.toString(httpEntity);
+								
+								Log.e("PR", "HTTP BODY: " + body);
 
 								JSONObject json = new JSONObject(body);
 
