@@ -23,6 +23,7 @@ import edu.northwestern.cbits.purple_robot_manager.http.JsonScriptRequestHandler
 import edu.northwestern.cbits.purple_robot_manager.http.LocalHttpServer;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.JSONCommand;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
@@ -57,7 +58,7 @@ public class PersistentService extends Service
 		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, StartActivity.class), Notification.FLAG_ONGOING_EVENT | Notification.FLAG_NO_CLEAR);
 		note.setLatestEventInfo(this, title, message, contentIntent);
 
-		this.startForeground(12345, note);
+		this.startForeground(SanityManager.NOTE_ID, note);
 
 		AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
 
