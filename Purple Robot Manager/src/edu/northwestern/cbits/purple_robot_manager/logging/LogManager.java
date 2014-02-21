@@ -173,6 +173,9 @@ public class LogManager
 
 					pendingEvents.put(jsonEvent);
 					
+					while (pendingEvents.length() > 128)
+						pendingEvents.remove(0);
+					
 					Editor e = prefs.edit();
 					e.putString(LogManager.LOG_QUEUE, pendingEvents.toString());
 					e.commit();
@@ -187,11 +190,7 @@ public class LogManager
 					e.printStackTrace();
 				}
 			}
-//			else
-//				Log.w("PR-LOGGING", "No logging endpoint provided.");
 		}
-		else
-			Log.w("PR-LOGGING", "Logging is not currently enabled.");
 
 		return false;
 	}

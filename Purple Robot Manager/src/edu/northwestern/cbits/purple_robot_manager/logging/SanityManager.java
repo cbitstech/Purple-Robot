@@ -17,16 +17,14 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
-
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.DiagnosticActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.StartActivity;
-import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
 public class SanityManager 
 {
-	private static final int NOTE_ID = 457284567;
+	public static final int NOTE_ID = 457284567;
 
 	private static SanityManager _sharedInstance = null;
 	

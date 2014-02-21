@@ -36,6 +36,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -210,16 +211,14 @@ public class SnapshotActivity extends ActionBarActivity
         
         listView.setAdapter(adapter);
 
-		MapsInitializer.initialize(this);
-
-//		try 
-//		{
-//			MapsInitializer.initialize(this);
-//		} 
-//		catch (GooglePlayServicesNotAvailableException e) 
-//		{
-// 			LogManager.getInstance(this).logException(e);
-//		}
+		try 
+		{
+			MapsInitializer.initialize(this);
+		} 
+		catch (GooglePlayServicesNotAvailableException e) 
+		{
+ 			LogManager.getInstance(this).logException(e);
+		}
 
 		final WebView webView = (WebView) this.findViewById(R.id.json_view);
 		webView.getSettings().setLoadWithOverviewMode(true);
