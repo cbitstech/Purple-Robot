@@ -81,6 +81,8 @@ public class ApplicationLaunchProbe extends Probe
 		long interval = 0;
 		boolean set = false;
 		
+		boolean isEnabled = false;
+		
 		if (super.isEnabled(context))
 		{
 			if (prefs.getBoolean("config_probe_application_launch_enabled", ApplicationLaunchProbe.DEFAULT_ENABLED))
@@ -91,6 +93,8 @@ public class ApplicationLaunchProbe extends Probe
 				{
 					disable = true;
 					set = true;
+					
+					isEnabled = true;
 				}
 			}
 			else 
@@ -169,7 +173,7 @@ public class ApplicationLaunchProbe extends Probe
 		if (set)
 			alarm.setRepeating(AlarmManager.ELAPSED_REALTIME, 0, interval, this._pollIntent);
 			
-		return (disable == false);
+		return isEnabled;
 	}
 
 	public String summarizeValue(Context context, Bundle bundle)
