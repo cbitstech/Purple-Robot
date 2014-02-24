@@ -342,18 +342,16 @@ public class StartActivity extends ActionBarActivity
 					{
 						Model model = ModelManager.getInstance(me).fetchModelByName(me, sensorName);
 
+						Intent dataIntent = new Intent(me, ProbeViewerActivity.class);
+
 						if (model != null)
-						{
-							Intent dataIntent = new Intent(me, ProbeViewerActivity.class);
-							
 							dataIntent.putExtra("probe_name", model.title(me));
-							dataIntent.putExtra("probe_bundle", value);
-							dataIntent.putExtra("is_model", true);
-	
-							me.startActivity(dataIntent);
-						}
 						else
-							Log.e("PR", "Looking for model named " + sensorName);
+							dataIntent.putExtra("probe_name", sensorName);
+
+						dataIntent.putExtra("is_model", true);
+						dataIntent.putExtra("probe_bundle", value);
+						me.startActivity(dataIntent);
 					}
 				}
 			}
