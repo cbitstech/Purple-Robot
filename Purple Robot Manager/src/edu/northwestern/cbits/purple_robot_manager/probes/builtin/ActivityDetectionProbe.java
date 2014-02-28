@@ -252,8 +252,8 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
 		ListPreference duration = new ListPreference(activity);
 		duration.setKey("config_probe_activity_detection_frequency");
 		duration.setDefaultValue(Probe.DEFAULT_FREQUENCY);
-		duration.setEntryValues(R.array.probe_satellite_frequency_values);
-		duration.setEntries(R.array.probe_satellite_frequency_labels);
+		duration.setEntryValues(R.array.probe_activity_recognition_frequency_values);
+		duration.setEntries(R.array.probe_activity_recognition_frequency_labels);
 		duration.setTitle(R.string.probe_frequency_label);
 
 		screen.addPreference(duration);
