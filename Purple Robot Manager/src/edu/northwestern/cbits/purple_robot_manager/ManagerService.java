@@ -7,14 +7,6 @@ import java.util.Locale;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
-import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
-import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
-import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
-import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ActivityDetectionProbe;
-import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
-import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
-
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.PendingIntent;
@@ -30,6 +22,13 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
+import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ActivityDetectionProbe;
+import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
+import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
 public class ManagerService extends IntentService
 {
@@ -356,18 +355,22 @@ public class ManagerService extends IntentService
 
 		pi = PendingIntent.getService(context, 0, new Intent(ManagerService.REFRESH_CONFIGURATION), PendingIntent.FLAG_UPDATE_CURRENT);
 		alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 5000, pi);
-
+		
 		prefs.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener()
 		{
 	        public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
 	        {
 	        	Intent reloadIntent = new Intent(ManagerService.REFRESH_CONFIGURATION);
+	        	reloadIntent.setClass(context, ManagerService.class);
 
 	        	context.startService(reloadIntent);
 	        }
 	    });
 
-		context.startService(new Intent(PersistentService.NUDGE_PROBES));
+		Intent nudgeIntent = new Intent(PersistentService.NUDGE_PROBES);
+		nudgeIntent.setClass(context, PersistentService.class);
+
+		context.startService(nudgeIntent);
 		
 		SanityManager.getInstance(context);
 
@@ -395,7 +398,7 @@ public class ManagerService extends IntentService
 		
 		for (int i = 0; i < labels.length && i < values.length; i++)
 		{
-			if (labels[i].toLowerCase().equals(name.toLowerCase(Locale.getDefault())))
+			if (labels[i].toLowerCase(Locale.getDefault()).equals(name.toLowerCase(Locale.getDefault())))
 				return values[i];
 		}
 			

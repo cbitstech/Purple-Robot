@@ -50,7 +50,6 @@ import android.content.SharedPreferences.Editor;
 import android.net.http.AndroidHttpClient;
 import android.os.Build;
 import android.preference.PreferenceManager;
-
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.WiFiHelper;
@@ -151,7 +150,6 @@ public abstract class DataUploadPlugin extends OutputPlugin
 			JSONObject jsonMessage = new JSONObject();
 
 			jsonMessage.put(OPERATION_KEY, "SubmitProbes");
-				
 				
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
 				payload = Normalizer.normalize(payload, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");

@@ -25,6 +25,8 @@ public class ScreenProbe extends Probe
 	private boolean _isInited = false;
 	private boolean _isEnabled = false;
 
+	private BroadcastReceiver _receiver = null;
+
 	public String name(Context context)
 	{
 		return ScreenProbe.NAME;
@@ -49,7 +51,7 @@ public class ScreenProbe extends Probe
 
 			final ScreenProbe me = this;
 
-			BroadcastReceiver receiver = new BroadcastReceiver()
+			this._receiver  = new BroadcastReceiver()
 			{
 				public void onReceive(Context context, Intent intent)
 				{
@@ -70,21 +72,23 @@ public class ScreenProbe extends Probe
 					}
 				}
 			};
-
-			context.registerReceiver(receiver, filter);
+			
+			context.registerReceiver(this._receiver, filter);
 
 			this._isInited = true;
 		}
 
 		SharedPreferences prefs = Probe.getPreferences(context);
 
-		this._isEnabled = false;
-
 		if (super.isEnabled(context))
 		{
 			if (prefs.getBoolean("config_probe_screen_enabled", ScreenProbe.DEFAULT_ENABLED))
 				this._isEnabled = true;
+			else
+				this._isEnabled = false;
 		}
+		else
+			this._isEnabled = false;
 
 		return this._isEnabled;
 	}

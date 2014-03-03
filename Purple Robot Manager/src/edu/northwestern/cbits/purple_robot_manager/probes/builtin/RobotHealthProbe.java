@@ -10,8 +10,8 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Map;
 
-import org.apache.commons.net.ntp.NTPUDPClient;
-import org.apache.commons.net.ntp.TimeInfo;
+// import org.apache.commons.net.ntp.NTPUDPClient;
+// import org.apache.commons.net.ntp.TimeInfo;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -326,6 +326,7 @@ public class RobotHealthProbe extends Probe
 									}
 
 									bundle.putLong(RobotHealthProbe.TIME_OFFSET_MS, me._lastOffset);
+									
 									bundle.putLong(RobotHealthProbe.ACTIVE_RUNTIME, System.currentTimeMillis() - ManagerService.startTimestamp);
 									bundle.putFloat(RobotHealthProbe.CPU_USAGE, me.readUsage(context));
 									

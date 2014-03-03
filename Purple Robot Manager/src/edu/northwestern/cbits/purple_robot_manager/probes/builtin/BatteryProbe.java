@@ -41,6 +41,8 @@ public class BatteryProbe extends Probe
 	private boolean _isInited = false;
 	private boolean _isEnabled = false;
 
+	private BroadcastReceiver _receiver = null;;
+
 	public Intent viewIntent(Context context)
 	{
 		Intent i = new Intent(context, WebkitLandscapeActivity.class);
@@ -222,7 +224,7 @@ public class BatteryProbe extends Probe
 
 			final BatteryProbe me = this;
 
-			BroadcastReceiver receiver = new BroadcastReceiver()
+			this._receiver  = new BroadcastReceiver()
 			{
 				public void onReceive(Context context, Intent intent)
 				{
@@ -246,7 +248,7 @@ public class BatteryProbe extends Probe
 				}
 			};
 
-			context.registerReceiver(receiver, filter);
+			context.registerReceiver(this._receiver, filter);
 
 			this._isInited = true;
 		}
