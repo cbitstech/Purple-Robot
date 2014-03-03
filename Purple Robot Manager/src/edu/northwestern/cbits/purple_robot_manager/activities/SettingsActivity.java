@@ -94,6 +94,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 
 				Intent intent = new Intent(ManagerService.HAPTIC_PATTERN_INTENT);
 				intent.putExtra(ManagerService.HAPTIC_PATTERN_NAME, pattern);
+				intent.setClass(me, ManagerService.class);
 
 				me.startService(intent);
 
@@ -147,6 +148,8 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 	@SuppressWarnings("deprecation")
 	public boolean onPreferenceClick(Preference preference)
 	{
+		final SettingsActivity me = this;
+		
         if (HAPTIC_PATTERN_KEY.equals(preference.getKey()))
         {
         	ListPreference listPref = (ListPreference) preference;
@@ -155,6 +158,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 
 			Intent intent = new Intent(ManagerService.HAPTIC_PATTERN_INTENT);
 			intent.putExtra(ManagerService.HAPTIC_PATTERN_NAME, pattern);
+			intent.setClass(me, ManagerService.class);
 
 			this.startService(intent);
 
@@ -181,6 +185,8 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
         else if (LOG_REFRESH_KEY.equals(preference.getKey()))
         {
         	Intent refreshIntent = new Intent(ManagerService.UPLOAD_LOGS_INTENT);
+        	refreshIntent.setClass(me, ManagerService.class);
+
         	this.startService(refreshIntent);
 
             return true;
@@ -263,8 +269,6 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
         }
         else if (RESET_KEY.equals(preference.getKey()))
         {
-        	final SettingsActivity me = this;
-        	
         	AlertDialog.Builder builder = new AlertDialog.Builder(this);
         	
         	builder = builder.setTitle(R.string.title_clear_configuration);
@@ -285,8 +289,11 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 					}
 					
 					e.commit();
-					
-					me.startService(new Intent(PersistentService.NUDGE_PROBES));
+
+					Intent intent = new Intent(PersistentService.NUDGE_PROBES);
+					intent.setClass(me, PersistentService.class);
+
+					me.startService(intent);
 					
 					TriggerManager.getInstance(me).removeAllTriggers();
 					TriggerManager.getInstance(me).refreshTriggers(me);
@@ -404,7 +411,9 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
         	if (name != null)
         		playIntent.putExtra(SettingsActivity.RINGTONE_KEY, name);
         	
-        	this.startService(playIntent);
+        	playIntent.setClass(this, ManagerService.class);
+
+			this.startService(playIntent);
         	
         	return true;
 		}

@@ -289,7 +289,8 @@ public class SchemeEngine extends BaseScriptEngine
 		Map<String, Object> paramsMap = SchemeEngine.parsePairList(parameters);
 		
 		Intent intent = new Intent(ManagerService.UPDATE_WIDGETS);
-		
+		intent.setClass(this._context, ManagerService.class);
+
 		for (String key : paramsMap.keySet())
 		{
 			intent.putExtra(key, paramsMap.get(key).toString());

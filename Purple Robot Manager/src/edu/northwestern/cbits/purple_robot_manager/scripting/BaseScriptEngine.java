@@ -120,6 +120,7 @@ public abstract class BaseScriptEngine
 	public void playTone(String tone)
 	{
 		Intent intent = new Intent(ManagerService.RINGTONE_INTENT);
+		intent.setClass(this._context, ManagerService.class);
 
 		if (tone != null)
 			intent.putExtra(ManagerService.RINGTONE_NAME, tone);
@@ -127,7 +128,8 @@ public abstract class BaseScriptEngine
 		HashMap <String, Object> payload = new HashMap<String, Object>();
 		payload.put("tone", tone);
 		LogManager.getInstance(this._context).log("tone_played", payload);
-
+		
+		
 		this._context.startService(intent);
 	}
 
@@ -165,6 +167,7 @@ public abstract class BaseScriptEngine
 	{
 		Intent intent = new Intent(ManagerService.HAPTIC_PATTERN_INTENT);
 		intent.putExtra(ManagerService.HAPTIC_PATTERN_NAME, pattern);
+		intent.setClass(this._context, ManagerService.class);
 
 		HashMap <String, Object> payload = new HashMap<String, Object>();
 		payload.put("pattern", pattern);
@@ -818,6 +821,8 @@ public abstract class BaseScriptEngine
 
 		if (intent != null)
 		{
+			intent.setClass(this._context, ManagerService.class);
+
 			this._context.startService(intent);
 
 			return true;
@@ -908,7 +913,8 @@ public abstract class BaseScriptEngine
 	protected void updateWidget(Map<String, Object> parameters)
 	{
 		Intent intent = new Intent(ManagerService.UPDATE_WIDGETS);
-		
+		intent.setClass(this._context, ManagerService.class);
+	
 		for (Object keyObj : parameters.keySet())
 		{
 			String key = keyObj.toString();

@@ -931,7 +931,7 @@ public class HttpUploadPlugin extends OutputPlugin
 		SharedPreferences prefs = HttpUploadPlugin.getPreferences(this.getContext());
 
 		File internalStorage = this.getContext().getFilesDir();
-
+		
 		if (prefs.getBoolean("config_external_storage", false))
 			internalStorage = this.getContext().getExternalFilesDir(null);
 
