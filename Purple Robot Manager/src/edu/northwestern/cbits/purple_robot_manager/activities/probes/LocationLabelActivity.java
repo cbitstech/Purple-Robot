@@ -25,7 +25,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapsInitializer;
@@ -36,7 +35,6 @@ import com.google.android.gms.maps.model.LatLngBounds;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
-import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
 import edu.northwestern.cbits.purple_robot_manager.util.DBSCAN;
 import edu.northwestern.cbits.purple_robot_manager.util.DBSCAN.Cluster;
@@ -79,14 +77,7 @@ public class LocationLabelActivity extends ActionBarActivity
 			}
 		});
 
-		try 
-		{
-			MapsInitializer.initialize(this);
-		} 
-		catch (GooglePlayServicesNotAvailableException e) 
-		{
-			LogManager.getInstance(this).logException(e);
-		}
+		MapsInitializer.initialize(this);
 		
 		this.getSupportActionBar().setTitle(R.string.title_location_label);
 		this.getSupportActionBar().setSubtitle(R.string.title_location_desc);

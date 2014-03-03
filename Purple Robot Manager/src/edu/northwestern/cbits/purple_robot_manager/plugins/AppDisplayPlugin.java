@@ -118,9 +118,12 @@ public class AppDisplayPlugin extends OutputPlugin
 				
 				final ArrayList<ContentValues> toUpdate = new ArrayList<ContentValues>();
 				
-				while (this._valuesQueue.size() > 0)
+				synchronized(this._valuesQueue)
 				{
-					toUpdate.add(this._valuesQueue.remove(0));
+					while (this._valuesQueue.size() > 0)
+					{
+						toUpdate.add(this._valuesQueue.remove(0));
+					}
 				}
 				
 				Handler mainHandler = new Handler(context.getMainLooper());

@@ -2,6 +2,7 @@ package edu.northwestern.cbits.purple_robot_manager.util;
 
 import android.annotation.SuppressLint;
 import java.text.Normalizer;
+import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -17,7 +18,7 @@ public class Slugify
 
 		ret = normalize( ret );
 		ret = removeDuplicateWhiteSpaces( ret );
-		return ret.replace( " ", "-" ).toLowerCase();
+		return ret.replace( " ", "-" ).toLowerCase(Locale.getDefault());
 	}
 
 	@SuppressLint("InlinedApi")

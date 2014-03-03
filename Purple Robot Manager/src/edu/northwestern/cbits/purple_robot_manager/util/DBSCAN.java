@@ -452,7 +452,7 @@ public class DBSCAN
 
 				fin.close();
 				
-				String fileString = new String(baos.toByteArray(), Charset.defaultCharset());
+				String fileString = new String(baos.toByteArray(), Charset.defaultCharset().name());
 				
 				JSONObject clusterJson = new JSONObject(fileString);
 				

@@ -233,6 +233,10 @@ public class TwitterProbe extends Probe
 									{
 					         			LogManager.getInstance(context).logException(e);
 									}
+									catch (IllegalStateException e) 
+									{
+					         			LogManager.getInstance(context).logException(e);
+									}
 								}
 							};
 							

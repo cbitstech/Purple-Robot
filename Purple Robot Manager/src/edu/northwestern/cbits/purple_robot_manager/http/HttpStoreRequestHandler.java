@@ -1,7 +1,8 @@
 package edu.northwestern.cbits.purple_robot_manager.http;
 
 import java.io.IOException;
-import java.net.URLDecoder;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 
 import org.apache.http.HttpEntity;
@@ -10,6 +11,8 @@ import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestHandler;
@@ -19,8 +22,8 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.net.Uri;
-
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.SchemeEngine;
 
 public class HttpStoreRequestHandler implements HttpRequestHandler 
@@ -52,13 +55,18 @@ public class HttpStoreRequestHandler implements HttpRequestHandler
             Uri u = Uri.parse("http://localhost/?" + entityString);
 
             HashMap<String, String> arguments = new HashMap<String, String>();
-
-        	for (String key : u.getQueryParameterNames())
-        	{
-        		String value = URLDecoder.decode(u.getQueryParameter(key), "UTF-8");
-        		
-        		arguments.put(key, value);
-        	}
+            
+            try 
+            {
+				for (NameValuePair pair : URLEncodedUtils.parse(new URI(u.toString()), "UTF-8"))
+				{
+					arguments.put(pair.getName(), pair.getValue());
+				}
+			}
+            catch (URISyntaxException e)
+            {
+            	LogManager.getInstance(this._context).logException(e);
+			}
 
             if (arguments.size() > 0)
             {

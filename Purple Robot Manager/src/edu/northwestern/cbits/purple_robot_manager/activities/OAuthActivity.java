@@ -173,119 +173,122 @@ public class OAuthActivity extends Activity
         			
         			if (verifier == null)
         				verifier = incomingUri.getQueryParameter("code");
-        			
-        			final Token requestToken = new Token(prefs.getString("request_token_" + requester, ""), prefs.getString("request_secret_" + requester, ""));
-        			
-        			final Verifier v = new Verifier(verifier);
-        			
-        			Class apiClass = null;
-        			String consumerKey = null;
-        			String consumerSecret = null;
-        			String callback = null;
-        			
-        			if ("fitbit".equals(requester))
-        			{
-            			apiClass = FitbitApi.class;
-            			consumerKey = FitbitApiFeature.CONSUMER_KEY;
-            			consumerSecret = FitbitApiFeature.CONSUMER_SECRET;
-        			}
-        			else if ("twitter".equals(requester))
-        			{
-            			apiClass = TwitterApi.SSL.class;
-            			consumerKey = TwitterProbe.CONSUMER_KEY;
-            			consumerSecret = TwitterProbe.CONSUMER_SECRET;
-        			}
-        			else if ("instagram".equals(requester))
-        			{
-            			apiClass = InstagramApi.class;
-            			consumerKey = InstagramProbe.CONSUMER_KEY;
-            			consumerSecret = InstagramProbe.CONSUMER_SECRET;
-            			callback = InstagramProbe.CALLBACK;
-        			}
-                	else if ("linkedin".equalsIgnoreCase(requester))
-                	{
-            			apiClass = LinkedInApi.class;
-            			consumerKey = LinkedInProbe.CONSUMER_KEY;
-            			consumerSecret = LinkedInProbe.CONSUMER_SECRET;
-            			callback = LinkedInProbe.CALLBACK;
-                	}
-                	else if ("foursquare".equalsIgnoreCase(requester))
-                	{
-            			apiClass = Foursquare2Api.class;
-            			consumerKey = FoursquareProbe.CONSUMER_KEY;
-            			consumerSecret = FoursquareProbe.CONSUMER_SECRET;
-            			callback = FoursquareProbe.CALLBACK;
-                	}
-        			
-        			if (apiClass != null && consumerKey != null && consumerSecret != null)
-        			{
-		            	ServiceBuilder builder = new ServiceBuilder();
-		            	builder = builder.provider(apiClass);
-		            	builder = builder.apiKey(consumerKey);
-		            	builder = builder.apiSecret(consumerSecret);
-		            	
-		            	if (callback != null)
-		            		builder = builder.callback(callback);
-		            	
-		            	final OAuthService service = builder.build();
 
-		            	Runnable r = null;
-		            	
-		            	if (DefaultApi20.class.isAssignableFrom(apiClass))
-						{
-			            	r = new Runnable()
-			            	{
-								public void run() 
-								{
-				                	Token accessToken = service.getAccessToken(null, v);
-				                	
-				                	Editor e = prefs.edit();
-				                	e.putString("oauth_" + requester + "_secret", accessToken.getSecret());
-				                	e.putString("oauth_" + requester + "_token", accessToken.getToken());
-				                	
-				                	e.commit();
-				                	
-				                	SanityManager.getInstance(me).refreshState();
-				                	
-				                	me.runOnUiThread(new Runnable()
-				                	{
-										public void run() 
-										{
-						                	me.authSuccess();
-										}
-				                	});
-								}
-			            	};
-						}
-						else if (DefaultApi10a.class.isAssignableFrom(apiClass))
-						{
-			            	r = new Runnable()
-			            	{
-								public void run() 
-								{
-				                	Token accessToken = service.getAccessToken(requestToken, v);
-				                	
-				                	Editor e = prefs.edit();
-				                	e.putString("oauth_" + requester + "_secret", accessToken.getSecret());
-				                	e.putString("oauth_" + requester + "_token", accessToken.getToken());
-				                	
-				                	e.commit();
-				                	
-				                	SanityManager.getInstance(me).refreshState();
-
-				                	me.runOnUiThread(new Runnable()
-				                	{
-										public void run() 
-										{
-						                	me.authSuccess();
-										}
-				                	});
-								}
-			            	};
-						}
-
-		            	Thread t = new Thread(r);
-		            	t.start();
+        			if (verifier != null)
+        			{
+	        			final Token requestToken = new Token(prefs.getString("request_token_" + requester, ""), prefs.getString("request_secret_" + requester, ""));
+	        			
+	        			final Verifier v = new Verifier(verifier);
+	        			
+	        			Class apiClass = null;
+	        			String consumerKey = null;
+	        			String consumerSecret = null;
+	        			String callback = null;
+	        			
+	        			if ("fitbit".equals(requester))
+	        			{
+	            			apiClass = FitbitApi.class;
+	            			consumerKey = FitbitApiFeature.CONSUMER_KEY;
+	            			consumerSecret = FitbitApiFeature.CONSUMER_SECRET;
+	        			}
+	        			else if ("twitter".equals(requester))
+	        			{
+	            			apiClass = TwitterApi.SSL.class;
+	            			consumerKey = TwitterProbe.CONSUMER_KEY;
+	            			consumerSecret = TwitterProbe.CONSUMER_SECRET;
+	        			}
+	        			else if ("instagram".equals(requester))
+	        			{
+	            			apiClass = InstagramApi.class;
+	            			consumerKey = InstagramProbe.CONSUMER_KEY;
+	            			consumerSecret = InstagramProbe.CONSUMER_SECRET;
+	            			callback = InstagramProbe.CALLBACK;
+	        			}
+	                	else if ("linkedin".equalsIgnoreCase(requester))
+	                	{
+	            			apiClass = LinkedInApi.class;
+	            			consumerKey = LinkedInProbe.CONSUMER_KEY;
+	            			consumerSecret = LinkedInProbe.CONSUMER_SECRET;
+	            			callback = LinkedInProbe.CALLBACK;
+	                	}
+	                	else if ("foursquare".equalsIgnoreCase(requester))
+	                	{
+	            			apiClass = Foursquare2Api.class;
+	            			consumerKey = FoursquareProbe.CONSUMER_KEY;
+	            			consumerSecret = FoursquareProbe.CONSUMER_SECRET;
+	            			callback = FoursquareProbe.CALLBACK;
+	                	}
+	        			
+	        			if (apiClass != null && consumerKey != null && consumerSecret != null)
+	        			{
+			            	ServiceBuilder builder = new ServiceBuilder();
+			            	builder = builder.provider(apiClass);
+			            	builder = builder.apiKey(consumerKey);
+			            	builder = builder.apiSecret(consumerSecret);
+			            	
+			            	if (callback != null)
+			            		builder = builder.callback(callback);
+			            	
+			            	final OAuthService service = builder.build();
+	
+			            	Runnable r = null;
+			            	
+			            	if (DefaultApi20.class.isAssignableFrom(apiClass))
+							{
+				            	r = new Runnable()
+				            	{
+									public void run() 
+									{
+					                	Token accessToken = service.getAccessToken(null, v);
+					                	
+					                	Editor e = prefs.edit();
+					                	e.putString("oauth_" + requester + "_secret", accessToken.getSecret());
+					                	e.putString("oauth_" + requester + "_token", accessToken.getToken());
+					                	
+					                	e.commit();
+					                	
+					                	SanityManager.getInstance(me).refreshState();
+					                	
+					                	me.runOnUiThread(new Runnable()
+					                	{
+											public void run() 
+											{
+							                	me.authSuccess();
+											}
+					                	});
+									}
+				            	};
+							}
+							else if (DefaultApi10a.class.isAssignableFrom(apiClass))
+							{
+				            	r = new Runnable()
+				            	{
+									public void run() 
+									{
+					                	Token accessToken = service.getAccessToken(requestToken, v);
+					                	
+					                	Editor e = prefs.edit();
+					                	e.putString("oauth_" + requester + "_secret", accessToken.getSecret());
+					                	e.putString("oauth_" + requester + "_token", accessToken.getToken());
+					                	
+					                	e.commit();
+					                	
+					                	SanityManager.getInstance(me).refreshState();
+	
+					                	me.runOnUiThread(new Runnable()
+					                	{
+											public void run() 
+											{
+							                	me.authSuccess();
+											}
+					                	});
+									}
+				            	};
+							}
+	
+			            	Thread t = new Thread(r);
+			            	t.start();
+	        			}
         			}
         		}
         	}
