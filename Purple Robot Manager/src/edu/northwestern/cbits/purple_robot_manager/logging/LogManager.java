@@ -173,13 +173,21 @@ public class LogManager
 
 					pendingEvents.put(jsonEvent);
 					
-					while (pendingEvents.length() > 128)
-						pendingEvents.remove(0);
+					if (pendingEvents.length() > 128)
+					{
+						JSONArray newEvents = new JSONArray();
+						
+						for (int i = pendingEvents.length() - 128; i < pendingEvents.length(); i++)
+						{
+							newEvents.put(pendingEvents.get(i));
+						}
+
+						pendingEvents = newEvents;
+					}
 					
 					Editor e = prefs.edit();
 					e.putString(LogManager.LOG_QUEUE, pendingEvents.toString());
 					e.commit();
-					e.apply();
 
 					pendingEvents = new JSONArray(prefs.getString(LogManager.LOG_QUEUE, "[]"));
 

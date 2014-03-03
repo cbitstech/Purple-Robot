@@ -380,7 +380,7 @@ public class AddressBookDistancesProbe extends Probe
 	public String summarizeValue(Context context, Bundle bundle)
 	{
 		float minDistance = Float.MAX_VALUE;
-		String minLabel = null;
+		String minLabel = "";
 		
 		Bundle now = bundle.getBundle(AddressBookDistancesProbe.NOW);
 		

@@ -1,3 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lint>
+    <issue id="AlwaysShowAction" severity="ignore" />
+    <issue id="ContentDescription" severity="ignore" />
+    <issue id="ExportedReceiver" severity="ignore" />
+    <issue id="ExportedService" severity="ignore" />
+    <issue id="IconColors" severity="ignore" />
+    <issue id="IconDensities" severity="ignore" />
+    <issue id="Instantiatable" severity="ignore" />
+    <issue id="InvalidPackage" severity="ignore" />
+    <issue id="MissingTranslation" severity="ignore" />
+    <issue id="TooManyViews" severity="ignore" />
+    <issue id="UnusedResources" severity="ignore" />
+    <issue id="ValidFragment" severity="ignore" />
 </lint>

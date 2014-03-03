@@ -2,6 +2,7 @@ package edu.northwestern.cbits.purple_robot_manager;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Locale;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -380,7 +381,7 @@ public class ManagerService extends IntentService
 		
 		for (int i = 0; i < labels.length && i < values.length; i++)
 		{
-			if (values[i].toLowerCase().equals(path.toLowerCase()))
+			if (values[i].toLowerCase().equals(path.toLowerCase(Locale.getDefault())))
 				return labels[i];
 		}
 			
@@ -394,7 +395,7 @@ public class ManagerService extends IntentService
 		
 		for (int i = 0; i < labels.length && i < values.length; i++)
 		{
-			if (labels[i].toLowerCase().equals(name.toLowerCase()))
+			if (labels[i].toLowerCase().equals(name.toLowerCase(Locale.getDefault())))
 				return values[i];
 		}
 			
