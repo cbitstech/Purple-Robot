@@ -40,6 +40,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LinkedInProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.NetworkProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RandomNoiseProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RawLocationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RobotHealthProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RotationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RunningSoftwareProbe;
@@ -249,6 +250,13 @@ public class ProbeManager
 			else if (probe instanceof LocationProbe)
 			{
 				LocationProbe location = (LocationProbe) probe;
+
+				if (location.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof RawLocationProbe)
+			{
+				RawLocationProbe location = (RawLocationProbe) probe;
 
 				if (location.name(context).equalsIgnoreCase(name))
 					found = true;

@@ -579,6 +579,10 @@
     <string name="title_location_probe">Location Probe</string>
     <string name="summary_location_probe_desc">Records the most accurate location available for the device, given device limitations and respecting battery life.</string>
 
+    <!-- Raw Location Probe -->
+    <string name="title_raw_location_probe">Raw Location Probe (Beta)</string>
+    <string name="summary_raw_location_probe_desc">Variation of the location probe, but with battery conservation functionality removed for testing purposes.</string>
+    
 	<!-- Purple Robot Health Probe -->
     <string name="title_robot_probe">Purple Robot Health</string>
     <string name="summary_robot_probe_desc">Summarizes the current state of the Purple Robot app, including the amount of data to be transmitted to the server.</string>

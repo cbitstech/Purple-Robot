@@ -70,6 +70,8 @@
         <item>builtin.InstagramProbe</item>
         <item>builtin.LinkedInProbe</item>
         <item>builtin.FoursquareProbe</item>
+
+        <item>builtin.RawLocationProbe</item>
         
         <!-- <item>builtin.BluetoothReceiverProbe</item> -->
         <!-- <item>builtin.ZeroconfProbe</item> -->
