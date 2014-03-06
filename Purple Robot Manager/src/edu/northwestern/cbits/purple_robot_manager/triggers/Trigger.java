@@ -73,6 +73,11 @@ public abstract class Trigger
 		}
 	}
 
+	public String toString()
+	{
+		return this.name();
+	}
+	
 	public String name()
 	{
 		return this._name;

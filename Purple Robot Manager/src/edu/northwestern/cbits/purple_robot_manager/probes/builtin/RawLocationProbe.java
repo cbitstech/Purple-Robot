@@ -159,7 +159,7 @@ public class RawLocationProbe extends Probe implements LocationListener
 					else
 						locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, freq, 1, this);
 
-						this._listening = true;
+					this._listening = true;
 
 					this.onLocationChanged(locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER));
 				}
