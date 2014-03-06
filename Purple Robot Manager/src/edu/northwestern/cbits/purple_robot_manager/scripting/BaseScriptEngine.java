@@ -36,6 +36,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Browser;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -831,8 +832,12 @@ public abstract class BaseScriptEngine
 		return false;
 	}
 
-	@SuppressWarnings("deprecation")
 	protected boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen, Map<String,Object> launchParams, final String script)
+	{
+		return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen, false, launchParams, script);
+	}
+	
+	protected boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen, boolean persistent, Map<String,Object> launchParams, final String script)
 	{
 		try
 		{
@@ -840,9 +845,7 @@ public abstract class BaseScriptEngine
 
 			if (displayWhen < now)
 				displayWhen = now;
-
-			Notification note = new Notification(R.drawable.ic_launcher, message, displayWhen);
-
+			
 			Intent intent = this.constructDirectLaunchIntent(applicationName, launchParams);
 
 			HashMap <String, Object> payload = new HashMap<String, Object>();
@@ -854,12 +857,22 @@ public abstract class BaseScriptEngine
 			{
 				PendingIntent pendingIntent = PendingIntent.getActivity(this._context, 0, intent, 0);
 
-				note.setLatestEventInfo(this._context, title, message, pendingIntent);
-
-				note.flags = Notification.FLAG_AUTO_CANCEL;
+				NotificationCompat.Builder builder = new NotificationCompat.Builder(this._context);
+				builder.setContentIntent(pendingIntent);
+				builder.setAutoCancel(true);
+				builder.setContentTitle(title);
+				builder.setContentText(message);
+				builder.setTicker(message);
+				builder.setSmallIcon(R.drawable.ic_note_icon);
 
 				try
 				{
+					Notification note = builder.build();
+					
+					if (persistent)
+						note.flags = note.flags | Notification.FLAG_NO_CLEAR;
+
+					
 					NotificationManager noteManager = (NotificationManager) this._context.getSystemService(android.content.Context.NOTIFICATION_SERVICE);
 					noteManager.notify(BaseScriptEngine.NOTIFICATION_ID, note);
 				}
