@@ -1065,7 +1065,8 @@
 	<string name="title_fire_triggers">Fire Trigger</string>
 	<string name="menu_trigger_label">Triggers</string>
 	<string name="message_no_triggers">No triggers are currently configured on this device.</string>
-			
+	<string name="message_no_user_triggers">No user-accessible triggers are currently available.</string>
+				
 <!--     
     <string name="config_probe_facebook_hash_title">Obfuscate Details</string>
     <string name="config_probe_facebook_hash_summary">Hashes recipient and profile data to obfuscate personally-identitifiable information.</string>
