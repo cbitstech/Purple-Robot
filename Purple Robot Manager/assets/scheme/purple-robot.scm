@@ -33,7 +33,7 @@
 (define pr-schedule-script (lambda (identifier date-string action) (.scheduleScript PurpleRobot identifier date-string action)))
 (define pr-update-probe (lambda (probe-config) (.updateProbe PurpleRobot probe-config)))
 (define pr-update-widget (lambda (widget-config) (.updateWidget PurpleRobot widget-config)))
-(define pr-emit-reading (lambda (reading-name value) (.emitReading PurpleRobot read-name value)))
+(define pr-emit-reading (lambda (reading-name value) (.emitReading PurpleRobot reading-name value)))
 (define pr-broadcast-intent (lambda (action extras) (.broadcastIntent PurpleRobot action extras)))
 (define pr-launch-application(lambda (app-name params post-script) (.launchApplication PurpleRobot app-name params post-script)))
 (define pr-show-application-launch-notification (lambda (title message app-name timestamp params post-script) (.showApplicationLaunchNotification PurpleRobot title message app-name timestamp params post-script)))

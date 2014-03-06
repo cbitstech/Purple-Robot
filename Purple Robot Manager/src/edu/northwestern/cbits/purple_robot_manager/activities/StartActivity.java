@@ -670,7 +670,10 @@ public class StartActivity extends ActionBarActivity
     public boolean onOptionsItemSelected(MenuItem item)
     {
     	final StartActivity me = this;
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+    	final String savedPassword = this.getPreferences(this).getString("config_password", null);
+		
+    	AlertDialog.Builder builder = new AlertDialog.Builder(this);
     	
         switch (item.getItemId())
     	{
@@ -684,26 +687,42 @@ public class StartActivity extends ActionBarActivity
 				
 				builder.setTitle(R.string.title_fire_triggers);
 				
-				final List<Trigger> triggers = TriggerManager.getInstance(this).allTriggers();
-				
-				if (triggers.size() > 0)
+
+				if (savedPassword == null || savedPassword.equals(""))
 				{
-					ArrayAdapter<Trigger> adapter = new ArrayAdapter<Trigger>(this, android.R.layout.simple_list_item_1, triggers);
+					final List<Trigger> triggers = TriggerManager.getInstance(this).allTriggers();
 					
-					builder.setAdapter(adapter, new OnClickListener()
+					if (triggers.size() > 0)
 					{
-						public void onClick(DialogInterface dialog, int which) 
+						ArrayAdapter<Trigger> adapter = new ArrayAdapter<Trigger>(this, android.R.layout.simple_list_item_1, triggers);
+						
+						builder.setAdapter(adapter, new OnClickListener()
 						{
-							Trigger target = triggers.get(which);
-							
-							target.execute(me, true);
-						}
-					});
-				}
+							public void onClick(DialogInterface dialog, int which) 
+							{
+								Trigger target = triggers.get(which);
+								
+								target.execute(me, true);
+							}
+						});
+					}
+					else
+					{
+						builder.setMessage(R.string.message_no_triggers);
+					
+						builder.setPositiveButton(R.string.button_close, new OnClickListener()
+						{
+							public void onClick(DialogInterface arg0, int arg1) 
+							{
+		
+							}
+						});
+					}
+				}				
 				else
 				{
-					builder.setMessage(R.string.message_no_triggers);
-				
+					builder.setMessage(R.string.message_no_user_triggers);
+					
 					builder.setPositiveButton(R.string.button_close, new OnClickListener()
 					{
 						public void onClick(DialogInterface arg0, int arg1) 
@@ -712,7 +731,6 @@ public class StartActivity extends ActionBarActivity
 						}
 					});
 				}
-				
 				builder.create().show();
 		
 				break;
@@ -741,8 +759,6 @@ public class StartActivity extends ActionBarActivity
 
     			break;
     		case R.id.menu_settings_item:
-    	        final String savedPassword = this.getPreferences(this).getString("config_password", null);
-
 				if (savedPassword == null || savedPassword.equals(""))
 					this.launchPreferences();
 				else
