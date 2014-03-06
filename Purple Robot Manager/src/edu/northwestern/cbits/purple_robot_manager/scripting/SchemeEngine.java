@@ -351,7 +351,12 @@ public class SchemeEngine extends BaseScriptEngine
 	{
 		return this.launchApplication(applicationName, SchemeEngine.parsePairList(launchParams), script);
 	}
-
+	
+	public boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen, boolean persistent, final Pair launchParams, final String script)
+	{
+		return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen, persistent, SchemeEngine.parsePairList(launchParams), script);
+	}
+	
 	public boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen, final Pair launchParams, final String script)
 	{
 		return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen, SchemeEngine.parsePairList(launchParams), script);

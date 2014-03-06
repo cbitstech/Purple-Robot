@@ -133,6 +133,11 @@ public class JavaScriptEngine extends BaseScriptEngine
 		return this.launchApplication(applicationName, JavaScriptEngine.nativeToMap(launchParams), script);
 	}
 
+	public boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen, boolean persistent, final NativeObject launchParams, final String script)
+	{
+		return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen, persistent, JavaScriptEngine.nativeToMap(launchParams), script);
+	}
+	
 	public boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen, final NativeObject launchParams, final String script)
 	{
 		return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen, JavaScriptEngine.nativeToMap(launchParams), script);
