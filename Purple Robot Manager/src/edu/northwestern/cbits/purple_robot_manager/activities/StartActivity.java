@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.CrashManagerListener;
@@ -42,6 +43,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
@@ -63,6 +65,8 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.Feature;
 import edu.northwestern.cbits.purple_robot_manager.snapshots.SnapshotsActivity;
+import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
+import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
 public class StartActivity extends ActionBarActivity
 {
@@ -665,12 +669,51 @@ public class StartActivity extends ActionBarActivity
 
     public boolean onOptionsItemSelected(MenuItem item)
     {
+    	final StartActivity me = this;
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    	
         switch (item.getItemId())
     	{
 			case R.id.menu_snapshot_item:
 				Intent snapIntent = new Intent(this, SnapshotsActivity.class);
 				
 				this.startActivity(snapIntent);
+		
+				break;
+			case R.id.menu_trigger_item:
+				
+				builder.setTitle(R.string.title_fire_triggers);
+				
+				final List<Trigger> triggers = TriggerManager.getInstance(this).allTriggers();
+				
+				if (triggers.size() > 0)
+				{
+					ArrayAdapter<Trigger> adapter = new ArrayAdapter<Trigger>(this, android.R.layout.simple_list_item_1, triggers);
+					
+					builder.setAdapter(adapter, new OnClickListener()
+					{
+						public void onClick(DialogInterface dialog, int which) 
+						{
+							Trigger target = triggers.get(which);
+							
+							target.execute(me, true);
+						}
+					});
+				}
+				else
+				{
+					builder.setMessage(R.string.message_no_triggers);
+				
+					builder.setPositiveButton(R.string.button_close, new OnClickListener()
+					{
+						public void onClick(DialogInterface arg0, int arg1) 
+						{
+	
+						}
+					});
+				}
+				
+				builder.create().show();
 		
 				break;
 			case R.id.menu_label_item:
@@ -700,14 +743,10 @@ public class StartActivity extends ActionBarActivity
     		case R.id.menu_settings_item:
     	        final String savedPassword = this.getPreferences(this).getString("config_password", null);
 
-    	        final StartActivity me = this;
-
 				if (savedPassword == null || savedPassword.equals(""))
 					this.launchPreferences();
 				else
 				{
-	    	        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
 	    	        builder.setMessage(R.string.dialog_password_prompt);
 	    	        builder.setPositiveButton(R.string.dialog_password_submit, new DialogInterface.OnClickListener()
 	    	        {
