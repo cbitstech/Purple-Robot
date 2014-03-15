@@ -124,65 +124,72 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
 		if (prefs.getBoolean(StreamingJacksonUploadPlugin.ENABLED, false) == false)
 			return;
 
-		String action = intent.getAction();
-		
-		if (OutputPlugin.FORCE_UPLOAD.equals(action))
+		synchronized(this)
 		{
-			this._lastAttempt = 0;
-
-			this.uploadFiles(context, prefs);
-		}
-		else if (Probe.PROBE_READING.equals(action))
-		{
-			Bundle extras = intent.getExtras();
+			String action = intent.getAction();
 			
-			if (extras.containsKey(DataUploadPlugin.TRANSMIT_KEY) && extras.getBoolean(DataUploadPlugin.TRANSMIT_KEY) == false)
-				return;
-
-			long now = System.currentTimeMillis();
-
-			try 
+			if (OutputPlugin.FORCE_UPLOAD.equals(action))
 			{
-				if (this._currentFile != null)
+				this._lastAttempt = 0;
+	
+				this.uploadFiles(context, prefs);
+			}
+			else if (Probe.PROBE_READING.equals(action))
+			{
+				Bundle extras = intent.getExtras();
+				
+				if (extras.containsKey(DataUploadPlugin.TRANSMIT_KEY) && extras.getBoolean(DataUploadPlugin.TRANSMIT_KEY) == false)
 				{
-					File f = this._currentFile.getAbsoluteFile();
-				
-					long length = f.length();
-					long modDelta = now - f.lastModified();
-					
-					long size = Long.parseLong(prefs.getString(StreamingJacksonUploadPlugin.UPLOAD_SIZE, StreamingJacksonUploadPlugin.UPLOAD_SIZE_DEFAULT));
-				
-					if (this._generator != null && (length > size || modDelta > 60000))
+
+				}
+				else
+				{
+					long now = System.currentTimeMillis();
+		
+					try 
 					{
-						this._generator.writeEndArray();
+						if (this._currentFile != null)
+						{
+							File f = this._currentFile.getAbsoluteFile();
+						
+							long length = f.length();
+							long modDelta = now - f.lastModified();
+							
+							long size = Long.parseLong(prefs.getString(StreamingJacksonUploadPlugin.UPLOAD_SIZE, StreamingJacksonUploadPlugin.UPLOAD_SIZE_DEFAULT));
+						
+							if (this._generator != null && (length > size || modDelta > 60000))
+							{
+								this._generator.writeEndArray();
+								this._generator.flush();
+								this._generator.close();
+								
+								this._generator = null;
+								
+								this._currentFile = null;
+							}
+						}
+						
+						this.uploadFiles(context, prefs);
+		
+						if (this._generator == null)
+						{
+							this._currentFile = new File(this.getPendingFolder(), now + FILE_EXTENSION);
+							
+							JsonFactory factory = new JsonFactory();
+							
+							this._generator = factory.createGenerator(this._currentFile, JsonEncoding.UTF8);
+							
+							this._generator.writeStartArray();
+						}
+						
+						StreamingJacksonUploadPlugin.writeBundle(this.getContext(), this._generator, extras);
 						this._generator.flush();
-						this._generator.close();
-						
-						this._generator = null;
-						
-						this._currentFile = null;
+					} 
+					catch (IOException e) 
+					{
+						LogManager.getInstance(this.getContext()).logException(e);
 					}
 				}
-				
-				this.uploadFiles(context, prefs);
-
-				if (this._generator == null)
-				{
-					this._currentFile = new File(this.getPendingFolder(), now + FILE_EXTENSION);
-					
-					JsonFactory factory = new JsonFactory();
-					
-					this._generator = factory.createGenerator(this._currentFile, JsonEncoding.UTF8);
-					
-					this._generator.writeStartArray();
-				}
-				
-				StreamingJacksonUploadPlugin.writeBundle(this.getContext(), this._generator, extras);
-				this._generator.flush();
-			} 
-			catch (IOException e) 
-			{
-				LogManager.getInstance(this.getContext()).logException(e);
 			}
 		}
 	}
