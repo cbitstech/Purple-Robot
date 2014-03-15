@@ -38,6 +38,9 @@ public class RawLocationProbe extends Probe implements LocationListener
 
 	private static final boolean DEFAULT_ENABLED = false;
 
+	private static final String GPS_AVAILABLE = "GPS_AVAILABLE";
+	private static final String NETWORK_AVAILABLE = "NETWORK_AVAILABLE";
+
 	protected Context _context = null;
 
 	private long _lastFrequency = 0;
@@ -156,8 +159,8 @@ public class RawLocationProbe extends Probe implements LocationListener
 
 					if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
 						locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, freq, 1, this);
-					else
-						locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, freq, 1, this);
+
+					locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, freq, 1, this);
 
 					this._listening = true;
 
@@ -201,6 +204,11 @@ public class RawLocationProbe extends Probe implements LocationListener
 		bundle.putDouble(RawLocationProbe.LONGITUDE, location.getLongitude());
 		
 		bundle.putString(RawLocationProbe.PROVIDER, location.getProvider());
+
+		LocationManager locationManager = (LocationManager) this._context.getSystemService(Context.LOCATION_SERVICE);
+		
+		bundle.putBoolean(RawLocationProbe.GPS_AVAILABLE, locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER));
+		bundle.putBoolean(RawLocationProbe.NETWORK_AVAILABLE, locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER));
 
 		if (location.hasAccuracy())
 			bundle.putFloat(RawLocationProbe.ACCURACY, location.getAccuracy());

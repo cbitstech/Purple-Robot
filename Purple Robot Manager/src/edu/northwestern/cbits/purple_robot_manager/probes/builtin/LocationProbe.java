@@ -43,6 +43,8 @@ public class LocationProbe extends Probe implements LocationListener
 	public static final String LATITUDE_KEY = LATITUDE;
 	public static final String DB_TABLE = "location_probe";
 	private static final String CLUSTER = "CLUSTER";
+	private static final String GPS_AVAILABLE = "GPS_AVAILABLE";
+	private static final String NETWORK_AVAILABLE = "NETWORK_AVAILABLE";
 
 	private static final boolean DEFAULT_ENABLED = true;
 
@@ -212,8 +214,8 @@ public class LocationProbe extends Probe implements LocationListener
 
 						if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
 							locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
-						else
-							locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, this);
+
+						locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, this);
 
 						this._lastCheck = now;
 						this._listening = true;
@@ -268,6 +270,11 @@ public class LocationProbe extends Probe implements LocationListener
 			bundle.putString(LocationProbe.CLUSTER, cluster);
 			
 		bundle.putString(LocationProbe.PROVIDER, location.getProvider());
+
+		LocationManager locationManager = (LocationManager) this._context.getSystemService(Context.LOCATION_SERVICE);
+		
+		bundle.putBoolean(LocationProbe.GPS_AVAILABLE, locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER));
+		bundle.putBoolean(LocationProbe.NETWORK_AVAILABLE, locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER));
 
 		if (location.hasAccuracy())
 			bundle.putFloat(LocationProbe.ACCURACY, location.getAccuracy());
