@@ -84,7 +84,7 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
 		
 		if (this._context == null)
 			this._context = context.getApplicationContext();
-
+		
 		if (enabled)
 			enabled = prefs.getBoolean("config_probe_activity_detection_enabled", ActivityDetectionProbe.DEFAULT_ENABLED);
 
@@ -133,7 +133,9 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
 	
 	public static void activityDetected(Context context, Intent intent) 
 	{
-		if (ActivityRecognitionResult.hasResult(intent))
+		final SharedPreferences prefs = Probe.getPreferences(context);
+
+		if (prefs.getBoolean("config_probe_activity_detection_enabled", ActivityDetectionProbe.DEFAULT_ENABLED) && ActivityRecognitionResult.hasResult(intent))
 		{
 			ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
 	         

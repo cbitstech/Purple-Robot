@@ -105,7 +105,15 @@ public class CallStateProbe extends Probe
 
 		if (this._receiver != null)
 		{
-			context.unregisterReceiver(this._receiver);
+			try
+			{
+				context.unregisterReceiver(this._receiver);
+			}
+			catch (RuntimeException e)
+			{
+				
+			}
+			
 			this._receiver = null;
 		}
 		
