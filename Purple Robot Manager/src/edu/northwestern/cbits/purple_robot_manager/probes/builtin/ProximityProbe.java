@@ -26,6 +26,7 @@ import android.os.SystemClock;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
@@ -232,12 +233,16 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
         {
         	if (prefs.getBoolean("config_probe_proximity_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
         	{
+        		Log.e("PR", "PROX ENABLED");
+        		
 				int frequency = Integer.parseInt(prefs.getString("config_probe_proximity_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
 
 				if (this._lastFrequency != frequency)
 				{
 					sensors.unregisterListener(this, sensor);
 	                
+					Log.e("PR", "REGISTERING");
+					
 	                switch (frequency)
 	                {
 	                	case SensorManager.SENSOR_DELAY_FASTEST:
@@ -264,12 +269,16 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
         	}
         	else
         	{
-                sensors.unregisterListener(this, sensor);
+				Log.e("PR", "UNREGISTERING 1");
+
+				sensors.unregisterListener(this, sensor);
                 this._lastFrequency = -1;
         	}
         }
     	else
     	{
+			Log.e("PR", "UNREGISTERING 2");
+			
             sensors.unregisterListener(this, sensor);
             this._lastFrequency = -1;
     	}
@@ -350,6 +359,8 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 	@SuppressLint("NewApi")
 	public void onSensorChanged(SensorEvent event)
 	{
+		Log.e("PR", "GOT PROX DATA: " + event.accuracy);
+		
 		double now = System.currentTimeMillis();
 
 		if (this.passesThreshold(event))
