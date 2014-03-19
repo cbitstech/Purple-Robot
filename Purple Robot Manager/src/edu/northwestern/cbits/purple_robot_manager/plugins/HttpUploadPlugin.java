@@ -226,7 +226,7 @@ public class HttpUploadPlugin extends OutputPlugin
 	{
 		final SharedPreferences prefs = HttpUploadPlugin.getPreferences(this.getContext());
 
-		if (prefs.getBoolean("config_enable_data_server", false) == false)
+		if (this.enableDataServer(prefs) == false)
 			return;
 		
 		PurpleRobotApplication.fixPreferences(this.getContext(), false);
@@ -386,7 +386,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 							try
 							{
-								byte[] bytes = EncryptionManager.getInstance().readFromEncryptedStream(me.getContext(), new FileInputStream(f), prefs.getBoolean("config_http_encrypt", true));
+								byte[] bytes = EncryptionManager.getInstance().readFromEncryptedStream(me.getContext(), new FileInputStream(f), me.encryptData(prefs));
 
 								JSONArray jsonArray = new JSONArray(new String(bytes, "UTF-8"));
 
@@ -412,7 +412,7 @@ public class HttpUploadPlugin extends OutputPlugin
 								LogManager.getInstance(me.getContext()).logException(e);
 							}
 
-							if (prefs.getBoolean("config_http_archive", false))
+							if (me.enableArchive(prefs))
 							{
 								long now = System.currentTimeMillis();
 
@@ -497,7 +497,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 									byte[] jsonBytes = toSave.toString().getBytes("UTF-8");
 
-									EncryptionManager.getInstance().writeToEncryptedStream(me.getContext(), new FileOutputStream(f), jsonBytes, prefs.getBoolean("config_http_encrypt", true));
+									EncryptionManager.getInstance().writeToEncryptedStream(me.getContext(), new FileOutputStream(f), jsonBytes, me.encryptData(prefs));
 
 									pendingObjects.removeAll(toRemove);
 								}
@@ -550,7 +550,7 @@ public class HttpUploadPlugin extends OutputPlugin
 							
 							SSLSocketFactory socketFactory = SSLSocketFactory.getSocketFactory();
 							
-							if (prefs.getBoolean("config_http_liberal_ssl", true))
+							if (me.useLiberalSsl(prefs))
 							{
 						        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
 						        trustStore.load(null, null);
@@ -777,7 +777,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 								byte[] jsonBytes = toSave.toString().getBytes("UTF-8");
 
-								EncryptionManager.getInstance().writeToEncryptedStream(me.getContext(), new FileOutputStream(f), jsonBytes, prefs.getBoolean("config_http_encrypt", true));
+								EncryptionManager.getInstance().writeToEncryptedStream(me.getContext(), new FileOutputStream(f), jsonBytes, me.encryptData(prefs));
 
 								pendingObjects.removeAll(toRemove);
 							}
@@ -880,45 +880,50 @@ public class HttpUploadPlugin extends OutputPlugin
 			t.start();
 		}
 	}
+	
+	protected boolean useLiberalSsl(SharedPreferences prefs) 
+	{
+		return this.coerceBoolean(prefs, "config_http_liberal_ssl", true);
+	}
 
-	private boolean restrictToWifi(SharedPreferences prefs) 
+	protected boolean enableArchive(SharedPreferences prefs) 
+	{
+		return this.coerceBoolean(prefs, "config_http_archive", false);
+	}
+
+	private boolean coerceBoolean(SharedPreferences prefs, String key, boolean defaultValue)
 	{
 		try
 		{
-			return prefs.getBoolean("config_restrict_data_wifi", true);
+			return prefs.getBoolean(key, defaultValue);
 		}
 		catch (ClassCastException e)
 		{
-			String enabled = prefs.getString("config_restrict_data_wifi", "true").toLowerCase(Locale.ENGLISH);
+			String enabled = prefs.getString(key, "" + defaultValue).toLowerCase(Locale.ENGLISH);
 			
-			boolean isRestricted = ("false".equals(enabled) == false); 
+			boolean coerced = ("false".equals(enabled) == false); 
 			
 			Editor edit = prefs.edit();
-			edit.putBoolean("config_restrict_data_wifi", isRestricted);
+			edit.putBoolean(key, coerced);
 			edit.commit();
 			
-			return isRestricted;
+			return coerced;
 		}
+	}
+	
+	private boolean restrictToWifi(SharedPreferences prefs) 
+	{
+		return this.coerceBoolean(prefs, "config_restrict_data_wifi", true);
+	}
+
+	private boolean encryptData(SharedPreferences prefs) 
+	{
+		return this.coerceBoolean(prefs, "config_http_encrypt", true);
 	}
 
 	private boolean enableDataServer(SharedPreferences prefs) 
 	{
-		try
-		{
-			return prefs.getBoolean("config_enable_data_server", false);
-		}
-		catch (ClassCastException e)
-		{
-			String enabled = prefs.getString("config_enable_data_server", "false").toLowerCase(Locale.ENGLISH);
-			
-			boolean isEnabled = ("false".equals(enabled) == false); 
-			
-			Editor edit = prefs.edit();
-			edit.putBoolean("config_enable_data_server", isEnabled);
-			edit.commit();
-			
-			return isEnabled;
-		}
+		return this.coerceBoolean(prefs, "config_enable_data_server", false);
 	}
 
 	protected void broadcastMessage(int stringId)
@@ -932,7 +937,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
 		File internalStorage = this.getContext().getFilesDir();
 		
-		if (prefs.getBoolean("config_external_storage", false))
+		if (this.useExternalStorage(prefs))
 			internalStorage = this.getContext().getExternalFilesDir(null);
 
 		if (internalStorage != null && !internalStorage.exists())
@@ -944,6 +949,11 @@ public class HttpUploadPlugin extends OutputPlugin
 			pendingFolder.mkdirs();
 
 		return pendingFolder;
+	}
+
+	private boolean useExternalStorage(SharedPreferences prefs) 
+	{
+		return this.coerceBoolean(prefs, "config_external_storage", false);
 	}
 
 	public File getArchiveFolder()
@@ -1011,7 +1021,7 @@ public class HttpUploadPlugin extends OutputPlugin
 			
 			SharedPreferences prefs = HttpUploadPlugin.getPreferences(this.getContext());
 
-			EncryptionManager.getInstance().writeToEncryptedStream(this.getContext(), new FileOutputStream(f), jsonBytes, prefs.getBoolean("config_http_encrypt", true));
+			EncryptionManager.getInstance().writeToEncryptedStream(this.getContext(), new FileOutputStream(f), jsonBytes, this.encryptData(prefs));
 			
 			this._accumulationSum += jsonBytes.length;
 			

@@ -104,12 +104,18 @@ public class AudioFeaturesProbe extends Probe
 							
 							int read = 0;
 							
+							double sampleSum = 0;
+							double samplePower = 0;
+							
 							while (index < me.samples.length && 0 <= (read = recorder.read(buffer, 0, bufferSize)))
 							{
 								for (int i = 0; i < read; i++)
 								{
 									if (index < me.samples.length)
 									{
+										sampleSum += Math.abs(buffer[i]);
+										samplePower += Math.pow(((double) buffer[i]) / Short.MAX_VALUE, 2);
+										
 										me.samples[index] = (double) buffer[i];
 										index += 1;
 									}
@@ -133,7 +139,6 @@ public class AudioFeaturesProbe extends Probe
 							double maxMagnitude = 0;
 							
 							double minMagnitude = Double.MAX_VALUE;
-							double sumSquaredMagnitude = 0;
 	
 							for (int i = 0; i < values.length / 2; i++) 
 							{
@@ -141,12 +146,10 @@ public class AudioFeaturesProbe extends Probe
 								
 								double magnitude = value.abs();
 								
-								sumSquaredMagnitude += Math.pow(magnitude, 2);
-								
 								if (magnitude > maxMagnitude)
 								{
 									maxMagnitude = magnitude;
-									maxFrequency = (i * 44100.0) / (double) me.samples.length;
+									maxFrequency = (i * recorder.getSampleRate()) / (double) me.samples.length;
 								}
 	
 								if (magnitude < minMagnitude)
@@ -154,7 +157,8 @@ public class AudioFeaturesProbe extends Probe
 							}
 							
 							bundle.putDouble("FREQUENCY", maxFrequency);
-							bundle.putDouble("POWER", sumSquaredMagnitude / recorder.getSampleRate());
+							bundle.putDouble("NORMALIZED_AVG_MAGNITUDE", (sampleSum / Short.MAX_VALUE) / me.samples.length);
+							bundle.putDouble("POWER", samplePower / me.samples.length);
 							
 							me.transmitData(context, bundle);
 						}

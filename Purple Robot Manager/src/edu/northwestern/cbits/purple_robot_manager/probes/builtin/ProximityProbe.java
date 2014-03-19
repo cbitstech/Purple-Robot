@@ -26,7 +26,6 @@ import android.os.SystemClock;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
@@ -38,7 +37,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 @SuppressLint("SimpleDateFormat")
 public class ProximityProbe extends ContinuousProbe implements SensorEventListener
 {
-	private static int BUFFER_SIZE = 256;
+	private static int BUFFER_SIZE = 8;
 
 	private static final String DB_TABLE = "proximity_probe";
 
@@ -233,15 +232,11 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
         {
         	if (prefs.getBoolean("config_probe_proximity_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
         	{
-        		Log.e("PR", "PROX ENABLED");
-        		
 				int frequency = Integer.parseInt(prefs.getString("config_probe_proximity_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
 
 				if (this._lastFrequency != frequency)
 				{
 					sensors.unregisterListener(this, sensor);
-	                
-					Log.e("PR", "REGISTERING");
 					
 	                switch (frequency)
 	                {
@@ -269,16 +264,12 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
         	}
         	else
         	{
-				Log.e("PR", "UNREGISTERING 1");
-
 				sensors.unregisterListener(this, sensor);
                 this._lastFrequency = -1;
         	}
         }
     	else
     	{
-			Log.e("PR", "UNREGISTERING 2");
-			
             sensors.unregisterListener(this, sensor);
             this._lastFrequency = -1;
     	}
@@ -346,7 +337,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 		double value = event.values[0];
 
 		boolean passes = false;
-
+		
 		if (Math.abs(value - this._lastValue) > this.lastThreshold)
 			passes = true;
 		
@@ -359,8 +350,6 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 	@SuppressLint("NewApi")
 	public void onSensorChanged(SensorEvent event)
 	{
-		Log.e("PR", "GOT PROX DATA: " + event.accuracy);
-		
 		double now = System.currentTimeMillis();
 
 		if (this.passesThreshold(event))
@@ -406,7 +395,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 					{
 						data.putFloatArray(fieldNames[i], valueBuffer[i]);
 					}
-
+					
 					this.transmitData(data);
 
 					for (int j = 0; j < timeBuffer.length; j++)
@@ -430,6 +419,8 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 							ProbeValuesProvider.getProvider(this._context).insertValue(this._context, ProximityProbe.DB_TABLE, this.databaseSchema(), values);
 						}
 					}
+					
+					
 
 					bufferIndex = 0;
 				}

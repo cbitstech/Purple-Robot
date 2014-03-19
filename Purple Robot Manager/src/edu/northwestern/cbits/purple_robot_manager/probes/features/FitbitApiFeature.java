@@ -255,6 +255,10 @@ public class FitbitApiFeature extends Feature
 									{
 					         			LogManager.getInstance(context).logException(e);
 									}
+									catch (IllegalArgumentException e)
+									{
+					         			LogManager.getInstance(context).logException(e);
+									}
 								}
 							};
 							

@@ -103,8 +103,19 @@ public class LogManager
 			payload = new HashMap<String, Object>();
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
-
-		if (prefs.getBoolean("config_enable_log_server", false))
+		
+		boolean enabled = false;
+		
+		try
+		{
+			enabled = prefs.getBoolean("config_enable_log_server", false);
+		}
+		catch (ClassCastException e)
+		{
+			enabled = prefs.getString("config_enable_log_server", "false").equalsIgnoreCase("true");
+		}
+			
+		if (enabled)
 		{
 			String endpointUri = prefs.getString("config_log_server_uri", null);
 			
@@ -122,8 +133,19 @@ public class LogManager
 							payload.put(key, namespace.get(key));
 					}
 				}
+				
+				boolean logLocation = false;
+						
+				try
+				{
+					logLocation = prefs.getBoolean("config_log_location", false);
+				}
+				catch (ClassCastException e)
+				{
+					logLocation = prefs.getString("config_log_location", "false").equalsIgnoreCase("true");
+				}
 
-				if (prefs.getBoolean("config_log_location", false))
+				if (logLocation)
 				{
 					LocationManager lm = (LocationManager) this._context.getSystemService(Context.LOCATION_SERVICE);
 				
@@ -217,7 +239,18 @@ public class LogManager
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
 
-		if (prefs.getBoolean("config_restrict_log_wifi", true) && WiFiHelper.wifiAvailable(this._context) == false)
+		boolean restrictWifi = true;
+		
+		try
+		{
+			restrictWifi = prefs.getBoolean("config_restrict_log_wifi", true);
+		}
+		catch (ClassCastException e)
+		{
+			restrictWifi = prefs.getString("config_restrict_log_wifi", "true").equalsIgnoreCase("true");
+		}
+		
+		if (restrictWifi && WiFiHelper.wifiAvailable(this._context) == false)
 			return;
 		
 		String endpointUri = prefs.getString("config_log_server_uri", null);
@@ -236,8 +269,19 @@ public class LogManager
 					registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
 					
 					SSLSocketFactory socketFactory = SSLSocketFactory.getSocketFactory();
+
+					boolean liberalSsl = true;
 					
-					if (prefs.getBoolean("config_http_liberal_ssl", true))
+					try
+					{
+						liberalSsl = prefs.getBoolean("config_http_liberal_ssl", true);
+					}
+					catch (ClassCastException e)
+					{
+						liberalSsl = prefs.getString("config_http_liberal_ssl", "true").equalsIgnoreCase("true");
+					}
+					
+					if (liberalSsl)
 					{
 				        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
 				        trustStore.load(null, null);
