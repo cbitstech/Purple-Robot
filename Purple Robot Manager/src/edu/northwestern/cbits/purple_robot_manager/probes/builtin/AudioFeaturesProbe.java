@@ -133,12 +133,15 @@ public class AudioFeaturesProbe extends Probe
 							double maxMagnitude = 0;
 							
 							double minMagnitude = Double.MAX_VALUE;
+							double sumSquaredMagnitude = 0;
 	
 							for (int i = 0; i < values.length / 2; i++) 
 							{
 								Complex value = values[i];
 								
 								double magnitude = value.abs();
+								
+								sumSquaredMagnitude += Math.pow(magnitude, 2);
 								
 								if (magnitude > maxMagnitude)
 								{
@@ -150,8 +153,8 @@ public class AudioFeaturesProbe extends Probe
 									minMagnitude = magnitude;
 							}
 							
-							
 							bundle.putDouble("FREQUENCY", maxFrequency);
+							bundle.putDouble("POWER", sumSquaredMagnitude / recorder.getSampleRate());
 							
 							me.transmitData(context, bundle);
 						}
