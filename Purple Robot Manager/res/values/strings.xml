@@ -53,6 +53,10 @@
     <string name="activity_diagnostic_title">Diagnostics</string>
     <string name="user_id_label">User Identifier</string>
     <string name="user_id_placeholder">Unknown</string>
+
+    <string name="ip_address_label">IP Address</string>
+    <string name="ip_address_placeholder">Unknown</string>
+    
     <string name="probe_status_label">Probe &amp; Sensor Status</string>
     <string name="probe_status_placeholder">Unknown</string>
     <string name="upload_status_label">HTTP Transmission Status</string>

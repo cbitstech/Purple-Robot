@@ -32,16 +32,20 @@ import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
 public class ManagerService extends IntentService
 {
-	public static String UPDATE_WIDGETS = "purple_robot_manager_update_widgets";
-	public static String PERIODIC_CHECK_INTENT = "purple_robot_manager_periodic_check";
-	public static String INCOMING_DATA_INTENT = "purple_robot_manager_incoming_data";
-	public static String UPLOAD_LOGS_INTENT = "purple_robot_manager_upload_logs";
-	public static String REFRESH_ERROR_STATE_INTENT = "purple_robot_manager_refresh_errors";
+	public static String RUN_SCRIPT_INTENT = "purple_robot_manager_run_script";
+	public static String RUN_SCRIPT = "run_script";
+
 	public static String APPLICATION_LAUNCH_INTENT = "purple_robot_manager_application_launch";
 	public static String APPLICATION_LAUNCH_INTENT_PACKAGE = "purple_robot_manager_widget_launch_package";
 	public static String APPLICATION_LAUNCH_INTENT_URL = "purple_robot_manager_widget_launch_url";
 	public static String APPLICATION_LAUNCH_INTENT_PARAMETERS = "purple_robot_manager_widget_launch_parameters";
 	public static String APPLICATION_LAUNCH_INTENT_POSTSCRIPT = "purple_robot_manager_widget_launch_postscript";
+
+	public static String UPDATE_WIDGETS = "purple_robot_manager_update_widgets";
+	public static String PERIODIC_CHECK_INTENT = "purple_robot_manager_periodic_check";
+	public static String INCOMING_DATA_INTENT = "purple_robot_manager_incoming_data";
+	public static String UPLOAD_LOGS_INTENT = "purple_robot_manager_upload_logs";
+	public static String REFRESH_ERROR_STATE_INTENT = "purple_robot_manager_refresh_errors";
 
 	public static String GOOGLE_PLAY_ACTIVITY_DETECTED = "purple_robot_manager_google_play_activity_detected";
 
@@ -327,6 +331,17 @@ public class ManagerService extends IntentService
 					if (script != null)
 						BaseScriptEngine.runScript(this, script);
 				}
+			}
+		}
+		else if (RUN_SCRIPT_INTENT.equalsIgnoreCase(action))
+		{
+			if (intent.hasExtra(RUN_SCRIPT))
+			{
+
+				String script = intent.getStringExtra(RUN_SCRIPT);
+
+				if (script != null)
+					BaseScriptEngine.runScript(this, script);
 			}
 		}
 		else if (PERIODIC_CHECK_INTENT.equals(action))
