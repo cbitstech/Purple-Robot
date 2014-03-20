@@ -4,9 +4,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.Map;
 
 import android.annotation.SuppressLint;
@@ -19,9 +23,12 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.net.Uri;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
+import android.text.format.Formatter;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -54,6 +61,7 @@ public class DiagnosticActivity extends ActionBarActivity
         this.setContentView(R.layout.layout_diagnostic_activity);
     }
 	
+	@SuppressWarnings("deprecation")
 	protected void onResume()
 	{
 		super.onResume();
@@ -218,6 +226,51 @@ public class DiagnosticActivity extends ActionBarActivity
     	}
     	
     	sensorsList.setText(sb.toString());
+    	
+    	String ipAddress = null;
+    	
+		WifiManager wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
+		WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+   
+		if (wifiInfo != null)
+		{
+			int ip = wifiInfo.getIpAddress();
+
+			ipAddress = Formatter.formatIpAddress(ip);
+		}
+		else
+		{
+			try 
+			{
+				Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
+
+				NetworkInterface iface = null;
+				
+				while (ifaces.hasMoreElements() && (iface = ifaces.nextElement()) != null && ipAddress == null)
+				{
+					if (iface.getName().equals("lo") == false)
+					{
+						Enumeration<InetAddress> ips = iface.getInetAddresses();
+						InetAddress ipAddr = null;
+						
+						while (ips.hasMoreElements() && (ipAddr = ips.nextElement()) != null)
+						{
+							ipAddress = ipAddr.getHostAddress();
+						}
+					}
+				}
+			} 
+			catch (SocketException e) 
+			{
+				LogManager.getInstance(this).logException(e);
+			}
+		}
+    	
+		if (ipAddress != null)
+		{
+			TextView ipAddressView = (TextView) this.findViewById(R.id.ip_address_value);
+			ipAddressView.setText(ipAddress);
+		}
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu)

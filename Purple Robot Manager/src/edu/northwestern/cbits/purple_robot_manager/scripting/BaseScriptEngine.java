@@ -743,7 +743,7 @@ public abstract class BaseScriptEngine
 	}
 	
 	@SuppressLint("DefaultLocale")
-	protected Intent constructDirectLaunchIntent(final String applicationName, Map<String,Object> launchParams, final String script)
+	protected Intent constructDirectLaunchIntent(final String applicationName, Map<String,Object> launchParams)
 	{
 		if (applicationName.toLowerCase().startsWith("http://") || applicationName.toLowerCase().startsWith("https://"))
 			return new Intent(Intent.ACTION_VIEW, Uri.parse(applicationName));
@@ -754,9 +754,6 @@ public abstract class BaseScriptEngine
 			if (packageName != null)
 			{
 				Intent intent = this._context.getPackageManager().getLaunchIntentForPackage(packageName);
-
-				if (script != null)
-					intent.putExtra(ManagerService.APPLICATION_LAUNCH_INTENT_POSTSCRIPT, script);
 
 				if (launchParams != null)
 				{
@@ -771,11 +768,6 @@ public abstract class BaseScriptEngine
 		}
 
 		return null;
-	}
-
-	protected Intent constructDirectLaunchIntent(final String applicationName, Map<String,Object> launchParams)
-	{
-		constructDirectLaunchIntent(applicationName, launchParams, null);
 	}
 
 	protected boolean updateTrigger(String triggerId, Map<String, Object> params)
@@ -853,8 +845,8 @@ public abstract class BaseScriptEngine
 
 			if (displayWhen < now)
 				displayWhen = now;
-			
-			Intent intent = this.constructDirectLaunchIntent(applicationName, launchParams, script);
+
+			Intent intent = this.constructDirectLaunchIntent(applicationName, launchParams);
 
 			HashMap <String, Object> payload = new HashMap<String, Object>();
 			payload.put("application_present", (intent != null));
@@ -864,6 +856,12 @@ public abstract class BaseScriptEngine
 			if (intent != null)
 			{
 				PendingIntent pendingIntent = PendingIntent.getActivity(this._context, 0, intent, 0);
+				
+				if (script != null)
+				{
+					Intent serviceIntent = this.constructLaunchIntent(applicationName, launchParams, script);
+					pendingIntent = PendingIntent.getService(this._context, 0, serviceIntent, 0);
+				}
 
 				NotificationCompat.Builder builder = new NotificationCompat.Builder(this._context);
 				builder.setContentIntent(pendingIntent);
@@ -898,6 +896,57 @@ public abstract class BaseScriptEngine
 		}
 
 		return false;
+	}
+
+	public boolean showScriptNotification(String title, String message, boolean persistent, final String script)
+	{
+		try
+		{
+			HashMap <String, Object> payload = new HashMap<String, Object>();
+			LogManager.getInstance(this._context).log("script_run_notification", payload);
+
+			Intent serviceIntent = this.constructScriptIntent(script);
+			PendingIntent pendingIntent = PendingIntent.getService(this._context, 0, serviceIntent, 0);
+
+			NotificationCompat.Builder builder = new NotificationCompat.Builder(this._context);
+			builder.setContentIntent(pendingIntent);
+			builder.setAutoCancel(true);
+			builder.setContentTitle(title);
+			builder.setContentText(message);
+			builder.setTicker(message);
+			builder.setSmallIcon(R.drawable.ic_note_icon);
+
+			try
+			{
+				Notification note = builder.build();
+				
+				if (persistent)
+					note.flags = note.flags | Notification.FLAG_NO_CLEAR;
+				
+				NotificationManager noteManager = (NotificationManager) this._context.getSystemService(android.content.Context.NOTIFICATION_SERVICE);
+				noteManager.notify(BaseScriptEngine.NOTIFICATION_ID, note);
+			}
+			catch (UnsupportedOperationException e)
+			{
+				// Added so that the mock test cases could still execute.
+			}
+
+			return true;
+		}
+		catch (Exception e)
+		{
+			LogManager.getInstance(this._context).logException(e);
+		}
+
+		return false;
+	}
+
+	private Intent constructScriptIntent(String script) 
+	{
+		Intent intent = new Intent(ManagerService.RUN_SCRIPT_INTENT);
+		intent.putExtra(ManagerService.RUN_SCRIPT, script);
+
+		return intent;
 	}
 
 	public void showNativeDialog(final String title, final String message, final String confirmTitle, final String cancelTitle, final String confirmScript, final String cancelScript)
