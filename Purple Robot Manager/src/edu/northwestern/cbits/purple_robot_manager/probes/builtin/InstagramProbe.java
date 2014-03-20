@@ -237,6 +237,10 @@ public class InstagramProbe extends Probe
 									{
 						     			LogManager.getInstance(context).logException(e);
 									} 
+									catch (IllegalArgumentException e) 
+									{
+						     			LogManager.getInstance(context).logException(e);
+									} 
 								}
 							};
 							
