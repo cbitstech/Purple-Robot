@@ -190,4 +190,11 @@ public class ContactCalibrationHelper
 		
     	return normalizedContacts;
     }
+
+	public static void clear(Context context) 
+	{
+		final SanityManager sanity = SanityManager.getInstance(context);
+ 		
+		sanity.clearAlert(context.getString(R.string.title_address_book_label_check));
+	}
 }

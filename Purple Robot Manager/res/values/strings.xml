@@ -1070,6 +1070,8 @@
 	<string name="menu_trigger_label">Triggers</string>
 	<string name="message_no_triggers">No triggers are currently configured on this device.</string>
 	<string name="message_no_user_triggers">No user-accessible triggers are currently available.</string>
+	
+	<string name="message_snapshot_not_found">Snapshot not found. Check that you provided a valid "timestamp" parameter.</string>
 				
 <!--     
     <string name="config_probe_facebook_hash_title">Obfuscate Details</string>

@@ -383,6 +383,45 @@ public class DiagnosticActivity extends ActionBarActivity
              		message.append(newline);
         		}
          		
+        		message.append(this.getString(R.string.pr_errors_label));
+         		message.append(newline);
+
+		 		final SanityManager sanity = SanityManager.getInstance(this);
+
+				if (sanity.getErrorLevel() != SanityCheck.OK)
+				{
+					Map<String, String> errors = sanity.errors();
+					
+					if (errors.size() > 0)
+					{
+						for (String error : errors.keySet())
+						{
+							message.append(errors.get(error));
+			         		message.append(newline);
+						}
+
+		         		message.append(newline);
+					}
+					
+					Map<String, String> warnings = sanity.warnings();
+
+					if (warnings.size() > 0)
+					{
+						for (String error : warnings.keySet())
+						{
+							message.append(warnings.get(error));
+			         		message.append(newline);
+						}
+
+		         		message.append(newline);
+					}
+				}
+				else
+				{
+	        		message.append(this.getString(R.string.pr_errors_none_label));
+	         		message.append(newline);
+				}
+        		
          		message.append(this.getString(R.string.pr_version_label));
          		message.append(newline);
          		

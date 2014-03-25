@@ -19,7 +19,7 @@
 (define pr-enable-trigger (lambda (trigger-id) (.enableTrigger PurpleRobot trigger-id)))
 (define pr-disable-trigger (lambda (trigger-id) (.disableTrigger PurpleRobot trigger-id)))
 (define pr-reset-trigger (lambda (trigger-id) (.resetTrigger PurpleRobot trigger-id)))
-(define pr-enable-trigger (lambda (trigger-id) (.enableTrigger PurpleRobot trigger-id)))
+(define pr-delete-trigger (lambda (trigger-id) (.deleteTrigger PurpleRobot trigger-id)))
 (define pr-log (lambda (message) (.log PurpleRobot message)))
 (define pr-launch-application (lambda (app-name) (.launchApplication PurpleRobot app-name)))
 (define pr-play-tone (lambda (ringtone) (.playTone PurpleRobot ringtone)))

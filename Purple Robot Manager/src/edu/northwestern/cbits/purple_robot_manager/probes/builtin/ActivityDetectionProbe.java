@@ -87,7 +87,7 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
 		
 		if (enabled)
 			enabled = prefs.getBoolean("config_probe_activity_detection_enabled", ActivityDetectionProbe.DEFAULT_ENABLED);
-
+		
 		if (enabled)
 		{
 			long interval = Long.parseLong(prefs.getString("config_probe_activity_detection_frequency", Probe.DEFAULT_FREQUENCY));
@@ -107,11 +107,11 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
 
         	if (ActivityDetectionProbe._activityDetectionClient == null)
         	{
-		        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(context);
+				int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(context);
 
 		        if (ConnectionResult.SUCCESS == resultCode) 
 		        {
-	        		ActivityDetectionProbe._activityDetectionClient  = new ActivityRecognitionClient(context.getApplicationContext(), this, this);
+					ActivityDetectionProbe._activityDetectionClient  = new ActivityRecognitionClient(context.getApplicationContext(), this, this);
 	        		
 	        		ActivityDetectionProbe._activityDetectionClient.connect();
                 } 
@@ -135,7 +135,12 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
 	{
 		final SharedPreferences prefs = Probe.getPreferences(context);
 
-		if (prefs.getBoolean("config_probe_activity_detection_enabled", ActivityDetectionProbe.DEFAULT_ENABLED) && ActivityRecognitionResult.hasResult(intent))
+		boolean enabled = prefs.getBoolean("config_probes_enabled", false);
+		
+		if (enabled)
+			enabled = prefs.getBoolean("config_probe_activity_detection_enabled", ActivityDetectionProbe.DEFAULT_ENABLED);
+		
+		if (enabled && ActivityRecognitionResult.hasResult(intent))
 		{
 			ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
 	         
