@@ -19,6 +19,7 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.net.Uri;
 
+import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.snapshots.SnapshotManager;
 
@@ -75,6 +76,17 @@ public class SnapshotRequestHandler implements HttpRequestHandler
 				response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
 
 				StringEntity body = new StringEntity(e.toString());
+	            body.setContentType("text/plain");
+
+	            response.setEntity(body);
+			} 
+			catch (NumberFormatException e) 
+			{
+	        	LogManager.getInstance(this._context).logException(e);
+
+				response.setStatusCode(HttpStatus.SC_NOT_FOUND);
+
+				StringEntity body = new StringEntity(this._context.getString(R.string.message_snapshot_not_found));
 	            body.setContentType("text/plain");
 
 	            response.setEntity(body);

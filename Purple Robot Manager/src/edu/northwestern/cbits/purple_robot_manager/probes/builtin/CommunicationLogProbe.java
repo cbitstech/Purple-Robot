@@ -246,6 +246,8 @@ public class CommunicationLogProbe extends Probe
 			}
 		}
 
+		ContactCalibrationHelper.clear(context);
+
 		return false;
 	}
 
