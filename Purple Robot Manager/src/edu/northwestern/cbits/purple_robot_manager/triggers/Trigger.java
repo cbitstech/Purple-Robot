@@ -289,4 +289,13 @@ public abstract class Trigger
 
 		return bundle;
 	}
+
+	public long lastFireTime(Context context) 
+	{
+		SharedPreferences prefs =  PreferenceManager.getDefaultSharedPreferences(context);
+
+		String key = "last_fired_" + this.identifier();
+		
+		return prefs.getLong(key, 0);
+	}
 }
