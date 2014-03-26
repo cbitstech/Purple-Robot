@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
@@ -42,6 +44,14 @@ public class DateTrigger extends Trigger
 	private static final String DATETIME_END = "datetime_end";
 	private static final String DATETIME_REPEATS = "datetime_repeat";
 	private static final String DATETIME_RANDOM = "datetime_random";
+
+	private static final String RANDOM = "random";
+	private static final String START = "start";
+	private static final String END = "end";
+	private static final String ORIGINAL_END = "original_end";
+	private static final String CALENDAR_STRING = "calendar_rule";
+	private static final String ORIGINAL_START = "original_start";
+	private static final String REPEATS = "repeats";
 
 	private static SecureRandom random = null;
 
@@ -614,5 +624,63 @@ public class DateTrigger extends Trigger
 		}	
 		
 		return screen;
+	}
+
+	public String getDiagnosticString(Context context) 
+	{
+		String name = this.name();
+		String identifier = this.identifier();
+		
+		SharedPreferences prefs =  PreferenceManager.getDefaultSharedPreferences(context);
+
+		String key = "last_fired_" + identifier;
+		
+		long lastFired = prefs.getLong(key, 0);
+		
+		String lastFiredString = context.getString(R.string.trigger_fired_never);
+		
+		if (lastFired != 0)
+		{
+			DateFormat formatter = android.text.format.DateFormat.getMediumDateFormat(context);
+			DateFormat timeFormatter = android.text.format.DateFormat.getTimeFormat(context);
+
+			lastFiredString = formatter.format(new Date(lastFired)) + " " + timeFormatter.format(new Date(lastFired));
+		}
+
+		String enabled = context.getString(R.string.trigger_disabled);
+		
+		if (this.enabled(context))
+			enabled = context.getString(R.string.trigger_enabled);
+
+		return context.getString(R.string.trigger_diagnostic_string, name, identifier, enabled, lastFiredString);
+	}
+	
+	public Bundle bundle(Context context) 
+	{
+		Bundle bundle = super.bundle(context);
+		
+		bundle.putString(Trigger.TYPE, DateTrigger.TYPE_NAME);
+		bundle.putBoolean(DateTrigger.RANDOM, this._random);
+		bundle.putString(DateTrigger.REPEATS, this._repeats);
+		
+		if (this._start != null)
+			bundle.putString(DateTrigger.START, this._start);
+
+		if (this._start != null)
+			bundle.putString(DateTrigger.START, this._start);
+
+		if (this._end != null)
+			bundle.putString(DateTrigger.END, this._end);
+
+		if (this._originalStart != null)
+			bundle.putString(DateTrigger.ORIGINAL_START, this._originalStart);
+
+		if (this._originalEnd != null)
+			bundle.putString(DateTrigger.ORIGINAL_END, this._originalEnd);
+		
+		if (this._icalString != null)
+			bundle.putString(DateTrigger.CALENDAR_STRING, this._icalString);
+		
+		return bundle;
 	}
 }

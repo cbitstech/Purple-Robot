@@ -11,6 +11,7 @@ import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 
 import android.annotation.SuppressLint;
@@ -48,6 +49,8 @@ import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
+import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
+import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
 @SuppressLint("SimpleDateFormat")
 public class DiagnosticActivity extends ActionBarActivity 
@@ -211,6 +214,27 @@ public class DiagnosticActivity extends ActionBarActivity
 			errorList.setVisibility(View.GONE);
 			okText.setVisibility(View.VISIBLE);
 		}
+		
+		TextView triggerList = (TextView) this.findViewById(R.id.installed_triggers_value);
+		
+		StringBuffer triggerSb = new StringBuffer();
+
+		List<Trigger> triggers = TriggerManager.getInstance(this).allTriggers();
+		
+		if (triggers.size() > 0)
+		{
+			for (Trigger trigger : triggers)
+			{
+				if (triggerSb.length() > 0)
+					triggerSb.append("\n");
+	
+				triggerSb.append(trigger.getDiagnosticString(this));
+			}
+			
+			triggerList.setText(triggerSb.toString());
+		}
+		else
+			triggerList.setText(R.string.no_installed_triggers_label);
 		
 		TextView sensorsList = (TextView) this.findViewById(R.id.available_sensors_value);
 		StringBuffer sb = new StringBuffer();

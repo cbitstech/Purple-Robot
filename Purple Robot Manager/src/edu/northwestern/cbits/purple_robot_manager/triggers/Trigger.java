@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
@@ -20,6 +21,13 @@ import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
 public abstract class Trigger
 {
+	private static final String NAME = "name";
+	private static final String ACTION = "action";
+	private static final String IDENTIFIER = "identifier";
+	private static final String ENABLED = "enabled";
+	private static final String LAST_FIRED = "last_fired";
+	public static final String TYPE = "trigger_type";
+
 	private String _name = null;
 	private String _action = null;
 	private String _identifier = "unidentified-trigger";
@@ -256,5 +264,29 @@ public abstract class Trigger
 		TriggerManager.getInstance(context).persistTriggers(context);
 
 		return true;
+	}
+
+	public abstract String getDiagnosticString(Context context);
+
+	public Bundle bundle(Context context) 
+	{
+		Bundle bundle = new Bundle();
+		
+		bundle.putString(Trigger.NAME, this._name);
+		
+		if (this._action != null)
+			bundle.putString(Trigger.ACTION, this._action);
+		
+		bundle.putString(Trigger.IDENTIFIER, this._identifier);
+		
+		bundle.putBoolean(Trigger.ENABLED, this.enabled(context));
+
+		SharedPreferences prefs =  PreferenceManager.getDefaultSharedPreferences(context);
+
+		String key = "last_fired_" + this._identifier;
+
+		bundle.putLong(Trigger.LAST_FIRED, prefs.getLong(key, 0));
+
+		return bundle;
 	}
 }

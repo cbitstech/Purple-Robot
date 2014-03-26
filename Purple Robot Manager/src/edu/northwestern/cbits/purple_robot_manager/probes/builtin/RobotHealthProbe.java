@@ -41,6 +41,7 @@ import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
+import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
 public class RobotHealthProbe extends Probe
 {
@@ -394,7 +395,9 @@ public class RobotHealthProbe extends Probe
 										warnings.add(check);
 									
 									if (warnings.size() > 0)
-										bundle.putStringArrayList("CHECK_WARNNIGS", warnings);
+										bundle.putStringArrayList("CHECK_WARNINGS", warnings);
+									
+									bundle.putParcelableArrayList("TRIGGERS", TriggerManager.getInstance(context).allTriggersBundles(context));
 									
 									long later = System.currentTimeMillis();
 									

@@ -125,6 +125,23 @@
 	        android:paddingBottom="10dp"
 	        android:textIsSelectable="true"
 	        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+   	    <TextView
+	        android:paddingTop="10dp"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/installed_triggers_label"
+	        android:textIsSelectable="true"
+	        android:textAppearance="?android:attr/textAppearanceSmall" />
+	    <TextView
+	        android:id="@+id/installed_triggers_value"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:paddingBottom="10dp"
+	        android:textIsSelectable="true"
+	        android:textAppearance="?android:attr/textAppearanceMedium" />
+	    
+	    
    	    <TextView
 	        android:paddingTop="10dp"
 	        android:layout_width="wrap_content"
@@ -139,6 +156,5 @@
 	        android:paddingBottom="10dp"
 	        android:textIsSelectable="true"
 	        android:textAppearance="?android:attr/textAppearanceMedium" />
-	    
    	</LinearLayout>
 </ScrollView>

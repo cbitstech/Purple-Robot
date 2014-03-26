@@ -1,5 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager.triggers;
 
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,6 +10,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
@@ -16,6 +22,8 @@ public class ProbeTrigger extends Trigger
 	public static final String TYPE_NAME = "probe";
 	private static final String TRIGGER_TEST = "test";
 	private static final String TRIGGER_PROBE = "probe";
+	private static final String PROBE = null;
+	private static final String TEST = null;
 
 	private String _probe = null;
 	private String _test = null;
@@ -129,5 +137,49 @@ public class ProbeTrigger extends Trigger
 			return true;
 		
 		return false;
+	}
+	
+	public String getDiagnosticString(Context context) 
+	{
+		String name = this.name();
+		String identifier = this.identifier();
+		
+		SharedPreferences prefs =  PreferenceManager.getDefaultSharedPreferences(context);
+
+		String key = "last_fired_" + identifier;
+		
+		long lastFired = prefs.getLong(key, 0);
+		
+		String lastFiredString = context.getString(R.string.trigger_fired_never);
+		
+		if (lastFired != 0)
+		{
+			DateFormat formatter = android.text.format.DateFormat.getMediumDateFormat(context);
+			DateFormat timeFormatter = android.text.format.DateFormat.getTimeFormat(context);
+
+			lastFiredString = formatter.format(new Date(lastFired)) + " " + timeFormatter.format(new Date(lastFired));
+		}
+
+		String enabled = context.getString(R.string.trigger_disabled);
+		
+		if (this.enabled(context))
+			enabled = context.getString(R.string.trigger_enabled);
+
+		return context.getString(R.string.trigger_diagnostic_string, name, identifier, enabled, lastFiredString);
+	}
+	
+	public Bundle bundle(Context context) 
+	{
+		Bundle bundle = super.bundle(context);
+		
+		bundle.putString(Trigger.TYPE, ProbeTrigger.TYPE_NAME);
+		
+		if (this._probe != null)
+			bundle.putString(ProbeTrigger.PROBE, this._probe);
+
+		if (this._test != null)
+			bundle.putString(ProbeTrigger.TEST, this._probe);
+		
+		return bundle;
 	}
 }

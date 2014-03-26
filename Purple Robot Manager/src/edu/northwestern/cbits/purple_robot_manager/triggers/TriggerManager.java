@@ -10,6 +10,7 @@ import java.util.TimerTask;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
@@ -282,5 +283,20 @@ public class TriggerManager
 		}
 		
 		return triggers.size() > 0;
+	}
+
+	public ArrayList<Bundle> allTriggersBundles(Context context) 
+	{
+		ArrayList<Bundle> triggers = new ArrayList<Bundle>();
+
+		synchronized(this._triggers)
+		{
+			for (Trigger trigger : this._triggers)
+			{
+				triggers.add(trigger.bundle(context));
+			}
+		}
+
+		return triggers;
 	}
 }
