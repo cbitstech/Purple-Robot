@@ -52,6 +52,7 @@ public class DateTrigger extends Trigger
 	private static final String CALENDAR_STRING = "calendar_rule";
 	private static final String ORIGINAL_START = "original_start";
 	private static final String REPEATS = "repeats";
+	private static final String FIRE_ON_BOOT = "fire_on_boot";
 
 	private static SecureRandom random = null;
 
@@ -64,6 +65,7 @@ public class DateTrigger extends Trigger
 	private String _originalStart = null;
 	private String _originalEnd = null;
 	private String _repeats = null;
+	private boolean _fireOnBoot = false;
 	
 	private Calendar _calendar = null;
 	
@@ -361,6 +363,9 @@ public class DateTrigger extends Trigger
 			if (map.containsKey(DateTrigger.DATETIME_RANDOM))
 				this._random = ((Boolean) map.get(DateTrigger.DATETIME_RANDOM)).booleanValue();
 
+			if (map.containsKey(DateTrigger.FIRE_ON_BOOT))
+				this._fireOnBoot = ((Boolean) map.get(DateTrigger.FIRE_ON_BOOT)).booleanValue();
+
 			if ("null".equals(this._repeats))
 				this._repeats = null;
 			
@@ -388,6 +393,7 @@ public class DateTrigger extends Trigger
 		config.put(DateTrigger.DATETIME_END, this._end);
 		config.put(DateTrigger.DATETIME_REPEATS, this._repeats);
 		config.put(DateTrigger.DATETIME_RANDOM, this._random);
+		config.put(DateTrigger.FIRE_ON_BOOT, this._fireOnBoot);
 		config.put("type", DateTrigger.TYPE_NAME);
 		
 		return config;
@@ -631,11 +637,7 @@ public class DateTrigger extends Trigger
 		String name = this.name();
 		String identifier = this.identifier();
 		
-		SharedPreferences prefs =  PreferenceManager.getDefaultSharedPreferences(context);
-
-		String key = "last_fired_" + identifier;
-		
-		long lastFired = prefs.getLong(key, 0);
+		long lastFired = this.lastFireTime(context);
 		
 		String lastFiredString = context.getString(R.string.trigger_fired_never);
 		
@@ -682,5 +684,39 @@ public class DateTrigger extends Trigger
 			bundle.putString(DateTrigger.CALENDAR_STRING, this._icalString);
 		
 		return bundle;
+	}
+
+	public boolean missedFire(Context context, long end) 
+	{
+		if (this._fireOnBoot)
+		{
+			this.refreshCalendar(context);
+			
+			long start = this.lastFireTime(context);
+
+			try
+			{
+				DateTime from = new DateTime(new Date(start));
+				DateTime to = new DateTime(new Date(end));
+	
+				Period period = new Period(from, to);
+	
+				for (Object o : this._calendar.getComponents("VEVENT"))
+				{
+					Component c = (Component) o;
+	
+					PeriodList l = c.calculateRecurrenceSet(period);
+	
+					if (l != null && l.size() > 0)
+						return true;
+				}
+			}
+			catch (IllegalArgumentException e)
+			{
+				LogManager.getInstance(context).logException(e);
+			}
+		}
+		
+		return false;
 	}
 }
