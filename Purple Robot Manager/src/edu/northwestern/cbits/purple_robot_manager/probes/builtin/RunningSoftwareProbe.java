@@ -150,12 +150,33 @@ public class RunningSoftwareProbe extends Probe
 		if (prefs.contains(key))
 			return prefs.getString(key, context.getString(R.string.app_category_unknown));
 
-		if (prefs.getBoolean("config_restrict_data_wifi", true))
+		try
 		{
-			if (WiFiHelper.wifiAvailable(context) == false)
-				return context.getString(R.string.app_category_unknown);
+			if (prefs.getBoolean("config_restrict_data_wifi", true))
+			{
+				if (WiFiHelper.wifiAvailable(context) == false)
+					return context.getString(R.string.app_category_unknown);
+			}
 		}
-
+		catch (ClassCastException e)
+		{
+			if (prefs.getString("config_restrict_data_wifi", "true").equalsIgnoreCase("true"))
+			{
+				Editor ed = prefs.edit();
+				ed.putBoolean("config_restrict_data_wifi", true);
+				ed.commit();
+				
+				if (WiFiHelper.wifiAvailable(context) == false)
+					return context.getString(R.string.app_category_unknown);
+			}
+			else
+			{
+				Editor ed = prefs.edit();
+				ed.putBoolean("config_restrict_data_wifi", false);
+				ed.commit();
+			}
+		}
+			
 		String category = null;
 		
 		try 
