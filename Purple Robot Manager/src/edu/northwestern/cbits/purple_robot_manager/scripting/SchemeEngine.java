@@ -41,8 +41,15 @@ public class SchemeEngine extends BaseScriptEngine
 		{
 			if (script.charAt(script.length() - 1) == ';')
 				return false;
-			else if (script.toLowerCase().contains("function("))
-				return false;
+			else
+			{
+				JScheme scheme = new JScheme();
+				
+				Object pair = scheme.read(script);
+				
+				if ((pair instanceof Pair) == false)
+					return false;
+			}
 			
 			return true;
 		}
