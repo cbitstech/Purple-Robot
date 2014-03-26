@@ -10,6 +10,7 @@ import org.scribe.builder.api.DefaultApi20;
 import org.scribe.builder.api.Foursquare2Api;
 import org.scribe.builder.api.LinkedInApi;
 import org.scribe.builder.api.TwitterApi;
+import org.scribe.exceptions.OAuthConnectionException;
 import org.scribe.exceptions.OAuthException;
 import org.scribe.model.OAuthConfig;
 import org.scribe.model.Token;
@@ -265,23 +266,30 @@ public class OAuthActivity extends Activity
 				            	{
 									public void run() 
 									{
-					                	Token accessToken = service.getAccessToken(requestToken, v);
-					                	
-					                	Editor e = prefs.edit();
-					                	e.putString("oauth_" + requester + "_secret", accessToken.getSecret());
-					                	e.putString("oauth_" + requester + "_token", accessToken.getToken());
-					                	
-					                	e.commit();
-					                	
-					                	SanityManager.getInstance(me).refreshState();
-	
-					                	me.runOnUiThread(new Runnable()
-					                	{
-											public void run() 
-											{
-							                	me.authSuccess();
-											}
-					                	});
+										try
+										{
+						                	Token accessToken = service.getAccessToken(requestToken, v);
+						                	
+						                	Editor e = prefs.edit();
+						                	e.putString("oauth_" + requester + "_secret", accessToken.getSecret());
+						                	e.putString("oauth_" + requester + "_token", accessToken.getToken());
+						                	
+						                	e.commit();
+						                	
+						                	SanityManager.getInstance(me).refreshState();
+		
+						                	me.runOnUiThread(new Runnable()
+						                	{
+												public void run() 
+												{
+								                	me.authSuccess();
+												}
+						                	});
+										}
+										catch (OAuthConnectionException e)
+										{
+											LogManager.getInstance(me).logException(e);
+										}
 									}
 				            	};
 							}
