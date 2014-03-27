@@ -416,7 +416,7 @@ public class DateTrigger extends Trigger
 
 		Date date = new Date(timestamp);
 
-		if (periodList == null)
+		if (this._calendar != null && periodList == null)
 		{
 			try
 			{
