@@ -38,6 +38,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.InstagramProbe
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LinearAccelerationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LinkedInProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.MediaRouterDeviceProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.NetworkProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RandomNoiseProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RawLocationProbe;
@@ -259,6 +260,13 @@ public class ProbeManager
 				RawLocationProbe location = (RawLocationProbe) probe;
 
 				if (location.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof MediaRouterDeviceProbe)
+			{
+				MediaRouterDeviceProbe devices = (MediaRouterDeviceProbe) probe;
+
+				if (devices.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 			else if (probe instanceof WifiAccessPointsProbe)

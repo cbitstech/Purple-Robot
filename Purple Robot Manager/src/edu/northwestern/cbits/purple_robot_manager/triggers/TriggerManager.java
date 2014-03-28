@@ -2,6 +2,7 @@ package edu.northwestern.cbits.purple_robot_manager.triggers;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -15,6 +16,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import edu.emory.mathcs.backport.java.util.Collections;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.SchemeConfigFile;
@@ -298,5 +300,39 @@ public class TriggerManager
 		}
 
 		return triggers;
+	}
+
+	public void fireMissedTriggers(Context context, long now) 
+	{
+		HashMap<Long, String> fireDates = new HashMap<Long, String>();
+
+		for (Trigger trigger : this._triggers)
+		{
+			if (trigger instanceof DateTrigger)
+			{
+				DateTrigger dateTrig = (DateTrigger) trigger;
+				
+				if (dateTrig.missedFire(context, now))
+				{
+					long lastFired = dateTrig.lastFireTime(context);
+					
+					fireDates.put(Long.valueOf(lastFired), dateTrig.identifier());
+				}
+			}
+		}
+		
+		ArrayList<Long> fireTimes = new ArrayList<Long>();
+		
+		fireTimes.addAll(fireDates.keySet());
+		
+		Collections.sort(fireTimes);
+		
+		for (Long time : fireTimes)
+		{
+			for (Trigger t : this.triggersForId(fireDates.get(time)))
+			{
+				t.execute(context, true);
+			}
+		}
 	}
 }
