@@ -106,7 +106,6 @@ public class WifiAccessPointsProbe extends Probe
 
 										accessPoints.add(pointBundle);
 									}
-
 								}
 								else
 									bundle.putInt(WifiAccessPointsProbe.ACCESS_POINT_COUNT, 0);

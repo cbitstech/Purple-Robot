@@ -599,6 +599,10 @@
     <string name="title_wifi_probe">WiFi Probe</string>
     <string name="summary_wifi_probe_desc">Records available wireless (WiFi) access points and relevant connection information.</string>
 
+    <!-- Wifi Probe -->
+    <string name="title_mediarouter_probe">Media Router Probe</string>
+    <string name="summary_mediarouter_probe_desc">Discovers available media routers (such as Chromecast devices).</string>
+    
     <!-- Telephony Probe -->
     <string name="title_telephony_probe">Telephony Probe</string>
     <string name="summary_telephony_probe_desc">Records telephony hardware, software, and account information.</string>

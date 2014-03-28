@@ -1,6 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
+import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,16 +15,20 @@ public class BootUpReceiver extends BroadcastReceiver
 
     public void onReceive(Context context, Intent intent)
     {
+    	long now = System.currentTimeMillis();
+    	
     	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
     	
     	Editor e = prefs.edit();
     	
-    	e.putLong(BootUpReceiver.BOOT_KEY, System.currentTimeMillis());
+    	e.putLong(BootUpReceiver.BOOT_KEY, now);
     	
     	e.commit();
 
     	ManagerService.setupPeriodicCheck(context);
 
     	LegacyJSONConfigFile.getSharedFile(context.getApplicationContext());
+    	
+    	TriggerManager.getInstance(context).fireMissedTriggers(context, now);
     }
 }
