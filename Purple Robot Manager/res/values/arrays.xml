@@ -73,6 +73,7 @@
 
         <item>builtin.RawLocationProbe</item>
         <item>builtin.MediaRouterDeviceProbe</item>
+        <item>builtin.ShionProbe</item>
         
         <!-- <item>builtin.BluetoothReceiverProbe</item> -->
         <!-- <item>builtin.ZeroconfProbe</item> -->

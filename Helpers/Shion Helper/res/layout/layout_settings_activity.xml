@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<EditTextPreference
+		android:key="config_username"
+		android:title="@string/config_username"
+		android:dialogTitle="@string/title_config_username" />
+	<EditTextPreference
+		android:key="config_password"
+		android:title="@string/config_password"
+		android:dialogTitle="@string/title_config_password"
+		android:inputType="textPassword" />
+	<EditTextPreference
+		android:key="config_server"
+		android:title="@string/config_server"
+		android:dialogTitle="@string/title_config_server"
+		android:defaultValue="@string/config_server_default" />
+	<EditTextPreference
+		android:key="config_site"
+		android:title="@string/config_site"
+		android:dialogTitle="@string/title_config_site" />
+</PreferenceScreen>
