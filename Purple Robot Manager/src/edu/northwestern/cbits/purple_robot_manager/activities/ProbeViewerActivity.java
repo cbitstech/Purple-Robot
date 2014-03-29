@@ -262,21 +262,10 @@ public class ProbeViewerActivity extends PreferenceActivity
 			{
 				Bundle[] array = (Bundle[]) o;
 
-				if (array.length > 1)
-				{
-					PreferenceScreen subscreen = this.screenForBundleArray(key, array);
-					subscreen.setSummary(String.format(this.getString(R.string.display_probe_values), array.length));
+				PreferenceScreen subscreen = this.screenForBundleArray(key, array);
+				subscreen.setSummary(String.format(this.getString(R.string.display_probe_values), array.length));
 
-					screen.addPreference(subscreen);
-				}
-				else
-				{
-					Preference pref = new Preference(this);
-					pref.setTitle("" + array[0]);
-					pref.setSummary(key);
-
-					screen.addPreference(pref);
-				}
+				screen.addPreference(subscreen);
 			}
 			else if (o instanceof int[])
 			{
@@ -348,21 +337,10 @@ public class ProbeViewerActivity extends PreferenceActivity
 
 					if (oo instanceof Bundle)
 					{
-						if (array.size() > 1)
-						{
-							PreferenceScreen subscreen = this.screenForBundleArray(key, (Bundle[]) array.toArray(new Bundle[0]));
-							subscreen.setSummary(String.format(this.getString(R.string.display_probe_values), array.size()));
+						PreferenceScreen subscreen = this.screenForBundleArray(key, (Bundle[]) array.toArray(new Bundle[0]));
+						subscreen.setSummary(String.format(this.getString(R.string.display_probe_values), array.size()));
 
-							screen.addPreference(subscreen);
-						}
-						else
-						{
-							Preference pref = new Preference(this);
-							pref.setTitle("" + oo);
-							pref.setSummary(key);
-
-							screen.addPreference(pref);
-						}
+						screen.addPreference(subscreen);
 					}
 				}
 			}
