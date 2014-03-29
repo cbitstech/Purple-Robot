@@ -158,7 +158,7 @@ public class MediaRouterDeviceProbe extends Probe
 												break;
 										}
 										
-										routeBundle.putBundle("EXTRAS", route.getExtras());
+										// routeBundle.putBundle("EXTRAS", route.getExtras());
 										
 										routes.add(routeBundle);
 									}
