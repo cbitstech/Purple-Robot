@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Shion Helper</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="config_username">Username</string>
+    <string name="title_config_username">Shion Username</string>
+
+    <string name="config_password">Password</string>
+    <string name="title_config_password">Shion Password</string>
+    
+    <string name="config_server">Server</string>
+    <string name="title_config_server">Shion Server</string>
+    <string name="config_server_default">subspace.shiononline.com</string>
+    
+    <string name="config_site">Site</string>
+    <string name="title_config_site">Shion Site</string>
+</resources>
