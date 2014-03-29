@@ -21,6 +21,7 @@ import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
 import android.location.Location;
 import android.net.wifi.ScanResult;
+import android.os.BadParcelableException;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -212,11 +213,19 @@ public abstract class OutputPlugin
 
 		if (bundle == null)
 			return values;
-		for (String key : bundle.keySet())
-		{
-			values.put(key, bundle.get(key));
-		}
 
+		try
+		{
+			for (String key : bundle.keySet())
+			{
+				values.put(key, bundle.get(key));
+			}
+		}
+		catch (BadParcelableException e)
+		{
+			e.printStackTrace();
+		}
+		
 		return values;
 	}
 
