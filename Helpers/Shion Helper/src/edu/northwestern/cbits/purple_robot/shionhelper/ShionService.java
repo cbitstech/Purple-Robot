@@ -3,6 +3,8 @@ package edu.northwestern.cbits.purple_robot.shionhelper;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import net.hockeyapp.android.CrashManager;
+
 import org.jivesoftware.smack.SmackAndroid;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
@@ -42,6 +44,8 @@ public class ShionService extends IntentService implements IQProvider
 	public static final String FETCH_INTENT = "fetch_shion_devices";
 	private static final String DEVICES = "devices";
 	
+	private static final String APP_ID = "961620153026f515359a75150eca0212";
+	
 	private XMPPConnection _connection = null;
 
 	public ShionService() 
@@ -52,6 +56,14 @@ public class ShionService extends IntentService implements IQProvider
 	public ShionService(String name) 
 	{
 		super(name);
+		
+		CrashManager.register(this, APP_ID, new net.hockeyapp.android.CrashManagerListener() 
+		{
+			public boolean shouldAutoUploadCrashes() 
+			{
+			    return true;
+			}
+		});
 	}
 
 	protected void onHandleIntent(Intent intent) 
