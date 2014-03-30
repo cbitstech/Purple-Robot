@@ -19,6 +19,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
@@ -62,6 +63,45 @@ public class FitbitApiFeature extends Feature
 	protected static final String GOAL_STEPS_RATIO = "GOAL_STEPS_RATIO";
 	protected static final String GOAL_CALORIES_RATIO = "GOAL_CALORIES_RATIO";
 	protected static final String GOAL_SCORE_RATIO = "GOAL_SCORE_RATIO";
+
+	private static final boolean SLEEP_DEFAULT = false;
+	private static final boolean FOOD_DEFAULT = false;
+	private static final boolean BODY_DEFAULT = false;
+	
+	protected static final String MEASUREMENT_BICEP = "BICEP";
+	protected static final String MEASUREMENT_CALF = "CALF";
+	protected static final String MEASUREMENT_FAT = "FAT";
+	protected static final String MEASUREMENT_HIPS = "HIPS";
+	protected static final String MEASUREMENT_THIGH = "THIGH";
+	protected static final String MEASUREMENT_WEIGHT = "WEIGHT";
+	protected static final String MEASUREMENT_BMI = "BMI";
+	protected static final String MEASUREMENT_FOREARM = "FOREARM";
+	protected static final String MEASUREMENT_WAIST = "WAIST";
+	protected static final String MEASUREMENT_CHEST = "CHEST";
+	protected static final String MEASUREMENT_NECK = "NECK";
+	
+	protected static final String MEASUREMENT_WATER = "WATER";
+	protected static final String MEASUREMENT_SODIUM = "SODIUM";
+	protected static final String MEASUREMENT_CARBS = "CARBOHYDRATES";
+	protected static final String MEASUREMENT_FAT_FOOD = "FATS";
+	protected static final String MEASUREMENT_CALORIES = "CALORIES";
+	protected static final String MEASUREMENT_PROTEIN = "PROTIEN";
+	protected static final String MEASUREMENT_FIBER = "FIBER";
+	protected static final String MEASUREMENT_BODY = "BODY_MEASUREMENTS";
+	protected static final String MEASUREMENT_FOOD = "FOOD_MEASUREMENTS";
+	
+	protected static final String MEASUREMENT_RESTLESS_COUNT = "RESTLESS_COUNT";
+	protected static final String MEASUREMENT_AWAKE_COUNT = "AWAKE_COUNT";
+	protected static final String MEASUREMENT_AWAKENINGS_COUNT = "AWAKENINGS_COUNT";
+	protected static final String MEASUREMENT_MINUTES_ASLEEP = "MINUTES_ASLEEP";
+	protected static final String MEASUREMENT_MINUTES_IN_BED_AFTER = "MINUTES_IN_BED_BEFORE";
+	protected static final String MEASUREMENT_DURATION = "DURATION";
+	protected static final String MEASUREMENT_SLEEP = "SLEEP_MEASUREMENTS";
+	protected static final String MEASUREMENT_RESTLESS_DURATION = "DURATION";
+	protected static final String MEASUREMENT_MINUTES_IN_BED_BEFORE = "MINUTES_IN_BED_AFTER";
+	protected static final String MEASUREMENT_TIME_IN_BED = "TIME_IN_BED";
+	protected static final String MEASUREMENT_AWAKE_DURATION = "DURATION";
+	protected static final String MEASUREMENT_MINUTES_AWAKE = "MINUTES_AWAKE";
 
 	private long _lastUpdate = 0;
 	private long _lastFetch = 0;
@@ -114,7 +154,7 @@ public class FitbitApiFeature extends Feature
 	
 	public boolean isEnabled(final Context context)
 	{
-		SharedPreferences prefs = Probe.getPreferences(context);
+		final SharedPreferences prefs = Probe.getPreferences(context);
 		
 		if (super.isEnabled(context))
 		{
@@ -155,22 +195,6 @@ public class FitbitApiFeature extends Feature
 						if (now - this._lastFetch > 1000 * 60 * 5)
 						{
 							this._lastFetch = now;
-							
-							Token accessToken = new Token(this._token, this._secret);
-	
-		                	ServiceBuilder builder = new ServiceBuilder();
-		                	builder = builder.provider(FitbitApi.class);
-		                	builder = builder.apiKey(FitbitApiFeature.CONSUMER_KEY);
-		                	builder = builder.apiSecret(FitbitApiFeature.CONSUMER_SECRET);
-		                	
-		                	final OAuthService service = builder.build();
-		                	
-		                	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		                	
-		                	String dateString = sdf.format(new Date());
-	
-							final OAuthRequest request = new OAuthRequest(Verb.GET, "https://api.fitbit.com/1/user/-/activities/date/" + dateString + ".json");
-							service.signRequest(accessToken, request);
 	
 							Runnable r = new Runnable()
 							{
@@ -178,6 +202,22 @@ public class FitbitApiFeature extends Feature
 								{
 									try 
 									{
+										Token accessToken = new Token(me._token, me._secret);
+										
+					                	ServiceBuilder builder = new ServiceBuilder();
+					                	builder = builder.provider(FitbitApi.class);
+					                	builder = builder.apiKey(FitbitApiFeature.CONSUMER_KEY);
+					                	builder = builder.apiSecret(FitbitApiFeature.CONSUMER_SECRET);
+					                	
+					                	final OAuthService service = builder.build();
+					                	
+					                	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+					                	
+					                	String dateString = sdf.format(new Date());
+				
+										OAuthRequest request = new OAuthRequest(Verb.GET, "https://api.fitbit.com/1/user/-/activities/date/" + dateString + ".json");
+										service.signRequest(accessToken, request);
+
 										Response response = request.send();
 
 										JSONObject body = new JSONObject(response.getBody());
@@ -245,6 +285,120 @@ public class FitbitApiFeature extends Feature
 										bundle.putDouble(FitbitApiFeature.GOAL_STEPS_RATIO, (double) steps / (double) goalSteps);
 										bundle.putDouble(FitbitApiFeature.GOAL_CALORIES_RATIO, (double) caloriesOut / (double) goalCalories);
 										
+										if (prefs.getBoolean("config_feature_fitbit_api_sleep_enabled", FitbitApiFeature.SLEEP_DEFAULT))
+										{
+											request = new OAuthRequest(Verb.GET, "https://api.fitbit.com/1/user/-/sleep/date/" + dateString + ".json");
+											service.signRequest(accessToken, request);
+
+											response = request.send();
+
+											body = new JSONObject(response.getBody());
+											
+											JSONArray sleeps = body.getJSONArray("sleep");
+											
+											int restlessCount = 0;
+											int restlessDuration = 0;
+
+											int awakeCount = 0;
+											int awakeDuration = 0;
+											int awakeningsCount = 0;
+
+											int minutesInBedBefore = 0;
+											int minutesAsleep = 0;
+											int minutesAwake = 0;
+											int minutesInBedAfter = 0;
+
+											int timeInBed = 0;
+											int duration = 0;
+											
+											
+											for (int j = 0; j < sleeps.length(); j++)
+											{
+												JSONObject sleep = sleeps.getJSONObject(j);
+												
+												restlessCount += sleep.getInt("restlessCount");
+												restlessDuration += sleep.getInt("restlessDuration");
+												
+												awakeCount += sleep.getInt("awakeCount");
+												awakeDuration += sleep.getInt("awakeDuration");
+												awakeningsCount += sleep.getInt("awakeningsCount");
+												
+												minutesInBedBefore += sleep.getInt("minutesToFallAsleep");
+												minutesAsleep += sleep.getInt("minutesAsleep");
+												minutesAwake += sleep.getInt("minutesAwake");
+												minutesInBedAfter += sleep.getInt("minutesAfterWakeup");
+
+												timeInBed += sleep.getInt("timeInBed");
+												duration += sleep.getInt("duration");
+											}
+
+											Bundle sleepBundle = new Bundle();
+
+											sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_RESTLESS_COUNT, restlessCount);
+											sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_RESTLESS_DURATION, restlessDuration);
+											sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_AWAKE_COUNT, awakeCount);
+											sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_AWAKE_DURATION, awakeDuration);
+											sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_AWAKENINGS_COUNT, awakeningsCount);
+											sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_MINUTES_IN_BED_BEFORE, minutesInBedBefore);
+											sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_MINUTES_ASLEEP, minutesAsleep);
+											sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_MINUTES_AWAKE, minutesAwake);
+											sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_MINUTES_IN_BED_AFTER, minutesInBedAfter);
+											sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_TIME_IN_BED, timeInBed);
+											sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_DURATION, duration);
+
+											bundle.putBundle(FitbitApiFeature.MEASUREMENT_SLEEP, sleepBundle);
+										}
+										
+										if (prefs.getBoolean("config_feature_fitbit_api_food_enabled", FitbitApiFeature.FOOD_DEFAULT))
+										{
+											request = new OAuthRequest(Verb.GET, "https://api.fitbit.com/1/user/-/foods/log/date/" + dateString + ".json");
+											service.signRequest(accessToken, request);
+
+											response = request.send();
+
+											body = new JSONObject(response.getBody());
+											body = body.getJSONObject("summary");
+											
+											Bundle foodBundle = new Bundle();
+
+											foodBundle.putDouble(FitbitApiFeature.MEASUREMENT_WATER, (double) body.getInt("water"));
+											foodBundle.putDouble(FitbitApiFeature.MEASUREMENT_CALORIES, (double) body.getInt("calories"));
+											foodBundle.putDouble(FitbitApiFeature.MEASUREMENT_SODIUM, (double) body.getInt("sodium"));
+											foodBundle.putDouble(FitbitApiFeature.MEASUREMENT_FIBER, (double) body.getInt("fiber"));
+											foodBundle.putDouble(FitbitApiFeature.MEASUREMENT_CARBS, (double) body.getInt("carbs"));
+											foodBundle.putDouble(FitbitApiFeature.MEASUREMENT_PROTEIN, (double) body.getInt("protein"));
+											foodBundle.putDouble(FitbitApiFeature.MEASUREMENT_FAT_FOOD, (double) body.getInt("fat"));
+											
+											bundle.putBundle(FitbitApiFeature.MEASUREMENT_FOOD, foodBundle);
+										}
+										
+										if (prefs.getBoolean("config_feature_fitbit_api_body_enabled", FitbitApiFeature.BODY_DEFAULT))
+										{
+											request = new OAuthRequest(Verb.GET, "https://api.fitbit.com/1/user/-/body/date/" + dateString + ".json");
+											service.signRequest(accessToken, request);
+
+											response = request.send();
+
+											body = new JSONObject(response.getBody());
+											body = body.getJSONObject("body");
+											
+											Bundle bodyBundle = new Bundle();
+											
+											bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_BICEP, (double) body.getInt("bicep"));
+											bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_BMI, (double) body.getInt("bmi"));
+											bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_CALF, (double) body.getInt("calf"));
+											bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_CHEST, (double) body.getInt("chest"));
+											bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_FAT, (double) body.getInt("fat"));
+											bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_FOREARM, (double) body.getInt("forearm"));
+											bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_HIPS, (double) body.getInt("hips"));
+											bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_NECK, (double) body.getInt("neck"));
+											bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_THIGH, (double) body.getInt("thigh"));
+											bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_WAIST, (double) body.getInt("waist"));
+											bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_WEIGHT, (double) body.getInt("weight"));
+											
+											bundle.putBundle(FitbitApiFeature.MEASUREMENT_BODY, bodyBundle);
+										}
+										
 										me.transmitData(context, bundle);
 									} 
 									catch (JSONException e) 
@@ -296,6 +450,24 @@ public class FitbitApiFeature extends Feature
 	public PreferenceScreen preferenceScreen(final PreferenceActivity activity)
 	{
 		final PreferenceScreen screen = super.preferenceScreen(activity);
+		
+		CheckBoxPreference sleepPref = new CheckBoxPreference(activity);
+		sleepPref.setKey("config_feature_fitbit_api_sleep_enabled");
+		sleepPref.setDefaultValue(FitbitApiFeature.SLEEP_DEFAULT);
+		sleepPref.setTitle(R.string.config_fitbit_sleep_title);
+		screen.addPreference(sleepPref);
+
+		CheckBoxPreference foodPref = new CheckBoxPreference(activity);
+		foodPref.setKey("config_feature_fitbit_api_food_enabled");
+		foodPref.setDefaultValue(FitbitApiFeature.FOOD_DEFAULT);
+		foodPref.setTitle(R.string.config_fitbit_food_title);
+		screen.addPreference(foodPref);
+
+		CheckBoxPreference bodyPref = new CheckBoxPreference(activity);
+		bodyPref.setKey("config_feature_fitbit_api_body_enabled");
+		bodyPref.setDefaultValue(FitbitApiFeature.BODY_DEFAULT);
+		bodyPref.setTitle(R.string.config_fitbit_body_title);
+		screen.addPreference(bodyPref);
 
 		final SharedPreferences prefs = Probe.getPreferences(activity);
 

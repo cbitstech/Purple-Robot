@@ -1092,7 +1092,12 @@
 	<string name="trigger_disabled">Disabled</string>					
 		
     <string name="trigger_diagnostic_string">%1$s/%2$s\n(%3$s, %4$s)</string>	
-	
+    
+    
+    <string name="config_fitbit_sleep_title">Include Sleep Information</string>
+    <string name="config_fitbit_food_title">Include Food Information</string>
+    <string name="config_fitbit_body_title">Include Body Information</string>
+    	
 <!--     
     <string name="config_probe_facebook_hash_title">Obfuscate Details</string>
     <string name="config_probe_facebook_hash_summary">Hashes recipient and profile data to obfuscate personally-identitifiable information.</string>
