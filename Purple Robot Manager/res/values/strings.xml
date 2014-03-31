@@ -1093,11 +1093,22 @@
 		
     <string name="trigger_diagnostic_string">%1$s/%2$s\n(%3$s, %4$s)</string>	
     
-    
     <string name="config_fitbit_sleep_title">Include Sleep Information</string>
     <string name="config_fitbit_food_title">Include Food Information</string>
     <string name="config_fitbit_body_title">Include Body Information</string>
-    	
+
+    <string name="title_saint_probe">SAINT Probe</string>
+    <string name="summary_saint_probe_desc">Fetches data collected &amp; predicted by the SAINT sensing &amp; activity recognition library.</string>    	
+
+    <string name="label_speech_none">No Speech Detected</string>
+    <string name="label_speech_human">Speech Detected</string>
+    <string name="label_activity_unknown">Unknown Activity</string>
+    <string name="label_activity_stationary">Stationary Activity</string>
+    <string name="label_activity_walking">Walking Activity</string>
+    <string name="label_activity_running">Running Activity</string>
+
+    <string name="summary_saint_probe">%1$s: %2$s</string>	
+    
 <!--     
     <string name="config_probe_facebook_hash_title">Obfuscate Details</string>
     <string name="config_probe_facebook_hash_summary">Hashes recipient and profile data to obfuscate personally-identitifiable information.</string>
