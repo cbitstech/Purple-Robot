@@ -45,6 +45,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RawLocationPro
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RobotHealthProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RotationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RunningSoftwareProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.SaintProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ScreenProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ShionProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.SoftwareInformationProbe;
@@ -520,6 +521,13 @@ public class ProbeManager
 				ShionProbe shion = (ShionProbe) probe;
 
 				if (shion.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof SaintProbe)
+			{
+				SaintProbe saint = (SaintProbe) probe;
+
+				if (saint.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 
