@@ -12,8 +12,9 @@ public class WidgetReceiver extends BroadcastReceiver
 {
     public void onReceive(Context context, Intent intent)
     {
-    	String action = intent.getStringExtra("widget_action");
     	
+    	String action = intent.getStringExtra("widget_action");
+
     	String script = null;
 
     	if ("tap".equals(action))
@@ -32,7 +33,7 @@ public class WidgetReceiver extends BroadcastReceiver
 		HashMap <String, Object> payload = new HashMap<String, Object>();
 		payload.put("widget_action", action);
 		LogManager.getInstance(context).log("widget_tapped", payload);
-    	
+		
 		if (script != null)
 		{
 			try

@@ -1,9 +1,13 @@
 package edu.northwestern.cbits.purple_robot_manager.activities;
 
+import java.util.HashMap;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 public class DialogBackgroundActivity extends Activity 
 {
@@ -25,6 +29,7 @@ public class DialogBackgroundActivity extends Activity
 		else
 		{
 			Intent intent = new Intent(this, DialogActivity.class);
+			intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 			
 			intent.putExtras(this.getIntent().getExtras());
 		
@@ -32,5 +37,22 @@ public class DialogBackgroundActivity extends Activity
 			
 			this._started = true;
 		}
+	}
+	
+	protected void onUserLeaveHint()
+	{
+        Intent intent = this.getIntent();
+
+        final String title = intent.getStringExtra(DialogActivity.DIALOG_TITLE);
+        final String message = intent.getStringExtra(DialogActivity.DIALOG_MESSAGE);
+
+        HashMap <String, Object> payload = new HashMap<String, Object>();
+		payload.put("title", title);
+		payload.put("message", message);
+		payload.put("home_button", Boolean.TRUE);
+		
+		LogManager.getInstance(this).log("dialog_dismissed", payload);
+
+		this.finish();
 	}
 }

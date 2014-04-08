@@ -855,12 +855,12 @@ public abstract class BaseScriptEngine
 
 			if (intent != null)
 			{
-				PendingIntent pendingIntent = PendingIntent.getActivity(this._context, 0, intent, 0);
+				PendingIntent pendingIntent = PendingIntent.getActivity(this._context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 				
 				if (script != null)
 				{
 					Intent serviceIntent = this.constructLaunchIntent(applicationName, launchParams, script);
-					pendingIntent = PendingIntent.getService(this._context, 0, serviceIntent, 0);
+					pendingIntent = PendingIntent.getService(this._context, 0, serviceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 				}
 
 				NotificationCompat.Builder builder = new NotificationCompat.Builder(this._context);
@@ -900,21 +900,30 @@ public abstract class BaseScriptEngine
 
 	public boolean showScriptNotification(String title, String message, boolean persistent, final String script)
 	{
+		return this.showScriptNotification(title, message, persistent, false, script);
+	}
+	
+	public boolean showScriptNotification(String title, String message, boolean persistent, boolean sticky, final String script)
+	{
 		try
 		{
 			HashMap <String, Object> payload = new HashMap<String, Object>();
 			LogManager.getInstance(this._context).log("script_run_notification", payload);
 
 			Intent serviceIntent = this.constructScriptIntent(script);
-			PendingIntent pendingIntent = PendingIntent.getService(this._context, 0, serviceIntent, 0);
+			
+			PendingIntent pendingIntent = PendingIntent.getService(this._context, 0, serviceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 			NotificationCompat.Builder builder = new NotificationCompat.Builder(this._context);
-			builder.setContentIntent(pendingIntent);
-			builder.setAutoCancel(true);
-			builder.setContentTitle(title);
-			builder.setContentText(message);
-			builder.setTicker(message);
-			builder.setSmallIcon(R.drawable.ic_note_icon);
+			builder = builder.setContentIntent(pendingIntent);
+			
+			if (sticky == false)
+				builder = builder.setAutoCancel(true);
+
+			builder = builder.setContentTitle(title);
+			builder = builder.setContentText(message);
+			builder = builder.setTicker(message);
+			builder = builder.setSmallIcon(R.drawable.ic_note_icon);
 
 			try
 			{
@@ -922,6 +931,9 @@ public abstract class BaseScriptEngine
 				
 				if (persistent)
 					note.flags = note.flags | Notification.FLAG_NO_CLEAR;
+				
+				if (sticky)
+					note.flags = note.flags | Notification.FLAG_ONGOING_EVENT;
 				
 				NotificationManager noteManager = (NotificationManager) this._context.getSystemService(android.content.Context.NOTIFICATION_SERVICE);
 				noteManager.notify(BaseScriptEngine.NOTIFICATION_ID, note);
@@ -954,6 +966,7 @@ public abstract class BaseScriptEngine
 		final Context context = this._context;
 		
 		Intent intent = new Intent(context, DialogBackgroundActivity.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
 		intent.putExtra(DialogActivity.DIALOG_TITLE, title);

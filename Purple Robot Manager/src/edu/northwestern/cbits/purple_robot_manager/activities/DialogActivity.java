@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager.LayoutParams;
@@ -176,4 +177,43 @@ public class DialogActivity extends Activity
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
         	this.setFinishOnTouchOutside(false);
     }
+	
+	public boolean onKeyDown(int keyCode, KeyEvent event) 
+	{
+		if ((keyCode == KeyEvent.KEYCODE_BACK)) 
+		{
+	        Intent intent = this.getIntent();
+
+	        final String title = intent.getStringExtra(DialogActivity.DIALOG_TITLE);
+	        final String message = intent.getStringExtra(DialogActivity.DIALOG_MESSAGE);
+
+	        HashMap <String, Object> payload = new HashMap<String, Object>();
+			payload.put("title", title);
+			payload.put("message", message);
+			payload.put("back_button", Boolean.TRUE);
+			
+			LogManager.getInstance(this).log("dialog_dismissed", payload);
+
+			this.finish();
+		}
+		
+		return super.onKeyDown(keyCode, event);
+	}
+	
+	protected void onUserLeaveHint()
+	{
+        Intent intent = this.getIntent();
+
+        final String title = intent.getStringExtra(DialogActivity.DIALOG_TITLE);
+        final String message = intent.getStringExtra(DialogActivity.DIALOG_MESSAGE);
+
+        HashMap <String, Object> payload = new HashMap<String, Object>();
+		payload.put("title", title);
+		payload.put("message", message);
+		payload.put("home_button", Boolean.TRUE);
+		
+		LogManager.getInstance(this).log("dialog_dismissed", payload);
+
+		this.finish();
+	}
 }
