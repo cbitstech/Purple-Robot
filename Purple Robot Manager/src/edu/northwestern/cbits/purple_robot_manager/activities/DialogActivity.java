@@ -1,26 +1,15 @@
 package edu.northwestern.cbits.purple_robot_manager.activities;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.view.KeyEvent;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.WindowManager.LayoutParams;
-import android.widget.Button;
-import android.widget.TextView;
 import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
-public class DialogActivity extends Activity
+public class DialogActivity extends Activity 
 {
 	public static String DIALOG_MESSAGE = "dialog_message";
 	public static String DIALOG_TITLE = "dialog_title";
@@ -30,190 +19,103 @@ public class DialogActivity extends Activity
 	public static String DIALOG_CONFIRM_SCRIPT = "dialog_confirm_script";
 	public static String DIALOG_CANCEL_SCRIPT = "dialog_cancel_script";
 	
-	private static ArrayList<DialogActivity> _dialogStack = new ArrayList<DialogActivity>();
-
 	protected void onCreate(Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
+		super.onCreate(savedInstanceState);
 
-        this.setContentView(R.layout.layout_dialog_activity);
-
-        this.getWindow().setLayout(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-        
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        
-        int stackSize = Integer.parseInt(prefs.getString("config_dialog_count", "4"));
-        
-        DialogActivity._dialogStack.add(this);
-
-        while (stackSize > 0 && DialogActivity._dialogStack.size() > stackSize)
-        {
-        	DialogActivity activity = DialogActivity._dialogStack.remove(0);
-        	
-        	activity.finish();
-        }
+        this.setContentView(R.layout.layout_dialog_background_activity);
     }
 	
-	protected void onDestroy ()
-	{
-		super.onDestroy();
-		
-		DialogActivity._dialogStack.remove(this);
-	}
-	
-	protected void onPause()
-	{
-		super.onPause();
-
-        Intent intent = this.getIntent();
-
-        final String title = intent.getStringExtra(DialogActivity.DIALOG_TITLE);
-        final String message = intent.getStringExtra(DialogActivity.DIALOG_MESSAGE);
-
-        HashMap <String, Object> payload = new HashMap<String, Object>();
-		payload.put("title", title);
-		payload.put("message", message);
-		
-		LogManager.getInstance(this).log("dialog_dismissed", payload);
-	}
-
-	@SuppressLint("NewApi")
 	protected void onResume()
 	{
 		super.onResume();
-
-		final DialogActivity me = this;
-
-        final TextView messageText = (TextView) this.findViewById(R.id.text_dialog_message);
-
-        Intent intent = this.getIntent();
-
-        final String title = intent.getStringExtra(DialogActivity.DIALOG_TITLE);
-        final String message = intent.getStringExtra(DialogActivity.DIALOG_MESSAGE);
-
-        final String confirmScript = intent.getStringExtra(DialogActivity.DIALOG_CONFIRM_SCRIPT);
-
-        this.setTitle(title);
-
-        messageText.setText(message);
-
-        Button confirmButton = (Button) this.findViewById(R.id.button_dialog_confirm);
-        confirmButton.setText(intent.getStringExtra(DialogActivity.DIALOG_CONFIRM_BUTTON));
-
-		HashMap <String, Object> payload = new HashMap<String, Object>();
-		payload.put("title", title);
-		payload.put("message", message);
 		
-		LogManager.getInstance(me).log("dialog_shown", payload);
+		Intent intent = this.getIntent();
+		
+		String title = intent.getStringExtra(DialogActivity.DIALOG_TITLE);
+		String message = intent.getStringExtra(DialogActivity.DIALOG_MESSAGE);
 
-        confirmButton.setOnClickListener(new OnClickListener()
-        {
-			public void onClick(View v)
+		String confirmTitle = intent.getStringExtra(DialogActivity.DIALOG_CONFIRM_BUTTON);
+		final String confirmScript = intent.getStringExtra(DialogActivity.DIALOG_CONFIRM_SCRIPT);
+		
+		final Activity me = this;
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder = builder.setTitle(title);
+		builder = builder.setMessage(message);
+		builder = builder.setCancelable(false);
+		builder = builder.setPositiveButton(confirmTitle, new DialogInterface.OnClickListener() 
+		{
+			public void onClick(DialogInterface dialog, int which) 
 			{
-				HashMap <String, Object> payload = new HashMap<String, Object>();
-				payload.put("title", title);
-				payload.put("message", message);
-				
-				LogManager.getInstance(me).log("dialog_confirm", payload);
-				
-				if (confirmScript != null && confirmScript.length() >= 0)
+				if (confirmScript != null && confirmScript.trim().length() > 0)
 				{
-					try
+					Runnable r = new Runnable()
 					{
-						BaseScriptEngine.runScript(me, confirmScript);
-					}
-					catch (Exception e)
+						public void run() 
+						{
+							try 
+							{
+								Thread.sleep(500);
+							} 
+							catch (InterruptedException e) 
+							{
+								e.printStackTrace();
+							}
+
+							BaseScriptEngine.runScript(me, confirmScript);
+						}
+					};
+					
+					Thread t = new Thread(r);
+					t.start();
+				}
+			}
+		});
+
+		String cancelTitle = intent.getStringExtra(DialogActivity.DIALOG_CANCEL_BUTTON);
+		final String cancelScript = intent.getStringExtra(DialogActivity.DIALOG_CANCEL_SCRIPT);
+
+		if (cancelTitle != null && cancelTitle.trim().length() > 0)
+		{
+			builder = builder.setNegativeButton(cancelTitle, new DialogInterface.OnClickListener() 
+			{
+				public void onClick(DialogInterface dialog, int which) 
+				{
+					if (cancelScript != null && cancelScript.trim().length() > 0)
 					{
-						LogManager.getInstance(me).logException(e);
+						Runnable r = new Runnable()
+						{
+							public void run() 
+							{
+								try 
+								{
+									Thread.sleep(500);
+								} 
+								catch (InterruptedException e) 
+								{
+									e.printStackTrace();
+								}
+	
+								BaseScriptEngine.runScript(me, cancelScript);
+							}
+						};
+						
+						Thread t = new Thread(r);
+						t.start();
 					}
 				}
-
-				me.finish();
-			}
-        });
-
-        Button cancelButton = (Button) this.findViewById(R.id.button_dialog_cancel);
-
-        if (intent.hasExtra(DialogActivity.DIALOG_CANCEL_BUTTON))
-        {
-			cancelButton.setText(intent.getStringExtra(DialogActivity.DIALOG_CANCEL_BUTTON));
-
-            if (intent.hasExtra(DialogActivity.DIALOG_CANCEL_SCRIPT))
-            {
-	            final String cancelScript = intent.getStringExtra(DialogActivity.DIALOG_CANCEL_SCRIPT);
-	
-	            cancelButton.setOnClickListener(new OnClickListener()
-	            {
-	    			public void onClick(View v)
-	    			{
-	    				HashMap <String, Object> payload = new HashMap<String, Object>();
-	    				payload.put("title", title);
-	    				payload.put("message", message);
-	    				
-	    				LogManager.getInstance(me).log("dialog_cancel", payload);
-
-	    				if (cancelScript != null && cancelScript.length() >= 0)
-	    				{
-	    					try
-	    					{
-	    						BaseScriptEngine.runScript(me, cancelScript);
-	    					}
-	    					catch (Exception e)
-	    					{
-	    						LogManager.getInstance(me).logException(e);
-	    					}
-	    				}
-	    				
-	    				me.finish();
-	    			}
-	            });
-            }
-
-            cancelButton.setVisibility(View.VISIBLE);
-        }
-        else
-            cancelButton.setVisibility(View.GONE);
-        
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-        	this.setFinishOnTouchOutside(false);
-    }
-	
-	public boolean onKeyDown(int keyCode, KeyEvent event) 
-	{
-		if ((keyCode == KeyEvent.KEYCODE_BACK)) 
-		{
-	        Intent intent = this.getIntent();
-
-	        final String title = intent.getStringExtra(DialogActivity.DIALOG_TITLE);
-	        final String message = intent.getStringExtra(DialogActivity.DIALOG_MESSAGE);
-
-	        HashMap <String, Object> payload = new HashMap<String, Object>();
-			payload.put("title", title);
-			payload.put("message", message);
-			payload.put("back_button", Boolean.TRUE);
-			
-			LogManager.getInstance(this).log("dialog_dismissed", payload);
-
-			this.finish();
+			});
 		}
 		
-		return super.onKeyDown(keyCode, event);
-	}
-	
-	protected void onUserLeaveHint()
-	{
-        Intent intent = this.getIntent();
-
-        final String title = intent.getStringExtra(DialogActivity.DIALOG_TITLE);
-        final String message = intent.getStringExtra(DialogActivity.DIALOG_MESSAGE);
-
-        HashMap <String, Object> payload = new HashMap<String, Object>();
-		payload.put("title", title);
-		payload.put("message", message);
-		payload.put("home_button", Boolean.TRUE);
+		builder = builder.setOnDismissListener(new OnDismissListener()
+		{
+			public void onDismiss(DialogInterface arg0) 
+			{
+				me.finish();
+			}
+		});
 		
-		LogManager.getInstance(this).log("dialog_dismissed", payload);
-
-		this.finish();
+		builder.create().show();
 	}
 }
