@@ -7,7 +7,6 @@ import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 public class DialogBackgroundActivity extends Activity 
 {
