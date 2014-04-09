@@ -300,50 +300,57 @@ public class BluetoothDevicesProbe extends Probe
 				@SuppressWarnings("unchecked")
 				public void onReceive(Context context, Intent intent)
 				{
-					if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction()))
+					try
 					{
-						boolean doHash = prefs.getBoolean("config_probe_bluetooth_hash_data", Probe.DEFAULT_HASH_DATA);
-
-						BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-
-						Bundle deviceBundle = new Bundle();
-
-						if (doHash)
+						if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction()))
 						{
-							deviceBundle.putString(BluetoothDevicesProbe.NAME, em.createHash(context, device.getName()));
-							deviceBundle.putString(BluetoothDevicesProbe.ADDRESS, em.createHash(context, device.getAddress()));
+							boolean doHash = prefs.getBoolean("config_probe_bluetooth_hash_data", Probe.DEFAULT_HASH_DATA);
+	
+							BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+	
+							Bundle deviceBundle = new Bundle();
+	
+							if (doHash)
+							{
+								deviceBundle.putString(BluetoothDevicesProbe.NAME, em.createHash(context, device.getName()));
+								deviceBundle.putString(BluetoothDevicesProbe.ADDRESS, em.createHash(context, device.getAddress()));
+							}
+							else
+							{
+								deviceBundle.putString(BluetoothDevicesProbe.NAME, device.getName());
+								deviceBundle.putString(BluetoothDevicesProbe.ADDRESS, device.getAddress());
+							}
+	
+							deviceBundle.putString(BluetoothDevicesProbe.BOND_STATE, BluetoothDevicesProbe.bondState(device.getBondState()));
+	
+							BluetoothClass deviceClass = device.getBluetoothClass();
+	
+							deviceBundle.putString(BluetoothDevicesProbe.MAJOR_CLASS, BluetoothDevicesProbe.majorDeviceClass(deviceClass.getMajorDeviceClass()));
+							deviceBundle.putString(BluetoothDevicesProbe.MINOR_CLASS, BluetoothDevicesProbe.minorDeviceClass(deviceClass.getDeviceClass()));
+	
+							me._foundDevices.add(deviceBundle);
 						}
-						else
+						else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction()))
 						{
-							deviceBundle.putString(BluetoothDevicesProbe.NAME, device.getName());
-							deviceBundle.putString(BluetoothDevicesProbe.ADDRESS, device.getAddress());
+							Bundle bundle = new Bundle();
+	
+							bundle.putString("PROBE", me.name(context));
+							bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+							bundle.putParcelableArrayList(BluetoothDevicesProbe.DEVICES, (ArrayList<Bundle>) me._foundDevices.clone());
+							bundle.putInt(BluetoothDevicesProbe.DEVICES_COUNT, me._foundDevices.size());
+	
+							synchronized(me)
+							{
+								me.transmitData(context, bundle);
+							}
 						}
-
-						deviceBundle.putString(BluetoothDevicesProbe.BOND_STATE, BluetoothDevicesProbe.bondState(device.getBondState()));
-
-						BluetoothClass deviceClass = device.getBluetoothClass();
-
-						deviceBundle.putString(BluetoothDevicesProbe.MAJOR_CLASS, BluetoothDevicesProbe.majorDeviceClass(deviceClass.getMajorDeviceClass()));
-						deviceBundle.putString(BluetoothDevicesProbe.MINOR_CLASS, BluetoothDevicesProbe.minorDeviceClass(deviceClass.getDeviceClass()));
-
-						me._foundDevices.add(deviceBundle);
+						else if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(intent.getAction()))
+							me._lastCheck = 0;
 					}
-					else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction()))
+					catch (RuntimeException e)
 					{
-						Bundle bundle = new Bundle();
-
-						bundle.putString("PROBE", me.name(context));
-						bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
-						bundle.putParcelableArrayList(BluetoothDevicesProbe.DEVICES, (ArrayList<Bundle>) me._foundDevices.clone());
-						bundle.putInt(BluetoothDevicesProbe.DEVICES_COUNT, me._foundDevices.size());
-
-						synchronized(me)
-						{
-							me.transmitData(context, bundle);
-						}
+						LogManager.getInstance(context).logException(e);
 					}
-					else if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(intent.getAction()))
-						me._lastCheck = 0;
 				}
 			};
 

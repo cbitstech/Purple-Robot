@@ -205,6 +205,11 @@ public abstract class BaseScriptEngine
 			
 		return null;
 	}
+
+	public boolean emitToast(final String message)
+	{
+		return this.emitToast(message, true);
+	}
 	
 	public boolean emitToast(final String message, final boolean longDuration)
 	{
@@ -1111,18 +1116,24 @@ public abstract class BaseScriptEngine
 
 	public static Object runScript(Context context, String script, Map<String, Object> objects) 
 	{
-		
-		if (SchemeEngine.canRun(script))
+		try
 		{
-			SchemeEngine engine = new SchemeEngine(context, objects);
-			
-			return engine.evaluateSource(script);
+			if (SchemeEngine.canRun(script))
+			{
+				SchemeEngine engine = new SchemeEngine(context, objects);
+				
+				return engine.evaluateSource(script);
+			}
+			else if (JavaScriptEngine.canRun(script))
+			{
+				JavaScriptEngine engine = new JavaScriptEngine(context);
+				
+				return engine.runScript(script, "extras", objects);
+			}
 		}
-		else if (JavaScriptEngine.canRun(script))
+		catch (RuntimeException e)
 		{
-			JavaScriptEngine engine = new JavaScriptEngine(context);
-			
-			return engine.runScript(script, "extras", objects);
+			LogManager.getInstance(context).logException(e);
 		}
 		
 		return null;
