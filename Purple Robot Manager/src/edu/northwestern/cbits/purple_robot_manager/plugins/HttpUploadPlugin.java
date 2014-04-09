@@ -1227,7 +1227,14 @@ public class HttpUploadPlugin extends OutputPlugin
 					}
 				});
 
-				pendingFolder.delete();
+				try 
+				{
+					FileUtils.deleteDirectory(pendingFolder);
+				} 
+				catch (IOException e) 
+				{
+					LogManager.getInstance(activity).logException(e);
+				}
 			}
 		};
 

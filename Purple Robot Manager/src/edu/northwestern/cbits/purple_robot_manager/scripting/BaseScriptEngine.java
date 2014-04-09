@@ -47,7 +47,6 @@ import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.ScheduleManager;
 import edu.northwestern.cbits.purple_robot_manager.activities.DialogActivity;
-import edu.northwestern.cbits.purple_robot_manager.activities.DialogBackgroundActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.LabelActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebActivity;
@@ -71,7 +70,7 @@ public abstract class BaseScriptEngine
 
 	protected Context _context = null;
 	private static Map<String, String> packageMap = null;
-
+	
 	protected abstract String language();
 
 	public BaseScriptEngine(Context context)
@@ -969,9 +968,10 @@ public abstract class BaseScriptEngine
 	public void showNativeDialog(final String title, final String message, final String confirmTitle, final String cancelTitle, final String confirmScript, final String cancelScript)
 	{
 		final Context context = this._context;
-		
-		Intent intent = new Intent(context, DialogBackgroundActivity.class);
+
+		Intent intent = new Intent(context, DialogActivity.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+		intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
 		intent.putExtra(DialogActivity.DIALOG_TITLE, title);
@@ -1116,6 +1116,8 @@ public abstract class BaseScriptEngine
 
 	public static Object runScript(Context context, String script, Map<String, Object> objects) 
 	{
+		context = context.getApplicationContext();
+		
 		try
 		{
 			if (SchemeEngine.canRun(script))
