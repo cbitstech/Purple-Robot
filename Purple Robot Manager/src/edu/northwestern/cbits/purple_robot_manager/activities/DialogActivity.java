@@ -1,7 +1,11 @@
 package edu.northwestern.cbits.purple_robot_manager.activities;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
@@ -19,17 +23,88 @@ public class DialogActivity extends Activity
 	public static String DIALOG_CONFIRM_SCRIPT = "dialog_confirm_script";
 	public static String DIALOG_CANCEL_SCRIPT = "dialog_cancel_script";
 	
+	private static ArrayList<HashMap<String, String>> _pendingDialogs = new ArrayList<HashMap<String, String>>();
+	private static boolean _visible = false;
+	private static AlertDialog _currentDialog = null;
+	private static DialogActivity _currentActivity = null;
+	
 	protected void onCreate(Bundle savedInstanceState)
     {
 		super.onCreate(savedInstanceState);
 
         this.setContentView(R.layout.layout_dialog_background_activity);
+        
+        DialogActivity._visible = true;
     }
+	
+	protected void onDestroy()
+	{
+		DialogActivity._visible = false;
+		
+		super.onDestroy();
+	}
+	
+	public static void showNativeDialog(Context context, String title, String message, String confirmTitle, String cancelTitle, String confirmScript, String cancelScript)
+	{
+		if (title == null)
+			title = "";
+
+		if (message == null)
+			message = "";
+		
+		if (confirmTitle == null)
+			confirmTitle = "";
+
+		if (confirmScript == null)
+			confirmScript = "";
+
+		if (cancelTitle == null)
+			cancelTitle = "";
+
+		if (cancelScript == null)
+			cancelScript = "";
+
+		if (DialogActivity._visible == false)
+		{
+			DialogActivity._visible = true;
+			
+			Intent intent = new Intent(context, DialogActivity.class);
+			intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+			intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			
+			intent.putExtra(DialogActivity.DIALOG_TITLE, title);
+			intent.putExtra(DialogActivity.DIALOG_MESSAGE, message);
+			intent.putExtra(DialogActivity.DIALOG_CONFIRM_BUTTON, confirmTitle);
+			intent.putExtra(DialogActivity.DIALOG_CONFIRM_SCRIPT, confirmScript);
+			intent.putExtra(DialogActivity.DIALOG_CANCEL_BUTTON, cancelTitle);
+			intent.putExtra(DialogActivity.DIALOG_CANCEL_SCRIPT, cancelScript);
+
+			context.startActivity(intent);
+		}
+		else
+		{
+			HashMap<String, String> dialog = new HashMap<String, String>();
+			dialog.put(DialogActivity.DIALOG_TITLE, title);
+			dialog.put(DialogActivity.DIALOG_MESSAGE, message);
+			dialog.put(DialogActivity.DIALOG_CONFIRM_BUTTON, confirmTitle);
+			dialog.put(DialogActivity.DIALOG_CONFIRM_SCRIPT, confirmScript);
+			dialog.put(DialogActivity.DIALOG_CANCEL_BUTTON, cancelTitle);
+			dialog.put(DialogActivity.DIALOG_CANCEL_SCRIPT, cancelScript);
+			
+			DialogActivity._pendingDialogs.add(dialog);
+		}
+	}
 	
 	protected void onResume()
 	{
 		super.onResume();
 		
+		this.showNativeDialog();
+	}
+		
+	private void showNativeDialog() 
+	{
 		Intent intent = this.getIntent();
 		
 		String title = intent.getStringExtra(DialogActivity.DIALOG_TITLE);
@@ -38,45 +113,49 @@ public class DialogActivity extends Activity
 		String confirmTitle = intent.getStringExtra(DialogActivity.DIALOG_CONFIRM_BUTTON);
 		final String confirmScript = intent.getStringExtra(DialogActivity.DIALOG_CONFIRM_SCRIPT);
 		
-		final Activity me = this;
+		final DialogActivity me = this;
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder = builder.setTitle(title);
 		builder = builder.setMessage(message);
 		builder = builder.setCancelable(false);
-		builder = builder.setPositiveButton(confirmTitle, new DialogInterface.OnClickListener() 
+		
+		if (confirmTitle.trim().length() > 0)
 		{
-			public void onClick(DialogInterface dialog, int which) 
+			builder = builder.setPositiveButton(confirmTitle, new DialogInterface.OnClickListener() 
 			{
-				if (confirmScript != null && confirmScript.trim().length() > 0)
+				public void onClick(DialogInterface dialog, int which) 
 				{
-					Runnable r = new Runnable()
+					if (confirmScript != null && confirmScript.trim().length() > 0)
 					{
-						public void run() 
+						Runnable r = new Runnable()
 						{
-							try 
+							public void run() 
 							{
-								Thread.sleep(500);
-							} 
-							catch (InterruptedException e) 
-							{
-								e.printStackTrace();
+								try 
+								{
+									Thread.sleep(500);
+								} 
+								catch (InterruptedException e) 
+								{
+									e.printStackTrace();
+								}
+	
+								BaseScriptEngine.runScript(me, confirmScript);
 							}
-
-							BaseScriptEngine.runScript(me, confirmScript);
-						}
-					};
-					
-					Thread t = new Thread(r);
-					t.start();
+						};
+						
+						Thread t = new Thread(r);
+						t.start();
+					}
 				}
-			}
-		});
-
+			});
+		}
+		
 		String cancelTitle = intent.getStringExtra(DialogActivity.DIALOG_CANCEL_BUTTON);
 		final String cancelScript = intent.getStringExtra(DialogActivity.DIALOG_CANCEL_SCRIPT);
 
-		if (cancelTitle != null && cancelTitle.trim().length() > 0)
+		if (cancelTitle.trim().length() > 0)
 		{
 			builder = builder.setNegativeButton(cancelTitle, new DialogInterface.OnClickListener() 
 			{
@@ -112,10 +191,49 @@ public class DialogActivity extends Activity
 		{
 			public void onDismiss(DialogInterface arg0) 
 			{
-				me.finish();
+				DialogActivity._currentDialog = null;
+				DialogActivity._currentActivity = null;
+				
+				if (DialogActivity._pendingDialogs.size() > 0)
+				{
+					HashMap<String, String> dialog = DialogActivity._pendingDialogs.remove(0);
+					
+					Intent intent = new Intent();
+					intent.putExtra(DialogActivity.DIALOG_TITLE, dialog.get(DialogActivity.DIALOG_TITLE));
+					intent.putExtra(DialogActivity.DIALOG_MESSAGE, dialog.get(DialogActivity.DIALOG_MESSAGE));
+					intent.putExtra(DialogActivity.DIALOG_CONFIRM_BUTTON, dialog.get(DialogActivity.DIALOG_CONFIRM_BUTTON));
+					intent.putExtra(DialogActivity.DIALOG_CONFIRM_SCRIPT, dialog.get(DialogActivity.DIALOG_CONFIRM_SCRIPT));
+					intent.putExtra(DialogActivity.DIALOG_CANCEL_BUTTON, dialog.get(DialogActivity.DIALOG_CANCEL_BUTTON));
+					intent.putExtra(DialogActivity.DIALOG_CANCEL_SCRIPT, dialog.get(DialogActivity.DIALOG_CANCEL_SCRIPT));
+					
+					me.setIntent(intent);
+					
+					me.showNativeDialog();
+				}
+				else
+					me.finish();
 			}
 		});
 		
-		builder.create().show();
+		DialogActivity._currentDialog = builder.create();
+		DialogActivity._currentActivity  = this;
+				
+		DialogActivity._currentDialog.show();
+	}
+
+	public static void clearNativeDialogs() 
+	{
+		DialogActivity._pendingDialogs.clear();
+		
+		if (DialogActivity._currentDialog != null && DialogActivity._currentActivity != null)
+		{
+			DialogActivity._currentActivity.runOnUiThread(new Runnable()
+			{
+				public void run() 
+				{
+					DialogActivity._currentDialog.dismiss();
+				}
+			});
+		}
 	}
 }

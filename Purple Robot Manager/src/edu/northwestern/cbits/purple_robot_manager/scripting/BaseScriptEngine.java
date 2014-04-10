@@ -967,25 +967,11 @@ public abstract class BaseScriptEngine
 
 	public void showNativeDialog(final String title, final String message, final String confirmTitle, final String cancelTitle, final String confirmScript, final String cancelScript)
 	{
-		final Context context = this._context;
-
-		Intent intent = new Intent(context, DialogActivity.class);
-		intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-		intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-		intent.putExtra(DialogActivity.DIALOG_TITLE, title);
-		intent.putExtra(DialogActivity.DIALOG_MESSAGE, message);
-		intent.putExtra(DialogActivity.DIALOG_CONFIRM_BUTTON, confirmTitle);
-		intent.putExtra(DialogActivity.DIALOG_CONFIRM_SCRIPT, confirmScript);
-
-		if (cancelTitle != null  && "".equals(cancelTitle.trim()) == false)
-			intent.putExtra(DialogActivity.DIALOG_CANCEL_BUTTON, cancelTitle);
-
-		if (cancelScript != null && "".equals(cancelScript.trim()) == false)
-			intent.putExtra(DialogActivity.DIALOG_CANCEL_SCRIPT, cancelScript);
-
-		context.startActivity(intent);
+		DialogActivity.showNativeDialog(this._context, title, message, confirmTitle, cancelTitle, confirmScript, cancelScript);
+	}
+	public void clearNativeDialogs()
+	{
+		DialogActivity.clearNativeDialogs();
 	}
 
 	public boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen)
