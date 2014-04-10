@@ -634,7 +634,7 @@ public class HttpUploadPlugin extends OutputPlugin
 								}
 								else
 									body = EntityUtils.toString(httpEntity);
-
+								
 								JSONObject json = new JSONObject(body);
 
 								String status = json.getString(STATUS_KEY);
