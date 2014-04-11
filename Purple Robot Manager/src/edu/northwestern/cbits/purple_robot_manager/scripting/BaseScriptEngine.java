@@ -34,6 +34,8 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.provider.Browser;
 import android.support.v4.app.NotificationCompat;
@@ -47,7 +49,6 @@ import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.ScheduleManager;
 import edu.northwestern.cbits.purple_robot_manager.activities.DialogActivity;
-import edu.northwestern.cbits.purple_robot_manager.activities.DialogBackgroundActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.LabelActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebActivity;
@@ -71,7 +72,9 @@ public abstract class BaseScriptEngine
 
 	protected Context _context = null;
 	private static Map<String, String> packageMap = null;
-
+	
+	private Handler _handler = new Handler(Looper.getMainLooper());
+	
 	protected abstract String language();
 
 	public BaseScriptEngine(Context context)
@@ -205,6 +208,11 @@ public abstract class BaseScriptEngine
 			
 		return null;
 	}
+
+	public boolean emitToast(final String message)
+	{
+		return this.emitToast(message, true);
+	}
 	
 	public boolean emitToast(final String message, final boolean longDuration)
 	{
@@ -213,23 +221,18 @@ public abstract class BaseScriptEngine
 		payload.put("message", message);
 		LogManager.getInstance(this._context).log("toast_message", payload);
 
-		if (this._context instanceof Activity)
+		final BaseScriptEngine me = this;
+				
+		this._handler.post(new Runnable()
 		{
-			final Activity activity = (Activity) this._context;
-
-			activity.runOnUiThread(new Runnable()
+			public void run() 
 			{
-				public void run()
-				{
-					if (longDuration)
-						Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
-					else
-						Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
-				}
-			});
-
-			return true;
-		}
+				if (longDuration)
+					Toast.makeText(me._context, message, Toast.LENGTH_LONG).show();
+				else
+					Toast.makeText(me._context, message, Toast.LENGTH_SHORT).show();
+			}
+		});
 
 		return false;
 	}
@@ -855,12 +858,12 @@ public abstract class BaseScriptEngine
 
 			if (intent != null)
 			{
-				PendingIntent pendingIntent = PendingIntent.getActivity(this._context, 0, intent, 0);
+				PendingIntent pendingIntent = PendingIntent.getActivity(this._context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 				
 				if (script != null)
 				{
 					Intent serviceIntent = this.constructLaunchIntent(applicationName, launchParams, script);
-					pendingIntent = PendingIntent.getService(this._context, 0, serviceIntent, 0);
+					pendingIntent = PendingIntent.getService(this._context, 0, serviceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 				}
 
 				NotificationCompat.Builder builder = new NotificationCompat.Builder(this._context);
@@ -900,21 +903,30 @@ public abstract class BaseScriptEngine
 
 	public boolean showScriptNotification(String title, String message, boolean persistent, final String script)
 	{
+		return this.showScriptNotification(title, message, persistent, false, script);
+	}
+	
+	public boolean showScriptNotification(String title, String message, boolean persistent, boolean sticky, final String script)
+	{
 		try
 		{
 			HashMap <String, Object> payload = new HashMap<String, Object>();
 			LogManager.getInstance(this._context).log("script_run_notification", payload);
 
 			Intent serviceIntent = this.constructScriptIntent(script);
-			PendingIntent pendingIntent = PendingIntent.getService(this._context, 0, serviceIntent, 0);
+			
+			PendingIntent pendingIntent = PendingIntent.getService(this._context, 0, serviceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 			NotificationCompat.Builder builder = new NotificationCompat.Builder(this._context);
-			builder.setContentIntent(pendingIntent);
-			builder.setAutoCancel(true);
-			builder.setContentTitle(title);
-			builder.setContentText(message);
-			builder.setTicker(message);
-			builder.setSmallIcon(R.drawable.ic_note_icon);
+			builder = builder.setContentIntent(pendingIntent);
+			
+			if (sticky == false)
+				builder = builder.setAutoCancel(true);
+
+			builder = builder.setContentTitle(title);
+			builder = builder.setContentText(message);
+			builder = builder.setTicker(message);
+			builder = builder.setSmallIcon(R.drawable.ic_note_icon);
 
 			try
 			{
@@ -922,6 +934,9 @@ public abstract class BaseScriptEngine
 				
 				if (persistent)
 					note.flags = note.flags | Notification.FLAG_NO_CLEAR;
+				
+				if (sticky)
+					note.flags = note.flags | Notification.FLAG_ONGOING_EVENT;
 				
 				NotificationManager noteManager = (NotificationManager) this._context.getSystemService(android.content.Context.NOTIFICATION_SERVICE);
 				noteManager.notify(BaseScriptEngine.NOTIFICATION_ID, note);
@@ -951,23 +966,11 @@ public abstract class BaseScriptEngine
 
 	public void showNativeDialog(final String title, final String message, final String confirmTitle, final String cancelTitle, final String confirmScript, final String cancelScript)
 	{
-		final Context context = this._context;
-		
-		Intent intent = new Intent(context, DialogBackgroundActivity.class);
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-		intent.putExtra(DialogActivity.DIALOG_TITLE, title);
-		intent.putExtra(DialogActivity.DIALOG_MESSAGE, message);
-		intent.putExtra(DialogActivity.DIALOG_CONFIRM_BUTTON, confirmTitle);
-		intent.putExtra(DialogActivity.DIALOG_CONFIRM_SCRIPT, confirmScript);
-
-		if (cancelTitle != null  && "".equals(cancelTitle.trim()) == false)
-			intent.putExtra(DialogActivity.DIALOG_CANCEL_BUTTON, cancelTitle);
-
-		if (cancelScript != null && "".equals(cancelScript.trim()) == false)
-			intent.putExtra(DialogActivity.DIALOG_CANCEL_SCRIPT, cancelScript);
-
-		context.startActivity(intent);
+		DialogActivity.showNativeDialog(this._context, title, message, confirmTitle, cancelTitle, confirmScript, cancelScript);
+	}
+	public void clearNativeDialogs()
+	{
+		DialogActivity.clearNativeDialogs();
 	}
 
 	public boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen)
@@ -1098,18 +1101,26 @@ public abstract class BaseScriptEngine
 
 	public static Object runScript(Context context, String script, Map<String, Object> objects) 
 	{
+		context = context.getApplicationContext();
 		
-		if (SchemeEngine.canRun(script))
+		try
 		{
-			SchemeEngine engine = new SchemeEngine(context, objects);
-			
-			return engine.evaluateSource(script);
+			if (SchemeEngine.canRun(script))
+			{
+				SchemeEngine engine = new SchemeEngine(context, objects);
+				
+				return engine.evaluateSource(script);
+			}
+			else if (JavaScriptEngine.canRun(script))
+			{
+				JavaScriptEngine engine = new JavaScriptEngine(context);
+				
+				return engine.runScript(script, "extras", objects);
+			}
 		}
-		else if (JavaScriptEngine.canRun(script))
+		catch (RuntimeException e)
 		{
-			JavaScriptEngine engine = new JavaScriptEngine(context);
-			
-			return engine.runScript(script, "extras", objects);
+			LogManager.getInstance(context).logException(e);
 		}
 		
 		return null;

@@ -634,7 +634,7 @@ public class HttpUploadPlugin extends OutputPlugin
 								}
 								else
 									body = EntityUtils.toString(httpEntity);
-
+								
 								JSONObject json = new JSONObject(body);
 
 								String status = json.getString(STATUS_KEY);
@@ -1227,7 +1227,14 @@ public class HttpUploadPlugin extends OutputPlugin
 					}
 				});
 
-				pendingFolder.delete();
+				try 
+				{
+					FileUtils.deleteDirectory(pendingFolder);
+				} 
+				catch (IOException e) 
+				{
+					LogManager.getInstance(activity).logException(e);
+				}
 			}
 		};
 

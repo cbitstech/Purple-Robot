@@ -51,7 +51,7 @@ public class JavaScriptEngine extends BaseScriptEngine
 		this._jsContext.setOptimizationLevel(-1);
 
 		this._scope = _jsContext.initStandardObjects();
-
+		
 		Object thisWrapper = Context.javaToJS(this, this._scope);
 		ScriptableObject.putProperty(this._scope, "PurpleRobot", thisWrapper);
 		
