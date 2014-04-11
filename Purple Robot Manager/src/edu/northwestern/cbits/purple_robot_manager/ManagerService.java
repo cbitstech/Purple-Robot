@@ -337,7 +337,6 @@ public class ManagerService extends IntentService
 		{
 			if (intent.hasExtra(RUN_SCRIPT))
 			{
-
 				String script = intent.getStringExtra(RUN_SCRIPT);
 
 				if (script != null)

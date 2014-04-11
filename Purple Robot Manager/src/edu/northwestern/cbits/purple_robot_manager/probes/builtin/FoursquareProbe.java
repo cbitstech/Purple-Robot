@@ -239,6 +239,10 @@ public class FoursquareProbe extends Probe
 										{
 							     			LogManager.getInstance(context).logException(e);
 										} 
+										catch (IllegalArgumentException e) 
+										{
+							     			LogManager.getInstance(context).logException(e);
+										} 
 										catch (OAuthException e)
 										{
 							     			LogManager.getInstance(context).logException(e);
