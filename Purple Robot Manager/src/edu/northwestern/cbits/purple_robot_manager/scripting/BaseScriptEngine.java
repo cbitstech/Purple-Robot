@@ -34,6 +34,8 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.provider.Browser;
 import android.support.v4.app.NotificationCompat;
@@ -70,6 +72,8 @@ public abstract class BaseScriptEngine
 
 	protected Context _context = null;
 	private static Map<String, String> packageMap = null;
+	
+	private Handler _handler = new Handler(Looper.getMainLooper());
 	
 	protected abstract String language();
 
@@ -217,23 +221,18 @@ public abstract class BaseScriptEngine
 		payload.put("message", message);
 		LogManager.getInstance(this._context).log("toast_message", payload);
 
-		if (this._context instanceof Activity)
+		final BaseScriptEngine me = this;
+				
+		this._handler.post(new Runnable()
 		{
-			final Activity activity = (Activity) this._context;
-
-			activity.runOnUiThread(new Runnable()
+			public void run() 
 			{
-				public void run()
-				{
-					if (longDuration)
-						Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
-					else
-						Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
-				}
-			});
-
-			return true;
-		}
+				if (longDuration)
+					Toast.makeText(me._context, message, Toast.LENGTH_LONG).show();
+				else
+					Toast.makeText(me._context, message, Toast.LENGTH_SHORT).show();
+			}
+		});
 
 		return false;
 	}
