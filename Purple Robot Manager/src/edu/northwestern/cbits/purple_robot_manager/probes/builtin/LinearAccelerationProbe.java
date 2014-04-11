@@ -326,11 +326,11 @@ public class LinearAccelerationProbe extends ContinuousProbe implements SensorEv
 
 		boolean passes = false;
 		
-		if (Math.abs(x - this._lastX) > this.lastThreshold)
+		if (Math.abs(x - this._lastX) >= this.lastThreshold)
 			passes = true;
-		else if (Math.abs(y - this._lastY) > this.lastThreshold)
+		else if (Math.abs(y - this._lastY) >= this.lastThreshold)
 			passes = true;
-		else if (Math.abs(z - this._lastZ) > this.lastThreshold)
+		else if (Math.abs(z - this._lastZ) >= this.lastThreshold)
 			passes = true;
 		
 		if (passes)
@@ -444,7 +444,7 @@ public class LinearAccelerationProbe extends ContinuousProbe implements SensorEv
 						data.putFloatArray(fieldNames[i], valueBuffer[i]);
 					}
 
-					this.transmitData(data);
+					this.transmitData(this._context, data);
 
 					for (int j = 0; j < timeBuffer.length; j++)
 					{

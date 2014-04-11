@@ -26,6 +26,7 @@ import android.os.SystemClock;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
@@ -43,7 +44,7 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 
 	public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.PressureProbe";
 
-	private static int BUFFER_SIZE = 1024;
+	private static int BUFFER_SIZE = 512;
 
 	private static String PRESSURE_KEY = "PRESSURE";
 	private static String ALTITUDE_KEY = "ALTITUDE";
@@ -333,7 +334,7 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 
 		boolean passes = false;
 
-		if (Math.abs(value - this._lastValue) > this.lastThreshold)
+		if (Math.abs(value - this._lastValue) >= this.lastThreshold)
 			passes = true;
 		
 		if (passes)
@@ -374,7 +375,7 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 				}
 
 				bufferIndex += 1;
-
+				
 				if (bufferIndex >= timeBuffer.length)
 				{
 					Sensor sensor = event.sensor;
@@ -403,8 +404,8 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 						data.putFloatArray(fieldNames[i], valueBuffer[i]);
 					}
 
-					this.transmitData(data);
-
+					this.transmitData(this._context, data);
+					
 					for (int j = 0; j < timeBuffer.length; j++)
 					{
 						Double pressure = null;
