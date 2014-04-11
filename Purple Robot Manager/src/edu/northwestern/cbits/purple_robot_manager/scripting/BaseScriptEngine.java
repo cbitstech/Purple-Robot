@@ -68,6 +68,8 @@ public abstract class BaseScriptEngine
 	protected static String SCRIPT_ENGINE_NAMESPACES = "purple_robot_script_namespaces";
 
 	public static final int NOTIFICATION_ID = (int) System.currentTimeMillis();
+	public static final String STICKY_NOTIFICATION_PARAMS = "STICKY_NOTIFICATION_PARAMS";
+	
 	private static String LOG_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";
 
 	protected Context _context = null;
@@ -936,7 +938,23 @@ public abstract class BaseScriptEngine
 					note.flags = note.flags | Notification.FLAG_NO_CLEAR;
 				
 				if (sticky)
+				{
 					note.flags = note.flags | Notification.FLAG_ONGOING_EVENT;
+					
+					JSONObject json = new JSONObject();
+					
+					json.put("title", title);
+					json.put("message", message);
+					json.put("script", script);
+					json.put("persistent", persistent);
+					json.put("sticky", sticky);
+					
+					SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+					
+					Editor e = prefs.edit();
+					e.putString(BaseScriptEngine.STICKY_NOTIFICATION_PARAMS, json.toString());
+					e.commit();
+				}
 				
 				NotificationManager noteManager = (NotificationManager) this._context.getSystemService(android.content.Context.NOTIFICATION_SERVICE);
 				noteManager.notify(BaseScriptEngine.NOTIFICATION_ID, note);
@@ -954,6 +972,18 @@ public abstract class BaseScriptEngine
 		}
 
 		return false;
+	}
+	
+	public void cancelScriptNotification()
+	{
+		NotificationManager noteManager = (NotificationManager) this._context.getSystemService(android.content.Context.NOTIFICATION_SERVICE);
+		noteManager.cancel(BaseScriptEngine.NOTIFICATION_ID);
+		
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+		
+		Editor e = prefs.edit();
+		e.remove(BaseScriptEngine.STICKY_NOTIFICATION_PARAMS);
+		e.commit();
 	}
 
 	private Intent constructScriptIntent(String script) 
