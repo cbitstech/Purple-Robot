@@ -406,7 +406,7 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 						data.putDoubleArray(fieldNames[i], values);
 					}
 
-					this.transmitData(data);
+					this.transmitData(this._context, data);
 
 					for (int j = 0; j < timeBuffer.length; j++)
 					{

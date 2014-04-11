@@ -1,11 +1,9 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
 import java.util.Map;
-import java.util.UUID;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.hardware.Sensor;
@@ -18,7 +16,6 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.support.v4.content.LocalBroadcastManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
@@ -179,21 +176,6 @@ public abstract class ContinuousProbe extends Probe
 		return context.getString(this.getSummaryResource());
 	}
 
-	protected void transmitData(Bundle data)
-	{
-		if (this._context != null)
-		{
-			UUID uuid = UUID.randomUUID();
-			data.putString("GUID", uuid.toString());
-
-			LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(this._context);
-			Intent intent = new Intent(edu.northwestern.cbits.purple_robot_manager.probes.Probe.PROBE_READING);
-			intent.putExtras(data);
-
-			localManager.sendBroadcast(intent);
-		}
-	}
-	
 	@SuppressLint("Wakelock")
 	public boolean isEnabled(Context context)
 	{

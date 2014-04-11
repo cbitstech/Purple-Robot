@@ -199,7 +199,7 @@ public class AmbientHumidityProbe extends ContinuousProbe implements SensorEvent
 
 		boolean passes = false;
 
-		if (Math.abs(value - this._lastValue) > this.lastThreshold)
+		if (Math.abs(value - this._lastValue) >= this.lastThreshold)
 			passes = true;
 		
 		if (passes)
@@ -302,7 +302,7 @@ public class AmbientHumidityProbe extends ContinuousProbe implements SensorEvent
 						data.putFloatArray(fieldNames[i], valueBuffer[i]);
 					}
 
-					this.transmitData(data);
+					this.transmitData(this._context, data);
 
 					bufferIndex = 0;
 				}

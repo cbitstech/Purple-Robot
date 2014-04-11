@@ -338,7 +338,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 
 		boolean passes = false;
 		
-		if (Math.abs(value - this._lastValue) > this.lastThreshold)
+		if (Math.abs(value - this._lastValue) >= this.lastThreshold)
 			passes = true;
 		
 		if (passes)
@@ -396,7 +396,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 						data.putFloatArray(fieldNames[i], valueBuffer[i]);
 					}
 					
-					this.transmitData(data);
+					this.transmitData(this._context, data);
 
 					for (int j = 0; j < timeBuffer.length; j++)
 					{
