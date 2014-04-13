@@ -496,6 +496,11 @@ public abstract class BaseScriptEngine
 		ProbeManager.disableProbes(this._context);
 	}
 	
+	public void disableEachProbe()
+	{
+		ProbeManager.disableEachProbe(this._context);
+	}
+	
 	public boolean probesState()
 	{
 		return ProbeManager.probesState(this._context);

@@ -33,6 +33,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.PersistentService;
@@ -65,6 +66,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 	public static final String MODELS_SCREEN_KEY = "config_models_screen";
 	private static final String DUMP_JSON_KEY = "config_dump_json";
 	private static final String RESET_KEY = "config_reset";
+	public static final String PROBES_DISABLE_EACH_KEY = "config_disable_each_probe";
 
 	@SuppressWarnings("deprecation")
 	public void onCreate(Bundle savedInstanceState)
@@ -321,6 +323,12 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
         	});
         	
         	builder.create().show();
+        }
+        else if (PROBES_DISABLE_EACH_KEY.equals(preference.getKey()))
+        {
+        	ProbeManager.disableEachProbe(this);
+        	
+        	Toast.makeText(this, R.string.message_disable_each_probe, Toast.LENGTH_LONG).show();
         }
 
         return false;
