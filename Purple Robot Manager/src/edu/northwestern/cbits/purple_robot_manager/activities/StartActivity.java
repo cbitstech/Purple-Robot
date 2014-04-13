@@ -162,11 +162,15 @@ public class StartActivity extends ActionBarActivity
 		    				{
 								public void run()
 								{
+									if (me.getString(R.string.message_reading_complete).equals(message) && prefs.getBoolean("config_probes_enabled", false) == false)
+										StartActivity._statusMessage = null;
+									else
+									{
+										SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+										StartActivity._statusMessage = sdf.format(new Date())+ ": " + message;
+									}										
+									
 									ActionBar bar = me.getSupportActionBar();
-
-									SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-
-									StartActivity._statusMessage = sdf.format(new Date())+ ": " + message;
 									bar.setSubtitle(StartActivity._statusMessage);
 								}
 		    				});
@@ -568,7 +572,7 @@ public class StartActivity extends ActionBarActivity
 
 		Uri incomingUri = this.getIntent().getData();
 
-		SharedPreferences prefs = this.getPreferences(this);
+		final SharedPreferences prefs = this.getPreferences(this);
 
         final String savedPassword = prefs.getString("config_password", null);
 
@@ -630,8 +634,12 @@ public class StartActivity extends ActionBarActivity
 
         				adapter.changeCursor(c);
         			}
+
+        	        if (prefs.getBoolean("config_probes_enabled", false))
+        	        	me.getSupportActionBar().setTitle(String.format(me.getResources().getString(R.string.title_probes_count), c.getCount()));
+    	        	else
+        	        	me.getSupportActionBar().setTitle(R.string.app_name);
         			
-	    	        me.getSupportActionBar().setTitle(String.format(me.getResources().getString(R.string.title_probes_count), c.getCount()));
 	    	        me.updateAlertIcon();
         		};
         		
