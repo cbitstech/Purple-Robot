@@ -185,8 +185,11 @@
     <string name="title_preference_probes_screen">Probe Configuration</string>
     <string name="title_preference_probes_global_category">Application Options</string>
     <string name="title_preference_probes_enable_probes">Enable Probes</string>
+    <string name="title_preference_probes_disable_each_probe">Disable Each Probe Individually</string>
     <string name="title_preference_probes_available_category">Available Probes</string>
 
+    <string name="message_disable_each_probe">Each probe disabled.</string>
+    
     <string name="title_preference_models_screen">Model Configuration</string>
     <string name="title_preference_models_global_category">Application Options</string>
     <string name="title_preference_models_enable_models">Enable Models</string>

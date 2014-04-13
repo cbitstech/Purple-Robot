@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.CheckBoxPreference;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
@@ -586,6 +587,14 @@ public class ProbeManager
 
 		globalCategory.addPreference(enabled);
 
+		Preference disableAll = new Preference(settingsActivity);
+		disableAll.setTitle(R.string.title_preference_probes_disable_each_probe);
+		disableAll.setKey(SettingsActivity.PROBES_DISABLE_EACH_KEY);
+		disableAll.setOnPreferenceClickListener((SettingsActivity) settingsActivity);
+
+		globalCategory.addPreference(disableAll);
+
+		
 		PreferenceCategory probesCategory = new PreferenceCategory(settingsActivity);
 		probesCategory.setTitle(R.string.title_preference_probes_available_category);
 		probesCategory.setKey("config_all_probes_list");
@@ -735,5 +744,19 @@ public class ProbeManager
 		}
 		
 		return false;
+	}
+
+	public static void disableEachProbe(Context context) 
+	{
+		if (ProbeManager._inited == false)
+			return;
+
+		if (context != null && ProbeManager._probeInstances != null)
+		{
+			for (Probe probe : ProbeManager.allProbes(context))
+			{
+				probe.disable(context);
+			}
+		}
 	}
 }
