@@ -128,10 +128,10 @@ public class SanityManager
 			this._lastStatus = this.getErrorLevel();
 			int issueCount = this._errors.size() + this._warnings.size();
 
-			PendingIntent contentIntent = PendingIntent.getActivity(this._context, SanityManager.NOTE_ID, new Intent(this._context, StartActivity.class), Notification.FLAG_ONGOING_EVENT);
+			PendingIntent contentIntent = PendingIntent.getActivity(this._context, SanityManager.NOTE_ID, new Intent(this._context, StartActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 			
 			if (this._lastStatus != SanityCheck.OK)
-				contentIntent = PendingIntent.getActivity(this._context, SanityManager.NOTE_ID, new Intent(this._context, DiagnosticActivity.class), Notification.FLAG_ONGOING_EVENT);
+				contentIntent = PendingIntent.getActivity(this._context, SanityManager.NOTE_ID, new Intent(this._context, DiagnosticActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 			
 			NotificationManager noteManager = (NotificationManager) this._context.getSystemService(Context.NOTIFICATION_SERVICE);
 			
