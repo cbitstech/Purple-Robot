@@ -256,6 +256,9 @@ public class AmbientHumidityProbe extends ContinuousProbe implements SensorEvent
 	@SuppressLint("NewApi")
 	public void onSensorChanged(SensorEvent event)
 	{
+		if (this.shouldProcessEvent(event) == false)
+			return;
+
 		double now = System.currentTimeMillis();
 
 		if (this.passesThreshold(event))

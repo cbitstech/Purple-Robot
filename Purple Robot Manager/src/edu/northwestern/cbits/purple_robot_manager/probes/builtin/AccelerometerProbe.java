@@ -386,6 +386,9 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 	
 	public void onSensorChanged(SensorEvent event)
 	{
+		if (this.shouldProcessEvent(event) == false)
+			return;
+			
 		final double now = (double) System.currentTimeMillis();
 		
 		if (this.passesThreshold(event))

@@ -257,6 +257,9 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 	@SuppressLint("NewApi")
 	public void onSensorChanged(SensorEvent event)
 	{
+		if (this.shouldProcessEvent(event) == false)
+			return;
+
 		double now = System.currentTimeMillis();
 
 		if (this.passesThreshold(event))

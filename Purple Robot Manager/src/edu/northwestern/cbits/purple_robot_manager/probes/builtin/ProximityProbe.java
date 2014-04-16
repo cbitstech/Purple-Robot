@@ -350,6 +350,9 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 	@SuppressLint("NewApi")
 	public void onSensorChanged(SensorEvent event)
 	{
+		if (this.shouldProcessEvent(event) == false)
+			return;
+
 		double now = System.currentTimeMillis();
 
 		if (this.passesThreshold(event))

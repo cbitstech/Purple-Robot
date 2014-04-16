@@ -411,6 +411,9 @@ public class RotationProbe extends ContinuousProbe implements SensorEventListene
 	
 	public void onSensorChanged(SensorEvent event)
 	{
+		if (this.shouldProcessEvent(event) == false)
+			return;
+
 		final double now = (double) System.currentTimeMillis();
 		
 		if (this.passesThreshold(event))
