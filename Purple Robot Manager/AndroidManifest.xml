@@ -154,7 +154,7 @@
 		<activity android:name=".activities.WebkitActivity" android:label="@string/app_name" android:theme="@style/Theme.AppCompat" />
 		<activity android:name=".activities.WebkitLandscapeActivity" android:label="@string/app_name" android:screenOrientation="landscape" android:theme="@style/Theme.AppCompat" />
 		<activity android:name=".activities.SettingsActivity" android:label="@string/app_name" />
-		<activity android:name=".activities.DialogActivity" android:label="@string/app_name" android:theme="@android:style/Theme.Translucent.NoTitleBar" android:noHistory="true" />
+		<activity android:name=".activities.DialogActivity" android:label="@string/app_name" android:launchMode="singleInstance" android:noHistory="true" android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 		<activity android:name=".activities.LabelActivity" android:label="@string/app_name" android:theme="@style/Theme.AppCompat" />
 		<activity android:name=".activities.CodeViewerActivity" android:label="@string/app_name" android:theme="@style/Theme.AppCompat" />
 		<activity android:name=".snapshots.SnapshotsActivity" android:label="@string/app_name" android:theme="@style/Theme.AppCompat" />

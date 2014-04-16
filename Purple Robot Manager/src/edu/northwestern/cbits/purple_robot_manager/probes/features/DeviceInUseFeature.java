@@ -117,7 +117,7 @@ public class DeviceInUseFeature extends Feature
 
 		SharedPreferences prefs = Probe.getPreferences(context);
 
-		 this._isEnabled = false;
+		this._isEnabled = false;
 
 		if (super.isEnabled(context))
 		{
