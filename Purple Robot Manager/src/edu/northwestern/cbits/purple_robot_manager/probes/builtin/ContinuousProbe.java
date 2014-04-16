@@ -31,6 +31,9 @@ public abstract class ContinuousProbe extends Probe
 
 	protected Context _context = null;
 
+	private boolean _lastEnableResult = false;
+	private long _lastEnableCheck = 0;
+
 	public void enable(Context context)
 	{
 		String key = this.getPreferenceKey();
@@ -53,6 +56,23 @@ public abstract class ContinuousProbe extends Probe
 		e.putBoolean("config_probe_" + key + "_enabled", false);
 		
 		e.commit();
+	}
+	
+	protected boolean shouldProcessEvent(SensorEvent event)
+	{
+		long now = System.currentTimeMillis();
+		
+		if (now - this._lastEnableCheck  > 5000)
+		{
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+
+			String key = this.getPreferenceKey();
+			this._lastEnableResult = prefs.getBoolean("config_probe_" + key + "_enabled", ContinuousProbe.DEFAULT_ENABLED);
+			
+			this._lastEnableCheck = now;
+		}
+		
+		return this._lastEnableResult;
 	}
 
 	@SuppressWarnings("deprecation")

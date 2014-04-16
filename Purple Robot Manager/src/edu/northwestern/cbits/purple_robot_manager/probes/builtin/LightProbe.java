@@ -355,6 +355,9 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 	@SuppressLint("NewApi")
 	public void onSensorChanged(SensorEvent event)
 	{
+		if (this.shouldProcessEvent(event) == false)
+			return;
+
 		double now = System.currentTimeMillis();
 
 		if (this.passesThreshold(event))
