@@ -64,7 +64,7 @@ public class WifiAccessPointsProbe extends Probe
 	{
 		if (super.isEnabled(context))
 		{
-			SharedPreferences prefs = Probe.getPreferences(context);
+			final SharedPreferences prefs = Probe.getPreferences(context);
 
 			if (prefs.getBoolean("config_probe_wifi_enabled", WifiAccessPointsProbe.DEFAULT_ENABLED))
 			{
@@ -76,6 +76,9 @@ public class WifiAccessPointsProbe extends Probe
 					{
 						public void onReceive(Context context, Intent intent)
 						{
+							if (prefs.getBoolean("config_probe_wifi_enabled", WifiAccessPointsProbe.DEFAULT_ENABLED) == false)
+								return;
+							
 							if (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(intent.getAction()))
 							{
 								WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);

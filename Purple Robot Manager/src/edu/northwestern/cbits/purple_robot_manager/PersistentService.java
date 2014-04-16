@@ -55,7 +55,7 @@ public class PersistentService extends Service
 		String message = this.getString(R.string.notify_running);
 
 		Notification note = new Notification(R.drawable.ic_note_normal, title, System.currentTimeMillis());
-		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, StartActivity.class), Notification.FLAG_ONGOING_EVENT | Notification.FLAG_NO_CLEAR);
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, StartActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 		note.setLatestEventInfo(this, title, message, contentIntent);
 
 		this.startForeground(SanityManager.NOTE_ID, note);
