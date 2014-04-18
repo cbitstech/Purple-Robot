@@ -49,6 +49,7 @@ import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
+import edu.northwestern.cbits.purple_robot_manager.plugins.StreamingJacksonUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
@@ -115,16 +116,35 @@ public class DiagnosticActivity extends ActionBarActivity
 			
 			lastUpload.setText(String.format(this.getString(R.string.last_upload_format), dateString, lastPayloadSize));
 		}
-
-		OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(this, HttpUploadPlugin.class);
 		
-		if (plugin instanceof HttpUploadPlugin)
+		if (prefs.getBoolean("config_enable_data_server", false))
 		{
-			HttpUploadPlugin http = (HttpUploadPlugin) plugin;
+			OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(this, HttpUploadPlugin.class);
+			
+			if (plugin instanceof HttpUploadPlugin)
+			{
+				HttpUploadPlugin http = (HttpUploadPlugin) plugin;
 
-			TextView uploadCount = (TextView) this.findViewById(R.id.pending_files_value);
-			uploadCount.setText(this.getString(R.string.pending_files_file, http.pendingFilesCount()));
+				TextView uploadCount = (TextView) this.findViewById(R.id.pending_files_value);
+				uploadCount.setText(this.getString(R.string.pending_files_file, http.pendingFilesCount()));
+			}
 		}
+		else
+		{
+			OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(this, StreamingJacksonUploadPlugin.class);
+			
+			if (plugin instanceof StreamingJacksonUploadPlugin)
+			{
+				StreamingJacksonUploadPlugin http = (StreamingJacksonUploadPlugin) plugin;
+
+				TextView uploadCount = (TextView) this.findViewById(R.id.pending_files_value);
+				uploadCount.setText(this.getString(R.string.pending_files_file, http.pendingFilesCount()));
+			}
+		}
+		// config_enable_data_server
+		
+		// config_enable_streaming_jackson_data_server
+
 		
 		try 
 		{

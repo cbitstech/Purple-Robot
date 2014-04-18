@@ -50,6 +50,7 @@ import android.content.SharedPreferences.Editor;
 import android.net.http.AndroidHttpClient;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.WiFiHelper;
@@ -301,6 +302,13 @@ public abstract class DataUploadPlugin extends OutputPlugin
 			{
 				String errorMessage = String.format(context.getString(R.string.message_server_error), status);
 				me.broadcastMessage(errorMessage);
+				
+				String payloadString = json.getString("Payload");
+				
+				if (payloadString.length() > 512)
+					payloadString = payloadString.substring(payloadString.length() - 512);
+				
+				Log.e("PR", "ERROR BODY: " + payloadString);
 			}
 		}
 		catch (HttpHostConnectException e)
