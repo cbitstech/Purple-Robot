@@ -16,6 +16,7 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class SaintProbe extends Probe 
@@ -97,7 +98,15 @@ public class SaintProbe extends Probe
 		
 		if (this._receiver != null)
 		{
-			context.unregisterReceiver(this._receiver);
+			try
+			{
+				context.unregisterReceiver(this._receiver);
+			}
+			catch (IllegalArgumentException e)
+			{
+				LogManager.getInstance(context).logException(e);
+			}
+
 			this._receiver = null;
 		}
 
