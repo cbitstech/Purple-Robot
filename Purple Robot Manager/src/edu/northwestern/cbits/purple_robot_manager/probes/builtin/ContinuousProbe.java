@@ -67,7 +67,10 @@ public abstract class ContinuousProbe extends Probe
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
 
 			String key = this.getPreferenceKey();
-			this._lastEnableResult = prefs.getBoolean("config_probe_" + key + "_enabled", ContinuousProbe.DEFAULT_ENABLED);
+			this._lastEnableResult = prefs.getBoolean("config_probes_enabled", false);
+			
+			if (this._lastEnableResult)
+				this._lastEnableResult = prefs.getBoolean("config_probe_" + key + "_enabled", ContinuousProbe.DEFAULT_ENABLED);
 			
 			this._lastEnableCheck = now;
 		}
