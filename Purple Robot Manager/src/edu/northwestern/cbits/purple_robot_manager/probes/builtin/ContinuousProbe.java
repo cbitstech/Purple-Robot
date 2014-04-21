@@ -16,6 +16,7 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
@@ -60,6 +61,8 @@ public abstract class ContinuousProbe extends Probe
 	
 	protected boolean shouldProcessEvent(SensorEvent event)
 	{
+		Log.e("PR", "GOT SENSOR EVENT: " + event.sensor.getName());
+		
 		long now = System.currentTimeMillis();
 		
 		if (now - this._lastEnableCheck  > 5000)

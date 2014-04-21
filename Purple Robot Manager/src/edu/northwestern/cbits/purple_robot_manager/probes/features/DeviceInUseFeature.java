@@ -61,6 +61,16 @@ public class DeviceInUseFeature extends Feature
 
 	public boolean isEnabled(Context context)
 	{
+		SharedPreferences prefs = Probe.getPreferences(context);
+
+		this._isEnabled = false;
+
+		if (super.isEnabled(context))
+		{
+			if (prefs.getBoolean("config_probe_device_use_enabled", true))
+				this._isEnabled = true;
+		}
+
 		if (!this._isInited)
 		{
 			IntentFilter intentFilter = new IntentFilter(Probe.PROBE_READING);
@@ -71,6 +81,9 @@ public class DeviceInUseFeature extends Feature
 			{
 				public void onReceive(Context context, Intent intent)
 				{
+					if (me._isEnabled == false)
+						return;
+					
 					Bundle extras = intent.getExtras();
 
 					String probeName = extras.getString("PROBE");
@@ -113,16 +126,6 @@ public class DeviceInUseFeature extends Feature
 			localManager.registerReceiver(receiver, intentFilter);
 
 			this._isInited = true;
-		}
-
-		SharedPreferences prefs = Probe.getPreferences(context);
-
-		this._isEnabled = false;
-
-		if (super.isEnabled(context))
-		{
-			if (prefs.getBoolean("config_probe_device_use_enabled", true))
-				this._isEnabled = true;
 		}
 
 		return this._isEnabled;
