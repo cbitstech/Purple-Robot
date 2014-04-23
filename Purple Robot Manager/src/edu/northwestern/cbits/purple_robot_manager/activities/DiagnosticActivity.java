@@ -141,10 +141,6 @@ public class DiagnosticActivity extends ActionBarActivity
 				uploadCount.setText(this.getString(R.string.pending_files_file, http.pendingFilesCount()));
 			}
 		}
-		// config_enable_data_server
-		
-		// config_enable_streaming_jackson_data_server
-
 		
 		try 
 		{

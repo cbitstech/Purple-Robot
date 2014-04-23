@@ -1281,4 +1281,22 @@ public class HttpUploadPlugin extends OutputPlugin
 			LogManager.getInstance(context).logException(e);
 		}
 	}
+	
+	public long pendingFilesSize() 
+	{
+		File pendingFolder = this.getPendingFolder();
+
+		String[] filenames = pendingFolder.list(new FilenameFilter()
+		{
+			public boolean accept(File dir, String filename)
+			{
+				return filename.endsWith(".json");
+			}
+		});
+		
+		if (filenames.length < 1024)
+			return FileUtils.sizeOf(pendingFolder);
+		
+		return 2 * 1024 * 1024 * 1024;
+	}
 }

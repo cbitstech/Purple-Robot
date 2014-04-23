@@ -1,7 +1,5 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.InetAddress;
@@ -12,9 +10,6 @@ import java.util.Map;
 
 import org.apache.commons.net.ntp.NTPUDPClient;
 import org.apache.commons.net.ntp.TimeInfo;
-
-// import org.apache.commons.net.ntp.NTPUDPClient;
-// import org.apache.commons.net.ntp.TimeInfo;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -40,8 +35,11 @@ import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
+import edu.northwestern.cbits.purple_robot_manager.plugins.StreamingJacksonUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
+// import org.apache.commons.net.ntp.NTPUDPClient;
+// import org.apache.commons.net.ntp.TimeInfo;
 
 public class RobotHealthProbe extends Probe
 {
@@ -197,60 +195,51 @@ public class RobotHealthProbe extends Probe
 
 									me._checking = true;
 									
-//									File archiveFolder = httpPlugin.getArchiveFolder();
-									File pendingFolder = httpPlugin.getPendingFolder();
-
 									int pendingCount = 0;
-//									int archiveCount = 0;
+									
+									if (prefs.getBoolean("config_enable_data_server", false))
+									{
+										OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(context, HttpUploadPlugin.class);
+										
+										if (plugin instanceof HttpUploadPlugin)
+										{
+											HttpUploadPlugin http = (HttpUploadPlugin) plugin;
+											pendingCount += http.pendingFilesCount();
+										}
+									}
+									else
+									{
+										OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(context, StreamingJacksonUploadPlugin.class);
+										
+										if (plugin instanceof StreamingJacksonUploadPlugin)
+										{
+											StreamingJacksonUploadPlugin http = (StreamingJacksonUploadPlugin) plugin;
+											pendingCount += http.pendingFilesCount();
+										}
+									}
 
 									long pendingSize = 0;
-//									long archiveSize = 0;
 
-
-//									String[] archivesNames = archiveFolder.list();
-
-//									archiveCount = archivesNames.length;
-	
-/*									if (archiveCount < 2048)
+									if (prefs.getBoolean("config_enable_data_server", false))
 									{
-										for (File f : archiveFolder.listFiles())
+										OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(context, HttpUploadPlugin.class);
+										
+										if (plugin instanceof HttpUploadPlugin)
 										{
-											archiveSize += f.length();
+											HttpUploadPlugin http = (HttpUploadPlugin) plugin;
+											pendingSize += http.pendingFilesSize();
 										}
 									}
 									else
-										archiveSize = Integer.MAX_VALUE;
-*/
-
-									FilenameFilter jsonFilter =  new FilenameFilter()
 									{
-										public boolean accept(File dir, String filename)
+										OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(context, StreamingJacksonUploadPlugin.class);
+										
+										if (plugin instanceof StreamingJacksonUploadPlugin)
 										{
-											return filename.endsWith(".json");
-										}
-									};
-
-									String[] filenames = pendingFolder.list(jsonFilter);
-
-									if (filenames == null)
-										filenames = new String[0];
-
-									pendingCount = filenames.length;
-
-									if (pendingCount < 2048)
-									{
-										File[] fs = pendingFolder.listFiles(jsonFilter);
-
-										if (fs != null)
-										{
-											for (File f : fs)
-											{
-												pendingSize += f.length();
-											}
+											StreamingJacksonUploadPlugin http = (StreamingJacksonUploadPlugin) plugin;
+											pendingSize += http.pendingFilesSize();
 										}
 									}
-									else
-										pendingSize = Integer.MAX_VALUE;
 
 									Bundle bundle = new Bundle();
 									bundle.putString("PROBE", me.name(context));
@@ -258,9 +247,6 @@ public class RobotHealthProbe extends Probe
 
 									bundle.putInt(RobotHealthProbe.PENDING_COUNT, pendingCount);
 									bundle.putLong(RobotHealthProbe.PENDING_SIZE, pendingSize);
-
-//									bundle.putInt(RobotHealthProbe.ARCHIVE_COUNT, archiveCount);
-//									bundle.putLong(RobotHealthProbe.ARCHIVE_SIZE, archiveSize);
 
 									double throughput = httpPlugin.getRecentThroughput();
 
