@@ -485,4 +485,23 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
 
 		return filenames.length;
 	}
+
+	public long pendingFilesSize() 
+	{
+		File pendingFolder = this.getPendingFolder();
+		
+		String[] filenames = pendingFolder.list(new FilenameFilter()
+		{
+			public boolean accept(File dir, String filename)
+			{
+				return (filename.endsWith(StreamingJacksonUploadPlugin.FILE_EXTENSION) ||
+						filename.endsWith(StreamingJacksonUploadPlugin.TEMP_FILE_EXTENSION));
+			}
+		});
+		
+		if (filenames.length < 1024)
+			return FileUtils.sizeOf(pendingFolder);
+		
+		return 2 * 1024 * 1024 * 1024;
+	}
 }

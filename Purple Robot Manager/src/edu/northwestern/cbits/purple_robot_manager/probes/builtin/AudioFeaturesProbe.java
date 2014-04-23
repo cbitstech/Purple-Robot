@@ -25,6 +25,8 @@ public class AudioFeaturesProbe extends Probe
 	
 	private double[] samples = new double[32768];
 
+	private boolean _recording = false;
+
 	public String name(Context context) 
 	{
 		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.AudioFeaturesProbe";
@@ -65,8 +67,10 @@ public class AudioFeaturesProbe extends Probe
 		{
 			SharedPreferences prefs = Probe.getPreferences(context);
 
-			if (prefs.getBoolean("config_probe_audio_feature_enabled", AudioFeaturesProbe.DEFAULT_ENABLED))
+			if (this._recording == false && prefs.getBoolean("config_probe_audio_feature_enabled", AudioFeaturesProbe.DEFAULT_ENABLED))
 			{
+				this._recording = true;
+
 				final AudioFeaturesProbe me = this;
 
 				Runnable r = new Runnable()
@@ -88,7 +92,6 @@ public class AudioFeaturesProbe extends Probe
 								
 								if (newRecorder.getState() == AudioRecord.STATE_INITIALIZED)
 									recorder = newRecorder;
-									
 								else
 									newRecorder.release();
 							}
@@ -106,7 +109,7 @@ public class AudioFeaturesProbe extends Probe
 							
 							double sampleSum = 0;
 							double samplePower = 0;
-							
+
 							while (index < me.samples.length && 0 <= (read = recorder.read(buffer, 0, bufferSize)))
 							{
 								for (int i = 0; i < read; i++)
@@ -121,7 +124,7 @@ public class AudioFeaturesProbe extends Probe
 									}
 								}
 							}
-		
+
 							recorder.stop();
 
 							Bundle bundle = new Bundle();
@@ -139,7 +142,7 @@ public class AudioFeaturesProbe extends Probe
 							double maxMagnitude = 0;
 							
 							double minMagnitude = Double.MAX_VALUE;
-	
+
 							for (int i = 0; i < values.length / 2; i++) 
 							{
 								Complex value = values[i];
@@ -155,13 +158,24 @@ public class AudioFeaturesProbe extends Probe
 								if (magnitude < minMagnitude)
 									minMagnitude = magnitude;
 							}
-							
+
 							bundle.putDouble("FREQUENCY", maxFrequency);
 							bundle.putDouble("NORMALIZED_AVG_MAGNITUDE", (sampleSum / Short.MAX_VALUE) / me.samples.length);
 							bundle.putDouble("POWER", samplePower / me.samples.length);
 							
 							me.transmitData(context, bundle);
 						}
+
+						try 
+						{
+							Thread.sleep(10000);
+						} 
+						catch (InterruptedException e) 
+						{
+							e.printStackTrace();
+						}
+						
+						me._recording = false;
 					}
 				};
 				
@@ -171,7 +185,7 @@ public class AudioFeaturesProbe extends Probe
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 
