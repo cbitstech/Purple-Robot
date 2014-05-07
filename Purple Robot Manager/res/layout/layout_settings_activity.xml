@@ -76,7 +76,7 @@
 	           	android:defaultValue="true"/>
 			<EditTextPreference
 	           	android:key="config_data_server_uri"
-	           	android:inputType="textUri"
+	           	android:inputType="textUri|textMultiLine"
 	           	android:title="@string/title_http_upload_uri"
 	           	android:dialogTitle="@string/title_http_upload_uri"
 	           	android:dialogMessage="@string/summary_http_upload_uri"
@@ -152,7 +152,7 @@
 	           	android:defaultValue="false"/>
 			<EditTextPreference
 	           	android:key="config_log_server_uri"
-	           	android:inputType="textUri"
+	           	android:inputType="textUri|textMultiLine"
 	           	android:title="@string/title_log_upload_uri"
 	           	android:dialogTitle="@string/title_http_upload_uri"
 	           	android:dialogMessage="@string/summary_log_upload_uri"
@@ -196,7 +196,7 @@
             android:defaultValue="" />
         <EditTextPreference
             android:key="config_json_url"
-          	android:inputType="textUri"
+          	android:inputType="textUri|textMultiLine"
             android:title="@string/config_json_url_label"
             android:dialogMessage="@string/config_json_url_message"
             android:defaultValue="" />
