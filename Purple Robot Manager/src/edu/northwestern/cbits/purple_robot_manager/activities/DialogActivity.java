@@ -3,13 +3,16 @@ package edu.northwestern.cbits.purple_robot_manager.activities;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.ContextThemeWrapper;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
@@ -103,6 +106,7 @@ public class DialogActivity extends Activity
 		this.showNativeDialog();
 	}
 		
+	@SuppressLint("NewApi")
 	private void showNativeDialog() 
 	{
 		Intent intent = this.getIntent();
@@ -115,7 +119,9 @@ public class DialogActivity extends Activity
 		
 		final DialogActivity me = this;
 		
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		ContextThemeWrapper wrapper = new ContextThemeWrapper(this, R.style.Theme_AppCompat);
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(wrapper);
 		builder = builder.setTitle(title);
 		builder = builder.setMessage(message);
 		builder = builder.setCancelable(false);
@@ -187,33 +193,36 @@ public class DialogActivity extends Activity
 			});
 		}
 		
-		builder = builder.setOnDismissListener(new OnDismissListener()
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
 		{
-			public void onDismiss(DialogInterface arg0) 
+			builder = builder.setOnDismissListener(new OnDismissListener()
 			{
-				DialogActivity._currentDialog = null;
-				DialogActivity._currentActivity = null;
-				
-				if (DialogActivity._pendingDialogs.size() > 0)
+				public void onDismiss(DialogInterface arg0) 
 				{
-					HashMap<String, String> dialog = DialogActivity._pendingDialogs.remove(0);
+					DialogActivity._currentDialog = null;
+					DialogActivity._currentActivity = null;
 					
-					Intent intent = new Intent();
-					intent.putExtra(DialogActivity.DIALOG_TITLE, dialog.get(DialogActivity.DIALOG_TITLE));
-					intent.putExtra(DialogActivity.DIALOG_MESSAGE, dialog.get(DialogActivity.DIALOG_MESSAGE));
-					intent.putExtra(DialogActivity.DIALOG_CONFIRM_BUTTON, dialog.get(DialogActivity.DIALOG_CONFIRM_BUTTON));
-					intent.putExtra(DialogActivity.DIALOG_CONFIRM_SCRIPT, dialog.get(DialogActivity.DIALOG_CONFIRM_SCRIPT));
-					intent.putExtra(DialogActivity.DIALOG_CANCEL_BUTTON, dialog.get(DialogActivity.DIALOG_CANCEL_BUTTON));
-					intent.putExtra(DialogActivity.DIALOG_CANCEL_SCRIPT, dialog.get(DialogActivity.DIALOG_CANCEL_SCRIPT));
-					
-					me.setIntent(intent);
-					
-					me.showNativeDialog();
+					if (DialogActivity._pendingDialogs.size() > 0)
+					{
+						HashMap<String, String> dialog = DialogActivity._pendingDialogs.remove(0);
+						
+						Intent intent = new Intent();
+						intent.putExtra(DialogActivity.DIALOG_TITLE, dialog.get(DialogActivity.DIALOG_TITLE));
+						intent.putExtra(DialogActivity.DIALOG_MESSAGE, dialog.get(DialogActivity.DIALOG_MESSAGE));
+						intent.putExtra(DialogActivity.DIALOG_CONFIRM_BUTTON, dialog.get(DialogActivity.DIALOG_CONFIRM_BUTTON));
+						intent.putExtra(DialogActivity.DIALOG_CONFIRM_SCRIPT, dialog.get(DialogActivity.DIALOG_CONFIRM_SCRIPT));
+						intent.putExtra(DialogActivity.DIALOG_CANCEL_BUTTON, dialog.get(DialogActivity.DIALOG_CANCEL_BUTTON));
+						intent.putExtra(DialogActivity.DIALOG_CANCEL_SCRIPT, dialog.get(DialogActivity.DIALOG_CANCEL_SCRIPT));
+						
+						me.setIntent(intent);
+						
+						me.showNativeDialog();
+					}
+					else
+						me.finish();
 				}
-				else
-					me.finish();
-			}
-		});
+			});
+		}
 		
 		DialogActivity._currentDialog = builder.create();
 		DialogActivity._currentActivity  = this;
