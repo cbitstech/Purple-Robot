@@ -589,9 +589,15 @@ public abstract class BaseScriptEngine
 
 	public void setUserId(String userId)
 	{
+		this.setUserId(userId, true);
+	}
+
+	public void setUserId(String userId, boolean refreshConfig)
+	{
 		EncryptionManager.getInstance().setUserId(this._context, userId);
 		
-		this.refreshConfigUrl();
+		if (refreshConfig)
+			this.refreshConfigUrl();
 	}
 
 	public String fetchUserId()
