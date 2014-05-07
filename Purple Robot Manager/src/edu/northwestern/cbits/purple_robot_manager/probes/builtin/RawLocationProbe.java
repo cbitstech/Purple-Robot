@@ -1,5 +1,6 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import android.content.Context;
@@ -8,12 +9,14 @@ import android.content.SharedPreferences.Editor;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -41,10 +44,23 @@ public class RawLocationProbe extends Probe implements LocationListener
 	private static final String GPS_AVAILABLE = "GPS_AVAILABLE";
 	private static final String NETWORK_AVAILABLE = "NETWORK_AVAILABLE";
 
+	private static final String LOG_EVENT = "LOG_EVENT";
+	private static final String PROVIDER_DISABLED = "PROVIDER_DISABLED";
+	private static final String PROVIDER_ENABLED = "PROVIDER_ENABLED";
+
+	private static final String PROVIDER_STATUS_CHANGE = "PROVIDER_STATUS_CHANGE";
+	private static final String PROVIDER_STATUS = "PROVIDER_STATUS";
+	private static final String PROVIDER_STATUS_AVAILABLE = "AVAILABLE";
+	private static final String PROVIDER_STATUS_OUT_OF_SERVICE = "OUT_OF_SERVICE";
+	private static final String PROVIDER_STATUS_TEMPORARILY_UNAVAILABLE = "TEMPORARILY_UNAVAILABLE";
+
 	protected Context _context = null;
 
 	private long _lastFrequency = 0;
-	private boolean _listening= false;
+	private boolean _listening = false;
+	
+	private HashMap<String, Boolean> _lastEnabled = new HashMap<String, Boolean>();
+	private HashMap<String, Integer> _lastStatus = new HashMap<String, Integer>();
 
 	public String probeCategory(Context context)
 	{
@@ -153,7 +169,7 @@ public class RawLocationProbe extends Probe implements LocationListener
 				if (this._lastFrequency != freq || this._listening == false)
 				{
 					this._lastFrequency = freq;
-					this._listening = true;
+					this._listening = false;
 					
 					locationManager.removeUpdates(this);
 
@@ -171,7 +187,7 @@ public class RawLocationProbe extends Probe implements LocationListener
 			}
 		}
 
-		this._listening = true;
+		this._listening = false;
 
 		locationManager.removeUpdates(this);
 
@@ -226,26 +242,84 @@ public class RawLocationProbe extends Probe implements LocationListener
 
 		this.transmitData(this._context, bundle);
 	}
+	
+	private void logEvent(Bundle bundle)
+	{
+		Log.e("PR", "EVENT: " + bundle.getString(RawLocationProbe.LOG_EVENT));
+		Log.e("PR", "PROVIDER: " + bundle.getString(RawLocationProbe.PROVIDER));
+
+		long now = System.currentTimeMillis();
+
+		bundle.putString("PROBE", this.name(this._context) + "EventLog");
+		bundle.putLong("TIMESTAMP", now / 1000);
+
+		this.transmitData(this._context, bundle);
+	}
 
 	public void onProviderDisabled(String provider)
 	{
+		if (this._lastEnabled.containsKey(provider) && this._lastEnabled.get(provider).booleanValue() == false)
+			return;
+			
 		this._lastFrequency = 0;
 		
+		Bundle bundle = new Bundle();
+		bundle.putString(RawLocationProbe.PROVIDER, provider);
+		bundle.putString(RawLocationProbe.LOG_EVENT, RawLocationProbe.PROVIDER_DISABLED);
+		
+		this.logEvent(bundle);
+		
+		this._lastEnabled.put(provider, false);
+
 		if (this._context != null)
 			this.isEnabled(this._context);
 	}
 
 	public void onProviderEnabled(String provider)
 	{
+		if (this._lastEnabled.containsKey(provider) && this._lastEnabled.get(provider).booleanValue() == true)
+			return;
+
 		this._lastFrequency = 0;
+
+		Bundle bundle = new Bundle();
+		bundle.putString(RawLocationProbe.PROVIDER, provider);
+		bundle.putString(RawLocationProbe.LOG_EVENT, RawLocationProbe.PROVIDER_ENABLED);
+		
+		this.logEvent(bundle);
+
+		this._lastEnabled.put(provider, true);
 
 		if (this._context != null)
 			this.isEnabled(this._context);
 	}
 
-	public void onStatusChanged(String provider, int status, Bundle extras)
+	public void onStatusChanged(String provider, int status, Bundle bundle)
 	{
+		if (this._lastStatus.containsKey(provider) && this._lastStatus.get(provider).intValue() == status)
+			return;
+
 		this._lastFrequency = 0;
+
+		bundle.putString(RawLocationProbe.PROVIDER, provider);
+		bundle.putString(RawLocationProbe.LOG_EVENT, RawLocationProbe.PROVIDER_STATUS_CHANGE);
+		
+		switch (status)
+		{
+			case LocationProvider.OUT_OF_SERVICE:
+				bundle.putString(RawLocationProbe.PROVIDER_STATUS, RawLocationProbe.PROVIDER_STATUS_OUT_OF_SERVICE);
+				break;
+			case LocationProvider.AVAILABLE:
+				bundle.putString(RawLocationProbe.PROVIDER_STATUS, RawLocationProbe.PROVIDER_STATUS_AVAILABLE);
+				break;
+			case LocationProvider.TEMPORARILY_UNAVAILABLE:
+				bundle.putString(RawLocationProbe.PROVIDER_STATUS, RawLocationProbe.PROVIDER_STATUS_TEMPORARILY_UNAVAILABLE);
+				break;
+		}
+		
+		this.logEvent(bundle);
+
+		this._lastStatus.put(provider, status);
 
 		if (this._context != null)
 			this.isEnabled(this._context);
