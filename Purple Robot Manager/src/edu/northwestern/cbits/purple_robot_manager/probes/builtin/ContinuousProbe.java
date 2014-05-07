@@ -60,8 +60,6 @@ public abstract class ContinuousProbe extends Probe
 	
 	protected boolean shouldProcessEvent(SensorEvent event)
 	{
-//		Log.e("PR", "GOT SENSOR EVENT: " + event.sensor.getName());
-		
 		long now = System.currentTimeMillis();
 		
 		if (now - this._lastEnableCheck  > 5000)
