@@ -187,6 +187,9 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
 									}
 								});
 								
+								if (filenames == null)
+									filenames = new String[0];
+								
 								for (String filename : filenames)
 								{
 									File toDelete = new File(pendingFolder, filename);
@@ -500,7 +503,18 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
 		});
 		
 		if (filenames.length < 1024)
-			return FileUtils.sizeOf(pendingFolder);
+		{
+			try
+			{
+				return FileUtils.sizeOf(pendingFolder);
+			}
+			catch (IllegalArgumentException e)
+			{
+				// File went away - try again...
+				
+				return this.pendingFilesSize();
+			}
+		}
 		
 		return 2 * 1024 * 1024 * 1024;
 	}
