@@ -613,6 +613,10 @@
     <!-- Shion Probe -->
     <string name="title_shion_probe">Shion Probe</string>
     <string name="summary_shion_probe_desc">Fetches device information from a Shion home automation deployment.</string>
+
+    <!-- Pebble Probe -->
+    <string name="title_pebble_probe">Pebble Probe</string>
+    <string name="summary_pebble_probe_desc">Receives device information from a Pebble smartwatch.</string>
     
     <!-- Telephony Probe -->
     <string name="title_telephony_probe">Telephony Probe</string>

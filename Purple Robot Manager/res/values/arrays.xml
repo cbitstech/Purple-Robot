@@ -75,6 +75,7 @@
         <item>builtin.MediaRouterDeviceProbe</item>
         <item>builtin.ShionProbe</item>
         <item>builtin.SaintProbe</item>
+        <item>builtin.PebbleProbe</item>
         
         <!-- <item>builtin.BluetoothReceiverProbe</item> -->
         <!-- <item>builtin.ZeroconfProbe</item> -->

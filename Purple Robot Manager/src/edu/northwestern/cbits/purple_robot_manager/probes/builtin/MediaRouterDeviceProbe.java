@@ -16,9 +16,6 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.support.v7.media.MediaControlIntent;
-import android.support.v7.media.MediaRouteSelector;
-import android.support.v7.media.MediaRouter;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
@@ -34,7 +31,7 @@ public class MediaRouterDeviceProbe extends Probe
 	private long _lastScan = 0;
 	private boolean _isScanning = false;
 	
-	private MediaRouter.Callback _callback = new MediaRouter.Callback() 
+/*	private MediaRouter.Callback _callback = new MediaRouter.Callback() 
 	{
 		public void onProviderAdded (MediaRouter router, MediaRouter.ProviderInfo info)
 		{
@@ -66,7 +63,7 @@ public class MediaRouterDeviceProbe extends Probe
 //			Log.e("PR", "ROUTE REMOVE: " + route.getName() + " -- " + route.getPlaybackType() + " -- " + route.getVolume() + "/" + route.getVolumeMax());
 		}
 	};
-
+*/
 	public String name(Context context)
 	{
 		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.MediaRouterDeviceProbe";
@@ -106,7 +103,7 @@ public class MediaRouterDeviceProbe extends Probe
 						{
 							public void run() 
 							{
-								MediaRouter router = MediaRouter.getInstance(context);
+/*								MediaRouter router = MediaRouter.getInstance(context);
 
 								Bundle bundle = new Bundle();
 
@@ -170,6 +167,7 @@ public class MediaRouterDeviceProbe extends Probe
 								bundle.putString("DEFAULT_ROUTE", router.getDefaultRoute().getName());
 
 								me.transmitData(context, bundle);
+								*/
 							}						
 						});
 					}

@@ -41,6 +41,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LinkedInProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.MediaRouterDeviceProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.NetworkProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.PebbleProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RandomNoiseProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RawLocationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RobotHealthProbe;
@@ -522,6 +523,13 @@ public class ProbeManager
 				ShionProbe shion = (ShionProbe) probe;
 
 				if (shion.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof PebbleProbe)
+			{
+				PebbleProbe pebble = (PebbleProbe) probe;
+
+				if (pebble.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 			else if (probe instanceof SaintProbe)
