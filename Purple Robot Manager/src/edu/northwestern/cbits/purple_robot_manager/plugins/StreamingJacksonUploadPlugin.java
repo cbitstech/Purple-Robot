@@ -485,6 +485,9 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
 						filename.endsWith(StreamingJacksonUploadPlugin.TEMP_FILE_EXTENSION));
 			}
 		});
+		
+		if (filenames == null)
+			filenames = new String[0];
 
 		return filenames.length;
 	}
@@ -501,6 +504,9 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
 						filename.endsWith(StreamingJacksonUploadPlugin.TEMP_FILE_EXTENSION));
 			}
 		});
+
+		if (filenames == null)
+			filenames = new String[0];
 		
 		if (filenames.length < 1024)
 		{
