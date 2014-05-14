@@ -154,6 +154,12 @@ public class JavaScriptEngine extends BaseScriptEngine
 		bundle.putString("PROBE", name);
 		bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
 		
+		HashMap<String, Object> payload = new HashMap<String, Object>();
+		payload.put("name", name);
+		payload.put("value", value);
+		
+		LogManager.getInstance(this._context).log("script_emit_reading", payload);
+		
 		if (value instanceof String)
 			bundle.putString(Feature.FEATURE_VALUE, value.toString());
 		else if (value instanceof Double)

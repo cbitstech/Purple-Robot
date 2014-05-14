@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.ContextThemeWrapper;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
 public class DialogActivity extends Activity 
@@ -66,6 +67,16 @@ public class DialogActivity extends Activity
 
 		if (cancelScript == null)
 			cancelScript = "";
+
+		HashMap<String, Object> payload = new HashMap<String, Object>();
+		payload.put("title", title);
+		payload.put("message", message);
+		payload.put("confirmTitle", confirmTitle);
+		payload.put("cancelTitle", cancelTitle);
+		payload.put("cancelScript", cancelScript);
+		payload.put("confirmTitle", confirmTitle);
+		
+		LogManager.getInstance(context).log("static_show_dialog", payload);
 
 		if (DialogActivity._visible == false)
 		{
@@ -132,6 +143,8 @@ public class DialogActivity extends Activity
 			{
 				public void onClick(DialogInterface dialog, int which) 
 				{
+					HashMap<String, Object> payload = new HashMap<String, Object>();
+
 					if (confirmScript != null && confirmScript.trim().length() > 0)
 					{
 						Runnable r = new Runnable()
@@ -153,7 +166,11 @@ public class DialogActivity extends Activity
 						
 						Thread t = new Thread(r);
 						t.start();
+
+						payload.put("confirmScript", confirmScript);
 					}
+					
+					LogManager.getInstance(me).log("dialog_clicked_positive", payload);
 				}
 			});
 		}
@@ -167,6 +184,8 @@ public class DialogActivity extends Activity
 			{
 				public void onClick(DialogInterface dialog, int which) 
 				{
+					HashMap<String, Object> payload = new HashMap<String, Object>();
+
 					if (cancelScript != null && cancelScript.trim().length() > 0)
 					{
 						Runnable r = new Runnable()
@@ -188,7 +207,11 @@ public class DialogActivity extends Activity
 						
 						Thread t = new Thread(r);
 						t.start();
+
+						payload.put("cancelScript", cancelScript);
 					}
+					
+					LogManager.getInstance(me).log("dialog_clicked_negative", payload);
 				}
 			});
 		}
@@ -236,6 +259,8 @@ public class DialogActivity extends Activity
 		
 		if (DialogActivity._currentDialog != null && DialogActivity._currentActivity != null)
 		{
+			LogManager.getInstance(DialogActivity._currentActivity).log("dialogs_cleared", null);
+
 			DialogActivity._currentActivity.runOnUiThread(new Runnable()
 			{
 				public void run() 

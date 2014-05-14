@@ -1007,6 +1007,9 @@ public abstract class BaseScriptEngine
 
 	public void showNativeDialog(final String title, final String message, final String confirmTitle, final String cancelTitle, final String confirmScript, final String cancelScript)
 	{
+		HashMap<String, Object> payload = new HashMap<String, Object>();
+		LogManager.getInstance(this._context).log("script_show_native_dialog", payload);
+
 		DialogActivity.showNativeDialog(this._context, title, message, confirmTitle, cancelTitle, confirmScript, cancelScript);
 	}
 	public void clearNativeDialogs()

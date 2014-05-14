@@ -16,6 +16,7 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.CodeViewerActivity;
+import edu.northwestern.cbits.purple_robot_manager.activities.DialogActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
@@ -57,8 +58,16 @@ public abstract class Trigger
 
 	public void execute(final Context context, boolean force)
 	{
+		HashMap<String, Object> payload = new HashMap<String, Object>();
+		
 		if (this.enabled(context) && this._action != null)
 		{
+			payload.put("enabled", true);
+			payload.put("action", this._action);
+			payload.put("name", this.name());
+			payload.put("identifier", this.identifier());
+			payload.put("action", this._action);
+			
 			final Trigger me = this;
 
 			Runnable r = new Runnable()
@@ -79,6 +88,10 @@ public abstract class Trigger
 			Thread t = new Thread(new ThreadGroup("Triggers"), r, this.name(), 32768);
 			t.start();
 		}
+		else
+			payload.put("enabled", false);
+
+		LogManager.getInstance(context).log("trigger_fired", null);
 	}
 
 	public String toString()
