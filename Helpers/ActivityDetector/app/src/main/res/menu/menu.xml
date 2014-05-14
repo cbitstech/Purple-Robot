@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:id="@+id/menu_item_clearlog" android:title="@string/menu_item_clearlog" android:enabled="true"></item>
+    <item android:id="@+id/menu_item_showlog" android:visible="true" android:enabled="true" android:title="@string/menu_item_showlog"></item>
+    
+
+</menu>
