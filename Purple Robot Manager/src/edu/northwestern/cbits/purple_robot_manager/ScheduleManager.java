@@ -12,6 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -30,6 +31,7 @@ public class ScheduleManager
 		return sdf.format(date);
 	}
 
+	@SuppressLint("SimpleDateFormat")
 	public static void runOverdueScripts(Context context) 
 	{
 		List<Map<String, String>> scripts = ScheduleManager.fetchScripts(context);
@@ -54,6 +56,13 @@ public class ScheduleManager
 					String action = script.get("action");
 					
 					BaseScriptEngine.runScript(context, action);
+					
+					HashMap<String, Object> payload = new HashMap<String, Object>();
+					payload.put("run_timestamp", now);
+					payload.put("scheduled_timestamp", d.getTime());
+					payload.put("action", action);
+
+					LogManager.getInstance(context).log("scheduled_script_run", null);
 				}
 			}
 			catch (Exception e) 
@@ -163,7 +172,14 @@ public class ScheduleManager
 			
 			scripts.add(script);
 		}
-		
+
+		HashMap<String, Object> payload = new HashMap<String, Object>();
+		payload.put("scheduled_date", dateString);
+		payload.put("action", action);
+		payload.put("identifier", identifier);
+
+		LogManager.getInstance(context).log("scheduled_script", null);
+
 		ScheduleManager.persistScripts(context, scripts);
 	}
 	
