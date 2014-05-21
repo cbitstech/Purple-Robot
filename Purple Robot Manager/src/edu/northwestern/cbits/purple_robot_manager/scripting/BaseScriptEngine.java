@@ -1007,11 +1007,22 @@ public abstract class BaseScriptEngine
 
 	public void showNativeDialog(final String title, final String message, final String confirmTitle, final String cancelTitle, final String confirmScript, final String cancelScript)
 	{
-		DialogActivity.showNativeDialog(this._context, title, message, confirmTitle, cancelTitle, confirmScript, cancelScript);
+		DialogActivity.showNativeDialog(this._context, title, message, confirmTitle, cancelTitle, confirmScript, cancelScript, null, 0);
 	}
+
+	public void showNativeDialog(final String title, final String message, final String confirmTitle, final String cancelTitle, final String confirmScript, final String cancelScript, String tag, long priority)
+	{
+		DialogActivity.showNativeDialog(this._context, title, message, confirmTitle, cancelTitle, confirmScript, cancelScript, tag, priority);
+	}
+
 	public void clearNativeDialogs()
 	{
 		DialogActivity.clearNativeDialogs();
+	}
+
+	public void clearNativeDialogs(String tag)
+	{
+		DialogActivity.clearNativeDialogs(tag, null);
 	}
 
 	public boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen)
