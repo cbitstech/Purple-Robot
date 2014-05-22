@@ -78,6 +78,13 @@ public abstract class Trigger
 
 			Thread t = new Thread(new ThreadGroup("Triggers"), r, this.name(), 32768);
 			t.start();
+
+			HashMap<String, Object> payload = new HashMap<String, Object>();
+			payload.put("name", this.name());
+			payload.put("identifier", this.identifier());
+			payload.put("action", this._action);
+
+			LogManager.getInstance(context).log("pr_trigger_fired", payload);
 		}
 	}
 

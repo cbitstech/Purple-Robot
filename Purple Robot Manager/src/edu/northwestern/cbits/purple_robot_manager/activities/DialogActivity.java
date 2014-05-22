@@ -14,6 +14,7 @@ import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ContextThemeWrapper;
 import edu.emory.mathcs.backport.java.util.Collections;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -75,8 +76,11 @@ public class DialogActivity extends Activity
 		if (tag == null || "".equals(tag))
 			tag = UUID.randomUUID().toString();
 		
+		Log.e("PR", "1");
+		
 		if (DialogActivity._visible == false)
 		{
+			Log.e("PR", "1.1");
 			DialogActivity._visible = true;
 			
 			Intent intent = new Intent(context, DialogActivity.class);
@@ -96,13 +100,18 @@ public class DialogActivity extends Activity
 			intent.putExtra(DialogActivity.DIALOG_PRIORITY, priority);
 
 			context.startActivity(intent);
+			Log.e("PR", "1.2");
 		}
 		else
 		{
+			Log.e("PR", "2.1");
 			Intent intent = DialogActivity._currentActivity.getIntent();
 		
+			Log.e("PR", "2.1.0 TEST " + intent.getLongExtra(DialogActivity.DIALOG_PRIORITY, 0) + " <? " + priority);
+			
 			if (intent.getLongExtra(DialogActivity.DIALOG_PRIORITY, 0) < priority)
 			{
+				Log.e("PR", "2.1.1");
 				HashMap<String, Object> dialog = new HashMap<String, Object>();
 				dialog.put(DialogActivity.DIALOG_TITLE, intent.getStringExtra(DialogActivity.DIALOG_TITLE));
 				dialog.put(DialogActivity.DIALOG_MESSAGE, intent.getStringExtra(DialogActivity.DIALOG_MESSAGE));
@@ -116,7 +125,15 @@ public class DialogActivity extends Activity
 				dialog.put(DialogActivity.DIALOG_PRIORITY, intent.getLongExtra(DialogActivity.DIALOG_PRIORITY, 0));
 
 				DialogActivity._pendingDialogs.add(dialog);
+				
+				// Tag changed to current one so the dialog gets refreshed below...
+				
+				intent.putExtra(DialogActivity.DIALOG_TAG, tag);
+
+				Log.e("PR", "2.1.2");
 			}
+
+			Log.e("PR", "2.2");
 
 			HashMap<String, Object> dialog = new HashMap<String, Object>();
 			dialog.put(DialogActivity.DIALOG_TITLE, title);
@@ -129,8 +146,14 @@ public class DialogActivity extends Activity
 			dialog.put(DialogActivity.DIALOG_ADDED, System.currentTimeMillis());
 			dialog.put(DialogActivity.DIALOG_PRIORITY, priority);
 
+			Log.e("PR", "2.3");
+
 			DialogActivity.clearNativeDialogs(tag, dialog);
+
+			Log.e("PR", "2.4");
 		}
+		
+		Log.e("PR", "3");
 	}
 	
 	protected void onResume()
@@ -274,23 +297,22 @@ public class DialogActivity extends Activity
 		{
 			public int compare(HashMap<String, Object> one, HashMap<String, Object> two) 
 			{
-				Long priorityOne = (Long) one.get(DialogActivity.DIALOG_TITLE);
-				Long priorityTwo = (Long) two.get(DialogActivity.DIALOG_TITLE);
 				
-				if (priorityOne.longValue() < priorityTwo.longValue())
+				String priorityOne = one.get(DialogActivity.DIALOG_PRIORITY).toString();
+				String priorityTwo = two.get(DialogActivity.DIALOG_PRIORITY).toString();
+				
+				long pOne = Long.parseLong(priorityOne);
+				long pTwo = Long.parseLong(priorityTwo);
+				
+				if (pOne < pTwo)
 					return 1;
-				else if (priorityOne.longValue() > priorityTwo.longValue())
+				else if (pOne > pTwo)
 					return -1;
 
 				Long addedOne = (Long) one.get(DialogActivity.DIALOG_ADDED);
 				Long addedTwo = (Long) two.get(DialogActivity.DIALOG_ADDED);
 				
-				if (addedOne.longValue() < addedTwo.longValue())
-					return -1;
-				else if (addedOne.longValue() > addedTwo.longValue())
-					return 1;
-
-				return 0;
+				return addedOne.compareTo(addedTwo);
 			}
 		});
 	}

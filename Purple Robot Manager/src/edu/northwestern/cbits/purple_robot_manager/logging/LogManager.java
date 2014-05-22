@@ -28,6 +28,7 @@ import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.SingleClientConnManager;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
@@ -91,6 +92,8 @@ public class LogManager
 		
 		if (context != null)
 			LogManager._sharedInstance = new LogManager(context.getApplicationContext());
+		
+		LogManager._sharedInstance.log("pr_log_manager_initialized", null);
 		
 		return LogManager._sharedInstance;
 	}
@@ -295,7 +298,7 @@ public class LogManager
 					{
 						AndroidHttpClient androidClient = AndroidHttpClient.newInstance("Purple Robot", this._context);
 
-						SingleClientConnManager mgr = new SingleClientConnManager(androidClient.getParams(), registry);
+						ThreadSafeClientConnManager mgr = new ThreadSafeClientConnManager(androidClient.getParams(), registry);
 						HttpClient httpClient = new DefaultHttpClient(mgr, androidClient.getParams());
 
 						androidClient.close();
@@ -317,6 +320,8 @@ public class LogManager
 						HttpEntity httpEntity = response.getEntity();
 						
 						Log.e("PR-LOGGING", "Log upload result: " + EntityUtils.toString(httpEntity));
+						
+						httpEntity.consumeContent();
 
 						mgr.shutdown();
 					}

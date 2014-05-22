@@ -113,12 +113,12 @@ public abstract class BaseScriptEngine
 
 		HashMap <String, Object> payload = new HashMap<String, Object>();
 		payload.put("message", message);
-		LogManager.getInstance(this._context).log("script_log_message", payload);
+		LogManager.getInstance(this._context).log("pr_script_log_message", payload);
 	}
 	
 	public void playDefaultTone()
 	{
-		LogManager.getInstance(this._context).log("default_tone_played", null);
+		LogManager.getInstance(this._context).log("pr_default_tone_played", null);
 
 		this.playTone(null);
 	}
@@ -133,7 +133,7 @@ public abstract class BaseScriptEngine
 
 		HashMap <String, Object> payload = new HashMap<String, Object>();
 		payload.put("tone", tone);
-		LogManager.getInstance(this._context).log("tone_played", payload);
+		LogManager.getInstance(this._context).log("pr_tone_played", payload);
 		
 		
 		this._context.startService(intent);
@@ -177,7 +177,7 @@ public abstract class BaseScriptEngine
 
 		HashMap <String, Object> payload = new HashMap<String, Object>();
 		payload.put("pattern", pattern);
-		LogManager.getInstance(this._context).log("vibrate_device", payload);
+		LogManager.getInstance(this._context).log("pr_vibrate_device", payload);
 
 		this._context.startService(intent);
 	}
@@ -221,7 +221,7 @@ public abstract class BaseScriptEngine
 		HashMap <String, Object> payload = new HashMap<String, Object>();
 		payload.put("has_activity", (this._context instanceof Activity));
 		payload.put("message", message);
-		LogManager.getInstance(this._context).log("toast_message", payload);
+		LogManager.getInstance(this._context).log("pr_toast_message", payload);
 
 		final BaseScriptEngine me = this;
 				
@@ -251,7 +251,7 @@ public abstract class BaseScriptEngine
 
 			HashMap <String, Object> payload = new HashMap<String, Object>();
 			payload.put("url", urlString);
-			LogManager.getInstance(this._context).log("launch_url", payload);
+			LogManager.getInstance(this._context).log("pr_launch_url", payload);
 
 			return true;
 		}
@@ -273,7 +273,7 @@ public abstract class BaseScriptEngine
 
 		HashMap <String, Object> payload = new HashMap<String, Object>();
 		payload.put("url", urlString);
-		LogManager.getInstance(this._context).log("launch_internal_url", payload);
+		LogManager.getInstance(this._context).log("pr_launch_internal_url", payload);
 
 		return true;
 	}
@@ -834,7 +834,7 @@ public abstract class BaseScriptEngine
 		HashMap <String, Object> payload = new HashMap<String, Object>();
 		payload.put("application_present", (intent != null));
 		payload.put("application_name", applicationName);
-		LogManager.getInstance(this._context).log("application_launch", payload);
+		LogManager.getInstance(this._context).log("pr_application_launch", payload);
 
 		if (intent != null)
 		{
@@ -867,7 +867,7 @@ public abstract class BaseScriptEngine
 			HashMap <String, Object> payload = new HashMap<String, Object>();
 			payload.put("application_present", (intent != null));
 			payload.put("application_name", applicationName);
-			LogManager.getInstance(this._context).log("application_launch_notification", payload);
+			LogManager.getInstance(this._context).log("pr_application_launch_notification", payload);
 
 			if (intent != null)
 			{
@@ -924,7 +924,7 @@ public abstract class BaseScriptEngine
 		try
 		{
 			HashMap <String, Object> payload = new HashMap<String, Object>();
-			LogManager.getInstance(this._context).log("script_run_notification", payload);
+			LogManager.getInstance(this._context).log("pr_script_run_notification", payload);
 
 			Intent serviceIntent = this.constructScriptIntent(script);
 			
