@@ -62,7 +62,7 @@ public class ScheduleManager
 					payload.put("scheduled_timestamp", d.getTime());
 					payload.put("action", action);
 
-					LogManager.getInstance(context).log("scheduled_script_run", null);
+					LogManager.getInstance(context).log("pr_scheduled_script_run", payload);
 				}
 			}
 			catch (Exception e) 
@@ -178,7 +178,7 @@ public class ScheduleManager
 		payload.put("action", action);
 		payload.put("identifier", identifier);
 
-		LogManager.getInstance(context).log("scheduled_script", null);
+		LogManager.getInstance(context).log("pr_scheduled_script", null);
 
 		ScheduleManager.persistScripts(context, scripts);
 	}

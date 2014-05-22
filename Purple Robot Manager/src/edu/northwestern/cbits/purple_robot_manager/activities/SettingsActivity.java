@@ -136,14 +136,14 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
         Preference reset = prefs.findPreference(RESET_KEY);
         reset.setOnPreferenceClickListener(this);
 
-        LogManager.getInstance(me).log("settings_visited", null);
+        LogManager.getInstance(me).log("pr_settings_visited", null);
     }
 	
 	protected void onDestroy()
 	{
 		super.onDestroy();
 
-		LogManager.getInstance(this).log("settings_exited", null);
+		LogManager.getInstance(this).log("pr_settings_exited", null);
 	}
 
 	@SuppressWarnings("deprecation")

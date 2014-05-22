@@ -500,7 +500,7 @@ public class StartActivity extends ActionBarActivity
 
 		HashMap <String, Object> payload = new HashMap<String, Object>();
 		payload.put("probes_enabled", probesEnabled);
-		LogManager.getInstance(this).log("main_ui_dismissed", payload);
+		LogManager.getInstance(this).log("pr_main_ui_dismissed", payload);
 		
         if (this._observer != null)
         {
@@ -614,7 +614,7 @@ public class StartActivity extends ActionBarActivity
         
 		HashMap <String, Object> payload = new HashMap<String, Object>();
 		payload.put("probes_enabled", probesEnabled);
-		LogManager.getInstance(this).log("main_ui_shown", payload);
+		LogManager.getInstance(this).log("pr_main_ui_shown", payload);
 
 		final StartActivity me = this;
 

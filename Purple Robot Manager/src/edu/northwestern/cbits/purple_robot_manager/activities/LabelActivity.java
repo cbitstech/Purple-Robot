@@ -464,7 +464,7 @@ public class LabelActivity extends ActionBarActivity
 		payload.put("label_time", this._timestamp);
 		payload.put("label_context", this._labelContext);
 		
-		LogManager.getInstance(this).log("label_prompt", payload);
+		LogManager.getInstance(this).log("pr_label_prompt", payload);
     }
 
 	protected void onPause()
@@ -481,7 +481,7 @@ public class LabelActivity extends ActionBarActivity
         payload.put("label_time", this._timestamp);
 		payload.put("label_context", this._labelContext);
 		
-		LogManager.getInstance(this).log("label_dismissed", payload);
+		LogManager.getInstance(this).log("pr_label_dismissed", payload);
 	}
 
 	public boolean onCreateOptionsMenu(Menu menu)
@@ -519,7 +519,7 @@ public class LabelActivity extends ActionBarActivity
 	    				payload.put("label", key);
 	    				payload.put("label_value", value.toString());
 	    				
-	    				LogManager.getInstance(this).log("label_submit", payload);
+	    				LogManager.getInstance(this).log("pr_label_submit", payload);
 	    				
 	    				if (value instanceof Float)
 	    					e.putFloat("label_field_" + key, ((Float) value).floatValue());
@@ -599,7 +599,7 @@ public class LabelActivity extends ActionBarActivity
 	    				payload.put("label", key);
 	    				payload.put("label_value", value);
 	    				
-	    				LogManager.getInstance(this).log("label_submit", payload);
+	    				LogManager.getInstance(this).log("pr_label_submit", payload);
 	
 	    				this.finish();
 	    			}
