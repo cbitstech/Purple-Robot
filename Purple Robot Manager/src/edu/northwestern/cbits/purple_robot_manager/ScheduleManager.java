@@ -24,6 +24,7 @@ public class ScheduleManager
 {
 	private static final String DATE_FORMAT = "yyyyMMdd'T'HHmmss";
 	
+	@SuppressLint("SimpleDateFormat")
 	public static String formatString(Date date)
 	{
 		SimpleDateFormat sdf = new SimpleDateFormat(ScheduleManager.DATE_FORMAT);
@@ -192,6 +193,7 @@ public class ScheduleManager
 		return new Date(time);
 	}
 
+	@SuppressLint("SimpleDateFormat")
 	public static Date parseString(String dateString) 
 	{
 		SimpleDateFormat sdf = new SimpleDateFormat(ScheduleManager.DATE_FORMAT);
