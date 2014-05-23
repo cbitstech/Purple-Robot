@@ -14,7 +14,6 @@ import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ContextThemeWrapper;
 import edu.emory.mathcs.backport.java.util.Collections;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -76,11 +75,8 @@ public class DialogActivity extends Activity
 		if (tag == null || "".equals(tag))
 			tag = UUID.randomUUID().toString();
 		
-		Log.e("PR", "1");
-		
 		if (DialogActivity._visible == false)
 		{
-			Log.e("PR", "1.1");
 			DialogActivity._visible = true;
 			
 			Intent intent = new Intent(context, DialogActivity.class);
@@ -100,18 +96,13 @@ public class DialogActivity extends Activity
 			intent.putExtra(DialogActivity.DIALOG_PRIORITY, priority);
 
 			context.startActivity(intent);
-			Log.e("PR", "1.2");
 		}
 		else
 		{
-			Log.e("PR", "2.1");
 			Intent intent = DialogActivity._currentActivity.getIntent();
 		
-			Log.e("PR", "2.1.0 TEST " + intent.getLongExtra(DialogActivity.DIALOG_PRIORITY, 0) + " <? " + priority);
-			
 			if (intent.getLongExtra(DialogActivity.DIALOG_PRIORITY, 0) < priority)
 			{
-				Log.e("PR", "2.1.1");
 				HashMap<String, Object> dialog = new HashMap<String, Object>();
 				dialog.put(DialogActivity.DIALOG_TITLE, intent.getStringExtra(DialogActivity.DIALOG_TITLE));
 				dialog.put(DialogActivity.DIALOG_MESSAGE, intent.getStringExtra(DialogActivity.DIALOG_MESSAGE));
@@ -129,11 +120,7 @@ public class DialogActivity extends Activity
 				// Tag changed to current one so the dialog gets refreshed below...
 				
 				intent.putExtra(DialogActivity.DIALOG_TAG, tag);
-
-				Log.e("PR", "2.1.2");
 			}
-
-			Log.e("PR", "2.2");
 
 			HashMap<String, Object> dialog = new HashMap<String, Object>();
 			dialog.put(DialogActivity.DIALOG_TITLE, title);
@@ -146,14 +133,8 @@ public class DialogActivity extends Activity
 			dialog.put(DialogActivity.DIALOG_ADDED, System.currentTimeMillis());
 			dialog.put(DialogActivity.DIALOG_PRIORITY, priority);
 
-			Log.e("PR", "2.3");
-
 			DialogActivity.clearNativeDialogs(tag, dialog);
-
-			Log.e("PR", "2.4");
 		}
-		
-		Log.e("PR", "3");
 	}
 	
 	protected void onResume()

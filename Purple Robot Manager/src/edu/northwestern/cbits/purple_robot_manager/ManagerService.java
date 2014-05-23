@@ -22,7 +22,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -84,8 +83,6 @@ public class ManagerService extends IntentService
 			final ManagerService me = this;
 			
 			final boolean force = intent.getBooleanExtra(ManagerService.LOG_FORCE_UPLOAD, false);
-			
-			Log.e("PR", "UPLOAD LOGS: " + force);
 			
 			Runnable r = new Runnable()
 			{
