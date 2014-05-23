@@ -22,6 +22,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -32,6 +33,7 @@ import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
 public class ManagerService extends IntentService
 {
+	public static final String LOG_FORCE_UPLOAD = "log_force_upload";
 	public static String RUN_SCRIPT_INTENT = "purple_robot_manager_run_script";
 	public static String RUN_SCRIPT = "run_script";
 
@@ -81,11 +83,15 @@ public class ManagerService extends IntentService
 		{
 			final ManagerService me = this;
 			
+			final boolean force = intent.getBooleanExtra(ManagerService.LOG_FORCE_UPLOAD, false);
+			
+			Log.e("PR", "UPLOAD LOGS: " + force);
+			
 			Runnable r = new Runnable()
 			{
 				public void run() 
 				{
-					LogManager.getInstance(me).attemptUploads();
+					LogManager.getInstance(me).attemptUploads(force);
 				}
 			};
 			
@@ -398,7 +404,7 @@ public class ManagerService extends IntentService
 		
 		for (int i = 0; i < labels.length && i < values.length; i++)
 		{
-			if (values[i].toLowerCase().equals(path.toLowerCase(Locale.getDefault())))
+			if (values[i].toLowerCase(Locale.ENGLISH).equals(path.toLowerCase(Locale.getDefault())))
 				return labels[i];
 		}
 			

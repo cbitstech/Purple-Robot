@@ -1201,6 +1201,13 @@
     
 -->
 		
+	<string name="value_zero">0</string>
+	<string name="value_four">4</string>
+	<string name="value_sixty">60</string>
+	<string name="value_256k">262114</string>
+	<string name="value_300">300</string>
+	<string name="value_600">600</string>
+	<string name="value_3600">3600</string>
 </resources>
 
 

@@ -186,6 +186,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
         else if (LOG_REFRESH_KEY.equals(preference.getKey()))
         {
         	Intent refreshIntent = new Intent(ManagerService.UPLOAD_LOGS_INTENT);
+        	refreshIntent.putExtra(ManagerService.LOG_FORCE_UPLOAD, true);
         	refreshIntent.setClass(me, ManagerService.class);
 
         	this.startService(refreshIntent);
