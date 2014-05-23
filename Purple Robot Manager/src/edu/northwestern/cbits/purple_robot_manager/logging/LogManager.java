@@ -216,8 +216,6 @@ public class LogManager
 	
 	public void attemptUploads(boolean force) 
 	{
-		Log.e("PR", "UPLOAD LOGS: " + force);
-		
 		if (force)
 			this._lastUpload = 0;
 		
@@ -229,8 +227,6 @@ public class LogManager
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
 		
 		long interval = Long.parseLong(prefs.getString("config_log_upload_interval", "" + LogManager.DEFAULT_INTERVAL)) * 1000;
-		
-		Log.e("PR", (now - this._lastUpload) + " >? " + interval + " ==> " + (now - this._lastUpload > interval));
 		
 		if (now - this._lastUpload < interval)
 			return;
@@ -291,8 +287,6 @@ public class LogManager
 				String[] args = { "" + 0 };
 				
 				Cursor c = this._context.getContentResolver().query(LogContentProvider.APP_EVENTS_URI, null, selection, args, LogContentProvider.APP_EVENT_RECORDED);
-				
-				Log.e("PR", "TO UPLOAD: " + c.getCount());
 
 				while (c.moveToNext())
 				{
@@ -344,11 +338,7 @@ public class LogManager
 				
 				selection = LogContentProvider.APP_EVENT_TRANSMITTED + " != ?";
 				
-				c = this._context.getContentResolver().query(LogContentProvider.APP_EVENTS_URI, null, selection, args, LogContentProvider.APP_EVENT_RECORDED);
-
-				Log.e("PR", "TRANSMITTED: " + c.getCount());
-				
-				c.close();
+				this._context.getContentResolver().delete(LogContentProvider.APP_EVENTS_URI, selection, args);
 			} 
 			catch (URISyntaxException e) 
 			{
