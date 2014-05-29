@@ -158,7 +158,7 @@ public class LocalHttpServer
             } 
             catch (ConnectionClosedException e) 
             {
-            	e.printStackTrace();
+            	// e.printStackTrace();
             }
             catch (IOException e) 
             {

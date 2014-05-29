@@ -14,6 +14,8 @@ import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.ContextThemeWrapper;
 import edu.emory.mathcs.backport.java.util.Collections;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -52,28 +54,56 @@ public class DialogActivity extends Activity
 		super.onDestroy();
 	}
 	
-	public static void showNativeDialog(Context context, String title, String message, String confirmTitle, String cancelTitle, String confirmScript, String cancelScript, String tag, long priority)
+	public static void showNativeDialog(final Context context, final String title, final String message, final String confirmTitle, final String cancelTitle, final String confirmScript, final String cancelScript, final String tag, final long priority)
 	{
 		if (title == null)
-			title = "";
+		{
+			DialogActivity.showNativeDialog(context, "", message, confirmTitle, cancelTitle, confirmScript, cancelScript, tag, priority);
+			
+			return;
+		}
 
 		if (message == null)
-			message = "";
+		{
+			DialogActivity.showNativeDialog(context, title, "", confirmTitle, cancelTitle, confirmScript, cancelScript, tag, priority);
+			
+			return;
+		}
 		
 		if (confirmTitle == null)
-			confirmTitle = "";
+		{
+			DialogActivity.showNativeDialog(context, title, message, "", cancelTitle, confirmScript, cancelScript, tag, priority);
+			
+			return;
+		}
 
 		if (confirmScript == null)
-			confirmScript = "";
+		{
+			DialogActivity.showNativeDialog(context, title, message, confirmTitle, cancelTitle, "", cancelScript, tag, priority);
+			
+			return;
+		}
 
 		if (cancelTitle == null)
-			cancelTitle = "";
+		{
+			DialogActivity.showNativeDialog(context, title, message, confirmTitle, "", confirmScript, cancelScript, tag, priority);
+			
+			return;
+		}
 
 		if (cancelScript == null)
-			cancelScript = "";
+		{
+			DialogActivity.showNativeDialog(context, title, message, confirmTitle, cancelTitle, confirmScript, "", tag, priority);
+			
+			return;
+		}
 		
 		if (tag == null || "".equals(tag))
-			tag = UUID.randomUUID().toString();
+		{
+			DialogActivity.showNativeDialog(context, title, message, confirmTitle, cancelTitle, confirmScript, cancelScript, UUID.randomUUID().toString(), priority);
+			
+			return;
+		}
 		
 		if (DialogActivity._visible == false)
 		{
@@ -99,41 +129,57 @@ public class DialogActivity extends Activity
 		}
 		else
 		{
-			Intent intent = DialogActivity._currentActivity.getIntent();
-		
-			if (intent.getLongExtra(DialogActivity.DIALOG_PRIORITY, 0) < priority)
+			final Handler handler = new Handler(Looper.getMainLooper());
+
+			Runnable r = new Runnable()
 			{
-				HashMap<String, Object> dialog = new HashMap<String, Object>();
-				dialog.put(DialogActivity.DIALOG_TITLE, intent.getStringExtra(DialogActivity.DIALOG_TITLE));
-				dialog.put(DialogActivity.DIALOG_MESSAGE, intent.getStringExtra(DialogActivity.DIALOG_MESSAGE));
-				dialog.put(DialogActivity.DIALOG_CONFIRM_BUTTON, intent.getStringExtra(DialogActivity.DIALOG_CONFIRM_BUTTON));
-				dialog.put(DialogActivity.DIALOG_CONFIRM_SCRIPT, intent.getStringExtra(DialogActivity.DIALOG_CONFIRM_SCRIPT));
-				dialog.put(DialogActivity.DIALOG_CANCEL_BUTTON, intent.getStringExtra(DialogActivity.DIALOG_CANCEL_BUTTON));
-				dialog.put(DialogActivity.DIALOG_CANCEL_SCRIPT, intent.getStringExtra(DialogActivity.DIALOG_CANCEL_SCRIPT));
+				public void run() 
+				{
+					if (DialogActivity._currentActivity == null)
+					{
+						handler.postDelayed(this, 100);
+						return;
+					}
 
-				dialog.put(DialogActivity.DIALOG_TAG, intent.getStringExtra(DialogActivity.DIALOG_CANCEL_SCRIPT));
-				dialog.put(DialogActivity.DIALOG_ADDED, intent.getLongExtra(DialogActivity.DIALOG_ADDED, System.currentTimeMillis()));
-				dialog.put(DialogActivity.DIALOG_PRIORITY, intent.getLongExtra(DialogActivity.DIALOG_PRIORITY, 0));
+					Intent intent = DialogActivity._currentActivity.getIntent();
+					
+					if (intent.getLongExtra(DialogActivity.DIALOG_PRIORITY, 0) < priority)
+					{
+						HashMap<String, Object> dialog = new HashMap<String, Object>();
+						dialog.put(DialogActivity.DIALOG_TITLE, intent.getStringExtra(DialogActivity.DIALOG_TITLE));
+						dialog.put(DialogActivity.DIALOG_MESSAGE, intent.getStringExtra(DialogActivity.DIALOG_MESSAGE));
+						dialog.put(DialogActivity.DIALOG_CONFIRM_BUTTON, intent.getStringExtra(DialogActivity.DIALOG_CONFIRM_BUTTON));
+						dialog.put(DialogActivity.DIALOG_CONFIRM_SCRIPT, intent.getStringExtra(DialogActivity.DIALOG_CONFIRM_SCRIPT));
+						dialog.put(DialogActivity.DIALOG_CANCEL_BUTTON, intent.getStringExtra(DialogActivity.DIALOG_CANCEL_BUTTON));
+						dialog.put(DialogActivity.DIALOG_CANCEL_SCRIPT, intent.getStringExtra(DialogActivity.DIALOG_CANCEL_SCRIPT));
 
-				DialogActivity._pendingDialogs.add(dialog);
-				
-				// Tag changed to current one so the dialog gets refreshed below...
-				
-				intent.putExtra(DialogActivity.DIALOG_TAG, tag);
-			}
+						dialog.put(DialogActivity.DIALOG_TAG, intent.getStringExtra(DialogActivity.DIALOG_TAG));
+						dialog.put(DialogActivity.DIALOG_ADDED, intent.getLongExtra(DialogActivity.DIALOG_ADDED, System.currentTimeMillis()));
+						dialog.put(DialogActivity.DIALOG_PRIORITY, intent.getLongExtra(DialogActivity.DIALOG_PRIORITY, 0));
 
-			HashMap<String, Object> dialog = new HashMap<String, Object>();
-			dialog.put(DialogActivity.DIALOG_TITLE, title);
-			dialog.put(DialogActivity.DIALOG_MESSAGE, message);
-			dialog.put(DialogActivity.DIALOG_CONFIRM_BUTTON, confirmTitle);
-			dialog.put(DialogActivity.DIALOG_CONFIRM_SCRIPT, confirmScript);
-			dialog.put(DialogActivity.DIALOG_CANCEL_BUTTON, cancelTitle);
-			dialog.put(DialogActivity.DIALOG_CANCEL_SCRIPT, cancelScript);
-			dialog.put(DialogActivity.DIALOG_TAG, tag);
-			dialog.put(DialogActivity.DIALOG_ADDED, System.currentTimeMillis());
-			dialog.put(DialogActivity.DIALOG_PRIORITY, priority);
+						DialogActivity._pendingDialogs.add(dialog);
+						
+						// Tag changed to current one so the dialog gets refreshed below...
+						
+						intent.putExtra(DialogActivity.DIALOG_TAG, tag);
+					}
 
-			DialogActivity.clearNativeDialogs(tag, dialog);
+					HashMap<String, Object> dialog = new HashMap<String, Object>();
+					dialog.put(DialogActivity.DIALOG_TITLE, title);
+					dialog.put(DialogActivity.DIALOG_MESSAGE, message);
+					dialog.put(DialogActivity.DIALOG_CONFIRM_BUTTON, confirmTitle);
+					dialog.put(DialogActivity.DIALOG_CONFIRM_SCRIPT, confirmScript);
+					dialog.put(DialogActivity.DIALOG_CANCEL_BUTTON, cancelTitle);
+					dialog.put(DialogActivity.DIALOG_CANCEL_SCRIPT, cancelScript);
+					dialog.put(DialogActivity.DIALOG_TAG, tag);
+					dialog.put(DialogActivity.DIALOG_ADDED, System.currentTimeMillis());
+					dialog.put(DialogActivity.DIALOG_PRIORITY, priority);
+
+					DialogActivity.clearNativeDialogs(tag, dialog);
+				}
+			};
+			
+			handler.postDelayed(r, 100);
 		}
 	}
 	

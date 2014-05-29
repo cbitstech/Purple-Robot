@@ -11,6 +11,7 @@ import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Undefined;
 
 import android.content.Context;
+
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 
