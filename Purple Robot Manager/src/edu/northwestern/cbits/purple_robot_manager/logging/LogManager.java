@@ -300,8 +300,6 @@ public class LogManager
 						
 						String payload = c.getString(c.getColumnIndex(LogContentProvider.APP_EVENT_PAYLOAD));
 						
-						Log.e("PR", "UPLOADING: " + payload);
-						
 						HttpPost httpPost = new HttpPost(siteUri);
 						
 						List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();

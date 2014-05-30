@@ -12,10 +12,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.preference.PreferenceManager;
 import android.view.ContextThemeWrapper;
 import edu.emory.mathcs.backport.java.util.Collections;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -175,7 +177,7 @@ public class DialogActivity extends Activity
 					dialog.put(DialogActivity.DIALOG_ADDED, System.currentTimeMillis());
 					dialog.put(DialogActivity.DIALOG_PRIORITY, priority);
 
-					DialogActivity.clearNativeDialogs(tag, dialog);
+					DialogActivity.clearNativeDialogs(context, tag, dialog);
 				}
 			};
 			
@@ -360,7 +362,7 @@ public class DialogActivity extends Activity
 		}
 	}
 
-	public static void clearNativeDialogs(String tag, HashMap<String, Object> replacement) 
+	public static void clearNativeDialogs(Context context, String tag, HashMap<String, Object> replacement) 
 	{
 		ArrayList<HashMap<String, Object>> toRemove = new ArrayList<HashMap<String, Object>>();
 		
@@ -376,6 +378,15 @@ public class DialogActivity extends Activity
 			DialogActivity._pendingDialogs.add(replacement);
 		
 		DialogActivity.sortPending();
+		
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		
+		int stackCount = Integer.parseInt(prefs.getString("config_dialog_count", "4"));
+		
+		while (DialogActivity._pendingDialogs.size() >= stackCount && stackCount > 0)
+		{
+			DialogActivity._pendingDialogs.remove(DialogActivity._pendingDialogs.size() - 1);
+		}
 		
 		if (DialogActivity._currentDialog != null && DialogActivity._currentActivity != null)
 		{
