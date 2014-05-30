@@ -27,26 +27,25 @@ import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.SingleClientConnManager;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
+import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.http.AndroidHttpClient;
 import android.preference.PreferenceManager;
 import android.util.Log;
-
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.WiFiHelper;
@@ -62,16 +61,17 @@ public class LogManager
 	private static final String ALTITUDE = "altitude";
 	private static final String TIME_DRIFT = "time_drift";
 	
-	private static final String LOG_QUEUE = "pending_log_queue";
 	private static final String CONTENT_OBJECT = "content_object";
 	private static final String USER_ID = "user_id";
 	private static final String STACKTRACE = "stacktrace";
+	private static final long DEFAULT_INTERVAL = 300;
 
 	private static LogManager _sharedInstance = null;
 	
 	private boolean _uploading = false;
 	
 	private Context _context = null;
+	private long _lastUpload = System.currentTimeMillis();
 	
 	public LogManager(Context context) 
 	{
@@ -81,7 +81,7 @@ public class LogManager
 		
 		Intent intent = new Intent(ManagerService.UPLOAD_LOGS_INTENT);
 		PendingIntent pending = PendingIntent.getService(this._context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-		alarms.setInexactRepeating(AlarmManager.RTC, 0, 300000, pending);
+		alarms.setInexactRepeating(AlarmManager.RTC, 0, 60000, pending);
 	}
 
 	public static LogManager getInstance(Context context)
@@ -91,6 +91,8 @@ public class LogManager
 		
 		if (context != null)
 			LogManager._sharedInstance = new LogManager(context.getApplicationContext());
+		
+		LogManager._sharedInstance.log("pr_log_manager_initialized", null);
 		
 		return LogManager._sharedInstance;
 	}
@@ -180,44 +182,31 @@ public class LogManager
 				
 				if (payload.containsKey(LogManager.USER_ID) == false)
 					payload.put(LogManager.USER_ID, EncryptionManager.getInstance().getUserHash(this._context));
-
+				
 				try 
 				{
-					JSONArray pendingEvents = new JSONArray(prefs.getString(LogManager.LOG_QUEUE, "[]"));
+					ContentValues values = new ContentValues();
+					values.put(LogContentProvider.APP_EVENT_RECORDED, System.currentTimeMillis());
+					values.put(LogContentProvider.APP_EVENT_NAME, event);
+	
 					JSONObject jsonEvent = new JSONObject();
-					
+	
 					for (String key : payload.keySet())
 					{
 						jsonEvent.put(key, payload.get(key));
 					}
 
 					jsonEvent.put(LogManager.CONTENT_OBJECT, new JSONObject(jsonEvent.toString()));
-
-					pendingEvents.put(jsonEvent);
 					
-					if (pendingEvents.length() > 128)
-					{
-						JSONArray newEvents = new JSONArray();
-						
-						for (int i = pendingEvents.length() - 128; i < pendingEvents.length(); i++)
-						{
-							newEvents.put(pendingEvents.get(i));
-						}
-
-						pendingEvents = newEvents;
-					}
+					values.put(LogContentProvider.APP_EVENT_PAYLOAD, jsonEvent.toString());
 					
-					Editor e = prefs.edit();
-					e.putString(LogManager.LOG_QUEUE, pendingEvents.toString());
-					e.commit();
-
-					pendingEvents = new JSONArray(prefs.getString(LogManager.LOG_QUEUE, "[]"));
-
+					this._context.getContentResolver().insert(LogContentProvider.APP_EVENTS_URI, values);
+					
 					return true;
-				}
+				} 
 				catch (JSONException e) 
 				{
-					e.printStackTrace();
+					this.logException(e);
 				}
 			}
 		}
@@ -225,20 +214,25 @@ public class LogManager
 		return false;
 	}
 	
-	public boolean queueContains(String event, Map<String, Object> payload)
+	public void attemptUploads(boolean force) 
 	{
-		return false;
-	}
-
-	public void attemptUploads() 
-	{
+		if (force)
+			this._lastUpload = 0;
+		
 		if (this._uploading)
 			return;
 		
-		this._uploading = true;
+		long now = System.currentTimeMillis();
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+		
+		long interval = Long.parseLong(prefs.getString("config_log_upload_interval", "" + LogManager.DEFAULT_INTERVAL)) * 1000;
+		
+		if (now - this._lastUpload < interval)
+			return;
 
+		this._lastUpload = now;
+		
 		boolean restrictWifi = true;
 		
 		try
@@ -252,6 +246,8 @@ public class LogManager
 		
 		if (restrictWifi && WiFiHelper.wifiAvailable(this._context) == false)
 			return;
+
+		this._uploading = true;
 		
 		String endpointUri = prefs.getString("config_log_server_uri", null);
 		
@@ -259,104 +255,116 @@ public class LogManager
 		{
 			try 
 			{
-				JSONArray pendingEvents = new JSONArray(prefs.getString(LogManager.LOG_QUEUE, "[]"));
+				URI siteUri = new URI(endpointUri);
+
+				SchemeRegistry registry = new SchemeRegistry();
+				registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
 				
-				try 
+				SSLSocketFactory socketFactory = SSLSocketFactory.getSocketFactory();
+
+				boolean liberalSsl = true;
+				
+				try
 				{
-					URI siteUri = new URI(endpointUri);
+					liberalSsl = prefs.getBoolean("config_http_liberal_ssl", true);
+				}
+				catch (ClassCastException e)
+				{
+					liberalSsl = prefs.getString("config_http_liberal_ssl", "true").equalsIgnoreCase("true");
+				}
+				
+				if (liberalSsl)
+				{
+			        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+			        trustStore.load(null, null);
 
-					SchemeRegistry registry = new SchemeRegistry();
-					registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-					
-					SSLSocketFactory socketFactory = SSLSocketFactory.getSocketFactory();
+			        socketFactory = new LiberalSSLSocketFactory(trustStore);								
+				}
 
-					boolean liberalSsl = true;
-					
-					try
-					{
-						liberalSsl = prefs.getBoolean("config_http_liberal_ssl", true);
-					}
-					catch (ClassCastException e)
-					{
-						liberalSsl = prefs.getString("config_http_liberal_ssl", "true").equalsIgnoreCase("true");
-					}
-					
-					if (liberalSsl)
-					{
-				        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-				        trustStore.load(null, null);
+				registry.register(new Scheme("https", socketFactory, 443));
 
-				        socketFactory = new LiberalSSLSocketFactory(trustStore);								
-					}
+				String selection = LogContentProvider.APP_EVENT_TRANSMITTED + " = ?";
+				String[] args = { "" + 0 };
+				
+				Cursor c = this._context.getContentResolver().query(LogContentProvider.APP_EVENTS_URI, null, selection, args, LogContentProvider.APP_EVENT_RECORDED);
 
-					registry.register(new Scheme("https", socketFactory, 443));
-
-					for (int i = 0; i < pendingEvents.length(); i++)
+				while (c.moveToNext())
+				{
+					try 
 					{
 						AndroidHttpClient androidClient = AndroidHttpClient.newInstance("Purple Robot", this._context);
+						ThreadSafeClientConnManager mgr = new ThreadSafeClientConnManager(androidClient.getParams(), registry);
 
-						SingleClientConnManager mgr = new SingleClientConnManager(androidClient.getParams(), registry);
 						HttpClient httpClient = new DefaultHttpClient(mgr, androidClient.getParams());
-
 						androidClient.close();
-
-						JSONObject event = pendingEvents.getJSONObject(i);
+						
+						String payload = c.getString(c.getColumnIndex(LogContentProvider.APP_EVENT_PAYLOAD));
 						
 						HttpPost httpPost = new HttpPost(siteUri);
 						
 						List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-						nameValuePairs.add(new BasicNameValuePair("logJSON", event.toString()));
-						nameValuePairs.add(new BasicNameValuePair("json", event.toString()));
+						nameValuePairs.add(new BasicNameValuePair("logJSON", payload.toString()));
+						nameValuePairs.add(new BasicNameValuePair("json", payload.toString()));
 						HttpEntity entity = new UrlEncodedFormEntity(nameValuePairs, HTTP.US_ASCII);
 
 						httpPost.setEntity(entity);
-						
+
 						httpClient.execute(httpPost);
 						HttpResponse response = httpClient.execute(httpPost);
 
 						HttpEntity httpEntity = response.getEntity();
-						
+
 						Log.e("PR-LOGGING", "Log upload result: " + EntityUtils.toString(httpEntity));
 
 						mgr.shutdown();
+
+						ContentValues values = new ContentValues();
+						values.put(LogContentProvider.APP_EVENT_TRANSMITTED, System.currentTimeMillis());
+
+						String updateWhere = LogContentProvider.APP_EVENT_ID + " = ?";
+						String[] updateArgs = { "" + c.getLong(c.getColumnIndex(LogContentProvider.APP_EVENT_ID)) };
+
+						this._context.getContentResolver().update(LogContentProvider.APP_EVENTS_URI, values, updateWhere, updateArgs);
+					}
+					catch (IOException e) 
+					{
+						e.printStackTrace();
 					}
 				}
-				catch (URISyntaxException e) 
-				{
-					e.printStackTrace();
-				} 
-				catch (KeyStoreException e) 
-				{
-					e.printStackTrace();
-				} 
-				catch (NoSuchAlgorithmException e) 
-				{
-					e.printStackTrace();
-				}
-				catch (CertificateException e) 
-				{
-					e.printStackTrace();
-				} 
-				catch (IOException e) 
-				{
-					e.printStackTrace();
-				} 
-				catch (KeyManagementException e) 
-				{
-					e.printStackTrace();
-				}
-				catch (UnrecoverableKeyException e) 
-				{
-					e.printStackTrace();
-				}
+
+				c.close();
 				
-				Editor e = prefs.edit();
-				e.putString(LogManager.LOG_QUEUE, "[]");
-				e.commit();
-			}
-			catch (JSONException e) 
+				selection = LogContentProvider.APP_EVENT_TRANSMITTED + " != ?";
+				
+				this._context.getContentResolver().delete(LogContentProvider.APP_EVENTS_URI, selection, args);
+			} 
+			catch (URISyntaxException e) 
 			{
-				e.printStackTrace();
+				this.logException(e);
+			} 
+			catch (NoSuchAlgorithmException e) 
+			{
+				this.logException(e);
+			} 
+			catch (CertificateException e) 
+			{
+				this.logException(e);
+			} 
+			catch (IOException e) 
+			{
+				this.logException(e);
+			} 
+			catch (KeyStoreException e) 
+			{
+				this.logException(e);
+			} 
+			catch (KeyManagementException e) 
+			{
+				this.logException(e);
+			} 
+			catch (UnrecoverableKeyException e) 
+			{
+				this.logException(e);
 			}
 		}
 		

@@ -32,7 +32,7 @@ public class WidgetReceiver extends BroadcastReceiver
 
 		HashMap <String, Object> payload = new HashMap<String, Object>();
 		payload.put("widget_action", action);
-		LogManager.getInstance(context).log("widget_tapped", payload);
+		LogManager.getInstance(context).log("pr_widget_tapped", payload);
 		
 		if (script != null)
 		{

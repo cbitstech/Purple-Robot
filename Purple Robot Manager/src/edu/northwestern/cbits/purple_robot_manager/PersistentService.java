@@ -1,5 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
+import java.util.HashMap;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -48,6 +50,8 @@ public class PersistentService extends Service
 	public void onCreate()
 	{
 		super.onCreate();
+		
+		LogManager.getInstance(this);
 
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -140,6 +144,22 @@ public class PersistentService extends Service
 		filter.addAction(PersistentService.SCRIPT_ACTION);
 		
 		this.registerReceiver(scriptReceiver, filter);
+		
+		final PersistentService me = this;
+		
+		final Thread.UncaughtExceptionHandler handler = Thread.getDefaultUncaughtExceptionHandler();
+		
+		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler()
+		{
+			public void uncaughtException(Thread thread, Throwable ex) 
+			{
+				HashMap<String, Object> payload = new HashMap<String, Object>();
+				payload.put("message", ex.getMessage());
+				LogManager.getInstance(me).log("pr_app_crashed", payload);
+				
+				handler.uncaughtException(thread, ex);
+			}
+		});
 	}
 
 	@SuppressLint("NewApi")
@@ -180,5 +200,10 @@ public class PersistentService extends Service
 		}
 
 		return Service.START_STICKY;
+	}
+	
+	public void onTaskRemoved(Intent rootIntent)
+	{
+		LogManager.getInstance(this).log("pr_service_stopped", null);
 	}
 }
