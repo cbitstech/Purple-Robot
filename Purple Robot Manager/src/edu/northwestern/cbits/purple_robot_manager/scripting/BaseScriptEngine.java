@@ -1022,7 +1022,7 @@ public abstract class BaseScriptEngine
 
 	public void clearNativeDialogs(String tag)
 	{
-		DialogActivity.clearNativeDialogs(tag, null);
+		DialogActivity.clearNativeDialogs(this._context, tag, null);
 	}
 
 	public boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen)
