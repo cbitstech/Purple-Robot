@@ -23,14 +23,14 @@
 	        android:entryValues="@array/sound_effect_values"
 	        android:title="@string/config_notification_sound_label"
 	        android:summary="@string/config_notification_sound_summary"
-	        android:defaultValue="0" />
+	        android:defaultValue="@string/value_zero" />
         <ListPreference
             android:key="config_json_haptic_pattern"
             android:entries="@array/vibrator_pattern_labels"
             android:entryValues="@array/vibrator_pattern_values"
             android:title="@string/config_vibrator_pattern_label"
             android:summary="@string/config_vibrator_pattern_message"
-            android:defaultValue="60" />
+            android:defaultValue="@string/value_sixty" />
     	<CheckBoxPreference
 	   	    android:title="@string/config_mute_warnings"
    		    android:summary="@string/summary_mute_warnings"
@@ -42,7 +42,7 @@
             android:entryValues="@array/dialog_count_values"
             android:title="@string/config_dialog_count_label"
             android:summary="@string/config_dialog_count_message"
-            android:defaultValue="4" />
+            android:defaultValue="@string/value_four" />
 	</PreferenceCategory>
     <PreferenceCategory android:title="@string/config_application_category">
     	<CheckBoxPreference
@@ -105,17 +105,17 @@
 	            android:entryValues="@array/http_upload_interval_values"
 	            android:title="@string/config_http_upload_interval_label"
 	            android:summary="@string/config_http_upload_interval_summary"
-	            android:defaultValue="0" />
+	            android:defaultValue="@string/value_zero" />
 	        <ListPreference
 	            android:key="config_http_upload_size"
 	            android:entries="@array/http_upload_size_labels"
 	            android:entryValues="@array/http_upload_size_values"
 	            android:title="@string/config_http_upload_size_label"
 	            android:summary="@string/config_http_upload_size_summary"
-	            android:defaultValue="0" />
+	            android:defaultValue="@string/value_zero" />
   			<PreferenceScreen android:title="@string/title_advanced_settings">
-				<Preference android:title="@string/title_email_files" android:key="config_mail_archives" android:defaultValue="0" />
-				<Preference android:title="@string/title_delete_files" android:key="config_delete_archives" android:defaultValue="0" />
+				<Preference android:title="@string/title_email_files" android:key="config_mail_archives" android:defaultValue="@string/value_zero" />
+				<Preference android:title="@string/title_delete_files" android:key="config_delete_archives" android:defaultValue="@string/value_zero" />
  			</PreferenceScreen>
  		</PreferenceScreen>
     	<!-- <PreferenceScreen android:title="@string/title_streaming_json_upload_section">
@@ -136,13 +136,13 @@
 	            android:entryValues="@array/streaming_jackson_upload_interval_values"
 	            android:title="@string/config_streaming_jackson_upload_interval_label"
 	            android:summary="@string/config_streaming_jackson_upload_interval_summary"
-	            android:defaultValue="300" />
+	            android:defaultValue="@string/value_300" />
 	        <ListPreference
 	            android:key="config_streaming_jackson_upload_size"
 	            android:entries="@array/streaming_jackson_upload_size_labels"
 	            android:entryValues="@array/streaming_jackson_upload_size_values"
 	            android:title="@string/config_streaming_jackson_upload_size_label"
-	            android:defaultValue="262114" />
+	            android:defaultValue="@string/value_256k" />
 		</PreferenceScreen>
 		<PreferenceScreen android:title="@string/title_log_upload_section">
 			<CheckBoxPreference
@@ -174,10 +174,10 @@
 	            android:entryValues="@array/log_upload_interval_values"
 	            android:title="@string/config_log_upload_interval_label"
 	            android:summary="@string/config_log_upload_interval_summary"
-	            android:defaultValue="600" />
+	            android:defaultValue="@string/value_600" />
    		<Preference android:title="@string/config_upload_logs"
             android:key="config_log_refresh_manually"
-            android:defaultValue="0" />
+            android:defaultValue="@string/value_zero" />
         </PreferenceScreen>
 	</PreferenceCategory>
 	<PreferenceCategory android:title="@string/config_settings_category">
@@ -206,7 +206,7 @@
             android:entryValues="@array/json_refresh_interval_values"
             android:title="@string/config_json_refresh_interval_label"
             android:summary="@string/config_json_refresh_interval_message"
-            android:defaultValue="3600" />
+            android:defaultValue="@string/value_3600" />
      	<CheckBoxPreference
       	    android:title="@string/title_config_check"
       	    android:summary="@string/summary_config_check"
@@ -214,11 +214,11 @@
            	android:defaultValue="true"/>
    		<Preference android:title="@string/config_refresh_json_label"
             android:key="config_json_refresh_manually"
-            android:defaultValue="0" />
+            android:defaultValue="@string/value_zero" />
    		<Preference android:title="@string/config_reset_label"
             android:summary="@string/config_reset_summary"
             android:key="config_reset"
-            android:defaultValue="0" />
+            android:defaultValue="@string/value_zero" />
 	</PreferenceCategory>
 	<PreferenceCategory android:title="@string/title_acknowledgements_section">
 		<PreferenceScreen android:title="@string/title_third_party_libraries">

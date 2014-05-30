@@ -1,7 +1,9 @@
 package edu.northwestern.cbits.purple_robot_manager.activities;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.UUID;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -10,23 +12,30 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.preference.PreferenceManager;
 import android.view.ContextThemeWrapper;
+import edu.emory.mathcs.backport.java.util.Collections;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
 public class DialogActivity extends Activity 
 {
+	public static final String DIALOG_TAG = "dialog_tag";
+	public static final String DIALOG_PRIORITY = "dialog_priority";
+	public static final String DIALOG_ADDED = "dialog_added";
 	public static String DIALOG_MESSAGE = "dialog_message";
 	public static String DIALOG_TITLE = "dialog_title";
 	public static String DIALOG_CONFIRM_BUTTON = "dialog_confirm";
 	public static String DIALOG_CANCEL_BUTTON= "dialog_cancel";
-
 	public static String DIALOG_CONFIRM_SCRIPT = "dialog_confirm_script";
 	public static String DIALOG_CANCEL_SCRIPT = "dialog_cancel_script";
 	
-	private static ArrayList<HashMap<String, String>> _pendingDialogs = new ArrayList<HashMap<String, String>>();
+	private static ArrayList<HashMap<String, Object>> _pendingDialogs = new ArrayList<HashMap<String, Object>>();
 	private static boolean _visible = false;
 	private static AlertDialog _currentDialog = null;
 	private static DialogActivity _currentActivity = null;
@@ -47,26 +56,57 @@ public class DialogActivity extends Activity
 		super.onDestroy();
 	}
 	
-	public static void showNativeDialog(Context context, String title, String message, String confirmTitle, String cancelTitle, String confirmScript, String cancelScript)
+	public static void showNativeDialog(final Context context, final String title, final String message, final String confirmTitle, final String cancelTitle, final String confirmScript, final String cancelScript, final String tag, final long priority)
 	{
 		if (title == null)
-			title = "";
+		{
+			DialogActivity.showNativeDialog(context, "", message, confirmTitle, cancelTitle, confirmScript, cancelScript, tag, priority);
+			
+			return;
+		}
 
 		if (message == null)
-			message = "";
+		{
+			DialogActivity.showNativeDialog(context, title, "", confirmTitle, cancelTitle, confirmScript, cancelScript, tag, priority);
+			
+			return;
+		}
 		
 		if (confirmTitle == null)
-			confirmTitle = "";
+		{
+			DialogActivity.showNativeDialog(context, title, message, "", cancelTitle, confirmScript, cancelScript, tag, priority);
+			
+			return;
+		}
 
 		if (confirmScript == null)
-			confirmScript = "";
+		{
+			DialogActivity.showNativeDialog(context, title, message, confirmTitle, cancelTitle, "", cancelScript, tag, priority);
+			
+			return;
+		}
 
 		if (cancelTitle == null)
-			cancelTitle = "";
+		{
+			DialogActivity.showNativeDialog(context, title, message, confirmTitle, "", confirmScript, cancelScript, tag, priority);
+			
+			return;
+		}
 
 		if (cancelScript == null)
-			cancelScript = "";
-
+		{
+			DialogActivity.showNativeDialog(context, title, message, confirmTitle, cancelTitle, confirmScript, "", tag, priority);
+			
+			return;
+		}
+		
+		if (tag == null || "".equals(tag))
+		{
+			DialogActivity.showNativeDialog(context, title, message, confirmTitle, cancelTitle, confirmScript, cancelScript, UUID.randomUUID().toString(), priority);
+			
+			return;
+		}
+		
 		if (DialogActivity._visible == false)
 		{
 			DialogActivity._visible = true;
@@ -83,19 +123,65 @@ public class DialogActivity extends Activity
 			intent.putExtra(DialogActivity.DIALOG_CANCEL_BUTTON, cancelTitle);
 			intent.putExtra(DialogActivity.DIALOG_CANCEL_SCRIPT, cancelScript);
 
+			intent.putExtra(DialogActivity.DIALOG_TAG, tag);
+			intent.putExtra(DialogActivity.DIALOG_ADDED, System.currentTimeMillis());
+			intent.putExtra(DialogActivity.DIALOG_PRIORITY, priority);
+
 			context.startActivity(intent);
 		}
 		else
 		{
-			HashMap<String, String> dialog = new HashMap<String, String>();
-			dialog.put(DialogActivity.DIALOG_TITLE, title);
-			dialog.put(DialogActivity.DIALOG_MESSAGE, message);
-			dialog.put(DialogActivity.DIALOG_CONFIRM_BUTTON, confirmTitle);
-			dialog.put(DialogActivity.DIALOG_CONFIRM_SCRIPT, confirmScript);
-			dialog.put(DialogActivity.DIALOG_CANCEL_BUTTON, cancelTitle);
-			dialog.put(DialogActivity.DIALOG_CANCEL_SCRIPT, cancelScript);
+			final Handler handler = new Handler(Looper.getMainLooper());
+
+			Runnable r = new Runnable()
+			{
+				public void run() 
+				{
+					if (DialogActivity._currentActivity == null)
+					{
+						handler.postDelayed(this, 100);
+						return;
+					}
+
+					Intent intent = DialogActivity._currentActivity.getIntent();
+					
+					if (intent.getLongExtra(DialogActivity.DIALOG_PRIORITY, 0) < priority)
+					{
+						HashMap<String, Object> dialog = new HashMap<String, Object>();
+						dialog.put(DialogActivity.DIALOG_TITLE, intent.getStringExtra(DialogActivity.DIALOG_TITLE));
+						dialog.put(DialogActivity.DIALOG_MESSAGE, intent.getStringExtra(DialogActivity.DIALOG_MESSAGE));
+						dialog.put(DialogActivity.DIALOG_CONFIRM_BUTTON, intent.getStringExtra(DialogActivity.DIALOG_CONFIRM_BUTTON));
+						dialog.put(DialogActivity.DIALOG_CONFIRM_SCRIPT, intent.getStringExtra(DialogActivity.DIALOG_CONFIRM_SCRIPT));
+						dialog.put(DialogActivity.DIALOG_CANCEL_BUTTON, intent.getStringExtra(DialogActivity.DIALOG_CANCEL_BUTTON));
+						dialog.put(DialogActivity.DIALOG_CANCEL_SCRIPT, intent.getStringExtra(DialogActivity.DIALOG_CANCEL_SCRIPT));
+
+						dialog.put(DialogActivity.DIALOG_TAG, intent.getStringExtra(DialogActivity.DIALOG_TAG));
+						dialog.put(DialogActivity.DIALOG_ADDED, intent.getLongExtra(DialogActivity.DIALOG_ADDED, System.currentTimeMillis()));
+						dialog.put(DialogActivity.DIALOG_PRIORITY, intent.getLongExtra(DialogActivity.DIALOG_PRIORITY, 0));
+
+						DialogActivity._pendingDialogs.add(dialog);
+						
+						// Tag changed to current one so the dialog gets refreshed below...
+						
+						intent.putExtra(DialogActivity.DIALOG_TAG, tag);
+					}
+
+					HashMap<String, Object> dialog = new HashMap<String, Object>();
+					dialog.put(DialogActivity.DIALOG_TITLE, title);
+					dialog.put(DialogActivity.DIALOG_MESSAGE, message);
+					dialog.put(DialogActivity.DIALOG_CONFIRM_BUTTON, confirmTitle);
+					dialog.put(DialogActivity.DIALOG_CONFIRM_SCRIPT, confirmScript);
+					dialog.put(DialogActivity.DIALOG_CANCEL_BUTTON, cancelTitle);
+					dialog.put(DialogActivity.DIALOG_CANCEL_SCRIPT, cancelScript);
+					dialog.put(DialogActivity.DIALOG_TAG, tag);
+					dialog.put(DialogActivity.DIALOG_ADDED, System.currentTimeMillis());
+					dialog.put(DialogActivity.DIALOG_PRIORITY, priority);
+
+					DialogActivity.clearNativeDialogs(context, tag, dialog);
+				}
+			};
 			
-			DialogActivity._pendingDialogs.add(dialog);
+			handler.postDelayed(r, 100);
 		}
 	}
 	
@@ -204,15 +290,19 @@ public class DialogActivity extends Activity
 					
 					if (DialogActivity._pendingDialogs.size() > 0)
 					{
-						HashMap<String, String> dialog = DialogActivity._pendingDialogs.remove(0);
+						DialogActivity.sortPending();
+						
+						HashMap<String, Object> dialog = DialogActivity._pendingDialogs.remove(0);
 						
 						Intent intent = new Intent();
-						intent.putExtra(DialogActivity.DIALOG_TITLE, dialog.get(DialogActivity.DIALOG_TITLE));
-						intent.putExtra(DialogActivity.DIALOG_MESSAGE, dialog.get(DialogActivity.DIALOG_MESSAGE));
-						intent.putExtra(DialogActivity.DIALOG_CONFIRM_BUTTON, dialog.get(DialogActivity.DIALOG_CONFIRM_BUTTON));
-						intent.putExtra(DialogActivity.DIALOG_CONFIRM_SCRIPT, dialog.get(DialogActivity.DIALOG_CONFIRM_SCRIPT));
-						intent.putExtra(DialogActivity.DIALOG_CANCEL_BUTTON, dialog.get(DialogActivity.DIALOG_CANCEL_BUTTON));
-						intent.putExtra(DialogActivity.DIALOG_CANCEL_SCRIPT, dialog.get(DialogActivity.DIALOG_CANCEL_SCRIPT));
+						intent.putExtra(DialogActivity.DIALOG_TITLE, dialog.get(DialogActivity.DIALOG_TITLE).toString());
+						intent.putExtra(DialogActivity.DIALOG_MESSAGE, dialog.get(DialogActivity.DIALOG_MESSAGE).toString());
+						intent.putExtra(DialogActivity.DIALOG_CONFIRM_BUTTON, dialog.get(DialogActivity.DIALOG_CONFIRM_BUTTON).toString());
+						intent.putExtra(DialogActivity.DIALOG_CONFIRM_SCRIPT, dialog.get(DialogActivity.DIALOG_CONFIRM_SCRIPT).toString());
+						intent.putExtra(DialogActivity.DIALOG_CANCEL_BUTTON, dialog.get(DialogActivity.DIALOG_CANCEL_BUTTON).toString());
+						intent.putExtra(DialogActivity.DIALOG_CANCEL_SCRIPT, dialog.get(DialogActivity.DIALOG_CANCEL_SCRIPT).toString());
+						intent.putExtra(DialogActivity.DIALOG_TAG, dialog.get(DialogActivity.DIALOG_TAG).toString());
+						intent.putExtra(DialogActivity.DIALOG_PRIORITY, (Long) dialog.get(DialogActivity.DIALOG_PRIORITY));
 						
 						me.setIntent(intent);
 						
@@ -230,6 +320,32 @@ public class DialogActivity extends Activity
 		DialogActivity._currentDialog.show();
 	}
 
+	private static void sortPending() 
+	{
+		Collections.sort(DialogActivity._pendingDialogs, new Comparator<HashMap<String, Object>>()
+		{
+			public int compare(HashMap<String, Object> one, HashMap<String, Object> two) 
+			{
+				
+				String priorityOne = one.get(DialogActivity.DIALOG_PRIORITY).toString();
+				String priorityTwo = two.get(DialogActivity.DIALOG_PRIORITY).toString();
+				
+				long pOne = Long.parseLong(priorityOne);
+				long pTwo = Long.parseLong(priorityTwo);
+				
+				if (pOne < pTwo)
+					return 1;
+				else if (pOne > pTwo)
+					return -1;
+
+				Long addedOne = (Long) one.get(DialogActivity.DIALOG_ADDED);
+				Long addedTwo = (Long) two.get(DialogActivity.DIALOG_ADDED);
+				
+				return addedOne.compareTo(addedTwo);
+			}
+		});
+	}
+
 	public static void clearNativeDialogs() 
 	{
 		DialogActivity._pendingDialogs.clear();
@@ -243,6 +359,49 @@ public class DialogActivity extends Activity
 					DialogActivity._currentDialog.dismiss();
 				}
 			});
+		}
+	}
+
+	public static void clearNativeDialogs(Context context, String tag, HashMap<String, Object> replacement) 
+	{
+		ArrayList<HashMap<String, Object>> toRemove = new ArrayList<HashMap<String, Object>>();
+		
+		for (HashMap<String, Object> dialog : DialogActivity._pendingDialogs)
+		{
+			if (tag.equals(dialog.get(DialogActivity.DIALOG_TAG)))
+				toRemove.add(dialog);
+		}
+		
+		DialogActivity._pendingDialogs.removeAll(toRemove);
+		
+		if (replacement != null)
+			DialogActivity._pendingDialogs.add(replacement);
+		
+		DialogActivity.sortPending();
+		
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		
+		int stackCount = Integer.parseInt(prefs.getString("config_dialog_count", "4"));
+		
+		while (DialogActivity._pendingDialogs.size() >= stackCount && stackCount > 0)
+		{
+			DialogActivity._pendingDialogs.remove(DialogActivity._pendingDialogs.size() - 1);
+		}
+		
+		if (DialogActivity._currentDialog != null && DialogActivity._currentActivity != null)
+		{
+			Intent intent = DialogActivity._currentActivity.getIntent();
+			
+			if (tag.equals(intent.getStringExtra(DialogActivity.DIALOG_TAG)))
+			{
+				DialogActivity._currentActivity.runOnUiThread(new Runnable()
+				{
+					public void run() 
+					{
+						DialogActivity._currentDialog.dismiss();
+					}
+				});
+			}
 		}
 	}
 }
