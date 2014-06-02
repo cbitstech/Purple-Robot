@@ -17,6 +17,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteStatement;
+
 import edu.northwestern.cbits.purple_robot_manager.db.filters.Filter;
 import edu.northwestern.cbits.purple_robot_manager.db.filters.FrequencyThrottleFilter;
 import edu.northwestern.cbits.purple_robot_manager.db.filters.ValueDeltaFilter;

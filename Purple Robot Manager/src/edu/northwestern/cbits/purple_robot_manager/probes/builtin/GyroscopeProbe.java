@@ -419,7 +419,7 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 
 					this.transmitData(this._context, data);
 
-					for (int j = 0; j < timeBuffer.length; j++)
+					if (timeBuffer.length > 0)
 					{
 						double x = Double.NaN;
 						double y = Double.NaN;
@@ -428,14 +428,14 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 						for (int i = 0; i < fieldNames.length; i++)
 						{
 							if (fieldNames[i].equals(GyroscopeProbe.X_KEY))
-								x = valueBuffer[i][j];
+								x = valueBuffer[i][0];
 							else if (fieldNames[i].equals(GyroscopeProbe.Y_KEY))
-								y = valueBuffer[i][j];
+								y = valueBuffer[i][0];
 							else if (fieldNames[i].equals(GyroscopeProbe.Z_KEY))
-								z = valueBuffer[i][j];
+								z = valueBuffer[i][0];
 						}
 
-						if (Double.isNaN(x) == false && Double.isNaN(y) && Double.isNaN(z))
+						if (Double.isNaN(x) == false && Double.isNaN(y) == false && Double.isNaN(z) == false)
 						{
 							Map<String, Object> values = new HashMap<String, Object>(4);
 
@@ -443,7 +443,7 @@ public class GyroscopeProbe extends ContinuousProbe implements SensorEventListen
 							values.put(GyroscopeProbe.Y_KEY, y);
 							values.put(GyroscopeProbe.Z_KEY, z);
 
-							values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[j] / 1000));
+							values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[0] / 1000));
 
 							ProbeValuesProvider.getProvider(this._context).insertValue(this._context, GyroscopeProbe.DB_TABLE, this.databaseSchema(), values);
 						}

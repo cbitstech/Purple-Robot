@@ -1,80 +1,199 @@
 <html>
 	<head>
-		<script src="js/jquery.min.js"></script>
-		<script src="js/highcharts.js"></script>
-		<link rel="stylesheet" type="text/css" href="css/webview.css" />
+		<script src="vendor/jquery.min.js"></script>
+		<script src="vendor/d3.v3.js"></script>
+		<script src="vendor/d3.layout.min.js"></script>
+		<script src="vendor/rickshaw.js"></script>
+		<link rel="stylesheet" type="text/css" href="vendor/rickshaw.css" />
+		
+		<style>
+			#chart {
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				right: 0;
+				left: 0;
+			}
+			
+			#legend {
+				position: absolute;
+				bottom: 20;
+				right: 20;
+			}
+		</style>
+		
 		<script type="text/javascript">
 		    $(document).ready(function()
 		    {
-			    var chart = null;
-			    var shape = null;
+				var chartJson = {{{ highchart_json }}};
+				var series = [];
+				
+				var jsonSeries = chartJson.series;
+				
+				var min = 0;
+				var max = 0;
 
-				Highcharts.setOptions(
+				var colors = ["#0099CC", "#FF8800", "#9933CC", "#669900", "#CC0000"];
+				
+				var includePlot = true;
+				
+				if (jsonSeries[0].data.length > 256)
+					includePlot = false; 
+					
+				var startTime = -1;
+				var endTime = 0;
+				
+				for (var i = 0; i < jsonSeries.length; i++)
 				{
-					global:
+					var orig = jsonSeries[i];
+					
+					var newSeries = {};
+					var newPlots = {};
+					
+					newSeries.name = orig.name;
+					
+					if (includePlot)
+						newSeries.name += " (Line)";
+						
+					newSeries.data = [];
+					newSeries.color = colors[i % colors.length];
+					newSeries.renderer = "line";
+
+					newPlots.name = orig.name + " (Plot)";
+					newPlots.data = [];
+					newPlots.color = colors[i % colors.length];
+					newPlots.renderer = "scatterplot";
+					
+					for (var j = 0; j < orig.data.length; j++)
 					{
-				        useUTC: false
-				    }
+						var point = {};
+						point.x = orig.data[j][0] / 1000;
+						point.y = orig.data[j][1];
+						
+						if (point.y < min)
+							min = point.y;
+							
+						if (point.y > max)
+							max = point.y;
+							
+						newSeries.data.push(point);
+						newPlots.data.push(point);
+						
+						if (startTime == -1)
+							startTime = point.x;
+							
+						if (point.x > endTime)
+							endTime = point.x;
+					}
+					
+					series.push(newSeries);
+					
+					if (includePlot)
+						series.push(newPlots);
+				}
+				
+				function interpolator(points) 
+				{
+					var line = "";
+					
+					for (var i = 0; i < points.length - 1; i++)
+					{
+						var start = points[i];
+						var end = points[i + 1];
+						
+						var control = end;
+
+						if (i > 0)
+						{
+							var previous = points[i - 1];
+							
+							control = {};
+							
+							control.x = start[0] + ((start[0] - previous[0]) / 2);
+							
+							if (control.x > end[0])
+								control.x = end[0];
+								
+							control.y = start[1] + ((start[1] - previous[1]) / 2);
+
+							line += start[0] + "," + start[1] + " Q" + control.x + "," + control.y + " " + end[0] + "," + end[1];
+							
+							if (i < points.length - 2)
+								line += " M";
+						}
+						else
+						{
+							control = {};
+							
+							control.x = start[0] - ((start[0] - end[0]) / 2);
+							control.y = start[1] - ((start[1] - end[1]) / 2);
+
+							line += start[0] + "," + start[1] + " Q" + control.x + "," + control.y + " " + end[0] + "," + end[1];
+							
+							if (i < points.length - 2)
+								line += " M";
+						}
+					}
+
+					return line;
+				};
+				
+				min = min * 1.25;
+				max = max * 1.25;
+							
+				var graph = new Rickshaw.Graph({
+					element: document.querySelector("#chart"),
+					interpolation: interpolator, // "bundle",
+					tension: 0.99,
+					renderer: 'multi',
+					series: series,
+					min: min,
+					max: max
+				});
+ 
+				graph.render();	
+				
+				var time = new Rickshaw.Fixtures.Time();
+				
+				var timeUnit = time.unit('week');
+				
+				if (endTime - startTime < 3600)
+					timeUnit = time.unit('minute');
+				else if (endTime - startTime < 3600 * 12)
+					timeUnit = time.unit('hour');
+				else if (endTime - startTime < 3600 * 24 * 10)
+					timeUnit = time.unit('day');
+
+				var xAxis = new Rickshaw.Graph.Axis.Time({
+					graph: graph,
+					timeUnit: timeUnit,
+					orientation: 'bottom'
 				});
 
-		    	var chartJson = {{{ highchart_json }}};
-		    	var plotCount = {{{ highchart_count }}};
+				xAxis.render();
+				
+				var yAxis = new Rickshaw.Graph.Axis.Y({
+					graph: graph
+				});
 
-				var plotWidth = plotCount * 10;
-				var chartWidth = $("div#container").width();
+				yAxis.render();
+				
+				var legend = new Rickshaw.Graph.Legend({
+					graph: graph,
+					element: document.querySelector('#legend')
+				});
 
-				if (plotWidth > chartWidth)
-				{
-					$("div#container").css("width", plotWidth + "px");
-					$("div#container").css("right", "");
-				}
-				else
-				{
-					$("div#container").css("width", "");
-					$("div#container").css("right", "0px");
-				}
-
-		    	chartJson.chart.events = {};
-		    	chartJson.chart.events.click = function(e)
-		    	{
-		    		PurpleRobot.setValue("timestamp", "" + e.xAxis[0].value);
-
-					var pixel = this.xAxis[0].translate(e.xAxis[0].value);
-
-					var extremes = this.yAxis[0].getExtremes();
-
-					var minY = this.yAxis[0].translate(extremes.min);
-					var maxY = this.yAxis[0].translate(extremes.max);
-
-					$("#myPath").remove();
-
-				    this.renderer.rect(pixel, 5, 1, (maxY - minY), 1).attr(
-				    {
-						"fill": "white",
-					    "stroke": "#808080",
-					    "stroke-width": 1,
-					    "id": "myPath"
-				    }).add();
-				};
-
-				var i = 0;
-		    	for (i = 0; i < chartJson.series.length; i++)
-		    	{
-			    	var data = chartJson.series[i].data;
-
-			    	if (data.length > 0 && $.isArray(data[0]))
-			    	{
-			    		chartJson.xAxis = { type: 'datetime' };
-			    	}
-		    	}
-
-		        chart = new Highcharts.Chart(chartJson);
-		    });
+//				var shelving = new Rickshaw.Graph.Behavior.Series.Toggle( {
+//					graph: graph,
+//					legend: legend
+//				});
+			});
 		</script>
 	</head>
 	<body>
-		<div id="container">
-			Loading...
+		<div id="chart_container">
+			<div id="chart"></div>
+			<div id="legend"></div>
 		</div>
 	</body>
 </html>

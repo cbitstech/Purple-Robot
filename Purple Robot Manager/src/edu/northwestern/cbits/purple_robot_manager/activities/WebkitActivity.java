@@ -10,14 +10,8 @@ import java.util.Date;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -50,7 +44,7 @@ public class WebkitActivity extends ActionBarActivity
 
 		while ((line = br.readLine()) != null)
 		{
-			sb.append(line);
+			sb.append(line + "\n");
 		}
 
 		return sb.toString();
@@ -224,7 +218,7 @@ public class WebkitActivity extends ActionBarActivity
 
     			break;
 
-    		case R.id.menu_new_label:
+/*    		case R.id.menu_new_label:
     			if (this._selectedTimestamp == 0)
     			{
     				FragmentManager manager = this.getSupportFragmentManager();
@@ -267,7 +261,7 @@ public class WebkitActivity extends ActionBarActivity
     		case R.id.menu_refresh:
     			this.refresh();
 
-    			break;
+    			break; */
     	}
 
     	return true;

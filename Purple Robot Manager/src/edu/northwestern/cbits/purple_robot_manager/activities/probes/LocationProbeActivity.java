@@ -63,11 +63,11 @@ public class LocationProbeActivity extends ActionBarActivity
         MenuInflater inflater = this.getMenuInflater();
         inflater.inflate(R.menu.menu_probe_activity, menu);
         
-        MenuItem refresh = menu.findItem(R.id.menu_refresh);
-        MenuItem label = menu.findItem(R.id.menu_new_label);
+//        MenuItem refresh = menu.findItem(R.id.menu_refresh);
+//        MenuItem label = menu.findItem(R.id.menu_new_label);
         
-        refresh.setVisible(false);
-        label.setVisible(false);
+//        refresh.setVisible(false);
+//        label.setVisible(false);
         
         return true;
 	}
