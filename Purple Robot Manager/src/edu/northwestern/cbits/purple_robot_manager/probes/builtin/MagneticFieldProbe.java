@@ -26,6 +26,7 @@ import android.os.SystemClock;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
@@ -386,7 +387,7 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 
 					this.transmitData(this._context, data);
 
-					for (int j = 0; j < timeBuffer.length; j++)
+					if (timeBuffer.length > 0)
 					{
 						double x = Double.NaN;
 						double y = Double.NaN;
@@ -395,14 +396,14 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 						for (int i = 0; i < fieldNames.length; i++)
 						{
 							if (fieldNames[i].equals(MagneticFieldProbe.X_KEY))
-								x = valueBuffer[i][j];
+								x = valueBuffer[i][0];
 							else if (fieldNames[i].equals(MagneticFieldProbe.Y_KEY))
-								y = valueBuffer[i][j];
+								y = valueBuffer[i][0];
 							else if (fieldNames[i].equals(MagneticFieldProbe.Z_KEY))
-								z = valueBuffer[i][j];
+								z = valueBuffer[i][0];
 						}
 
-						if (Double.isNaN(x) == false && Double.isNaN(y) && Double.isNaN(z))
+						if (Double.isNaN(x) == false && Double.isNaN(y) == false && Double.isNaN(z) == false)
 						{
 							Map<String, Object> values = new HashMap<String, Object>(4);
 
@@ -410,7 +411,7 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 							values.put(MagneticFieldProbe.Y_KEY, y);
 							values.put(MagneticFieldProbe.Z_KEY, z);
 
-							values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[j] / 1000));
+							values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[0] / 1000));
 
 							ProbeValuesProvider.getProvider(this._context).insertValue(this._context, MagneticFieldProbe.DB_TABLE, this.databaseSchema(), values);
 						}

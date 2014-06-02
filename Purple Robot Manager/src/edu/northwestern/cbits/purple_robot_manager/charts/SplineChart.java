@@ -15,7 +15,7 @@ public class SplineChart extends LineChart
 {
 	public JSONObject highchartsJson(Activity activity) throws JSONException, IOException
 	{
-		JSONObject chartJson = (JSONObject) new JSONTokener(WebkitActivity.stringForAsset(activity, "webkit/js/highcharts_spline.js")).nextValue();
+		JSONObject chartJson = (JSONObject) new JSONTokener(WebkitActivity.stringForAsset(activity, "webkit/vendor/spline_template.js")).nextValue();
 
 		JSONArray series = chartJson.getJSONArray("series");
 
