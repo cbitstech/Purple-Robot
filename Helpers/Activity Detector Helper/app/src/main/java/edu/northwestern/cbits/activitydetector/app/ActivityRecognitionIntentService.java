@@ -100,6 +100,10 @@ public class ActivityRecognitionIntentService extends IntentService {
                 return "on_bicycle";
             case DetectedActivity.ON_FOOT:
                 return "on_foot";
+            case DetectedActivity.RUNNING:
+                return "running";
+            case DetectedActivity.WALKING:
+                return "walking";
             case DetectedActivity.STILL:
                 return "still";
             case DetectedActivity.UNKNOWN:
