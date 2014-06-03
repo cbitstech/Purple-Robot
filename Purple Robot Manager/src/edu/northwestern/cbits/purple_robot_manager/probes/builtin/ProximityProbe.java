@@ -101,7 +101,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 	{
 		try
 		{
-			String template = WebkitActivity.stringForAsset(activity, "webkit/highcharts_full.html");
+			String template = WebkitActivity.stringForAsset(activity, "webkit/chart_spline_full.html");
 
 			ArrayList<Double> distance = new ArrayList<Double>();
 			ArrayList<Double> time = new ArrayList<Double>();
@@ -131,7 +131,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 
 			c.addTime("tIME", time);
 
-			JSONObject json = c.highchartsJson(activity);
+			JSONObject json = c.dataJson(activity);
 
 			template = template.replace("{{{ highchart_json }}}", json.toString());
 			template = template.replace("{{{ highchart_count }}}", "" + count);

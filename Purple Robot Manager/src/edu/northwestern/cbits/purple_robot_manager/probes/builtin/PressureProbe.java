@@ -97,7 +97,7 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 	{
 		try
 		{
-			String template = WebkitActivity.stringForAsset(activity, "webkit/highcharts_full.html");
+			String template = WebkitActivity.stringForAsset(activity, "webkit/chart_spline_full.html");
 
 			SplineChart c = new SplineChart();
 
@@ -127,7 +127,7 @@ public class PressureProbe extends ContinuousProbe implements SensorEventListene
 			c.addSeries(activity.getString(R.string.pressure_label), pressure);
 			c.addTime(activity.getString(R.string.pressure_time_label), time);
 
-			JSONObject json = c.highchartsJson(activity);
+			JSONObject json = c.dataJson(activity);
 
 			template = template.replace("{{{ highchart_json }}}", json.toString());
 			template = template.replace("{{{ highchart_count }}}", "" + count);

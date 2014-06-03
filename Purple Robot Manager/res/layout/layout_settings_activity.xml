@@ -258,11 +258,15 @@
 	   		    android:summary="@string/summary_third_qunit">
 		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_qunit" />
 	        </Preference>
-	        <Preference android:title="@string/title_third_highcharts"
-	   		    android:summary="@string/summary_third_highcharts">
-		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_highcharts" />
+	        <Preference android:title="@string/title_third_d3"
+	   		    android:summary="@string/summary_third_d3">
+		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_d3" />
 	        </Preference>
-	        <Preference android:title="@string/title_third_datejs"
+	        <Preference android:title="@string/title_third_rickshaw"
+	   		    android:summary="@string/summary_third_rickshaw">
+		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_rickshaw" />
+	        </Preference>
+	        	        <Preference android:title="@string/title_third_datejs"
 	   		    android:summary="@string/summary_third_datejs">
 		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_third_datejs" />
 	        </Preference>

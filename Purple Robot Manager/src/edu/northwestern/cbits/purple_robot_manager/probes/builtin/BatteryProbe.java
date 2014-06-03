@@ -83,7 +83,7 @@ public class BatteryProbe extends Probe
 	{
 		try
 		{
-			String template = WebkitActivity.stringForAsset(activity, "webkit/highcharts_full.html");
+			String template = WebkitActivity.stringForAsset(activity, "webkit/chart_spline_full.html");
 
 			SplineChart c = new SplineChart();
 
@@ -113,7 +113,7 @@ public class BatteryProbe extends Probe
 			c.addSeries(activity.getString(R.string.battery_level_label), battery);
 			c.addTime(activity.getString(R.string.battery_time_label), time);
 
-			JSONObject json = c.highchartsJson(activity);
+			JSONObject json = c.dataJson(activity);
 
 			template = template.replace("{{{ highchart_json }}}", json.toString());
 			template = template.replace("{{{ highchart_count }}}", "" + count);

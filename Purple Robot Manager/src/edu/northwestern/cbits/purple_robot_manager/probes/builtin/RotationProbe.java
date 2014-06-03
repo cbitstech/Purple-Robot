@@ -120,7 +120,7 @@ public class RotationProbe extends ContinuousProbe implements SensorEventListene
 	{
 		try
 		{
-			String template = WebkitActivity.stringForAsset(activity, "webkit/highcharts_full.html");
+			String template = WebkitActivity.stringForAsset(activity, "webkit/chart_spline_full.html");
 
 			ArrayList<Double> x = new ArrayList<Double>();
 			ArrayList<Double> y = new ArrayList<Double>();
@@ -168,7 +168,7 @@ public class RotationProbe extends ContinuousProbe implements SensorEventListene
 
 			ch.addTime("tIME", time);
 
-			JSONObject json = ch.highchartsJson(activity);
+			JSONObject json = ch.dataJson(activity);
 
 			template = template.replace("{{{ highchart_json }}}", json.toString());
 			template = template.replace("{{{ highchart_count }}}", "" + count);

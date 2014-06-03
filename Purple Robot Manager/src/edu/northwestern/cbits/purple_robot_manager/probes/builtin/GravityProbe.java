@@ -114,7 +114,7 @@ public class GravityProbe extends ContinuousProbe implements SensorEventListener
 	{
 		try
 		{
-			String template = WebkitActivity.stringForAsset(activity, "webkit/highcharts_full.html");
+			String template = WebkitActivity.stringForAsset(activity, "webkit/chart_spline_full.html");
 
 			ArrayList<Double> x = new ArrayList<Double>();
 			ArrayList<Double> y = new ArrayList<Double>();
@@ -153,7 +153,7 @@ public class GravityProbe extends ContinuousProbe implements SensorEventListener
 
 			c.addTime("tIME", time);
 
-			JSONObject json = c.highchartsJson(activity);
+			JSONObject json = c.dataJson(activity);
 
 			template = template.replace("{{{ highchart_json }}}", json.toString());
 			template = template.replace("{{{ highchart_count }}}", "" + count);

@@ -747,10 +747,14 @@
     <string name="summary_third_qunit">jQuery Foundation (MIT License)</string>
     <string name="url_third_qunit">http://qunitjs.com/</string>
 
-    <string name="title_third_highcharts">Highcharts</string>
-    <string name="summary_third_highcharts">HighSoft (CC BY-NC 3.0 License)</string>
-    <string name="url_third_highcharts">http://www.highcharts.com/</string>
+    <string name="title_third_d3">D3.js</string>
+    <string name="summary_third_d3">Michael Bostock (BSD License)</string>
+    <string name="url_third_d3">http://d3js.org/</string>
 
+    <string name="title_third_rickshaw">Rickshaw</string>
+    <string name="summary_third_rickshaw">Shutterstock (MIT License)</string>
+    <string name="url_third_rickshaw">http://code.shutterstock.com/rickshaw/</string>
+    
     <string name="title_third_datejs">Datejs</string>
     <string name="summary_third_datejs">Coolite Inc. (MIT License)</string>
     <string name="url_third_datejs">http://www.datejs.com/</string>
