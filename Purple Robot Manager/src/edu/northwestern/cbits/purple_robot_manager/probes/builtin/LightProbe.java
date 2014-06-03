@@ -107,7 +107,7 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 	{
 		try
 		{
-			String template = WebkitActivity.stringForAsset(activity, "webkit/highcharts_full.html");
+			String template = WebkitActivity.stringForAsset(activity, "webkit/chart_spline_full.html");
 
 			ArrayList<Double> light = new ArrayList<Double>();
 			ArrayList<Double> time = new ArrayList<Double>();
@@ -137,7 +137,7 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 			c.addSeries("lIGHT", light);
 			c.addTime("tIME", time);
 
-			JSONObject json = c.highchartsJson(activity);
+			JSONObject json = c.dataJson(activity);
 
 			template = template.replace("{{{ highchart_json }}}", json.toString());
 			template = template.replace("{{{ highchart_count }}}", "" + count);

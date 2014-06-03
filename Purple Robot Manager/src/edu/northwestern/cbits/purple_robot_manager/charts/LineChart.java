@@ -29,9 +29,9 @@ public class LineChart extends Chart
 		this._times = times;
 	}
 
-	public JSONObject highchartsJson(Activity activity) throws JSONException, IOException
+	public JSONObject dataJson(Activity activity) throws JSONException, IOException
 	{
-		JSONObject chartJson = (JSONObject) new JSONTokener(WebkitActivity.stringForAsset(activity, "webkit/js/highcharts_line.js")).nextValue();
+		JSONObject chartJson = (JSONObject) new JSONTokener(WebkitActivity.stringForAsset(activity, "webkit/js/placeholder_line.js")).nextValue();
 
 		JSONArray series = chartJson.getJSONArray("series");
 
