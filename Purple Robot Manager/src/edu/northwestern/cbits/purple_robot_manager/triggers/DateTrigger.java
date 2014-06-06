@@ -32,6 +32,7 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
@@ -379,6 +380,8 @@ public class DateTrigger extends Trigger
 			this._lastFireCalcDate = 0;
 			this.refresh(context);
 
+			this.refreshCalendar(context);
+			
 			return true;
 		}
 		
@@ -482,8 +485,12 @@ public class DateTrigger extends Trigger
 
 			DateTime end = p.getEnd();
 			DateTime start = p.getStart();
+			
+			Log.e("PR", "LOOKING IF " + this.identifier() + " FIRED BETWEEN " + start + " & " + end);
 
 			DateRange range = new DateRange(start, end);
+
+			Log.e("PR", "DID FIRE: " + range.includes(lastFireDate, DateRange.INCLUSIVE_START | DateRange.INCLUSIVE_END));
 
 			if (range.includes(lastFireDate, DateRange.INCLUSIVE_START | DateRange.INCLUSIVE_END))
 				return; // Already fired.
