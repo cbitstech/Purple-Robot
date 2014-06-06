@@ -9,14 +9,19 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 import edu.emory.mathcs.backport.java.util.Collections;
+import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.SchemeConfigFile;
@@ -51,8 +56,12 @@ public class TriggerManager
 
 	public void nudgeTriggers(Context context)
 	{
+        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        WakeLock wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, "trigger_wakelock");
+        wakeLock.acquire();
+
 		Date now = new Date();
-		
+
 		synchronized(this._triggers)
 		{
 			for (Trigger trigger : this._triggers)
@@ -66,9 +75,13 @@ public class TriggerManager
 				}
 				
 				if (execute)
+				{
 					trigger.execute(context, false);
+				}
 			}
 		}
+		
+		wakeLock.release();
 	}
 
 	public void updateTriggers(Context context, List<Trigger> triggerList)
