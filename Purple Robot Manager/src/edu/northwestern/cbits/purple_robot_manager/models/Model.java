@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
@@ -29,25 +30,94 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
+/**
+ * Provides the structure for Models. Models take input from probes, features, 
+ * and other models and generate predictions from those inputs. Purple Robot 
+ * supports both linear (e.g. regressions) and categorical models (e.g. decision
+ * trees).
+ * 
+ * In Purple Robot, models are defined by providing a URL to the model, which 
+ * contains a JSON representation of the model that can be deserialized into a 
+ * functioning class instance that implements the given model. Purple Robot 
+ * caches model definitions, allowing the system to access and construct model
+ * instances even when the device is unable to access the original definition's 
+ * URL due to a lack of reliable network connectivity.
+ * 
+ * Please see the various Model subclasses for specific implementation details.
+ */
+
+/**
+ * @author Administrator
+ *
+ */
 public abstract class Model 
 {
 	public static final boolean DEFAULT_ENABLED = true;
 	private static long _lastEnabledCheck = 0;
 	private static boolean _lastEnabled = false;
 
+	// Cached values used to determine when the model state has changed.
 	private Object _latestPrediction = null;
 	private double _latestAccuracy = 0.0;
 
+	/**
+	 * Provides a lookup key used to generate and configure a given model.
+	 * 
+	 * @return Value used internally to manipulate model settings via the
+	 *         SharedPreferences mechanism.
+	 */
+
 	public abstract String getPreferenceKey();
+	
+
+	/**
+	 * Provides a human-readable name for the model used throughout the user
+	 * interface.
+	 * 
+	 * @param context Android Context object used to resolve values such as
+	 *                strings.
+	 *                
+	 * @return Human-readable model name.
+	 */
+	
 	public abstract String title(Context context);
+	
+	
+	/**
+	 * Provides a human-readable description of the model used throughout the 
+	 * user interface.
+	 * 
+	 * @param context Android Context object used to resolve values such as
+	 *                strings.
+	 *                
+	 * @return Human-readable model description.
+	 */
+
 	public abstract String summary(Context context);
 
-	public static Model modelForUrl(Context context, String jsonUrl) 
+	/**
+	 * Reads the model definition from an online URL and attempts to construct 
+	 * an appropriate dynamic model instance using the model subclasses. For 
+	 * example, a decision tree may be constructed from the TreeModel class, 
+	 * while a linear equation may be expanded using the {@link RegressionModel} 
+	 * class. 
+	 * 
+	 * @param context Android Context object used to lookup internal storage 
+	 *                destinations.
+	 * @param jsonUrl HTTP URL pointing to a model definition.
+	 * 
+	 * @return Model instance implementing model specified, null if no 
+	 *         appropriate {@link Model} class can be determined.
+	 */
+	
+	public final static Model modelForUrl(Context context, String jsonUrl) 
 	{
 		String hash = EncryptionManager.getInstance().createHash(context, jsonUrl);
 		
 		SharedPreferences prefs = Probe.getPreferences(context);
 
+		// Determine where to cache the contents of jsonUrl...
+		
 		File internalStorage = context.getFilesDir();
 
 		if (prefs.getBoolean("config_external_storage", false))
@@ -64,6 +134,8 @@ public abstract class Model
 		String contents = null;
 		File cachedModel = new File(modelsFolder, hash);
 		
+		// Load any cached model definitions...
+		
 		try 
 		{
 			contents = FileUtils.readFileToString(cachedModel);
@@ -72,6 +144,9 @@ public abstract class Model
 		{
 
 		}
+		
+		// Fetch the contents of the URL & replace the cached version if 
+		// successful retrieving the definition online...
 		
 		try 
 		{
@@ -99,6 +174,9 @@ public abstract class Model
 			LogManager.getInstance(context).logException(e);
 		} 
 		
+		// Determine which subclass to use to instantiate an instance. Return 
+		// the new instance if successful...
+		
 		if (contents != null)
 		{
 			try
@@ -113,6 +191,8 @@ public abstract class Model
 		        	return new TreeModel(context, Uri.parse(jsonUrl));
 		        else if (ForestModel.TYPE.equals(type))
 		        	return new ForestModel(context, Uri.parse(jsonUrl));
+		        else if (NoiseModel.TYPE.equals(type))
+		        	return new NoiseModel(context, Uri.parse(jsonUrl));
 		        
 			}
 			catch (JSONException e) 
@@ -121,14 +201,32 @@ public abstract class Model
 			} 
 		}
 		
+		// ... and return null if something went wrong.
+		
 		return null;
 	}
 
+	/**
+	 * @return Uri referencing the model. May be the original URL of the model,
+	 *         but may also be an alternative Uri as the situation permits. 
+	 *         Model implementation returns null by default - subclasses 
+	 *         implement alternative behaviors.
+	 */
+	
 	public Uri uri() 
 	{
 		return null;
 	}
+	
 
+	/**
+	 * Enables the model. This method is used by other parts of the system such
+	 * as the scripting framework and user-facing settings.
+	 * 
+	 * @param context Android Context object used to access the SharedPreferences
+	 *                instances.
+	 */
+	
 	public void enable(Context context)
 	{
 		String key = this.getPreferenceKey();
@@ -140,6 +238,15 @@ public abstract class Model
 		
 		e.commit();
 	}
+	
+	
+	/**
+	 * Disables the model. This method is used by other parts of the system such
+	 * as the scripting framework and user-facing settings.
+	 * 
+	 * @param context Android Context object used to access the SharedPreferences
+	 *                instances.
+	 */
 
 	public void disable(Context context)
 	{
@@ -152,6 +259,18 @@ public abstract class Model
 		
 		e.commit();
 	}
+	
+	
+	/**
+	 * Reports whether a model instance is enabled. Note that models may be 
+	 * enabled and disabled on an individual basis or all may be disabled from
+	 * the {@link ModelManager} singleton.
+	 *  
+	 * @param context Android Context object used to access the SharedPreferences
+	 *                instances
+	 *                
+	 * @return Status of the model.
+	 */
 	
 	public boolean enabled(Context context) 
 	{
@@ -167,6 +286,15 @@ public abstract class Model
 		return false;
 	}
 
+	/**
+	 * Constructs a preference screen dynamically for an infividual model 
+	 * instance for used in the user-facing app settings.
+	 * 
+	 * @param activity Parent settings activity.
+	 * 
+	 * @return Screen containing all the relevant options for a model instance.
+	 */
+	
 	@SuppressWarnings("deprecation")
 	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
 	{
@@ -187,6 +315,19 @@ public abstract class Model
 
 		return screen;
 	}
+	
+	
+	/**
+	 * Called periodically by the rest of the system to determine if the model 
+	 * is enabled. TODO: "isEnabled" is a convention adopted from the Probe classes, 
+	 * and needs to be refactored, along with these instances as well. ("nudge" 
+	 * might be a better name.
+	 *  
+	 * @param context Android Context object used to access the SharedPreferences
+	 *                instances 
+	 *                
+	 * @return Status of the model.
+	 */
 	
 	public boolean isEnabled(Context context)
 	{
@@ -210,6 +351,16 @@ public abstract class Model
 		return Model._lastEnabled;
 	}
 	
+	
+	/**
+	 * Transmits a continuous prediction (real number) generated by the model to 
+	 * the rest of the data processing pipeline. 
+	 * 
+	 * @param context
+	 * @param prediction Value of the prediction.
+	 * @param accuracy Estimated accuracy of the prediction.
+	 */
+	
 	protected void transmitPrediction(Context context, double prediction, double accuracy) 
 	{
 		Bundle bundle = new Bundle();
@@ -224,7 +375,15 @@ public abstract class Model
 		this._latestAccuracy = accuracy;
 	}
 
-	public HashMap<String, Object> latestPrediction(Context context) 
+	
+	/**
+	 * Provides the latest prediction made by the model.
+	 * 
+	 * @param context
+	 * @return Map containing the prediction and any relevant metadata.
+	 */
+	
+	public Map<String, Object> latestPrediction(Context context) 
 	{
 		HashMap<String, Object> prediction = new HashMap<String, Object>();
 		
@@ -236,6 +395,16 @@ public abstract class Model
 		
 		return prediction;
 	}
+
+	
+	/**
+	 * Transmits a classification (string label) generated by the model to the 
+	 * rest of the data processing pipeline. 
+	 * 
+	 * @param context
+	 * @param prediction Value of the prediction.
+	 * @param accuracy Estimated accuracy of the prediction.
+	 */
 
 	protected void transmitPrediction(Context context, String prediction, double accuracy) 
 	{
@@ -252,6 +421,15 @@ public abstract class Model
 		this._latestAccuracy = accuracy;
 	}
 
+	
+	/**
+	 * Utility function used by the transmitPrediction methods to broadcast a 
+	 * model's predictions to the rest of the data processing pipeline.
+	 * 
+	 * @param context
+	 * @param data Bundle containing the prediction and any relevant metadata.
+	 */
+	
 	protected void transmitData(Context context, Bundle data) 
 	{
 		if (context != null)
@@ -268,7 +446,36 @@ public abstract class Model
 		}
 	}
 
-	public abstract void predict(Context context, HashMap<String, Object> snapshot);
+
+	/**
+	 * Called when a model prediction is requested. Note that this only requests
+	 * a prediction - models are not obligated to return a prediction 
+	 * immediately, but instead will generate a prediction asynchronously and 
+	 * share the prediction using the transmitPrediction methods. 
+	 * 
+	 * @param context
+	 * @param snapshot A representation of the state of the world to be used to
+	 *                 generate a prediction. 
+	 */
+	
+	public abstract void predict(Context context, Map<String, Object> snapshot);
+	
+	
+	/**
+	 * Returns the name of the model used internally (not human-readable). In 
+	 * most cases, this will be the URL of the model's definition file.
+	 * 
+	 * @param context
+	 * 
+	 * @return Unique string identifying a model instance.
+	 */
+	
 	public abstract String name(Context context);
+	
+	
+	/**
+	 * @return Identifier for the type of the model.
+	 */
+	
 	public abstract String modelType();
 }

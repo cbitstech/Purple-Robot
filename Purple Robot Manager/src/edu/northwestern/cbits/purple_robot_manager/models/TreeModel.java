@@ -2,8 +2,8 @@ package edu.northwestern.cbits.purple_robot_manager.models;
 
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.alexmerz.graphviz.ParseException;
 import com.alexmerz.graphviz.Parser;
@@ -19,7 +19,49 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
-// See: http://www.alexander-merz.com/graphviz/
+/**
+ * Implemements a trained decision tree model encoded using GraphViz generated 
+ * by Weka:
+ * 
+ * http://www.alexander-merz.com/graphviz/
+ * 
+ * Note that this class does not train the model, but instead expects the 
+ * representation of a model already trained.
+ * 
+ * A sample tree representation (spaces added for readability:
+ * 
+ * <pre>{@code
+ * digraph J48Tree {
+ * N0 [label="telephonyprobe_psc" ]
+ * N0->N1 [label="<= 305"]
+ *     N1 [label="weatherundergroundfeature_visibility" ]
+ *     N1->N2 [label="<= 8"]
+ *         N2 [label="colleagues (2.0/1.0)" shape=box style=filled ]
+ *     N1->N3 [label="> 8"]
+ *         N3 [label="wifiaccesspointsprobe_access_point_count" ]
+ *         N3->N4 [label="<= 11"]
+ *             N4 [label="sunrisesunsetfeature_sunrise_distance" ]
+ *             N4->N5 [label="<= 28478000"]
+ *                 N5 [label="family (7.0)" shape=box style=filled ]
+ *             N4->N6 [label="> 28478000"]
+ *                 N6 [label="weatherundergroundfeature_temperature" ]
+ *                 N6->N7 [label="<= 25.3"]
+ *                     N7 [label="locationprobe_bearing" ]
+ *                     N7->N8 [label="<= 91.699997"]
+ *                         N8 [label="friends (3.0/1.0)" shape=box style=filled ]
+ *                     N7->N9 [label="> 91.699997"]
+ *                         N9 [label="alone (11.0/2.0)" shape=box style=filled ]
+ *                 N6->N10 [label="> 25.3"]
+ *                     N10 [label="colleagues (2.0)" shape=box style=filled ]
+ *         N3->N11 [label="> 11"]
+ *             N11 [label="wifiaccesspointsprobe_current_rssi" ]
+ *             N11->N12 [label="<= -64"]
+ *                  N12 [label="friends (6.0/1.0)" shape=box style=filled ]
+ *             N11->N13 [label="> -64"]
+ *                  N13 [label="family (6.0)" shape=box style=filled ]
+ * N0->N14 [label="> 305"]
+ *     N14 [label="other (4.0/1.0)" shape=box style=filled ]}}</pre>
+ */
 
 public class TreeModel extends TrainedModel 
 {
@@ -32,6 +74,15 @@ public class TreeModel extends TrainedModel
 		super(context, uri);
 	}
 
+	
+	/**
+	 * Parses Graph object from the string provided in model to generate the 
+	 * data structure that evaluates data to generate predictions.
+	 * 
+	 * @see http://www.alexander-merz.com/graphviz/doc/com/alexmerz/graphviz/objects/Graph.html
+	 * @see edu.northwestern.cbits.purple_robot_manager.models.TrainedModel#generateModel(android.content.Context, java.lang.Object)
+	 */
+	
 	protected void generateModel(Context context, Object model) 
 	{
 		StringReader reader = new StringReader(model.toString());
@@ -54,7 +105,13 @@ public class TreeModel extends TrainedModel
 		}
 	}
 
-	protected Object evaluateModel(Context context, HashMap<String, Object> snapshot) 
+	
+	/**
+	 * Finds the root node of the tree and begins evaluating the model.
+	 * @see edu.northwestern.cbits.purple_robot_manager.models.TrainedModel#evaluateModel(android.content.Context, java.util.Map)
+	 */
+	
+	protected Object evaluateModel(Context context, Map<String, Object> snapshot) 
 	{
 		if (this._tree == null)
 			return null;
@@ -67,7 +124,23 @@ public class TreeModel extends TrainedModel
 		return this.fetchPrediction(root, this._tree.getEdges(), snapshot);
 	}
 
-	protected String fetchPrediction(Node node, List<Edge> edges, HashMap<String, Object> snapshot) 
+	/**
+	 * Evaluates the state of the world in relation to the provided node. Based
+	 * on the value of the node, recursively passes control to the next node in
+	 * the evaluation sequence until encountering a leaf node containing the 
+	 * prediction. The prediction value is returned up the tree and becomes the
+	 * final prediction for the model. Returns null if an error is encountered
+	 * or data needed to evaluate the model is missing.
+	 *  
+	 * @param node Node object representing the current location in the tree.
+	 * @param edges Edges of the graph connecting nodes. Encodes comparison 
+	 *              operators.
+	 * @param snapshot States used to generate prediction.
+	 * 
+	 * @return Prediction given states.
+	 */
+	
+	protected String fetchPrediction(Node node, List<Edge> edges, Map<String, Object> snapshot) 
 	{
 		synchronized(this)
 		{
