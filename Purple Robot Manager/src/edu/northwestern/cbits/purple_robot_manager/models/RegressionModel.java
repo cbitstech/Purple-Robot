@@ -104,7 +104,7 @@ public class RegressionModel extends TrainedModel
 		}
 	}
 	
-	protected Object evaluateModel(Context context, HashMap<String, Object> snapshot) 
+	protected Object evaluateModel(Context context, Map<String, Object> snapshot) 
 	{
 		ArrayList<String> requiredKeys = new ArrayList<String>();
 		requiredKeys.addAll(this._variables);
@@ -155,5 +155,4 @@ public class RegressionModel extends TrainedModel
 	{
 		return context.getString(R.string.summary_model_regression);
 	}
-
 }
