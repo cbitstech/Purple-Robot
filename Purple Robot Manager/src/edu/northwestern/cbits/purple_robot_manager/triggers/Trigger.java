@@ -14,8 +14,6 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
-import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.CodeViewerActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -59,42 +57,27 @@ public abstract class Trigger
 
 	public void execute(final Context context, boolean force)
 	{
-		Log.e("PR", "FIRING: " + this.identifier());
-		
 		if (this.enabled(context) && this._action != null)
 		{
-			Log.e("PR", "T1");
 			final Trigger me = this;
 
-			Log.e("PR", "T2");
 			Runnable r = new Runnable()
 			{
 				public void run()
 				{
-					Log.e("PR", "TT1 " + me._action);
 					try
 					{
 						BaseScriptEngine.runScript(context, me._action);
-
-						Log.e("PR", "TT2");
-
 					}
 					catch (Exception e)
 					{
-						Log.e("PR", "TT3");
 						LogManager.getInstance(context).logException(e);
 					}
-					
-					Log.e("PR", "TT4");
 				}
 			};
 
-
-			Log.e("PR", "T3");
 			Thread t = new Thread(new ThreadGroup("Triggers"), r, this.name(), 32768);
 			t.start();
-
-			Log.e("PR", "T4");
 
 			HashMap<String, Object> payload = new HashMap<String, Object>();
 			payload.put("name", this.name());
@@ -102,10 +85,7 @@ public abstract class Trigger
 			payload.put("action", this._action);
 
 			LogManager.getInstance(context).log("pr_trigger_fired", payload);
-			Log.e("PR", "T5");
 		}
-		
-		Log.e("PR", "T 10");
 	}
 
 	public String toString()
