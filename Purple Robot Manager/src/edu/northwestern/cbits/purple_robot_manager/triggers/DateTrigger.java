@@ -668,13 +668,11 @@ public class DateTrigger extends Trigger
 	{
 		Bundle bundle = super.bundle(context);
 		
-		bundle.putString(Trigger.TYPE, DateTrigger.TYPE_NAME);
 		bundle.putBoolean(DateTrigger.RANDOM, this._random);
+		bundle.putBoolean(DateTrigger.FIRE_ON_BOOT, this._fireOnBoot);
+		bundle.putString(Trigger.TYPE, DateTrigger.TYPE_NAME);
 		bundle.putString(DateTrigger.REPEATS, this._repeats);
 		
-		if (this._start != null)
-			bundle.putString(DateTrigger.START, this._start);
-
 		if (this._start != null)
 			bundle.putString(DateTrigger.START, this._start);
 
