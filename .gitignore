@@ -28,3 +28,5 @@ project.properties
 .settings/
 
 Thumbs.db
+android-support-v4.jar
+proguard-project.txt
