@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<lint>
-    <issue id="AlwaysShowAction" severity="ignore" />
-    <issue id="IconColors" severity="ignore" />
-    <issue id="InvalidPackage" severity="ignore" />
-    <issue id="MissingTranslation" severity="ignore" />
-    <issue id="TooManyViews" severity="ignore" />
-    <issue id="UnusedResources" severity="ignore" />
-</lint>

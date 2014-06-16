@@ -40,6 +40,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationManager;
@@ -103,6 +105,18 @@ public class LogManager
 
 		if (payload == null)
 			payload = new HashMap<String, Object>();
+		
+		try
+		{
+			PackageInfo info = this._context.getPackageManager().getPackageInfo(this._context.getPackageName(), 0);
+			
+			payload.put("version", info.versionName);
+			payload.put("version_code", info.versionCode);
+		}
+		catch (NameNotFoundException e)
+		{
+			LogManager.getInstance(this._context).logException(e);
+		}
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
 		
