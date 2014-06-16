@@ -26,3 +26,5 @@ project.properties
 .classpath
 .project
 .settings/
+
+Thumbs.db
