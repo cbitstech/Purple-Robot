@@ -26,7 +26,6 @@ import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
-import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ActivityDetectionProbe;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
@@ -76,8 +75,8 @@ public class ManagerService extends IntentService
 	{
 		String action = intent.getAction();
 		
-		if (GOOGLE_PLAY_ACTIVITY_DETECTED.equalsIgnoreCase(action))
-			ActivityDetectionProbe.activityDetected(this, intent);
+//		if (GOOGLE_PLAY_ACTIVITY_DETECTED.equalsIgnoreCase(action))
+//			ActivityDetectionProbe.activityDetected(this, intent);
 		if (UPLOAD_LOGS_INTENT.equalsIgnoreCase(action))
 		{
 			final ManagerService me = this;

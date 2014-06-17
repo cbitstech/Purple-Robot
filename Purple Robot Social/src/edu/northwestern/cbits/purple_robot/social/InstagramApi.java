@@ -1,4 +1,4 @@
-package edu.northwestern.cbits.purple_robot_manager.oauth;
+package edu.northwestern.cbits.purple_robot.social;
 
 import org.scribe.builder.api.DefaultApi20;
 import org.scribe.extractors.AccessTokenExtractor;

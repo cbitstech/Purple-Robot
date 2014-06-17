@@ -17,7 +17,6 @@ import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
-import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ActivityDetectionProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.AddressBookDistancesProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.AmbientHumidityProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ApplicationLaunchProbe;
@@ -29,17 +28,11 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CommunicationE
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CommunicationLogProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.DateCalendarProbe;
-import edu.northwestern.cbits.purple_robot_manager.probes.builtin.FacebookEventsProbe;
-import edu.northwestern.cbits.purple_robot_manager.probes.builtin.FacebookProbe;
-import edu.northwestern.cbits.purple_robot_manager.probes.builtin.FoursquareProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.GeomagneticRotationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.GravityProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.HardwareInformationProbe;
-import edu.northwestern.cbits.purple_robot_manager.probes.builtin.InstagramProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LinearAccelerationProbe;
-import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LinkedInProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
-import edu.northwestern.cbits.purple_robot_manager.probes.builtin.MediaRouterDeviceProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.NetworkProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RandomNoiseProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RawLocationProbe;
@@ -48,20 +41,16 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RotationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RunningSoftwareProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.SaintProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ScreenProbe;
-import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ShionProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.SoftwareInformationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.StepCounterProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TelephonyProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TemperatureProbe;
-import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TwitterProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.VisibleSatelliteProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.WifiAccessPointsProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.AccelerometerBasicStatisticsFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.AccelerometerFrequencyFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.CallHistoryFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.DeviceInUseFeature;
-import edu.northwestern.cbits.purple_robot_manager.probes.features.FitbitApiFeature;
-import edu.northwestern.cbits.purple_robot_manager.probes.features.GooglePlacesFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.GyroscopeBasicStatisticsFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.JavascriptFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.LightProbeBasicStatisticsFeature;
@@ -265,14 +254,14 @@ public class ProbeManager
 				if (location.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
-			else if (probe instanceof MediaRouterDeviceProbe)
+/*			else if (probe instanceof MediaRouterDeviceProbe)
 			{
 				MediaRouterDeviceProbe devices = (MediaRouterDeviceProbe) probe;
 
 				if (devices.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
-			else if (probe instanceof WifiAccessPointsProbe)
+*/			else if (probe instanceof WifiAccessPointsProbe)
 			{
 				WifiAccessPointsProbe wifi = (WifiAccessPointsProbe) probe;
 
@@ -391,7 +380,7 @@ public class ProbeManager
 				if (stats.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
-			else if (probe instanceof GooglePlacesFeature)
+/*			else if (probe instanceof GooglePlacesFeature)
 			{
 				GooglePlacesFeature places = (GooglePlacesFeature) probe;
 
@@ -412,7 +401,7 @@ public class ProbeManager
 				if (twitter.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
-			else if (probe instanceof AudioFeaturesProbe)
+*/			else if (probe instanceof AudioFeaturesProbe)
 			{
 				AudioFeaturesProbe audio = (AudioFeaturesProbe) probe;
 
@@ -475,7 +464,7 @@ public class ProbeManager
 				if (humid.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
-			else if (probe instanceof FacebookProbe)
+/*			else if (probe instanceof FacebookProbe)
 			{
 				FacebookProbe facebook = (FacebookProbe) probe;
 
@@ -524,7 +513,7 @@ public class ProbeManager
 				if (shion.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
-			else if (probe instanceof SaintProbe)
+*/			else if (probe instanceof SaintProbe)
 			{
 				SaintProbe saint = (SaintProbe) probe;
 

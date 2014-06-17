@@ -322,7 +322,7 @@ public class LocationProbe extends Probe implements LocationListener
 			{
 				public void run() 
 				{
-					FoursquareProbe.annotate(me._context, bundle);
+//					FoursquareProbe.annotate(me._context, bundle);
 
 					me.transmitData(me._context, bundle);
 				}

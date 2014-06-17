@@ -47,9 +47,9 @@
         <item>features.PressureProbeBasicStatisticsFeature</item>
         <item>features.ProximityProbeBasicStatisticsFeature</item>
         <item>features.TemperatureProbeBasicStatisticsFeature</item>
-        <item>features.GooglePlacesFeature</item>
+<!--    <item>features.GooglePlacesFeature</item>
         <item>features.FitbitApiFeature</item>
-        
+ -->        
         <item>builtin.RandomNoiseProbe</item>
 
         <item>features.AccelerometerFrequencyFeature</item>
@@ -63,19 +63,19 @@
         <item>builtin.GeomagneticRotationProbe</item>
         <item>builtin.AmbientHumidityProbe</item>
         <item>builtin.ActivityDetectionProbe</item>
-        
+<!--         
         <item>builtin.FacebookProbe</item>
         <item>builtin.FacebookEventsProbe</item>
         <item>builtin.TwitterProbe</item>
         <item>builtin.InstagramProbe</item>
         <item>builtin.LinkedInProbe</item>
         <item>builtin.FoursquareProbe</item>
-
+ -->
         <item>builtin.RawLocationProbe</item>
-        <item>builtin.MediaRouterDeviceProbe</item>
+<!--    <item>builtin.MediaRouterDeviceProbe</item>
         <item>builtin.ShionProbe</item>
         <item>builtin.SaintProbe</item>
-        
+ -->        
         <!-- <item>builtin.BluetoothReceiverProbe</item> -->
         <!-- <item>builtin.ZeroconfProbe</item> -->
    	</array>

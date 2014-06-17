@@ -1,4 +1,4 @@
-package edu.northwestern.cbits.purple_robot_manager.activities.probes;
+package edu.northwestern.cbits.purple_robot.social;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;

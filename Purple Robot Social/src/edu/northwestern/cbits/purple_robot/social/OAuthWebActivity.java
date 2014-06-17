@@ -1,4 +1,4 @@
-package edu.northwestern.cbits.purple_robot_manager.activities;
+package edu.northwestern.cbits.purple_robot.social;
 
 import java.util.Locale;
 

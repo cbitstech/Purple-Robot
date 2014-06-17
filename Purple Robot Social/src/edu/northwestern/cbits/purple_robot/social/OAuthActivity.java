@@ -1,4 +1,4 @@
-package edu.northwestern.cbits.purple_robot_manager.activities;
+package edu.northwestern.cbits.purple_robot.social;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -29,13 +29,6 @@ import android.preference.PreferenceManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
-import edu.northwestern.cbits.purple_robot_manager.oauth.FitbitApi;
-import edu.northwestern.cbits.purple_robot_manager.oauth.InstagramApi;
-import edu.northwestern.cbits.purple_robot_manager.probes.builtin.FoursquareProbe;
-import edu.northwestern.cbits.purple_robot_manager.probes.builtin.InstagramProbe;
-import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LinkedInProbe;
-import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TwitterProbe;
-import edu.northwestern.cbits.purple_robot_manager.probes.features.FitbitApiFeature;
 
 public class OAuthActivity extends Activity
 {
@@ -64,17 +57,17 @@ public class OAuthActivity extends Activity
 
         	Class api = null;
         	
-        	if ("fitbit".equals(requester))
-        		api = FitbitApi.class;
-        	else if ("twitter".equals(requester))
-        		api = TwitterApi.SSL.class;
-        	else if ("instagram".equalsIgnoreCase(requester))
-        		api = InstagramApi.class;
+        	if ("foursquare".equalsIgnoreCase(requester))
+        		api = Foursquare2Api.class;
         	else if ("linkedin".equalsIgnoreCase(requester))
         		api = LinkedInApi.class;
-        	else if ("foursquare".equalsIgnoreCase(requester))
-        		api = Foursquare2Api.class;
-        	
+        	else if ("twitter".equals(requester))
+        		api = TwitterApi.SSL.class;
+/*        	if ("fitbit".equals(requester))
+        		api = FitbitApi.class;
+        	else if ("instagram".equalsIgnoreCase(requester))
+        		api = InstagramApi.class;
+*/        	
         	final Class apiClass = api;
 
         	if (apiClass != null)
@@ -186,7 +179,7 @@ public class OAuthActivity extends Activity
 	        			String consumerSecret = null;
 	        			String callback = null;
 	        			
-	        			if ("fitbit".equals(requester))
+/*	        			if ("fitbit".equals(requester))
 	        			{
 	            			apiClass = FitbitApi.class;
 	            			consumerKey = FitbitApiFeature.CONSUMER_KEY;
@@ -219,7 +212,7 @@ public class OAuthActivity extends Activity
 	            			consumerSecret = FoursquareProbe.CONSUMER_SECRET;
 	            			callback = FoursquareProbe.CALLBACK;
 	                	}
-	        			
+*/	        			
 	        			if (apiClass != null && consumerKey != null && consumerSecret != null)
 	        			{
 			            	ServiceBuilder builder = new ServiceBuilder();

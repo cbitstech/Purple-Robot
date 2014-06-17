@@ -1,4 +1,4 @@
-package edu.northwestern.cbits.purple_robot_manager.calibration;
+package edu.northwestern.cbits.purple_robot.social;
 
 import android.content.Context;
 import android.content.Intent;

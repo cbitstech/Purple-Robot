@@ -1,4 +1,4 @@
-package edu.northwestern.cbits.purple_robot_manager.oauth;
+package edu.northwestern.cbits.purple_robot.fitness;
 
 import org.scribe.builder.api.DefaultApi10a;
 import org.scribe.model.Token;

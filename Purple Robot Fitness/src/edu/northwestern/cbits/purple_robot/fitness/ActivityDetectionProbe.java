@@ -1,4 +1,4 @@
-package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
+package edu.northwestern.cbits.purple_robot.fitness;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -179,6 +179,10 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
 				return "STILL";
 			case DetectedActivity.TILTING:
 				return "TILTING";
+			case DetectedActivity.RUNNING:
+				return "RUNNING";
+			case DetectedActivity.WALKING:
+			return "WALKING";
 		}
 		
 		return "UNKNOWN";
