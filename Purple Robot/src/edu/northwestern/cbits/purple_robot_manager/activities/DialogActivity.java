@@ -21,6 +21,7 @@ import android.preference.PreferenceManager;
 import android.view.ContextThemeWrapper;
 import edu.emory.mathcs.backport.java.util.Collections;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
 public class DialogActivity extends Activity 
@@ -362,7 +363,7 @@ public class DialogActivity extends Activity
 		}
 	}
 
-	public static void clearNativeDialogs(Context context, String tag, HashMap<String, Object> replacement) 
+	public static void clearNativeDialogs(final Context context, String tag, HashMap<String, Object> replacement) 
 	{
 		ArrayList<HashMap<String, Object>> toRemove = new ArrayList<HashMap<String, Object>>();
 		
@@ -398,7 +399,14 @@ public class DialogActivity extends Activity
 				{
 					public void run() 
 					{
-						DialogActivity._currentDialog.dismiss();
+						try
+						{
+							DialogActivity._currentDialog.dismiss();
+						}
+						catch (IllegalArgumentException e)
+						{
+							LogManager.getInstance(context).logException(e);
+						}
 					}
 				});
 			}
