@@ -1021,7 +1021,7 @@ public abstract class BaseScriptEngine
 
 	public void clearNativeDialogs()
 	{
-		DialogActivity.clearNativeDialogs();
+		DialogActivity.clearNativeDialogs(this._context);
 	}
 
 	public void clearNativeDialogs(String tag)
