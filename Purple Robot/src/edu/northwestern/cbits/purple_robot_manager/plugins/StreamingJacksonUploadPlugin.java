@@ -201,6 +201,9 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
 
 	private void closeOpenSession() throws JsonGenerationException, IOException 
 	{
+		if (this._generator == null || this._currentFile == null)
+			return;
+		
 		File pendingFolder = this.getPendingFolder();
 
 		this._generator.writeEndArray();
