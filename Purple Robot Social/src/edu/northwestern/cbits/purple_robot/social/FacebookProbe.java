@@ -1,4 +1,4 @@
-package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
+package edu.northwestern.cbits.purple_robot.social;
 
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;

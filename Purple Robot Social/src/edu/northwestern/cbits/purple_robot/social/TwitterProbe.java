@@ -1,6 +1,9 @@
-package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
+package edu.northwestern.cbits.purple_robot.social;
 
 import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.crypto.BadPaddingException;
@@ -10,7 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.scribe.builder.ServiceBuilder;
-import org.scribe.builder.api.LinkedInApi;
+import org.scribe.builder.api.TwitterApi;
 import org.scribe.exceptions.OAuthException;
 import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;
@@ -30,7 +33,6 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -40,11 +42,10 @@ import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
-public class LinkedInProbe extends Probe
+public class TwitterProbe extends Probe
 {
-	public static final String CONSUMER_KEY = "75ayz3gl4v7pv2";
-	public static final String CONSUMER_SECRET = "ndaAazgBiNTefTgJ";
-	public static final String CALLBACK = "http://purple.robot.com/oauth/linkedin";
+	public static final String CONSUMER_KEY = "q2JL6t5LenW1f8DPFqag";
+	public static final String CONSUMER_SECRET = "zsB6bELsZfj47kRHvXfinvBSgbddTzq7vgyqg5E3jn0";
 
 	private static final boolean DEFAULT_ENABLED = false;
 	private static final boolean DEFAULT_ENCRYPT = false;
@@ -58,12 +59,12 @@ public class LinkedInProbe extends Probe
 
 	public String name(Context context)
 	{
-		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.LinkedInProbe";
+		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.TwitterProbe";
 	}
 
 	public String title(Context context)
 	{
-		return context.getString(R.string.title_linkedin_probe);
+		return context.getString(R.string.title_twitter_probe);
 	}
 
 	public String probeCategory(Context context)
@@ -76,7 +77,7 @@ public class LinkedInProbe extends Probe
 		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
-		e.putBoolean("config_probe_linkedin_enabled", true);
+		e.putBoolean("config_probe_twitter_enabled", true);
 		
 		e.commit();
 	}
@@ -86,7 +87,7 @@ public class LinkedInProbe extends Probe
 		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
-		e.putBoolean("config_probe_linkedin_enabled", false);
+		e.putBoolean("config_probe_twitter_enabled", false);
 		
 		e.commit();
 	}
@@ -99,28 +100,28 @@ public class LinkedInProbe extends Probe
 		{
 			final long now = System.currentTimeMillis();
 
-			if (prefs.getBoolean("config_probe_linkedin_enabled", LinkedInProbe.DEFAULT_ENABLED))
+			if (prefs.getBoolean("config_probe_twitter_enabled", TwitterProbe.DEFAULT_ENABLED))
 			{
 				synchronized(this)
 				{
-					long freq = Long.parseLong(prefs.getString("config_probe_linkedin_frequency", Probe.DEFAULT_FREQUENCY));
-					final boolean doEncrypt = prefs.getBoolean("config_probe_linkedin_encrypt_data", LinkedInProbe.DEFAULT_ENCRYPT);
+					long freq = Long.parseLong(prefs.getString("config_probe_twitter_frequency", Probe.DEFAULT_FREQUENCY));
+					final boolean doEncrypt = prefs.getBoolean("config_probe_twitter_encrypt_data", TwitterProbe.DEFAULT_ENCRYPT);
 					
 					final EncryptionManager em = EncryptionManager.getInstance();
 					
 					if (now - this._lastCheck  > freq)
 					{
-						final LinkedInProbe me = this;
+						final TwitterProbe me = this;
 
-						this._token = prefs.getString("oauth_linkedin_token", null);
-						this._secret = prefs.getString("oauth_linkedin_secret", null);
+						this._token = prefs.getString("oauth_twitter_token", null);
+						this._secret = prefs.getString("oauth_twitter_secret", null);
 
-	    				final String title = context.getString(R.string.title_linkedin_check);
+	    				final String title = context.getString(R.string.title_twitter_check);
 	    				final SanityManager sanity = SanityManager.getInstance(context);
 
 	        			if (this._token == null || this._secret == null)
 	        			{
-	        				String message = context.getString(R.string.message_linkedin_check);
+	        				String message = context.getString(R.string.message_twitter_check);
 	        				
 	        				Runnable action = new Runnable()
 	        				{
@@ -135,17 +136,17 @@ public class LinkedInProbe extends Probe
 						else
 						{
 							sanity.clearAlert(title);
-							
+
 							Token accessToken = new Token(this._token, this._secret);
 							
 		                	ServiceBuilder builder = new ServiceBuilder();
-		                	builder = builder.provider(LinkedInApi.class);
-		                	builder = builder.apiKey(LinkedInProbe.CONSUMER_KEY);
-		                	builder = builder.apiSecret(LinkedInProbe.CONSUMER_SECRET);
+		                	builder = builder.provider(TwitterApi.class);
+		                	builder = builder.apiKey(TwitterProbe.CONSUMER_KEY);
+		                	builder = builder.apiSecret(TwitterProbe.CONSUMER_SECRET);
 		                	
 		                	final OAuthService service = builder.build();
 		                	
-							final OAuthRequest request = new OAuthRequest(Verb.GET, "http://api.linkedin.com/v1/people/~/network/updates?scope=self&type=RECU&type=SHAR&type=VIRL&format=json");
+							final OAuthRequest request = new OAuthRequest(Verb.GET, "https://api.twitter.com/1.1/statuses/user_timeline.json");
 							service.signRequest(accessToken, request);
 	
 							Runnable r = new Runnable()
@@ -154,92 +155,87 @@ public class LinkedInProbe extends Probe
 								{
 									try 
 									{
-										long mostRecent = prefs.getLong("config_linkedin_most_recent", 0);
+										SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss ZZZZZ yyyy", Locale.ENGLISH);
+										sdf.setLenient(true);
+
+										long mostRecent = prefs.getLong("config_twitter_most_recent", 0);
 										
 										Response response = request.send();
-										
-										JSONObject root = new JSONObject(response.getBody());
-										
-										if (root.getInt("_total") > 0)
-										{
-											JSONArray values = root.getJSONArray("values");
-											
-											for (int i = (values.length() - 1); i >= 0; i--)
-											{
-												JSONObject post = values.getJSONObject(i);
-												
-												long postTime = post.getLong("timestamp");
-	
-												if (postTime > mostRecent)
-												{
-													Bundle eventBundle = new Bundle();
-													eventBundle.putString("PROBE", me.name(context));
-													eventBundle.putLong("TIMESTAMP", postTime / 1000);
-													
-													eventBundle.putString("TYPE", post.getString("updateType"));
-													
-													if (post.has("updateContent"))
-													{
-														JSONObject content = post.getJSONObject("updateContent").getJSONObject("person").getJSONObject("currentShare");
-														
-														if (content.has("comment"))
-														{
-															String comment = content.getString("comment");
-															
-															if (doEncrypt)
-																comment = em.encryptString(context, comment);
 
-															eventBundle.putString("COMMENT", comment);
-														}
-														
-														if (content.has("content"))
-														{
-															JSONObject contentContent = content.getJSONObject("content");
-															
-															if (contentContent.has("title"))
-																eventBundle.putString("CONTENT_TITLE", contentContent.getString("title"));
-	
-															if (contentContent.has("submittedUrl"))
-																eventBundle.putString("CONTENT_URL", contentContent.getString("submittedUrl"));
-	
-															if (contentContent.has("description"))
-																eventBundle.putString("CONTENT_DESCRIPTION", contentContent.getString("description"));
-														}
-													}
-													
-													eventBundle.putBoolean("IS_OBFUSCATED", doEncrypt);
-													me.transmitData(context, eventBundle);
+										JSONArray tweets = new JSONArray(response.getBody());
+										
+										for (int i = (tweets.length() - 1); i >= 0; i--)
+										{
+											JSONObject tweet = tweets.getJSONObject(i);
+											
+											long tweetTime = sdf.parse(tweet.getString("created_at")).getTime();
+
+											if (tweetTime > mostRecent)
+											{
+												Bundle eventBundle = new Bundle();
+												eventBundle.putString("PROBE", me.name(context));
+												eventBundle.putLong("TIMESTAMP", tweetTime / 1000);
+												eventBundle.putString("LANGUAGE", tweet.getString("lang"));
+												eventBundle.putInt("FAVORITE_COUNT", tweet.getInt("favorite_count"));
+												eventBundle.putInt("RETWEET_COUNT", tweet.getInt("retweet_count"));
+												eventBundle.putLong("TWEET_ID", tweet.getLong("id"));
+												eventBundle.putString("SOURCE", tweet.getString("source"));
+												
+												JSONObject user = tweet.getJSONObject("user");
+												
+												eventBundle.putString("SCREENNAME", user.getString("screen_name"));
+												
+												String respondent = tweet.getString("in_reply_to_screen_name");
+												
+												if (respondent != null)
+													eventBundle.putString("RESPONDENT", respondent);
+												
+												String message = tweet.getString("text");
+
+												try 
+												{	
+													if (doEncrypt)
+														message = em.encryptString(context, message);
+
+													eventBundle.putString("CONTENT", message);
 												}
+												catch (IllegalBlockSizeException e) 
+												{
+													LogManager.getInstance(context).logException(e);
+												} 
+												catch (BadPaddingException e) 
+												{
+													LogManager.getInstance(context).logException(e);
+												} 
+												catch (UnsupportedEncodingException e) 
+												{
+													LogManager.getInstance(context).logException(e);
+												}
+
+												eventBundle.putBoolean("IS_OBFUSCATED", doEncrypt);
+												me.transmitData(context, eventBundle);
 											}
 										}
 										
 										Editor e = prefs.edit();
-										e.putLong("config_linkedin_most_recent", System.currentTimeMillis());
+										e.putLong("config_twitter_most_recent", System.currentTimeMillis());
 										e.commit();
-									} 
-									catch (OAuthException e)
-									{
-						     			LogManager.getInstance(context).logException(e);
 									} 
 									catch (JSONException e) 
 									{
-						     			LogManager.getInstance(context).logException(e);
-									} 
-									catch (IllegalBlockSizeException e) 
+					         			LogManager.getInstance(context).logException(e);
+									}
+									catch (OAuthException e)
 									{
-						     			LogManager.getInstance(context).logException(e);
+					         			LogManager.getInstance(context).logException(e);
 									} 
-									catch (BadPaddingException e) 
+									catch (ParseException e) 
 									{
-						     			LogManager.getInstance(context).logException(e);
-									} 
-									catch (UnsupportedEncodingException e) 
+					         			LogManager.getInstance(context).logException(e);
+									}
+									catch (IllegalStateException e) 
 									{
-						     			LogManager.getInstance(context).logException(e);
-									} 
-									catch (IllegalStateException e)
-									{
-						     			LogManager.getInstance(context).logException(e);
+					         			LogManager.getInstance(context).logException(e);
 									}
 								}
 							};
@@ -266,18 +262,18 @@ public class LinkedInProbe extends Probe
 		
 		intent.putExtra(OAuthActivity.CONSUMER_KEY, CONSUMER_KEY);
 		intent.putExtra(OAuthActivity.CONSUMER_SECRET, CONSUMER_SECRET);
-		intent.putExtra(OAuthActivity.REQUESTER, "linkedin");
-		intent.putExtra(OAuthActivity.CALLBACK_URL, CALLBACK);
+		intent.putExtra(OAuthActivity.REQUESTER, "twitter");
+		intent.putExtra(OAuthActivity.CALLBACK_URL, "http://pr-oauth/oauth/twitter");
 		
 		context.startActivity(intent);
 	}
 
 	public String summarizeValue(Context context, Bundle bundle)
 	{
-		if (bundle.containsKey("COMMENT"))
-			return bundle.getString("COMMENT") + " (" + bundle.getString("TYPE") + ")";
-
-		return bundle.getString("TYPE");
+		String screenname = bundle.getString("SCREENNAME");
+		String message = bundle.getString("CONTENT");
+		
+		return "@" + screenname + ": " + message;
 	}
 	
 	public Map<String, Object> configuration(Context context)
@@ -286,10 +282,10 @@ public class LinkedInProbe extends Probe
 		
 		SharedPreferences prefs = Probe.getPreferences(context);
 
-		long freq = Long.parseLong(prefs.getString("config_probe_linkedin_frequency", Probe.DEFAULT_FREQUENCY));
+		long freq = Long.parseLong(prefs.getString("config_probe_twitter_frequency", Probe.DEFAULT_FREQUENCY));
 		map.put(Probe.PROBE_FREQUENCY, freq);
 		
-		boolean hash = prefs.getBoolean("config_probe_linkedin_encrypt_data", LinkedInProbe.DEFAULT_ENCRYPT);
+		boolean hash = prefs.getBoolean("config_probe_twitter_encrypt_data", TwitterProbe.DEFAULT_ENCRYPT);
 		map.put(Probe.ENCRYPT_DATA, hash);
 
 		return map;
@@ -308,7 +304,7 @@ public class LinkedInProbe extends Probe
 				SharedPreferences prefs = Probe.getPreferences(context);
 				Editor e = prefs.edit();
 				
-				e.putString("config_probe_linkedin_frequency", frequency.toString());
+				e.putString("config_probe_twitter_frequency", frequency.toString());
 				e.commit();
 			}
 		}
@@ -324,15 +320,15 @@ public class LinkedInProbe extends Probe
 				SharedPreferences prefs = Probe.getPreferences(context);
 				Editor e = prefs.edit();
 				
-				e.putBoolean("config_probe_linkedin_encrypt_data", encryptBoolean.booleanValue());
+				e.putBoolean("config_probe_twitter_encrypt_data", encryptBoolean.booleanValue());
 				e.commit();
 			}
 		}
 	}
-
+	
 	public String summary(Context context) 
 	{
-		return context.getString(R.string.summary_linkedin_probe_desc);
+		return context.getString(R.string.summary_twitter_probe_desc);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -342,22 +338,22 @@ public class LinkedInProbe extends Probe
 
 		final PreferenceScreen screen = manager.createPreferenceScreen(activity);
 		screen.setTitle(this.title(activity));
-		screen.setSummary(R.string.summary_linkedin_probe_desc);
+		screen.setSummary(R.string.summary_twitter_probe_desc);
 
 		final SharedPreferences prefs = Probe.getPreferences(activity);
 
-		String token = prefs.getString("oauth_linkedin_token", null);
-		String secret = prefs.getString("oauth_linkedin_secret", null);
+		String token = prefs.getString("oauth_twitter_token", null);
+		String secret = prefs.getString("oauth_twitter_secret", null);
 
 		CheckBoxPreference enabled = new CheckBoxPreference(activity);
 		enabled.setTitle(R.string.title_enable_probe);
-		enabled.setKey("config_probe_linkedin_enabled");
-		enabled.setDefaultValue(LinkedInProbe.DEFAULT_ENABLED);
+		enabled.setKey("config_probe_twitter_enabled");
+		enabled.setDefaultValue(TwitterProbe.DEFAULT_ENABLED);
 
 		screen.addPreference(enabled);
 
 		ListPreference duration = new ListPreference(activity);
-		duration.setKey("config_probe_linkedin_frequency");
+		duration.setKey("config_probe_twitter_frequency");
 		duration.setEntryValues(R.array.probe_low_frequency_values);
 		duration.setEntries(R.array.probe_low_frequency_labels);
 		duration.setTitle(R.string.probe_frequency_label);
@@ -366,22 +362,22 @@ public class LinkedInProbe extends Probe
 		screen.addPreference(duration);
 
 		CheckBoxPreference encrypt = new CheckBoxPreference(activity);
-		encrypt.setKey("config_probe_linkedin_encrypt_data");
-		encrypt.setDefaultValue(LinkedInProbe.DEFAULT_ENCRYPT);
-		encrypt.setTitle(R.string.config_probe_linkedin_encrypt_title);
-		encrypt.setSummary(R.string.config_probe_linkedin_encrypt_summary);
+		encrypt.setKey("config_probe_twitter_encrypt_data");
+		encrypt.setDefaultValue(TwitterProbe.DEFAULT_ENCRYPT);
+		encrypt.setTitle(R.string.config_probe_twitter_encrypt_title);
+		encrypt.setSummary(R.string.config_probe_twitter_encrypt_summary);
 
 		screen.addPreference(encrypt);
 
 		final Preference authPreference = new Preference(activity);
-		authPreference.setTitle(R.string.title_authenticate_linkedin_probe);
-		authPreference.setSummary(R.string.summary_authenticate_linkedin_probe);
+		authPreference.setTitle(R.string.title_authenticate_twitter_probe);
+		authPreference.setSummary(R.string.summary_authenticate_twitter_probe);
 
-		final LinkedInProbe me = this;
+		final TwitterProbe me = this;
 		
 		final Preference logoutPreference = new Preference(activity);
-		logoutPreference.setTitle(R.string.title_logout_linkedin_probe);
-		logoutPreference.setSummary(R.string.summary_logout_linkedin_probe);
+		logoutPreference.setTitle(R.string.title_logout_twitter_probe);
+		logoutPreference.setSummary(R.string.summary_logout_twitter_probe);
 
 		authPreference.setOnPreferenceClickListener(new OnPreferenceClickListener()
 		{
@@ -401,8 +397,8 @@ public class LinkedInProbe extends Probe
 			public boolean onPreferenceClick(Preference preference) 
 			{
 				Editor e = prefs.edit();
-				e.remove("oauth_linkedin_token");
-				e.remove("oauth_linkedin_secret");
+				e.remove("oauth_twitter_token");
+				e.remove("oauth_twitter_secret");
 				e.commit();
 				
 				screen.addPreference(authPreference);
@@ -412,7 +408,7 @@ public class LinkedInProbe extends Probe
 				{
 					public void run() 
 					{
-						Toast.makeText(activity, activity.getString(R.string.toast_linkedin_logout), Toast.LENGTH_LONG).show();
+						Toast.makeText(activity, activity.getString(R.string.toast_twitter_logout), Toast.LENGTH_LONG).show();
 					}
 				});
 

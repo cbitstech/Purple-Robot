@@ -1,4 +1,4 @@
-package edu.northwestern.cbits.purple_robot_manager.probes.features;
+package edu.northwestern.cbits.purple_robot.location;
 
 import java.io.IOException;
 import java.io.InputStream;

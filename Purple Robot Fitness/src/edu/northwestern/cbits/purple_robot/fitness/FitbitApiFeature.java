@@ -1,4 +1,4 @@
-package edu.northwestern.cbits.purple_robot_manager.probes.features;
+package edu.northwestern.cbits.purple_robot.fitness;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

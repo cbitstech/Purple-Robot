@@ -1,4 +1,4 @@
-package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
+package edu.northwestern.purple_robot.cbits;
 
 import java.util.ArrayList;
 import java.util.Map;
