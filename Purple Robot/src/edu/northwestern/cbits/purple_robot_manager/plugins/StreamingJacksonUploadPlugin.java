@@ -25,6 +25,7 @@ import android.util.Log;
 
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -73,46 +74,51 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
 			@SuppressLint("TrulyRandom")
 			public void run() 
 			{
-				try 
+				synchronized(me)
 				{
-					File pendingFolder = me.getPendingFolder();
-
-					String[] filenames = pendingFolder.list(new FilenameFilter()
+					try 
 					{
-						public boolean accept(File dir, String filename)
+						me.closeOpenSession();
+	
+						File pendingFolder = me.getPendingFolder();
+	
+						String[] filenames = pendingFolder.list(new FilenameFilter()
 						{
-							return filename.endsWith(StreamingJacksonUploadPlugin.FILE_EXTENSION);
-						}
-					});
-
-					if (filenames == null)
-						filenames = new String[0];
-					
-					if (filenames.length < 1)
-						return;
-
-					SecureRandom random = new SecureRandom();
-					
-					int index = 0;
-					
-					if (filenames.length > 1)
-						index = random.nextInt(filenames.length);
-
-					File payloadFile = new File(pendingFolder, filenames[index]);
-					String payload = FileUtils.readFileToString(payloadFile);
-
-					if (me.transmitPayload(prefs, payload) == DataUploadPlugin.RESULT_SUCCESS)
-					{
-						payloadFile.delete();
+							public boolean accept(File dir, String filename)
+							{
+								return filename.endsWith(StreamingJacksonUploadPlugin.FILE_EXTENSION);
+							}
+						});
+	
+						if (filenames == null)
+							filenames = new String[0];
 						
-						me._lastAttempt = 0;
-						me.uploadFiles(context, prefs);
+						if (filenames.length < 1)
+							return;
+	
+						SecureRandom random = new SecureRandom();
+						
+						int index = 0;
+						
+						if (filenames.length > 1)
+							index = random.nextInt(filenames.length);
+	
+						File payloadFile = new File(pendingFolder, filenames[index]);
+						String payload = FileUtils.readFileToString(payloadFile);
+	
+						if (me.transmitPayload(prefs, payload) == DataUploadPlugin.RESULT_SUCCESS)
+						{
+							payloadFile.delete();
+							
+							me._lastAttempt = 0;
+							me.uploadFiles(context, prefs);
+						}
 					}
-				}
-				catch (IOException e) 
-				{
-					LogManager.getInstance(context).logException(e);
-					me.broadcastMessage(context.getString(R.string.message_general_error));
+					catch (IOException e) 
+					{
+						LogManager.getInstance(context).logException(e);
+						me.broadcastMessage(context.getString(R.string.message_general_error));
+					}
 				}
 			}
 		};
@@ -165,38 +171,7 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
 							long size = Long.parseLong(prefs.getString(StreamingJacksonUploadPlugin.UPLOAD_SIZE, StreamingJacksonUploadPlugin.UPLOAD_SIZE_DEFAULT));
 						
 							if (this._generator != null && (length > size || modDelta > 60000))
-							{
-								this._generator.writeEndArray();
-								this._generator.flush();
-								this._generator.close();
-								
-								this._generator = null;
-								
-								String tempFile = this._currentFile.getAbsolutePath();
-								String finalFile = tempFile.replace(TEMP_FILE_EXTENSION, FILE_EXTENSION);
-								
-								this._currentFile = null;
-
-								FileUtils.moveFile(new File(tempFile), new File(finalFile));
-								
-								String[] filenames = pendingFolder.list(new FilenameFilter()
-								{
-									public boolean accept(File dir, String filename)
-									{
-										return filename.endsWith(StreamingJacksonUploadPlugin.TEMP_FILE_EXTENSION);
-									}
-								});
-								
-								if (filenames == null)
-									filenames = new String[0];
-								
-								for (String filename : filenames)
-								{
-									File toDelete = new File(pendingFolder, filename);
-
-									toDelete.delete();
-								}
-							}
+								this.closeOpenSession();
 						}
 						
 						this.uploadFiles(context, prefs);
@@ -221,6 +196,42 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
 					}
 				}
 			}
+		}
+	}
+
+	private void closeOpenSession() throws JsonGenerationException, IOException 
+	{
+		File pendingFolder = this.getPendingFolder();
+
+		this._generator.writeEndArray();
+		this._generator.flush();
+		this._generator.close();
+		
+		this._generator = null;
+		
+		String tempFile = this._currentFile.getAbsolutePath();
+		String finalFile = tempFile.replace(TEMP_FILE_EXTENSION, FILE_EXTENSION);
+		
+		this._currentFile = null;
+
+		FileUtils.moveFile(new File(tempFile), new File(finalFile));
+		
+		String[] filenames = pendingFolder.list(new FilenameFilter()
+		{
+			public boolean accept(File dir, String filename)
+			{
+				return filename.endsWith(StreamingJacksonUploadPlugin.TEMP_FILE_EXTENSION);
+			}
+		});
+		
+		if (filenames == null)
+			filenames = new String[0];
+		
+		for (String filename : filenames)
+		{
+			File toDelete = new File(pendingFolder, filename);
+
+			toDelete.delete();
 		}
 	}
 
