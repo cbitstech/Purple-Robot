@@ -347,7 +347,7 @@ public class DialogActivity extends Activity
 		});
 	}
 
-	public static void clearNativeDialogs() 
+	public static void clearNativeDialogs(final Context context) 
 	{
 		DialogActivity._pendingDialogs.clear();
 		
@@ -357,7 +357,15 @@ public class DialogActivity extends Activity
 			{
 				public void run() 
 				{
-					DialogActivity._currentDialog.dismiss();
+					try
+					{
+						if (DialogActivity._currentDialog.isShowing())
+							DialogActivity._currentDialog.dismiss();
+					}
+					catch (IllegalArgumentException e)
+					{
+						LogManager.getInstance(context).logException(e);
+					}
 				}
 			});
 		}
@@ -401,7 +409,8 @@ public class DialogActivity extends Activity
 					{
 						try
 						{
-							DialogActivity._currentDialog.dismiss();
+							if (DialogActivity._currentDialog.isShowing())
+								DialogActivity._currentDialog.dismiss();
 						}
 						catch (IllegalArgumentException e)
 						{
