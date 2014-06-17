@@ -16,7 +16,6 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -245,9 +244,6 @@ public class RawLocationProbe extends Probe implements LocationListener
 	
 	private void logEvent(Bundle bundle)
 	{
-		Log.e("PR", "EVENT: " + bundle.getString(RawLocationProbe.LOG_EVENT));
-		Log.e("PR", "PROVIDER: " + bundle.getString(RawLocationProbe.PROVIDER));
-
 		long now = System.currentTimeMillis();
 
 		bundle.putString("PROBE", this.name(this._context) + "EventLog");
