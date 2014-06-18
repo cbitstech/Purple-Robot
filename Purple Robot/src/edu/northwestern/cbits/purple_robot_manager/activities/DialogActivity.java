@@ -13,7 +13,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -59,6 +58,15 @@ public class DialogActivity extends Activity
 	
 	public static void showNativeDialog(final Context context, final String title, final String message, final String confirmTitle, final String cancelTitle, final String confirmScript, final String cancelScript, final String tag, final long priority)
 	{
+		try 
+		{
+			Thread.sleep(250);
+		} 
+		catch (InterruptedException e) 
+		{
+			e.printStackTrace();
+		}
+		
 		if (title == null)
 		{
 			DialogActivity.showNativeDialog(context, "", message, confirmTitle, cancelTitle, confirmScript, cancelScript, tag, priority);
@@ -212,7 +220,7 @@ public class DialogActivity extends Activity
 		builder = builder.setTitle(title);
 		builder = builder.setMessage(message);
 		builder = builder.setCancelable(false);
-		
+
 		if (confirmTitle.trim().length() > 0)
 		{
 			builder = builder.setPositiveButton(confirmTitle, new DialogInterface.OnClickListener() 
@@ -244,7 +252,7 @@ public class DialogActivity extends Activity
 				}
 			});
 		}
-		
+
 		String cancelTitle = intent.getStringExtra(DialogActivity.DIALOG_CANCEL_BUTTON);
 		final String cancelScript = intent.getStringExtra(DialogActivity.DIALOG_CANCEL_SCRIPT);
 
@@ -279,45 +287,43 @@ public class DialogActivity extends Activity
 				}
 			});
 		}
-		
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
-		{
-			builder = builder.setOnDismissListener(new OnDismissListener()
-			{
-				public void onDismiss(DialogInterface arg0) 
-				{
-					DialogActivity._currentDialog = null;
-					DialogActivity._currentActivity = null;
-					
-					if (DialogActivity._pendingDialogs.size() > 0)
-					{
-						DialogActivity.sortPending();
-						
-						HashMap<String, Object> dialog = DialogActivity._pendingDialogs.remove(0);
-						
-						Intent intent = new Intent();
-						intent.putExtra(DialogActivity.DIALOG_TITLE, dialog.get(DialogActivity.DIALOG_TITLE).toString());
-						intent.putExtra(DialogActivity.DIALOG_MESSAGE, dialog.get(DialogActivity.DIALOG_MESSAGE).toString());
-						intent.putExtra(DialogActivity.DIALOG_CONFIRM_BUTTON, dialog.get(DialogActivity.DIALOG_CONFIRM_BUTTON).toString());
-						intent.putExtra(DialogActivity.DIALOG_CONFIRM_SCRIPT, dialog.get(DialogActivity.DIALOG_CONFIRM_SCRIPT).toString());
-						intent.putExtra(DialogActivity.DIALOG_CANCEL_BUTTON, dialog.get(DialogActivity.DIALOG_CANCEL_BUTTON).toString());
-						intent.putExtra(DialogActivity.DIALOG_CANCEL_SCRIPT, dialog.get(DialogActivity.DIALOG_CANCEL_SCRIPT).toString());
-						intent.putExtra(DialogActivity.DIALOG_TAG, dialog.get(DialogActivity.DIALOG_TAG).toString());
-						intent.putExtra(DialogActivity.DIALOG_PRIORITY, (Long) dialog.get(DialogActivity.DIALOG_PRIORITY));
-						
-						me.setIntent(intent);
-						
-						me.showNativeDialog();
-					}
-					else
-						me.finish();
-				}
-			});
-		}
-		
+
 		DialogActivity._currentDialog = builder.create();
-		DialogActivity._currentActivity  = this;
-				
+		DialogActivity._currentDialog.setOnDismissListener(new OnDismissListener()
+		{
+			public void onDismiss(DialogInterface dialogInterface) 
+			{
+				DialogActivity._currentDialog = null;
+				DialogActivity._currentActivity = null;
+				DialogActivity._visible = false;
+
+				if (DialogActivity._pendingDialogs.size() > 0)
+				{
+					DialogActivity.sortPending();
+					
+					HashMap<String, Object> dialog = DialogActivity._pendingDialogs.remove(0);
+					
+					Intent intent = new Intent();
+					intent.putExtra(DialogActivity.DIALOG_TITLE, dialog.get(DialogActivity.DIALOG_TITLE).toString());
+					intent.putExtra(DialogActivity.DIALOG_MESSAGE, dialog.get(DialogActivity.DIALOG_MESSAGE).toString());
+					intent.putExtra(DialogActivity.DIALOG_CONFIRM_BUTTON, dialog.get(DialogActivity.DIALOG_CONFIRM_BUTTON).toString());
+					intent.putExtra(DialogActivity.DIALOG_CONFIRM_SCRIPT, dialog.get(DialogActivity.DIALOG_CONFIRM_SCRIPT).toString());
+					intent.putExtra(DialogActivity.DIALOG_CANCEL_BUTTON, dialog.get(DialogActivity.DIALOG_CANCEL_BUTTON).toString());
+					intent.putExtra(DialogActivity.DIALOG_CANCEL_SCRIPT, dialog.get(DialogActivity.DIALOG_CANCEL_SCRIPT).toString());
+					intent.putExtra(DialogActivity.DIALOG_TAG, dialog.get(DialogActivity.DIALOG_TAG).toString());
+					intent.putExtra(DialogActivity.DIALOG_PRIORITY, (Long) dialog.get(DialogActivity.DIALOG_PRIORITY));
+					
+					me.setIntent(intent);
+					
+					me.showNativeDialog();
+				}
+				else
+					me.finish();
+			}
+		});
+		
+		DialogActivity._currentActivity = this;
+
 		DialogActivity._currentDialog.show();
 	}
 
@@ -378,11 +384,13 @@ public class DialogActivity extends Activity
 		for (HashMap<String, Object> dialog : DialogActivity._pendingDialogs)
 		{
 			if (tag.equals(dialog.get(DialogActivity.DIALOG_TAG)))
+			{
 				toRemove.add(dialog);
+			}
 		}
 		
 		DialogActivity._pendingDialogs.removeAll(toRemove);
-		
+
 		if (replacement != null)
 			DialogActivity._pendingDialogs.add(replacement);
 		
@@ -410,7 +418,9 @@ public class DialogActivity extends Activity
 						try
 						{
 							if (DialogActivity._currentDialog.isShowing())
+							{
 								DialogActivity._currentDialog.dismiss();
+							}
 						}
 						catch (IllegalArgumentException e)
 						{
