@@ -29,4 +29,4 @@ project.properties
 
 Thumbs.db
 android-support-v4.jar
-proguard-project.txt
+lint.xml
