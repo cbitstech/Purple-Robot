@@ -305,7 +305,7 @@ public class WekaJ48TreeParser extends TreeNodeParser
 		// Add additional format-specific metadata.
 		
 		prediction.put(WekaJ48TreeParser.NUM_INSTANCES, Double.valueOf(coverage));
-		prediction.put(WekaJ48TreeParser.NUM_INCORRECT, Double.valueOf(coverage));
+		prediction.put(WekaJ48TreeParser.NUM_INCORRECT, Double.valueOf(incorrect));
 		
 		return new LeafNode(prediction);
 	}
