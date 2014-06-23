@@ -56,7 +56,7 @@ import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
-import edu.northwestern.cbits.purple_robot_manager.snapshots.SnapshotManager;
+// import edu.northwestern.cbits.purple_robot_manager.snapshots.SnapshotManager;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 import edu.northwestern.cbits.purple_robot_manager.widget.PurpleRobotAppWideWidgetProvider;
@@ -1330,6 +1330,7 @@ public abstract class BaseScriptEngine
 		return TriggerManager.getInstance(this._context).triggerIds();
 	}
 
+	/*
 	public List<String> fetchSnapshotIds() 
 	{
 		ArrayList<String> times = new ArrayList<String>();
@@ -1339,15 +1340,8 @@ public abstract class BaseScriptEngine
 		
 		return times;
 	}
+	*/
 
-	public Map<String, Object> fetchSnapshot(String timestamp) 
-	{
-		//TriggerManager.getInstance(this._context).fetchTrigger(this._context, id);
-		
-		return new HashMap<String, Object>();
-	}
-
-	
 	public Map<String, Object> fetchTrigger(String id) 
 	{
 		return TriggerManager.getInstance(this._context).fetchTrigger(this._context, id);
