@@ -162,8 +162,7 @@ public class CallHistoryFeature extends Feature
 										}
 									}
 									
-									String number = cursor.getString(cursor.getColumnIndex(CallLog.Calls.NUMBER));
-									number = PhoneNumberUtils.formatNumber(number);
+									String number = PhoneNumberUtils.formatNumber(cursor.getString(cursor.getColumnIndex(CallLog.Calls.NUMBER)));
 	
 									if (doHash)
 										number = EncryptionManager.getInstance().createHash(context, number);

@@ -332,7 +332,7 @@ public class JavaScriptEngine extends BaseScriptEngine
 		return new NativeArray(values);
 	}
 
-	public NativeArray fetchSnapshotIds()
+/*	public NativeArray fetchSnapshotIds()
 	{
 		List<String> snapshotIds = super.fetchSnapshotIds();
 			
@@ -355,7 +355,7 @@ public class JavaScriptEngine extends BaseScriptEngine
 		
 		return null;
 	}
-
+*/
 	public NativeObject fetchNamespace(String namespace)
 	{
 		Map<String, Object> map = super.fetchNamespaceMap(namespace);
