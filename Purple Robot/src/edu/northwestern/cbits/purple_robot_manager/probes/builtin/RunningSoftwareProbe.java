@@ -33,6 +33,7 @@ public class RunningSoftwareProbe extends Probe
 	private static final String RUNNING_TASKS = "RUNNING_TASKS";
 	private static final String RUNNING_TASK_COUNT = "RUNNING_TASK_COUNT";
 	private static final String PACKAGE_CATEGORY = "PACKAGE_CATEGORY";
+	private static final String TASK_STACK_INDEX = "TASK_STACK_INDEX";
 
 	private static final boolean DEFAULT_ENABLED = true;
 
@@ -107,16 +108,19 @@ public class RunningSoftwareProbe extends Probe
 								{
 									ArrayList<Bundle> running = new ArrayList<Bundle>();
 			
-									for (RunningTaskInfo info : tasks)
+									for (int i = 0; i < tasks.size(); i++)
 									{
+										RunningTaskInfo info = tasks.get(i);
+										
 										Bundle taskBundle = new Bundle();
 			
 										taskBundle.putString(RunningSoftwareProbe.PACKAGE_NAME, info.baseActivity.getPackageName());
-
-										running.add(taskBundle);
+										taskBundle.putInt(RunningSoftwareProbe.TASK_STACK_INDEX, i);
 
 										String category = RunningSoftwareProbe.fetchCategory(context, info.baseActivity.getPackageName());
 										taskBundle.putString(RunningSoftwareProbe.PACKAGE_CATEGORY, category);
+										
+										running.add(taskBundle);
 									}
 			
 									bundle.putParcelableArrayList(RunningSoftwareProbe.RUNNING_TASKS, running);
