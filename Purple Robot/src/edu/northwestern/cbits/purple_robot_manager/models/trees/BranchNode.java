@@ -385,4 +385,22 @@ public class BranchNode extends TreeNode
 		
 		return sb.toString();
 	}
+
+	public void addDefaultCondition(TreeNode node) 
+	{
+		this._conditions.add(new Condition(Operation.DEFAULT, "foo", "bar", Condition.LOWEST_PRIORITY, node));
+		
+		Collections.sort(this._conditions, new Comparator<Condition>()
+		{
+			public int compare(Condition one, Condition two) 
+			{
+				if (one._priority > two._priority)
+					return -1;
+				else if (one._priority < two._priority)
+					return 1;
+
+				return one._operation.compareTo(two._operation);
+			}
+		});
+	}
 }

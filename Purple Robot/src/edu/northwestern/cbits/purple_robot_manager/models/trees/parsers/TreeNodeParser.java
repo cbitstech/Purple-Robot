@@ -42,6 +42,8 @@ public abstract class TreeNodeParser
 		
 		if (content.startsWith("digraph J48Tree"))
 			parser = new WekaJ48TreeParser();
+		else if (content.startsWith("   1  "))
+			parser = new MatLabBinaryTreeParser();
 		
 		if (parser == null)
 			throw new TreeNodeParser.ParserNotFound("Unable to find parser for content.");
