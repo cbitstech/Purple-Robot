@@ -73,5 +73,9 @@
 -dontwarn sun.rmi.rmic.Main
 -dontwarn javax.xml.bind.DatatypeConverter
 -dontwarn org.apache.commons.codec.binary.Base64
--keep class edu.northwestern.cbits.** { *; }
 -dontwarn edu.northwestern.cbits.**
+
+-keep class edu.northwestern.cbits.** { *; }
+-keep class jscheme.** { *; }
+-keep class jsint.** { *; }
+-keep class org.mozilla.** { *; }
