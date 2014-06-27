@@ -168,7 +168,7 @@ public class WebkitActivity extends ActionBarActivity
 	}
 
 
-	private String contentSubtitle()
+	protected String contentSubtitle()
 	{
 		String name = this.getIntent().getStringExtra("probe_name");
 
@@ -182,7 +182,7 @@ public class WebkitActivity extends ActionBarActivity
 		return null;
 	}
 
-	private String contentTitle()
+	protected String contentTitle()
 	{
 		String name = this.getIntent().getStringExtra("probe_name");
 
