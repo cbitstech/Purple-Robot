@@ -947,6 +947,7 @@
     <string name="config_dialog_count_message" formatted="false">Limits the number of dialog views that will stack upon each other before older dialogs are deleted.</string>
     
     <string name="title_application_launch_probe">Application Launch Events</string>
+    <string name="summary_application_launch_probe_desc">Records when different apps come to the top of the user\'s task stack.</string>
     <string name="summary_app_launch_probe">%1$s (%2$s)</string>
     
     <string name="available_sensors_label">Available Hardware Sensors</string>
