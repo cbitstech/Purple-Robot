@@ -30,11 +30,16 @@ public class ApplicationLaunchProbe extends Probe
 
 	private static final String WAKE_ACTION = "ACTIVITY_LAUNCH_WAKE";
 	private static final String DEFAULT_FREQUENCY = "100";
+
+	private static final String ENABLED_KEY = "config_probe_application_launch_enabled";
+	private static final String FREQUENCY_KEY = "config_probe_application_launch_frequency";
 	
 	private PendingIntent _pollIntent = null;
 	private long _lastInterval = 0;
 	
+	private String _lastPkgName = null;
 	private String _lastName = null;
+	private long _lastStart = 0;
 
 	public String name(Context context)
 	{
@@ -56,7 +61,7 @@ public class ApplicationLaunchProbe extends Probe
 		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
-		e.putBoolean("config_probe_application_launch_enabled", true);
+		e.putBoolean(ApplicationLaunchProbe.ENABLED_KEY, true);
 		
 		e.commit();
 	}
@@ -66,7 +71,7 @@ public class ApplicationLaunchProbe extends Probe
 		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
-		e.putBoolean("config_probe_application_launch_enabled", false);
+		e.putBoolean(ApplicationLaunchProbe.ENABLED_KEY, false);
 		
 		e.commit();
 	}
@@ -85,9 +90,9 @@ public class ApplicationLaunchProbe extends Probe
 		
 		if (super.isEnabled(context))
 		{
-			if (prefs.getBoolean("config_probe_application_launch_enabled", ApplicationLaunchProbe.DEFAULT_ENABLED))
+			if (prefs.getBoolean(ApplicationLaunchProbe.ENABLED_KEY, ApplicationLaunchProbe.DEFAULT_ENABLED))
 			{
-				interval = Long.parseLong(prefs.getString("config_probe_application_launch_frequency", "10"));
+				interval = Long.parseLong(prefs.getString(ApplicationLaunchProbe.FREQUENCY_KEY, "10"));
 
 				if (interval != this._lastInterval)
 				{
@@ -134,7 +139,7 @@ public class ApplicationLaunchProbe extends Probe
 
 					final String name = (String)((applicationInfo != null) ? packageManager.getApplicationLabel(applicationInfo) : "???");
 
-					if (pkgName.equals(me._lastName) == false)
+					if (pkgName.equals(me._lastPkgName) == false)
 					{
 						Runnable r = new Runnable()
 						{
@@ -142,13 +147,16 @@ public class ApplicationLaunchProbe extends Probe
 							{
 								Bundle bundle = new Bundle();
 
-								if (me._lastName != null)
+								if (me._lastPkgName != null)
 								{
-									bundle.putString("PREVIOUS_APP_PKG", me._lastName);
-									bundle.putString("PREVIOUS_CATEGORY", RunningSoftwareProbe.fetchCategory(context, me._lastName));
+									bundle.putString("PREVIOUS_APP_PKG", me._lastPkgName);
+									bundle.putString("PREVIOUS_APP_NAME", me._lastName);
+									bundle.putString("PREVIOUS_CATEGORY", RunningSoftwareProbe.fetchCategory(context, me._lastPkgName));
+									bundle.putLong("PREVIOUS_TIMESTAMP", me._lastStart);
 								}
 
-								me._lastName = pkgName;
+								me._lastPkgName = pkgName;
+								me._lastName = name;
 
 								bundle.putString("PROBE", me.name(context));
 								bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
@@ -157,6 +165,8 @@ public class ApplicationLaunchProbe extends Probe
 								bundle.putString("CURRENT_CATEGORY", RunningSoftwareProbe.fetchCategory(context, pkgName));
 
 								me.transmitData(context, bundle);
+								
+								me._lastStart = bundle.getLong("TIMESTAMP");
 							}
 						};
 
@@ -190,7 +200,7 @@ public class ApplicationLaunchProbe extends Probe
 		
 		SharedPreferences prefs = Probe.getPreferences(context);
 
-		long freq = Long.parseLong(prefs.getString("config_probe_running_software_frequency", Probe.DEFAULT_FREQUENCY));
+		long freq = Long.parseLong(prefs.getString(ApplicationLaunchProbe.FREQUENCY_KEY, Probe.DEFAULT_FREQUENCY));
 		
 		map.put(Probe.PROBE_FREQUENCY, freq);
 		
@@ -210,7 +220,7 @@ public class ApplicationLaunchProbe extends Probe
 				SharedPreferences prefs = Probe.getPreferences(context);
 				Editor e = prefs.edit();
 				
-				e.putString("config_probe_application_launch_frequency", frequency.toString());
+				e.putString(ApplicationLaunchProbe.FREQUENCY_KEY, frequency.toString());
 				e.commit();
 			}
 		}
@@ -218,7 +228,7 @@ public class ApplicationLaunchProbe extends Probe
 	
 	public String summary(Context context) 
 	{
-		return context.getString(R.string.summary_running_software_probe_desc);
+		return context.getString(R.string.summary_application_launch_probe_desc);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -232,7 +242,7 @@ public class ApplicationLaunchProbe extends Probe
 
 		CheckBoxPreference enabled = new CheckBoxPreference(activity);
 		enabled.setTitle(R.string.title_enable_probe);
-		enabled.setKey("config_probe_application_launch_enabled");
+		enabled.setKey(ApplicationLaunchProbe.ENABLED_KEY);
 		enabled.setDefaultValue(ApplicationLaunchProbe.DEFAULT_ENABLED);
 
 		screen.addPreference(enabled);
