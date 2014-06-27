@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -26,9 +27,10 @@ import android.os.SystemClock;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.RealTimeProbeViewActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
-import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
 import edu.northwestern.cbits.purple_robot_manager.charts.SplineChart;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -70,7 +72,8 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 
 	public Intent viewIntent(Context context)
 	{
-		Intent i = new Intent(context, WebkitLandscapeActivity.class);
+		Intent i = new Intent(context, RealTimeProbeViewActivity.class);
+		i.putExtra(RealTimeProbeViewActivity.PROBE_NAME, AccelerometerProbe.NAME);
 
 		return i;
 	}
@@ -113,21 +116,16 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 	{
 		try
 		{
-			String template = WebkitActivity.stringForAsset(activity, "webkit/chart_spline_full.html");
-
-			ArrayList<Double> x = new ArrayList<Double>();
-			ArrayList<Double> y = new ArrayList<Double>();
-			ArrayList<Double> z = new ArrayList<Double>();
-			ArrayList<Double> time = new ArrayList<Double>();
+			String template = WebkitActivity.stringForAsset(activity, "webkit/epoch_chart_spline_full.html");
 
 			Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(activity, AccelerometerProbe.DB_TABLE, this.databaseSchema());
-
-			int count = -1;
+			
+			JSONArray xSeries = new JSONArray();
+			JSONArray ySeries = new JSONArray();
+			JSONArray zSeries = new JSONArray();
 
 			if (cursor != null)
 			{
-				count = cursor.getCount();
-
 				while (cursor.moveToNext())
 				{
 					double xd = cursor.getDouble(cursor.getColumnIndex(AccelerometerProbe.X_KEY));
@@ -135,28 +133,52 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 					double zd = cursor.getDouble(cursor.getColumnIndex(AccelerometerProbe.Z_KEY));
 
 					double t = cursor.getDouble(cursor.getColumnIndex(ProbeValuesProvider.TIMESTAMP));
+					
+					JSONObject x = new JSONObject();
+					x.put("y", xd);
+					x.put("time", t);
+					
+					xSeries.put(x);
 
-					x.add(xd);
-					y.add(yd);
-					z.add(zd);
-					time.add(t);
+					JSONObject y = new JSONObject();
+					y.put("y", yd);
+					y.put("time", t);
+					
+					ySeries.put(y);
+
+					JSONObject z = new JSONObject();
+					z.put("y", zd);
+					z.put("time", t);
+					
+					zSeries.put(z);
 				}
 
 				cursor.close();
 			}
 
-			SplineChart c = new SplineChart();
-			c.addSeries("X", x);
-			c.addSeries("Y", y);
-			c.addSeries("Z", z);
+			JSONArray data = new JSONArray();
 
-			c.addTime("tIME", time);
+			JSONObject xData = new JSONObject();
+			xData.put("label", "X");
+			xData.put("values", xSeries);
+			
+			data.put(xData);
+			
+			JSONObject yData = new JSONObject();
+			yData.put("label", "Y");
+			yData.put("values", ySeries);
 
-			JSONObject json = c.dataJson(activity);
+			data.put(yData);
+			
+			JSONObject zData = new JSONObject();
+			zData.put("label", "Z");
+			zData.put("values", zSeries);
 
-			template = template.replace("{{{ highchart_json }}}", json.toString());
-			template = template.replace("{{{ highchart_count }}}", "" + count);
+			data.put(zData);
 
+			template = template.replace("{{{ data_json }}}", data.toString());
+
+			Log.e("PR", "TEMPLATE: " + template);
 		    return template;
 		}
 		catch (IOException e)
