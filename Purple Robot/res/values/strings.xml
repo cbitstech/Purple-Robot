@@ -799,7 +799,11 @@
     <string name="summary_slugify">Danny Trunk (GPL License)</string>
     <string name="url_slugify">https://github.com/slugify/slugify</string>
     
-  	<string name="title_funders">Funders &amp; Benefactors</string>
+    <string name="title_epoch">Epoch</string>
+    <string name="summary_epoch">Fastly (MIT License)</string>
+    <string name="url_epoch">http://fastly.github.io/epoch/</string>
+    
+    	<string name="title_funders">Funders &amp; Benefactors</string>
     
     <string name="title_funder_nih">National Institutes of Health</string>
     <string name="summary_funder_nih">U.S. Department of Health &amp; Human Services</string>
