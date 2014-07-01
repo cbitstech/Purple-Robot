@@ -49,22 +49,28 @@ public class JsonScriptRequestHandler implements HttpRequestHandler
         	HttpEntityEnclosingRequest enclosingRequest = (HttpEntityEnclosingRequest) request;
     		
             HttpEntity entity = enclosingRequest.getEntity();
-            
+
             String entityString = EntityUtils.toString(entity);
             
             Uri u = Uri.parse("http://localhost/?" + entityString);
 
             JSONObject arguments = null;
 
+        	String jsonArg = URLDecoder.decode(entityString.substring(5)); // u.getQueryParameter("json");
+
             try 
             {
             	try
             	{
-            		arguments = new JSONObject(u.getQueryParameter("json"));
+                	jsonArg = URLDecoder.decode(u.getQueryParameter("json"), "UTF-16");
+
+                	arguments = new JSONObject(jsonArg);
             	}
             	catch (JSONException e)
             	{
-            		arguments = new JSONObject(URLDecoder.decode(u.getQueryParameter("json")));
+                	jsonArg = URLDecoder.decode(u.getQueryParameter("json"), "UTF-16");
+
+                	arguments = new JSONObject(jsonArg);
             	}
 			} 
             catch (JSONException e) 

@@ -12,6 +12,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Looper;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
@@ -141,6 +142,11 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 			{
 				if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
 				{
+					Looper looper = Looper.myLooper();
+					
+					if (looper == null)
+						Looper.prepare();
+					
 					locationManager.addGpsStatusListener(this);
 					locationManager.addNmeaListener(this);
 

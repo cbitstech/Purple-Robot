@@ -15,6 +15,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
@@ -386,6 +387,11 @@ public class BluetoothDevicesProbe extends Probe
 	
 					if (now - this._lastCheck > freq)
 					{
+						Looper looper = Looper.myLooper();
+						
+						if (looper == null)
+							Looper.prepare();
+
 						if (this._adapter == null)
 							this._adapter = BluetoothAdapter.getDefaultAdapter();
 	

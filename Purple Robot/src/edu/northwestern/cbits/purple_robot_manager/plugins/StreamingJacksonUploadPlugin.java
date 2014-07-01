@@ -104,8 +104,9 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
 							index = random.nextInt(filenames.length);
 	
 						File payloadFile = new File(pendingFolder, filenames[index]);
-						String payload = FileUtils.readFileToString(payloadFile);
-	
+						
+						String payload = FileUtils.readFileToString(payloadFile, "UTF-8");
+
 						if (me.transmitPayload(prefs, payload) == DataUploadPlugin.RESULT_SUCCESS)
 						{
 							payloadFile.delete();

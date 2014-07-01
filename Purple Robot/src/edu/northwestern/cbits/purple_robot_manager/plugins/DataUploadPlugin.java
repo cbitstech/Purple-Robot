@@ -152,8 +152,8 @@ public abstract class DataUploadPlugin extends OutputPlugin
 
 			jsonMessage.put(OPERATION_KEY, "SubmitProbes");
 				
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
-				payload = Normalizer.normalize(payload, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+			// if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
+			//	payload = Normalizer.normalize(payload, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
 						
 			payload = payload.replaceAll("\r", "");
 			payload = payload.replaceAll("\n", "");
@@ -166,7 +166,7 @@ public abstract class DataUploadPlugin extends OutputPlugin
 
 			MessageDigest md = MessageDigest.getInstance("MD5");
 				
-			byte[] checksummed = (jsonMessage.get(USER_HASH_KEY).toString() + jsonMessage.get(OPERATION_KEY).toString() + jsonMessage.get(PAYLOAD_KEY).toString()).getBytes("US-ASCII");
+			byte[] checksummed = (jsonMessage.get(USER_HASH_KEY).toString() + jsonMessage.get(OPERATION_KEY).toString() + jsonMessage.get(PAYLOAD_KEY).toString()).getBytes("UTF-8"); // .getBytes("US-ASCII");
 
 			byte[] digest = md.digest(checksummed);
 
@@ -223,12 +223,13 @@ public abstract class DataUploadPlugin extends OutputPlugin
 			URI siteUri = new URI(uriString);
 			
 			HttpPost httpPost = new HttpPost(siteUri);
-
+			httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
+			
 			String jsonString = jsonMessage.toString();
 			
 			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 			nameValuePairs.add(new BasicNameValuePair("json", jsonString));
-			HttpEntity entity = new UrlEncodedFormEntity(nameValuePairs, HTTP.US_ASCII);
+			HttpEntity entity = new UrlEncodedFormEntity(nameValuePairs, HTTP.UTF_8);
 
 			httpPost.setEntity(entity);
 
