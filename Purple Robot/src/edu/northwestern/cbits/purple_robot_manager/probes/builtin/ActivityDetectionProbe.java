@@ -16,7 +16,6 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
@@ -180,12 +179,10 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
 				return "STILL";
 			case DetectedActivity.TILTING:
 				return "TILTING";
-// TODO: Reneable...
-//		Log.e("PR", "");
-//			case DetectedActivity.RUNNING:
-//				return "RUNNING";
-//			case DetectedActivity.WALKING:
-//				return "WALKING";
+			case DetectedActivity.RUNNING:
+				return "RUNNING";
+			case DetectedActivity.WALKING:
+				return "WALKING";
 		}
 		
 		return "UNKNOWN";

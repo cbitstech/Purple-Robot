@@ -31,7 +31,6 @@ import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.RealTimeProbeViewActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
-import edu.northwestern.cbits.purple_robot_manager.charts.SplineChart;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;

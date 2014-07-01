@@ -2,11 +2,12 @@
 	<head>
 		<title>Test Interface | Purple Robot</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	</head>
 	<body style="margin: 1em; font-family: Roboto, 'Droid Sans', sans-serif; overflow-y: scroll; overflow-x: hidden;">
 		<h3>Test Interface</h3>
 		<p>Use the form below to test Purple Robot's built-in web-based scripting interface.</p>
-		<form action="/json/submit" method="POST">
+		<form action="/json/submit" method="POST" enctype="application/x-www-form-urlencoded;charset=UTF-8">
 			<center>
 				<textarea name="json" rows="12" style="width: 90%;">{
     "command": "execute_script",

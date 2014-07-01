@@ -149,5 +149,7 @@ public class RealTimeProbeViewActivity extends WebkitActivity
 	{
 		LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(this);
 		localManager.unregisterReceiver(this._receiver);
+		
+		super.onPause();
 	}
 }
