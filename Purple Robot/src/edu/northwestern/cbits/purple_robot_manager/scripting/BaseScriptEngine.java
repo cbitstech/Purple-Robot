@@ -150,8 +150,6 @@ public abstract class BaseScriptEngine
 	{
 		key = SCRIPT_ENGINE_PERSISTENCE_PREFIX + key;
 		key = namespace + " - " + key;
-		
-		Log.e("PR", "PERSIST " + namespace + ":" + key + " -> " + value);
 
 		return EncryptionManager.getInstance().persistEncryptedString(this._context, key, value);
 	}
@@ -167,8 +165,6 @@ public abstract class BaseScriptEngine
 	{
 		key = SCRIPT_ENGINE_PERSISTENCE_PREFIX + key;
 		key = namespace + " - " + key;
-		
-		Log.e("PR", "FETCH " + namespace + ":" + key + " -> " + EncryptionManager.getInstance().fetchEncryptedString(this._context, key));
 
 		return EncryptionManager.getInstance().fetchEncryptedString(this._context, key);
 	}

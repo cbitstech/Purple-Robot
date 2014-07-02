@@ -1,23 +1,15 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.database.Cursor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -27,26 +19,17 @@ import android.os.SystemClock;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.RealTimeProbeViewActivity;
-import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
-import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("SimpleDateFormat")
-public class AccelerometerProbe extends ContinuousProbe implements SensorEventListener
+public class AccelerometerProbe extends Continuous3DProbe implements SensorEventListener
 {
 	private static int BUFFER_SIZE = 1024;
 
 	public static final String DB_TABLE = "accelerometer_probe";
-
-	private static final String X_KEY = "X";
-	private static final String Y_KEY = "Y";
-	private static final String Z_KEY = "Z";
-	
-	private static final String[] fieldNames = { X_KEY, Y_KEY, Z_KEY };
 
 	private static final String DEFAULT_THRESHOLD = "0.5";
 
@@ -69,32 +52,9 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 
 	private int bufferIndex  = 0;
 
-	public Intent viewIntent(Context context)
-	{
-		Intent i = new Intent(context, RealTimeProbeViewActivity.class);
-		i.putExtra(RealTimeProbeViewActivity.PROBE_NAME, AccelerometerProbe.NAME);
-
-		return i;
-	}
-
 	public String probeCategory(Context context)
 	{
 		return context.getString(R.string.probe_sensor_category);
-	}
-
-	public String contentSubtitle(Context context)
-	{
-		Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(context, AccelerometerProbe.DB_TABLE, this.databaseSchema());
-
-		int count = -1;
-
-		if (c != null)
-		{
-			count = c.getCount();
-			c.close();
-		}
-
-		return String.format(context.getString(R.string.display_item_count), count);
 	}
 
 	public Map<String, String> databaseSchema()
@@ -109,87 +69,6 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 		}
 
 		return this._schema;
-	}
-
-	public String getDisplayContent(Activity activity)
-	{
-		try
-		{
-			String template = WebkitActivity.stringForAsset(activity, "webkit/epoch_chart_spline_full.html");
-
-			Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(activity, AccelerometerProbe.DB_TABLE, this.databaseSchema());
-			
-			JSONArray xSeries = new JSONArray();
-			JSONArray ySeries = new JSONArray();
-			JSONArray zSeries = new JSONArray();
-
-			if (cursor != null)
-			{
-				while (cursor.moveToNext())
-				{
-					double xd = cursor.getDouble(cursor.getColumnIndex(AccelerometerProbe.X_KEY));
-					double yd = cursor.getDouble(cursor.getColumnIndex(AccelerometerProbe.Y_KEY));
-					double zd = cursor.getDouble(cursor.getColumnIndex(AccelerometerProbe.Z_KEY));
-
-					double t = cursor.getDouble(cursor.getColumnIndex(ProbeValuesProvider.TIMESTAMP));
-					
-					JSONObject x = new JSONObject();
-					x.put("y", xd);
-					x.put("time", t);
-					
-					xSeries.put(x);
-
-					JSONObject y = new JSONObject();
-					y.put("y", yd);
-					y.put("time", t);
-					
-					ySeries.put(y);
-
-					JSONObject z = new JSONObject();
-					z.put("y", zd);
-					z.put("time", t);
-					
-					zSeries.put(z);
-				}
-
-				cursor.close();
-			}
-
-			JSONArray data = new JSONArray();
-
-			JSONObject xData = new JSONObject();
-			xData.put("label", "X");
-			xData.put("values", xSeries);
-			
-			data.put(xData);
-			
-			JSONObject yData = new JSONObject();
-			yData.put("label", "Y");
-			yData.put("values", ySeries);
-
-			data.put(yData);
-			
-			JSONObject zData = new JSONObject();
-			zData.put("label", "Z");
-			zData.put("values", zSeries);
-
-			data.put(zData);
-
-			template = template.replace("{{{ data_json }}}", data.toString());
-
-			Log.e("PR", "TEMPLATE: " + template);
-		    return template;
-		}
-		catch (IOException e)
-		{
-			LogManager.getInstance(activity).logException(e);
-		}
-		catch (JSONException e)
-		{
-			LogManager.getInstance(activity).logException(e);
-		}
-
-		return null;
 	}
 
 	public Bundle formattedBundle(Context context, Bundle bundle)
@@ -431,6 +310,9 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 				{
 					valueBuffer[i][bufferIndex] = event.values[i];
 				}
+				
+				double[] plotValues = {timeBuffer[0] / 1000, valueBuffer[0][bufferIndex], valueBuffer[1][bufferIndex], valueBuffer[2][bufferIndex] }; 
+				RealTimeProbeViewActivity.plotIfVisible(this.getTitleResource(), plotValues);
 
 				bufferIndex += 1;
 
@@ -464,7 +346,7 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 					}
 
 					this.transmitData(this._context, data);
-
+					
 					if (timeBuffer.length > 0)
 					{
 						double x = Double.NaN;
@@ -518,5 +400,10 @@ public class AccelerometerProbe extends ContinuousProbe implements SensorEventLi
 	public int getSummaryResource()
 	{
 		return R.string.summary_accelerometer_probe_desc;
+	}
+
+	protected String tableName() 
+	{
+		return AccelerometerProbe.DB_TABLE;
 	}
 }

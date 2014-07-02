@@ -1,19 +1,13 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
@@ -26,17 +20,13 @@ import android.os.SystemClock;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
-
 import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
-import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
-import edu.northwestern.cbits.purple_robot_manager.charts.SplineChart;
+import edu.northwestern.cbits.purple_robot_manager.activities.RealTimeProbeViewActivity;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
-import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("SimpleDateFormat")
-public class MagneticFieldProbe extends ContinuousProbe implements SensorEventListener
+public class MagneticFieldProbe extends Continuous3DProbe implements SensorEventListener
 {
 	private static int BUFFER_SIZE = 1024;
 
@@ -69,31 +59,9 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 
 	private int _lastFrequency = -1;
 
-	public Intent viewIntent(Context context)
-	{
-		Intent i = new Intent(context, WebkitLandscapeActivity.class);
-
-		return i;
-	}
-
 	public String probeCategory(Context context)
 	{
 		return context.getString(R.string.probe_sensor_category);
-	}
-
-	public String contentSubtitle(Context context)
-	{
-		Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(context, MagneticFieldProbe.DB_TABLE, this.databaseSchema());
-
-		int count = -1;
-
-		if (c != null)
-		{
-			count = c.getCount();
-			c.close();
-		}
-
-		return String.format(context.getString(R.string.display_item_count), count);
 	}
 
 	public Map<String, String> databaseSchema()
@@ -108,68 +76,6 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 		}
 
 		return this._schema;
-	}
-
-	public String getDisplayContent(Activity activity)
-	{
-		try
-		{
-			String template = WebkitActivity.stringForAsset(activity, "webkit/chart_spline_full.html");
-
-			ArrayList<Double> x = new ArrayList<Double>();
-			ArrayList<Double> y = new ArrayList<Double>();
-			ArrayList<Double> z = new ArrayList<Double>();
-			ArrayList<Double> time = new ArrayList<Double>();
-
-			Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(activity, MagneticFieldProbe.DB_TABLE, this.databaseSchema());
-
-			int count = -1;
-
-			if (cursor != null)
-			{
-				count = cursor.getCount();
-
-				while (cursor.moveToNext())
-				{
-					double xd = cursor.getDouble(cursor.getColumnIndex(MagneticFieldProbe.X_KEY));
-					double yd = cursor.getDouble(cursor.getColumnIndex(MagneticFieldProbe.Y_KEY));
-					double zd = cursor.getDouble(cursor.getColumnIndex(MagneticFieldProbe.Z_KEY));
-
-					double t = cursor.getDouble(cursor.getColumnIndex(ProbeValuesProvider.TIMESTAMP));
-
-					x.add(xd);
-					y.add(yd);
-					z.add(zd);
-					time.add(t);
-				}
-
-				cursor.close();
-			}
-
-			SplineChart c = new SplineChart();
-			c.addSeries("X", x);
-			c.addSeries("Y", y);
-			c.addSeries("Z", z);
-
-			c.addTime("tIME", time);
-
-			JSONObject json = c.dataJson(activity);
-
-			template = template.replace("{{{ highchart_json }}}", json.toString());
-			template = template.replace("{{{ highchart_count }}}", "" + count);
-
-		    return template;
-		}
-		catch (IOException e)
-		{
-			LogManager.getInstance(activity).logException(e);
-		}
-		catch (JSONException e)
-		{
-			LogManager.getInstance(activity).logException(e);
-		}
-
-		return null;
 	}
 
 	public long getFrequency()
@@ -354,6 +260,9 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 				{
 					valueBuffer[i][bufferIndex] = event.values[i];
 				}
+				
+				double[] plotValues = {timeBuffer[0] / 1000, valueBuffer[0][bufferIndex], valueBuffer[1][bufferIndex], valueBuffer[2][bufferIndex] }; 
+				RealTimeProbeViewActivity.plotIfVisible(this.getTitleResource(), plotValues);
 
 				bufferIndex += 1;
 
@@ -493,5 +402,10 @@ public class MagneticFieldProbe extends ContinuousProbe implements SensorEventLi
 	public int getSummaryResource()
 	{
 		return R.string.summary_magnetic_field_probe_desc;
+	}
+
+	protected String tableName() 
+	{
+		return MagneticFieldProbe.DB_TABLE;
 	};
 }

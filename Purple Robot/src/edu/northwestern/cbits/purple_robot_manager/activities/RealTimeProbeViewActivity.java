@@ -3,12 +3,8 @@ package edu.northwestern.cbits.purple_robot_manager.activities;
 import java.io.IOException;
 
 import android.annotation.SuppressLint;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.webkit.ConsoleMessage;
@@ -22,12 +18,15 @@ import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 @SuppressLint("SimpleDateFormat")
 public class RealTimeProbeViewActivity extends WebkitActivity
 {
-	public static final String PROBE_NAME = "probe_name";
+	public static final String PROBE_ID = "probe_id";
+
+	private static RealTimeProbeViewActivity _currentActivity = null;
+
+	private static long _lastUpdate = 0;
 	
 	private boolean _inited = false;
 
-	private BroadcastReceiver _receiver = null;
-	
+	private int _probeId = -1;
 
 	protected String contentString()
 	{
@@ -54,43 +53,19 @@ public class RealTimeProbeViewActivity extends WebkitActivity
 
 		return null;
 	}
-
-	protected void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-        
-        final String probeName = this.getIntent().getStringExtra(RealTimeProbeViewActivity.PROBE_NAME);
-		
-        final WebView webview = (WebView) this.findViewById(R.id.webview);
-        
-        this._receiver = new BroadcastReceiver()
-        {
-			public void onReceive(Context context, Intent intent) 
-			{
-				String bcastName = intent.getStringExtra("PROBE");
-				
-				if (bcastName != null && bcastName.equals(probeName))
-				{
-					Bundle extras = intent.getExtras();
-					
-					float[] xs = extras.getFloatArray("X");
-					float[] ys = extras.getFloatArray("Y");
-					float[] zs = extras.getFloatArray("Z");
-					double[] ts = extras.getDoubleArray("EVENT_TIMESTAMP");
-
-					Log.e("PR", "GOT MATCH " + xs + " - " + ys + " - " + zs + " - " + ts);
-					
-					webview.loadUrl("javascript:newData(" + xs[0] + ", " + ys[0] + ", " + zs[0] + ", " + ts[0] + ");");
-				}
-			}
-        };
-    }
+	
+	protected String contentSubtitle()
+	{
+		return this.getString(R.string.subtitle_streaming_live);
+	}
 
 	@SuppressLint("SetJavaScriptEnabled")
 	protected void onResume()
 	{
 		super.onResume();
-
+		
+		this._probeId = this.getIntent().getIntExtra(RealTimeProbeViewActivity.PROBE_ID, -1);
+		
 		WebView webview = (WebView) this.findViewById(R.id.webview);
 
 		webview.setWebChromeClient(new WebChromeClient()
@@ -141,15 +116,52 @@ public class RealTimeProbeViewActivity extends WebkitActivity
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction(Probe.PROBE_READING);
 		
-		LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(this);
-		localManager.registerReceiver(this._receiver , intentFilter);
+		RealTimeProbeViewActivity._currentActivity = this;
 	}
 	
 	protected void onPause()
 	{
-		LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(this);
-		localManager.unregisterReceiver(this._receiver);
-		
+		RealTimeProbeViewActivity._currentActivity = null;
+
 		super.onPause();
+	}
+	
+	public static void plotIfVisible(final int probeId, final double[] values)
+	{
+		if (RealTimeProbeViewActivity._currentActivity  != null)
+		{
+			long now = System.currentTimeMillis();
+			
+			if (now - RealTimeProbeViewActivity._lastUpdate < 1000)
+				return;
+
+			final RealTimeProbeViewActivity me  = RealTimeProbeViewActivity._currentActivity;
+
+			if (probeId != me._probeId )
+				return;
+
+			RealTimeProbeViewActivity._lastUpdate = now;
+			
+			me.runOnUiThread(new Runnable()
+			{
+				public void run() 
+				{
+			        final WebView webview = (WebView) me.findViewById(R.id.webview);
+
+			        double t = values[0];
+					double x = values[1];
+					double y = 0;
+					double z = 0;
+					
+					if (values.length >= 4)
+					{
+						y = values[2];
+						z = values[3];
+					}
+
+					webview.loadUrl("javascript:newData(" + x + ", " + y + ", " + z + ", " + t + ");");
+				}
+			});
+		}
 	}
 }

@@ -28,6 +28,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.RealTimeProbeViewActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
 import edu.northwestern.cbits.purple_robot_manager.charts.SplineChart;
@@ -36,7 +37,7 @@ import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("SimpleDateFormat")
-public class LightProbe extends ContinuousProbe implements SensorEventListener
+public class LightProbe extends Continuous1DProbe implements SensorEventListener
 {
 	public static final String DB_TABLE = "light_probe";
 
@@ -63,13 +64,6 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 	private int bufferIndex  = 0;
 
 	private int _lastFrequency = -1;
-
-	public Intent viewIntent(Context context)
-	{
-		Intent i = new Intent(context, WebkitLandscapeActivity.class);
-
-		return i;
-	}
 
 	public String probeCategory(Context context)
 	{
@@ -101,60 +95,6 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 		}
 
 		return this._schema;
-	}
-
-	public String getDisplayContent(Activity activity)
-	{
-		try
-		{
-			String template = WebkitActivity.stringForAsset(activity, "webkit/chart_spline_full.html");
-
-			ArrayList<Double> light = new ArrayList<Double>();
-			ArrayList<Double> time = new ArrayList<Double>();
-
-			Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(activity, LightProbe.DB_TABLE, this.databaseSchema());
-
-			int count = -1;
-
-			if (cursor != null)
-			{
-				count = cursor.getCount();
-
-				while (cursor.moveToNext())
-				{
-					double d = cursor.getDouble(cursor.getColumnIndex(LightProbe.LIGHT_KEY));
-					double t = cursor.getDouble(cursor.getColumnIndex(ProbeValuesProvider.TIMESTAMP));
-
-					light.add(d);
-					time.add(t);
-				}
-
-				cursor.close();
-			}
-
-
-			SplineChart c = new SplineChart();
-			c.addSeries("lIGHT", light);
-			c.addTime("tIME", time);
-
-			JSONObject json = c.dataJson(activity);
-
-			template = template.replace("{{{ highchart_json }}}", json.toString());
-			template = template.replace("{{{ highchart_count }}}", "" + count);
-
-		    return template;
-
-		}
-		catch (IOException e)
-		{
-			LogManager.getInstance(activity).logException(e);
-		}
-		catch (JSONException e)
-		{
-			LogManager.getInstance(activity).logException(e);
-		}
-
-		return null;
 	}
 
 	public Bundle formattedBundle(Context context, Bundle bundle)
@@ -375,6 +315,9 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 				timeBuffer[bufferIndex] = timestamp / 1000000;
 				valueBuffer[0][bufferIndex] = event.values[0];
 
+				double[] plotValues = {timeBuffer[0] / 1000, valueBuffer[0][bufferIndex] }; 
+				RealTimeProbeViewActivity.plotIfVisible(this.getTitleResource(), plotValues);
+
 				bufferIndex += 1;
 
 				if (bufferIndex >= timeBuffer.length)
@@ -454,5 +397,11 @@ public class LightProbe extends ContinuousProbe implements SensorEventListener
 	public int getSummaryResource()
 	{
 		return R.string.summary_light_probe_desc;
+	}
+
+	@Override
+	protected String tableName() 
+	{
+		return LightProbe.DB_TABLE;
 	}
 }

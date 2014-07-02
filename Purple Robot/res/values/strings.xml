@@ -1217,6 +1217,8 @@
 	<string name="value_300">300</string>
 	<string name="value_600">600</string>
 	<string name="value_3600">3600</string>
+	
+	<string name="subtitle_streaming_live">Live data stream</string>
 </resources>
 
 
