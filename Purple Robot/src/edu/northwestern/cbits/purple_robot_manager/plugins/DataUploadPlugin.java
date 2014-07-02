@@ -308,8 +308,6 @@ public abstract class DataUploadPlugin extends OutputPlugin
 				
 				if (payloadString.length() > 512)
 					payloadString = payloadString.substring(payloadString.length() - 512);
-				
-				Log.e("PR", "ERROR BODY: " + payloadString);
 			}
 		}
 		catch (HttpHostConnectException e)
