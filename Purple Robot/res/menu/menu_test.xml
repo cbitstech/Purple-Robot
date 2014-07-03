@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" 
+    xmlns:robot="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/menu_test_item"
+        android:title="@string/menu_test_label"
+        robot:showAsAction="always"
+        android:icon="@drawable/action_play" />
+</menu>

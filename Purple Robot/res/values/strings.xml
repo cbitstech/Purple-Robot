@@ -1219,6 +1219,31 @@
 	<string name="value_3600">3600</string>
 	
 	<string name="subtitle_streaming_live">Live data stream</string>
+	<string name="title_run_tests">Application Tests</string>
+	<string name="subtitle_run_tests">%1$d tests</string>
+	<string name="subtitle_run_tests_single">1 test</string>
+	
+	<string name="name_test_test">JUnit Test Cases</string>
+	<string name="name_service_test">Android Service Test Cases</string>
+	<string name="name_trigger_test">Trigger Test Cases</string>
+	<string name="name_encryption_test">Encryption Test Cases</string>
+	<string name="name_probe_test">Probe Test Cases</string>
+	<string name="name_event_log_test">Event Log Test Cases</string>
+	<string name="name_upload_test">Upload Plugin Test Cases</string>
+	<string name="name_http_server_test">HTTP Server Test Cases</string>
+	<string name="name_scheme_test">Scheme Test Cases</string>
+	<string name="name_javascript_test">JavaScript Test Cases</string>
+	<string name="name_models_test">Models Test Cases</string>
+	
+	<string name="menu_test_label">Start Tests</string>
+
+	<string name="title_tests_successful">All Tests Passed</string>
+	<string name="message_tests_successful">All tests passed successfully.</string>
+	<string name="action_close">Close</string>
+
+	<string name="title_tests_failed">1$d Tests Failed</string>
+	<string name="title_test_failed">1 Test Failed</string>
+		
 </resources>
 
 
