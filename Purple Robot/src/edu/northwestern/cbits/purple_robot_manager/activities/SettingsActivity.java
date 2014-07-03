@@ -66,6 +66,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 	private static final String DUMP_JSON_KEY = "config_dump_json";
 	private static final String RESET_KEY = "config_reset";
 	public static final String PROBES_DISABLE_EACH_KEY = "config_disable_each_probe";
+	private static final String RUN_TESTS_KEY = "config_run_tests";
 
 	@SuppressWarnings("deprecation")
 	public void onCreate(Bundle savedInstanceState)
@@ -126,6 +127,9 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 
         Preference dump = prefs.findPreference(DUMP_JSON_KEY);
         dump.setOnPreferenceClickListener(this);
+
+        Preference test = prefs.findPreference(RUN_TESTS_KEY);
+        test.setOnPreferenceClickListener(this);
 
         CheckBoxPreference update = (CheckBoxPreference) prefs.findPreference(CHECK_UPDATES_KEY);
         update.setOnPreferenceChangeListener(this);
@@ -214,6 +218,11 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 
         		return true;
         	}
+        }
+        else if (RUN_TESTS_KEY.equals(preference.getKey()))
+        {
+        	Intent intent = new Intent(this, TestActivity.class);
+        	this.startActivity(intent);
         }
         else if (DUMP_JSON_KEY.equals(preference.getKey()))
         {
