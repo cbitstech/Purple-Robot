@@ -1,7 +1,9 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 
 import org.json.JSONException;
@@ -22,6 +24,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -43,7 +46,7 @@ public class ManagerService extends IntentService
 	public static String APPLICATION_LAUNCH_INTENT_POSTSCRIPT = "purple_robot_manager_widget_launch_postscript";
 
 	public static String UPDATE_WIDGETS = "purple_robot_manager_update_widgets";
-	public static String PERIODIC_CHECK_INTENT = "purple_robot_manager_periodic_check";
+	public static String FIRE_TRIGGERS_INTENT = "purple_robot_manager_fire_triggers";
 	public static String INCOMING_DATA_INTENT = "purple_robot_manager_incoming_data";
 	public static String UPLOAD_LOGS_INTENT = "purple_robot_manager_upload_logs";
 	public static String REFRESH_ERROR_STATE_INTENT = "purple_robot_manager_refresh_errors";
@@ -56,6 +59,8 @@ public class ManagerService extends IntentService
 	public static String RINGTONE_NAME = "purple_robot_manager_ringtone_name";
 
 	public static String REFRESH_CONFIGURATION = "purple_robot_manager_refresh_configuration";
+
+	public static final String UPDATE_TRIGGER_SCHEDULE_INTENT = "purple_robot_manager_update_trigger_schedule";
 	
 	public static long startTimestamp = System.currentTimeMillis();
 
@@ -346,9 +351,27 @@ public class ManagerService extends IntentService
 					BaseScriptEngine.runScript(this, script);
 			}
 		}
-		else if (PERIODIC_CHECK_INTENT.equals(action))
+		else if (FIRE_TRIGGERS_INTENT.equals(action))
 		{
 			TriggerManager.getInstance(this).nudgeTriggers(this);
+		}
+		else if (UPDATE_TRIGGER_SCHEDULE_INTENT.equals(action))
+		{
+			AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+
+			PendingIntent pi = PendingIntent.getService(this, 0, new Intent(ManagerService.FIRE_TRIGGERS_INTENT), PendingIntent.FLAG_UPDATE_CURRENT);
+			
+			alarmManager.cancel(pi);
+			
+			List<Long> times = TriggerManager.getInstance(this).upcomingFireTimes(this);
+			
+			Log.e("PR", "SCHEDULING " + times.size());
+
+			for (Long fire : times)
+			{
+				Log.e("PR", "SCHEDULING " + new Date(fire.longValue()));
+				alarmManager.set(AlarmManager.RTC_WAKEUP, fire.longValue() + 15000, pi);
+			}
 		}
 		else if (REFRESH_CONFIGURATION.equals(action))
 			LegacyJSONConfigFile.update(this, false);
@@ -367,12 +390,12 @@ public class ManagerService extends IntentService
 
 		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-		PendingIntent pi = PendingIntent.getService(context, 0, new Intent(ManagerService.PERIODIC_CHECK_INTENT), PendingIntent.FLAG_UPDATE_CURRENT);
-		alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 15000, pi);
+		PendingIntent pi = PendingIntent.getService(context, 0, new Intent(ManagerService.REFRESH_CONFIGURATION), PendingIntent.FLAG_UPDATE_CURRENT);
+		alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60000, pi);
 
-		pi = PendingIntent.getService(context, 0, new Intent(ManagerService.REFRESH_CONFIGURATION), PendingIntent.FLAG_UPDATE_CURRENT);
-		alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 5000, pi);
-		
+		pi = PendingIntent.getService(context, 0, new Intent(ManagerService.UPDATE_TRIGGER_SCHEDULE_INTENT), PendingIntent.FLAG_UPDATE_CURRENT);
+		alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), (15 * 60 * 1000), pi);
+
 		prefs.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener()
 		{
 	        public void onSharedPreferenceChanged(SharedPreferences prefs, String key)

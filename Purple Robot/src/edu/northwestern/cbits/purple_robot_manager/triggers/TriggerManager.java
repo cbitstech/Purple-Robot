@@ -9,6 +9,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
@@ -18,7 +19,9 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 import edu.emory.mathcs.backport.java.util.Collections;
+import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.SchemeConfigFile;
@@ -59,6 +62,8 @@ public class TriggerManager
 
 		Date now = new Date();
 
+		Log.e("PR", "NUDGE TRIGGERS " + this._triggers.size());
+		
 		synchronized(this._triggers)
 		{
 			for (Trigger trigger : this._triggers)
@@ -70,6 +75,8 @@ public class TriggerManager
 					if (trigger.matches(context, now))
 						execute = true;
 				}
+				
+				Log.e("PR", "TTTT " + trigger.identifier() + " " + execute);
 				
 				if (execute)
 				{
@@ -162,6 +169,9 @@ public class TriggerManager
 				
 			}, 5000);
 		}
+		
+		Intent intent = new Intent(ManagerService.UPDATE_TRIGGER_SCHEDULE_INTENT);
+		context.startService(intent);
 	}
 
 	public List<Trigger> triggersForId(String triggerId) 
@@ -344,5 +354,33 @@ public class TriggerManager
 				t.execute(context, true);
 			}
 		}
+	}
+
+	public List<Long> upcomingFireTimes(Context context) 
+	{
+		ArrayList<Long> upcoming = new ArrayList<Long>();
+
+        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        WakeLock wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, "trigger_wakelock");
+        wakeLock.acquire();
+
+		long now = System.currentTimeMillis();
+
+		synchronized(this._triggers)
+		{
+			for (Trigger trigger : this._triggers)
+			{
+				if (trigger instanceof DateTrigger)
+				{
+					DateTrigger dateTrigger = (DateTrigger) trigger;
+					
+					upcoming.addAll(dateTrigger.fireTimes(context, now, now + (60 * 60 * 1000)));
+				}
+			}
+		}
+		
+		wakeLock.release();
+		
+		return upcoming;
 	}
 }

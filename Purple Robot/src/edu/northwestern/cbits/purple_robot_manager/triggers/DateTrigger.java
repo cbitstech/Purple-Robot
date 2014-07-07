@@ -32,6 +32,7 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -41,8 +42,8 @@ public class DateTrigger extends Trigger
 {
 	public static final String TYPE_NAME = "datetime";
 
-	private static final String DATETIME_START = "datetime_start";
-	private static final String DATETIME_END = "datetime_end";
+	public static final String DATETIME_START = "datetime_start";
+	public static final String DATETIME_END = "datetime_end";
 	private static final String DATETIME_REPEATS = "datetime_repeat";
 	private static final String DATETIME_RANDOM = "datetime_random";
 
@@ -306,6 +307,11 @@ public class DateTrigger extends Trigger
 			
 			try 
 			{
+				Log.e("PR", this._start + " -- " + this._end);
+				
+				if (this._end == null)
+					this._end = this._start;
+				
 				Date startDate = sdf.parse(this._start);
 				Date endDate = sdf.parse(this._end);
 
@@ -424,7 +430,7 @@ public class DateTrigger extends Trigger
 			try
 			{
 				DateTime from = new DateTime(new Date(timestamp - 5000));
-				DateTime to = new DateTime(new Date(timestamp + 600000));
+				DateTime to = new DateTime(new Date(timestamp + (30 * 60 * 1000)));
 	
 				Period period = new Period(from, to);
 	
@@ -719,5 +725,20 @@ public class DateTrigger extends Trigger
 		}
 		
 		return false;
+	}
+
+	public List<Long> fireTimes(Context context, long start, long end)
+	{
+		ArrayList<Long> times = new ArrayList<Long>();
+		
+		while (start <= end)
+		{
+			if (this.getPeriod(context, start) != null)
+				times.add(Long.valueOf(start));
+			
+			start += 60000;
+		}
+
+		return times;
 	}
 }
