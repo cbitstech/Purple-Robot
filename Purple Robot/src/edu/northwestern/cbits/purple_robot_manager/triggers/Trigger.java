@@ -21,9 +21,9 @@ import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
 public abstract class Trigger
 {
-	private static final String NAME = "name";
-	private static final String ACTION = "action";
-	private static final String IDENTIFIER = "identifier";
+	public static final String NAME = "name";
+	public static final String ACTION = "action";
+	public static final String IDENTIFIER = "identifier";
 	private static final String ENABLED = "enabled";
 	private static final String LAST_FIRED = "last_fired";
 	public static final String TYPE = "trigger_type";

@@ -6,12 +6,9 @@ import java.util.List;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestFailure;
 import junit.framework.TestResult;
-
 import android.content.Context;
 import android.test.AndroidTestRunner;
-import android.util.Log;
 
 public class RobotTestRunner extends AndroidTestRunner 
 {
@@ -32,8 +29,10 @@ public class RobotTestRunner extends AndroidTestRunner
 		this._suite.addTest(new SchemeTestCase(context, 0));
 		this._suite.addTest(new ServiceTestCase(context, 0));
 		this._suite.addTest(new TriggerTestCase(context, 0));
+		this._suite.addTest(new DateTriggerTestCase(context, 0));
 		this._suite.addTest(new UploadPluginTestCase(context, 0));
 		this._suite.addTest(new ModelsTestCase(context, 0));
+		this._suite.addTest(new HalfHourDateTriggerTestCase(context, 9));
 	}
 	
 	public List<TestCase> getTestCases ()

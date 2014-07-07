@@ -51,6 +51,7 @@ import edu.northwestern.cbits.purple_robot_manager.ScheduleManager;
 import edu.northwestern.cbits.purple_robot_manager.activities.DialogActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.LabelActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
+import edu.northwestern.cbits.purple_robot_manager.activities.TestActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -115,7 +116,19 @@ public abstract class BaseScriptEngine
 		payload.put("message", message);
 		LogManager.getInstance(this._context).log("pr_script_log_message", payload);
 	}
-	
+
+	public void testLog(Object message)
+	{
+		this.log(message);
+		
+		LocalBroadcastManager bcast = LocalBroadcastManager.getInstance(this._context);
+		
+		Intent intent = new Intent(TestActivity.INTENT_PROGRESS_MESSAGE);
+		intent.putExtra(TestActivity.PROGRESS_MESSAGE, message.toString());
+		
+		bcast.sendBroadcastSync(intent);
+	}
+
 	public void playDefaultTone()
 	{
 		LogManager.getInstance(this._context).log("pr_default_tone_played", null);

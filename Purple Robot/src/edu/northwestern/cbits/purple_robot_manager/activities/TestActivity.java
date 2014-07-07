@@ -7,9 +7,13 @@ import junit.framework.TestFailure;
 import junit.framework.TestResult;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,10 +29,16 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.tests.RobotTestCase;
 import edu.northwestern.cbits.purple_robot_manager.tests.RobotTestRunner;
 
-public class TestActivity extends ActionBarActivity 
+public class TestActivity extends ActionBarActivity
 {
+	public static final String PROGRESS_MESSAGE = "test_activity_progress_message";
+	public static final String PROGRESS_DELAY = "test_activity_progress_delay";
+	public static final String INTENT_PROGRESS_MESSAGE = "intent_test_activiity_progress_message";
+
 	private static RobotTestRunner _testRunner = null;
-	private Menu _menu = null;
+	private BroadcastReceiver _receiver = null;
+	
+	private static ProgressDialog _progress = null;
 
 	protected void onCreate(Bundle savedInstanceState)
     {
@@ -81,8 +91,8 @@ public class TestActivity extends ActionBarActivity
 	        		TextView nameField = (TextView) convertView.findViewById(R.id.text_test_name);
 	        		nameField.setText(robot.name(me));
 	
-	        		TextView detailsField = (TextView) convertView.findViewById(R.id.text_test_details);
-	        		detailsField.setText(robot.description(me));
+//	        		TextView detailsField = (TextView) convertView.findViewById(R.id.text_test_details);
+//	        		detailsField.setText(robot.description(me));
         		}
         		
         		return convertView;
@@ -90,14 +100,51 @@ public class TestActivity extends ActionBarActivity
 		};
 		
 		listView.setAdapter(adapter);
+		
+		this._receiver = new BroadcastReceiver()
+		{
+			public void onReceive(final Context context, final Intent intent) 
+			{
+				if (TestActivity._progress != null)
+				{
+					me.runOnUiThread(new Runnable()
+					{
+						public void run() 
+						{
+							TestActivity._progress.setMessage(intent.getStringExtra(TestActivity.PROGRESS_MESSAGE));
+						}
+					});
+					
+					try 
+					{
+						Thread.sleep(intent.getLongExtra(TestActivity.PROGRESS_DELAY, 1000));
+					}
+					catch (InterruptedException e) 
+					{
+
+					}
+				}
+			}
+		};
+		
+		IntentFilter filter = new IntentFilter(TestActivity.INTENT_PROGRESS_MESSAGE);
+		
+		LocalBroadcastManager.getInstance(this).registerReceiver(this._receiver, filter);
+	}
+	
+	protected void onPause()
+	{
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(this._receiver);
+		
+		this._receiver = null;
+		
+		super.onPause();
 	}
 
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
         MenuInflater inflater = this.getMenuInflater();
         inflater.inflate(R.menu.menu_test, menu);
-
-        this._menu  = menu;
 
         return true;
 	}
@@ -119,6 +166,13 @@ public class TestActivity extends ActionBarActivity
 				{
 					item.setIcon(R.drawable.action_pause);
 					
+					TestActivity._progress = new ProgressDialog(this);
+					TestActivity._progress.setIndeterminate(true);
+					
+					TestActivity._progress.setTitle(R.string.title_running_tests);
+					TestActivity._progress.setCancelable(false);
+					TestActivity._progress.show();
+					
 					final TestResult result = new TestResult();
 					
 					TestActivity._testRunner.startTests(result, new Runnable()
@@ -129,6 +183,9 @@ public class TestActivity extends ActionBarActivity
 							{
 								public void run() 
 								{
+									TestActivity._progress.dismiss();
+									TestActivity._progress = null;
+									
 									Log.e("PR", "RESULTS: " + result.errorCount() + " errors; " + result.failureCount() + " failures");
 									
 									int count = result.errorCount() + result.failureCount();
