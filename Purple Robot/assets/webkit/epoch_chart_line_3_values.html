@@ -24,8 +24,31 @@
 				chart = $('#chart').epoch({ 
 					type: 'time.line', 
 					data: data,
-					windowSize: 300,
-					axes: ['right', 'bottom'] 
+					windowSize: 180,
+					axes: ['right', 'bottom'],
+					tickFormats: { time: function(d) {
+					        console.log("D:" + d);
+
+							var date = new Date(d * 1000); 
+							var hour = date.getHours();
+							var minute = date.getMinute();
+							var second = date.getSeconds();
+						
+							hour = hour % 12;
+						
+							if (hour == 0)
+								hour = 12;
+							
+							if (minute < 10)
+							    minute = "0" + minute;
+						
+							if (second < 10)
+							    second = "0" + second;
+						
+							return hour + ":" + minute + ":" + second 
+						}
+					},
+					ticks: { time: 30 }
 				});
 			});
 			
