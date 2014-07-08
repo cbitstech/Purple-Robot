@@ -12,7 +12,8 @@ public class ProbeTestCase extends RobotTestCase
 	
 	public void test() 
 	{
-
+		if (this.isSelected(this._context) == false)
+			return;
 	}
 
 	public String name(Context context) 

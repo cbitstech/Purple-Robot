@@ -13,6 +13,9 @@ public class JUnitTestCase extends RobotTestCase
 
 	public void test() 
 	{
+		if (this.isSelected(this._context) == false)
+			return;
+
 		Assert.assertTrue(true);
 		Assert.assertFalse(false);
 		Assert.assertNull(null);

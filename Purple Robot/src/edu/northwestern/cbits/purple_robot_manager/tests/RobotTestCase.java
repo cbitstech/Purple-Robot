@@ -2,6 +2,9 @@ package edu.northwestern.cbits.purple_robot_manager.tests;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.test.AndroidTestCase;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -33,12 +36,17 @@ public abstract class RobotTestCase extends AndroidTestCase
 
 	public String description(Context context) 
 	{
-		int count = this.countTestCases();
+		int minutes = this.estimatedMinutes();
 		
-		if (count != 1)
-			return context.getString(R.string.subtitle_run_tests, count);
+		if (minutes < 1)
+			return context.getString(R.string.description_minute_or_less_test);
 
-		return context.getString(R.string.subtitle_run_tests_single, count);
+		return context.getString(R.string.description_minutes_test, minutes);
+	}
+
+	public int estimatedMinutes() 
+	{
+		return 1;
 	}
 
 	protected void broadcastUpdate(String message, long delay) 
@@ -55,5 +63,21 @@ public abstract class RobotTestCase extends AndroidTestCase
 	protected void broadcastUpdate(String message)
 	{
 		this.broadcastUpdate(message, 500);
+	}
+
+	public boolean isSelected(Context context) 
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		
+		return prefs.getBoolean("test_" + this.name(context), false);
+	}
+	
+	public void setSelected(Context context, boolean isSelected)
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		
+		Editor e = prefs.edit();
+		e.putBoolean("test_" + this.name(context), isSelected);
+		e.commit();
 	}
 }

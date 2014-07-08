@@ -1,6 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager.activities;
 
 import java.util.Enumeration;
+import java.util.List;
 
 import junit.framework.TestCase;
 import junit.framework.TestFailure;
@@ -21,8 +22,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ListView;
 import android.widget.TextView;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -48,18 +55,10 @@ public class TestActivity extends ActionBarActivity
 		
 		if (TestActivity._testRunner == null)
 			TestActivity._testRunner = new RobotTestRunner(this);
-
-		Log.e("PR", "RUNNER: " + TestActivity._testRunner);
-		Log.e("PR", "CASES: " + TestActivity._testRunner.getTestCases());
-		
-		int count = TestActivity._testRunner.getTestCases().size();
-		
-		if (count != 1)
-			this.getSupportActionBar().setSubtitle(this.getString(R.string.subtitle_run_tests, count));
-		else
-			this.getSupportActionBar().setSubtitle(R.string.subtitle_run_tests_single);
 		
 		this.setContentView(R.layout.layout_test_activity);
+
+		this.updateSubtitle();
     }
 	
 	protected void onResume()
@@ -86,21 +85,56 @@ public class TestActivity extends ActionBarActivity
         		
         		if (test instanceof RobotTestCase)
         		{
-        			RobotTestCase robot = (RobotTestCase) test;
+        			final RobotTestCase robot = (RobotTestCase) test;
         			
-	        		TextView nameField = (TextView) convertView.findViewById(R.id.text_test_name);
+	        		CheckBox nameField = (CheckBox) convertView.findViewById(R.id.text_test_name);
 	        		nameField.setText(robot.name(me));
-	
-//	        		TextView detailsField = (TextView) convertView.findViewById(R.id.text_test_details);
-//	        		detailsField.setText(robot.description(me));
+	        		
+	        		nameField.setOnCheckedChangeListener(new OnCheckedChangeListener()
+	        		{
+						public void onCheckedChanged(CompoundButton arg0, boolean arg1) 
+						{
+							// Do nothing...
+						}
+	        		});
+	        		
+	        		nameField.setChecked(robot.isSelected(me));
+
+	        		nameField.setOnCheckedChangeListener(new OnCheckedChangeListener()
+	        		{
+						public void onCheckedChanged(CompoundButton arg0, boolean isSelected) 
+						{
+							Log.e("PR", "SELECTED = " + isSelected);
+							
+							robot.setSelected(me, isSelected);
+							
+							me.updateSubtitle();
+						}
+	        		});
+
+	        		TextView detailsField = (TextView) convertView.findViewById(R.id.text_test_details);
+	        		detailsField.setText(robot.description(me));
         		}
+        		
+        		final View view = convertView;
+        		
+        		convertView.setOnClickListener(new OnClickListener()
+        		{
+					public void onClick(View arg0) 
+					{
+	            		CheckBox nameField = (CheckBox) view.findViewById(R.id.text_test_name);
+	            		
+	            		Log.e("PR", "SETTING " + (nameField.isChecked() == false));
+	            		nameField.setChecked(nameField.isChecked() == false);
+					}
+        		});
         		
         		return convertView;
         	}
 		};
 		
 		listView.setAdapter(adapter);
-		
+
 		this._receiver = new BroadcastReceiver()
 		{
 			public void onReceive(final Context context, final Intent intent) 
@@ -132,6 +166,45 @@ public class TestActivity extends ActionBarActivity
 		LocalBroadcastManager.getInstance(this).registerReceiver(this._receiver, filter);
 	}
 	
+	protected void updateSubtitle() 
+	{
+		List<TestCase> cases = TestActivity._testRunner.getTestCases();
+		
+		int minutes = 0;
+		int count = 0;
+		
+		for (TestCase test : cases)
+		{
+			if (test instanceof RobotTestCase)
+			{
+				RobotTestCase robot = (RobotTestCase) test;
+				
+				if (robot.isSelected(this))
+				{
+					count += 1;
+					minutes += robot.estimatedMinutes();
+				}
+			}
+		}
+		
+		if (count == 0)
+			this.getSupportActionBar().setSubtitle(this.getString(R.string.subtitle_no_tests));
+		else if (minutes < 1)
+		{
+			if (count < 2)
+				this.getSupportActionBar().setSubtitle(this.getString(R.string.subtitle_minute_or_less_test_single));
+			else
+				this.getSupportActionBar().setSubtitle(this.getString(R.string.subtitle_minute_or_less_test, count));
+		}
+		else
+		{
+			if (count < 2)
+				this.getSupportActionBar().setSubtitle(this.getString(R.string.subtitle_minutes_test_single, minutes));
+			else
+				this.getSupportActionBar().setSubtitle(this.getString(R.string.subtitle_minutes_test, count, minutes));
+		}
+	}
+
 	protected void onPause()
 	{
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(this._receiver);

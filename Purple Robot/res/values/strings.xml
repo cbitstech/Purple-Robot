@@ -1243,10 +1243,18 @@
 	<string name="message_tests_successful">All tests passed successfully.</string>
 	<string name="action_close">Close</string>
 
-	<string name="title_tests_failed">1$d Tests Failed</string>
+	<string name="title_tests_failed">%1$d Tests Failed</string>
 	<string name="title_test_failed">1 Test Failed</string>
 	<string name="title_running_tests">Running Tests&#8230;</string>
 		
+	<string name="subtitle_minute_or_less_test">Test time: a minute or less (%1$d tests)</string>
+	<string name="subtitle_minute_or_less_test_single">Test time: a minute or less (1 test)</string>
+	<string name="subtitle_minutes_test">Test time: %2$d minutes (%1$d tests)</string>
+	<string name="subtitle_minutes_test_single">Test time: %1$d minutes (1 test)</string>
+
+	<string name="description_minutes_test">Test time: %1$d minutes</string>
+	<string name="description_minute_or_less_test">Test time: 1 minute or less</string>
+	<string name="subtitle_no_tests">Please select one or more tests</string>
 </resources>
 
 

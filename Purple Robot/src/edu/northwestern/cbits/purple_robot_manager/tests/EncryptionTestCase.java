@@ -14,6 +14,9 @@ public class EncryptionTestCase extends RobotTestCase
 	
 	public void test() 
 	{
+		if (this.isSelected(this._context) == false)
+			return;
+
 		Assert.assertEquals("55502f40dc8b7c769880b10874abc9d0", EncryptionManager.getInstance().createHash(this._context,  "test@example.com"));
 	}
 

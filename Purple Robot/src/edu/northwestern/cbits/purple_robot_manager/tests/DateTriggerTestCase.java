@@ -4,17 +4,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import junit.framework.Assert;
+
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.mozilla.javascript.NativeObject;
 
-import junit.framework.Assert;
 import android.content.Context;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
-import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 import edu.northwestern.cbits.purple_robot_manager.triggers.DateTrigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
@@ -28,6 +25,9 @@ public class DateTriggerTestCase extends RobotTestCase
 	
 	public void test() 
 	{
+		if (this.isSelected(this._context) == false)
+			return;
+		
 		TriggerManager triggers = TriggerManager.getInstance(this._context);
 
 		this.broadcastUpdate("Clearing triggers...");
@@ -117,6 +117,12 @@ public class DateTriggerTestCase extends RobotTestCase
 
 		triggers.removeAllTriggers();
 	}
+	
+	public int estimatedMinutes() 
+	{
+		return 2;
+	}
+
 
 	public String name(Context context) 
 	{
