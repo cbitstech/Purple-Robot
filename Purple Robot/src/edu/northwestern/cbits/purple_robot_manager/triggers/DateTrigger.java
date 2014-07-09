@@ -44,7 +44,7 @@ public class DateTrigger extends Trigger
 
 	public static final String DATETIME_START = "datetime_start";
 	public static final String DATETIME_END = "datetime_end";
-	private static final String DATETIME_REPEATS = "datetime_repeat";
+	public static final String DATETIME_REPEATS = "datetime_repeat";
 	private static final String DATETIME_RANDOM = "datetime_random";
 
 	private static final String RANDOM = "random";
@@ -57,9 +57,6 @@ public class DateTrigger extends Trigger
 	private static final String FIRE_ON_BOOT = "fire_on_boot";
 
 	private static SecureRandom random = null;
-
-	private PeriodList periodList = null;
-	private long lastUpdate = 0;
 
 	private boolean _random = false;
 	private String _start = null;
@@ -236,8 +233,6 @@ public class DateTrigger extends Trigger
 	public void reset(Context context) 
 	{
 		super.reset(context);
-		
-		this.lastUpdate = 0;
 
 		String key = "last_fired_" + this.identifier();
 
@@ -307,8 +302,6 @@ public class DateTrigger extends Trigger
 			
 			try 
 			{
-				Log.e("PR", this._start + " -- " + this._end);
-				
 				if (this._end == null)
 					this._end = this._start;
 				
@@ -417,20 +410,19 @@ public class DateTrigger extends Trigger
 
 	public Period getPeriod(Context context, long timestamp)
 	{
-		if (timestamp - this.lastUpdate > 300000)
-		{
-			periodList = null;
-			this.lastUpdate = timestamp;
-		}
-
 		Date date = new Date(timestamp);
 
+		PeriodList periodList = null;
+		
 		if (this._calendar != null && periodList == null)
 		{
 			try
 			{
-				DateTime from = new DateTime(new Date(timestamp - 5000));
-				DateTime to = new DateTime(new Date(timestamp + (30 * 60 * 1000)));
+				Date fromDate = new Date(timestamp - 5000);
+				Date toDate = new Date(timestamp + (15 * 60 * 1000));
+				
+				DateTime from = new DateTime(fromDate);
+				DateTime to = new DateTime(toDate);
 	
 				Period period = new Period(from, to);
 	
@@ -449,7 +441,7 @@ public class DateTrigger extends Trigger
 				LogManager.getInstance(context).logException(e);
 			}
 		}
-
+		
 		try
 		{
 			for (Object po : periodList)
@@ -457,7 +449,7 @@ public class DateTrigger extends Trigger
 				if (po instanceof Period)
 				{
 					Period p = (Period) po;
-
+					
 					DateRange range = new DateRange(p.getStart(), p.getEnd());
 
 					if (range.includes(date, DateRange.INCLUSIVE_START | DateRange.INCLUSIVE_END))

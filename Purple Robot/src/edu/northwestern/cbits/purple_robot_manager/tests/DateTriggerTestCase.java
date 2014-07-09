@@ -34,7 +34,7 @@ public class DateTriggerTestCase extends RobotTestCase
 
 		triggers.removeAllTriggers();
 		
-		Assert.assertEquals(0, triggers.allTriggers().size());
+		Assert.assertEquals("DTT0", 0, triggers.allTriggers().size());
 
 		String triggerId = "date-test";
 		
@@ -63,30 +63,30 @@ public class DateTriggerTestCase extends RobotTestCase
 		} 
 		catch (JSONException e) 
 		{
-			Assert.fail();
+			Assert.fail("DTT1");
 		}
 		catch (InterruptedException e) 
 		{
-			Assert.fail();
+			Assert.fail("DTT2");
 		}
 
 		this.broadcastUpdate("Verifying trigger exists...");
 
 		List<Trigger> allTriggers = triggers.allTriggers();
-		Assert.assertEquals(1, allTriggers.size());
+		Assert.assertEquals("DTT3", 1, allTriggers.size());
 		
 		Trigger trigger = allTriggers.get(0);
-		Assert.assertEquals(triggerId, trigger.identifier());
+		Assert.assertEquals("DTT4", triggerId, trigger.identifier());
 		
-		Assert.assertEquals(trigger.getClass(), DateTrigger.class);
+		Assert.assertEquals("DTT5", trigger.getClass(), DateTrigger.class);
 		
 		DateTrigger dateTrigger = (DateTrigger) trigger;
 		
-		Assert.assertTrue(dateTrigger.matches(this._context, new Date(now + 90000)));
+		Assert.assertTrue("DTT6", dateTrigger.matches(this._context, new Date(now + 90000)));
 
 		List<Long> upcomingTimes = triggers.upcomingFireTimes(this._context);
 		
-		Assert.assertTrue("Trigger manager has no upcoming fire dates.", upcomingTimes.size() > 0);
+		Assert.assertTrue("DTT7", upcomingTimes.size() > 0);
 
 		try 
 		{
@@ -110,8 +110,8 @@ public class DateTriggerTestCase extends RobotTestCase
 
 		this.broadcastUpdate("Verifying that trigger fired...");
 
-		Assert.assertTrue("Trigger not fired at all.", dateTrigger.lastFireTime(this._context) > 0);
-		Assert.assertTrue("Trigger fired in the future?!?", dateTrigger.lastFireTime(this._context) < System.currentTimeMillis());
+		Assert.assertTrue("DTT8", dateTrigger.lastFireTime(this._context) > 0);
+		Assert.assertTrue("DTT9", dateTrigger.lastFireTime(this._context) < System.currentTimeMillis());
 
 		this.broadcastUpdate("Clearing triggers...");
 
