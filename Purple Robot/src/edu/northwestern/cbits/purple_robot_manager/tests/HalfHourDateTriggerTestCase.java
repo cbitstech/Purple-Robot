@@ -95,6 +95,8 @@ public class HalfHourDateTriggerTestCase extends RobotTestCase
 			{
 				this.broadcastUpdate("Sleeping. " + (wait / (60 * 1000)) + " minutes remaining...", 0);
 				Thread.sleep(60 * 1000);
+
+				wait = wait - 60 * 1000;
 			}
 		} 
 		catch (InterruptedException e) 

@@ -23,15 +23,7 @@ public class RobotTestRunner extends AndroidTestRunner
 		
 		this._suite.addTest(new JUnitTestCase(context, 0));
 		this._suite.addTest(new EncryptionTestCase(context, 0));
-		this._suite.addTest(new HttpServerTestCase(context, 0));
-		this._suite.addTest(new JavascriptTestCase(context, 0));
-		this._suite.addTest(new ProbeTestCase(context, 0));
-		this._suite.addTest(new SchemeTestCase(context, 0));
-		this._suite.addTest(new ServiceTestCase(context, 0));
-		this._suite.addTest(new TriggerTestCase(context, 0));
 		this._suite.addTest(new DateTriggerTestCase(context, 0));
-		this._suite.addTest(new UploadPluginTestCase(context, 0));
-		this._suite.addTest(new ModelsTestCase(context, 0));
 		this._suite.addTest(new HalfHourDateTriggerTestCase(context, 9));
 	}
 	
