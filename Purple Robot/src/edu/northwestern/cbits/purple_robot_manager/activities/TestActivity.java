@@ -46,6 +46,7 @@ public class TestActivity extends ActionBarActivity
 	private BroadcastReceiver _receiver = null;
 	
 	private static ProgressDialog _progress = null;
+	protected static String _progressMessage;
 
 	protected void onCreate(Bundle savedInstanceState)
     {
@@ -104,8 +105,6 @@ public class TestActivity extends ActionBarActivity
 	        		{
 						public void onCheckedChanged(CompoundButton arg0, boolean isSelected) 
 						{
-							Log.e("PR", "SELECTED = " + isSelected);
-							
 							robot.setSelected(me, isSelected);
 							
 							me.updateSubtitle();
@@ -123,8 +122,7 @@ public class TestActivity extends ActionBarActivity
 					public void onClick(View arg0) 
 					{
 	            		CheckBox nameField = (CheckBox) view.findViewById(R.id.text_test_name);
-	            		
-	            		Log.e("PR", "SETTING " + (nameField.isChecked() == false));
+
 	            		nameField.setChecked(nameField.isChecked() == false);
 					}
         		});
@@ -145,7 +143,9 @@ public class TestActivity extends ActionBarActivity
 					{
 						public void run() 
 						{
-							TestActivity._progress.setMessage(intent.getStringExtra(TestActivity.PROGRESS_MESSAGE));
+							TestActivity._progressMessage = intent.getStringExtra(TestActivity.PROGRESS_MESSAGE);
+							
+							me.showProgress(TestActivity._progressMessage);
 						}
 					});
 					
@@ -164,6 +164,8 @@ public class TestActivity extends ActionBarActivity
 		IntentFilter filter = new IntentFilter(TestActivity.INTENT_PROGRESS_MESSAGE);
 		
 		LocalBroadcastManager.getInstance(this).registerReceiver(this._receiver, filter);
+		
+		this.showProgress(TestActivity._progressMessage);
 	}
 	
 	protected void updateSubtitle() 
@@ -211,6 +213,12 @@ public class TestActivity extends ActionBarActivity
 		
 		this._receiver = null;
 		
+		if (TestActivity._progress != null)
+		{
+			TestActivity._progress.dismiss();
+			TestActivity._progress = null;
+		}
+
 		super.onPause();
 	}
 
@@ -239,12 +247,7 @@ public class TestActivity extends ActionBarActivity
 				{
 					item.setIcon(R.drawable.action_pause);
 					
-					TestActivity._progress = new ProgressDialog(this);
-					TestActivity._progress.setIndeterminate(true);
-					
-					TestActivity._progress.setTitle(R.string.title_running_tests);
-					TestActivity._progress.setCancelable(false);
-					TestActivity._progress.show();
+					this.showProgress(this.getString(R.string.message_starting_test));
 					
 					final TestResult result = new TestResult();
 					
@@ -256,26 +259,19 @@ public class TestActivity extends ActionBarActivity
 							{
 								public void run() 
 								{
-									TestActivity._progress.dismiss();
-									TestActivity._progress = null;
-									
-									Log.e("PR", "RESULTS: " + result.errorCount() + " errors; " + result.failureCount() + " failures");
+									me.showProgress(null);
 									
 									int count = result.errorCount() + result.failureCount();
 
-									AlertDialog.Builder builder = new AlertDialog.Builder(me);
+									String title = me.getString(R.string.title_tests_successful);
+									String message = me.getString(R.string.message_tests_successful);
 
-									if (count == 0)
-									{
-										builder.setTitle(R.string.title_tests_successful);
-										builder.setMessage(R.string.message_tests_successful);
-									}
-									else
+									if (count != 0)
 									{
 										if (count > 1)
-											builder.setTitle(me.getString(R.string.title_tests_failed, count));
+											title = me.getString(R.string.title_tests_failed, count);
 										else
-											builder.setTitle(R.string.title_test_failed);
+											title = me.getString(R.string.title_test_failed);
 										
 										StringBuffer sb = new StringBuffer();
 
@@ -303,13 +299,10 @@ public class TestActivity extends ActionBarActivity
 											sb.append(fail.toString());
 										}
 										
-										builder.setMessage(sb.toString().replace("edu.northwestern.cbits.purple_robot_manager.tests.", ""));
+										message = sb.toString().replace("edu.northwestern.cbits.purple_robot_manager.tests.", "");
 									}
-
-									builder.setPositiveButton(R.string.action_close, null);
-									builder.create().show();
 									
-									item.setIcon(R.drawable.action_play);
+									DialogActivity.showNativeDialog(me, title, message, me.getString(R.string.action_close), null, null, null, null, Integer.MAX_VALUE);
 								}
 							});
 						}
@@ -321,4 +314,32 @@ public class TestActivity extends ActionBarActivity
         
         return true;
     }
+
+	private void showProgress(String message) 
+	{
+		TestActivity._progressMessage = message;
+
+		if (TestActivity._progressMessage != null)
+		{
+			if (TestActivity._progress == null)
+			{
+				TestActivity._progress = new ProgressDialog(this);
+				TestActivity._progress.setIndeterminate(true);
+				
+				TestActivity._progress.setTitle(R.string.title_running_tests);
+				TestActivity._progress.setCancelable(false);
+				TestActivity._progress.show();
+			}
+			
+			TestActivity._progress.setMessage(TestActivity._progressMessage);
+		}
+		else
+		{
+			if (TestActivity._progress != null)
+			{
+				TestActivity._progress.dismiss();
+				TestActivity._progress = null;
+			}
+		}
+	}
 }

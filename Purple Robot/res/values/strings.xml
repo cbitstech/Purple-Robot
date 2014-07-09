@@ -1255,6 +1255,8 @@
 	<string name="description_minutes_test">Test time: %1$d minutes</string>
 	<string name="description_minute_or_less_test">Test time: 1 minute or less</string>
 	<string name="subtitle_no_tests">Please select one or more tests</string>
+	
+	<string name="message_starting_test">Starting tests&#8230;</string>
 </resources>
 
 
