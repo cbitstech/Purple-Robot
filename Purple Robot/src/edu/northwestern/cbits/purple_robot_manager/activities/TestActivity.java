@@ -245,8 +245,6 @@ public class TestActivity extends ActionBarActivity
 				}
 				else
 				{
-					item.setIcon(R.drawable.action_pause);
-					
 					this.showProgress(this.getString(R.string.message_starting_test));
 					
 					final TestResult result = new TestResult();
