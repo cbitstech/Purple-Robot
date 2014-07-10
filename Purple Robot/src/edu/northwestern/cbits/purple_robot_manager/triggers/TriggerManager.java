@@ -19,7 +19,6 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 import edu.emory.mathcs.backport.java.util.Collections;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -62,8 +61,6 @@ public class TriggerManager
 
 		Date now = new Date();
 
-		Log.e("PR", "NUDGE TRIGGERS " + this._triggers.size());
-		
 		synchronized(this._triggers)
 		{
 			for (Trigger trigger : this._triggers)
@@ -75,8 +72,6 @@ public class TriggerManager
 					if (trigger.matches(context, now))
 						execute = true;
 				}
-				
-				Log.e("PR", "TTTT " + trigger.identifier() + " " + execute);
 				
 				if (execute)
 				{
@@ -378,6 +373,8 @@ public class TriggerManager
 				}
 			}
 		}
+		
+		Collections.sort(upcoming);
 		
 		wakeLock.release();
 		
