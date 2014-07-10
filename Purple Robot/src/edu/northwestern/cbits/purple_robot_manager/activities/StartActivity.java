@@ -683,54 +683,41 @@ public class StartActivity extends ActionBarActivity
 		
     	AlertDialog.Builder builder = new AlertDialog.Builder(this);
     	
-        switch (item.getItemId())
+    	final int itemId = item.getItemId();
+    	
+    	if(itemId == R.id.menu_snapshot_item)
     	{
-			case R.id.menu_snapshot_item:
 				Intent snapIntent = new Intent(this, SnapshotsActivity.class);
 				
 				this.startActivity(snapIntent);
-		
-				break;
-			case R.id.menu_trigger_item:
-				
-				builder.setTitle(R.string.title_fire_triggers);
-				
+    	}
+		if(itemId == R.id.menu_trigger_item)
+		{
+			builder.setTitle(R.string.title_fire_triggers);
+			
 
-				if (savedPassword == null || savedPassword.equals(""))
+			if (savedPassword == null || savedPassword.equals(""))
+			{
+				final List<Trigger> triggers = TriggerManager.getInstance(this).allTriggers();
+				
+				if (triggers.size() > 0)
 				{
-					final List<Trigger> triggers = TriggerManager.getInstance(this).allTriggers();
+					ArrayAdapter<Trigger> adapter = new ArrayAdapter<Trigger>(this, android.R.layout.simple_list_item_1, triggers);
 					
-					if (triggers.size() > 0)
+					builder.setAdapter(adapter, new OnClickListener()
 					{
-						ArrayAdapter<Trigger> adapter = new ArrayAdapter<Trigger>(this, android.R.layout.simple_list_item_1, triggers);
-						
-						builder.setAdapter(adapter, new OnClickListener()
+						public void onClick(DialogInterface dialog, int which) 
 						{
-							public void onClick(DialogInterface dialog, int which) 
-							{
-								Trigger target = triggers.get(which);
-								
-								target.execute(me, true);
-							}
-						});
-					}
-					else
-					{
-						builder.setMessage(R.string.message_no_triggers);
-					
-						builder.setPositiveButton(R.string.button_close, new OnClickListener()
-						{
-							public void onClick(DialogInterface arg0, int arg1) 
-							{
-		
-							}
-						});
-					}
-				}				
+							Trigger target = triggers.get(which);
+							
+							target.execute(me, true);
+						}
+					});
+				}
 				else
 				{
-					builder.setMessage(R.string.message_no_user_triggers);
-					
+					builder.setMessage(R.string.message_no_triggers);
+				
 					builder.setPositiveButton(R.string.button_close, new OnClickListener()
 					{
 						public void onClick(DialogInterface arg0, int arg1) 
@@ -739,10 +726,23 @@ public class StartActivity extends ActionBarActivity
 						}
 					});
 				}
-				builder.create().show();
-		
-				break;
-			case R.id.menu_label_item:
+			}				
+			else
+			{
+				builder.setMessage(R.string.message_no_user_triggers);
+				
+				builder.setPositiveButton(R.string.button_close, new OnClickListener()
+				{
+					public void onClick(DialogInterface arg0, int arg1) 
+					{
+
+					}
+				});
+			}
+			builder.create().show();
+		}		
+		if(itemId == R.id.menu_label_item)
+		{
 				Intent labelIntent = new Intent();
 				labelIntent.setClass(this, LabelActivity.class);
 		
@@ -750,54 +750,52 @@ public class StartActivity extends ActionBarActivity
 				labelIntent.putExtra(LabelActivity.TIMESTAMP, ((double) System.currentTimeMillis()));
 				
 				this.startActivity(labelIntent);
-		
-				break;
-    		case R.id.menu_upload_item:
+		}
+		if(itemId == R.id.menu_upload_item)
+		{
     			LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(this);
     			Intent intent = new Intent(OutputPlugin.FORCE_UPLOAD);
 
     			localManager.sendBroadcast(intent);
-
-    			break;
-    		case R.id.menu_diagnostic_item:
+		}
+		if(itemId == R.id.menu_diagnostic_item)
+		{
     			Intent diagIntent = new Intent();
     			diagIntent.setClass(this, DiagnosticActivity.class);
 
     			this.startActivity(diagIntent);
+		}
+		if(itemId == R.id.menu_settings_item)
+		{
+			if (savedPassword == null || savedPassword.equals(""))
+				this.launchPreferences();
+			else
+			{
+    	        builder.setMessage(R.string.dialog_password_prompt);
+    	        builder.setPositiveButton(R.string.dialog_password_submit, new DialogInterface.OnClickListener()
+    	        {
+					public void onClick(DialogInterface dialog, int which)
+					{
+						AlertDialog alertDialog = (AlertDialog) dialog;
 
-    			break;
-    		case R.id.menu_settings_item:
-				if (savedPassword == null || savedPassword.equals(""))
-					this.launchPreferences();
-				else
-				{
-	    	        builder.setMessage(R.string.dialog_password_prompt);
-	    	        builder.setPositiveButton(R.string.dialog_password_submit, new DialogInterface.OnClickListener()
-	    	        {
-						public void onClick(DialogInterface dialog, int which)
-						{
-							AlertDialog alertDialog = (AlertDialog) dialog;
+		    	        final EditText passwordField = (EditText) alertDialog.findViewById(R.id.text_dialog_password);
 
-			    	        final EditText passwordField = (EditText) alertDialog.findViewById(R.id.text_dialog_password);
+						Editable password = passwordField.getText();
 
-							Editable password = passwordField.getText();
+						if (password.toString().equals(savedPassword))
+							me.launchPreferences();
+						else
+							Toast.makeText(me, R.string.toast_incorrect_password, Toast.LENGTH_LONG).show();
 
-							if (password.toString().equals(savedPassword))
-								me.launchPreferences();
-							else
-								Toast.makeText(me, R.string.toast_incorrect_password, Toast.LENGTH_LONG).show();
+						alertDialog.dismiss();
+					}
+				});
+    	        builder.setView(me.getLayoutInflater().inflate(R.layout.dialog_password, null));
 
-							alertDialog.dismiss();
-						}
-					});
-	    	        builder.setView(me.getLayoutInflater().inflate(R.layout.dialog_password, null));
+    	        AlertDialog alert = builder.create();
 
-	    	        AlertDialog alert = builder.create();
-
-	    	        alert.show();
-				}
-
-    	        break;
+    	        alert.show();
+			}
 		}
 
     	return true;

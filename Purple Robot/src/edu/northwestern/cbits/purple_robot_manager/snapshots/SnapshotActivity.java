@@ -336,42 +336,40 @@ public class SnapshotActivity extends ActionBarActivity
     {
     	final SnapshotActivity me = this;
     	
-        switch (item.getItemId())
+    	if(item.getItemId() == R.id.menu_play_snapshot_item)
     	{
-			case R.id.menu_play_snapshot_item:
-				if (this._isPlaying  == false)
-				{
-					this._isPlaying = true;
-					item.setVisible(false);
+			if (this._isPlaying  == false)
+			{
+				this._isPlaying = true;
+				item.setVisible(false);
+				
+				MediaPlayer player = new MediaPlayer();
+		        
+				try 
+		        {
+					player.setDataSource(this._audioPath);
 					
-					MediaPlayer player = new MediaPlayer();
-			        
-					try 
-			        {
-						player.setDataSource(this._audioPath);
-						
-						player.setOnCompletionListener(new OnCompletionListener()
-						{
-							public void onCompletion(MediaPlayer player) 
-							{
-								player.release();
-								
-								me._isPlaying = false;
-								item.setVisible(true);
-
-							}
-						});
-						
-						player.prepare();
-						player.start();
-			        } 
-					catch (IOException e) 
+					player.setOnCompletionListener(new OnCompletionListener()
 					{
-						this._isPlaying = false;
-					}
-				}
+						public void onCompletion(MediaPlayer player) 
+						{
+							player.release();
+							
+							me._isPlaying = false;
+							item.setVisible(true);
 
-				break;
+						}
+					});
+					
+					player.prepare();
+					player.start();
+		        } 
+				catch (IOException e) 
+				{
+					this._isPlaying = false;
+				}
+			}
+
 		}
 
     	return true;

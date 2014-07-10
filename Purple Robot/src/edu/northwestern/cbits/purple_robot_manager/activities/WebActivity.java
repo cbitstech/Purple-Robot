@@ -102,25 +102,24 @@ public class WebActivity extends ActionBarActivity
 
 	public boolean onOptionsItemSelected(MenuItem item)
     {
-        switch (item.getItemId())
-    	{
-		    case android.R.id.home:
-		    	this.onUpPressed();
-				
-				break;
-    		case R.id.menu_close:
+		final int itemId = item.getItemId();
+		
+		if(itemId == android.R.id.home)
+		{
+			this.onUpPressed();
+		}
+		if(itemId == R.id.menu_close)
+		{
     			this.finish();
-
-    			break;
-    		case R.id.menu_open:
+		}
+		if(itemId == R.id.menu_open)
+		{
     			JavaScriptEngine engine = new JavaScriptEngine(this);
 
     			Uri data = this.getIntent().getData();
     			
     			if (data != null)
     				engine.launchUrl(data.toString());
-    			
-    			break;
 		}
 
     	return true;

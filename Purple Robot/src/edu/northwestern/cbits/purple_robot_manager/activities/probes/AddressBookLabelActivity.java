@@ -53,22 +53,20 @@ public class AddressBookLabelActivity extends ActionBarActivity
     @SuppressLint("ValidFragment")
 	public boolean onOptionsItemSelected(MenuItem item)
     {
-        switch (item.getItemId())
+    	if(item.getItemId() == R.id.menu_accept_label)
     	{
-    		case R.id.menu_accept_label:
-    			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
+    		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
 
-    			Editor e = prefs.edit();
-    			e.putLong("last_address_book_calibration", System.currentTimeMillis());
-    			e.commit();
+			Editor e = prefs.edit();
+			e.putLong("last_address_book_calibration", System.currentTimeMillis());
+			e.commit();
 
-    			this.finish();
+			this.finish();
 
-    			final SanityManager sanity = SanityManager.getInstance(this);
-    			final String title = this.getString(R.string.title_address_book_label_check);
-    			sanity.clearAlert(title);
+			final SanityManager sanity = SanityManager.getInstance(this);
+			final String title = this.getString(R.string.title_address_book_label_check);
+			sanity.clearAlert(title);
 
-    			break;
     	}
         
         return true;

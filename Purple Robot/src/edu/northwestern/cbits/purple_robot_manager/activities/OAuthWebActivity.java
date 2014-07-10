@@ -124,12 +124,9 @@ public class OAuthWebActivity extends ActionBarActivity
 
 	public boolean onOptionsItemSelected(MenuItem item)
     {
-        switch (item.getItemId())
-    	{
-    		case R.id.menu_close:
-    			this.finish();
-
-    			break;
+		if(item.getItemId() == R.id.menu_close)
+		{
+			this.finish();
 		}
 
     	return true;

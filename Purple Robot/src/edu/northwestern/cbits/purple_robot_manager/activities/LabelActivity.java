@@ -495,149 +495,148 @@ public class LabelActivity extends ActionBarActivity
     @SuppressLint("ValidFragment")
 	public boolean onOptionsItemSelected(MenuItem item)
     {
-        switch (item.getItemId())
+    	final int itemId = item.getItemId();
+
+    	if(itemId == R.id.menu_accept_label)
     	{
-    		case R.id.menu_accept_label:
-    	        Bundle extras = this.getIntent().getExtras();
+    		Bundle extras = this.getIntent().getExtras();
 
-    	        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-    	        
-    			if (extras.containsKey(LabelActivity.LABEL_DEFINITIONS))
-    			{
-        	        Editor e = prefs.edit();
+	        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+	        
+			if (extras.containsKey(LabelActivity.LABEL_DEFINITIONS))
+			{
+    	        Editor e = prefs.edit();
 
-        	        for (String key : this._values.keySet())
-    				{
-    					Object value = this._values.get(key);
-    					
-	    				JavaScriptEngine js = new JavaScriptEngine(this);
-	    				js.emitReading(key, value.toString());
-	
-	    				HashMap <String, Object> payload = new HashMap<String, Object>();
-	
-	    				payload.put("label_time", this._timestamp);
-	    				payload.put("label", key);
-	    				payload.put("label_value", value.toString());
-	    				
-	    				LogManager.getInstance(this).log("pr_label_submit", payload);
-	    				
-	    				if (value instanceof Float)
-	    					e.putFloat("label_field_" + key, ((Float) value).floatValue());
-	    				else
-	    				{
-	    					e.putString("label_field_" + key, value.toString());
-	    					
-	    					String valuesList = prefs.getString("label_field_" + key + "_saved_values", "");
-	    					
-	    					ArrayList<String> savedValues = new ArrayList<String>();
-	    					
-	    					for (String saved : valuesList.split(";"))
-	    						savedValues.add(saved);
-	    					
-	    					savedValues.remove(value.toString());
-	    					savedValues.add(0, value.toString());
-	    					
-	    					StringBuffer sb = new StringBuffer();
-	    					
-	    					for (String savedValue : savedValues)
-	    					{
-	    						if (sb.length() > 0)
-	    							sb.append(";");
-	    						
-	    						sb.append(savedValue);
-	    					}
-	    					
-	    					e.putString("label_field_" + key + "_saved_values", sb.toString());
-	    				}
-    				}
+    	        for (String key : this._values.keySet())
+				{
+					Object value = this._values.get(key);
+					
+    				JavaScriptEngine js = new JavaScriptEngine(this);
+    				js.emitReading(key, value.toString());
+
+    				HashMap <String, Object> payload = new HashMap<String, Object>();
+
+    				payload.put("label_time", this._timestamp);
+    				payload.put("label", key);
+    				payload.put("label_value", value.toString());
     				
-        	        e.commit();
-        	        
+    				LogManager.getInstance(this).log("pr_label_submit", payload);
+    				
+    				if (value instanceof Float)
+    					e.putFloat("label_field_" + key, ((Float) value).floatValue());
+    				else
+    				{
+    					e.putString("label_field_" + key, value.toString());
+    					
+    					String valuesList = prefs.getString("label_field_" + key + "_saved_values", "");
+    					
+    					ArrayList<String> savedValues = new ArrayList<String>();
+    					
+    					for (String saved : valuesList.split(";"))
+    						savedValues.add(saved);
+    					
+    					savedValues.remove(value.toString());
+    					savedValues.add(0, value.toString());
+    					
+    					StringBuffer sb = new StringBuffer();
+    					
+    					for (String savedValue : savedValues)
+    					{
+    						if (sb.length() > 0)
+    							sb.append(";");
+    						
+    						sb.append(savedValue);
+    					}
+    					
+    					e.putString("label_field_" + key + "_saved_values", sb.toString());
+    				}
+				}
+				
+    	        e.commit();
+    	        
+				this.finish();
+			}
+			else
+			{
+    			EditText keyText = (EditText) this.findViewById(R.id.text_label_text);
+    			EditText valueText = (EditText) this.findViewById(R.id.text_value_text);
+
+    			String key = keyText.getText().toString();
+    			String value = valueText.getText().toString();
+
+    			if (key != null && value != null && key.length() > 0 && value.length() > 0)
+    			{
+    				boolean rememberLabel = prefs.getBoolean(LabelActivity.REMEMBER_LABEL, LabelActivity.REMEMBER_LABEL_DEFAULT);
+    				
+    				if (rememberLabel)
+    				{
+            	        Editor e = prefs.edit();
+
+            	        e.putString(LabelActivity.REMEMBER_LABEL_NAME, key);
+            	        e.putString(LabelActivity.REMEMBER_LABEL_VALUE, value);
+            	        
+            	        e.commit();
+    				}
+
+    				
+    				JavaScriptEngine js = new JavaScriptEngine(this);
+    				js.emitReading(key, value);
+    				
+    				List<String> labels = new ArrayList<String>(Arrays.asList(this.savedLabels()));
+    				labels.remove(key);
+    				labels.add(0, key);
+    				String[] labelsArray = labels.toArray(new String[0]);
+    				this.saveLabels(labelsArray);
+
+    				List<String> values = new ArrayList<String>(Arrays.asList(this.savedValues()));
+    				values.remove(value);
+    				values.add(0, value);
+    				String[] valuesArray = values.toArray(new String[0]);
+    				this.saveValues(valuesArray);
+
+    				HashMap <String, Object> payload = new HashMap<String, Object>();
+
+    				payload.put("label_time", this._timestamp);
+    				payload.put("label", key);
+    				payload.put("label_value", value);
+    				
+    				LogManager.getInstance(this).log("pr_label_submit", payload);
+
     				this.finish();
     			}
     			else
     			{
-	    			EditText keyText = (EditText) this.findViewById(R.id.text_label_text);
-	    			EditText valueText = (EditText) this.findViewById(R.id.text_value_text);
-	
-	    			String key = keyText.getText().toString();
-	    			String value = valueText.getText().toString();
-	
-	    			if (key != null && value != null && key.length() > 0 && value.length() > 0)
-	    			{
-	    				boolean rememberLabel = prefs.getBoolean(LabelActivity.REMEMBER_LABEL, LabelActivity.REMEMBER_LABEL_DEFAULT);
-	    				
-	    				if (rememberLabel)
-	    				{
-	            	        Editor e = prefs.edit();
+    				FragmentManager manager = this.getSupportFragmentManager();
 
-	            	        e.putString(LabelActivity.REMEMBER_LABEL_NAME, key);
-	            	        e.putString(LabelActivity.REMEMBER_LABEL_VALUE, value);
-	            	        
-	            	        e.commit();
-	    				}
+    				final LabelActivity me = this;
 
-	    				
-	    				JavaScriptEngine js = new JavaScriptEngine(this);
-	    				js.emitReading(key, value);
-	    				
-	    				List<String> labels = new ArrayList<String>(Arrays.asList(this.savedLabels()));
-	    				labels.remove(key);
-	    				labels.add(0, key);
-	    				String[] labelsArray = labels.toArray(new String[0]);
-	    				this.saveLabels(labelsArray);
-	
-	    				List<String> values = new ArrayList<String>(Arrays.asList(this.savedValues()));
-	    				values.remove(value);
-	    				values.add(0, value);
-	    				String[] valuesArray = values.toArray(new String[0]);
-	    				this.saveValues(valuesArray);
-	
-	    				HashMap <String, Object> payload = new HashMap<String, Object>();
-	
-	    				payload.put("label_time", this._timestamp);
-	    				payload.put("label", key);
-	    				payload.put("label_value", value);
-	    				
-	    				LogManager.getInstance(this).log("pr_label_submit", payload);
-	
-	    				this.finish();
-	    			}
-	    			else
-	    			{
-	    				FragmentManager manager = this.getSupportFragmentManager();
-	
-	    				final LabelActivity me = this;
-	
-	    				DialogFragment dialog = new DialogFragment()
-	    				{
-	    					public Dialog onCreateDialog(Bundle savedInstanceState)
-	    					{
-	    	    				AlertDialog.Builder builder = new AlertDialog.Builder(me);
-	    	    				builder.setTitle(R.string.title_missing_label);
-	    	    				builder.setMessage(R.string.message_missing_label);
-	    	    				builder.setPositiveButton(R.string.button_ok, new OnClickListener()
-	    	    				{
-									public void onClick(DialogInterface dialog, int arg)
-									{
-	
-									}
-	    	    				});
-	
-	    	    				return builder.create();
-	    					}
-	    				};
-	
-	    				dialog.show(manager, "label_error");
-	    			}
+    				DialogFragment dialog = new DialogFragment()
+    				{
+    					public Dialog onCreateDialog(Bundle savedInstanceState)
+    					{
+    	    				AlertDialog.Builder builder = new AlertDialog.Builder(me);
+    	    				builder.setTitle(R.string.title_missing_label);
+    	    				builder.setMessage(R.string.message_missing_label);
+    	    				builder.setPositiveButton(R.string.button_ok, new OnClickListener()
+    	    				{
+								public void onClick(DialogInterface dialog, int arg)
+								{
+
+								}
+    	    				});
+
+    	    				return builder.create();
+    					}
+    				};
+
+    				dialog.show(manager, "label_error");
     			}
-    			
-    			break;
+			}
+		}
 
-    		case R.id.menu_cancel:
-    			this.finish();
-
-    			break;
+    	if(itemId == R.id.menu_cancel)
+		{
+			this.finish();
 		}
 
     	return true;
