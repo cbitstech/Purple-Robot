@@ -234,82 +234,81 @@ public class TestActivity extends ActionBarActivity
     {
     	final TestActivity me = this;
     	
-        switch (item.getItemId())
+    	final int itemId =item.getItemId(); 
+    	
+    	if(itemId == R.id.menu_test_item)
     	{
-			case R.id.menu_test_item:
-				if (TestActivity._testRunner.isRunning())
+    		if (TestActivity._testRunner.isRunning())
+			{
+				item.setIcon(R.drawable.action_play);
+				
+				TestActivity._testRunner.stopTests();
+			}
+			else
+			{
+				item.setIcon(R.drawable.action_pause);
+				
+				this.showProgress(this.getString(R.string.message_starting_test));
+				
+				final TestResult result = new TestResult();
+				
+				TestActivity._testRunner.startTests(result, new Runnable()
 				{
-					item.setIcon(R.drawable.action_play);
-					
-					TestActivity._testRunner.stopTests();
-				}
-				else
-				{
-					item.setIcon(R.drawable.action_pause);
-					
-					this.showProgress(this.getString(R.string.message_starting_test));
-					
-					final TestResult result = new TestResult();
-					
-					TestActivity._testRunner.startTests(result, new Runnable()
+					public void run() 
 					{
-						public void run() 
+						me.runOnUiThread(new Runnable()
 						{
-							me.runOnUiThread(new Runnable()
+							public void run() 
 							{
-								public void run() 
+								me.showProgress(null);
+								
+								int count = result.errorCount() + result.failureCount();
+
+								String title = me.getString(R.string.title_tests_successful);
+								String message = me.getString(R.string.message_tests_successful);
+
+								if (count != 0)
 								{
-									me.showProgress(null);
+									if (count > 1)
+										title = me.getString(R.string.title_tests_failed, count);
+									else
+										title = me.getString(R.string.title_test_failed);
 									
-									int count = result.errorCount() + result.failureCount();
+									StringBuffer sb = new StringBuffer();
 
-									String title = me.getString(R.string.title_tests_successful);
-									String message = me.getString(R.string.message_tests_successful);
-
-									if (count != 0)
+									Enumeration<TestFailure> errors = result.errors();
+									
+									while (errors.hasMoreElements())
 									{
-										if (count > 1)
-											title = me.getString(R.string.title_tests_failed, count);
-										else
-											title = me.getString(R.string.title_test_failed);
+										if (sb.length() > 0)
+											sb.append("\n\n");
 										
-										StringBuffer sb = new StringBuffer();
+										TestFailure fail = errors.nextElement();
+										
+										sb.append(fail.toString());
+									}
 
-										Enumeration<TestFailure> errors = result.errors();
-										
-										while (errors.hasMoreElements())
-										{
-											if (sb.length() > 0)
-												sb.append("\n\n");
-											
-											TestFailure fail = errors.nextElement();
-											
-											sb.append(fail.toString());
-										}
+									Enumeration<TestFailure> fails = result.failures();
+									
+									while (fails.hasMoreElements())
+									{
+										if (sb.length() > 0)
+											sb.append("\n\n");
 
-										Enumeration<TestFailure> fails = result.failures();
+										TestFailure fail = fails.nextElement();
 										
-										while (fails.hasMoreElements())
-										{
-											if (sb.length() > 0)
-												sb.append("\n\n");
-
-											TestFailure fail = fails.nextElement();
-											
-											sb.append(fail.toString());
-										}
-										
-										message = sb.toString().replace("edu.northwestern.cbits.purple_robot_manager.tests.", "");
+										sb.append(fail.toString());
 									}
 									
-									DialogActivity.showNativeDialog(me, title, message, me.getString(R.string.action_close), null, null, null, null, Integer.MAX_VALUE);
+									message = sb.toString().replace("edu.northwestern.cbits.purple_robot_manager.tests.", "");
 								}
-							});
-						}
-					});
-				}
-				
-				break;
+								
+								DialogActivity.showNativeDialog(me, title, message, me.getString(R.string.action_close), null, null, null, null, Integer.MAX_VALUE);
+							}
+						});
+					}
+				});
+			}
     	}
         
         return true;

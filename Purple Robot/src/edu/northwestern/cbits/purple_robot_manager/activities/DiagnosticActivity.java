@@ -334,216 +334,217 @@ public class DiagnosticActivity extends ActionBarActivity
 
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        switch (item.getItemId())
+    	final int itemId = item.getItemId();
+    	
+    	if(itemId == android.R.id.home)
     	{
-		    case android.R.id.home:
-		    	this.onBackPressed();
+    		this.onBackPressed();
 				
-				break;
-    		case R.id.menu_email_item:
-    			StringBuffer message = new StringBuffer();
+    	}
+    	if(itemId == R.id.menu_email_item)
+    	{
+			StringBuffer message = new StringBuffer();
 
-         		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-         		
-         		String newline = System.getProperty("line.separator");
+     		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+     		
+     		String newline = System.getProperty("line.separator");
 
-         		message.append(this.getString(R.string.user_id_label));
+     		message.append(this.getString(R.string.user_id_label));
+     		message.append(newline);
+     		message.append("\"" + EncryptionManager.getInstance().getUserId(this) + "\"");
+
+     		message.append(newline);
+     		message.append(newline);
+
+     		message.append(this.getString(R.string.probe_status_label));
+     		message.append(newline);
+
+    		boolean probeEnabled = prefs.getBoolean("config_probes_enabled", false);
+    		
+    		if (probeEnabled)
+         		message.append(this.getString(R.string.probe_status_enabled));
+    		else
+         		message.append(this.getString(R.string.probe_status_disabled));
+
+     		message.append(newline);
+     		message.append(newline);
+
+     		message.append(this.getString(R.string.upload_status_label));
+     		message.append(newline);
+
+    		PurpleRobotApplication.fixPreferences(this, true);
+
+    		boolean uploadEnabled = prefs.getBoolean("config_enable_data_server", false);
+    		
+    		if (uploadEnabled)
+    		{
+    			boolean wifiOnly = prefs.getBoolean("config_restrict_data_wifi", true);
+    			
+    			if (wifiOnly)
+             		message.append(this.getString(R.string.upload_status_enabled_wifi_only));
+    			else
+             		message.append(this.getString(R.string.upload_status_enabled));
+    		}
+    		else
+         		message.append(this.getString(R.string.upload_status_disabled));
+
+     		message.append(newline);
+     		message.append(newline);
+
+     		message.append(this.getString(R.string.last_upload_label));
+     		message.append(newline);
+     		
+     		if (prefs.contains("http_last_upload") && prefs.contains("http_last_payload_size"))
+			{
+				long lastUploadTime = prefs.getLong("http_last_upload", 0);
+				long lastPayloadSize = prefs.getLong("http_last_payload_size", 0) / 1024;
+	
+				SimpleDateFormat sdf = new SimpleDateFormat("MMM d - HH:mm:ss");
+				
+				String dateString = sdf.format(new Date(lastUploadTime));
+
+         		message.append(String.format(this.getString(R.string.last_upload_format), dateString, lastPayloadSize));
+			}
+     		else
+         		message.append(this.getString(R.string.last_upload_placeholder));
+
+     		message.append(newline);
+     		message.append(newline);
+
+    		OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(this, HttpUploadPlugin.class);
+    		
+    		if (plugin instanceof HttpUploadPlugin)
+    		{
+    			HttpUploadPlugin http = (HttpUploadPlugin) plugin;
+    			
+    			message.append(this.getString(R.string.robot_pending_count_label));
          		message.append(newline);
-         		message.append("\"" + EncryptionManager.getInstance().getUserId(this) + "\"");
+    			message.append(this.getString(R.string.pending_files_file, http.pendingFilesCount()));
 
          		message.append(newline);
          		message.append(newline);
+    		}
+     		
+    		message.append(this.getString(R.string.pr_errors_label));
+     		message.append(newline);
 
-         		message.append(this.getString(R.string.probe_status_label));
-         		message.append(newline);
+	 		final SanityManager sanity = SanityManager.getInstance(this);
 
-        		boolean probeEnabled = prefs.getBoolean("config_probes_enabled", false);
-        		
-        		if (probeEnabled)
-             		message.append(this.getString(R.string.probe_status_enabled));
-        		else
-             		message.append(this.getString(R.string.probe_status_disabled));
-
-         		message.append(newline);
-         		message.append(newline);
-
-         		message.append(this.getString(R.string.upload_status_label));
-         		message.append(newline);
-
-        		PurpleRobotApplication.fixPreferences(this, true);
-
-        		boolean uploadEnabled = prefs.getBoolean("config_enable_data_server", false);
-        		
-        		if (uploadEnabled)
-        		{
-        			boolean wifiOnly = prefs.getBoolean("config_restrict_data_wifi", true);
-        			
-        			if (wifiOnly)
-                 		message.append(this.getString(R.string.upload_status_enabled_wifi_only));
-        			else
-                 		message.append(this.getString(R.string.upload_status_enabled));
-        		}
-        		else
-             		message.append(this.getString(R.string.upload_status_disabled));
-
-         		message.append(newline);
-         		message.append(newline);
-
-         		message.append(this.getString(R.string.last_upload_label));
-         		message.append(newline);
-         		
-         		if (prefs.contains("http_last_upload") && prefs.contains("http_last_payload_size"))
+			if (sanity.getErrorLevel() != SanityCheck.OK)
+			{
+				Map<String, String> errors = sanity.errors();
+				
+				if (errors.size() > 0)
 				{
-					long lastUploadTime = prefs.getLong("http_last_upload", 0);
-					long lastPayloadSize = prefs.getLong("http_last_payload_size", 0) / 1024;
-		
-					SimpleDateFormat sdf = new SimpleDateFormat("MMM d - HH:mm:ss");
-					
-					String dateString = sdf.format(new Date(lastUploadTime));
-
-	         		message.append(String.format(this.getString(R.string.last_upload_format), dateString, lastPayloadSize));
-				}
-         		else
-             		message.append(this.getString(R.string.last_upload_placeholder));
-
-         		message.append(newline);
-         		message.append(newline);
-
-        		OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(this, HttpUploadPlugin.class);
-        		
-        		if (plugin instanceof HttpUploadPlugin)
-        		{
-        			HttpUploadPlugin http = (HttpUploadPlugin) plugin;
-        			
-        			message.append(this.getString(R.string.robot_pending_count_label));
-             		message.append(newline);
-        			message.append(this.getString(R.string.pending_files_file, http.pendingFilesCount()));
-
-             		message.append(newline);
-             		message.append(newline);
-        		}
-         		
-        		message.append(this.getString(R.string.pr_errors_label));
-         		message.append(newline);
-
-		 		final SanityManager sanity = SanityManager.getInstance(this);
-
-				if (sanity.getErrorLevel() != SanityCheck.OK)
-				{
-					Map<String, String> errors = sanity.errors();
-					
-					if (errors.size() > 0)
+					for (String error : errors.keySet())
 					{
-						for (String error : errors.keySet())
-						{
-							message.append(errors.get(error));
-			         		message.append(newline);
-						}
-
+						message.append(errors.get(error));
 		         		message.append(newline);
 					}
-					
-					Map<String, String> warnings = sanity.warnings();
 
-					if (warnings.size() > 0)
-					{
-						for (String error : warnings.keySet())
-						{
-							message.append(warnings.get(error));
-			         		message.append(newline);
-						}
-
-		         		message.append(newline);
-					}
-				}
-				else
-				{
-	        		message.append(this.getString(R.string.pr_errors_none_label));
 	         		message.append(newline);
 				}
-        		
-         		message.append(this.getString(R.string.pr_version_label));
-         		message.append(newline);
-         		
-         		try 
-        		{
-        			PackageInfo pInfo = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
-        			message.append(pInfo.versionName);
-        		} 
-        		catch (NameNotFoundException e) 
-        		{
-        			LogManager.getInstance(this).logException(e);
-        		}
+				
+				Map<String, String> warnings = sanity.warnings();
 
-         		message.append(newline);
-         		message.append(newline);
+				if (warnings.size() > 0)
+				{
+					for (String error : warnings.keySet())
+					{
+						message.append(warnings.get(error));
+		         		message.append(newline);
+					}
 
-         		message.append(this.getString(R.string.available_sensors_label));
-         		message.append(newline);
-
-         		StringBuffer sb = new StringBuffer();
-         		
-            	SensorManager sensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
-            	
-            	for (Sensor s : sensorManager.getSensorList(Sensor.TYPE_ALL))
-            	{
-            		if (sb.length() > 0)
-            			sb.append("\n");
-            		
-            		sb.append(s.getName());
-            	}
-            	
-            	message.append(sb.toString());
-         		
-         		try
-         		{
-	         		Intent intent = new Intent(Intent.ACTION_SEND);
-	
-	         		intent.setType("message/rfc822");
-	         		intent.putExtra(Intent.EXTRA_SUBJECT, this.getString(R.string.email_diagnostic_subject));
-	         		intent.putExtra(Intent.EXTRA_TEXT, message.toString());
-
-	         		SchemeConfigFile scheme = new SchemeConfigFile(this);
-
-	            	File cacheDir = this.getExternalCacheDir();
-	            	File configFile = new File(cacheDir, "config.scm");
-	            	
-	        		FileOutputStream fout = new FileOutputStream(configFile);
-
-	        		fout.write(scheme.toString().getBytes(Charset.defaultCharset().name()));
-
-	        		fout.flush();
-	        		fout.close();
-	        		
-	        		intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(configFile));
-	
-	         		this.startActivity(intent);
-         		}
-         		catch (ActivityNotFoundException e)
-         		{
-         			try
-         			{
-	         			Intent mailIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("mailto:c-karr@northwestern.edu"));
-	         			mailIntent.putExtra(Intent.EXTRA_SUBJECT, this.getString(R.string.email_diagnostic_subject));
-	         			mailIntent.putExtra(Intent.EXTRA_TEXT, message.toString());
-	
-	         			this.startActivity(mailIntent);
-         			}
-         			catch (ActivityNotFoundException ex)
-         			{
-         				Toast.makeText(this, R.string.toast_mail_not_found, Toast.LENGTH_LONG).show();
-         			}
-         		} 
-         		catch (FileNotFoundException e) 
-         		{
-         			LogManager.getInstance(this).logException(e);
-				} 
-         		catch (IOException e) 
-         		{
-         			LogManager.getInstance(this).logException(e);
+	         		message.append(newline);
 				}
+			}
+			else
+			{
+        		message.append(this.getString(R.string.pr_errors_none_label));
+         		message.append(newline);
+			}
+    		
+     		message.append(this.getString(R.string.pr_version_label));
+     		message.append(newline);
+     		
+     		try 
+    		{
+    			PackageInfo pInfo = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
+    			message.append(pInfo.versionName);
+    		} 
+    		catch (NameNotFoundException e) 
+    		{
+    			LogManager.getInstance(this).logException(e);
+    		}
+
+     		message.append(newline);
+     		message.append(newline);
+
+     		message.append(this.getString(R.string.available_sensors_label));
+     		message.append(newline);
+
+     		StringBuffer sb = new StringBuffer();
+     		
+        	SensorManager sensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
+        	
+        	for (Sensor s : sensorManager.getSensorList(Sensor.TYPE_ALL))
+        	{
+        		if (sb.length() > 0)
+        			sb.append("\n");
+        		
+        		sb.append(s.getName());
+        	}
+        	
+        	message.append(sb.toString());
+     		
+     		try
+     		{
+         		Intent intent = new Intent(Intent.ACTION_SEND);
+
+         		intent.setType("message/rfc822");
+         		intent.putExtra(Intent.EXTRA_SUBJECT, this.getString(R.string.email_diagnostic_subject));
+         		intent.putExtra(Intent.EXTRA_TEXT, message.toString());
+
+         		SchemeConfigFile scheme = new SchemeConfigFile(this);
+
+            	File cacheDir = this.getExternalCacheDir();
+            	File configFile = new File(cacheDir, "config.scm");
+            	
+        		FileOutputStream fout = new FileOutputStream(configFile);
+
+        		fout.write(scheme.toString().getBytes(Charset.defaultCharset().name()));
+
+        		fout.flush();
+        		fout.close();
+        		
+        		intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(configFile));
+
+         		this.startActivity(intent);
+     		}
+     		catch (ActivityNotFoundException e)
+     		{
+     			try
+     			{
+         			Intent mailIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("mailto:c-karr@northwestern.edu"));
+         			mailIntent.putExtra(Intent.EXTRA_SUBJECT, this.getString(R.string.email_diagnostic_subject));
+         			mailIntent.putExtra(Intent.EXTRA_TEXT, message.toString());
+
+         			this.startActivity(mailIntent);
+     			}
+     			catch (ActivityNotFoundException ex)
+     			{
+     				Toast.makeText(this, R.string.toast_mail_not_found, Toast.LENGTH_LONG).show();
+     			}
+     		} 
+     		catch (FileNotFoundException e) 
+     		{
+     			LogManager.getInstance(this).logException(e);
+			} 
+     		catch (IOException e) 
+     		{
+     			LogManager.getInstance(this).logException(e);
+			}
          		
-    			break;
     	}
         
         return true;

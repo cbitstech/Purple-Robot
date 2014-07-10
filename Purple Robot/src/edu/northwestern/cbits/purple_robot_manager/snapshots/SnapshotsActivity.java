@@ -134,33 +134,30 @@ public class SnapshotsActivity extends ActionBarActivity
     {
     	final SnapshotsActivity me = this;
     	
-        switch (item.getItemId())
+    	if(item.getItemId() == R.id.menu_snapshot)
     	{
-			case R.id.menu_snapshot:
-				String label = this.getString(R.string.snapshot_user_initiated);
+    		String label = this.getString(R.string.snapshot_user_initiated);
 				
-				try 
+			try 
+			{
+				SnapshotManager.getInstance(this).takeSnapshot(this, label, new Runnable()
 				{
-					SnapshotManager.getInstance(this).takeSnapshot(this, label, new Runnable()
+					public void run() 
 					{
-						public void run() 
+						me.runOnUiThread(new Runnable()
 						{
-							me.runOnUiThread(new Runnable()
+							public void run() 
 							{
-								public void run() 
-								{
-									me.refresh();
-								}
-							});
-						}
-					});
-				} 
-				catch (EmptySnapshotException e) 
-				{
-					Toast.makeText(this, R.string.empty_snapshot_error, Toast.LENGTH_SHORT).show();
-				}
-
-				break;
+								me.refresh();
+							}
+						});
+					}
+				});
+			} 
+			catch (EmptySnapshotException e) 
+			{
+				Toast.makeText(this, R.string.empty_snapshot_error, Toast.LENGTH_SHORT).show();
+			}
 		}
 
     	return true;

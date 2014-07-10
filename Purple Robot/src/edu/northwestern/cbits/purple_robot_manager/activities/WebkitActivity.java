@@ -206,17 +206,15 @@ public class WebkitActivity extends ActionBarActivity
 
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        switch (item.getItemId())
+    	if(item.getItemId() == R.id.menu_data_item)
     	{
-    		case R.id.menu_data_item:
-				Intent dataIntent = new Intent(this, ProbeViewerActivity.class);
+			Intent dataIntent = new Intent(this, ProbeViewerActivity.class);
 
-				dataIntent.putExtra("probe_name", this.getIntent().getStringExtra("probe_name"));
-				dataIntent.putExtra("probe_bundle", this.getIntent().getParcelableExtra("probe_bundle"));
+			dataIntent.putExtra("probe_name", this.getIntent().getStringExtra("probe_name"));
+			dataIntent.putExtra("probe_bundle", this.getIntent().getParcelableExtra("probe_bundle"));
 
-				this.startActivity(dataIntent);
+			this.startActivity(dataIntent);
 
-    			break;
 
 /*    		case R.id.menu_new_label:
     			if (this._selectedTimestamp == 0)
