@@ -1237,8 +1237,10 @@
 	<string name="name_date_trigger_test">Date Trigger Tests</string>
 	<string name="name_half_hour_date_trigger_test">Half-Hour Date Trigger Tests</string>
 	<string name="name_repeating_date_trigger_test">Repeating Date Trigger Tests</string>
-			
-	<string name="menu_test_label">Start Tests</string>
+	<string name="name_accelerometer_probe_test">Basic Accelerometer Probe Tests</string>
+	<string name="name_health_probe_test">Basic Purple Robot Health Probe Tests</string>
+
+		<string name="menu_test_label">Start Tests</string>
 
 	<string name="title_tests_successful">All Tests Passed</string>
 	<string name="message_tests_successful">All tests passed successfully.</string>

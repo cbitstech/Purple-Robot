@@ -76,13 +76,15 @@ public class RobotHealthProbe extends Probe
 	private static final Object INCLUDE_JSON = "include_json";
 	private static final Object INCLUDE_SCHEME = "include_scheme";
 	
+	public static String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.RobotHealthProbe";
+	
 
 	private long _lastOffset = 0;
 	private long _lastTimeCheck = 0;
 	
 	public String name(Context context)
 	{
-		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.RobotHealthProbe";
+		return RobotHealthProbe.NAME;
 	}
 
 	public String title(Context context)
