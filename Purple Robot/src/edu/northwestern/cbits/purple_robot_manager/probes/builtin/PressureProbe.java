@@ -1,19 +1,13 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
@@ -26,14 +20,9 @@ import android.os.SystemClock;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
-
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.RealTimeProbeViewActivity;
-import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
-import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
-import edu.northwestern.cbits.purple_robot_manager.charts.SplineChart;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
-import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("SimpleDateFormat")
