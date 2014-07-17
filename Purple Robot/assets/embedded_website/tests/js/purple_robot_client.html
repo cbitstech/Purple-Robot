@@ -1,0 +1,32 @@
+<html>
+	<head>
+		<title>Purple Robot Client Trigger Test</title>
+		<script type="text/javascript" src="/js/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript" src="/js/moment.js"></script>
+		<script type="text/javascript" src="/js/purple-robot.min.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function ()
+			{
+				var now = moment();
+				
+				var start = now.add(1, "minute");
+				var end = start.add(1, "minute");
+				
+				var client = new PurpleRobot();
+				
+				client.updateTrigger({
+					script: client.vibrate("buzz"),
+					startAt: start.format("YYYYMMDD[T]HHmmss"),
+					endAt: end.format("YYYYMMDD[T]HHmmss"),
+					repeatRule: "FREQ=DAILY;COUNT=1"}).execute()
+			});
+		</script>
+	</head>
+	<body>
+		<h1>Purple Robot Client Trigger Test</h1>
+		
+		<p>Each time this page is loaded, it creates a new trigger in Purple Robot that will vibrate the device in 1 minute.</p>
+	</body>
+</html>
+	
+	

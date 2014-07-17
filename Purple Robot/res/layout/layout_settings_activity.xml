@@ -314,7 +314,11 @@
 	   		    android:summary="@string/summary_epoch">
 		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_epoch" />
 	        </Preference>
-   	   	</PreferenceScreen>
+   	        <Preference android:title="@string/title_moment"
+	   		    android:summary="@string/summary_moment">
+		        <intent android:action="android.intent.action.VIEW" android:data="@string/url_moment" />
+	        </Preference>
+   	        	   	</PreferenceScreen>
 		<PreferenceScreen android:title="@string/title_funders">
 	   		<Preference android:title="@string/title_funder_nih"
 	   		    android:summary="@string/summary_funder_nih">
