@@ -66,7 +66,7 @@ public class TestActivity extends ActionBarActivity
 		
 		ListView listView = (ListView) this.findViewById(R.id.list_tests);
 		
-		ArrayAdapter<TestCase> adapter = new ArrayAdapter<TestCase>(this, R.layout.layout_test_row, TestActivity._testRunner.getTestCases())
+		ArrayAdapter<TestCase> adapter = new ArrayAdapter<TestCase>(this, R.layout.layout_test_row, TestActivity._testRunner.getTestCases(this))
 		{
         	@SuppressLint("InflateParams")
 			public View getView(final int position, View convertView, ViewGroup parent)
@@ -166,7 +166,7 @@ public class TestActivity extends ActionBarActivity
 	
 	protected void updateSubtitle() 
 	{
-		List<TestCase> cases = TestActivity._testRunner.getTestCases();
+		List<TestCase> cases = TestActivity._testRunner.getTestCases(this);
 		
 		int minutes = 0;
 		int count = 0;
@@ -248,7 +248,7 @@ public class TestActivity extends ActionBarActivity
 				
 				final TestResult result = new TestResult();
 				
-				TestActivity._testRunner.startTests(result, new Runnable()
+				TestActivity._testRunner.startTests(this, result, new Runnable()
 				{
 					public void run() 
 					{
