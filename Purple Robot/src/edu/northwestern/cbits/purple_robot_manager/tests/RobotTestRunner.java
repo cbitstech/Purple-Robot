@@ -1,6 +1,8 @@
 package edu.northwestern.cbits.purple_robot_manager.tests;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -30,7 +32,7 @@ public class RobotTestRunner extends AndroidTestRunner
 		this._suite.addTest(new HalfHourDateTriggerTestCase(context, 9));
 	}
 	
-	public List<TestCase> getTestCases ()
+	public List<TestCase> getTestCases (final Context context)
 	{
 		if (this._cases.size() == 0)
 		{
@@ -49,6 +51,26 @@ public class RobotTestRunner extends AndroidTestRunner
 			}
 		}
 		
+		Collections.sort(this._cases, new Comparator<TestCase>()
+		{
+			public int compare(TestCase one, TestCase two) 
+			{
+				if (one instanceof RobotTestCase && two instanceof RobotTestCase)
+				{
+					RobotTestCase robotOne = (RobotTestCase) one;
+					RobotTestCase robotTwo = (RobotTestCase) two;
+					
+					return robotOne.compareTo(context, robotTwo);
+				}
+				else if (one instanceof RobotTestCase)
+					return -1;
+				else if (two instanceof RobotTestCase)
+					return 1;
+				
+				return one.getName().compareTo(two.getName());
+			}
+		});
+		
 		return this._cases;
 	}
 
@@ -57,7 +79,7 @@ public class RobotTestRunner extends AndroidTestRunner
 		return this._thread != null;
 	}
 
-	public void startTests(final TestResult result, final Runnable next) 
+	public void startTests(final Context context, final TestResult result, final Runnable next) 
 	{
 		final RobotTestRunner me = this;
 		
@@ -65,7 +87,7 @@ public class RobotTestRunner extends AndroidTestRunner
 		{
 			public void run() 
 			{
-				for (TestCase testCase : me.getTestCases())
+				for (TestCase testCase : me.getTestCases(context))
 					testCase.run(result);
 				
 				me._thread = null;

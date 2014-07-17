@@ -80,4 +80,18 @@ public abstract class RobotTestCase extends AndroidTestCase
 		e.putBoolean("test_" + this.name(context), isSelected);
 		e.commit();
 	}
+
+	public int compareTo(Context context, RobotTestCase other) 
+	{
+		if (this._priority < other._priority)
+			return -1;
+		else if (this._priority > other._priority)
+			return 1;
+		else if (this.estimatedMinutes() < other.estimatedMinutes())
+			return -1;
+		else if (this.estimatedMinutes() > other.estimatedMinutes())
+			return 1;
+		
+		return this.name(context).compareToIgnoreCase(other.name(context));
+	}
 }
