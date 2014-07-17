@@ -802,8 +802,12 @@
     <string name="title_epoch">Epoch</string>
     <string name="summary_epoch">Fastly (MIT License)</string>
     <string name="url_epoch">http://fastly.github.io/epoch/</string>
+
+    <string name="title_moment">Moment.JS</string>
+    <string name="summary_moment">Tim Wood &amp; Iskren Chernev (MIT License)</string>
+    <string name="url_moment">http://momentjs.com/</string>
     
-    	<string name="title_funders">Funders &amp; Benefactors</string>
+   	<string name="title_funders">Funders &amp; Benefactors</string>
     
     <string name="title_funder_nih">National Institutes of Health</string>
     <string name="summary_funder_nih">U.S. Department of Health &amp; Human Services</string>
