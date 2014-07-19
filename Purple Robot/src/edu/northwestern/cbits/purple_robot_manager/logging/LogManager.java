@@ -44,9 +44,17 @@ public class LogManager
 		this._logger.setEnabled(prefs.getBoolean(LogManager.ENABLED, LogManager.ENABLED_DEFAULT));
 		this._logger.setUploadUri(Uri.parse(prefs.getString(LogManager.URI, LogManager.URI_DEFAULT)));
 		this._logger.setIncludeLocation(prefs.getBoolean(LogManager.INCLUDE_LOCATION, LogManager.INCLUDE_LOCATION_DEFAULT));
-		this._logger.setUploadInterval(prefs.getLong(LogManager.UPLOAD_INTERVAL, LogManager.UPLOAD_INTERVAL_DEFAULT));
 		this._logger.setWifiOnly(prefs.getBoolean(LogManager.WIFI_ONLY, LogManager.WIFI_ONLY_DEFAULT));
 		this._logger.setLiberalSsl(prefs.getBoolean(LogManager.LIBERAL_SSL, LogManager.LIBERAL_SSL_ONLY));
+		
+		try
+		{
+			this._logger.setUploadInterval(prefs.getLong(LogManager.UPLOAD_INTERVAL, LogManager.UPLOAD_INTERVAL_DEFAULT));
+		}
+		catch (ClassCastException e)
+		{
+			this._logger.setUploadInterval(Long.parseLong(prefs.getString(LogManager.UPLOAD_INTERVAL, "" + LogManager.UPLOAD_INTERVAL_DEFAULT)));
+		}
 	}
 
 	public static LogManager getInstance(Context context)

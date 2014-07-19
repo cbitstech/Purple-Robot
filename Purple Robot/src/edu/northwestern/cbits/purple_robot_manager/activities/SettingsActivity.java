@@ -34,6 +34,9 @@ import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.widget.Toast;
+
+import edu.northwestern.cbits.anthracite.LogService;
+
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.PersistentService;
 import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;
@@ -189,11 +192,20 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
         }
         else if (LOG_REFRESH_KEY.equals(preference.getKey()))
         {
-        	Intent refreshIntent = new Intent(ManagerService.UPLOAD_LOGS_INTENT);
-        	refreshIntent.putExtra(ManagerService.LOG_FORCE_UPLOAD, true);
-        	refreshIntent.setClass(me, ManagerService.class);
+			try 
+			{
+				PackageInfo info = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
 
-        	this.startService(refreshIntent);
+				Intent refreshIntent = new Intent(info.packageName + ".UPLOAD_LOGS_INTENT");
+	        	refreshIntent.putExtra(LogService.LOG_FORCE_UPLOAD, true);
+	        	refreshIntent.setClass(me, ManagerService.class);
+
+	        	this.startService(refreshIntent);
+			} 
+			catch (NameNotFoundException e) 
+			{
+				LogManager.getInstance(this).logException(e);
+			}
 
             return true;
         }
