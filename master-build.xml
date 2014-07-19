@@ -1,37 +1,79 @@
-<project name="Purple Robot Master Build" default="robot.debug" basedir=".">
+<project name="Purple Robot Master Build" default="robot.debug" basedir="." xmlns:ac="antlib:net.sf.antcontrib">
     <description>Build file for fetching and building Purple Robot from Git.</description>
     <property name="repo.base" location="Purple-Robot-Manager"/>
     <property name="sherlock.base" location="ActionBarSherlock"/>
-    <property name="robot.base" location="Purple-Robot-Manager/Purple Robot Manager"/>
+    <property name="robot.base" location="Purple Robot"/>
     <property name="test.base" location="Purple-Robot-Manager/Purple Robot Manager Tests"/>
     <property name="android.sdk.url" location="http://mohrlab.northwestern.edu/ckarr/android-sdk-linux.tgz"/>
-    <property name="android.sdk.file" location="android.tgz"/>
-    <property name="sdk.dir" location="android-sdk-linux"/>
+    <!-- <property name="android.sdk.file.linux" location="android.tgz"/> -->
+    <property name="sdk.dir" location="android-sdk"/>
+    <property name="sdk.file.windows" location="android.zip" />
+    <property name="sdk.file.linux" location="android.tgz" />
+
+
+    <!-- enable if tasks -->
+    <taskdef resource="net/sf/antcontrib/antlib.xml" />
+
+
+    <!-- determine OS -->
+    <target name="isWindows">
+        <condition property="isWindows" value="true">
+            <os family="windows" />
+        </condition>
+    </target>
+    <target name="isLinux">
+        <condition property="isLinux" value="true">
+            <os family="unix" />
+        </condition>
+    </target>
+
+
 
     <target name="init">
         <tstamp/>
         <available file="${repo.base}" property="robot.present" />
         <available file="${sdk.dir}" property="sdk.present" />
+        <available file="${sdk.file.windows}" property="sdk.file.windows.present" />
+        <available file="${sdk.file.linux}" property="sdk.file.linux.present" />
     </target>
     
-    <target name="git.clone" depends="sdk.install" unless="robot.present">
-        <exec executable="git">
-            <arg value="clone" />
-            <arg value="git@github.com:nupmmarkbegale/Purple-Robot-Manager.git" />
-        </exec>
-        <exec executable="git">
-            <arg value="clone" />
-            <arg value="https://github.com/JakeWharton/ActionBarSherlock.git" />
-        </exec>
-        <exec executable="bash" dir="${sdk.dir}">
+
+    <target name="sdk.install.linux" depends="init,isLinux"> <!--  unless="sdk.present" -->
+        <!-- <get src="http://mohrlab.northwestern.edu/ckarr/android-sdk-linux.tgz" dest="android.tgz" /> -->
+        <if>
+            <not>
+                <equals arg1="${sdk.file.linux.present}" arg2="true" />
+            </not>
+            <then>
+                <echo message="Downloading the SDK..." />
+                <get src="http://dl.google.com/android/android-sdk_r23.0.2-linux.tgz" dest="android.tgz" />
+            </then>
+        </if>
+
+        <if>
+            <not>
+                <equals arg1="${sdk.present}" arg2="true" />
+            </not>
+            <then>
+                <echo message="Decompressing the SDK..." />
+                <untar src="android.tgz" dest="." compression="gzip" />
+                <chmod file="${sdk.dir}/tools/android" perm="ugo+rx"/>
+                <chmod file="${sdk.dir}/tools/zipalign" perm="ugo+rx"/>
+                <move file="android-sdk-linux" tofile="${sdk.dir}" />
+            </then>
+        </if>
+
+        <echo message="Updating the SDK..." />
+        <exec executable="bash" dir="${sdk.dir}" failonerror="true">
             <arg value="tools/android" />
             <arg value="update" />
             <arg value="sdk" />
             <arg value="--filter" />
-            <arg value="1,6,11,39,46,50" />
+            <!-- <arg value="1,6,11,39,46,50" /> -->
+            <arg value="Android SDK Tools, revision 23.0.,SDK Platform Android 4.4.2, API 19, revision 3,Google APIs, Android API 18, revision 3,Google Play services, revision 18" />
             <arg value="--no-ui" />
         </exec>
-        <exec executable="bash" dir="${sdk.dir}">
+        <exec executable="bash" dir="${sdk.dir}" failonerror="true">
             <arg value="tools/android" />
             <arg value="update" />
             <arg value="project" />
@@ -40,27 +82,95 @@
         </exec>
     </target>
 
-    <target name="git.pull" depends="init" if="robot.present">
-        <exec executable="git" dir="${robot.base}">
-            <arg value="pull" />
-            <!-- <arg value="-commit" /> -->
+
+    <target name="sdk.install.windows" depends="init,isWindows"> <!--  unless="sdk.present" -->
+        <if>
+            <not>
+                <equals arg1="${sdk.file.windows.present}" arg2="true" />
+            </not>
+            <then>
+                <echo message="Downloading the SDK..." />
+                <get src="http://dl.google.com/android/android-sdk_r23.0.2-windows.zip" dest="android.zip" />
+            </then>
+        </if>
+
+        <if>
+            <not>
+                <equals arg1="${sdk.present}" arg2="true" />
+            </not>
+            <then>
+                <echo message="Decompressing the SDK..." />
+                <unzip src="android.zip" dest="." />
+                <move file="android-sdk-windows" tofile="${sdk.dir}" />
+            </then>
+        </if>
+
+        <echo message="Updating the SDK..." />
+        <exec executable="cmd" dir="${sdk.dir}" failonerror="true">
+            <arg value="/c" />
+            <arg value="tools\android.bat" />
+            <arg value="update" />
+            <arg value="sdk" />
+            <arg value="--filter" />
+            <!-- <arg value="1,6,11,39,46,50" /> -->
+            <arg value="'Android SDK Tools, revision 23.0.'" />
+            <arg value="--no-ui" />
+        </exec>
+        <exec executable="cmd" dir="${sdk.dir}" failonerror="true">
+            <arg value="/c" />
+            <arg value="tools\android.bat" />
+            <arg value="update" />
+            <arg value="project" />
+            <arg value="--path" />
+            <arg value="${sherlock.base}/library" />
         </exec>
     </target>
-    
-    <target name="sdk.install" depends="init" unless="sdk.present">
-        <get src="http://mohrlab.northwestern.edu/ckarr/android-sdk-linux.tgz" dest="android.tgz" />
-        <untar src="android.tgz" dest="." compression="gzip" />
-        <chmod file="${sdk.dir}/tools/android" perm="ugo+rx"/>
-        <chmod file="${sdk.dir}/tools/zipalign" perm="ugo+rx"/>
-        <delete file="${android.sdk.file}"/>
+
+
+    <target name="sdk.install" depends="isWindows,isLinux">
+        <if>
+            <equals arg1="${isWindows}" arg2="true" />
+            <then>
+                <echo message="The value of property isWindows is ${isWindows}" />
+                <antcall target="sdk.install.windows" />
+            </then>
+            <else>
+                <echo message="The value of property isWindows is not ${isWindows}" />
+                <antcall target="sdk.install.linux" />
+            </else>
+        </if>
     </target>
 
-    <target name="robot.debug" depends="git.clone,git.pull">
+
+    <target name="git.clone" depends="sdk.install" unless="robot.present">
+        <exec executable="git">
+            <arg value="clone" />
+            <arg value="https://github.com/cbitstech/Purple-Robot-Manager.git" />
+        </exec>
+        <exec executable="git">
+            <arg value="clone" />
+            <arg value="https://github.com/JakeWharton/ActionBarSherlock.git" />
+        </exec>
+    </target>
+
+
+    <target name="git.pull" depends="init" if="robot.present">
+        <echo message="Git pull disabled on request of @audaciouscode, due to PR changes. Uncomment me when @audaciouscode indicates to do so." />
+        <!-- <mkdir dir="${robot.base}" />
+        <exec executable="git" dir="${robot.base}">
+            <arg value="pull" /> -->
+            <!-- <arg value="-commit" /> -->
+        <!-- </exec> -->
+    </target>
+    
+
+    <target name="robot.debug" depends="git.clone,git.pull"> <!--  depends="git.clone,git.pull" -->
         <copy file="${robot.base}/libs/android-support-v4.jar" tofile="${sherlock.base}/library/libs/android-support-v4.jar" overwrite="true" />
-        <copy file="${sdk.dir}/add-ons/addon-google_apis-google-8/libs/maps.jar" tofile="${robot.base}/libs/maps.jar" overwrite="true" />
+        <!-- <copy file="${sdk.dir}/add-ons/addon-google_apis-google-8/libs/maps.jar" tofile="${robot.base}/libs/maps.jar" overwrite="true" /> -->
         <ant dir="${robot.base}" target="debug" />
         <copy file="${robot.base}/bin/Purple Robot-debug.apk" tofile="./Purple-Robot.debug.apk" overwrite="true" />
     </target>
+
 
     <target name="robot.test" depends="git.clone,git.pull">
         <copy file="${robot.base}/libs/android-support-v4.jar" tofile="${sherlock.base}/library/libs/android-support-v4.jar" overwrite="true" />
