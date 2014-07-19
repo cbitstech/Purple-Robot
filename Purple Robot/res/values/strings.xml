@@ -1244,7 +1244,8 @@
 	<string name="name_accelerometer_probe_test">Basic Accelerometer Probe Tests</string>
 	<string name="name_health_probe_test">Basic Purple Robot Health Probe Tests</string>
 	<string name="name_weka_tree_model_test">Weka Tree Model Tests</string>
-
+	<string name="non_ascii_dialog_test">Non-ASCII Dialog Tests</string>
+	
 	<string name="menu_test_label">Start Tests</string>
 
 	<string name="title_tests_successful">All Tests Passed</string>
