@@ -54,6 +54,6 @@ public class NonAsciiDialogTestCase extends RobotTestCase
 
 	public String name(Context context) 
 	{
-		return context.getString(R.string.non_ascii_dialog_test);
+		return context.getString(R.string.name_non_ascii_dialog_test);
 	}
 }

@@ -79,4 +79,34 @@ public class LogManager
 	{
 		this._logger.logException(e);
 	}
+
+	public void upload() 
+	{
+		this._logger.attemptUploads(true);
+	}
+
+	public void setEndpoint(String endpoint) 
+	{
+		this._logger.setUploadUri(Uri.parse(endpoint));
+	}
+
+	public String getEndpoint() 
+	{
+		Uri u = this._logger.getUploadUri();
+		
+		if (u != null)
+			return u.toString();
+		
+		return null;
+	}
+
+	public boolean getEnabled() 
+	{
+		return this._logger.getEnabled();
+	}
+
+	public void setEnabled(boolean enabled) 
+	{
+		this._logger.setEnabled(enabled);
+	}
 }
