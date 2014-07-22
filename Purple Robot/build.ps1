@@ -54,7 +54,7 @@ Write-Host "  ANDROID_HOME=$($env:ANDROID_HOME)"
 # Create the signing key.
 if(-Not (Test-Path $keystorePath)) {
   WriteHostFormatted("Generating Purple Robot signing key...")
-  & "$($env:JAVA_HOME)\bin\keytool.exe" -genkey -v -keystore $keystorePath -alias alias_name -keyalg $keyalg -keysize $keysize -validity $keyvalidity
+  & "$($env:JAVA_HOME)\bin\keytool.exe" -genkey -v -keystore $keystorePath -alias android_key -keyalg $keyalg -keysize $keysize -validity $keyvalidity
 }
 else {
   WriteHostFormatted("Purple Robot signing key already exists; not generating a new one.")
