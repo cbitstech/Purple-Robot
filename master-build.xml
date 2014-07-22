@@ -190,6 +190,15 @@
             <arg value="--target" />
             <arg value="android-19" />
         </exec>
+        <if>
+            <not>
+                <resourcecontains resource="${sdk.android.dir}\extras\android\support\v7\mediarouter\project.properties" substring="android.library.reference.1=../appcompat" />
+            </not>
+            <then>
+                <echo file="${sdk.android.dir}\extras\android\support\v7\mediarouter\project.properties" append="true"></echo>
+                <echo file="${sdk.android.dir}\extras\android\support\v7\mediarouter\project.properties" append="true">android.library.reference.1=../appcompat</echo>
+            </then>
+        </if>
         <exec executable="cmd" dir="${sdk.android.dir}/extras/android/support/v7/mediarouter" failonerror="true">
             <arg value="/c" />
             <arg value="${sdk.android.dir}\tools\android.bat" />
