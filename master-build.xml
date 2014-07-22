@@ -1,14 +1,15 @@
 <project name="Purple Robot Master Build" default="robot.debug" basedir="." xmlns:ac="antlib:net.sf.antcontrib">
     <description>Build file for fetching and building Purple Robot from Git.</description>
     <property name="repo.base" location="Purple-Robot-Manager"/>
-    <property name="sherlock.base" location="ActionBarSherlock"/>
     <property name="robot.base" location="Purple Robot"/>
     <property name="test.base" location="Purple-Robot-Manager/Purple Robot Manager Tests"/>
     <property name="android.sdk.url" location="http://mohrlab.northwestern.edu/ckarr/android-sdk-linux.tgz"/>
     <!-- <property name="android.sdk.file.linux" location="android.tgz"/> -->
-    <property name="sdk.dir" location="android-sdk"/>
+    <property name="sdk.android.dir" location="android-sdk"/>
+    <property name="sdk.facebook.dir" location="facebook-sdk"/>
     <property name="sdk.file.windows" location="android.zip" />
     <property name="sdk.file.linux" location="android.tgz" />
+    <property name="sdk.file.facebook" location="facebook.zip" />
 
 
     <!-- enable if tasks -->
@@ -32,102 +33,215 @@
     <target name="init">
         <tstamp/>
         <available file="${repo.base}" property="robot.present" />
-        <available file="${sdk.dir}" property="sdk.present" />
+        <available file="${sdk.android.dir}" property="sdk.android.present" />
+        <available file="${sdk.facebook.dir}" property="sdk.facebook.present" />
         <available file="${sdk.file.windows}" property="sdk.file.windows.present" />
         <available file="${sdk.file.linux}" property="sdk.file.linux.present" />
+        <available file="${sdk.file.facebook}" property="sdk.file.facebook.present" />
     </target>
     
 
-    <target name="sdk.install.linux" depends="init,isLinux"> <!--  unless="sdk.present" -->
+    <target name="sdk.install.linux" depends="init,isLinux"> <!--  unless="sdk.android.present" -->
         <!-- <get src="http://mohrlab.northwestern.edu/ckarr/android-sdk-linux.tgz" dest="android.tgz" /> -->
+
+        <!-- Create the project.properties file for the Facebook SDK. -->
+
+        <!-- Handle the Android SDK. -->
         <if>
             <not>
                 <equals arg1="${sdk.file.linux.present}" arg2="true" />
             </not>
             <then>
                 <echo message="Downloading the SDK..." />
-                <get src="http://dl.google.com/android/android-sdk_r23.0.2-linux.tgz" dest="android.tgz" />
+                <get src="http://dl.google.com/android/android-sdk_r23.0.2-linux.tgz" dest="${sdk.file.linux}" />
             </then>
         </if>
 
         <if>
             <not>
-                <equals arg1="${sdk.present}" arg2="true" />
+                <equals arg1="${sdk.android.present}" arg2="true" />
             </not>
             <then>
                 <echo message="Decompressing the SDK..." />
-                <untar src="android.tgz" dest="." compression="gzip" />
-                <chmod file="${sdk.dir}/tools/android" perm="ugo+rx"/>
-                <chmod file="${sdk.dir}/tools/zipalign" perm="ugo+rx"/>
-                <move file="android-sdk-linux" tofile="${sdk.dir}" />
+                <untar src="${sdk.file.linux}" dest="." compression="gzip" />
+                <chmod file="${sdk.android.dir}/tools/android" perm="ugo+rx"/>
+                <chmod file="${sdk.android.dir}/tools/zipalign" perm="ugo+rx"/>
+                <move file="android-sdk-linux" tofile="${sdk.android.dir}" />
             </then>
         </if>
 
         <echo message="Updating the SDK..." />
-        <exec executable="bash" dir="${sdk.dir}" failonerror="true">
+        <exec executable="bash" dir="${sdk.android.dir}" failonerror="true">
             <arg value="tools/android" />
             <arg value="update" />
             <arg value="sdk" />
-            <arg value="--filter" />
-            <!-- <arg value="1,6,11,39,46,50" /> -->
-            <arg value="Android SDK Tools, revision 23.0.,SDK Platform Android 4.4.2, API 19, revision 3,Google APIs, Android API 18, revision 3,Google Play services, revision 18" />
-            <arg value="--no-ui" />
         </exec>
-        <exec executable="bash" dir="${sdk.dir}" failonerror="true">
-            <arg value="tools/android" />
+
+        <input
+            message="Did you update the SDK? (y/n)"
+            validargs="y,n"
+            addproperty="do.update"
+        />
+        <condition property="do.abort">
+            <equals arg1="n" arg2="${do.update}"/>
+        </condition>
+        <fail if="do.abort">Build aborted by user.</fail>
+
+        <!-- Create the project.properties files. -->
+        <exec executable="bash" dir="${sdk.facebook.dir}/facebook" failonerror="true">
+            <arg value="${sdk.android.dir}\tools\android" />
             <arg value="update" />
             <arg value="project" />
             <arg value="--path" />
-            <arg value="${sherlock.base}/library" />
+            <arg value="." />
+            <arg value="--target" />
+            <arg value="android-19" />
         </exec>
+        <exec executable="bash" dir="${sdk.android.dir}/extras/android/support/v7/appcompat" failonerror="true">
+            <arg value="${sdk.android.dir}\tools\android" />
+            <arg value="update" />
+            <arg value="project" />
+            <arg value="--path" />
+            <arg value="." />
+            <arg value="--target" />
+            <arg value="android-19" />
+        </exec>
+        <exec executable="bash" dir="${sdk.android.dir}/extras/android/support/v7/mediarouter" failonerror="true">
+            <arg value="${sdk.android.dir}\tools\android" />
+            <arg value="update" />
+            <arg value="project" />
+            <arg value="--path" />
+            <arg value="." />
+            <arg value="--target" />
+            <arg value="android-19" />
+        </exec>
+        <exec executable="bash" dir="${sdk.android.dir}/extras/google/google_play_services/libproject/google-play-services_lib" failonerror="true">
+            <arg value="${sdk.android.dir}\tools\android" />
+            <arg value="update" />
+            <arg value="project" />
+            <arg value="--path" />
+            <arg value="." />
+            <arg value="--target" />
+            <arg value="android-19" />
+        </exec>
+
     </target>
 
 
-    <target name="sdk.install.windows" depends="init,isWindows"> <!--  unless="sdk.present" -->
+    <target name="sdk.install.windows" depends="init,isWindows"> <!--  unless="sdk.android.present" -->
+
+        <!-- Handle the Android SDK. -->
         <if>
             <not>
                 <equals arg1="${sdk.file.windows.present}" arg2="true" />
             </not>
             <then>
                 <echo message="Downloading the SDK..." />
-                <get src="http://dl.google.com/android/android-sdk_r23.0.2-windows.zip" dest="android.zip" />
+                <get src="http://dl.google.com/android/android-sdk_r23.0.2-windows.zip" dest="${sdk.file.windows}" />
             </then>
         </if>
 
         <if>
             <not>
-                <equals arg1="${sdk.present}" arg2="true" />
+                <equals arg1="${sdk.android.present}" arg2="true" />
             </not>
             <then>
                 <echo message="Decompressing the SDK..." />
-                <unzip src="android.zip" dest="." />
-                <move file="android-sdk-windows" tofile="${sdk.dir}" />
+                <unzip src="${sdk.file.windows}" dest="." />
+                <move file="android-sdk-windows" tofile="${sdk.android.dir}" />
             </then>
         </if>
 
         <echo message="Updating the SDK..." />
-        <exec executable="cmd" dir="${sdk.dir}" failonerror="true">
+        <exec executable="cmd" dir="${sdk.android.dir}" failonerror="true" inputstring="y">
             <arg value="/c" />
             <arg value="tools\android.bat" />
             <arg value="update" />
             <arg value="sdk" />
-            <arg value="--filter" />
-            <!-- <arg value="1,6,11,39,46,50" /> -->
-            <arg value="'Android SDK Tools, revision 23.0.'" />
-            <arg value="--no-ui" />
         </exec>
-        <exec executable="cmd" dir="${sdk.dir}" failonerror="true">
+        <input
+            message="Did you update the SDK? (y/n)"
+            validargs="y,n"
+            addproperty="do.update"
+        />
+        <condition property="do.abort">
+            <equals arg1="n" arg2="${do.update}"/>
+        </condition>
+        <fail if="do.abort">Build aborted by user.</fail>
+
+        <!-- Create the project.properties files. -->
+        <exec executable="cmd" dir="${sdk.facebook.dir}/facebook" failonerror="true">
             <arg value="/c" />
-            <arg value="tools\android.bat" />
+            <arg value="${sdk.android.dir}\tools\android.bat" />
             <arg value="update" />
             <arg value="project" />
             <arg value="--path" />
-            <arg value="${sherlock.base}/library" />
+            <arg value="." />
+            <arg value="--target" />
+            <arg value="android-19" />
         </exec>
+        <exec executable="cmd" dir="${sdk.android.dir}/extras/android/support/v7/appcompat" failonerror="true">
+            <arg value="/c" />
+            <arg value="${sdk.android.dir}\tools\android.bat" />
+            <arg value="update" />
+            <arg value="project" />
+            <arg value="--path" />
+            <arg value="." />
+            <arg value="--target" />
+            <arg value="android-19" />
+        </exec>
+        <exec executable="cmd" dir="${sdk.android.dir}/extras/android/support/v7/mediarouter" failonerror="true">
+            <arg value="/c" />
+            <arg value="${sdk.android.dir}\tools\android.bat" />
+            <arg value="update" />
+            <arg value="project" />
+            <arg value="--path" />
+            <arg value="." />
+            <arg value="--target" />
+            <arg value="android-19" />
+        </exec>
+        <exec executable="cmd" dir="${sdk.android.dir}/extras/google/google_play_services/libproject/google-play-services_lib" failonerror="true">
+            <arg value="/c" />
+            <arg value="${sdk.android.dir}\tools\android.bat" />
+            <arg value="update" />
+            <arg value="project" />
+            <arg value="--path" />
+            <arg value="." />
+            <arg value="--target" />
+            <arg value="android-19" />
+        </exec>
+
+    </target>
+
+
+    <target name="sdk.install.facebook" depends="init"> <!--  unless="sdk.android.present" -->
+        <if>
+            <not>
+                <equals arg1="${sdk.file.facebook.present}" arg2="true" />
+            </not>
+            <then>
+                <echo message="Downloading the SDK..." />
+                <get src="https://developers.facebook.com/resources/facebook-android-sdk-3.16.0.zip" dest="${sdk.file.facebook}" />
+            </then>
+        </if>
+
+        <if>
+            <not>
+                <equals arg1="${sdk.facebook.present}" arg2="true" />
+            </not>
+            <then>
+                <echo message="Decompressing the SDK..." />
+                <unzip src="${sdk.file.facebook}" dest="." />
+                <move file="facebook-android-sdk-3.16" tofile="${sdk.facebook.dir}" />
+            </then>
+        </if>
     </target>
 
 
     <target name="sdk.install" depends="isWindows,isLinux">
+        <!-- Get, decompress the SDKs -->
+        <antcall target="sdk.install.facebook" />
+
         <if>
             <equals arg1="${isWindows}" arg2="true" />
             <then>
@@ -139,6 +253,7 @@
                 <antcall target="sdk.install.linux" />
             </else>
         </if>
+        
     </target>
 
 
@@ -146,10 +261,6 @@
         <exec executable="git">
             <arg value="clone" />
             <arg value="https://github.com/cbitstech/Purple-Robot-Manager.git" />
-        </exec>
-        <exec executable="git">
-            <arg value="clone" />
-            <arg value="https://github.com/JakeWharton/ActionBarSherlock.git" />
         </exec>
     </target>
 
@@ -164,18 +275,19 @@
     </target>
     
 
-    <target name="robot.debug" depends="git.clone,git.pull"> <!--  depends="git.clone,git.pull" -->
-        <copy file="${robot.base}/libs/android-support-v4.jar" tofile="${sherlock.base}/library/libs/android-support-v4.jar" overwrite="true" />
-        <!-- <copy file="${sdk.dir}/add-ons/addon-google_apis-google-8/libs/maps.jar" tofile="${robot.base}/libs/maps.jar" overwrite="true" /> -->
-        <ant dir="${robot.base}" target="debug" />
-        <copy file="${robot.base}/bin/Purple Robot-debug.apk" tofile="./Purple-Robot.debug.apk" overwrite="true" />
+    <target name="robot.release" depends="git.clone,git.pull"> <!--  depends="git.clone,git.pull" -->
+        <!-- <copy file="${sdk.android.dir}/add-ons/addon-google_apis-google-8/libs/maps.jar" tofile="${robot.base}/libs/maps.jar" overwrite="true" /> -->
+        <ant dir="${robot.base}" target="clean" />
+        <!-- <ant dir="${robot.base}" target="debug" /> -->
+        <ant dir="${robot.base}" target="release" />
+        <copy file="${robot.base}/bin/Purple Robot-release.apk" tofile="./Purple-Robot.release.apk" overwrite="true" />
     </target>
 
 
     <target name="robot.test" depends="git.clone,git.pull">
-        <copy file="${robot.base}/libs/android-support-v4.jar" tofile="${sherlock.base}/library/libs/android-support-v4.jar" overwrite="true" />
-        <copy file="${sdk.dir}/add-ons/addon-google_apis-google-8/libs/maps.jar" tofile="${robot.base}/libs/maps.jar" overwrite="true" />
-        <exec executable="bash" dir="${sdk.dir}">
+        <!-- <copy file="${robot.base}/libs/android-support-v4.jar" tofile="${sherlock.base}/library/libs/android-support-v4.jar" overwrite="true" /> -->
+        <copy file="${sdk.android.dir}/add-ons/addon-google_apis-google-8/libs/maps.jar" tofile="${robot.base}/libs/maps.jar" overwrite="true" />
+        <exec executable="bash" dir="${sdk.android.dir}">
             <arg value="tools/android" />
             <arg value="update" />
             <arg value="project" />
@@ -193,12 +305,12 @@
         <javac srcdir="${src}" destdir="${build}"/>
     </target>
 -->
-    <!-- <import file="${android.sdk.dir}/tools/ant/build.xml" /> -->
+    <!-- <import file="${android.sdk.android.dir}/tools/ant/build.xml" /> -->
   
     <target name="clean" description="Clean up build products and other generated &amp; fetched files." >
         <delete file="./Purple-Robot.debug.apk"/>
         <delete dir="${repo.base}"/>
-        <delete dir="${sherlock.base}"/>
-        <delete dir="${sdk.dir}"/>
+        <!-- <delete dir="${sherlock.base}"/> -->
+        <delete dir="${sdk.android.dir}"/>
     </target>
 </project>

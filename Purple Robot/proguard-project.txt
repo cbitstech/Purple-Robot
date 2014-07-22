@@ -74,8 +74,10 @@
 -dontwarn javax.xml.bind.DatatypeConverter
 -dontwarn org.apache.commons.codec.binary.Base64
 -dontwarn edu.northwestern.cbits.**
+-dontwarn com.google.android.maps.**
 
 -keep class edu.northwestern.cbits.** { *; }
 -keep class jscheme.** { *; }
 -keep class jsint.** { *; }
 -keep class org.mozilla.** { *; }
+-keep class org.scribe.** { *; }
