@@ -34,7 +34,6 @@ import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
 public class ManagerService extends IntentService
 {
-	public static final String LOG_FORCE_UPLOAD = "log_force_upload";
 	public static String RUN_SCRIPT_INTENT = "purple_robot_manager_run_script";
 	public static String RUN_SCRIPT = "run_script";
 
@@ -83,30 +82,6 @@ public class ManagerService extends IntentService
 		
 		if (GOOGLE_PLAY_ACTIVITY_DETECTED.equalsIgnoreCase(action))
 			ActivityDetectionProbe.activityDetected(this, intent);
-		if (UPLOAD_LOGS_INTENT.equalsIgnoreCase(action))
-		{
-			final ManagerService me = this;
-			
-			final boolean force = intent.getBooleanExtra(ManagerService.LOG_FORCE_UPLOAD, false);
-			
-			Runnable r = new Runnable()
-			{
-				public void run() 
-				{
-					LogManager.getInstance(me).attemptUploads(force);
-				}
-			};
-			
-			try
-			{
-				Thread t = new Thread(r);
-				t.start();
-			}
-			catch (OutOfMemoryError e)
-			{
-				System.gc();
-			}
-		}
 		else if (REFRESH_ERROR_STATE_INTENT.equalsIgnoreCase(action))
 		{
 			final ManagerService me = this;

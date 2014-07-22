@@ -3,6 +3,4 @@
     
     <string name="create_snapshots_sql">CREATE TABLE IF NOT EXISTS snapshots(_id INTEGER PRIMARY KEY, source TEXT, recorded INTEGER DEFAULT 0, value TEXT);</string>
     <string name="db_update_snapshots_add_audio">ALTER TABLE snapshots ADD COLUMN audio_file TEXT;</string>
-    
-    <string name="db_create_events_log_table">CREATE TABLE IF NOT EXISTS app_events(_id INTEGER PRIMARY KEY, name TEXT, payload TEXT, recorded INTEGER DEFAULT 0, transmitted INTEGER DEFAULT 0);</string>
 </resources>
