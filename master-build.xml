@@ -88,15 +88,6 @@
         <fail if="do.abort">Build aborted by user.</fail>
 
         <!-- Create the project.properties files. -->
-        <exec executable="bash" dir="${sdk.facebook.dir}/facebook" failonerror="true">
-            <arg value="${sdk.android.dir}/tools/android" />
-            <arg value="update" />
-            <arg value="project" />
-            <arg value="--path" />
-            <arg value="." />
-            <arg value="--target" />
-            <arg value="${sdk.android.version}" />
-        </exec>
         <exec executable="bash" dir="${sdk.android.dir}/extras/android/support/v7/appcompat" failonerror="true">
             <arg value="${sdk.android.dir}/tools/android" />
             <arg value="update" />
@@ -170,16 +161,6 @@
         <fail if="do.abort">Build aborted by user.</fail>
 
         <!-- Create the project.properties files. -->
-        <exec executable="cmd" dir="${sdk.facebook.dir}/facebook" failonerror="true">
-            <arg value="/c" />
-            <arg value="${sdk.android.dir}\tools\android.bat" />
-            <arg value="update" />
-            <arg value="project" />
-            <arg value="--path" />
-            <arg value="." />
-            <arg value="--target" />
-            <arg value="${sdk.android.version}" />
-        </exec>
         <exec executable="cmd" dir="${sdk.android.dir}/extras/android/support/v7/appcompat" failonerror="true">
             <arg value="/c" />
             <arg value="${sdk.android.dir}\tools\android.bat" />
@@ -245,6 +226,18 @@
                 <move file="facebook-android-sdk-3.16" tofile="${sdk.facebook.dir}" />
             </then>
         </if>
+
+        <exec executable="cmd" dir="${sdk.facebook.dir}/facebook" failonerror="true">
+            <arg value="/c" />
+            <arg value="${sdk.android.dir}\tools\android.bat" />
+            <arg value="update" />
+            <arg value="project" />
+            <arg value="--path" />
+            <arg value="." />
+            <arg value="--target" />
+            <arg value="${sdk.android.version}" />
+        </exec>
+
     </target>
 
 
@@ -317,9 +310,6 @@
 
     <target name="sdk.install" depends="isWindows,isLinux">
         <!-- Get, decompress the SDKs -->
-        <echo message="Installing the Facebook SDK..." />
-        <antcall target="sdk.install.facebook" />
-
         <if>
             <equals arg1="${isWindows}" arg2="true" />
             <then>
@@ -332,6 +322,9 @@
             </else>
         </if>
         
+        <echo message="Installing the Facebook SDK..." />
+        <antcall target="sdk.install.facebook" />
+
         <echo message="Installing the anthracite library..." />
         <antcall target="sdk.install.anthracite" />
     </target>
