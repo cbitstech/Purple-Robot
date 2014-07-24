@@ -1,15 +1,18 @@
 <project name="Purple Robot Master Build" default="robot.debug" basedir="." xmlns:ac="antlib:net.sf.antcontrib">
+    
     <description>Build file for fetching and building Purple Robot from Git.</description>
+    
     <property name="repo.base" location="Purple-Robot-Manager"/>
     <property name="robot.base" location="Purple Robot"/>
     <property name="test.base" location="Purple-Robot-Manager/Purple Robot Manager Tests"/>
     <property name="android.sdk.url" location="http://mohrlab.northwestern.edu/ckarr/android-sdk-linux.tgz"/>
-    <!-- <property name="android.sdk.file.linux" location="android.tgz"/> -->
     <property name="sdk.android.dir" location="android-sdk"/>
     <property name="sdk.facebook.dir" location="facebook-sdk"/>
     <property name="sdk.file.windows" location="android.zip" />
     <property name="sdk.file.linux" location="android.tgz" />
     <property name="sdk.file.facebook" location="facebook.zip" />
+    <property name="sdk.android.version" value="android-19" />
+    <property name="sdk.anthracite.dir" location="anthracite-clients-android" />
 
 
     <!-- enable if tasks -->
@@ -35,6 +38,7 @@
         <available file="${repo.base}" property="robot.present" />
         <available file="${sdk.android.dir}" property="sdk.android.present" />
         <available file="${sdk.facebook.dir}" property="sdk.facebook.present" />
+        <available file="${sdk.anthracite.dir}" property="sdk.anthracite.present" />
         <available file="${sdk.file.windows}" property="sdk.file.windows.present" />
         <available file="${sdk.file.linux}" property="sdk.file.linux.present" />
         <available file="${sdk.file.facebook}" property="sdk.file.facebook.present" />
@@ -42,17 +46,13 @@
     
 
     <target name="sdk.install.linux" depends="init,isLinux"> <!--  unless="sdk.android.present" -->
-        <!-- <get src="http://mohrlab.northwestern.edu/ckarr/android-sdk-linux.tgz" dest="android.tgz" /> -->
-
-        <!-- Create the project.properties file for the Facebook SDK. -->
-
         <!-- Handle the Android SDK. -->
         <if>
             <not>
                 <equals arg1="${sdk.file.linux.present}" arg2="true" />
             </not>
             <then>
-                <echo message="Downloading the SDK..." />
+                <echo message="Downloading the Android SDK..." />
                 <get src="http://dl.google.com/android/android-sdk_r23.0.2-linux.tgz" dest="${sdk.file.linux}" />
             </then>
         </if>
@@ -62,7 +62,7 @@
                 <equals arg1="${sdk.android.present}" arg2="true" />
             </not>
             <then>
-                <echo message="Decompressing the SDK..." />
+                <echo message="Decompressing the Android SDK..." />
                 <untar src="${sdk.file.linux}" dest="." compression="gzip" />
                 <chmod file="${sdk.android.dir}/tools/android" perm="ugo+rx"/>
                 <chmod file="${sdk.android.dir}/tools/zipalign" perm="ugo+rx"/>
@@ -70,7 +70,7 @@
             </then>
         </if>
 
-        <echo message="Updating the SDK..." />
+        <echo message="Updating the Android SDK..." />
         <exec executable="bash" dir="${sdk.android.dir}" failonerror="true">
             <arg value="tools/android" />
             <arg value="update" />
@@ -78,7 +78,7 @@
         </exec>
 
         <input
-            message="Did you update the SDK? (y/n)"
+            message="Did you update the Android SDK? (y/n)"
             validargs="y,n"
             addproperty="do.update"
         />
@@ -89,40 +89,40 @@
 
         <!-- Create the project.properties files. -->
         <exec executable="bash" dir="${sdk.facebook.dir}/facebook" failonerror="true">
-            <arg value="${sdk.android.dir}\tools\android" />
+            <arg value="${sdk.android.dir}/tools/android" />
             <arg value="update" />
             <arg value="project" />
             <arg value="--path" />
             <arg value="." />
             <arg value="--target" />
-            <arg value="android-19" />
+            <arg value="${sdk.android.version}" />
         </exec>
         <exec executable="bash" dir="${sdk.android.dir}/extras/android/support/v7/appcompat" failonerror="true">
-            <arg value="${sdk.android.dir}\tools\android" />
+            <arg value="${sdk.android.dir}/tools/android" />
             <arg value="update" />
             <arg value="project" />
             <arg value="--path" />
             <arg value="." />
             <arg value="--target" />
-            <arg value="android-19" />
+            <arg value="${sdk.android.version}" />
         </exec>
         <exec executable="bash" dir="${sdk.android.dir}/extras/android/support/v7/mediarouter" failonerror="true">
-            <arg value="${sdk.android.dir}\tools\android" />
+            <arg value="${sdk.android.dir}/tools/android" />
             <arg value="update" />
             <arg value="project" />
             <arg value="--path" />
             <arg value="." />
             <arg value="--target" />
-            <arg value="android-19" />
+            <arg value="${sdk.android.version}" />
         </exec>
         <exec executable="bash" dir="${sdk.android.dir}/extras/google/google_play_services/libproject/google-play-services_lib" failonerror="true">
-            <arg value="${sdk.android.dir}\tools\android" />
+            <arg value="${sdk.android.dir}/tools/android" />
             <arg value="update" />
             <arg value="project" />
             <arg value="--path" />
             <arg value="." />
             <arg value="--target" />
-            <arg value="android-19" />
+            <arg value="${sdk.android.version}" />
         </exec>
 
     </target>
@@ -178,7 +178,7 @@
             <arg value="--path" />
             <arg value="." />
             <arg value="--target" />
-            <arg value="android-19" />
+            <arg value="${sdk.android.version}" />
         </exec>
         <exec executable="cmd" dir="${sdk.android.dir}/extras/android/support/v7/appcompat" failonerror="true">
             <arg value="/c" />
@@ -188,8 +188,9 @@
             <arg value="--path" />
             <arg value="." />
             <arg value="--target" />
-            <arg value="android-19" />
+            <arg value="${sdk.android.version}" />
         </exec>
+        <!-- Conditionally inject an appcompat reference into mediarouter because Google didn't bother to do it. -->
         <if>
             <not>
                 <resourcecontains resource="${sdk.android.dir}\extras\android\support\v7\mediarouter\project.properties" substring="android.library.reference.1=../appcompat" />
@@ -207,7 +208,7 @@
             <arg value="--path" />
             <arg value="." />
             <arg value="--target" />
-            <arg value="android-19" />
+            <arg value="${sdk.android.version}" />
         </exec>
         <exec executable="cmd" dir="${sdk.android.dir}/extras/google/google_play_services/libproject/google-play-services_lib" failonerror="true">
             <arg value="/c" />
@@ -217,7 +218,7 @@
             <arg value="--path" />
             <arg value="." />
             <arg value="--target" />
-            <arg value="android-19" />
+            <arg value="${sdk.android.version}" />
         </exec>
 
     </target>
@@ -247,26 +248,97 @@
     </target>
 
 
+    <target name="sdk.install.anthracite" depends="init"> <!--  unless="sdk.android.present" -->
+        <echo message="anthracite present?: ${sdk.anthracite.present}" />
+        <if>
+            <not>
+                <equals arg1="${sdk.anthracite.present}" arg2="true" />
+            </not>
+            <then>
+                <antcall target="git.clone.anthracite" />
+                <antcall target="git.pull.anthracite" />
+            </then>
+        </if>
+
+        <if>
+            <equals arg1="${isWindows}" arg2="true" />
+            <then>
+                <exec executable="cmd" dir="${sdk.anthracite.dir}" failonerror="true">
+                    <arg value="/c" />
+                    <arg value="${sdk.android.dir}\tools\android.bat" />
+                    <arg value="update" />
+                    <arg value="project" />
+                    <arg value="--path" />
+                    <arg value="." />
+                    <arg value="--target" />
+                    <arg value="${sdk.android.version}" />
+                </exec>
+            </then>
+            <else>
+                <exec executable="bash" dir="${sdk.anthracite.dir}" failonerror="true">
+                    <arg value="${sdk.android.dir}/tools/android" />
+                    <arg value="update" />
+                    <arg value="project" />
+                    <arg value="--path" />
+                    <arg value="." />
+                    <arg value="--target" />
+                    <arg value="${sdk.android.version}" />
+                </exec>
+            </else>
+        </if>
+
+        <!-- Append reference for appcompat to anthracite; append reference for anthracite to PR. -->
+        <if>
+            <not>
+                <resourcecontains resource="${sdk.anthracite.dir}\project.properties" substring="android.library.reference.1=../android-sdk/extras/android/support/v7/appcompat" />
+            </not>
+            <then>
+                <echo file="${sdk.anthracite.dir}\project.properties" append="true"></echo>
+                <echo file="${sdk.anthracite.dir}\project.properties" append="true">android.library.reference.1=../android-sdk/extras/android/support/v7/appcompat</echo>
+                <echo file="${sdk.anthracite.dir}\project.properties" append="true"></echo>
+                <echo file="${sdk.anthracite.dir}\project.properties" append="true">android.library=true</echo>
+            </then>
+        </if>
+        <if>
+            <not>
+                <resourcecontains resource="${sdk.robot.dir}\project.properties" substring="android.library.reference.5=../anthracite-clients-android" />
+            </not>
+            <then>
+                <echo file="${sdk.robot.dir}\project.properties" append="true">android.library.reference.5=../anthracite-clients-android</echo>
+            </then>
+        </if>
+
+        <!-- Build anthracite-clients-android. -->
+        <ant dir="${sdk.anthracite.dir}" target="clean" />
+        <ant dir="${sdk.anthracite.dir}" target="release" />
+
+    </target>
+
+
     <target name="sdk.install" depends="isWindows,isLinux">
         <!-- Get, decompress the SDKs -->
+        <echo message="Installing the Facebook SDK..." />
         <antcall target="sdk.install.facebook" />
 
         <if>
             <equals arg1="${isWindows}" arg2="true" />
             <then>
-                <echo message="The value of property isWindows is ${isWindows}" />
+                <echo message="Installing the Android SDK for Windows..." />
                 <antcall target="sdk.install.windows" />
             </then>
             <else>
-                <echo message="The value of property isWindows is not ${isWindows}" />
+                <echo message="Installing the Android SDK for Linux..." />
                 <antcall target="sdk.install.linux" />
             </else>
         </if>
         
+        <echo message="Installing the anthracite library..." />
+        <antcall target="sdk.install.anthracite" />
     </target>
 
 
-    <target name="git.clone" depends="sdk.install" unless="robot.present">
+    <target name="git.clone.PurpleRobot" depends="sdk.install" unless="robot.present">
+        <echo message="Getting source for Purple Robot..." />
         <exec executable="git">
             <arg value="clone" />
             <arg value="https://github.com/cbitstech/Purple-Robot-Manager.git" />
@@ -274,7 +346,16 @@
     </target>
 
 
-    <target name="git.pull" depends="init" if="robot.present">
+    <target name="git.clone.anthracite" unless="sdk.anthracite.present">
+        <echo message="Getting source for anthracite-clients-android..." />
+        <exec executable="git">
+            <arg value="clone" />
+            <arg value="https://github.com/cbitstech/anthracite-clients-android.git" />
+        </exec>
+    </target>
+
+
+    <target name="git.pull.PurpleRobot" depends="init" if="robot.present">
         <echo message="Git pull disabled on request of @audaciouscode, due to PR changes. Uncomment me when @audaciouscode indicates to do so." />
         <!-- <mkdir dir="${robot.base}" />
         <exec executable="git" dir="${robot.base}">
@@ -284,16 +365,24 @@
     </target>
     
 
-    <target name="robot.release" depends="git.clone,git.pull"> <!--  depends="git.clone,git.pull" -->
-        <!-- <copy file="${sdk.android.dir}/add-ons/addon-google_apis-google-8/libs/maps.jar" tofile="${robot.base}/libs/maps.jar" overwrite="true" /> -->
+    <target name="git.pull.anthracite" depends="init" if="sdk.anthracite.present">
+        <!-- <echo message="Git pull disabled on request of @audaciouscode, due to PR changes. Uncomment me when @audaciouscode indicates to do so." /> -->
+        <mkdir dir="${sdk.anthracite.dir}" />
+        <exec executable="git" dir="${sdk.anthracite.dir}">
+            <arg value="pull" />
+            <!-- <arg value="-commit" /> -->
+        </exec>
+    </target>
+    
+
+    <target name="robot.release" depends="git.clone.PurpleRobot,git.clone.anthracite,git.pull.PurpleRobot"> <!--  depends="git.clone.PurpleRobot,git.pull.PurpleRobot" -->
         <ant dir="${robot.base}" target="clean" />
-        <!-- <ant dir="${robot.base}" target="debug" /> -->
         <ant dir="${robot.base}" target="release" />
         <copy file="${robot.base}/bin/Purple Robot-release.apk" tofile="./Purple-Robot.release.apk" overwrite="true" />
     </target>
 
 
-    <target name="robot.test" depends="git.clone,git.pull">
+    <target name="robot.test" depends="git.clone.PurpleRobot,git.clone.anthracite,git.pull.PurpleRobot">
         <!-- <copy file="${robot.base}/libs/android-support-v4.jar" tofile="${sherlock.base}/library/libs/android-support-v4.jar" overwrite="true" /> -->
         <copy file="${sdk.android.dir}/add-ons/addon-google_apis-google-8/libs/maps.jar" tofile="${robot.base}/libs/maps.jar" overwrite="true" />
         <exec executable="bash" dir="${sdk.android.dir}">
