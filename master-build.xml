@@ -1,4 +1,4 @@
-<project name="Purple Robot Master Build" default="robot.debug" basedir="." xmlns:ac="antlib:net.sf.antcontrib">
+<project name="Purple Robot Master Build" default="robot.release" basedir="." xmlns:ac="antlib:net.sf.antcontrib">
     
     <description>Build file for fetching and building Purple Robot from Git.</description>
     
@@ -143,22 +143,29 @@
             </then>
         </if>
 
-        <echo message="Updating the SDK..." />
-        <exec executable="cmd" dir="${sdk.android.dir}" failonerror="true" inputstring="y">
-            <arg value="/c" />
-            <arg value="tools\android.bat" />
-            <arg value="update" />
-            <arg value="sdk" />
-        </exec>
-        <input
-            message="Did you update the SDK? (y/n)"
-            validargs="y,n"
-            addproperty="do.update"
-        />
-        <condition property="do.abort">
-            <equals arg1="n" arg2="${do.update}"/>
-        </condition>
-        <fail if="do.abort">Build aborted by user.</fail>
+        <if>
+            <not>
+                <isset property="noAndroidSDKUpdate" />
+            </not>
+            <then>
+                <echo message="Updating the SDK..." />
+                <exec executable="cmd" dir="${sdk.android.dir}" failonerror="true" inputstring="y">
+                    <arg value="/c" />
+                    <arg value="tools\android.bat" />
+                    <arg value="update" />
+                    <arg value="sdk" />
+                </exec>
+                <input
+                    message="Did you update the SDK? (y/n)"
+                    validargs="y,n"
+                    addproperty="do.update"
+                />
+                <condition property="do.abort">
+                    <equals arg1="n" arg2="${do.update}"/>
+                </condition>
+                <fail if="do.abort">Build aborted by user.</fail>
+            </then>
+        </if>
 
         <!-- Create the project.properties files. -->
         <exec executable="cmd" dir="${sdk.android.dir}/extras/android/support/v7/appcompat" failonerror="true">
@@ -399,7 +406,7 @@
     <!-- <import file="${android.sdk.android.dir}/tools/ant/build.xml" /> -->
   
     <target name="clean" description="Clean up build products and other generated &amp; fetched files." >
-        <delete file="./Purple-Robot.debug.apk"/>
+        <delete file="./Purple-Robot.release-signed.apk"/>
         <delete dir="${repo.base}"/>
         <!-- <delete dir="${sherlock.base}"/> -->
         <delete dir="${sdk.android.dir}"/>
