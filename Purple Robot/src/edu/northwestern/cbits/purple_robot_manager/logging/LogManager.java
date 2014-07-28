@@ -42,10 +42,18 @@ public class LogManager
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		
 		this._logger.setEnabled(prefs.getBoolean(LogManager.ENABLED, LogManager.ENABLED_DEFAULT));
-		this._logger.setUploadUri(Uri.parse(prefs.getString(LogManager.URI, LogManager.URI_DEFAULT)));
 		this._logger.setIncludeLocation(prefs.getBoolean(LogManager.INCLUDE_LOCATION, LogManager.INCLUDE_LOCATION_DEFAULT));
 		this._logger.setWifiOnly(prefs.getBoolean(LogManager.WIFI_ONLY, LogManager.WIFI_ONLY_DEFAULT));
 		this._logger.setLiberalSsl(prefs.getBoolean(LogManager.LIBERAL_SSL, LogManager.LIBERAL_SSL_ONLY));
+		
+		try
+		{
+			this._logger.setUploadUri(Uri.parse(prefs.getString(LogManager.URI, LogManager.URI_DEFAULT)));
+		}
+		catch (RuntimeException e)
+		{
+			e.printStackTrace();
+		}
 		
 		try
 		{
