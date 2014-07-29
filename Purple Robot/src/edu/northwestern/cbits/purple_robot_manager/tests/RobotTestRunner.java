@@ -35,7 +35,7 @@ public class RobotTestRunner extends AndroidTestRunner
 		this._suite.addTest(new WekaTreeModelTestCase(context, 8));
 		this._suite.addTest(new PurpleRobotHealthProbeTestCase(context, 8));
 		this._suite.addTest(new HalfHourDateTriggerTestCase(context, 9));
-		this._suite.addTest(new JavascriptTestCase(context, 9));
+//		this._suite.addTest(new JavascriptTestCase(context, 9));
 	}
 	
 	public List<TestCase> getTestCases (final Context context)

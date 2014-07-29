@@ -32,3 +32,4 @@ android-support-v4.jar
 lint.xml
 
 *.keystore
+gradle.properties
