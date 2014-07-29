@@ -3,4 +3,4 @@
 	url = https://github.com/facebook/facebook-android-sdk.git
 [submodule "anthracite-clients-android"]
 	path = anthracite-clients-android
-	url = git@github.com:cbitstech/anthracite-clients-android.git
+	url = https://github.com/cbitstech/anthracite-clients-android.git
