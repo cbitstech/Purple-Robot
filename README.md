@@ -4,11 +4,11 @@ Purple Robot
 Purple Robot is an Android application for creating automated experiences on the Android platform with sensing and inference capabilities. The app was created by the Center for Behavioral Intervention Technologies at Northwestern University as an infrastructural component for a variety of behavioral and medical intervention applications.
 
 
-# Building Purple Robot
+## Building Purple Robot
 
 Purple Robot is a large application that includes a variety of service integration libraries as well as full language runtimes for both the JavaScript and Scheme programming languages. Consequently, it cannot be built by traditional Android IDEs given its reliance on ProGuard to shrink installation below the 65k methods limitation imposed by Android. The instructions below describe how to create an APK Android package for your own testing and development.
 
-## Prerequisites
+### Prerequisites
 
 Purple Robot depends upon the following packages for compilation and installation:
 
@@ -24,7 +24,7 @@ After installing these prerequisites, open the Android SDK Manager and verify th
 * Google Repository
 * Google USB Driver (or suitable ADB driver for your device)
 
-## Pull from GitHub
+### Pull from GitHub
 
 Once the prerequisites are installed, clone the Purple Robot Git repository at
 
@@ -37,7 +37,7 @@ This will check out the Purple Robot app as well as some supporting technologies
 
 These commands will retrieve the Facebook SDK and Anthracite logging dependencies.
 
-## Building Purple Robot
+### Building Purple Robot
 
 Next, go to the `Purple Robot` folder and rename the following files:
 
@@ -60,6 +60,6 @@ If you receive an error about the Java heap size, you may need to set an environ
     
 On non-Unix platforms, you may also need to set your `JAVA_HOME` environment variable to point to you local copy of the Java Development Kit.
 
-## Questions or comments?
+### Questions or comments?
 
 If you have any questions or comments, please send an e-mail to [Chris Karr](mailto:c-karr@northwestern.edu) and I'll get back to you as soon as I can.
