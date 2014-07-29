@@ -1,12 +1,12 @@
 Purple Robot
 ====================
 
-Purple Robot is an Android application for creating automated experiences on the Android platform with sensing and inference capabilities. The app was created by the Center for Behavioral Intervention Technologies at Northwestern University as an infrastructural component for a variety of behavioral and medical intervention applications.
+Purple Robot is an Android application for creating automated experiences on the Android platform with sensing and inference capabilities. The app was created by [the Center for Behavioral Intervention Technologies](http://cbits.northwestern.edu) at Northwestern University as an infrastructural component for a variety of behavioral and medical intervention applications.
 
 
 ## Building Purple Robot
 
-Purple Robot is a large application that includes a variety of service integration libraries as well as full language runtimes for both the JavaScript and Scheme programming languages. Consequently, it cannot be built by traditional Android IDEs given its reliance on ProGuard to shrink installation below the 65k methods limitation imposed by Android. The instructions below describe how to create an APK Android package for your own testing and development.
+Purple Robot is a large application that includes a variety of service integration libraries as well as full language runtimes for both the JavaScript and Scheme programming languages. Consequently, it cannot be built by traditional Android IDEs given its reliance on [ProGuard](http://proguard.sourceforge.net/) to shrink installation below [the 65k methods](https://code.google.com/p/android/issues/detail?id=58008) limitation imposed by Android. The instructions below describe how to create an APK Android package for your own testing and development.
 
 ### Prerequisites
 
