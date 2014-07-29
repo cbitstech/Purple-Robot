@@ -52,24 +52,58 @@ public class JavascriptTestCase extends RobotTestCase {
 		Log.d(CN+".test", fmtTestHeader("BEGIN TESTS!"));
 		int testCount = 0;
 		
-		testScriptSize(++testCount);
+//		testScriptSizeViaLinearIncreasingNoOpStatements(++testCount);
 		
-		testScriptSizeWithNonTrivialGeneratedContent(++testCount);
+		testScriptSizeViaLargeNDateInstantiation(++testCount);
+		
+		testScriptSizeViaLinearSizeIncreasingObjInstantiation(++testCount);
 
 		Log.d(CN+".test", fmtTestHeader("END TESTS!"));
 	}
 
-	private void testScriptSizeWithNonTrivialGeneratedContent(int testCount) {
+	private void testScriptSizeViaLinearSizeIncreasingObjInstantiation(int testCount) {
+		Log.d(CN+".test", fmtTestHeader("TEST " + testCount + ": testScriptSizeWithNonTrivialGeneratedContent"));
+		StringBuilder sb = new StringBuilder();
+
+		int numStatements = 10000;
+		// generate some JS
+		sb.append("var myObj = { a: { b: { }, c: [0] };");
+		sb.append("var myObjArr = [];");
+		for (int i = 0; i < numStatements; i++) {
+			sb.append("for (var i = 0; i < 5; i++) {");
+			sb.append("  myObjArr.push(Object.create(myObj));");
+			sb.append("}");
+			BaseScriptEngine.runScript(this._context, sb.toString());
+		}
 		
+		Log.d(CN+".test", "script = " + (sb.toString()).substring(0, 1000));
+		BaseScriptEngine.runScript(this._context, sb.toString());
+	}
+	
+	private void testScriptSizeViaLargeNDateInstantiation(int testCount) {
+		Log.d(CN+".test", fmtTestHeader("TEST " + testCount + ": testScriptSizeWithNonTrivialGeneratedContent"));
+		StringBuilder sb = new StringBuilder();
+
+		int numStatements = 10000;
+		// generate some JS
+		for (int i = 0; i < numStatements; i++) {
+			sb.append("for (var i = 0; i < 5; i++) {");
+			sb.append("  var d = new Date();");
+//			if((i % (numStatements/10)) == 0) {
+//				sb.append("  PurpleRobot.log('d = ' + d);");
+//			}
+			sb.append("}");
+			BaseScriptEngine.runScript(this._context, sb.toString());
+		}
 	}
 
-	private void testScriptSize(int testCount) {
-		Log.d(CN+".test", fmtTestHeader("TEST " + testCount + ": script size"));
+	private void testScriptSizeViaLinearIncreasingNoOpStatements(int testCount) {
+		Log.d(CN+".test", fmtTestHeader("TEST " + testCount + ": testScriptSize"));
 		StringBuilder sb = new StringBuilder();
 		int maxScriptSize = 1000000;
 		for(int i = 0; i < maxScriptSize; i += (maxScriptSize / 1000)) {
 			sb.append(";");
-			if(i % (maxScriptSize / 10) == 0) { Log.d(CN+".test:01", "pre: i = " + i); }
+			if(i % (maxScriptSize / 10) == 0) { Log.d(CN+".test:" + testCount, "pre: i = " + i); }
 			BaseScriptEngine.runScript(this._context, sb.toString());
 		}
 	}
