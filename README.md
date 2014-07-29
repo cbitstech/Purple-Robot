@@ -35,7 +35,7 @@ This will check out the Purple Robot app as well as some supporting technologies
     git submodule init
     git submodule update
 
-These commands will retrieve the Facebook SDK and Anthracite logging dependencies.
+These commands will retrieve [the Facebook SDK](https://developers.facebook.com/docs/android) and [Anthracite](https://github.com/cbitstech/anthracite-clients-android) logging dependencies.
 
 ### Building Purple Robot
 
