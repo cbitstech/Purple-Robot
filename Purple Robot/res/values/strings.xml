@@ -1268,6 +1268,11 @@
 	<string name="message_starting_test">Starting tests&#8230;</string>
 	
 	<string name="error_only_logs_test">Only logs events of type "test_event".</string>
+	
+	<string name="title_touch_events_probe">Touch Events Probe</string>
+	<string name="summary_touch_events_probe_desc">Captures data about user touch interactions.</string>
+    <string name="summary_touch_events_probe">%1$d touches, %2$d ms delay</string>
+    <string name="summary_touch_events_probe_single">1 touch, %1$d ms delay</string>
 </resources>
 
 
