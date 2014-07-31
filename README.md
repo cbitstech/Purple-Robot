@@ -42,7 +42,7 @@ These commands will retrieve [the Facebook SDK](https://developers.facebook.com/
 Next, go to the `Purple Robot` folder and rename the following files:
 
 * `gradle.properties.template` to `gradle.properties`
-* `local.properties.template` to `local.properties.template`
+* `local.properties.template` to `local.properties`
     
 In `local.properties`, set the location of your Android SDK. In `gradle.properties`, set the values for your Android signing keystore and key. Refer to [Google's signing documentation](http://developer.android.com/tools/publishing/app-signing.html) for more details.
 
