@@ -53,6 +53,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.SoftwareInform
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.StepCounterProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TelephonyProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TemperatureProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TouchEventsProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TwitterProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.VisibleSatelliteProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.WifiAccessPointsProbe;
@@ -529,6 +530,13 @@ public class ProbeManager
 				SaintProbe saint = (SaintProbe) probe;
 
 				if (saint.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof TouchEventsProbe)
+			{
+				TouchEventsProbe touch = (TouchEventsProbe) probe;
+
+				if (touch.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 
