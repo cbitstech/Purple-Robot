@@ -359,7 +359,7 @@ public class BaseScriptEngineTests {
 		String MN = "testplayDefaultTone";
 		Log.d(CN+"."+MN, JavascriptTestCase.fmtTestHeader("TEST " + testCount + ": " + MN));
 		StringBuilder sb = new StringBuilder();
-		sb.append("PurpleRobot.playDefaultTone(null); PurpleRobot.persistString('" + CN + "','" + MN + "','" + persistValue + "');");
+		sb.append("PurpleRobot.playDefaultTone(); PurpleRobot.persistString('" + CN + "','" + MN + "','" + persistValue + "');");
 		BaseScriptEngine.runScript(ctx, sb.toString());
 		Assert.assertEquals(true, persistValue.equals(JavascriptTestCase.fetchString(ctx, CN, MN)));
 	}

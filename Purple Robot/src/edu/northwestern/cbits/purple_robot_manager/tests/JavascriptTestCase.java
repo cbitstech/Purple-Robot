@@ -61,7 +61,6 @@ public class JavascriptTestCase extends RobotTestCase {
 		testScriptSizeViaLargeNDateInstantiation(++testCount);
 		testScriptSizeViaLinearSizeIncreasingObjInstantiation(++testCount);
 		
-		BaseScriptEngineTests.log(this._context, ++testCount);
 		BaseScriptEngineTests.dateFromTimestamp(this._context, ++testCount);
 		BaseScriptEngineTests.formatDate(this._context, ++testCount);
 		BaseScriptEngineTests.parseDate(this._context, ++testCount);
@@ -155,7 +154,7 @@ public class JavascriptTestCase extends RobotTestCase {
 		JavaScriptEngineTests.updateTrigger(this._context, ++testCount);
 		JavaScriptEngineTests.emitReading(this._context, ++testCount);
 		JavaScriptEngineTests.nativeToJson(this._context, ++testCount);
-		JavaScriptEngineTests.JSONnativeToJson(this._context, ++testCount);
+		JavaScriptEngineTests.JSONnativeToJson(this._context, ++testCount); 
 		JavaScriptEngineTests.canRun(this._context, ++testCount);
 		JavaScriptEngineTests.fetchConfig(this._context, ++testCount);
 		JavaScriptEngineTests.updateConfig(this._context, ++testCount);
@@ -214,7 +213,7 @@ public class JavascriptTestCase extends RobotTestCase {
 		Log.d(CN+".testScriptSizeViaLinearIncreasingNoOpStatements", fmtTestHeader("TEST " + testCount + ": testScriptSize"));
 		StringBuilder sb = new StringBuilder();
 		int maxScriptSize = 1000000;
-		for(int i = 0; i < maxScriptSize; i += (maxScriptSize / 10000)) {
+		for(int i = 0; i < maxScriptSize; i += (maxScriptSize / 100)) {
 			sb.append(";");
 			if(i % (maxScriptSize / 10) == 0) { Log.d(CN+".testScriptSizeViaLinearIncreasingNoOpStatements:" + testCount, "pre: i = " + i); }
 			BaseScriptEngine.runScript(this._context, sb.toString());
