@@ -1,5 +1,6 @@
 package edu.northwestern.cbits.purple_robot_manager.tests;
 
+
 import org.mozilla.javascript.NativeJavaObject;
 
 import dclass.Method;
@@ -45,11 +46,6 @@ public class JavascriptTestCase extends RobotTestCase {
 		return context.getString(R.string.name_javascript_test);
 	}
 
-	static String fetchString(Context ctx, String namespace, String key) {
-		NativeJavaObject persisted = (NativeJavaObject) BaseScriptEngine.runScript(ctx, "PurpleRobot.fetchString('" + namespace + "','" + key + "');");
-		return (String) persisted.unwrap();
-	}
-	
 	@Override
 	public void test() {
 		Log.d(CN+".test", "entered");
@@ -225,8 +221,12 @@ public class JavascriptTestCase extends RobotTestCase {
 		}
 	}
 
+	public static String fetchString(Context ctx, String namespace, String key) {
+		NativeJavaObject persisted = (NativeJavaObject) BaseScriptEngine.runScript(ctx, "PurpleRobot.fetchString('" + namespace + "','" + key + "');");
+		return (String) persisted.unwrap();
+	}
 	
-	
+
 	public static String fmtTestHeader(String hdrTitle) {
 		return "----- " + hdrTitle + " -----";
 	}
