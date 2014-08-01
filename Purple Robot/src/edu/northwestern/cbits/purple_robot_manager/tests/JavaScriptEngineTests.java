@@ -1,5 +1,6 @@
-package src.edu.northwestern.cbits.purple_robot_manager.tests;
+package edu.northwestern.cbits.purple_robot_manager.tests;
 
+import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 import android.content.Context;
 
 /**
@@ -8,147 +9,148 @@ import android.content.Context;
  *
  */
 public class JavaScriptEngineTests {
+	private static final String CN = "JavaScriptEngineTests";
 	private static final String persistValue = "T";
 
-	public static void runScript(Context _context, int i) {
+	public static void runScript(Context _context, int testCount) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public static void widgets(Context _context, int i) {
+	public static void widgets(Context _context, int testCount) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public static void fetchWidget(Context _context, int i) {
+	public static void fetchWidget(Context _context, int testCount) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public static void predictions(Context _context, int i) {
+	public static void predictions(Context _context, int testCount) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public static void readings(Context _context, int i) {
+	public static void readings(Context _context, int testCount) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public static void models(Context _context, int i) {
+	public static void models(Context _context, int testCount) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public static void fetchSnapshotIds(Context _context, int i) {
+	public static void fetchSnapshotIds(Context _context, int testCount) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public static void fetchTriggerIds(Context _context, int i) {
+	public static void fetchTriggerIds(Context _context, int testCount) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public static void fetchNamespaces(Context _context, int i) {
+	public static void fetchNamespaces(Context _context, int testCount) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public static void updateConfig(Context _context, int i) {
+	public static void updateConfig(Context _context, int testCount) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public static void fetchConfig(Context _context, int i) {
+	public static void fetchConfig(Context _context, int testCount) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public static void canRun(Context _context, int i) {
+	public static void canRun(Context _context, int testCount) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public static void nativeToJson(Context _context, int i) {
+	public static void nativeToJson(Context _context, int testCount) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public static void JSONnativeToJson(Context _context, int i) {
+	public static void JSONnativeToJson(Context _context, int testCount) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public static void emitReading(Context _context, int i) {
+	public static void emitReading(Context _context, int testCount) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public static void updateTrigger(Context _context, int i) {
+	public static void updateTrigger(Context _context, int testCount) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	public static void showApplicationLaunchNotification(Context _context,
-			int i) {
+			int testCount) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public static void launchApplication(Context _context, int i) {
+	public static void launchApplication(Context _context, int testCount) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public static void broadcastIntent(Context _context, int i) {
+	public static void broadcastIntent(Context _context, int testCount) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public static void updateWidget(Context _context, int i) {
+	public static void updateWidget(Context _context, int testCount) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public static void loadLibrary(Context _context, int i) {
+	public static void loadLibrary(Context _context, int testCount) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public static void log(Context _context, int i) {
+	public static void log(Context _context, int testCount) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public static void runScript_var01(Context _context, int i) {
+	public static void runScript_var01(Context _context, int testCount) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public static void runScript_var02(Context _context, int i) {
+	public static void runScript_var02(Context _context, int testCount) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	public static void showApplicationLaunchNotification_var01(
-			Context _context, int i) {
+			Context _context, int testCount) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	public static void showApplicationLaunchNotification_var02(
-			Context _context, int i) {
+			Context _context, int testCount) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public static void fetchSnapshotIds_var01(Context _context, int i) {
+	public static void fetchSnapshotIds_var01(Context _context, int testCount) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public static void fetchSnapshotIds_var02(Context _context, int i) {
+	public static void fetchSnapshotIds_var02(Context _context, int testCount) {
 		// TODO Auto-generated method stub
 		
 	}
