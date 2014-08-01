@@ -3,7 +3,6 @@ package edu.northwestern.cbits.purple_robot_manager.tests;
 import org.mozilla.javascript.NativeJavaObject;
 
 import dclass.Method;
-import junit.framework.Assert;
 import android.content.Context;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -46,7 +45,7 @@ public class JavascriptTestCase extends RobotTestCase {
 		return context.getString(R.string.name_javascript_test);
 	}
 
-	private static String fetchString(Context ctx, String namespace, String key) {
+	static String fetchString(Context ctx, String namespace, String key) {
 		NativeJavaObject persisted = (NativeJavaObject) BaseScriptEngine.runScript(ctx, "PurpleRobot.fetchString('" + namespace + "','" + key + "');");
 		return (String) persisted.unwrap();
 	}
@@ -66,41 +65,119 @@ public class JavascriptTestCase extends RobotTestCase {
 		testScriptSizeViaLargeNDateInstantiation(++testCount);
 		testScriptSizeViaLinearSizeIncreasingObjInstantiation(++testCount);
 		
+		BaseScriptEngineTests.log(this._context, ++testCount);
+		BaseScriptEngineTests.dateFromTimestamp(this._context, ++testCount);
+		BaseScriptEngineTests.formatDate(this._context, ++testCount);
+		BaseScriptEngineTests.parseDate(this._context, ++testCount);
+		BaseScriptEngineTests.now(this._context, ++testCount);
+		BaseScriptEngineTests.log(this._context, ++testCount);
 		BaseScriptEngineTests.testLog(this._context, ++testCount);
-		BaseScriptEngineTests.testplayTone(this._context, ++testCount);
+		BaseScriptEngineTests.playDefaultTone(this._context, ++testCount);
+		BaseScriptEngineTests.playTone(this._context, ++testCount);
+		BaseScriptEngineTests.persistEncryptedString_var01(this._context, ++testCount);
+		BaseScriptEngineTests.persistEncryptedString_var02(this._context, ++testCount);
+		BaseScriptEngineTests.fetchEncryptedString_var01(this._context, ++testCount);
+		BaseScriptEngineTests.fetchEncryptedString_var02(this._context, ++testCount);
+		BaseScriptEngineTests.vibrate(this._context, ++testCount);
+		BaseScriptEngineTests.readUrl(this._context, ++testCount);
+		BaseScriptEngineTests.emitToast_var01(this._context, ++testCount);
+		BaseScriptEngineTests.emitToast_var02(this._context, ++testCount);
+		BaseScriptEngineTests.run(this._context, ++testCount);
+		BaseScriptEngineTests.launchUrl(this._context, ++testCount);
+		BaseScriptEngineTests.launchInternalUrl(this._context, ++testCount);
+		BaseScriptEngineTests.packageForApplicationName(this._context, ++testCount);
+		BaseScriptEngineTests.version(this._context, ++testCount);
+		BaseScriptEngineTests.versionCode(this._context, ++testCount);
+		BaseScriptEngineTests.persistString(this._context, ++testCount);
+		BaseScriptEngineTests.addNamespace(this._context, ++testCount);
+		BaseScriptEngineTests.persistString(this._context, ++testCount);
+		BaseScriptEngineTests.fetchString_var01(this._context, ++testCount);
+		BaseScriptEngineTests.fetchLabel(this._context, ++testCount);
+		BaseScriptEngineTests.fetchString_var02(this._context, ++testCount);
+		BaseScriptEngineTests.resetTrigger(this._context, ++testCount);
+		BaseScriptEngineTests.enableTrigger(this._context, ++testCount);
+		BaseScriptEngineTests.fireTrigger(this._context, ++testCount);
+		BaseScriptEngineTests.disableTrigger(this._context, ++testCount);
+		BaseScriptEngineTests.disableAutoConfigUpdates(this._context, ++testCount);
+		BaseScriptEngineTests.enableAutoConfigUpdates(this._context, ++testCount);
+		BaseScriptEngineTests.enableProbes(this._context, ++testCount);
+		BaseScriptEngineTests.disableProbes(this._context, ++testCount);
+		BaseScriptEngineTests.disableEachProbe(this._context, ++testCount);
+		BaseScriptEngineTests.probesState(this._context, ++testCount);
+		BaseScriptEngineTests.disableProbe(this._context, ++testCount);
+		BaseScriptEngineTests.updateConfigUrl(this._context, ++testCount);
+		BaseScriptEngineTests.setPassword(this._context, ++testCount);
+		BaseScriptEngineTests.clearPassword(this._context, ++testCount);
+		BaseScriptEngineTests.enableBackgroundImage(this._context, ++testCount);
+		BaseScriptEngineTests.disableBackgroundImage(this._context, ++testCount);
+		BaseScriptEngineTests.setUserId(this._context, ++testCount);
+		BaseScriptEngineTests.setUserId(this._context, ++testCount);
+		BaseScriptEngineTests.fetchUserId(this._context, ++testCount);
+		BaseScriptEngineTests.fetchUserHash(this._context, ++testCount);
+		BaseScriptEngineTests.restoreDefaultId(this._context, ++testCount);
+		BaseScriptEngineTests.enableUpdateChecks(this._context, ++testCount);
+		BaseScriptEngineTests.disableUpdateChecks(this._context, ++testCount);
+		BaseScriptEngineTests.enableProbe(this._context, ++testCount);
+		BaseScriptEngineTests.launchApplication(this._context, ++testCount);
+		BaseScriptEngineTests.showScriptNotification_var01(this._context, ++testCount);
+		BaseScriptEngineTests.showScriptNotification_var02(this._context, ++testCount);
+		BaseScriptEngineTests.cancelScriptNotification(this._context, ++testCount);
+		BaseScriptEngineTests.showNativeDialog_var01(this._context, ++testCount);
+		BaseScriptEngineTests.showNativeDialog_var02(this._context, ++testCount);
+		BaseScriptEngineTests.clearNativeDialogs_var01(this._context, ++testCount);
+		BaseScriptEngineTests.clearNativeDialogs_var02(this._context, ++testCount);
+		BaseScriptEngineTests.showApplicationLaunchNotification(this._context, ++testCount);
+		BaseScriptEngineTests.updateWidget(this._context, ++testCount);
+		BaseScriptEngineTests.scheduleScript(this._context, ++testCount);
+		BaseScriptEngineTests.runScript_var01(this._context, ++testCount);
+		BaseScriptEngineTests.runScript_var02(this._context, ++testCount);
+		BaseScriptEngineTests.updateConfig(this._context, ++testCount);
+		BaseScriptEngineTests.valueFromString(this._context, ++testCount);
+		BaseScriptEngineTests.fetchNamespaces(this._context, ++testCount);
+		BaseScriptEngineTests.fetchNamespaceMap(this._context, ++testCount);
+		BaseScriptEngineTests.fetchTriggerIds(this._context, ++testCount);
+		BaseScriptEngineTests.fetchSnapshotIds(this._context, ++testCount);
+		BaseScriptEngineTests.fetchTrigger(this._context, ++testCount);
+		BaseScriptEngineTests.deleteTrigger(this._context, ++testCount);
+		BaseScriptEngineTests.clearTriggers(this._context, ++testCount);
+		BaseScriptEngineTests.fetchLabels(this._context, ++testCount);
+		BaseScriptEngineTests.addModel(this._context, ++testCount);
+		BaseScriptEngineTests.deleteModel(this._context, ++testCount);
+		BaseScriptEngineTests.enableModel(this._context, ++testCount);
+		BaseScriptEngineTests.disableModel(this._context, ++testCount);
+
+		JavaScriptEngineTests.runScript_var01(this._context, ++testCount);
+		JavaScriptEngineTests.runScript_var02(this._context, ++testCount);
+		JavaScriptEngineTests.log(this._context, ++testCount);
+		JavaScriptEngineTests.loadLibrary(this._context, ++testCount);
+		JavaScriptEngineTests.updateWidget(this._context, ++testCount);
+		JavaScriptEngineTests.broadcastIntent(this._context, ++testCount);
+		JavaScriptEngineTests.updateWidget(this._context, ++testCount);
+		JavaScriptEngineTests.launchApplication(this._context, ++testCount);
+		JavaScriptEngineTests.showApplicationLaunchNotification_var01(this._context, ++testCount);
+		JavaScriptEngineTests.showApplicationLaunchNotification_var02(this._context, ++testCount);
+		JavaScriptEngineTests.updateTrigger(this._context, ++testCount);
+		JavaScriptEngineTests.emitReading(this._context, ++testCount);
+		JavaScriptEngineTests.nativeToJson(this._context, ++testCount);
+		JavaScriptEngineTests.JSONnativeToJson(this._context, ++testCount);
+		JavaScriptEngineTests.canRun(this._context, ++testCount);
+		JavaScriptEngineTests.fetchConfig(this._context, ++testCount);
+		JavaScriptEngineTests.updateConfig(this._context, ++testCount);
+		JavaScriptEngineTests.fetchNamespaces(this._context, ++testCount);
+		JavaScriptEngineTests.fetchTriggerIds(this._context, ++testCount);
+		JavaScriptEngineTests.fetchSnapshotIds_var01(this._context, ++testCount);
+		JavaScriptEngineTests.fetchSnapshotIds_var02(this._context, ++testCount);
+		JavaScriptEngineTests.fetchNamespaces(this._context, ++testCount);
+		JavaScriptEngineTests.fetchTriggerIds(this._context, ++testCount);
+		JavaScriptEngineTests.models(this._context, ++testCount);
+		JavaScriptEngineTests.readings(this._context, ++testCount);
+		JavaScriptEngineTests.predictions(this._context, ++testCount);
+		JavaScriptEngineTests.fetchWidget(this._context, ++testCount);
+		JavaScriptEngineTests.widgets(this._context, ++testCount);
 
 		Log.d(CN+".test", fmtTestHeader("END TESTS!"));
 	}
-	
-	
-	/**
-	 * Tests the methods in BaseScriptEngine.
-	 * @author mohrlab
-	 *
-	 */
-	public static class BaseScriptEngineTests {
-		private static final String persistValue = "T";
 
-		public static void testplayTone(Context ctx, int testCount) {
-			String MN = "testplayTone";
-			Log.d(CN+"."+MN, fmtTestHeader("TEST " + testCount + ": " + MN));
-			StringBuilder sb = new StringBuilder();
-			sb.append("PurpleRobot.playTone(null); PurpleRobot.persistString('" + CN + "','" + MN + "','" + persistValue + "');");
-			BaseScriptEngine.runScript(ctx, sb.toString());
-			Assert.assertEquals(true, persistValue.equals(JavascriptTestCase.fetchString(ctx, CN, MN)));
-		}
-		
-		public static void testLog(Context ctx, int testCount) {
-			String MN = "testPurpleRobotDotLog";
-			Log.d(CN+"."+MN, fmtTestHeader("TEST " + testCount + ": " + MN));
-			StringBuilder sb = new StringBuilder();
-			sb.append("PurpleRobot.log('" + MN + ": test'); PurpleRobot.persistString('" + CN + "','" + MN + "','" + persistValue + "');");
-			BaseScriptEngine.runScript(ctx, sb.toString());
-			Assert.assertEquals(true, persistValue.equals(JavascriptTestCase.fetchString(ctx, CN, MN)));
-		}
-		
-	}
-	
 
 	private void testScriptSizeViaPrnmExecution() {
 		//TODO. Ensure PRNM is too big, then here, read PRNM JS file, pass it to runScript.
@@ -116,9 +193,7 @@ public class JavascriptTestCase extends RobotTestCase {
 		sb.append("var myObjArr = new Array();");
 		for (int i = 0; i < numStatements; i += (numStatements/10)) {
 			if((i % (numStatements/10)) == 0) { Log.d(CN+".testScriptSizeViaLinearSizeIncreasingObjInstantiation", "i = " + i); }
-//			sb.append("for (var i = 0; i < 5; i++) {");
 			sb.append("  myObjArr.push(Object.create(myObj));");
-//			sb.append("}");
 			BaseScriptEngine.runScript(this._context, sb.toString());
 		}
 		
@@ -134,9 +209,6 @@ public class JavascriptTestCase extends RobotTestCase {
 		for (int i = 0; i < numStatements; i +=  (numStatements/10)) {
 			sb.append("for (var i = 0; i < 5; i++) {");
 			sb.append("  var d = new Date();");
-//			if((i % (numStatements/10)) == 0) {
-//				sb.append("  PurpleRobot.log('d = ' + d);");
-//			}
 			sb.append("}");
 			BaseScriptEngine.runScript(this._context, sb.toString());
 		}
