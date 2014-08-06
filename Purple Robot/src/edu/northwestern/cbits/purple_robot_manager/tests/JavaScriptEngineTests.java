@@ -12,146 +12,145 @@ public class JavaScriptEngineTests {
 	private static final String CN = "JavaScriptEngineTests";
 	private static final String persistValue = "T";
 
-	public static void runScript(Context _context, int testCount) {
-		// TODO Auto-generated method stub
+	public static void broadcastIntent(Context ctx, int testCount) {
+		String MN = "METHODNAME";		BaseScriptEngineTests.runTest(ctx, MN, testCount, null, CN, MN, true, false);
 		
 	}
 
-	public static void widgets(Context _context, int testCount) {
-		// TODO Auto-generated method stub
+	public static void canRun(Context ctx, int testCount) {
+		String MN = "METHODNAME";		BaseScriptEngineTests.runTest(ctx, MN, testCount, null, CN, MN, true, false);
 		
 	}
 
-	public static void fetchWidget(Context _context, int testCount) {
-		// TODO Auto-generated method stub
+	public static void emitReading(Context ctx, int testCount) {
+		String MN = "METHODNAME";		BaseScriptEngineTests.runTest(ctx, MN, testCount, null, CN, MN, true, false);
 		
 	}
 
-	public static void predictions(Context _context, int testCount) {
-		// TODO Auto-generated method stub
+	public static void fetchConfig(Context ctx, int testCount) {
+		String MN = "METHODNAME";		BaseScriptEngineTests.runTest(ctx, MN, testCount, null, CN, MN, true, false);
 		
 	}
 
-	public static void readings(Context _context, int testCount) {
-		// TODO Auto-generated method stub
+	public static void fetchNamespaces(Context ctx, int testCount) {
+		String MN = "METHODNAME";		BaseScriptEngineTests.runTest(ctx, MN, testCount, null, CN, MN, true, false);
 		
 	}
 
-	public static void models(Context _context, int testCount) {
-		// TODO Auto-generated method stub
+	public static void fetchSnapshotIds(Context ctx, int testCount) {
+		String MN = "METHODNAME";		BaseScriptEngineTests.runTest(ctx, MN, testCount, null, CN, MN, true, false);
 		
 	}
 
-	public static void fetchSnapshotIds(Context _context, int testCount) {
-		// TODO Auto-generated method stub
+	public static void fetchSnapshotIds_var01(Context ctx, int testCount) {
+		String MN = "METHODNAME";		BaseScriptEngineTests.runTest(ctx, MN, testCount, null, CN, MN, true, false);
 		
 	}
 
-	public static void fetchTriggerIds(Context _context, int testCount) {
-		// TODO Auto-generated method stub
+	public static void fetchSnapshotIds_var02(Context ctx, int testCount) {
+		String MN = "METHODNAME";		BaseScriptEngineTests.runTest(ctx, MN, testCount, null, CN, MN, true, false);
 		
 	}
 
-	public static void fetchNamespaces(Context _context, int testCount) {
-		// TODO Auto-generated method stub
+	public static void fetchTriggerIds(Context ctx, int testCount) {
+		String MN = "METHODNAME";		BaseScriptEngineTests.runTest(ctx, MN, testCount, null, CN, MN, true, false);
 		
 	}
 
-	public static void updateConfig(Context _context, int testCount) {
-		// TODO Auto-generated method stub
+	public static void fetchWidget(Context ctx, int testCount) {
+		String MN = "METHODNAME";		BaseScriptEngineTests.runTest(ctx, MN, testCount, null, CN, MN, true, false);
 		
 	}
 
-	public static void fetchConfig(Context _context, int testCount) {
-		// TODO Auto-generated method stub
+	public static void JSONnativeToJson(Context ctx, int testCount) {
+		String MN = "METHODNAME";		BaseScriptEngineTests.runTest(ctx, MN, testCount, null, CN, MN, true, false);
 		
 	}
 
-	public static void canRun(Context _context, int testCount) {
-		// TODO Auto-generated method stub
+	public static void launchApplication(Context ctx, int testCount) {
+		String MN = "METHODNAME";		BaseScriptEngineTests.runTest(ctx, MN, testCount, null, CN, MN, true, false);
 		
 	}
 
-	public static void nativeToJson(Context _context, int testCount) {
-		// TODO Auto-generated method stub
+	public static void loadLibrary(Context ctx, int testCount) {
+		String MN = "METHODNAME";		BaseScriptEngineTests.runTest(ctx, MN, testCount, null, CN, MN, true, false);
 		
 	}
 
-	public static void JSONnativeToJson(Context _context, int testCount) {
-		// TODO Auto-generated method stub
+	public static void log(Context ctx, int testCount) {
+		String MN = "METHODNAME";		BaseScriptEngineTests.runTest(ctx, MN, testCount, null, CN, MN, true, false);
 		
 	}
 
-	public static void emitReading(Context _context, int testCount) {
-		// TODO Auto-generated method stub
+	public static void models(Context ctx, int testCount) {
+		String MN = "METHODNAME";		BaseScriptEngineTests.runTest(ctx, MN, testCount, null, CN, MN, true, false);
 		
 	}
 
-	public static void updateTrigger(Context _context, int testCount) {
-		// TODO Auto-generated method stub
+	public static void nativeToJson(Context ctx, int testCount) {
+		String MN = "METHODNAME";		BaseScriptEngineTests.runTest(ctx, MN, testCount, null, CN, MN, true, false);
 		
 	}
 
-	public static void showApplicationLaunchNotification(Context _context,
+	public static void predictions(Context ctx, int testCount) {
+		String MN = "METHODNAME";		BaseScriptEngineTests.runTest(ctx, MN, testCount, null, CN, MN, true, false);
+		
+	}
+
+	public static void readings(Context ctx, int testCount) {
+		String MN = "METHODNAME";		BaseScriptEngineTests.runTest(ctx, MN, testCount, null, CN, MN, true, false);
+		
+	}
+
+	public static void runScript(Context ctx, int testCount) {
+		String MN = "METHODNAME";		BaseScriptEngineTests.runTest(ctx, MN, testCount, null, CN, MN, true, false);
+		
+	}
+
+	public static void runScript_var01(Context ctx, int testCount) {
+		String MN = "METHODNAME";		BaseScriptEngineTests.runTest(ctx, MN, testCount, null, CN, MN, true, false);
+		
+	}
+
+	public static void runScript_var02(Context ctx, int testCount) {
+		String MN = "METHODNAME";		BaseScriptEngineTests.runTest(ctx, MN, testCount, null, CN, MN, true, false);
+		
+	}
+
+	public static void showApplicationLaunchNotification(Context ctx,
 			int testCount) {
-		// TODO Auto-generated method stub
+		String MN = "METHODNAME";		BaseScriptEngineTests.runTest(ctx, MN, testCount, null, CN, MN, true, false);
 		
 	}
 
-	public static void launchApplication(Context _context, int testCount) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public static void broadcastIntent(Context _context, int testCount) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public static void updateWidget(Context _context, int testCount) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public static void loadLibrary(Context _context, int testCount) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public static void log(Context _context, int testCount) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public static void runScript_var01(Context _context, int testCount) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public static void runScript_var02(Context _context, int testCount) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public static void showApplicationLaunchNotification_var01(
-			Context _context, int testCount) {
-		// TODO Auto-generated method stub
+	public static void showApplicationLaunchNotification_var01(Context ctx, int testCount) {
+		String MN = "METHODNAME";		BaseScriptEngineTests.runTest(ctx, MN, testCount, null, CN, MN, true, false);
 		
 	}
 
 	public static void showApplicationLaunchNotification_var02(
-			Context _context, int testCount) {
-		// TODO Auto-generated method stub
+			Context ctx, int testCount) {
+		String MN = "METHODNAME";		BaseScriptEngineTests.runTest(ctx, MN, testCount, null, CN, MN, true, false);
 		
 	}
 
-	public static void fetchSnapshotIds_var01(Context _context, int testCount) {
-		// TODO Auto-generated method stub
+	public static void updateConfig(Context ctx, int testCount) {
+		String MN = "METHODNAME";		BaseScriptEngineTests.runTest(ctx, MN, testCount, null, CN, MN, true, false);
 		
 	}
 
-	public static void fetchSnapshotIds_var02(Context _context, int testCount) {
-		// TODO Auto-generated method stub
+	public static void updateTrigger(Context ctx, int testCount) {
+		String MN = "METHODNAME";		BaseScriptEngineTests.runTest(ctx, MN, testCount, null, CN, MN, true, false);
+		
+	}
+
+	public static void updateWidget(Context ctx, int testCount) {
+		String MN = "METHODNAME";		BaseScriptEngineTests.runTest(ctx, MN, testCount, null, CN, MN, true, false);
+		
+	}
+
+	public static void widgets(Context ctx, int testCount) {
+		String MN = "METHODNAME";		BaseScriptEngineTests.runTest(ctx, MN, testCount, null, CN, MN, true, false);
 		
 	}
 
