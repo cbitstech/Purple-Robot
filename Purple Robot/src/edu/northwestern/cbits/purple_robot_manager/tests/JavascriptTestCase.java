@@ -224,7 +224,9 @@ public class JavascriptTestCase extends RobotTestCase {
 	}
 
 	public static String fetchString(Context ctx, String key) {
+		Log.d(CN, "1");
 		NativeJavaObject persisted = (NativeJavaObject) BaseScriptEngine.runScript(ctx, "PurpleRobot.fetchString('" + key + "');");
+		Log.d(CN, "2");
 		return (String) persisted.unwrap();
 	}
 	
