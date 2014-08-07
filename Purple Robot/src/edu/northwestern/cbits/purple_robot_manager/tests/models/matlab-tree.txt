@@ -1,0 +1,1 @@
+1 if x59<-0.0396521 then node 2 elseif x59>=-0.0396521 then node 3 else 2 2 if x39<-0.162654 then node 4 elseif x39>=-0.162654 then node 5 else 1
