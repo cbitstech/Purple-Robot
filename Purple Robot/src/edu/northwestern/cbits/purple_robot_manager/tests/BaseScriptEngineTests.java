@@ -39,9 +39,7 @@ public class BaseScriptEngineTests {
 	public static void runTest(Context ctx, String expectedValue, String testMethodName, int testCount, String script, String jsStringPersistNamespace, String jsStringPersistKey, boolean isEncryptedString, boolean use2ParamFetchString, boolean logResultBeforeAssert) {  String MN = "runTest";
 		Log.d(CN+"."+testMethodName, JavascriptTestCase.fmtTestHeader("TEST " + testCount + ": " + jsStringPersistKey));
 		if(script != null) {
-			StringBuilder sb = new StringBuilder();
-			sb.append(script);
-			BaseScriptEngine.runScript(ctx, sb.toString());
+			BaseScriptEngine.runScript(ctx, script);
 
 			Log.d(CN+"."+testMethodName, "fetch for (namespace, key): (" + jsStringPersistNamespace + "," + jsStringPersistKey + ")");
 			if(isEncryptedString) {
