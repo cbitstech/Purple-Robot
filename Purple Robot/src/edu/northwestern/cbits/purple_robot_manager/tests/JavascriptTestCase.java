@@ -94,7 +94,7 @@ public class JavascriptTestCase extends RobotTestCase {
 	    BaseScriptEngineTests.fetchLabels(this._context, ++testCount);
 	    BaseScriptEngineTests.fetchNamespaceMap(this._context, ++testCount);
 	    BaseScriptEngineTests.fetchNamespaces(this._context, ++testCount);
-	    BaseScriptEngineTests.fetchSnapshotIds(this._context, ++testCount);
+//	    BaseScriptEngineTests.fetchSnapshotIds(this._context, ++testCount);
 	    BaseScriptEngineTests.fetchString_var01(this._context, ++testCount);
 	    BaseScriptEngineTests.fetchString_var02(this._context, ++testCount);
 	    BaseScriptEngineTests.fetchTrigger(this._context, ++testCount);
