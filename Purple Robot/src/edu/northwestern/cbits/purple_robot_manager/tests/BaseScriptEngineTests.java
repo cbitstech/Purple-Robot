@@ -1,5 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager.tests;
 
+import java.util.Map;
+
 import org.mozilla.javascript.NativeJavaObject;
 
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
@@ -48,14 +50,14 @@ public class BaseScriptEngineTests {
 					if(logResultBeforeAssert) {
 						Log.d(CN+"."+testMethodName, "encrypted string at k = " + jsStringPersistKey + ": " + s);
 					}
-					Assert.assertEquals(true, expectedValue.equals(s));
+					Assert.assertEquals("In " + testMethodName + ": ", true, expectedValue.equals(s));
 				}
 				else {
 					String s = JavascriptTestCase.fetchEncryptedString(ctx, jsStringPersistNamespace, jsStringPersistKey);
 					if(logResultBeforeAssert) {
 						Log.d(CN+"."+testMethodName, "encrypted string at n = " + jsStringPersistNamespace + ", k = " + jsStringPersistKey + ": " + s);
 					}
-					Assert.assertEquals(true, expectedValue.equals(s));
+					Assert.assertEquals("In " + testMethodName + ": ", true, expectedValue.equals(s));
 				}
 			}
 			else {
@@ -64,20 +66,20 @@ public class BaseScriptEngineTests {
 					if(logResultBeforeAssert) {
 						Log.d(CN+"."+testMethodName, "string at k = " + jsStringPersistKey + ": " + s);
 					}
-					Assert.assertEquals(true, expectedValue.equals(s));
+					Assert.assertEquals("In " + testMethodName + ": ", true, expectedValue.equals(s));
 				}
 				else {
 					String s = JavascriptTestCase.fetchString(ctx, jsStringPersistNamespace, jsStringPersistKey);
 					if(logResultBeforeAssert) {
 						Log.d(CN+"."+testMethodName, "string at n = " + jsStringPersistNamespace + ", k = " + jsStringPersistKey + ": " + s);
 					}
-					Assert.assertEquals(true, expectedValue.equals(s));
+					Assert.assertEquals("In " + testMethodName + ": ", true, expectedValue.equals(s));
 				}
 			}
 		}
 	}
 
-	private static String getScriptForPersistStringOnTestCompletedDefault(String mn) {
+	public static String getScriptForPersistStringOnTestCompletedDefault(String mn) {
 		return "PurpleRobot.persistString('" + CN + "','" + mn + "','" + persistValue + "');";
 	}
 	
@@ -378,7 +380,7 @@ public class BaseScriptEngineTests {
 	}
 
 	public static void readUrl(Context ctx, int testCount) {  String MN = "readUrl";
-		runTest(ctx, persistValue, MN, testCount,  "PurpleRobot.readUrl('http://www.northwestern.edu'); " + getScriptForPersistStringOnTestCompletedDefault(MN), CN, MN, false, false, false);
+		runTest(ctx, persistValue, MN+".1", testCount,  "PurpleRobot.readUrl('http://www.northwestern.edu'); " + getScriptForPersistStringOnTestCompletedDefault(MN+".1"), CN, MN+".1", false, false, false);
 		
 	}
 
@@ -397,20 +399,16 @@ public class BaseScriptEngineTests {
 		
 	}
 
-	public static void runScript(Context ctx, int testCount) {  String MN = "runScript";
-		runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false);
-		
-	}
-
-	public static void runScript_var01(Context ctx, int testCount) {  String MN = "runScript_var01";
-		runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false);
-		
-	}
-
-	public static void runScript_var02(Context ctx, int testCount) {  String MN = "runScript_var02";
-		runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false);
-		
-	}
+//	public static void runScript_var01(Context ctx, int testCount) {  String MN = "runScript_var01";
+//	// runScript(Context context, String script)
+//		runTest(ctx, persistValue, MN, testCount, "PurpleRobot.runScript('PurpleRobot.log(\'test message from " + MN + "\');');" + getScriptForPersistStringOnTestCompletedDefault(MN), CN, MN, false, false, false);
+//		
+//	}
+//
+//	public static void runScript_var02(Context ctx, int testCount) {  String MN = "runScript_var02";
+//		runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false);
+//		
+//	}
 
 	public static void scheduleScript(Context ctx, int testCount) {  String MN = "scheduleScript";
 		runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false);
@@ -427,64 +425,56 @@ public class BaseScriptEngineTests {
 		
 	}
 
-	public static void showApplicationLaunchNotification(Context ctx, int testCount) { String MN = "showApplicationLaunchNotification";
-		runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false);
-		
+	public static void showApplicationLaunchNotification_var01(Context ctx, int testCount) { String MN = "showApplicationLaunchNotification_var01";
+	// showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen, Map<String,Object> launchParams, final String script)
+	runTest(ctx, persistValue, MN, testCount, "PurpleRobot.showApplicationLaunchNotification('" + MN + " title', '" + MN + " message', 'com.google.android.gm', 0, {}, '');" + getScriptForPersistStringOnTestCompletedDefault(MN), CN, MN, false, false, false);
 	}
 
-	public static void showNativeDialog(Context ctx, int testCount) {  String MN = "showNativeDialog";
-		runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false);
-		
+	public static void showApplicationLaunchNotification_var02(Context ctx, int testCount) { String MN = "showApplicationLaunchNotification_var02";
+	// showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen, boolean persistent, Map<String,Object> launchParams, final String script)
+	runTest(ctx, persistValue, MN, testCount, "PurpleRobot.showApplicationLaunchNotification('" + MN + " title', '" + MN + " message', 'com.google.android.gm', 0, false, {}, '');" + getScriptForPersistStringOnTestCompletedDefault(MN), CN, MN, false, false, false);
 	}
 
 	public static void showNativeDialog_var01(Context ctx, int testCount) {  String MN = "showNativeDialog_var01";
-		runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false);
-		
+	// showNativeDialog(final String title, final String message, final String confirmTitle, final String cancelTitle, final String confirmScript, final String cancelScript)
+	runTest(ctx, persistValue, MN, testCount, "PurpleRobot.showNativeDialog('" + MN + " title', '" + MN + " message', 'Yes', 'No', '', '');" + getScriptForPersistStringOnTestCompletedDefault(MN), CN, MN, false, false, false);		
 	}
 
 	public static void showNativeDialog_var02(Context ctx, int testCount) {  String MN = "showNativeDialog_var02";
-		runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false);
-		
-	}
-
-	public static void showScriptNotification(Context ctx, int testCount) {  String MN = "showScriptNotification";
-		runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false);
-		
+	// showNativeDialog(final String title, final String message, final String confirmTitle, final String cancelTitle, final String confirmScript, final String cancelScript, String tag, long priority)
+	runTest(ctx, persistValue, MN, testCount, "PurpleRobot.showNativeDialog('" + MN + " title', '" + MN + " message', 'Yes', 'No', '', '', '" + (CN+"."+MN) + "', 10);" + getScriptForPersistStringOnTestCompletedDefault(MN), CN, MN, false, false, false);		
 	}
 
 	public static void showScriptNotification_var01(Context ctx, int testCount) {  String MN = "showScriptNotification_var01";
-		runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false);
-		
+	// showScriptNotification(String title, String message, boolean persistent, final String script)	
+	runTest(ctx, persistValue, MN, testCount, "PurpleRobot.showScriptNotification('showScriptNotification_var01 title', 'showScriptNotification_var01 message', false, '');" + getScriptForPersistStringOnTestCompletedDefault(MN), CN, MN, false, false, false);
 	}
 
 	public static void showScriptNotification_var02(Context ctx, int testCount) {  String MN = "showScriptNotification_var02";
-		runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false);
-		
+	// showScriptNotification(String title, String message, boolean persistent, boolean sticky, final String script)	
+	runTest(ctx, persistValue, MN, testCount, "PurpleRobot.showScriptNotification('showScriptNotification_var02 title', 'showScriptNotification_var02 message', false, false, '');" + getScriptForPersistStringOnTestCompletedDefault(MN), CN, MN, false, false, false);
 	}
 
 	public static void testLog(Context ctx, int testCount) {  String MN = "testLog";
-		runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false);
-		
+	runTest(ctx, persistValue, MN, testCount, "PurpleRobot.testLog('test message from testLog.');" + getScriptForPersistStringOnTestCompletedDefault(MN), CN, MN, false, false, false);		
 	}
 
 	public static void updateConfig(Context ctx, int testCount) {  String MN = "updateConfig";
-		runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false);
-		
+	runTest(ctx, persistValue, MN, testCount, "PurpleRobot.updateConfig({'config_show_background': true});" + getScriptForPersistStringOnTestCompletedDefault(MN), CN, MN, false, false, false);		
+	// TODO: verify that the PR config was actually updated (read the value from the PR cfg)
 	}
 
 	public static void updateConfigUrl(Context ctx, int testCount) {  String MN = "updateConfigUrl";
-		runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false);
-		
+	runTest(ctx, persistValue, MN, testCount, "PurpleRobot.updateConfigUrl('http://localhost');" + getScriptForPersistStringOnTestCompletedDefault(MN), CN, MN, false, false, false);
+	// TODO: verify that the PR cfg URL was actually updated (read the PR cfg URL field)
 	}
 
 	public static void updateWidget(Context ctx, int testCount) {  String MN = "updateWidget";
-		runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false);
-		
+	runTest(ctx, persistValue, MN, testCount, "PurpleRobot.updateWidget({identifier: '" + MN + "', title: 'myVal'});" + getScriptForPersistStringOnTestCompletedDefault(MN), CN, MN, false, false, false);		
 	}
 
 	public static void valueFromString(Context ctx, int testCount) {  String MN = "valueFromString";
-		runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false);
-		
+		runTest(ctx, "myval", MN, testCount, "var v = PurpleRobot.valueFromString('myKey', '{ myKey: \"myval\" }'); PurpleRobot.persistString('" + CN + "','" + MN + "', v);", CN, MN, false, false, true);
 	}
 
 	public static void version(Context ctx, int testCount) {  String MN = "version";

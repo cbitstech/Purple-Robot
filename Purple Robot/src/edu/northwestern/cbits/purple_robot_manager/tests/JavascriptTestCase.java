@@ -121,13 +121,14 @@ public class JavascriptTestCase extends RobotTestCase {
 	    BaseScriptEngineTests.resetTrigger(this._context, ++testCount);
 	    BaseScriptEngineTests.restoreDefaultId(this._context, ++testCount);
 	    BaseScriptEngineTests.run(this._context, ++testCount);
-	    BaseScriptEngineTests.runScript_var01(this._context, ++testCount);
-	    BaseScriptEngineTests.runScript_var02(this._context, ++testCount);
+//	    BaseScriptEngineTests.runScript_var01(this._context, ++testCount);
+//	    BaseScriptEngineTests.runScript_var02(this._context, ++testCount);
 	    BaseScriptEngineTests.scheduleScript(this._context, ++testCount);
 	    BaseScriptEngineTests.setPassword(this._context, ++testCount);
 	    BaseScriptEngineTests.setUserId(this._context, ++testCount);
 	    BaseScriptEngineTests.setUserId(this._context, ++testCount);
-	    BaseScriptEngineTests.showApplicationLaunchNotification(this._context, ++testCount);
+	    BaseScriptEngineTests.showApplicationLaunchNotification_var01(this._context, ++testCount);
+	    BaseScriptEngineTests.showApplicationLaunchNotification_var02(this._context, ++testCount);
 	    BaseScriptEngineTests.showNativeDialog_var01(this._context, ++testCount);
 	    BaseScriptEngineTests.showNativeDialog_var02(this._context, ++testCount);
 	    BaseScriptEngineTests.showScriptNotification_var01(this._context, ++testCount);
