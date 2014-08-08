@@ -1247,6 +1247,7 @@
 	<string name="name_non_ascii_dialog_test">Non-ASCII Dialog Tests</string>
 	<string name="name_local_log_server_test">Local Logging Tests</string>
 	<string name="menu_test_label">Start Tests</string>
+	<string name="name_matlab_tree_model_test">Matlab Tree Model Tests</string>
 
 	<string name="title_tests_successful">All Tests Passed</string>
 	<string name="message_tests_successful">All tests passed successfully.</string>
