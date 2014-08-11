@@ -269,8 +269,7 @@ public class BaseScriptEngineTests {
 	}
 
 	public static void fetchLabels(Context ctx, int testCount) {  String MN = "fetchLabels";
-		runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false, false);
-		
+	runTest(ctx, persistValue, MN, testCount, "PurpleRobot.fetchLabels(); " + getScriptForPersistStringOnTestCompletedDefault(MN), CN, MN, false, false, false, false);
 	}
 
 	public static void fetchNamespaceMap(Context ctx, int testCount) {  String MN = "fetchNamespaceMap";
@@ -311,8 +310,7 @@ public class BaseScriptEngineTests {
 	}
 
 	public static void fetchTriggerIds(Context ctx, int testCount) {  String MN = "fetchTriggerIds";
-		runTest(ctx, persistValue, MN, testCount, "PurpleRobot.fetchTriggerIds(); " + getScriptForPersistStringOnTestCompletedDefault(MN), CN, MN, false, false, false, false);
-		
+		runTest(ctx, persistValue, MN, testCount, "PurpleRobot.fetchTriggerIds(); " + getScriptForPersistStringOnTestCompletedDefault(MN), CN, MN, false, false, false, false);		
 	}
 
 	public static void fetchUserHash(Context ctx, int testCount) {  String MN = "fetchUserHash";
@@ -409,8 +407,13 @@ public class BaseScriptEngineTests {
 	}
 
 	public static void restoreDefaultId(Context ctx, int testCount) {  String MN = "restoreDefaultId";
-		runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false, false);
-		
+	String expected = (CN+"."+MN);
+	String actual = runTest(ctx, persistValue, MN, testCount, "var u1 = PurpleRobot.fetchUserId(); PurpleRobot.setUserId('" + expected + "'); var u2 = PurpleRobot.fetchUserId(); PurpleRobot.restoreDefaultId(); var u3 =  PurpleRobot.fetchUserId(); PurpleRobot.persistString('"+CN+"','"+MN+"', u1+'|||'+u2+'|||'+u3);  PurpleRobot.log('u1 = '+u1+'; u2 = '+u2+'; u3 = '+u3);", CN, MN, false, false, true, true);
+	String[] fetches = actual.split("\\|\\|\\|");
+	StringBuilder sb = new StringBuilder();
+	for(String s : fetches) { sb.append(s + "; ");	}
+	Log.d(CN+"."+MN, "fetches = " + sb.toString());
+	Assert.assertFalse(CN+": failed; strings are equal for string: " + fetches[1], fetches[1].equals(fetches[2]));
 	}
 
 	public static void run(Context ctx, int testCount) {  String MN = "run";
@@ -440,8 +443,9 @@ public class BaseScriptEngineTests {
 	}
 	
 	public static void setUserId(Context ctx, int testCount) {  String MN = "setUserId";
-		runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false, false);
-		
+		String expected = (CN+"."+MN);
+		String actual = runTest(ctx, persistValue, MN, testCount, "var u1 = PurpleRobot.fetchUserId(); PurpleRobot.setUserId('" + expected + "'); var u2 = PurpleRobot.fetchUserId(); PurpleRobot.persistString('"+CN+"','"+MN+"', u2); PurpleRobot.setUserId(u1);", CN, MN, false, false, true, true);
+		Assert.assertEquals(expected, actual);
 	}
 
 	public static void showApplicationLaunchNotification_var01(Context ctx, int testCount) { String MN = "showApplicationLaunchNotification_var01";
@@ -484,7 +488,7 @@ public class BaseScriptEngineTests {
 	}
 
 	public static void updateConfigUrl(Context ctx, int testCount) {  String MN = "updateConfigUrl";
-	runTest(ctx, persistValue, MN, testCount, "PurpleRobot.updateConfigUrl('http://localhost');" + getScriptForPersistStringOnTestCompletedDefault(MN), CN, MN, false, false, false, false);
+	runTest(ctx, persistValue, MN, testCount, "PurpleRobot.updateConfigUrl('http://localhost');" + getScriptForPersistStringOnTestCompletedDefault(MN) + " PurpleRobot.updateConfigUrl('http://mohrlab.northwestern.edu/robot/');", CN, MN, false, false, false, false);
 	// TODO: verify that the PR cfg URL was actually updated (read the PR cfg URL field)
 	}
 
