@@ -911,7 +911,7 @@
 	<string name="message_address_book_label_check">Please provide some information about your friends and family to help the system function better.</string>	
 	<string name="contact_group_label_unknown">Unknown</string>	
 
-	<string name="google_places_browser_key"></string>
+	<!-- <string name="google_places_browser_key"></string> -->
 
 	<!-- Location Label Activity -->
 	<string name="title_location_label">Places Calibrator</string>	

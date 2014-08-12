@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -53,6 +54,7 @@ public class TriggerManager
     	return TriggerManager._instance;
     }
 
+	@SuppressLint("Wakelock")
 	public void nudgeTriggers(Context context)
 	{
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
@@ -351,6 +353,7 @@ public class TriggerManager
 		}
 	}
 
+	@SuppressLint("Wakelock")
 	public List<Long> upcomingFireTimes(Context context) 
 	{
 		ArrayList<Long> upcoming = new ArrayList<Long>();
