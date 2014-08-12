@@ -344,7 +344,7 @@ public class BaseScriptEngineTests {
 	}
 
 	public static void launchUrl(Context ctx, int testCount) {  String MN = "launchUrl";
-		runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false, false);
+		runTest(ctx, persistValue, MN, testCount, "PurpleRobot.launchUrl('http://www.northwestern.edu');" + getScriptForPersistStringOnTestCompletedDefault(MN), CN, MN, false, false, false, false);
 		
 	}
 
@@ -406,14 +406,16 @@ public class BaseScriptEngineTests {
 		
 	}
 
+	public static String DELIM = "|||";
+	
 	public static void restoreDefaultId(Context ctx, int testCount) {  String MN = "restoreDefaultId";
-	String expected = (CN+"."+MN);
-	String actual = runTest(ctx, persistValue, MN, testCount, "var u1 = PurpleRobot.fetchUserId(); PurpleRobot.setUserId('" + expected + "'); var u2 = PurpleRobot.fetchUserId(); PurpleRobot.restoreDefaultId(); var u3 =  PurpleRobot.fetchUserId(); PurpleRobot.persistString('"+CN+"','"+MN+"', u1+'|||'+u2+'|||'+u3);  PurpleRobot.log('u1 = '+u1+'; u2 = '+u2+'; u3 = '+u3);", CN, MN, false, false, true, true);
-	String[] fetches = actual.split("\\|\\|\\|");
-	StringBuilder sb = new StringBuilder();
-	for(String s : fetches) { sb.append(s + "; ");	}
-	Log.d(CN+"."+MN, "fetches = " + sb.toString());
-	Assert.assertFalse(CN+": failed; strings are equal for string: " + fetches[1], fetches[1].equals(fetches[2]));
+//	String expected = (CN+"."+MN);
+//	String actual = runTest(ctx, persistValue, MN, testCount, "var u1 = PurpleRobot.fetchUserId(); PurpleRobot.setUserId('" + expected + "'); var u2 = PurpleRobot.fetchUserId(); PurpleRobot.restoreDefaultId(); var u3 =  PurpleRobot.fetchUserId(); PurpleRobot.persistString('"+CN+"','"+MN+"', u1+'"+DELIM+"'+u2+'"+DELIM+"'+u3);  PurpleRobot.log('u1 = '+u1+'; u2 = '+u2+'; u3 = '+u3);", CN, MN, false, false, true, true);
+//	String[] fetches = actual.split("\\|\\|\\|");
+//	StringBuilder sb = new StringBuilder();
+//	for(String s : fetches) { sb.append(s + "; ");	}
+//	Log.d(CN+"."+MN, "fetches = " + sb.toString());
+//	Assert.assertFalse(CN+": failed; strings are equal for string: " + fetches[1], fetches[1].equals(fetches[2]));
 	}
 
 	public static void run(Context ctx, int testCount) {  String MN = "run";
@@ -445,7 +447,7 @@ public class BaseScriptEngineTests {
 	public static void setUserId(Context ctx, int testCount) {  String MN = "setUserId";
 		String expected = (CN+"."+MN);
 		String actual = runTest(ctx, persistValue, MN, testCount, "var u1 = PurpleRobot.fetchUserId(); PurpleRobot.setUserId('" + expected + "'); var u2 = PurpleRobot.fetchUserId(); PurpleRobot.persistString('"+CN+"','"+MN+"', u2); PurpleRobot.setUserId(u1);", CN, MN, false, false, true, true);
-		Assert.assertEquals(expected, actual);
+		Assert.assertEquals("in setUserId: ", expected, actual);
 	}
 
 	public static void showApplicationLaunchNotification_var01(Context ctx, int testCount) { String MN = "showApplicationLaunchNotification_var01";
@@ -515,7 +517,47 @@ public class BaseScriptEngineTests {
 	public static void vibrate(Context ctx, int testCount) {  String MN = "vibrate";
 		runTest(ctx, persistValue, MN, testCount, "PurpleRobot.vibrate('buzz'); " + getScriptForPersistStringOnTestCompletedDefault(MN), CN, MN, false, false, false, false);
 	}
-
+	
+	
+	// ---------- tests of protected methods ----------
+	public static void broadcastIntent(Context ctx, int testCount) { String MN = "broadcastIntent"; 
+	runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false, false); 
+	}
+	public static void constructDirectLaunchIntent(Context ctx, int testCount) { String MN = "constructDirectLaunchIntent"; 
+	runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false, false); 
+	}
+	public static void constructLaunchIntent(Context ctx, int testCount) { String MN = "constructLaunchIntent";
+	runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false, false); 
+	}
+	public static void fetchWidget(Context ctx, int testCount) { String MN = "fetchWidget"; 
+	runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false, false); 
+	}
+	public static void language(Context ctx, int testCount) { String MN = "language"; 
+	runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false, false); 
+	}
+//	public static void launchApplication(Context ctx, int testCount) { String MN = "launchApplication"; runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false, false); }
+//	public static void showApplicationLaunchNotification(Context ctx, int testCount) { String MN = "showApplicationLaunchNotification"; runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false, false); }
+//	public static void showApplicationLaunchNotification(Context ctx, int testCount) { String MN = "showApplicationLaunchNotification"; runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false, false); }
+	public static void transmitData(Context ctx, int testCount) { String MN = "transmitData"; 
+	runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false, false); 
+	}
+//	public static void updateConfig(Context ctx, int testCount) { String MN = "updateConfig"; runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false, false); }
+	public static void updateProbe(Context ctx, int testCount) { String MN = "updateProbe"; 
+	runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false, false); 
+	}
+	public static void updateTrigger(Context ctx, int testCount) { String MN = "updateTrigger";
+	String id = (CN+"."+MN);
+	String expected = "T";
+	String actual = runTest(ctx, persistValue, MN, testCount, "PurpleRobot.updateTrigger('" + id + "', { identifier: '" + id + "', type: 'datetime', name: 'test: " + id + "' }); PurpleRobot.loadLibrary('underscore.js'); if(_.contains(PurpleRobot.fetchTriggers(), function(t) { return t.identifier == '" + id + "'; })) { PurpleRobot.persistString('"+CN+"','"+MN+"','T'); } else { PurpleRobot.persistString('"+CN+"','"+MN+"','F'); } PurpleRobot.deleteTrigger('"+id+"');", CN, MN, false, false, false, true);
+	Assert.assertEquals(expected, actual);
+	}
+//	public static void updateWidget(Context ctx, int testCount) { String MN = "updateWidget"; runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false, false); }
+//	public static void updateWidget(Context ctx, int testCount) { String MN = "updateWidget"; runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false, false); }
+	public static void widgets(Context ctx, int testCount) { String MN = "widgets"; 
+	runTest(ctx, persistValue, MN, testCount, null, CN, MN, false, false, false, false); 
+	}
+	
+	
 	/**
 	 * Runs specified function and stores the return value of the function in a persistent string. 
 	 * @param mn Name of the test method.
