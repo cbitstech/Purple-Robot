@@ -170,6 +170,23 @@ public class JavascriptTestCase extends RobotTestCase {
 	    JavaScriptEngineTests.updateWidget(this._context, ++testCount);
 	    JavaScriptEngineTests.updateWidget(this._context, ++testCount);
 	    JavaScriptEngineTests.widgets(this._context, ++testCount);
+	    
+	    // ----- tests of protected BaseScriptEngine methods
+	    BaseScriptEngineTests.language(this._context, ++testCount);
+	    BaseScriptEngineTests.transmitData(this._context, ++testCount);
+//	    BaseScriptEngineTests.updateWidget(this._context, ++testCount);
+	    BaseScriptEngineTests.constructLaunchIntent(this._context, ++testCount);
+	    BaseScriptEngineTests.constructDirectLaunchIntent(this._context, ++testCount);
+	    BaseScriptEngineTests.updateTrigger(this._context, ++testCount);
+	    BaseScriptEngineTests.updateProbe(this._context, ++testCount);
+//	    BaseScriptEngineTests.launchApplication(this._context, ++testCount);
+//	    BaseScriptEngineTests.showApplicationLaunchNotification_01(this._context, ++testCount);
+//	    BaseScriptEngineTests.showApplicationLaunchNotification_var02(this._context, ++testCount);
+//	    BaseScriptEngineTests.updateWidget(this._context, ++testCount);
+	    BaseScriptEngineTests.fetchWidget(this._context, ++testCount);
+	    BaseScriptEngineTests.widgets(this._context, ++testCount);
+	    BaseScriptEngineTests.broadcastIntent(this._context, ++testCount);
+//	    BaseScriptEngineTests.updateConfig(this._context, ++testCount);
 
 		Log.d(CN+".test", fmtTestHeader("END TESTS!"));
 	}
