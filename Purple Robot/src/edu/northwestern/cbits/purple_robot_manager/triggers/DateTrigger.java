@@ -71,7 +71,7 @@ public class DateTrigger extends Trigger
 
 	private long _lastFireCalcDate = 0;
 	private List<Date> _upcomingFireDates = new ArrayList<Date>();
-	
+
 	private static List<Runnable> pendingRefreshes = new ArrayList<Runnable>();
 	private static boolean isRefreshing = false;
 	
@@ -165,7 +165,7 @@ public class DateTrigger extends Trigger
 			
 			if (this._calendar == null)
 				return;
-			
+
 			ArrayList<Date> upcoming = new ArrayList<Date>();
 			
 			long current = now;
@@ -264,7 +264,8 @@ public class DateTrigger extends Trigger
 
 		try
 		{
-			StringReader sin = new StringReader(this._icalString);
+			
+			StringReader sin = new StringReader(this.adjustCalendar(context, this._icalString));
 			CalendarBuilder builder = new CalendarBuilder();
 
 			this._calendar = builder.build(sin);
@@ -283,6 +284,74 @@ public class DateTrigger extends Trigger
 		}
 	}
 	
+	private String adjustCalendar(Context context, String original) 
+	{
+		if (original.contains("FREQ=MINUTELY"))
+		{
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
+
+			StringBuffer newCalendar = new StringBuffer();
+			
+			long day = (24 * 60 * 60 * 1000);
+			
+			for (String line : original.split("\n"))
+			{
+				if (line.startsWith("DTSTART"))
+				{
+					try 
+					{
+						Date originalDate = sdf.parse(line.substring(8));
+						
+						long now = System.currentTimeMillis();
+						
+						long newTime = now - (now % day) + (originalDate.getTime() % day);
+						
+						Date newDate = new Date(newTime);
+						
+						String newLine = "DTSTART:" + sdf.format(newDate);
+
+						newCalendar.append(newLine + "\n");
+					}
+					catch (ParseException e) 
+					{
+						LogManager.getInstance(context).logException(e);
+						
+						return original;
+					} 
+				}
+				else if (line.startsWith("DTEND"))
+				{
+					try 
+					{
+						Date originalDate = sdf.parse(line.substring(6));
+						
+						long now = System.currentTimeMillis();
+						
+						long newTime = now - (now % day) + (originalDate.getTime() % day);
+						
+						Date newDate = new Date(newTime);
+						
+						String newLine = "DTEND:" + sdf.format(newDate);
+
+						newCalendar.append(newLine + "\n");
+					}
+					catch (ParseException e) 
+					{
+						LogManager.getInstance(context).logException(e);
+						
+						return original;
+					} 
+				}
+				else
+					newCalendar.append(line + "\n");
+			}
+		
+			return newCalendar.toString();
+		}
+
+		return original;
+	}
+
 	public boolean updateFromMap(Context context, Map<String, Object> map) 
 	{
 		if (super.updateFromMap(context, map))
@@ -409,8 +478,10 @@ public class DateTrigger extends Trigger
 
 	public Period getPeriod(Context context, long timestamp)
 	{
+		timestamp = timestamp - (timestamp % (60000));
+		
 		Date date = new Date(timestamp);
-
+		
 		PeriodList periodList = null;
 		
 		if (this._calendar != null && periodList == null)
@@ -727,7 +798,7 @@ public class DateTrigger extends Trigger
 			if (this.getPeriod(context, start) != null)
 				times.add(Long.valueOf(start));
 			
-			start += 60000;
+			start += (60000 * 15);
 		}
 
 		return times;
