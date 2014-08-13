@@ -13,7 +13,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
-import edu.northwestern.cbits.purple_robot_manager.probes.builtin.AccelerometerProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RobotHealthProbe;
 
 public class PurpleRobotHealthProbeTestCase extends RobotTestCase 
