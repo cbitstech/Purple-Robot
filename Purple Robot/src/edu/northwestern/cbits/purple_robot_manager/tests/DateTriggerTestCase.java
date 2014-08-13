@@ -3,6 +3,7 @@ package edu.northwestern.cbits.purple_robot_manager.tests;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import junit.framework.Assert;
 
@@ -10,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 import edu.northwestern.cbits.purple_robot_manager.triggers.DateTrigger;
@@ -38,7 +40,7 @@ public class DateTriggerTestCase extends RobotTestCase
 
 		String triggerId = "date-test";
 		
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss", Locale.getDefault());
 		
 		long now = System.currentTimeMillis();
 		

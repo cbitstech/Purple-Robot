@@ -32,6 +32,7 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -264,7 +265,6 @@ public class DateTrigger extends Trigger
 
 		try
 		{
-			
 			StringReader sin = new StringReader(this.adjustCalendar(context, this._icalString));
 			CalendarBuilder builder = new CalendarBuilder();
 
@@ -304,13 +304,16 @@ public class DateTrigger extends Trigger
 						
 						long now = System.currentTimeMillis();
 						
-						long newTime = now - (now % day) + (originalDate.getTime() % day);
+						long newTime = now - day - (now % day) + (originalDate.getTime() % day);
 						
 						Date newDate = new Date(newTime);
 						
 						String newLine = "DTSTART:" + sdf.format(newDate);
 
 						newCalendar.append(newLine + "\n");
+						
+						Log.e("PR", "OLD START: " + line);
+						Log.e("PR", "NEW START: " + newLine);
 					}
 					catch (ParseException e) 
 					{
@@ -327,13 +330,16 @@ public class DateTrigger extends Trigger
 						
 						long now = System.currentTimeMillis();
 						
-						long newTime = now - (now % day) + (originalDate.getTime() % day);
+						long newTime = now - day - (now % day) + (originalDate.getTime() % day);
 						
 						Date newDate = new Date(newTime);
 						
 						String newLine = "DTEND:" + sdf.format(newDate);
 
 						newCalendar.append(newLine + "\n");
+
+						Log.e("PR", "OLD END: " + line);
+						Log.e("PR", "NEW END: " + newLine);
 					}
 					catch (ParseException e) 
 					{
@@ -798,7 +804,7 @@ public class DateTrigger extends Trigger
 			if (this.getPeriod(context, start) != null)
 				times.add(Long.valueOf(start));
 			
-			start += (60000 * 15);
+			start += 60000;
 		}
 
 		return times;

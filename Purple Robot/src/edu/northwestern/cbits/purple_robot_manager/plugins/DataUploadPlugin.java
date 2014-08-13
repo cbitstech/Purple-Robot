@@ -70,9 +70,10 @@ public abstract class DataUploadPlugin extends OutputPlugin
 
 	private static final String RESTRICT_TO_WIFI = "config_restrict_data_wifi";
 	private static final boolean RESTRICT_TO_WIFI_DEFAULT = true;
-	private static final String ALLOW_ALL_SSL_CERTIFICATES = "config_http_liberal_ssl";
-	private static final boolean ALLOW_ALL_SSL_CERTIFICATES_DEFAULT = true;
 	private static final String UPLOAD_URI = "config_data_server_uri";
+
+	public static final String ALLOW_ALL_SSL_CERTIFICATES = "config_http_liberal_ssl";
+	public static final boolean ALLOW_ALL_SSL_CERTIFICATES_DEFAULT = true;
 
 	protected static final int RESULT_SUCCESS = 0;
 	protected static final int RESULT_NO_CONNECTION = 1;
