@@ -609,6 +609,15 @@ public abstract class BaseScriptEngine
 	{
 		EncryptionManager.getInstance().setUserId(this._context, userId);
 		
+		try 
+		{
+			Thread.sleep(1000);
+		}
+		catch (InterruptedException e) 
+		{
+
+		}
+		
 		if (refreshConfig)
 			this.refreshConfigUrl();
 	}
