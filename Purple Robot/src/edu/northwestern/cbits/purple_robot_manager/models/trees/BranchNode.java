@@ -119,7 +119,7 @@ public class BranchNode extends TreeNode
 		public boolean evaluate(Map<String, Object> features) throws TreeNodeException
 		{
 			Object value = features.get(this._feature);
-			
+
 			if (value == null && this._operation != Operation.DEFAULT)
 			{
 				// We're missing a value to test and this isn't a DEFAULT node.
@@ -178,7 +178,7 @@ public class BranchNode extends TreeNode
 			
 			int result = testComparable.compareTo(valueComparable);
 			
-			return result != 1;
+			return result < 1;
 		}
 
 		/**
@@ -202,7 +202,7 @@ public class BranchNode extends TreeNode
 			
 			int result = testComparable.compareTo(valueComparable);
 			
-			return result != -1;
+			return result > -1;
 		}
 
 		/**
@@ -226,7 +226,7 @@ public class BranchNode extends TreeNode
 			
 			int result = testComparable.compareTo(valueComparable);
 			
-			return result == -1;
+			return result < 0;
 		}
 
 		/**
@@ -250,7 +250,7 @@ public class BranchNode extends TreeNode
 			
 			int result = testComparable.compareTo(valueComparable);
 			
-			return result == 1;
+			return result > 0;
 		}
 
 		/**
@@ -308,6 +308,16 @@ public class BranchNode extends TreeNode
 		}
 	}
 	
+	public BranchNode(String name) 
+	{
+		super(name);
+	}
+
+	public BranchNode() 
+	{
+		super(null);
+	}
+
 	/**
 	 * Adds a test and subtree to this node.
 	 * 

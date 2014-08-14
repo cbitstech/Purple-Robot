@@ -4,13 +4,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import junit.framework.Assert;
 
 import android.content.Context;
-import android.util.Log;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.models.trees.LeafNode;
 import edu.northwestern.cbits.purple_robot_manager.models.trees.TreeNode;
@@ -33,6 +34,8 @@ public class MatlabTreeModelTestCase extends RobotTestCase
 
 		try 
 		{
+			ArrayList<String> lines = new ArrayList<String>();
+			
 		    StringBuilder sb = new StringBuilder();
 		    
 		    InputStream file = this._context.getAssets().open("test_data/matlab-tree.txt");
@@ -42,37 +45,54 @@ public class MatlabTreeModelTestCase extends RobotTestCase
 
 		    while ((line = in.readLine()) != null) 
 		    {
-		      sb.append(line + "\n");
+				sb.append(line + "\n");
+				lines.add(line);
 		    }
 
 		    in.close();
-			
+
 			TreeNode node = TreeNodeParser.parseString(sb.toString());
-			System.out.println(node.toString(0));
 			
 			HashMap<String, Object> world = new HashMap<String, Object>();
 			
-			Map<String, Object> prediction = node.fetchPrediction(world);
-
 			// Outputs class at line 508.
-			world.put("x59", Double.valueOf(4.0));
-			world.put("x42", Double.valueOf(-1.0));
-			prediction = node.fetchPrediction(world);
-			Assert.assertEquals("MATLAB1", "4", prediction.get(LeafNode.PREDICTION));
+			world.put("x10", Double.valueOf(-1.0));
+			world.put("x91", Double.valueOf(-1.0));
+			world.put("x41", Double.valueOf(-2.0));
+			world.put("x6", Double.valueOf(-1.0));
 
-			world.put("x59", Double.valueOf(5.0));
-			prediction = node.fetchPrediction(world);
-			Assert.assertEquals("MATLAB2", "4", prediction.get(LeafNode.PREDICTION));
+			Map<String, Object> prediction = node.fetchPrediction(world);
+			Assert.assertEquals("MATLAB1", "3", prediction.get(LeafNode.PREDICTION));
 
-			world.put("x39", "0.16");
+			world.put("x6", Double.valueOf(0.0));
+			world.put("x30", Double.valueOf(-1.0));
+
 			prediction = node.fetchPrediction(world);
-//			System.out.println("Expect 4. Got " + prediction.get(LeafNode.PREDICTION) + " // " + prediction.get(LeafNode.ACCURACY) + "."); 
-			Assert.assertEquals("MATLAB3", "-4", prediction.get(LeafNode.PREDICTION));			
+			Assert.assertEquals("MATLAB2", "6", prediction.get(LeafNode.PREDICTION));
+
+			Assert.assertEquals("MATLAB3", "   1  if x10<-0.464422 then node 2 elseif x10>=-0.464422 then node 3 else 8", lines.get(0));			
+			Assert.assertEquals("MATLAB4", "1815  class = 1", lines.get(1814));
+			Assert.assertEquals("MATLAB5", "1455  if x18<0.26036 then node 1560 elseif x18>=0.26036 then node 1561 else 4", lines.get(1454));			
+			Assert.assertEquals("MATLAB6", " 894  if x100<1.42992 then node 1092 elseif x100>=1.42992 then node 1093 else 6", lines.get(893));
+			Assert.assertEquals("MATLAB7", "   3  if x3<0.392665 then node 6 elseif x3>=0.392665 then node 7 else 8", lines.get(2));
+			Assert.assertEquals("MATLAB8", "   9  if x108<-0.0457584 then node 18 elseif x108>=-0.0457584 then node 19 else 6", lines.get(8));
+
+			prediction = node.fetchPrediction(world);
+			Assert.assertEquals("MATLAB9", "2", prediction.get(LeafNode.PREDICTION));
 			
-			world.put("x39", Double.valueOf(20));
-			prediction = node.fetchPrediction(world);
-//			System.out.println("Expect 5. Got " + prediction.get(LeafNode.PREDICTION) + " // " + prediction.get(LeafNode.ACCURACY) + "."); 
-			Assert.assertEquals("MATLAB4", "-5", prediction.get(LeafNode.PREDICTION));
+			world.clear();
+			
+			try
+			{
+				prediction = node.fetchPrediction(world);
+
+				// Should throw exception before getting here...
+				Assert.fail("MATLAB100");
+			}
+			catch (TreeNodeException e)
+			{
+				
+			}
 		} 
 		catch (ParserNotFound e) 
 		{
