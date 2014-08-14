@@ -44,7 +44,6 @@ import android.net.http.AndroidHttpClient;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.test.AndroidTestCase;
-import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.TestActivity;
@@ -213,8 +212,6 @@ public abstract class RobotTestCase extends AndroidTestCase
 			body = EntityUtils.toString(httpEntity);
 
 		androidClient.close();
-		
-		Log.e("PR", "BODY: " + body + " " + response.getStatusLine());
 		
 		return body;
 	}

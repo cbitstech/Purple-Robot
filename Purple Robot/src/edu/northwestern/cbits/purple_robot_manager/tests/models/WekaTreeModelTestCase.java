@@ -10,7 +10,7 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import android.content.Context;
-import android.util.Log;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.models.trees.LeafNode;
 import edu.northwestern.cbits.purple_robot_manager.models.trees.TreeNode;

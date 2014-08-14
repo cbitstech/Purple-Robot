@@ -22,10 +22,22 @@ public class LeafNode extends TreeNode
 	 * confidence of this prediction. Parsers may add additional keys as needed.
 	 */
 
+	public LeafNode(String name, HashMap<String, Object> prediction) 
+	{
+		super(name);
+
+		this._prediction = prediction;
+
+		this._prediction.put(TreeNode.NAME, name);
+	}
+	
 	public LeafNode(HashMap<String, Object> prediction) 
 	{
+		super(null);
+		
 		this._prediction = prediction;
 	}
+
 
 	/**
 	 * Returns the prediction associated with this leaf node.

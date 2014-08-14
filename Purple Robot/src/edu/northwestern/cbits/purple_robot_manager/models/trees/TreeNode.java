@@ -8,6 +8,20 @@ import java.util.Map;
 
 public abstract class TreeNode 
 {
+	public static final String NAME = "name";
+	
+	private String _name = null;
+
+	public TreeNode(String name) 
+	{
+		this._name = name;
+	}
+	
+	public String getName()
+	{
+		return this._name;
+	}
+
 	/**
 	 * Returns a prediction for the given state of the world as interpreted by
 	 * the model
