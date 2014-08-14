@@ -25,12 +25,13 @@ public class Slugify
 	private static String normalize( String input )
 	{
 		String ret = StringUtils.trim( input );
+		
 		if ( StringUtils.isBlank( ret ) )
 		{
 			return "";
 		}
 
-		ret = ret.replace( "ß", "ss" );
+		// ret = ret.replace( "ÃŸ", "ss" );
 		return Normalizer.normalize( ret, Normalizer.Form.NFD )
 				.replaceAll( "[^\\p{ASCII}]", "")
 				.replaceAll( "[^a-zA-Z0-9 ]", "" );

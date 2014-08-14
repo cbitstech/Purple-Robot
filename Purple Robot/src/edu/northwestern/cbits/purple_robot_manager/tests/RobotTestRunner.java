@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
 
+import edu.northwestern.cbits.purple_robot_manager.tests.models.MatlabTreeModelTestCase;
 import edu.northwestern.cbits.purple_robot_manager.tests.models.WekaTreeModelTestCase;
 import edu.northwestern.cbits.purple_robot_manager.tests.ui.NonAsciiDialogTestCase;
 
@@ -34,6 +35,7 @@ public class RobotTestRunner extends AndroidTestRunner
 		this._suite.addTest(new LocalLogServerTestCase(context, 8));
 		this._suite.addTest(new AccelerometerProbeTestCase(context, 8));
 		this._suite.addTest(new WekaTreeModelTestCase(context, 8));
+		this._suite.addTest(new MatlabTreeModelTestCase(context, 8));
 		this._suite.addTest(new PurpleRobotHealthProbeTestCase(context, 8));
 		this._suite.addTest(new HalfHourDateTriggerTestCase(context, 9));
 		this._suite.addTest(new JavascriptTestCase(context, 9));
