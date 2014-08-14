@@ -54,40 +54,43 @@ public class MatlabTreeModelTestCase extends RobotTestCase
 			
 			Map<String, Object> prediction = node.fetchPrediction(world);
 
-			world.put("x59", Double.valueOf(0.1));
+			// Outputs class at line 508.
+			world.put("x59", Double.valueOf(4.0));
+			world.put("x42", Double.valueOf(-1.0));
 			prediction = node.fetchPrediction(world);
-//			System.out.println("Expect 3. Got " + prediction.get(LeafNode.PREDICTION) + " // " + prediction.get(LeafNode.ACCURACY) + "."); 
-			Assert.assertEquals("x59", "3", prediction.get(LeafNode.PREDICTION));
+			Assert.assertEquals("MATLAB1", "4", prediction.get(LeafNode.PREDICTION));
 
-			world.put("x59", "0.02");
+			world.put("x59", Double.valueOf(5.0));
 			prediction = node.fetchPrediction(world);
-//			System.out.println("Expect 2. Got " + prediction.get(LeafNode.PREDICTION) + " // " + prediction.get(LeafNode.ACCURACY) + "."); 
-			Assert.assertEquals("x59", "2", prediction.get(LeafNode.PREDICTION));
+			Assert.assertEquals("MATLAB2", "4", prediction.get(LeafNode.PREDICTION));
 
 			world.put("x39", "0.16");
 			prediction = node.fetchPrediction(world);
 //			System.out.println("Expect 4. Got " + prediction.get(LeafNode.PREDICTION) + " // " + prediction.get(LeafNode.ACCURACY) + "."); 
-			Assert.assertEquals("x39", "4", prediction.get(LeafNode.PREDICTION));			
+			Assert.assertEquals("MATLAB3", "-4", prediction.get(LeafNode.PREDICTION));			
 			
 			world.put("x39", Double.valueOf(20));
 			prediction = node.fetchPrediction(world);
 //			System.out.println("Expect 5. Got " + prediction.get(LeafNode.PREDICTION) + " // " + prediction.get(LeafNode.ACCURACY) + "."); 
-			Assert.assertEquals("x39", "5", prediction.get(LeafNode.PREDICTION));
+			Assert.assertEquals("MATLAB4", "-5", prediction.get(LeafNode.PREDICTION));
 		} 
 		catch (ParserNotFound e) 
 		{
 			e.printStackTrace();
-			Assert.fail("x59");
+			
+			Assert.fail("MATLAB100");
 		} 
 		catch (TreeNodeException e) 
 		{
 			e.printStackTrace();
-			Assert.fail("x39");
+			
+			Assert.fail("MATLAB101");
 		}
-		// 20140808, estory: added due to build error
-		catch (IOException e) {
+		catch (IOException e) 
+		{
 			e.printStackTrace();
-			// TODO: anything else, e.g. Assert.fail?
+
+			Assert.fail("MATLAB102");
 		}
 	}
 	
