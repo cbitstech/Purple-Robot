@@ -72,6 +72,12 @@ public class JsonScriptRequestHandler implements HttpRequestHandler
 
                 	arguments = new JSONObject(jsonArg);
             	}
+            	catch (IllegalArgumentException e)
+            	{
+                	jsonArg = URLDecoder.decode(u.getQueryParameter("json"), "UTF-16");
+
+                	arguments = new JSONObject(jsonArg);
+            	}
 			} 
             catch (JSONException e) 
             {

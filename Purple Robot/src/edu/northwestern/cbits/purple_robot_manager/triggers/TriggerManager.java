@@ -20,6 +20,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+
 import edu.emory.mathcs.backport.java.util.Collections;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -108,6 +109,9 @@ public class TriggerManager
 				if (!found)
 					toAdd.add(newTrigger);
 			}
+			
+			if (toAdd.size() > 0)
+				ManagerService.resetTriggerNudgeDate();
 		
 			this._triggers.addAll(toAdd);
 		}

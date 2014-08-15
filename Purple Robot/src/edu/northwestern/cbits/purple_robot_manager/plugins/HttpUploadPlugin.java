@@ -1293,7 +1293,16 @@ public class HttpUploadPlugin extends OutputPlugin
 		});
 		
 		if (filenames.length < 1024)
-			return FileUtils.sizeOf(pendingFolder);
+		{
+			try
+			{
+				return FileUtils.sizeOf(pendingFolder);
+			}
+			catch (IllegalArgumentException e)
+			{
+				
+			}
+		}
 		
 		return 2 * 1024 * 1024 * 1024;
 	}

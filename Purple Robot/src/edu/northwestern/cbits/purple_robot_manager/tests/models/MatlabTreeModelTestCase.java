@@ -77,7 +77,13 @@ public class MatlabTreeModelTestCase extends RobotTestCase
 			Assert.assertEquals("MATLAB7", "   3  if x3<0.392665 then node 6 elseif x3>=0.392665 then node 7 else 8", lines.get(2));
 			Assert.assertEquals("MATLAB8", "   9  if x108<-0.0457584 then node 18 elseif x108>=-0.0457584 then node 19 else 6", lines.get(8));
 
+			world.put("x91", Double.valueOf(0.0));
+			world.put("x98", Double.valueOf(0.0));
+			world.put("x6", Double.valueOf(-2.0));
+			world.put("x103", Double.valueOf(-1.0));
+
 			prediction = node.fetchPrediction(world);
+			
 			Assert.assertEquals("MATLAB9", "2", prediction.get(LeafNode.PREDICTION));
 			
 			world.clear();

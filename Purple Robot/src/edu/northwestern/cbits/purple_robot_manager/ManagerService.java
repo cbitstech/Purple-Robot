@@ -1,6 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -24,6 +25,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+
 import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -64,6 +66,8 @@ public class ManagerService extends IntentService
 
 	private static boolean _checkSetup = false;
 	private static long _lastTriggerNudge = 0;
+	private static boolean _updatingTriggerSchedule = false;
+	protected static boolean _needsTriggerUpdate = false;
 
 	public ManagerService()
 	{
@@ -80,12 +84,12 @@ public class ManagerService extends IntentService
 	{
 		String action = intent.getAction();
 		
+		final ManagerService me = this;
+		
 		if (GOOGLE_PLAY_ACTIVITY_DETECTED.equalsIgnoreCase(action))
 			ActivityDetectionProbe.activityDetected(this, intent);
 		else if (REFRESH_ERROR_STATE_INTENT.equalsIgnoreCase(action))
 		{
-			final ManagerService me = this;
-			
 			Runnable r = new Runnable()
 			{
 				public void run() 
@@ -186,8 +190,6 @@ public class ManagerService extends IntentService
 	
 				if (r != null)
 				{
-					final ManagerService me = this;
-					
 					Thread t = new Thread(new Runnable()
 					{
 						public void run()
@@ -213,8 +215,6 @@ public class ManagerService extends IntentService
 			{
 				try 
 				{
-					final ManagerService me = this;
-
 					final AssetFileDescriptor afd = this.getAssets().openFd(ManagerService.pathForSound(this, toneString));
 
 					Runnable r = new Runnable()
@@ -334,32 +334,56 @@ public class ManagerService extends IntentService
 		}
 		else if (UPDATE_TRIGGER_SCHEDULE_INTENT.equals(action))
 		{
-			List<Long> times = TriggerManager.getInstance(this).upcomingFireTimes(this);
-			
-			long now = System.currentTimeMillis();
-			
-			for (int index = 0; now > ManagerService._lastTriggerNudge && index < times.size(); index++)
+			Runnable r = new Runnable()
 			{
-				Long fire = times.get(index);
-
-				if (Math.abs(ManagerService._lastTriggerNudge - fire.longValue()) >= 60000)
+				public void run() 
 				{
-					AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+					if (ManagerService._updatingTriggerSchedule)
+					{
+						ManagerService._needsTriggerUpdate  = true;
+
+						return;
+					}			
 					
-					PendingIntent pi = PendingIntent.getService(this, 0, new Intent(ManagerService.FIRE_TRIGGERS_INTENT), PendingIntent.FLAG_UPDATE_CURRENT);
-
-					alarmManager.cancel(pi);
-
-					ManagerService._lastTriggerNudge = fire.longValue();
+					ManagerService._updatingTriggerSchedule = true;
+					ManagerService._needsTriggerUpdate = false;
 					
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-						alarmManager.setExact(AlarmManager.RTC_WAKEUP, fire.longValue(), pi);
-					else
-						alarmManager.set(AlarmManager.RTC_WAKEUP, fire.longValue(), pi);
+					List<Long> times = TriggerManager.getInstance(me).upcomingFireTimes(me);
+					
+					long now = System.currentTimeMillis();
+					
+					for (int index = 0; now > ManagerService._lastTriggerNudge && index < times.size(); index++)
+					{
+						Long fire = times.get(index);
 
-					break;
+						if (Math.abs(ManagerService._lastTriggerNudge - fire.longValue()) >= 60000)
+						{
+							AlarmManager alarmManager = (AlarmManager) me.getSystemService(Context.ALARM_SERVICE);
+							
+							PendingIntent pi = PendingIntent.getService(me, 0, new Intent(ManagerService.FIRE_TRIGGERS_INTENT), PendingIntent.FLAG_UPDATE_CURRENT);
+
+							alarmManager.cancel(pi);
+
+							ManagerService._lastTriggerNudge = fire.longValue();
+							
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+								alarmManager.setExact(AlarmManager.RTC_WAKEUP, fire.longValue(), pi);
+							else
+								alarmManager.set(AlarmManager.RTC_WAKEUP, fire.longValue(), pi);
+
+							break;
+						}
+					}
+
+					ManagerService._updatingTriggerSchedule = false;
+					
+					if (ManagerService._needsTriggerUpdate)
+						this.run();
 				}
-			}
+			};
+			
+			Thread t = new Thread(r);
+			t.start();
 		}
 		else if (REFRESH_CONFIGURATION.equals(action))
 			LegacyJSONConfigFile.update(this, false);
@@ -433,4 +457,8 @@ public class ManagerService extends IntentService
 		return name;
 	}
 
+	public static void resetTriggerNudgeDate() 
+	{
+		ManagerService._lastTriggerNudge = 0;
+	}
 }

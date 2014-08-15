@@ -1,11 +1,10 @@
 package edu.northwestern.cbits.purple_robot_manager.tests.ui;
 
 import org.mozilla.javascript.NativeJavaObject;
-import org.mozilla.javascript.NativeObject;
 
 import junit.framework.Assert;
 import android.content.Context;
-import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 import edu.northwestern.cbits.purple_robot_manager.tests.RobotTestCase;

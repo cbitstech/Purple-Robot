@@ -813,6 +813,7 @@ public abstract class BaseScriptEngine
 		boolean found = false;
 		
 		params.put("identifier", triggerId);
+		
 		for (Trigger trigger : TriggerManager.getInstance(this._context).triggersForId(triggerId))
 		{
 			trigger.updateFromMap(this._context, params);

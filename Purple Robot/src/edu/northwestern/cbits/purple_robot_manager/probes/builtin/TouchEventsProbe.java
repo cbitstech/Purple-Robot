@@ -80,37 +80,41 @@ public class TouchEventsProbe extends Probe
 		
 		if (enabled)
 		{
-        	if (this._overlay == null)
-        	{
-    			WindowManager wm = (WindowManager) this._context.getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
-    			
-    			WindowManager.LayoutParams params = new WindowManager.LayoutParams();
-    			
-    			params.format = PixelFormat.TRANSLUCENT;
-    			params.height = 1; // WindowManager.LayoutParams.MATCH_PARENT;
-    		    params.width = 1; // WindowManager.LayoutParams.MATCH_PARENT;
-    		    params.gravity = Gravity.RIGHT | Gravity.BOTTOM;
-    		    params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
-    		    params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH;
-    		    
-    		    final TouchEventsProbe me = this;
-    		    
-    		    this._overlay = new LinearLayout(this._context.getApplicationContext());
-    		    this._overlay.setBackgroundColor(android.graphics.Color.argb(0, 255, 255, 255));
-    		    this._overlay.setHapticFeedbackEnabled(true);
-    		    this._overlay.setOnTouchListener(new OnTouchListener() 
-    		    {
-					public boolean onTouch(View arg0, MotionEvent event) 
-					{
-						me._lastTouch = System.currentTimeMillis();
-						me._timestamps.add(me._lastTouch);
+			WindowManager wm = (WindowManager) this._context.getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
+			
+			synchronized(wm)
+			{
+	        	if (this._overlay == null)
+	        	{
+	    			
+	    			WindowManager.LayoutParams params = new WindowManager.LayoutParams();
+	    			
+	    			params.format = PixelFormat.TRANSLUCENT;
+	    			params.height = 1; // WindowManager.LayoutParams.MATCH_PARENT;
+	    		    params.width = 1; // WindowManager.LayoutParams.MATCH_PARENT;
+	    		    params.gravity = Gravity.RIGHT | Gravity.BOTTOM;
+	    		    params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+	    		    params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH;
+	    		    
+	    		    final TouchEventsProbe me = this;
+	    		    
+	    		    this._overlay = new LinearLayout(this._context.getApplicationContext());
+	    		    this._overlay.setBackgroundColor(android.graphics.Color.argb(0, 255, 255, 255));
+	    		    this._overlay.setHapticFeedbackEnabled(true);
+	    		    this._overlay.setOnTouchListener(new OnTouchListener() 
+	    		    {
+						public boolean onTouch(View arg0, MotionEvent event) 
+						{
+							me._lastTouch = System.currentTimeMillis();
+							me._timestamps.add(me._lastTouch);
 
-    		            return false;
-					}
-    		    });
+	    		            return false;
+						}
+	    		    });
 
-    		    wm.addView(this._overlay, params);
-	        }
+	    		    wm.addView(this._overlay, params);
+		        }				
+			}
 			
         	if (this._lastTouch != 0)
         	{
