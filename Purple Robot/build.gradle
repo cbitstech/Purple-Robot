@@ -60,7 +60,7 @@ android {
             runProguard true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
             signingConfig signingConfigs.release
-            debuggable true
+            debuggable false
         }
     }
 	
