@@ -34,6 +34,7 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.util.Log;
 
+import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
@@ -68,10 +69,10 @@ public class DateTrigger extends Trigger
 	
 	private Calendar _calendar = null;
 	
-	private String _icalString = null;
+	public String _icalString = null;
 
 	private long _lastFireCalcDate = 0;
-	private List<Date> _upcomingFireDates = new ArrayList<Date>();
+	private final List<Date> _upcomingFireDates = new ArrayList<Date>();
 
 	private static List<Runnable> pendingRefreshes = new ArrayList<Runnable>();
 	private static boolean isRefreshing = false;
@@ -176,8 +177,8 @@ public class DateTrigger extends Trigger
 			long hour = 1000 * 60 * 60;
 			
 			Date currentDate = new Date(now);
-
-			while (current - now < (hour * 48) && upcoming.size() < maxCount)
+			
+			while (current < now + (hour * 48) && upcoming.size() < maxCount)
 			{
 				DateTime from = new DateTime(new Date(current));
 				DateTime to = new DateTime(new Date(current + hour));
@@ -454,7 +455,11 @@ public class DateTrigger extends Trigger
 			this.refresh(context);
 
 			this.refreshCalendar(context);
-			
+
+			ManagerService.resetTriggerNudgeDate();
+
+			TriggerManager.getInstance(context).persistTriggers(context);
+
 			return true;
 		}
 		
@@ -484,8 +489,6 @@ public class DateTrigger extends Trigger
 
 	public Period getPeriod(Context context, long timestamp)
 	{
-		timestamp = timestamp - (timestamp % (60000));
-		
 		Date date = new Date(timestamp);
 		
 		PeriodList periodList = null;
@@ -505,9 +508,9 @@ public class DateTrigger extends Trigger
 				for (Object o : this._calendar.getComponents("VEVENT"))
 				{
 					Component c = (Component) o;
-	
+					
 					PeriodList l = c.calculateRecurrenceSet(period);
-	
+
 					if (l != null && l.size() > 0)
 						periodList = l;
 				}
@@ -597,14 +600,14 @@ public class DateTrigger extends Trigger
 	{
 		if (obj instanceof Date)
 		{
-			if (this._calendar != null)
-			{
-				Date date = (Date) obj;
+			if (this._calendar == null)
+				this.refreshCalendar(context);
 
-				Period p = this.getPeriod(context, date.getTime());
+			Date date = (Date) obj;
 
-				return (p != null);
-			}
+			Period p = this.getPeriod(context, date.getTime());
+
+			return (p != null);
 		}
 
 		return false;
@@ -801,9 +804,11 @@ public class DateTrigger extends Trigger
 		
 		while (start <= end)
 		{
-			if (this.getPeriod(context, start) != null)
-				times.add(Long.valueOf(start));
+			Period p = this.getPeriod(context, start);
 			
+			if (p != null)
+				times.add(Long.valueOf(p.getStart().getTime() + 5000));
+
 			start += 60000;
 		}
 

@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="edu.northwestern.cbits.purple_robot_manager"
 	xmlns:tools="http://schemas.android.com/tools"
-	android:versionCode="10515" android:versionName="1.5.15">
+	android:versionCode="10515" android:versionName="1.5.16">
    	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
@@ -175,6 +175,6 @@
 		<activity android:name=".activities.ProbeViewerActivity" android:label="@string/app_name" />
 		<activity android:name="net.hockeyapp.android.UpdateActivity" />
 		<activity android:name="com.facebook.LoginActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar" android:label="@string/app_name" />
-        <provider android:name="edu.northwestern.cbits.anthracite.LogContentProvider" android:authorities="edu.northwestern.cbits.purple_robot_manager" android:exported="false" />
+        <provider android:name="edu.northwestern.cbits.anthracite.LogContentProvider" android:authorities="edu.northwestern.cbits.purple_robot_manager.logging" android:exported="false" />
 	</application>
 </manifest>
