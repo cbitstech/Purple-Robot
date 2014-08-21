@@ -9,16 +9,17 @@ import java.net.URL;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.AssetManager;
 import android.net.Uri;
-import android.util.Log;
+
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.models.trees.LeafNode;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 /**
@@ -78,7 +79,7 @@ public abstract class TrainedModel extends Model
 				
 				String contents = null;
 				File cachedModel = new File(modelsFolder, hash);
-				
+
 				try 
 				{
 					contents = FileUtils.readFileToString(cachedModel);
@@ -89,10 +90,22 @@ public abstract class TrainedModel extends Model
 				}
 				
 				try 
-				{
-					URL u = new URL(me._source.toString());
+				{					
+					BufferedReader in = null;
+					
+					if (me._source.toString().startsWith("file:///android_asset/"))
+					{
+						AssetManager assets = context.getAssets();
+						
+						in = new BufferedReader(new InputStreamReader(assets.open(me._source.toString().replace("file:///android_asset/", ""))));
+					}
+					else
+					{				
+						URL u = new URL(me._source.toString());
 
-			        BufferedReader in = new BufferedReader(new InputStreamReader(u.openStream()));
+						in  = new BufferedReader(new InputStreamReader(u.openStream()));
+					}
+
 			        
 			        StringBuffer sb = new StringBuffer();
 			        
@@ -107,35 +120,36 @@ public abstract class TrainedModel extends Model
 				} 
 				catch (MalformedURLException e) 
 				{
+					e.printStackTrace();
 					LogManager.getInstance(context).logException(e);
 				} 
 				catch (IOException e) 
 				{
+					e.printStackTrace();
 					LogManager.getInstance(context).logException(e);
 				} 
-				
+
 				if (contents != null)
 				{
 					try
 					{
 				        JSONObject json = new JSONObject(contents);
 				        
-				        me._name = json.getString("class");
-				        me._accuracy = json.getDouble("accuracy");
+				        me._name = json.getString("name");
 				        
+				        me._accuracy = json.getDouble("accuracy");
+
 				        me.generateModel(context, json.get("model"));
 
 				        FileUtils.writeStringToFile(cachedModel, contents);
 
 				        me._inited = true;
 					}
-					catch (JSONException e) 
+					catch (Exception e) 
 					{
 						LogManager.getInstance(context).logException(e);
-					} 
-					catch (IOException e) 
-					{
-						LogManager.getInstance(context).logException(e);
+						
+						ModelManager.getInstance(context).deleteModel(me._source.toString());
 					}
 				}
 			}
@@ -225,15 +239,20 @@ public abstract class TrainedModel extends Model
 		
 		Runnable r = new Runnable()
 		{
+			@SuppressWarnings("unchecked")
 			public void run() 
 			{
 				Object value = me.evaluateModel(context, snapshot);
 
-				Log.e("PR", "GOT PREDICTION: " + value);
-				
 				if (value == null)
 				{
 					
+				}
+				else if (value instanceof Map<?, ?>)
+				{
+					Map<String, Object> map = (Map<String, Object>) value;
+					
+					me.transmitPrediction(context, map.get(LeafNode.PREDICTION).toString(), (Double) map.get(LeafNode.ACCURACY));
 				}
 				else if (value instanceof Double)
 				{
@@ -259,10 +278,11 @@ public abstract class TrainedModel extends Model
 	 * 
 	 * @param model Java object obtained from JSONObject.get that encodes the 
 	 *              desired model.
+	 * @throws Exception 
 	 */
 	
 
-	protected abstract void generateModel(Context context, Object model); 
+	protected abstract void generateModel(Context context, Object model) throws Exception; 
 
 
 	/**

@@ -63,13 +63,13 @@ import android.util.Log;
  *     N14 [label="other (4.0/1.0)" shape=box style=filled ]}}</pre>
  */
 
-public class TreeModel extends TrainedModel 
+public class WekaTreeModel extends TrainedModel 
 {
-	public static final String TYPE = "decision-tree";
+	public static final String TYPE = "weka-decision-tree";
 	
 	private Graph _tree = null;
 	
-	public TreeModel(Context context, Uri uri) 
+	public WekaTreeModel(Context context, Uri uri) 
 	{
 		super(context, uri);
 	}
@@ -256,7 +256,7 @@ public class TreeModel extends TrainedModel
 	
 	public String modelType() 
 	{
-		return TreeModel.TYPE;
+		return WekaTreeModel.TYPE;
 	}
 	
 	public String summary(Context context)

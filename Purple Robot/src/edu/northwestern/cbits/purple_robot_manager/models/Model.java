@@ -18,6 +18,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -25,6 +26,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -150,10 +152,21 @@ public abstract class Model
 		
 		try 
 		{
-			URL u = new URL(jsonUrl);
+			BufferedReader in = null;
+					
+			if (jsonUrl.startsWith("file:///android_asset/"))
+			{
+				AssetManager assets = context.getAssets();
+				
+				in = new BufferedReader(new InputStreamReader(assets.open(jsonUrl.replace("file:///android_asset/", ""))));
+			}
+			else
+			{				
+				URL u = new URL(jsonUrl);
 
-	        BufferedReader in = new BufferedReader(new InputStreamReader(u.openStream()));
-	        
+				in  = new BufferedReader(new InputStreamReader(u.openStream()));
+			}
+			
 	        StringBuffer sb = new StringBuffer();
 	        
 	        String inputLine = null;
@@ -172,7 +185,7 @@ public abstract class Model
 		catch (IOException e) 
 		{
 			LogManager.getInstance(context).logException(e);
-		} 
+		}
 		
 		// Determine which subclass to use to instantiate an instance. Return 
 		// the new instance if successful...
@@ -187,10 +200,15 @@ public abstract class Model
 		        
 		        if (RegressionModel.TYPE.equals(type))
 		        	return new RegressionModel(context, Uri.parse(jsonUrl));
-		        else if (TreeModel.TYPE.equals(type))
-		        	return new TreeModel(context, Uri.parse(jsonUrl));
-		        else if (ForestModel.TYPE.equals(type))
-		        	return new ForestModel(context, Uri.parse(jsonUrl));
+		        else if (WekaTreeModel.TYPE.equals(type))
+		        	return new WekaTreeModel(context, Uri.parse(jsonUrl));
+		        else if (MatlabForestModel.TYPE.equals(type))
+		        	return new MatlabForestModel(context, Uri.parse(jsonUrl));
+		        else if (MatlabTreeModel.TYPE.equals(type))
+		        	return new MatlabTreeModel(context, Uri.parse(jsonUrl));
+		        else if (MatlabForestModel.TYPE.equals(type))
+		        	return new MatlabForestModel(context, Uri.parse(jsonUrl));
+
 		        else if (NoiseModel.TYPE.equals(type))
 		        	return new NoiseModel(context, Uri.parse(jsonUrl));
 		        
