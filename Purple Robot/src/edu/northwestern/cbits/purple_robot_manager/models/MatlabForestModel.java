@@ -20,13 +20,15 @@ import com.alexmerz.graphviz.objects.Node;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
-public class ForestModel extends TreeModel
+public class MatlabForestModel extends WekaTreeModel
 {
-	public static final String TYPE = "forest";
+	// TODO
+	
+	public static final String TYPE = "matlab-forest";
 
 	private Map<String, Graph> _trees = new HashMap<String, Graph>();
 
-	public ForestModel(Context context, Uri uri) 
+	public MatlabForestModel(Context context, Uri uri) 
 	{
 		super(context, uri);
 	}
@@ -154,6 +156,6 @@ public class ForestModel extends TreeModel
 
 	public String modelType() 
 	{
-		return ForestModel.TYPE;
+		return MatlabForestModel.TYPE;
 	}
 }

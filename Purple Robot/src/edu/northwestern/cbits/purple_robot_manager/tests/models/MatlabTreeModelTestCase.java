@@ -13,6 +13,8 @@ import junit.framework.Assert;
 import android.content.Context;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.models.Model;
+import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;
 import edu.northwestern.cbits.purple_robot_manager.models.trees.LeafNode;
 import edu.northwestern.cbits.purple_robot_manager.models.trees.TreeNode;
 import edu.northwestern.cbits.purple_robot_manager.models.trees.TreeNode.TreeNodeException;
@@ -22,6 +24,8 @@ import edu.northwestern.cbits.purple_robot_manager.tests.RobotTestCase;
 
 public class MatlabTreeModelTestCase extends RobotTestCase 
 {
+	private static final String MODEL_URI = "file:///android_asset/test_data/matlab-model.json";
+	
 	public MatlabTreeModelTestCase(Context context, int priority) 
 	{
 		super(context, priority);
@@ -118,6 +122,48 @@ public class MatlabTreeModelTestCase extends RobotTestCase
 
 			Assert.fail("MATLAB102");
 		}
+		
+		ModelManager models = ModelManager.getInstance(this._context);
+		
+		models.addModel(MatlabTreeModelTestCase.MODEL_URI);
+		
+		try 
+		{
+			Thread.sleep(1000);
+		} 
+		catch (InterruptedException e) 
+		{
+
+		}
+		
+		Assert.assertNotNull("MATLAB200", models.fetchModelByName(this._context, MatlabTreeModelTestCase.MODEL_URI));
+		Assert.assertNull("MATLAB201", models.fetchModelByTitle(this._context, MatlabTreeModelTestCase.MODEL_URI));
+		Assert.assertNotNull("MATLAB202", models.fetchModelByTitle(this._context, "Matlab Tree Model Test"));
+
+		HashMap<String, Object> world = new HashMap<String, Object>();
+		
+		// Outputs class at line 508.
+		world.put("x10", Double.valueOf(-1.0));
+		world.put("x91", Double.valueOf(-1.0));
+		world.put("x41", Double.valueOf(-2.0));
+		world.put("x6", Double.valueOf(-1.0));
+		
+		Model matlab = models.fetchModelByTitle(this._context, "Matlab Tree Model Test");
+
+		matlab.predict(this._context, world);
+		
+		try 
+		{
+			Thread.sleep(2000);
+		}
+		catch (InterruptedException e) 
+		{
+
+		}
+
+		Assert.assertEquals("MATLAB203", "3", matlab.latestPrediction(this._context).get(LeafNode.PREDICTION));
+
+		models.deleteModel(MatlabTreeModelTestCase.MODEL_URI);
 	}
 	
 	public int estimatedMinutes() 
