@@ -20,6 +20,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -46,9 +47,6 @@ public class ModelManager extends BroadcastReceiver
 		
 		LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(context);
 		localManager.registerReceiver(this, intentFilter);
-
-//		this._models.add(new TreeModel(this._context, Uri.parse("http://dashboard.cbits.northwestern.edu/media/brain/stats/1644_8e437c44-bc46-4fbd-929a-0c66ed528d6f")));
-//		this._models.add(new RegressionModel(this._context, Uri.parse("http://dashboard.cbits.northwestern.edu/media/brain/stats/1706_7570d91e-b6dc-4b2b-96f8-2b86e5924d66")));
     }
 
 	public static ModelManager getInstance(Context context) 
@@ -244,14 +242,14 @@ public class ModelManager extends BroadcastReceiver
 		return this._milieu;
 	}
 
-	public Model fetchModelByTitle(Context context, String name) 
+	public Model fetchModelByTitle(Context context, String title) 
 	{
-		if (name == null)
+		if (title == null)
 			return null;
 		
 		for (Model m : this._models)
 		{
-			if (name.equals(m.title(context)))
+			if (title.equals(m.title(context)))
 				return m;
 		}
 		
