@@ -43,8 +43,11 @@ Next, go to the `Purple Robot` folder and rename the following files:
 
 * `gradle.properties.template` to `gradle.properties`
 * `local.properties.template` to `local.properties`
+* `res/values/keys.xml.template` to `res/values/keys.xml`
     
 In `local.properties`, set the location of your Android SDK. In `gradle.properties`, set the values for your Android signing keystore and key. Refer to [Google's signing documentation](http://developer.android.com/tools/publishing/app-signing.html) for more details.
+
+In `keys.xml`, please obtain your own Google Places API key from the [Google API Console](https://code.google.com/apis/console/?pli=1) to enable integration with Google Play location services. (You may also leave the key empty if you're not using those features.)
 
 To test your installation, within the `Purple Robot` folder, run
 
