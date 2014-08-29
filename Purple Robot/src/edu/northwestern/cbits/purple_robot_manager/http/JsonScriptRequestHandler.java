@@ -18,6 +18,7 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.ExecuteSchemeCommand;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.ExecuteJavaScriptCommand;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.FetchStringCommand;
@@ -53,10 +54,14 @@ public class JsonScriptRequestHandler implements HttpRequestHandler
             String entityString = EntityUtils.toString(entity);
             
             Uri u = Uri.parse("http://localhost/?" + entityString);
+            
+            Log.e("PR", "ENTITY STRING: " + entityString);
 
             JSONObject arguments = null;
 
         	String jsonArg = URLDecoder.decode(entityString.substring(5)); // u.getQueryParameter("json");
+        	
+        	Log.e("PR", "JSON ARG: " + jsonArg);
 
             try 
             {
@@ -74,9 +79,20 @@ public class JsonScriptRequestHandler implements HttpRequestHandler
             	}
             	catch (IllegalArgumentException e)
             	{
-                	jsonArg = URLDecoder.decode(u.getQueryParameter("json"), "UTF-16");
-
-                	arguments = new JSONObject(jsonArg);
+            		try
+            		{
+	                	jsonArg = URLDecoder.decode(u.getQueryParameter("json"), "UTF-16");
+	
+	                	arguments = new JSONObject(jsonArg);
+            		}
+            		catch (IllegalArgumentException ex)
+            		{
+	                	jsonArg = u.getQueryParameter("json");
+	                	
+	                	arguments = new JSONObject(jsonArg);
+	                	
+	                	Log.e("PR", "PARSED JSON: " + arguments.toString(2));
+            		}
             	}
 			} 
             catch (JSONException e) 
