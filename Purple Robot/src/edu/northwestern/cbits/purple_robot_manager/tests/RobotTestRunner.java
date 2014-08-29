@@ -9,6 +9,7 @@ import java.util.List;
 import edu.northwestern.cbits.purple_robot_manager.tests.models.MatlabTreeModelTestCase;
 import edu.northwestern.cbits.purple_robot_manager.tests.models.WekaTreeModelTestCase;
 import edu.northwestern.cbits.purple_robot_manager.tests.ui.NonAsciiDialogTestCase;
+import edu.northwestern.cbits.purple_robot_manager.tests.ui.NotificationTestCase;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -32,6 +33,7 @@ public class RobotTestRunner extends AndroidTestRunner
 		this._suite.addTest(new DateTriggerTestCase(context, 0));
 		this._suite.addTest(new UserIdTestCase(context, 3));
 		this._suite.addTest(new NonAsciiDialogTestCase(context, 5));
+		this._suite.addTest(new NotificationTestCase(context, 5));
 		this._suite.addTest(new LocalLogServerTestCase(context, 8));
 		this._suite.addTest(new AccelerometerProbeTestCase(context, 8));
 		this._suite.addTest(new WekaTreeModelTestCase(context, 8));
