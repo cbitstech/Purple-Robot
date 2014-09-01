@@ -255,7 +255,7 @@ public class JavaScriptEngine extends BaseScriptEngine
 		return true;
 	}
 
-	private static Map<String, Object> nativeToMap(NativeObject nativeObj)
+	public static Map<String, Object> nativeToMap(NativeObject nativeObj)
 	{
 		HashMap<String, Object> params = new HashMap<String, Object>();
 		
@@ -332,7 +332,7 @@ public class JavaScriptEngine extends BaseScriptEngine
 		return new NativeArray(values);
 	}
 
-/*	public NativeArray fetchSnapshotIds()
+	public NativeArray fetchSnapshotIds()
 	{
 		List<String> snapshotIds = super.fetchSnapshotIds();
 			
@@ -348,14 +348,14 @@ public class JavaScriptEngine extends BaseScriptEngine
 
 	public NativeObject fetchSnapshot(String timestamp)
 	{
-		Map<String, Object> snapshot = super.fetchTrigger(timestamp);
+		Map<String, Object> snapshot = super.fetchSnapshot(timestamp);
 		
 		if (snapshot != null)
 			return JavaScriptEngine.mapToNative(this._jsContext, this._scope, snapshot);
 		
 		return null;
 	}
-*/
+
 	public NativeObject fetchNamespace(String namespace)
 	{
 		Map<String, Object> map = super.fetchNamespaceMap(namespace);

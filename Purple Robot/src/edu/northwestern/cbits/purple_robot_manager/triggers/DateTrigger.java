@@ -312,9 +312,6 @@ public class DateTrigger extends Trigger
 						String newLine = "DTSTART:" + sdf.format(newDate);
 
 						newCalendar.append(newLine + "\n");
-						
-						Log.e("PR", "OLD START: " + line);
-						Log.e("PR", "NEW START: " + newLine);
 					}
 					catch (ParseException e) 
 					{
@@ -338,9 +335,6 @@ public class DateTrigger extends Trigger
 						String newLine = "DTEND:" + sdf.format(newDate);
 
 						newCalendar.append(newLine + "\n");
-
-						Log.e("PR", "OLD END: " + line);
-						Log.e("PR", "NEW END: " + newLine);
 					}
 					catch (ParseException e) 
 					{

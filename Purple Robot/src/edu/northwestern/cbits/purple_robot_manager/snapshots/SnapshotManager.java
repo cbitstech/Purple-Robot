@@ -53,7 +53,7 @@ public class SnapshotManager
     	return SnapshotManager._instance;
     }
 	
-	public void takeSnapshot(Context context, String source, final Runnable r) throws EmptySnapshotException
+	public long takeSnapshot(Context context, String source, final Runnable r) throws EmptySnapshotException
 	{
 		final long now = System.currentTimeMillis();
 		
@@ -204,6 +204,8 @@ public class SnapshotManager
 		}
 		else
 			save.run();
+		
+		return now;
 	}
 	
 	public long[] snapshotTimes()
@@ -278,7 +280,9 @@ public class SnapshotManager
         	{
         		LogManager.getInstance(this._context).logException(e);
         	}
-         }
+        }
+        else
+        	object = null;
         
         c.close();
 		
@@ -293,5 +297,13 @@ public class SnapshotManager
 	public void showSnapshot(long time, Map<String, Object> options)
 	{
 		
+	}
+
+	public void deleteSnapshot(long timestamp) 
+	{
+		String selection = "recorded = ?";
+		String[] args = { "" + timestamp };
+	        
+		this._context.getContentResolver().delete(RobotContentProvider.SNAPSHOTS, selection, args);
 	}
 }
