@@ -59,7 +59,7 @@ public class RobotContentProvider extends ContentProvider
 		
 		try
 		{
-			newUri = ContentUris.withAppendedId(uri, values.getAsLong("id"));
+			newUri = ContentUris.withAppendedId(uri, values.getAsLong("_id"));
 		}
 		catch (NullPointerException e)
 		{

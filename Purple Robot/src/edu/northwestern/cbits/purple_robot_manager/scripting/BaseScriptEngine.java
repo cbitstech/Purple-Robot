@@ -57,7 +57,8 @@ import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
-// import edu.northwestern.cbits.purple_robot_manager.snapshots.SnapshotManager;
+import edu.northwestern.cbits.purple_robot_manager.snapshots.EmptySnapshotException;
+import edu.northwestern.cbits.purple_robot_manager.snapshots.SnapshotManager;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 import edu.northwestern.cbits.purple_robot_manager.widget.PurpleRobotAppWideWidgetProvider;
@@ -527,7 +528,7 @@ public abstract class BaseScriptEngine
 		LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(this._context);
 		Intent intent = new Intent(edu.northwestern.cbits.purple_robot_manager.probes.Probe.PROBE_READING);
 		intent.putExtras(data);
-
+		
 		localManager.sendBroadcast(intent);
 	}
 	
@@ -1349,7 +1350,6 @@ public abstract class BaseScriptEngine
 		return TriggerManager.getInstance(this._context).triggerIds();
 	}
 
-	/*
 	public List<String> fetchSnapshotIds() 
 	{
 		ArrayList<String> times = new ArrayList<String>();
@@ -1359,7 +1359,32 @@ public abstract class BaseScriptEngine
 		
 		return times;
 	}
-	*/
+	
+	public String takeSnapshot(String source)
+	{
+		try
+		{
+			return "" + SnapshotManager.getInstance(this._context).takeSnapshot(this._context, source, null);
+		}
+		catch (EmptySnapshotException e)
+		{
+			
+		}
+		
+		return null;
+	}
+
+	public void deleteSnapshot(String id)
+	{
+		SnapshotManager.getInstance(this._context).deleteSnapshot(Long.parseLong(id));
+	}
+
+	public Map<String, Object> fetchSnapshot(String timestamp) 
+	{
+		JSONObject json = SnapshotManager.getInstance(this._context).jsonForTime(Long.parseLong(timestamp), true);
+
+		return this.jsonToMap(json);
+	}
 
 	public Map<String, Object> fetchTrigger(String id) 
 	{
