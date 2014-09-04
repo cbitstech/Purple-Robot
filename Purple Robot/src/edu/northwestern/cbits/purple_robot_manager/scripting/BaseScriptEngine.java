@@ -608,6 +608,14 @@ public abstract class BaseScriptEngine
 
 	public void setUserId(String userId, boolean refreshConfig)
 	{
+		HashMap<String, Object> payload = new HashMap<String, Object>();
+		payload.put("source", "BaseScriptEngine");
+		payload.put("old_id", EncryptionManager.getInstance().getUserId(this._context));
+		payload.put("new_id", userId);
+		payload.put("refresh_config", refreshConfig);
+		
+		LogManager.getInstance(this._context).log("set_user_id", payload);
+
 		EncryptionManager.getInstance().setUserId(this._context, userId);
 		
 		try 
@@ -625,16 +633,31 @@ public abstract class BaseScriptEngine
 
 	public String fetchUserId()
 	{
+		HashMap<String, Object> payload = new HashMap<String, Object>();
+		payload.put("source", "BaseScriptEngine");
+		
+		LogManager.getInstance(this._context).log("fetch_user_id", payload);
+		
 		return EncryptionManager.getInstance().getUserId(this._context);
 	}
 
 	public String fetchUserHash()
 	{
+		HashMap<String, Object> payload = new HashMap<String, Object>();
+		payload.put("source", "BaseScriptEngine");
+		
+		LogManager.getInstance(this._context).log("fetch_user_hash", payload);
+
 		return EncryptionManager.getInstance().getUserHash(this._context);
 	}
 
 	public void restoreDefaultId()
 	{
+		HashMap<String, Object> payload = new HashMap<String, Object>();
+		payload.put("source", "BaseScriptEngine");
+		
+		LogManager.getInstance(this._context).log("restore_default_id", payload);
+
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
 		
 		Editor e = prefs.edit();

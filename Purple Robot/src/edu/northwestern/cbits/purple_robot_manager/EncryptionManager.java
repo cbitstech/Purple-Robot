@@ -11,6 +11,7 @@ import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -174,6 +175,10 @@ public class EncryptionManager
 
 		String userId = prefs.getString("config_user_id", null);
 
+		HashMap<String, Object> payload = new HashMap<String, Object>();
+		payload.put("source", "EncryptionManager");
+		payload.put("stored_id", prefs.getString("config_user_id", ""));
+
 		if (userId == null)
 		{
 			userId = "unknown-user";
@@ -190,16 +195,29 @@ public class EncryptionManager
 			Editor e = prefs.edit();
 			e.putString("config_user_id", userId);
 			e.commit();
+			
+			payload.put("retrieved_id", userId);
 		}
-		
+
+		LogManager.getInstance(context).log("get_user_id", payload);
+
 		return userId;
 	}
 
 	public String getUserHash(Context context)
 	{
+		return this.getUserHash(context, true);
+	}
+
+	public String getUserHash(Context context, boolean log) 
+	{
 		SharedPreferences prefs = EncryptionManager.getPreferences(context);
 
 		String userHash = prefs.getString("config_user_hash", null);
+
+		HashMap<String, Object> payload = new HashMap<String, Object>();
+		payload.put("source", "EncryptionManager");
+		payload.put("stored_hash", prefs.getString("config_user_hash", ""));
 
 		if (userHash == null)
 		{
@@ -213,7 +231,12 @@ public class EncryptionManager
 				e.putString("config_user_hash", userHash);
 
 			e.commit();
+
+			payload.put("retrieved_hash", userHash);
 		}
+
+		if (log)
+			LogManager.getInstance(context).log("get_user_hash", payload);
 
 		return userHash;
 	}
@@ -450,6 +473,13 @@ public class EncryptionManager
 		this.getConfigUri(context, userId);
 
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+		HashMap<String, Object> payload = new HashMap<String, Object>();
+		payload.put("source", "EncryptionManager");
+		payload.put("new_id", userId);
+		payload.put("old_id", prefs.getString("config_user_id", ""));
+		
+		LogManager.getInstance(context).log("set_user_id", payload);
 
 		Editor e = prefs.edit();
 		e.putString("config_user_id", userId);
