@@ -36,6 +36,7 @@ import android.preference.PreferenceScreen;
 import android.widget.Toast;
 
 import edu.northwestern.cbits.anthracite.LogService;
+import edu.northwestern.cbits.anthracite.Logger;
 
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.PersistentService;
@@ -444,6 +445,12 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 
 			this.startService(playIntent);
         	
+        	return true;
+		}
+		else if (LogManager.ENABLED.equals(pref.getKey()))
+		{
+			LogManager.getInstance(this).setEnabled(((Boolean) value).booleanValue());
+			
         	return true;
 		}
 

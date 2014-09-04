@@ -11,7 +11,7 @@ import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 
 public class LogManager 
 {
-	private static final String ENABLED = "config_enable_log_server";
+	public static final String ENABLED = "config_enable_log_server";
 	private static final boolean ENABLED_DEFAULT = false;
 	
 	private static final String URI = "config_log_server_uri";
@@ -35,7 +35,7 @@ public class LogManager
 	
 	public LogManager(Context context) 
 	{
-		String userId = EncryptionManager.getInstance().getUserHash(context);
+		String userId = EncryptionManager.getInstance().getUserHash(context, false);
 		
 		this._logger = Logger.getInstance(context, userId);
 		
