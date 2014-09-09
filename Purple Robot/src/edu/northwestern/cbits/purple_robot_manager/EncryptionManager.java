@@ -171,6 +171,11 @@ public class EncryptionManager
 	
 	public String getUserId(Context context)
 	{
+		return this.getUserId(context, true);
+	}
+	    
+	private String getUserId(Context context, boolean log) 
+	{
 		SharedPreferences prefs = EncryptionManager.getPreferences(context);
 
 		String userId = prefs.getString("config_user_id", null);
@@ -199,7 +204,8 @@ public class EncryptionManager
 			payload.put("retrieved_id", userId);
 		}
 
-		LogManager.getInstance(context).log("get_user_id", payload);
+		if (log)
+			LogManager.getInstance(context).log("get_user_id", payload);
 
 		return userId;
 	}
@@ -221,7 +227,7 @@ public class EncryptionManager
 
 		if (userHash == null)
 		{
-			String userId = this.getUserId(context);
+			String userId = this.getUserId(context, log);
 
 			userHash = this.createHash(context, userId);
 
@@ -241,7 +247,7 @@ public class EncryptionManager
 		return userHash;
 	}
 
-    public SecretKeySpec keyForCipher(Context context, String cipherName) throws UnsupportedEncodingException
+	public SecretKeySpec keyForCipher(Context context, String cipherName) throws UnsupportedEncodingException
 	{
 		String userHash = this.getUserHash(context);
 		String keyString = (new StringBuffer(userHash)).reverse().toString();
