@@ -168,8 +168,13 @@ public class EncryptionManager
 		
 		return hash;
 	}
-	
+
 	public String getUserId(Context context)
+	{
+		return this.getUserId(context, true);
+	}
+
+	public String getUserId(Context context, boolean log)
 	{
 		SharedPreferences prefs = EncryptionManager.getPreferences(context);
 
@@ -199,7 +204,8 @@ public class EncryptionManager
 			payload.put("retrieved_id", userId);
 		}
 
-		LogManager.getInstance(context).log("get_user_id", payload);
+		if (log)
+			LogManager.getInstance(context).log("get_user_id", payload);
 
 		return userId;
 	}
@@ -221,7 +227,7 @@ public class EncryptionManager
 
 		if (userHash == null)
 		{
-			String userId = this.getUserId(context);
+			String userId = this.getUserId(context, log);
 
 			userHash = this.createHash(context, userId);
 

@@ -72,6 +72,11 @@ public abstract class Trigger
 					catch (Exception e)
 					{
 						LogManager.getInstance(context).logException(e);
+
+						HashMap<String, Object> payload = new HashMap<String, Object>();
+						payload.put("script", me._action);
+						
+						LogManager.getInstance(context).log("failed_trigger_script", payload);
 					}
 				}
 			};
