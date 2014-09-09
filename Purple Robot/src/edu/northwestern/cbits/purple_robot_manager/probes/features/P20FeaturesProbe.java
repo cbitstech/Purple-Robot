@@ -20,6 +20,12 @@ import edu.northwestern.cbits.purple_robot_manager.probes.sample.SampleProbe;
 
 public class P20FeaturesProbe extends Probe implements SensorEventListener 
 {
+	
+	private final int freq_interp = 50;
+
+	Clip acc_clip;
+	Clip gyr_clip;
+
 	public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.features.P20FeaturesProbe";
 
 	private static final String ENABLE = "config_probe_p20_enabled";
@@ -141,6 +147,10 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 	            
 	            this._lastFrequency = frequency;
 			}
+
+			//initializing buffers
+			acc_clip = new Clip(3);
+			gyr_clip = new Clip(3);
 				
 			return true;
         }
@@ -170,15 +180,16 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 		
 		final float[] values = event.values; // values.length = 3: X, Y, Z
 		final long timestamp = event.timestamp;
-		
+
 		switch(sensor.getType())
 		{
 			case Sensor.TYPE_ACCELEROMETER:
 				// Do accelerometer stuff...
-				
+				acc_clip.add(values, timestamp);
 				break;
 			case Sensor.TYPE_GYROSCOPE:
 				// Do gyro stuff...
+				gyr_clip.add(values, timestamp);
 				break;
 		}
 		
