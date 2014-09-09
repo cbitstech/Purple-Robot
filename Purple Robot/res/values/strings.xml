@@ -1,4 +1,5 @@
 <resources>
+<string name="google_places_browser_key"></string>
     <string name="sensor_upload_url">https://app2.cbits.northwestern.edu/prImporter</string>
     <string name="json_config_url">http://mohrlab.northwestern.edu/robot/</string>
     <string name="app_name">Purple Robot</string>
