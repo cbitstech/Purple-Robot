@@ -72,6 +72,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.features.ProximityProb
 import edu.northwestern.cbits.purple_robot_manager.probes.features.SunriseSunsetFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.TemperatureProbeBasicStatisticsFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.WeatherUndergroundFeature;
+import edu.northwestern.cbits.purple_robot_manager.probes.sample.SampleProbe;
 
 public class ProbeManager
 {
@@ -537,6 +538,13 @@ public class ProbeManager
 				TouchEventsProbe touch = (TouchEventsProbe) probe;
 
 				if (touch.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			else if (probe instanceof SampleProbe)
+			{
+				SampleProbe sample = (SampleProbe) probe;
+
+				if (sample.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
 
