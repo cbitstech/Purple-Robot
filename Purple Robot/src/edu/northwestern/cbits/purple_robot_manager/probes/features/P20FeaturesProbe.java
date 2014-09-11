@@ -25,10 +25,11 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 {
 	
 	private final int freq_interp = 50;
-	private final long window_size = 4000; // timestamps are in ms
-	private final long window_shift = 1000;
-	long lastprocessingtime;
-	private FeatureExtractor acc_features;
+	private final long window_size = (long)4e9; // sensor timestamps are in ns
+	private final long window_shift = (long)1e9; // sensor timestamps are in ns
+	private long lastprocessingtime = 0;
+	private FeatureExtractor f0;
+	private float[] features_acc;
 
 	Clip acc_clip;
 	Clip gyr_clip;
@@ -40,6 +41,16 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 
 	private int _lastFrequency = -1;
 	private Context _context = null;
+
+	public P20FeaturesProbe() {
+				
+		acc_clip = new Clip(3, window_size);
+		gyr_clip = new Clip(3, window_size);
+
+	    String[] feature_list = {"meanx","nsamp"};
+	    f0 = new FeatureExtractor(window_size, feature_list);
+
+	}
 
 	public String name(Context context) 
 	{
@@ -154,18 +165,7 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 	            
 	            this._lastFrequency = frequency;
 			}
-
-			//initializing buffers
-			acc_clip = new Clip(3, window_size);
-			gyr_clip = new Clip(3, window_size);
-
-    		ArrayList<String> feature_list = new ArrayList<String>();
-    		feature_list.add("meanx");
-    		feature_list.add("meany");
-    		acc_features = new FeatureExtractor(window_size, feature_list);
-
-			lastprocessingtime = 0;
-				
+			
 			return true;
         }
     	else
@@ -209,9 +209,11 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 
 		if (timestamp-lastprocessingtime > window_shift) {
 
-			acc_features.ExtractFeatures(acc_clip);
+			features_acc = f0.ExtractFeatures(acc_clip);
 
-			//CalculateFeatures(acc_clip, FeatureOptions, acc_feature, acc_feature_label);
+			lastprocessingtime = timestamp;
+
+			this.transmitAnalysis();
 
 		}
 		
@@ -219,7 +221,7 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 		
 		// When enough data collected & analyzed...
 		
-		this.transmitAnalysis();
+		
 	}
 	
 	public void transmitAnalysis()
@@ -231,8 +233,8 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 		//bundle.putDouble("MY_FEATURE_A", 1.23456); 		// define your own keys and values 
 		//bundle.putLong("MY_FEATURE_B", Long.MAX_VALUE); // for the models & data collection
 
-		bundle.putDouble("MEANX", acc_features.feature_values.get(0));
-		bundle.putDouble("MEANY", acc_features.feature_values.get(1));
+		bundle.putDouble("MEANX", features_acc[0]);
+		bundle.putDouble("N", features_acc[1]);
 
 		this.transmitData(this._context, bundle);
 	}
