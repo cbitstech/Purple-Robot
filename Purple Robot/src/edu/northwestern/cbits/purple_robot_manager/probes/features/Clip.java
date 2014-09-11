@@ -1,21 +1,21 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.features;
 
+import java.util.List;
 import java.util.ArrayList;
 
 public class Clip {
     
-    public final float window_size = 4000.0f; // timestamps are in ms
-    public final float window_overlap = 0.75f;
-
-    private ArrayList<float[]> value;
-    private ArrayList<Long> timestamp;
+    public List<float[]> value;
+    public List<Long> timestamp;
     private int dim;
+    private long window_size;
 
-    public Clip(int dim) {
+    public Clip(int dim, long window_size) {
 
         value = new ArrayList<float[]>();
-        timestamp = new ArrayList();
+        timestamp = new ArrayList<Long>();
         this.dim = dim;
+        this.window_size = window_size;
 
     }
 
@@ -27,14 +27,20 @@ public class Clip {
             if (this.timestamp.size()==0)
                 addthestuff(value, timestamp);
             else {
-                while ((timestamp-this.timestamp.get(0) > window_size)&&(this.timestamp.size()>0)) {
+                while ((timestamp-this.timestamp.get(0) > window_size)&&(this.timestamp.size() >= 2)) 
+                {
                     this.timestamp.remove(0);
                     this.value.remove(0);
+                }
+                if (timestamp-this.timestamp.get(0) > window_size) {
+                    this.value = new ArrayList<float[]>();
+                    this.timestamp = new ArrayList<Long>();
                 }
                 addthestuff(value, timestamp);
             }
             return 0;
         }
+
     }
 
     private void addthestuff(float[] value, long timestamp) {

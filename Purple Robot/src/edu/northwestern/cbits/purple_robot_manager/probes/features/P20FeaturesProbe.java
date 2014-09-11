@@ -18,10 +18,17 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.sample.SampleProbe;
 
+import java.util.List;
+import java.util.ArrayList;
+
 public class P20FeaturesProbe extends Probe implements SensorEventListener 
 {
 	
 	private final int freq_interp = 50;
+	private final long window_size = 4000; // timestamps are in ms
+	private final long window_shift = 1000;
+	long lastprocessingtime;
+	private FeatureExtractor acc_features;
 
 	Clip acc_clip;
 	Clip gyr_clip;
@@ -149,8 +156,15 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 			}
 
 			//initializing buffers
-			acc_clip = new Clip(3);
-			gyr_clip = new Clip(3);
+			acc_clip = new Clip(3, window_size);
+			gyr_clip = new Clip(3, window_size);
+
+    		ArrayList<String> feature_list = new ArrayList<String>();
+    		feature_list.add("meanx");
+    		feature_list.add("meany");
+    		acc_features = new FeatureExtractor(window_size, feature_list);
+
+			lastprocessingtime = 0;
 				
 			return true;
         }
@@ -192,12 +206,20 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 				gyr_clip.add(values, timestamp);
 				break;
 		}
+
+		if (timestamp-lastprocessingtime > window_shift) {
+
+			acc_features.ExtractFeatures(acc_clip);
+
+			//CalculateFeatures(acc_clip, FeatureOptions, acc_feature, acc_feature_label);
+
+		}
 		
 		// Save values somewhere...
 		
 		// When enough data collected & analyzed...
 		
-		// this.transmitAnalysis();
+		this.transmitAnalysis();
 	}
 	
 	public void transmitAnalysis()
@@ -206,8 +228,11 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 		bundle.putString("PROBE", this.name(this._context)); // Required
 		bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000); // Required
 		
-		bundle.putDouble("MY_FEATURE_A", 1.23456); 		// define your own keys and values 
-		bundle.putLong("MY_FEATURE_B", Long.MAX_VALUE); // for the models & data collection
+		//bundle.putDouble("MY_FEATURE_A", 1.23456); 		// define your own keys and values 
+		//bundle.putLong("MY_FEATURE_B", Long.MAX_VALUE); // for the models & data collection
+
+		bundle.putDouble("MEANX", acc_features.feature_values.get(0));
+		bundle.putDouble("MEANY", acc_features.feature_values.get(1));
 
 		this.transmitData(this._context, bundle);
 	}
