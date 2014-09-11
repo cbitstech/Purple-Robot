@@ -28,12 +28,15 @@ public class FeatureExtractor {
                 case "meanx":
                     feature_values.add(mean(clip.value, 0));
                     break;
+
                 case "meany":
                     feature_values.add(mean(clip.value, 1));
                     break;
+
                 case "meanz":
                     feature_values.add(mean(clip.value, 2));
                     break;
+                    
                 default:
 
             }
