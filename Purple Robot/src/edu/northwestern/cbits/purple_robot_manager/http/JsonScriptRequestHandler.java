@@ -18,6 +18,7 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.http.commands.ExecuteSchemeCommand;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.ExecuteJavaScriptCommand;
@@ -56,38 +57,48 @@ public class JsonScriptRequestHandler implements HttpRequestHandler
             Uri u = Uri.parse("http://localhost/?" + entityString);
             
             JSONObject arguments = null;
+            
+            Log.e("PR", "OG ENTITY STRING: " + entityString);
 
         	String jsonArg = URLDecoder.decode(entityString.substring(5)); // u.getQueryParameter("json");
+
+            Log.e("PR", "JSON ARG: " + jsonArg);
 
             try 
             {
             	try
             	{
-                	jsonArg = URLDecoder.decode(u.getQueryParameter("json"), "UTF-16");
-
                 	arguments = new JSONObject(jsonArg);
             	}
             	catch (JSONException e)
             	{
-                	jsonArg = URLDecoder.decode(u.getQueryParameter("json"), "UTF-16");
-
-                	arguments = new JSONObject(jsonArg);
+            		try
+            		{
+            			jsonArg = URLDecoder.decode(u.getQueryParameter("json"), "UTF-16");
+                    	arguments = new JSONObject(jsonArg);
+            		}
+            		catch (JSONException ex)
+            		{
+                		jsonArg = URLDecoder.decode(u.getQueryParameter("json"), "UTF-8");
+                    	arguments = new JSONObject(jsonArg);
+            		}
             	}
             	catch (IllegalArgumentException e)
             	{
             		try
             		{
-	                	jsonArg = URLDecoder.decode(u.getQueryParameter("json"), "UTF-16");
-	
-	                	arguments = new JSONObject(jsonArg);
+            			jsonArg = URLDecoder.decode(u.getQueryParameter("json"), "UTF-16");
+                    	arguments = new JSONObject(jsonArg);
             		}
-            		catch (IllegalArgumentException ex)
+            		catch (JSONException ex)
             		{
-	                	jsonArg = u.getQueryParameter("json");
-	                	
-	                	arguments = new JSONObject(jsonArg);
+                		jsonArg = URLDecoder.decode(u.getQueryParameter("json"), "UTF-8");
+                    	arguments = new JSONObject(jsonArg);
             		}
             	}
+            	
+            	Log.e("PR", "FINAL JSON OBJECT: " + arguments.toString(2));
+            	
 			} 
             catch (JSONException e) 
             {
