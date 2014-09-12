@@ -20,6 +20,10 @@ import edu.northwestern.cbits.purple_robot_manager.probes.sample.SampleProbe;
 
 import java.util.List;
 import java.util.ArrayList;
+//import java.util.concurrent.TimeUnit;
+//import java.util.concurrent.ScheduledExecutorService;
+//import java.util.concurrent.Executors;
+import java.lang.Thread;
 
 public class P20FeaturesProbe extends Probe implements SensorEventListener 
 {
@@ -42,6 +46,16 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 	private int _lastFrequency = -1;
 	private Context _context = null;
 
+	private boolean extract_features = true;
+
+	private int counter = 0;
+
+	private long deltat;
+
+	//private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+
+
+
 	public P20FeaturesProbe() {
 				
 		acc_clip = new Clip(3, window_size);
@@ -49,6 +63,34 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 
 	    String[] feature_list = {"meanx","nsamp"};
 	    f0 = new FeatureExtractor(window_size, feature_list);
+
+		Runnable myRunnable = new Runnable() {
+			public void run() {
+				while (extract_features) {
+					if (acc_clip.value.size()>0) {
+						//long t1 = System.currentTimeMillis();
+						features_acc = f0.ExtractFeatures(acc_clip);
+						transmitAnalysis();
+						counter++;
+						try {
+							Thread.sleep(1000);
+							//wait(1000);
+						} 
+						catch (InterruptedException e) {
+							extract_features = false;
+							e.printStackTrace();
+						}
+						//deltat = System.currentTimeMillis() - t1;
+					}
+				}
+			}
+		};
+
+		Thread myThread = new Thread(myRunnable);
+
+	    myThread.start();
+
+	    //executor.scheduleAtFixedRate(periodicTask, 0, 3, TimeUnit.SECONDS);
 
 	}
 
@@ -165,6 +207,8 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 	            
 	            this._lastFrequency = frequency;
 			}
+
+			extract_features = true;
 			
 			return true;
         }
@@ -174,6 +218,9 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
     		sensors.unregisterListener(this, gyroscope);
 
     		this._lastFrequency = -1;
+
+			extract_features = false;
+
     	}
 
 		
@@ -206,7 +253,7 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 				gyr_clip.add(values, timestamp);
 				break;
 		}
-
+/*
 		if (timestamp-lastprocessingtime > window_shift) {
 
 			features_acc = f0.ExtractFeatures(acc_clip);
@@ -216,11 +263,7 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 			this.transmitAnalysis();
 
 		}
-		
-		// Save values somewhere...
-		
-		// When enough data collected & analyzed...
-		
+*/				
 		
 	}
 	
@@ -233,9 +276,11 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 		//bundle.putDouble("MY_FEATURE_A", 1.23456); 		// define your own keys and values 
 		//bundle.putLong("MY_FEATURE_B", Long.MAX_VALUE); // for the models & data collection
 
-		bundle.putDouble("MEANX", features_acc[0]);
-		bundle.putDouble("N", features_acc[1]);
+		//bundle.putDouble("MEANX", features_acc[0]);
+		//bundle.putDouble("N", features_acc[1]);
+		bundle.putInt("CNT", counter);
 
 		this.transmitData(this._context, bundle);
 	}
+
 }
