@@ -24,6 +24,7 @@ import java.util.ArrayList;
 //import java.util.concurrent.ScheduledExecutorService;
 //import java.util.concurrent.Executors;
 import java.lang.Thread;
+import android.util.Log;
 
 public class P20FeaturesProbe extends Probe implements SensorEventListener 
 {
@@ -32,11 +33,12 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 	private final long window_size = (long)4e9; // sensor timestamps are in ns
 	private final long window_shift = (long)1e9; // sensor timestamps are in ns
 	private long lastprocessingtime = 0;
-	private FeatureExtractor f0;
-	private float[] features_acc;
+	
+	private FeatureExtractor f_acc, f_gyr, f_bar;
 
-	Clip acc_clip;
-	Clip gyr_clip;
+	private List<Double> features;
+
+	Clip acc_clip, gyr_clip, bar_clip;
 
 	public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.features.P20FeaturesProbe";
 
@@ -46,51 +48,95 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 	private int _lastFrequency = -1;
 	private Context _context = null;
 
-	private boolean extract_features = true;
+	private boolean extract_features = false;
 
-	private int counter = 0;
+	//private int counter = 0;
+	//private long deltat;
+	//private long t_trans = 0;
 
-	private long deltat;
+    private String[] feature_list = {"accx_mean","accx_std","gyrx_std","accx_kurt"};
+
+    private boolean has_acc = false;
+    private boolean has_gyr = false;
+    private boolean has_bar = false;
+
+    private List<String> acc_feature_list;
+    private List<String> gyr_feature_list;
+    private List<String> bar_feature_list;
+
+	private Thread myThread;
 
 	//private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
+	Runnable myRunnable = new Runnable() {
+		public void run() {
+			while (extract_features) {
+				if (acc_clip.value.size()>0) {
+					//long t1 = System.currentTimeMillis();
+					features = new ArrayList<Double>();
+					if (has_acc)
+						features.addAll(f_acc.ExtractFeatures(acc_clip));
+					if (has_gyr)
+						features.addAll(f_gyr.ExtractFeatures(gyr_clip));
+					if (has_bar)
+						features.addAll(f_bar.ExtractFeatures(bar_clip));
+
+					transmitAnalysis();
+					//counter++;
+					try {
+						Thread.sleep(1000);
+					} 
+					catch (InterruptedException e) {
+						extract_features = false;
+						e.printStackTrace();
+					}
+					//deltat = System.currentTimeMillis() - t1;
+				}
+			}
+		}
+	};
 
 
 	public P20FeaturesProbe() {
 				
 		acc_clip = new Clip(3, window_size);
 		gyr_clip = new Clip(3, window_size);
+		bar_clip = new Clip(1, window_size);
 
-	    String[] feature_list = {"meanx","nsamp"};
-	    f0 = new FeatureExtractor(window_size, feature_list);
+	    //fining out which sensors are needed
+	    acc_feature_list = new ArrayList<String>();
+	    gyr_feature_list = new ArrayList<String>();
+	    bar_feature_list = new ArrayList<String>();
+	    for (String s : feature_list) {
+	    	if (s.startsWith("acc")) {
+	    		if (!has_acc) has_acc = true;
+	    		acc_feature_list.add(s.substring(3));
+	    	}
+	    	if (s.startsWith("gyr")) {
+	    		if (!has_gyr) has_gyr = true;
+	    		gyr_feature_list.add(s.substring(3));
+	    	}
+	    	if (s.startsWith("bar")) {
+	    		if (!has_bar) has_bar = true;
+	    		bar_feature_list.add(s.substring(3));
+	    	}
+	    }
 
-		Runnable myRunnable = new Runnable() {
-			public void run() {
-				while (extract_features) {
-					if (acc_clip.value.size()>0) {
-						//long t1 = System.currentTimeMillis();
-						features_acc = f0.ExtractFeatures(acc_clip);
-						transmitAnalysis();
-						counter++;
-						try {
-							Thread.sleep(1000);
-							//wait(1000);
-						} 
-						catch (InterruptedException e) {
-							extract_features = false;
-							e.printStackTrace();
-						}
-						//deltat = System.currentTimeMillis() - t1;
-					}
-				}
-			}
-		};
+	    //initializing feature extractors
+	    f_acc = new FeatureExtractor(window_size, acc_feature_list, 3);
+	    f_gyr = new FeatureExtractor(window_size, gyr_feature_list, 3);
+	    f_bar = new FeatureExtractor(window_size, bar_feature_list, 1);
 
-		Thread myThread = new Thread(myRunnable);
+	    //creating and staring the thread
+
+		myThread = new Thread(myRunnable);
+
+		extract_features = true;
 
 	    myThread.start();
 
-	    //executor.scheduleAtFixedRate(periodicTask, 0, 3, TimeUnit.SECONDS);
+	    Log.e("TEST", "Thread Started");
+
 
 	}
 
@@ -209,7 +255,16 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 			}
 
 			extract_features = true;
-			
+
+			// checking if the current thread is still running
+			if (!myThread.isAlive()) {
+				// A dead thread cannot be restarted. A new thread has to be created.
+				myThread = new Thread(myRunnable);
+			    myThread.start();
+	    	    Log.e("TEST", "Thread Started");
+
+			}
+
 			return true;
         }
     	else
@@ -238,19 +293,22 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 		// Sohrob - configure this!
 
 		Sensor sensor = event.sensor;
-		
-		final float[] values = event.values; // values.length = 3: X, Y, Z
+
+		final double[] values = new double[event.values.length];
+		for (int i=0; i<event.values.length; i++)
+			values[i] = (double)event.values[i]; // values.length = 3: X, Y, Z
 		final long timestamp = event.timestamp;
 
 		switch(sensor.getType())
 		{
 			case Sensor.TYPE_ACCELEROMETER:
-				// Do accelerometer stuff...
-				acc_clip.add(values, timestamp);
+				if (has_acc) acc_clip.add(values, timestamp);
 				break;
 			case Sensor.TYPE_GYROSCOPE:
-				// Do gyro stuff...
-				gyr_clip.add(values, timestamp);
+				if (has_gyr) gyr_clip.add(values, timestamp);
+				break;
+			case Sensor.TYPE_PRESSURE:
+				if (has_bar) bar_clip.add(values, timestamp);
 				break;
 		}
 /*
@@ -276,9 +334,16 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 		//bundle.putDouble("MY_FEATURE_A", 1.23456); 		// define your own keys and values 
 		//bundle.putLong("MY_FEATURE_B", Long.MAX_VALUE); // for the models & data collection
 
-		//bundle.putDouble("MEANX", features_acc[0]);
-		//bundle.putDouble("N", features_acc[1]);
-		bundle.putInt("CNT", counter);
+		for (int i=0; i<features.size(); i++)
+			bundle.putDouble(feature_list[i], features.get(i));
+		//bundle.putDouble("F2", features_acc[1]);
+		//bundle.putDouble("F3", features_acc[2]);
+		
+
+		//bundle.putInt("CNT", counter);
+		//bundle.putLong("T", deltat);
+		//bundle.putLong("Trans", t_trans);
+		//bundle.putLong("Time", (System.currentTimeMillis() - (long)1.410811849e12));
 
 		this.transmitData(this._context, bundle);
 	}

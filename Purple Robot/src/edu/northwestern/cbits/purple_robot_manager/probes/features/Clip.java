@@ -5,21 +5,21 @@ import java.util.ArrayList;
 
 public class Clip {
     
-    public List<float[]> value;
+    public List<double[]> value;
     public List<Long> timestamp;
     private int dim;
     private long window_size;
 
     public Clip(int dim, long window_size) {
 
-        value = new ArrayList<float[]>();
+        value = new ArrayList<double[]>();
         timestamp = new ArrayList<Long>();
         this.dim = dim;
         this.window_size = window_size;
 
     }
 
-    public int add(float[] value, long timestamp) {
+    public int add(double[] value, long timestamp) {
 
         if (value.length!=this.dim)
             return -1;
@@ -33,7 +33,7 @@ public class Clip {
                     this.value.remove(0);
                 }
                 if (timestamp-this.timestamp.get(0) > window_size) {
-                    this.value = new ArrayList<float[]>();
+                    this.value = new ArrayList<double[]>();
                     this.timestamp = new ArrayList<Long>();
                 }
                 addthestuff(value, timestamp);
@@ -43,10 +43,10 @@ public class Clip {
 
     }
 
-    private void addthestuff(float[] value, long timestamp) {
+    private void addthestuff(double[] value, long timestamp) {
         
         this.timestamp.add(timestamp);
-        this.value.add(new float[dim]);
+        this.value.add(new double[dim]);
         this.value.set(this.value.size()-1, value);
 
     }
