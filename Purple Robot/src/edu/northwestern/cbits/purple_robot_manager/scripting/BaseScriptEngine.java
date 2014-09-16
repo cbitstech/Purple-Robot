@@ -139,26 +139,55 @@ public abstract class BaseScriptEngine
 		bcast.sendBroadcastSync(intent);
 	}
 
-	public void playDefaultTone()
+	public void playDefaultTone(boolean loops)
 	{
 		LogManager.getInstance(this._context).log("pr_default_tone_played", null);
 
-		this.playTone(null);
+		this.playTone(null, loops);
+		
+	}
+
+	public void playDefaultTone()
+	{
+		this.playDefaultTone(false);
 	}
 	
 	public void playTone(String tone)
+	{
+		this.playTone(tone, false);
+	}
+	
+	public void stopVibrate()
+	{
+		Log.e("PR", "TODO: Implement PurpleRobot.stopVibrate();");
+	}
+	
+	public void stopPlayback()
+	{
+		Intent intent = new Intent(ManagerService.RINGTONE_STOP_INTENT);
+		intent.setClass(this._context, ManagerService.class);
+
+		HashMap <String, Object> payload = new HashMap<String, Object>();
+		LogManager.getInstance(this._context).log("pr_tone_stopped", payload);
+
+		this._context.startService(intent);
+	}
+
+	public void playTone(String tone, boolean loops)
 	{
 		Intent intent = new Intent(ManagerService.RINGTONE_INTENT);
 		intent.setClass(this._context, ManagerService.class);
 
 		if (tone != null)
 			intent.putExtra(ManagerService.RINGTONE_NAME, tone);
+		
+		if (loops)
+			intent.putExtra(ManagerService.RINGTONE_LOOPS, loops);
 
 		HashMap <String, Object> payload = new HashMap<String, Object>();
 		payload.put("tone", tone);
 		LogManager.getInstance(this._context).log("pr_tone_played", payload);
-		
-		
+
 		this._context.startService(intent);
 	}
 
@@ -192,10 +221,11 @@ public abstract class BaseScriptEngine
 		return EncryptionManager.getInstance().fetchEncryptedString(this._context, key);
 	}
 
-	public void vibrate(String pattern)
+	public void vibrate(String pattern, boolean repeats)
 	{
 		Intent intent = new Intent(ManagerService.HAPTIC_PATTERN_INTENT);
 		intent.putExtra(ManagerService.HAPTIC_PATTERN_NAME, pattern);
+		intent.putExtra(ManagerService.HAPTIC_PATTERN_VIBRATE, repeats);
 		intent.setClass(this._context, ManagerService.class);
 
 		HashMap <String, Object> payload = new HashMap<String, Object>();
