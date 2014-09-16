@@ -19,6 +19,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -55,8 +56,12 @@ public class ManagerService extends IntentService
 
 	public static String HAPTIC_PATTERN_INTENT = "purple_robot_manager_haptic_pattern";
 	public static String HAPTIC_PATTERN_NAME = "purple_robot_manager_haptic_pattern_name";
+	public static String HAPTIC_PATTERN_VIBRATE = "purple_robot_manager_haptic_pattern_vibrates";
+
+	public static String RINGTONE_STOP_INTENT = "purple_robot_manager_stop_ringtone";
 	public static String RINGTONE_INTENT = "purple_robot_manager_ringtone";
 	public static String RINGTONE_NAME = "purple_robot_manager_ringtone_name";
+	public static String RINGTONE_LOOPS = "purple_robot_manager_ringtone_loops";
 
 	public static String REFRESH_CONFIGURATION = "purple_robot_manager_refresh_configuration";
 
@@ -69,6 +74,9 @@ public class ManagerService extends IntentService
 	private static boolean _updatingTriggerSchedule = false;
 	protected static boolean _needsTriggerUpdate = false;
 
+	private static boolean _looping = false;
+	protected static MediaPlayer _player = null;
+
 	public ManagerService()
 	{
 		super("ManagerService");
@@ -80,7 +88,7 @@ public class ManagerService extends IntentService
 	}
 
 	@SuppressWarnings("deprecation")
-	protected void onHandleIntent(Intent intent)
+	protected void onHandleIntent(final Intent intent)
 	{
 		String action = intent.getAction();
 		
@@ -129,9 +137,20 @@ public class ManagerService extends IntentService
 				longSpec[i] = (long) patternSpec[i];
 			}
 
+			// TODO: Implement looping...
+			
 			Vibrator v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
 			v.cancel();
 			v.vibrate(longSpec, -1);
+		}
+		else if (RINGTONE_STOP_INTENT.equalsIgnoreCase(action))
+		{
+			ManagerService._looping = false;
+			
+			if (ManagerService._player != null)
+				ManagerService._player.stop();
+			
+			ManagerService._player = null;
 		}
 		else if (RINGTONE_INTENT.equalsIgnoreCase(action))
 		{
@@ -188,6 +207,8 @@ public class ManagerService extends IntentService
 			{
 				final Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), toneUri);
 	
+			    ManagerService._looping  = intent.getBooleanExtra(ManagerService.RINGTONE_LOOPS, false);
+
 				if (r != null)
 				{
 					Thread t = new Thread(new Runnable()
@@ -200,6 +221,13 @@ public class ManagerService extends IntentService
 							{
 								while (r.isPlaying())
 									Thread.sleep(100);
+								
+								if (ManagerService._looping)
+								{
+									Thread t = new Thread(this);
+					
+									t.start();
+								}
 							}
 							catch (InterruptedException e)
 							{
@@ -221,13 +249,24 @@ public class ManagerService extends IntentService
 					{
 						public void run() 
 						{
-							MediaPlayer player = new MediaPlayer();
+							ManagerService._player = new MediaPlayer();
 							
 							try 
 							{
-								player.setDataSource(afd.getFileDescriptor() ,afd.getStartOffset(),afd.getLength());
-							    player.prepare();
-							    player.start();
+								ManagerService._player .setDataSource(afd.getFileDescriptor() ,afd.getStartOffset(),afd.getLength());
+								ManagerService._player.setLooping(intent.getBooleanExtra(ManagerService.RINGTONE_LOOPS, false));
+							    
+								ManagerService._player.prepare();
+							    
+								ManagerService._player.setOnCompletionListener(new OnCompletionListener()
+							    {
+									public void onCompletion(MediaPlayer player) 
+									{
+										ManagerService._player = null;										
+									}
+							    });
+							    
+								ManagerService._player.start();
 							}
 							catch (IllegalArgumentException e) 
 							{
