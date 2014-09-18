@@ -3,6 +3,8 @@ package edu.northwestern.cbits.purple_robot_manager.probes.features;
 import java.util.List;
 import java.util.ArrayList;
 
+import android.util.Log;
+
 public class Clip {
     
     public List<double[]> value;
@@ -17,6 +19,14 @@ public class Clip {
         this.dim = dim;
         this.window_size = window_size;
 
+    }
+
+    // Copt Constructor
+    public Clip(Clip another) {
+        this.value = new ArrayList<double[]>(another.value);
+        this.timestamp = new ArrayList<Long>(another.timestamp);
+        this.dim = another.dim;
+        this.window_size = another.window_size;
     }
 
     public int add(double[] value, long timestamp) {
@@ -35,6 +45,7 @@ public class Clip {
                 if (timestamp-this.timestamp.get(0) > window_size) {
                     this.value = new ArrayList<double[]>();
                     this.timestamp = new ArrayList<Long>();
+                    Log.e("WARNING", "There has been a gap longer than 4sec!");
                 }
                 addthestuff(value, timestamp);
             }
