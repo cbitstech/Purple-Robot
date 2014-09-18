@@ -8,6 +8,9 @@ import org.apache.commons.math3.transform.DftNormalization;
 import org.apache.commons.math3.transform.FastFourierTransformer;
 import org.apache.commons.math3.transform.TransformType;
 
+import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
+import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
+
 public class FeatureExtractor {
     
 
@@ -40,15 +43,21 @@ public class FeatureExtractor {
 
     }
 
-    public List<Double> ExtractFeatures(Clip clip) {
+    public List<Double> ExtractFeatures(Clip clp) {
         
+        // build a copy of the clip. because it sometimes crashes suspiciously.
+        Clip clip = new Clip(clp);
+
+        //Spline Interpolation
+        List<double[]> signal = Interpolate(clip.value, clip.timestamp, 50);
+
         //Calculating the statistical moments
         double[] mean = new double[dim];
         double[] std = new double[dim];
         double[] skewness = new double[dim];
         double[] kurtosis = new double[dim];
         for (int i=0; i<dim; i++) {
-            double[] moments = getMoments(clip.value, i);
+            double[] moments = getMoments(signal, i);
             mean[i] = moments[0];
             std[i] = moments[1]; 
             skewness[i] = moments[2];
@@ -61,7 +70,7 @@ public class FeatureExtractor {
         double[] diff_kurtosis = new double[dim];
         if (hasDiff) {
             signal_diff = new ArrayList<double[]>();
-            signal_diff = getDiff(clip.value);
+            signal_diff = getDiff(signal);
             //Calculating the statistical moments of the difference signal
             for (int i=0; i<dim; i++) {
                 double[] moments = getMoments(signal_diff, i);
@@ -84,7 +93,7 @@ public class FeatureExtractor {
 
             switch (s) {
              
-                case "nsamp": //for debugging purpose. can be removed later
+                case "_nsamp": //for debugging purpose. can be removed later
                     features.add((double)clip.value.size());
                     break;
 
@@ -189,6 +198,67 @@ public class FeatureExtractor {
 
     }
 
+  
+    private List<double[]> Interpolate(List<double[]> signal, List<Long> t, int freq) {
+
+        
+        List<double[]> signal_out = new ArrayList<double[]>();
+
+        if (t.size()<2)
+            return signal_out;
+
+        //int n_samp = (int)(window_size / (long)1e9) * freq; // number of samples in the window
+        double step_size = (double)1e9/(double)freq; //step size in nanosec
+        
+
+        //converting time instances to double and getting rid of big numbers
+        long t_start = t.get(0);
+        double[] t_double = new double[signal.size()];
+        for (int j=0; j<signal.size(); j++)
+            t_double[j] = t.get(j) - t_start;   
+        
+        //calculating the number of interpolated samples
+        int n_samp = (int)Math.floor(t_double[signal.size()-1]/step_size);
+
+        //creating new, regular time instances 
+        double[] t_new = new double[n_samp];
+        for (int j=0; j<n_samp; j++)
+            t_new[j] = t_double[signal.size()-1] - (double)j*step_size;
+
+
+        double[][] signal_out_temp = new double[n_samp][dim];
+
+        for (int i=0; i<dim; i++) {
+            
+            //building a separate array for the current axis
+            double[] signal1D = new double[signal.size()];
+            for (int j=0; j<signal.size(); j++)
+                signal1D[j] = signal.get(j)[i];
+            
+
+            //spline interpolation
+            SplineInterpolator interp = new SplineInterpolator();
+            PolynomialSplineFunction func = interp.interpolate(t_double, signal1D);
+            
+            //interpolating onto new instances
+            //double[] signal1D_new = func.value(t_new);
+
+            for (int j=0; j<n_samp; j++)
+                signal_out_temp[j][i] = func.value(t_new[j]);
+
+        }
+
+        for (int i=0; i<n_samp; i++) {
+            signal_out.add(new double[dim]);
+            signal_out.set(signal_out.size()-1, signal_out_temp[i]);
+        }
+        
+        return signal_out;
+
+
+    }
+
+
     private List<double[]> getDiff(List<double[]> signal) {
 
         List<double[]> signal_diff = new ArrayList<double[]>();
@@ -217,7 +287,7 @@ public class FeatureExtractor {
 
     private double[] getMoments(List<double[]> signal, int axis) {
 
-        double N = (double)signal.size();
+        int N = signal.size();
 
         if (N<2) {
             double[] out = {0, 0, 0, 0};
@@ -225,7 +295,7 @@ public class FeatureExtractor {
         }
 
         double sum = 0f;
-        // for some reason, the following commented-out code generates "concurrent modification exception"!
+        // For some reason, the following commented-out code generates "concurrent modification exception"!
         //for (double[] value : signal)
             //sum += value[axis];
         for (int i=0; i<N; i++)
