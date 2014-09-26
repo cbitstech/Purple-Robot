@@ -27,12 +27,10 @@ public class FeatureExtractor {
 
     private int dim;
 
-    private List<double[]> signal_diff;
-
     private FastFourierTransformer fft;
 
     // bin edges must be in ascending order and equally spaced.
-    private double[] bin_edges = new double[]{-15, -10, -5, 0, 5, 10, 15};
+    private double[] bin_edges = new double[]{-3, -2, -1, 0, 1, 2, 3};
 
     public FeatureExtractor(long window_size, List<String> feature_list, int dim) {
 
@@ -95,8 +93,8 @@ public class FeatureExtractor {
         double[] diff_std = new double[dim];
         double[] diff_skewness = new double[dim];
         double[] diff_kurtosis = new double[dim];
+        List<double[]> signal_diff = new ArrayList<double[]>();
         if (hasDiff) {
-            signal_diff = new ArrayList<double[]>();
             signal_diff = getDiff(signal);
             //Calculating the statistical moments of the difference signal
             for (int i=0; i<dim; i++) {
@@ -110,17 +108,25 @@ public class FeatureExtractor {
         }
 
         int[][] hist = new int[dim][bin_edges.length-1];
+        List<double[]> signal_zscore = new ArrayList<double[]>();
         int bin = 0;
         if (hasHist) {
+            
+            //histogram of zscore values
+            signal_zscore = getZScore(signal, mean, std);
             for (int i=0; i<dim; i++) {
                 for (int j=0; j<bin_edges.length-1; j++)
                     hist[i][j] = 0;
-                for (int j=0; j<signal.size(); j++) {
-                    bin = (int)((signal.get(j)[i]-bin_edges[0])/(bin_edges[1]-bin_edges[0]));
+                for (int j=0; j<signal_zscore.size(); j++) {
+                    bin = (int)((signal_zscore.get(j)[i]-bin_edges[0])/(bin_edges[1]-bin_edges[0]));
                     if ((bin<bin_edges.length-1)&&(bin>=0)) //values outside the range are neglected
                         hist[i][bin]++;
                 }
             }
+
+            //TODO
+            // Add another set of histograms on raw signals (not zscore)
+            //TBD also on MATLAB side
         }
 
         double[] cross = new double[dim];
@@ -150,9 +156,10 @@ public class FeatureExtractor {
         if (hasFFT)
             Complex[] fft_values = fft.transform(signal, TransformType.FORWARD);
 */
+
         List<Double> features = new ArrayList<Double>();
 
-        int i=0;
+        //int i=0;
 
         for (String s: feature_list) {
 
@@ -162,7 +169,12 @@ public class FeatureExtractor {
                     features.add((double)clip.value.size());
                     break;
 
+                // overall mean square
                 case "_mean":
+                    features.add(getOverallMean(signal));
+                    break;
+
+                // mean
                 case "x_mean":
                     features.add(mean[0]);
                     break;
@@ -173,6 +185,7 @@ public class FeatureExtractor {
                     features.add(mean[2]);
                     break;
 
+                // absolute mean
                 case "_mean_abs":
                 case "x_mean_abs":
                     features.add(Math.abs(mean[0]));
@@ -184,6 +197,7 @@ public class FeatureExtractor {
                     features.add(Math.abs(mean[2]));
                     break;
 
+                // standard deviation
                 case "_std":
                 case "x_std":
                     features.add(std[0]);
@@ -195,6 +209,7 @@ public class FeatureExtractor {
                     features.add(std[2]);
                     break;
 
+                // skewness
                 case "_skew":
                 case "x_skew":
                     features.add(skewness[0]);
@@ -206,6 +221,7 @@ public class FeatureExtractor {
                     features.add(skewness[2]);
                     break;
 
+                // kurtosis
                 case "_kurt":
                 case "x_kurt":
                     features.add(kurtosis[0]);
@@ -217,6 +233,7 @@ public class FeatureExtractor {
                     features.add(kurtosis[2]);
                     break;
 
+                // mean of difference
                 case "_diff_mean":
                 case "x_diff_mean":
                     features.add(diff_mean[0]);
@@ -228,6 +245,7 @@ public class FeatureExtractor {
                     features.add(diff_mean[2]);
                     break;
 
+                // standard deviation of difference
                 case "_diff_std":
                 case "x_diff_std":
                     features.add(diff_std[0]);
@@ -239,6 +257,7 @@ public class FeatureExtractor {
                     features.add(diff_std[2]);
                     break;
 
+                // skewness of difference
                 case "_diff_skew":
                 case "x_diff_skew":
                     features.add(diff_skewness[0]);
@@ -250,6 +269,7 @@ public class FeatureExtractor {
                     features.add(diff_skewness[2]);
                     break;
 
+                // kurtosis of difference
                 case "_diff_kurt":
                 case "x_diff_kurt":
                     features.add(diff_kurtosis[0]);
@@ -261,6 +281,7 @@ public class FeatureExtractor {
                     features.add(diff_kurtosis[2]);
                     break;
 
+                // maximum
                 case "_max":
                 case "x_max":
                     features.add(getMax(signal, 0));
@@ -272,6 +293,7 @@ public class FeatureExtractor {
                     features.add(getMax(signal, 2));
                     break;
 
+                // minimum
                 case "_min":
                 case "x_min":
                     features.add(getMin(signal, 0));
@@ -283,6 +305,7 @@ public class FeatureExtractor {
                     features.add(getMin(signal, 2));
                     break;
 
+                // absolute maximum
                 case "_max_abs":
                 case "x_max_abs":
                     features.add(Math.abs(getMax(signal, 0)));
@@ -294,6 +317,7 @@ public class FeatureExtractor {
                     features.add(Math.abs(getMax(signal, 2)));
                     break;
 
+                // absolute minimum
                 case "_min_abs":
                 case "x_min_abs":
                     features.add(Math.abs(getMin(signal, 0)));
@@ -305,6 +329,7 @@ public class FeatureExtractor {
                     features.add(Math.abs(getMin(signal, 2)));
                     break;
 
+                // root mean square
                 case "_rms":
                 case "x_rms":
                     features.add(getRMS(signal, 0));
@@ -316,6 +341,7 @@ public class FeatureExtractor {
                     features.add(getRMS(signal, 2));
                     break;
 
+                // inner products
                 case "_cross_xy":
                     features.add(cross[0]);
                     break;
@@ -326,6 +352,7 @@ public class FeatureExtractor {
                     features.add(cross[2]);
                     break;
 
+                // absolute inner products
                 case "_cross_xy_abs":
                     features.add(Math.abs(cross[0]));
                     break;
@@ -336,6 +363,7 @@ public class FeatureExtractor {
                     features.add(Math.abs(cross[2]));
                     break;
 
+                // normalized inner products
                 case "_cross_xy_norm":
                     features.add(cross_norm[0]);
                     break;
@@ -346,6 +374,7 @@ public class FeatureExtractor {
                     features.add(cross_norm[2]);
                     break;
 
+                // absolute normalized inner products
                 case "_cross_xy_norm_abs":
                     features.add(Math.abs(cross_norm[0]));
                     break;
@@ -356,6 +385,7 @@ public class FeatureExtractor {
                     features.add(Math.abs(cross_norm[2]));
                     break;
 
+                // fast fourier transform coeficients
                 case "_fft_1":
                     features.add(0.0);
                     break;
@@ -391,6 +421,7 @@ public class FeatureExtractor {
 
             }
 
+            // histogram
             if (s.contains("hist")) {
                 String number = s.replaceAll("[^0-9]", "");
                 int hist_ind = Integer.parseInt(number) - 1;
@@ -404,7 +435,7 @@ public class FeatureExtractor {
                     Log.e("WARNING", "Bad histogram feature name!");
             }
 
-            i++;
+            //i++;
 
         }
 
@@ -492,6 +523,25 @@ public class FeatureExtractor {
 
     }
 
+    private List<double[]> getZScore(List<double[]> signal, double[] mean, double[] std) {
+        
+        List<double[]> signal_zscore = new ArrayList<double[]>();
+
+        for (int i=0; i<signal.size(); i++) {
+
+            double[] sig = signal.get(i);
+            double[] sig_zscore = new double[dim];
+
+            for (int j=0; j<dim; j++)
+                sig_zscore[j] = (sig[j] - mean[j])/std[j];
+
+            signal_zscore.add(sig_zscore);
+        }
+
+        return signal_zscore;
+    }
+
+
     // This method will calculate mean, standard deviation, skewness, and kurtosis.
     // each member of the list is one statistical moment, which consists of an array, with
     // each element accounting for one dimension
@@ -545,6 +595,17 @@ public class FeatureExtractor {
         double out[] = {mean, std, skewness, kurtosis};
         return out;
 
+    }
+
+    //overall mean of squares
+    private double getOverallMean(List<double[]> signal) {
+
+        double ms = 0;
+        for (int i=0; i<signal.size(); i++)
+            for (int j=0; j<dim; j++)
+                ms += signal.get(i)[j]*signal.get(i)[j]/dim;
+        ms /= signal.size();
+        return ms;
     }
 
     private double getRMS(List<double[]> signal, int axis) {
