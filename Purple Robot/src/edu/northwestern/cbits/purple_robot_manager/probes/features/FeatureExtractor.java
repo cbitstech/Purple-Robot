@@ -11,6 +11,8 @@ import org.apache.commons.math3.transform.TransformType;
 import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 
+import android.util.Log;
+
 public class FeatureExtractor {
     
 
@@ -19,11 +21,18 @@ public class FeatureExtractor {
     //private double[] features;
     private boolean hasFFT = false;
     private boolean hasDiff = false;
+    private boolean hasHist = false;
+    private boolean hasCross = false;
+    private boolean hasNormCross = false;
+
     private int dim;
 
     private List<double[]> signal_diff;
 
     private FastFourierTransformer fft;
+
+    // bin edges must be in ascending order and equally spaced.
+    private double[] bin_edges = new double[]{-15, -10, -5, 0, 5, 10, 15};
 
     public FeatureExtractor(long window_size, List<String> feature_list, int dim) {
 
@@ -37,9 +46,27 @@ public class FeatureExtractor {
                 hasFFT = true;
                 fft = new FastFourierTransformer(DftNormalization.STANDARD);
             }
+            
             if ((!hasDiff)&&(s.contains("diff")))
                 hasDiff = true;
+            
+            if ((!hasHist)&&(s.contains("hist")))
+                hasHist = true;
+
+            if ((!hasCross)&&(s.contains("cross")))
+                hasCross = true;
+
+            if((!hasNormCross)&&(s.contains("cross"))&&(s.contains("norm")))
+                hasNormCross = true;
+
         }
+
+    }
+
+    public void SetBinEdges(double[] edges) {
+        
+        this.bin_edges = new double[edges.length];
+        System.arraycopy(edges, 0, this.bin_edges, 0, edges.length);
 
     }
 
@@ -81,6 +108,44 @@ public class FeatureExtractor {
             }
 
         }
+
+        int[][] hist = new int[dim][bin_edges.length-1];
+        int bin = 0;
+        if (hasHist) {
+            for (int i=0; i<dim; i++) {
+                for (int j=0; j<bin_edges.length-1; j++)
+                    hist[i][j] = 0;
+                for (int j=0; j<signal.size(); j++) {
+                    bin = (int)((signal.get(j)[i]-bin_edges[0])/(bin_edges[1]-bin_edges[0]));
+                    if ((bin<bin_edges.length-1)&&(bin>=0)) //values outside the range are neglected
+                        hist[i][bin]++;
+                }
+            }
+        }
+
+        double[] cross = new double[dim];
+        if (hasCross) {
+            for (int i=0; i<dim; i++)
+                cross[i] = 0;
+            if (dim==3) {
+                cross = getInnerProds3(signal);
+            }
+            else
+                Log.e("Warning","Calculating cross-dimensional inner-products for a non-3D signal - values set to zero!");
+        }
+
+        double[] cross_norm = new double[dim];
+        if (hasNormCross) {
+            for (int i=0; i<dim; i++)
+                cross_norm[i] = 0;
+            if (dim==3) {
+                cross_norm = getNormInnerProds3(signal);
+            }
+            else
+                Log.e("Warning","Calculating cross-dimensional inner-products for a non-3D signal - values set to zero!");
+        }
+
+
 /*
         if (hasFFT)
             Complex[] fft_values = fft.transform(signal, TransformType.FORWARD);
@@ -106,6 +171,17 @@ public class FeatureExtractor {
                     break;
                 case "z_mean":
                     features.add(mean[2]);
+                    break;
+
+                case "_mean_abs":
+                case "x_mean_abs":
+                    features.add(Math.abs(mean[0]));
+                    break;
+                case "y_mean_abs":
+                    features.add(Math.abs(mean[1]));
+                    break;
+                case "z_mean_abs":
+                    features.add(Math.abs(mean[2]));
                     break;
 
                 case "_std":
@@ -185,9 +261,147 @@ public class FeatureExtractor {
                     features.add(diff_kurtosis[2]);
                     break;
 
+                case "_max":
+                case "x_max":
+                    features.add(getMax(signal, 0));
+                    break;
+                case "y_max":
+                    features.add(getMax(signal, 1));
+                    break;
+                case "z_max":
+                    features.add(getMax(signal, 2));
+                    break;
+
+                case "_min":
+                case "x_min":
+                    features.add(getMin(signal, 0));
+                    break;
+                case "y_min":
+                    features.add(getMin(signal, 1));
+                    break;
+                case "z_min":
+                    features.add(getMin(signal, 2));
+                    break;
+
+                case "_max_abs":
+                case "x_max_abs":
+                    features.add(Math.abs(getMax(signal, 0)));
+                    break;
+                case "y_max_abs":
+                    features.add(Math.abs(getMax(signal, 1)));
+                    break;
+                case "z_max_abs":
+                    features.add(Math.abs(getMax(signal, 2)));
+                    break;
+
+                case "_min_abs":
+                case "x_min_abs":
+                    features.add(Math.abs(getMin(signal, 0)));
+                    break;
+                case "y_min_abs":
+                    features.add(Math.abs(getMin(signal, 1)));
+                    break;
+                case "z_min_abs":
+                    features.add(Math.abs(getMin(signal, 2)));
+                    break;
+
+                case "_rms":
+                case "x_rms":
+                    features.add(getRMS(signal, 0));
+                    break;
+                case "y_rms":
+                    features.add(getRMS(signal, 1));
+                    break;
+                case "z_rms":
+                    features.add(getRMS(signal, 2));
+                    break;
+
+                case "_cross_xy":
+                    features.add(cross[0]);
+                    break;
+                case "_cross_yz":
+                    features.add(cross[1]);
+                    break;
+                case "_cross_zx":
+                    features.add(cross[2]);
+                    break;
+
+                case "_cross_xy_abs":
+                    features.add(Math.abs(cross[0]));
+                    break;
+                case "_cross_yz_abs":
+                    features.add(Math.abs(cross[1]));
+                    break;
+                case "_cross_zx_abs":
+                    features.add(Math.abs(cross[2]));
+                    break;
+
+                case "_cross_xy_norm":
+                    features.add(cross_norm[0]);
+                    break;
+                case "_cross_yz_norm":
+                    features.add(cross_norm[1]);
+                    break;
+                case "_cross_zx_norm":
+                    features.add(cross_norm[2]);
+                    break;
+
+                case "_cross_xy_norm_abs":
+                    features.add(Math.abs(cross_norm[0]));
+                    break;
+                case "_cross_yz_norm_abs":
+                    features.add(Math.abs(cross_norm[1]));
+                    break;
+                case "_cross_zx_norm_abs":
+                    features.add(Math.abs(cross_norm[2]));
+                    break;
+
+                case "_fft_1":
+                    features.add(0.0);
+                    break;
+                case "_fft_2":
+                    features.add(0.0);
+                    break;
+                case "_fft_3":
+                    features.add(0.0);
+                    break;
+                case "_fft_4":
+                    features.add(0.0);
+                    break;
+                case "_fft_5":
+                    features.add(0.0);
+                    break;
+                case "_fft_6":
+                    features.add(0.0);
+                    break;
+                case "_fft_7":
+                    features.add(0.0);
+                    break;
+                case "_fft_8":
+                    features.add(0.0);
+                    break;
+                case "_fft_9":
+                    features.add(0.0);
+                    break;
+                case "_fft_10":
+                    features.add(0.0);
+                    break;
 
                 default:
 
+            }
+
+            if (s.contains("hist")) {
+                String number = s.replaceAll("[^0-9]", "");
+                int hist_ind = Integer.parseInt(number) - 1;
+                if (s.startsWith("h")||s.startsWith("x"))
+                    features.add((double)hist[0][hist_ind]);
+                else if (s.startsWith("y"))
+                    features.add((double)hist[1][hist_ind]);
+                else if (s.startsWith("z"))
+                    features.add((double)hist[2][hist_ind]);
+                else
+                    Log.e("WARNING", "Bad histogram feature name!");
             }
 
             i++;
@@ -207,7 +421,6 @@ public class FeatureExtractor {
         if (t.size()<2)
             return signal_out;
 
-        //int n_samp = (int)(window_size / (long)1e9) * freq; // number of samples in the window
         double step_size = (double)1e9/(double)freq; //step size in nanosec
         
 
@@ -241,8 +454,6 @@ public class FeatureExtractor {
             PolynomialSplineFunction func = interp.interpolate(t_double, signal1D);
             
             //interpolating onto new instances
-            //double[] signal1D_new = func.value(t_new);
-
             for (int j=0; j<n_samp; j++)
                 signal_out_temp[j][i] = func.value(t_new[j]);
 
@@ -336,5 +547,85 @@ public class FeatureExtractor {
 
     }
 
+    private double getRMS(List<double[]> signal, int axis) {
+
+        double rms = 0;
+        for (int i=0; i<signal.size(); i++)
+            rms += signal.get(i)[axis]*signal.get(i)[axis];
+        rms /= (double)signal.size();
+        return rms;
+
+    }
+
+    private double getMax(List<double[]> signal, int axis) {
+
+        if (signal.size()==0)
+            return 0;
+        double max = signal.get(0)[axis];
+        for (int i=1; i<signal.size(); i++)
+            if (max<signal.get(i)[axis]) max = signal.get(i)[axis];
+        return max;
+
+    }
+
+    private double getMin(List<double[]> signal, int axis) {
+
+        if (signal.size()==0)
+            return 0;
+        double min = signal.get(0)[axis];
+        for (int i=1; i<signal.size(); i++)
+            if (min>signal.get(i)[axis]) min = signal.get(i)[axis];
+        return min;
+
+    }
+
+    //This feature only works for 3D signals (acceleration, magnetic field, etc).
+    private double[] getInnerProds3(List<double[]> signal) {
+        
+        double[] inner_prods = new double[3];
+        if (dim!=3) return inner_prods; // double-check for dimension
+
+        inner_prods[0] = 0;
+        for (int j=0; j<signal.size(); j++)
+            inner_prods[0] += signal.get(j)[0]*signal.get(j)[1];
+        inner_prods[0] /= (double)signal.size(); //mean
+        inner_prods[1] = 0;
+        for (int j=0; j<signal.size(); j++)
+            inner_prods[1] += signal.get(j)[1]*signal.get(j)[2];
+        inner_prods[1] /= (double)signal.size(); //mean
+        inner_prods[2] = 0;
+        for (int j=0; j<signal.size(); j++)
+            inner_prods[2] += signal.get(j)[2]*signal.get(j)[0];
+        inner_prods[2] /= (double)signal.size(); //mean
+
+        return inner_prods;
+
+    }
+
+   private double[] getNormInnerProds3(List<double[]> signal) {
+
+        double[] inner_prods = new double[3];
+        if (dim!=3) return inner_prods; // double-check for dimension
+
+        double[] magnitude = new double[signal.size()];
+        for (int j=0; j<signal.size(); j++)
+            magnitude[j] = signal.get(j)[0]*signal.get(j)[0] + signal.get(j)[1]*signal.get(j)[1] + signal.get(j)[2]*signal.get(j)[2];
+
+        inner_prods[0] = 0;
+        for (int j=0; j<signal.size(); j++)
+            inner_prods[0] += signal.get(j)[0]*signal.get(j)[1]/magnitude[j];
+        inner_prods[0] /= (double)signal.size(); //mean
+        inner_prods[1] = 0;
+        for (int j=0; j<signal.size(); j++)
+            inner_prods[1] += signal.get(j)[1]*signal.get(j)[2]/magnitude[j];
+        inner_prods[1] /= (double)signal.size(); //mean
+        inner_prods[2] = 0;
+        for (int j=0; j<signal.size(); j++)
+            inner_prods[2] += signal.get(j)[2]*signal.get(j)[0]/magnitude[j];
+        inner_prods[2] /= (double)signal.size(); //mean
+
+        return inner_prods;
+
+   }        
 
 }
