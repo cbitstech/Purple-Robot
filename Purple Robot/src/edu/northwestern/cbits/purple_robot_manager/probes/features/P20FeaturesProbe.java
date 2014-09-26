@@ -57,7 +57,37 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 	private long deltat;
 	//private long t_trans = 0;
 
-    private String[] feature_list = {"accx_mean","gyrx_diff_std","acc_nsamp"};
+    //private String[] feature_list = {"accx_hist2","accx_max","acc_cross_zx"};
+
+    private String[] feature_list = {"acc_mean","accx_mean","accy_mean","accz_mean","acc_mean_abs","accx_mean_abs","accy_mean_abs","accz_mean_abs",
+    								"accx_std","accy_std","accz_std","accx_skew","accy_skew","accz_skew","accx_kurt","accy_kurt","accz_kurt",
+    								"accx_diff_mean","accy_diff_mean","accz_diff_mean","accx_diff_std","accy_diff_std","accz_diff_std",
+    								"accx_diff_skew","accy_diff_skew","accz_diff_skew","accx_diff_kurt","accy_diff_kurt","accz_diff_kurt",
+    								"accx_max","accy_max","accz_max","accx_min","accy_min","accz_min","accx_max_abs","accy_max_abs","accz_max_abs","accx_min_abs","accy_min_abs","accz_min_abs",
+    								"accx_rms","accy_rms","accz_rms",
+    								"acc_cross_xy","acc_cross_yz","acc_cross_zx","acc_cross_xy_abs","acc_cross_yz_abs","acc_cross_zx_abs",
+    								"acc_cross_xy_norm","acc_cross_yz_norm","acc_cross_zx_norm","acc_cross_xy_norm_abs","acc_cross_yz_norm_abs","acc_cross_zx_norm_abs",
+    								"accx_fft_1","accx_fft_2","accx_fft_3","accx_fft_4","accx_fft_5","accx_fft_6","accx_fft_7","accx_fft_8","accx_fft_9","accx_fft_10",
+    								"accy_fft_1","accy_fft_2","accy_fft_3","accy_fft_4","accy_fft_5","accy_fft_6","accy_fft_7","accy_fft_8","accy_fft_9","accy_fft_10",
+    								"accz_fft_1","accz_fft_2","accz_fft_3","accz_fft_4","accz_fft_5","accz_fft_6","accz_fft_7","accz_fft_8","accz_fft_9","accz_fft_10",
+    								"accx_hist1","accx_hist2","accx_hist3","accx_hist4","accx_hist5","accx_hist6",
+    								"accy_hist1","accy_hist2","accy_hist3","accy_hist4","accy_hist5","accy_hist6",
+    								"accz_hist1","accz_hist2","accz_hist3","accz_hist4","accz_hist5","accz_hist6", ///
+    								"gyr_mean","gyrx_mean","gyry_mean","gyrz_mean","gyr_mean_abs","gyrx_mean_abs","gyry_mean_abs","gyrz_mean_abs",
+    								"gyrx_std","gyry_std","gyrz_std","gyrx_skew","gyry_skew","gyrz_skew","gyrx_kurt","gyry_kurt","gyrz_kurt",
+    								"gyrx_diff_mean","gyry_diff_mean","gyrz_diff_mean","gyrx_diff_std","gyry_diff_std","gyrz_diff_std",
+    								"gyrx_diff_skew","gyry_diff_skew","gyrz_diff_skew","gyrx_diff_kurt","gyry_diff_kurt","gyrz_diff_kurt",
+    								"gyrx_max","gyry_max","gyrz_max","gyrx_min","gyry_min","gyrz_min","gyrx_max_abs","gyry_max_abs","gyrz_max_abs","gyrx_min_abs","gyry_min_abs","gyrz_min_abs",
+    								"gyrx_rms","gyry_rms","gyrz_rms",
+    								"gyr_cross_xy","gyr_cross_yz","gyr_cross_zx","gyr_cross_xy_abs","gyr_cross_yz_abs","gyr_cross_zx_abs",
+    								"gyr_cross_xy_norm","gyr_cross_yz_norm","gyr_cross_zx_norm","gyr_cross_xy_norm_abs","gyr_cross_yz_norm_abs","gyr_cross_zx_norm_abs",
+    								"gyrx_fft_1","gyrx_fft_2","gyrx_fft_3","gyrx_fft_4","gyrx_fft_5","gyrx_fft_6","gyrx_fft_7","gyrx_fft_8","gyrx_fft_9","gyrx_fft_10",
+    								"gyry_fft_1","gyry_fft_2","gyry_fft_3","gyry_fft_4","gyry_fft_5","gyry_fft_6","gyry_fft_7","gyry_fft_8","gyry_fft_9","gyry_fft_10",
+    								"gyrz_fft_1","gyrz_fft_2","gyrz_fft_3","gyrz_fft_4","gyrz_fft_5","gyrz_fft_6","gyrz_fft_7","gyrz_fft_8","gyrz_fft_9","gyrz_fft_10",
+    								"gyrx_hist1","gyrx_hist2","gyrx_hist3","gyrx_hist4","gyrx_hist5","gyrx_hist6",
+    								"gyry_hist1","gyry_hist2","gyry_hist3","gyry_hist4","gyry_hist5","gyry_hist6",
+    								"gyrz_hist1","gyrz_hist2","gyrz_hist3","gyrz_hist4","gyrz_hist5","gyrz_hist6"};
+
     
     //sorted feature list
     private List<String> feature_list_sorted;
@@ -194,7 +224,9 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 
 		myThread = new Thread(myRunnable);
 
-		extract_features = true;
+		// Just to create a dead thread for isAlive() not to complain later on. But not running the 
+		// thread since the probe might be disabled.
+		extract_features = false;
 
 	    myThread.start();
 
