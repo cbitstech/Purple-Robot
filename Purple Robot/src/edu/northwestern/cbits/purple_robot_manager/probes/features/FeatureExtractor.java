@@ -166,7 +166,7 @@ public class FeatureExtractor {
             switch (s) {
              
                 case "_nsamp": //for debugging purpose. can be removed later
-                    features.add((double)clip.value.size());
+                    features.add((double)signal.size());
                     break;
 
                 // overall mean square
@@ -454,20 +454,34 @@ public class FeatureExtractor {
 
         double step_size = (double)1e9/(double)freq; //step size in nanosec
         
+        //checking if the timestamps are incremental - if not, the datapoint is removed
+        List<Long> t2 = new ArrayList<Long>();
+        List<double[]> signal2 = new ArrayList<double[]>();
+        t2.add(t.get(0));
+        signal2.add(new double[dim]);
+        signal2.set(0, signal.get(0));
+        for (int j=1; j<t.size(); j++) {
+            if (t.get(j)>t2.get(t2.size()-1)) {
+                t2.add(t.get(j));
+                signal2.add(new double[dim]);
+                signal2.set(signal2.size()-1, signal.get(j));
+            } else
+                Log.e("WARNING", "Non-increasing timestamp found!");
+        }
 
         //converting time instances to double and getting rid of big numbers
-        long t_start = t.get(0);
-        double[] t_double = new double[signal.size()];
-        for (int j=0; j<signal.size(); j++)
-            t_double[j] = t.get(j) - t_start;   
+        long t_start = t2.get(0);
+        double[] t_double = new double[signal2.size()];
+        for (int j=0; j<signal2.size(); j++)
+            t_double[j] = t2.get(j) - t_start;
         
         //calculating the number of interpolated samples
-        int n_samp = (int)Math.floor(t_double[signal.size()-1]/step_size);
+        int n_samp = (int)Math.floor(t_double[signal2.size()-1]/step_size);
 
         //creating new, regular time instances 
         double[] t_new = new double[n_samp];
         for (int j=0; j<n_samp; j++)
-            t_new[j] = t_double[signal.size()-1] - (double)j*step_size;
+            t_new[j] = t_double[signal2.size()-1] - (double)j*step_size;
 
 
         double[][] signal_out_temp = new double[n_samp][dim];
@@ -475,9 +489,9 @@ public class FeatureExtractor {
         for (int i=0; i<dim; i++) {
             
             //building a separate array for the current axis
-            double[] signal1D = new double[signal.size()];
-            for (int j=0; j<signal.size(); j++)
-                signal1D[j] = signal.get(j)[i];
+            double[] signal1D = new double[signal2.size()];
+            for (int j=0; j<signal2.size(); j++)
+                signal1D[j] = signal2.get(j)[i];
             
 
             //spline interpolation
