@@ -247,7 +247,7 @@ public class EncryptionManager
 		return userHash;
 	}
 
-    public SecretKeySpec keyForCipher(Context context, String cipherName) throws UnsupportedEncodingException
+	public SecretKeySpec keyForCipher(Context context, String cipherName) throws UnsupportedEncodingException
 	{
 		String userHash = this.getUserHash(context);
 		String keyString = (new StringBuffer(userHash)).reverse().toString();
