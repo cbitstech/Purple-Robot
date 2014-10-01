@@ -67,12 +67,12 @@ import edu.northwestern.cbits.purple_robot_manager.probes.features.GyroscopeBasi
 import edu.northwestern.cbits.purple_robot_manager.probes.features.JavascriptFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.LightProbeBasicStatisticsFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.MagneticFieldBasicStatisticsFeature;
-import edu.northwestern.cbits.purple_robot_manager.probes.features.P20FeaturesProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.PressureProbeBasicStatisticsFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.ProximityProbeBasicStatisticsFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.SunriseSunsetFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.TemperatureProbeBasicStatisticsFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.WeatherUndergroundFeature;
+import edu.northwestern.cbits.purple_robot_manager.probes.features.p20.P20FeaturesProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.sample.SampleProbe;
 
 public class ProbeManager
