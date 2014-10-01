@@ -67,6 +67,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.features.GyroscopeBasi
 import edu.northwestern.cbits.purple_robot_manager.probes.features.JavascriptFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.LightProbeBasicStatisticsFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.MagneticFieldBasicStatisticsFeature;
+import edu.northwestern.cbits.purple_robot_manager.probes.features.P20FeaturesProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.PressureProbeBasicStatisticsFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.ProximityProbeBasicStatisticsFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.SunriseSunsetFeature;
@@ -547,7 +548,14 @@ public class ProbeManager
 				if (sample.name(context).equalsIgnoreCase(name))
 					found = true;
 			}
+			else if (probe instanceof P20FeaturesProbe)
+			{
+				P20FeaturesProbe p20 = (P20FeaturesProbe) probe;
 
+				if (p20.name(context).equalsIgnoreCase(name))
+					found = true;
+			}
+			
 			if (found)
 			{
 				ProbeManager._cachedProbes.put(name, probe);
