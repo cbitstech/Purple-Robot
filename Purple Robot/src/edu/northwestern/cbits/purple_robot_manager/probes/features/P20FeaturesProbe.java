@@ -133,16 +133,37 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 					}
 					
 					if (has_acc) {
-						while (acc_writing);
+						while (acc_writing) {
+							try {
+								Thread.sleep(5);
+							}
+							catch(Exception e) {
+								e.printStackTrace();
+							}
+						}
 						features.addAll(f_acc.ExtractFeatures(acc_clip));
 						if (acc_clip.value.size()<100) generate_tone = true;
 					}
 					if (has_gyr) {
-						while (gyr_writing);
+						while (gyr_writing) {
+							try {
+								Thread.sleep(5);
+							}
+							catch(Exception e) {
+								e.printStackTrace();
+							}
+						}
 						features.addAll(f_gyr.ExtractFeatures(gyr_clip));
 					}
 					if (has_bar) {
-						while (bar_writing);
+						while (bar_writing) {
+							try {
+								Thread.sleep(5);
+							}
+							catch(Exception e) {
+								e.printStackTrace();
+							}
+						}
 						features.addAll(f_bar.ExtractFeatures(bar_clip));
 					}
 
