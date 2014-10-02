@@ -1,5 +1,8 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.features.p20;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -7,253 +10,252 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
-import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
-import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
-import edu.northwestern.cbits.purple_robot_manager.probes.sample.SampleProbe;
-
-import java.util.List;
-import java.util.ArrayList;
-//import java.util.concurrent.TimeUnit;
-//import java.util.concurrent.ScheduledExecutorService;
-//import java.util.concurrent.Executors;
-import java.lang.Thread;
 import android.util.Log;
-
-import android.media.ToneGenerator;
-import android.media.AudioManager;
+import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
+import edu.northwestern.cbits.purple_robot_manager.probes.features.p20.Clip.ClipException;
+import edu.northwestern.cbits.purple_robot_manager.probes.features.p20.FeatureExtractor.Feature;
 
 public class P20FeaturesProbe extends Probe implements SensorEventListener 
 {
-	
-	private final int freq_interp = 50;
-	private final long window_size = (long)4e9; // sensor timestamps are in nanoseconds
-	private final long window_shift = (long)3e9; // sensor timestamps are in nanoseconds
-	private long lastprocessingtime = 0;
-	
-	private FeatureExtractor f_acc, f_gyr, f_bar;
-
-	private List<Double> features;
-
-	Clip acc_clip, gyr_clip, bar_clip;
-
 	public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.features.P20FeaturesProbe";
-
 	private static final String ENABLE = "config_probe_p20_enabled";
 	private static final boolean DEFAULT_ENABLED = false;
+	
+	private static final long WINDOW_SIZE = (long) 4e9; // sensor timestamps are in nanoseconds
+	private static final long WINDOW_SHIFT = (long) 3e9; // sensor timestamps are in nanoseconds
+
+	private FeatureExtractor _accelerometerExtractor = null;
+	private FeatureExtractor _gyroscopeExtractor = null;
+	private FeatureExtractor _barometerExtractor = null;
+
+	private HashMap<Feature, Double> _featureValues = new HashMap<Feature, Double>();
+
+	private Clip _accelerometerClip = null;
+	private Clip _gyroscopeClip = null;
+	private Clip _barometerClip = null;
 
 	private int _lastFrequency = -1;
+	
 	private Context _context = null;
 
-	private boolean extract_features = false;
+	private boolean _extractFeatures = false;
 
-	//private int counter = 0;
-	private long deltat;
-	//private long t_trans = 0;
+    private FeatureExtractor.Feature[] _featureList = 
+    {
+    	Feature.ACC_MEAN, Feature.ACCX_MEAN, Feature.ACCY_MEAN, Feature.ACCZ_MEAN, 
+    	Feature.ACC_MEAN_ABS, Feature.ACCX_MEAN_ABS, Feature.ACCY_MEAN_ABS, Feature.ACCZ_MEAN_ABS,
+    	Feature.ACCX_STD, Feature.ACCY_STD, Feature.ACCZ_STD,
+    	Feature.ACCX_SKEW, Feature.ACCY_SKEW, Feature.ACCZ_SKEW,
+    	Feature.ACCX_KURT, Feature.ACCY_KURT, Feature.ACCZ_KURT,
+    	Feature.ACCX_DIFF_MEAN, Feature.ACCY_DIFF_MEAN, Feature.ACCZ_DIFF_MEAN,
+    	Feature.ACCX_DIFF_STD, Feature.ACCY_DIFF_STD, Feature.ACCZ_DIFF_STD,
+    	Feature.ACCX_DIFF_SKEW, Feature.ACCY_DIFF_SKEW, Feature.ACCZ_DIFF_SKEW,
+    	Feature.ACCX_DIFF_KURT, Feature.ACCY_DIFF_KURT, Feature.ACCZ_DIFF_KURT,
+    	Feature.ACCX_MAX, Feature.ACCY_MAX, Feature.ACCZ_MAX,
+    	Feature.ACCX_MIN, Feature.ACCY_MIN, Feature.ACCZ_MIN,
+    	Feature.ACCX_MAX_ABS, Feature.ACCY_MAX_ABS, Feature.ACCZ_MAX_ABS,
+    	Feature.ACCX_MIN_ABS, Feature.ACCY_MIN_ABS, Feature.ACCZ_MIN_ABS,
+    	Feature.ACCX_RMS, Feature.ACCY_RMS, Feature.ACCZ_RMS,
+    	Feature.ACC_CROSS_XY, Feature.ACC_CROSS_YZ, Feature.ACC_CROSS_ZX,
+    	Feature.ACC_CROSS_XY_ABS, Feature.ACC_CROSS_YZ_ABS, Feature.ACC_CROSS_ZX_ABS,
+    	Feature.ACC_CROSS_XY_NORM, Feature.ACC_CROSS_YZ_NORM, Feature.ACC_CROSS_ZX_NORM,
+    	Feature.ACC_CROSS_XY_NORM_ABS, Feature.ACC_CROSS_YZ_NORM_ABS, Feature.ACC_CROSS_ZX_NORM_ABS,
+    	Feature.ACCX_FFT_1, Feature.ACCX_FFT_2, Feature.ACCX_FFT_3, Feature.ACCX_FFT_4, Feature.ACCX_FFT_5, Feature.ACCX_FFT_6, Feature.ACCX_FFT_7, Feature.ACCX_FFT_8, Feature.ACCX_FFT_9, Feature.ACCX_FFT_10,
+    	Feature.ACCY_FFT_1, Feature.ACCY_FFT_2, Feature.ACCY_FFT_3, Feature.ACCY_FFT_4, Feature.ACCY_FFT_5, Feature.ACCY_FFT_6, Feature.ACCY_FFT_7, Feature.ACCY_FFT_8, Feature.ACCY_FFT_9, Feature.ACCY_FFT_10,
+    	Feature.ACCZ_FFT_1, Feature.ACCZ_FFT_2, Feature.ACCZ_FFT_3, Feature.ACCZ_FFT_4, Feature.ACCZ_FFT_5, Feature.ACCZ_FFT_6, Feature.ACCZ_FFT_7, Feature.ACCZ_FFT_8, Feature.ACCZ_FFT_9, Feature.ACCZ_FFT_10,
+    	Feature.ACCX_HIST1, Feature.ACCX_HIST2, Feature.ACCX_HIST3, Feature.ACCX_HIST4, Feature.ACCX_HIST5, Feature.ACCX_HIST6,
+    	Feature.ACCY_HIST1, Feature.ACCY_HIST2, Feature.ACCY_HIST3, Feature.ACCY_HIST4, Feature.ACCY_HIST5, Feature.ACCY_HIST6,
+    	Feature.ACCZ_HIST1, Feature.ACCZ_HIST2, Feature.ACCZ_HIST3, Feature.ACCZ_HIST4, Feature.ACCZ_HIST5, Feature.ACCZ_HIST6,
+    	Feature.GYR_MEAN, Feature.GYRX_MEAN, Feature.GYRY_MEAN, Feature.GYRZ_MEAN,
+    	Feature.GYR_MEAN_ABS, Feature.GYRX_MEAN_ABS, Feature.GYRY_MEAN_ABS, Feature.GYRZ_MEAN_ABS,
+    	Feature.GYRX_STD, Feature.GYRY_STD, Feature.GYRZ_STD,
+    	Feature.GYRX_SKEW, Feature.GYRY_SKEW, Feature.GYRZ_SKEW,
+    	Feature.GYRX_KURT, Feature.GYRY_KURT, Feature.GYRZ_KURT,
+    	Feature.GYRX_DIFF_MEAN, Feature.GYRY_DIFF_MEAN, Feature.GYRZ_DIFF_MEAN,
+    	Feature.GYRX_DIFF_STD, Feature.GYRY_DIFF_STD, Feature.GYRZ_DIFF_STD,
+    	Feature.GYRX_DIFF_SKEW, Feature.GYRY_DIFF_SKEW, Feature.GYRZ_DIFF_SKEW,
+    	Feature.GYRX_DIFF_KURT, Feature.GYRY_DIFF_KURT, Feature.GYRZ_DIFF_KURT,
+    	Feature.GYRX_MAX, Feature.GYRY_MAX, Feature.GYRZ_MAX, Feature.GYRX_MIN, Feature.GYRY_MIN, Feature.GYRZ_MIN,
+    	Feature.GYRX_MAX_ABS, Feature.GYRY_MAX_ABS, Feature.GYRZ_MAX_ABS, Feature.GYRX_MIN_ABS, Feature.GYRY_MIN_ABS, Feature.GYRZ_MIN_ABS,
+    	Feature.GYRX_RMS, Feature.GYRY_RMS, Feature.GYRZ_RMS,
+    	Feature.GYR_CROSS_XY, Feature.GYR_CROSS_YZ, Feature.GYR_CROSS_ZX,
+    	Feature.GYR_CROSS_XY_ABS, Feature.GYR_CROSS_YZ_ABS, Feature.GYR_CROSS_ZX_ABS,
+    	Feature.GYR_CROSS_XY_NORM, Feature.GYR_CROSS_YZ_NORM, Feature.GYR_CROSS_ZX_NORM,
+    	Feature.GYR_CROSS_XY_NORM_ABS, Feature.GYR_CROSS_YZ_NORM_ABS, Feature.GYR_CROSS_ZX_NORM_ABS,
+    	Feature.GYRX_FFT_1, Feature.GYRX_FFT_2, Feature.GYRX_FFT_3, Feature.GYRX_FFT_4, Feature.GYRX_FFT_5, Feature.GYRX_FFT_6, Feature.GYRX_FFT_7, Feature.GYRX_FFT_8, Feature.GYRX_FFT_9, Feature.GYRX_FFT_10,
+    	Feature.GYRY_FFT_1, Feature.GYRY_FFT_2, Feature.GYRY_FFT_3, Feature.GYRY_FFT_4, Feature.GYRY_FFT_5, Feature.GYRY_FFT_6, Feature.GYRY_FFT_7, Feature.GYRY_FFT_8, Feature.GYRY_FFT_9, Feature.GYRY_FFT_10,
+    	Feature.GYRZ_FFT_1, Feature.GYRZ_FFT_2, Feature.GYRZ_FFT_3, Feature.GYRZ_FFT_4, Feature.GYRZ_FFT_5, Feature.GYRZ_FFT_6, Feature.GYRZ_FFT_7, Feature.GYRZ_FFT_8, Feature.GYRZ_FFT_9, Feature.GYRZ_FFT_10,
+    	Feature.GYRX_HIST1, Feature.GYRX_HIST2, Feature.GYRX_HIST3, Feature.GYRX_HIST4, Feature.GYRX_HIST5, Feature.GYRX_HIST6,
+    	Feature.GYRY_HIST1, Feature.GYRY_HIST2, Feature.GYRY_HIST3, Feature.GYRY_HIST4, Feature.GYRY_HIST5, Feature.GYRY_HIST6,
+    	Feature.GYRZ_HIST1, Feature.GYRZ_HIST2, Feature.GYRZ_HIST3, Feature.GYRZ_HIST4, Feature.GYRZ_HIST5, Feature.GYRZ_HIST6    
+    };
 
-    //private String[] feature_list = {"accx_hist2","accx_max","acc_cross_zx"};
+    private boolean _hasAccelerometer = false;
+    private boolean _hasGyroscope = false;
+    private boolean _hasBarometer = false;
 
-    private String[] feature_list = {"acc_mean","accx_mean","accy_mean","accz_mean","acc_mean_abs","accx_mean_abs","accy_mean_abs","accz_mean_abs",
-    								"accx_std","accy_std","accz_std","accx_skew","accy_skew","accz_skew","accx_kurt","accy_kurt","accz_kurt",
-    								"accx_diff_mean","accy_diff_mean","accz_diff_mean","accx_diff_std","accy_diff_std","accz_diff_std",
-    								"accx_diff_skew","accy_diff_skew","accz_diff_skew","accx_diff_kurt","accy_diff_kurt","accz_diff_kurt",
-    								"accx_max","accy_max","accz_max","accx_min","accy_min","accz_min","accx_max_abs","accy_max_abs","accz_max_abs","accx_min_abs","accy_min_abs","accz_min_abs",
-    								"accx_rms","accy_rms","accz_rms",
-    								"acc_cross_xy","acc_cross_yz","acc_cross_zx","acc_cross_xy_abs","acc_cross_yz_abs","acc_cross_zx_abs",
-    								"acc_cross_xy_norm","acc_cross_yz_norm","acc_cross_zx_norm","acc_cross_xy_norm_abs","acc_cross_yz_norm_abs","acc_cross_zx_norm_abs",
-    								"accx_fft_1","accx_fft_2","accx_fft_3","accx_fft_4","accx_fft_5","accx_fft_6","accx_fft_7","accx_fft_8","accx_fft_9","accx_fft_10",
-    								"accy_fft_1","accy_fft_2","accy_fft_3","accy_fft_4","accy_fft_5","accy_fft_6","accy_fft_7","accy_fft_8","accy_fft_9","accy_fft_10",
-    								"accz_fft_1","accz_fft_2","accz_fft_3","accz_fft_4","accz_fft_5","accz_fft_6","accz_fft_7","accz_fft_8","accz_fft_9","accz_fft_10",
-    								"accx_hist1","accx_hist2","accx_hist3","accx_hist4","accx_hist5","accx_hist6",
-    								"accy_hist1","accy_hist2","accy_hist3","accy_hist4","accy_hist5","accy_hist6",
-    								"accz_hist1","accz_hist2","accz_hist3","accz_hist4","accz_hist5","accz_hist6", ///
-    								"gyr_mean","gyrx_mean","gyry_mean","gyrz_mean","gyr_mean_abs","gyrx_mean_abs","gyry_mean_abs","gyrz_mean_abs",
-    								"gyrx_std","gyry_std","gyrz_std","gyrx_skew","gyry_skew","gyrz_skew","gyrx_kurt","gyry_kurt","gyrz_kurt",
-    								"gyrx_diff_mean","gyry_diff_mean","gyrz_diff_mean","gyrx_diff_std","gyry_diff_std","gyrz_diff_std",
-    								"gyrx_diff_skew","gyry_diff_skew","gyrz_diff_skew","gyrx_diff_kurt","gyry_diff_kurt","gyrz_diff_kurt",
-    								"gyrx_max","gyry_max","gyrz_max","gyrx_min","gyry_min","gyrz_min","gyrx_max_abs","gyry_max_abs","gyrz_max_abs","gyrx_min_abs","gyry_min_abs","gyrz_min_abs",
-    								"gyrx_rms","gyry_rms","gyrz_rms",
-    								"gyr_cross_xy","gyr_cross_yz","gyr_cross_zx","gyr_cross_xy_abs","gyr_cross_yz_abs","gyr_cross_zx_abs",
-    								"gyr_cross_xy_norm","gyr_cross_yz_norm","gyr_cross_zx_norm","gyr_cross_xy_norm_abs","gyr_cross_yz_norm_abs","gyr_cross_zx_norm_abs",
-    								"gyrx_fft_1","gyrx_fft_2","gyrx_fft_3","gyrx_fft_4","gyrx_fft_5","gyrx_fft_6","gyrx_fft_7","gyrx_fft_8","gyrx_fft_9","gyrx_fft_10",
-    								"gyry_fft_1","gyry_fft_2","gyry_fft_3","gyry_fft_4","gyry_fft_5","gyry_fft_6","gyry_fft_7","gyry_fft_8","gyry_fft_9","gyry_fft_10",
-    								"gyrz_fft_1","gyrz_fft_2","gyrz_fft_3","gyrz_fft_4","gyrz_fft_5","gyrz_fft_6","gyrz_fft_7","gyrz_fft_8","gyrz_fft_9","gyrz_fft_10",
-    								"gyrx_hist1","gyrx_hist2","gyrx_hist3","gyrx_hist4","gyrx_hist5","gyrx_hist6",
-    								"gyry_hist1","gyry_hist2","gyry_hist3","gyry_hist4","gyry_hist5","gyry_hist6",
-    								"gyrz_hist1","gyrz_hist2","gyrz_hist3","gyrz_hist4","gyrz_hist5","gyrz_hist6"};
-
-    
-    //sorted feature list
-    private List<String> feature_list_sorted;
-
-    private boolean has_acc = false;
-    private boolean has_gyr = false;
-    private boolean has_bar = false;
-
-    //feature lists to be passed to FeatureExtractor (without probe name)
-    private List<String> acc_feature_list,  gyr_feature_list, bar_feature_list;
-
-    private ToneGenerator toneG;
-    private boolean generate_tone;
     private long last_timestamp;
 
     boolean acc_writing = false;
     boolean gyr_writing = false;
     boolean bar_writing = false;
 
-	private Thread myThread;
+	private Thread _featureThread = null;
+	
+	private Runnable _featureRunnable = null;
 
-	//private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-
-	Runnable myRunnable = new Runnable() {
-		public void run() {
-			while (extract_features) {
-				//if (acc_clip.value.size()>0) {
-					long t1 = System.currentTimeMillis();
-					features = new ArrayList<Double>();
-					
-					generate_tone = false;
-					
-					//checking if the clip has moved since last time
-					if (acc_clip.timestamp.size()>0) {
-						if (acc_clip.timestamp.get(acc_clip.timestamp.size()-1)==last_timestamp) {
-							Log.e("WARNING","Clip hasn't moved since last feature extraction!");
-							generate_tone = true;
-						} 
-						else {
-							last_timestamp = acc_clip.timestamp.get(acc_clip.timestamp.size()-1);
-							Log.e("INFO", "n_samp = "+acc_clip.timestamp.size());
-						}
-					}
-					
-					if (has_acc) {
-						while (acc_writing) {
-							try {
-								Thread.sleep(5);
-							}
-							catch(Exception e) {
-								e.printStackTrace();
-							}
-						}
-						features.addAll(f_acc.ExtractFeatures(acc_clip));
-						if (acc_clip.value.size()<100) generate_tone = true;
-					}
-					if (has_gyr) {
-						while (gyr_writing) {
-							try {
-								Thread.sleep(5);
-							}
-							catch(Exception e) {
-								e.printStackTrace();
-							}
-						}
-						features.addAll(f_gyr.ExtractFeatures(gyr_clip));
-					}
-					if (has_bar) {
-						while (bar_writing) {
-							try {
-								Thread.sleep(5);
-							}
-							catch(Exception e) {
-								e.printStackTrace();
-							}
-						}
-						features.addAll(f_bar.ExtractFeatures(bar_clip));
-					}
-
-					//transmit feature values and time stamps
-					transmitAnalysis();
-
-					try {				
-						if (generate_tone)
-							toneG.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 200);
-						//measuring the processing time
-						deltat = System.currentTimeMillis() - t1;
-						Log.e("INFO", "Processing Time : "+deltat+" ms");
-						//accounting for the processing time / also converting from ns to ms
-						long time_to_sleep = window_shift/(long)1e6 - deltat;
-						//in the rare case that processing time is greater than window shift interval
-						if (time_to_sleep<0) time_to_sleep = 0;
-						Thread.sleep(time_to_sleep);
-					} 
-					catch (Exception e) {
-						extract_features = false;
-						e.printStackTrace();
-					}
-
-					
-				//}
-			}
-		}
-	};
-
-
-	public P20FeaturesProbe() {
-				
-		acc_clip = new Clip(3, window_size);
-		gyr_clip = new Clip(3, window_size);
-		bar_clip = new Clip(1, window_size);
+	public P20FeaturesProbe() 
+	{
+		this._accelerometerClip = new Clip(3, P20FeaturesProbe.WINDOW_SIZE, Clip.ACCELEROMETER);
+		this._gyroscopeClip = new Clip(3, P20FeaturesProbe.WINDOW_SIZE, Clip.GYROSCOPE);
+		this._barometerClip = new Clip(1, P20FeaturesProbe.WINDOW_SIZE, Clip.BAROMETER);
 
 	    //lists to be passed to FeatureExtractor
-	    acc_feature_list = new ArrayList<String>();
-	    gyr_feature_list = new ArrayList<String>();
-	    bar_feature_list = new ArrayList<String>();
-	    //lists to sort the final feature list
-	    List<String> feature_list_sorted_acc = new ArrayList<String>();
-	    List<String> feature_list_sorted_gyr = new ArrayList<String>();
-	    List<String> feature_list_sorted_bar = new ArrayList<String>();
-	    for (String s : feature_list) {
-	    	if (s.startsWith("acc")) {
-	    		if (!has_acc) has_acc = true;
-	    		acc_feature_list.add(s.substring(3));
-	    		feature_list_sorted_acc.add(s);
+		ArrayList<Feature> accelerometerFeatures = new ArrayList<Feature>();
+		ArrayList<Feature> gyroscopeFeatures = new ArrayList<Feature>();
+		ArrayList<Feature> barometerFeatures = new ArrayList<Feature>();
+
+	    for (Feature f : this._featureList) 
+	    {
+	    	String featureName = f.toString().toLowerCase();
+	    	
+	    	if (featureName.startsWith("acc")) 
+	    	{
+	    		this._hasAccelerometer = true;
+	    		
+	    		accelerometerFeatures.add(f);
 	    	}
-	    	if (s.startsWith("gyr")) {
-	    		if (!has_gyr) has_gyr = true;
-	    		gyr_feature_list.add(s.substring(3));
-	    		feature_list_sorted_gyr.add(s);
+	    	else if (featureName.startsWith("gyr")) 
+	    	{
+	    		this._hasGyroscope = true;
+	    		
+	    		gyroscopeFeatures.add(f);
 	    	}
-	    	if (s.startsWith("bar")) {
-	    		if (!has_bar) has_bar = true;
-	    		bar_feature_list.add(s.substring(3));
-	    		feature_list_sorted_bar.add(s);
+	    	else if (featureName.startsWith("bar")) 
+	    	{
+	    		this._hasBarometer = true;
+	    		barometerFeatures.add(f);
 	    	}
 	    }
 
 	    //initializing feature extractors
-	    f_acc = new FeatureExtractor(window_size, acc_feature_list, 3);
-	    f_gyr = new FeatureExtractor(window_size, gyr_feature_list, 3);
-	    f_bar = new FeatureExtractor(window_size, bar_feature_list, 1);
+	    this._accelerometerExtractor = new FeatureExtractor(P20FeaturesProbe.WINDOW_SIZE, accelerometerFeatures, 3);
+	    this._gyroscopeExtractor = new FeatureExtractor(P20FeaturesProbe.WINDOW_SIZE, gyroscopeFeatures, 3);
+	    this._barometerExtractor = new FeatureExtractor(P20FeaturesProbe.WINDOW_SIZE, barometerFeatures, 1);
 
-	    //creating the sorted feature list
-	    feature_list_sorted = new ArrayList<String>();
-	    feature_list_sorted.addAll(feature_list_sorted_acc);
-	    feature_list_sorted.addAll(feature_list_sorted_gyr);
-	    feature_list_sorted.addAll(feature_list_sorted_bar);
-
-	    // creating a tone generator
-	    // the second argument is the volume (0-100)
-	    toneG = new ToneGenerator(AudioManager.STREAM_ALARM, 50);
+	    final P20FeaturesProbe me = this;
 	    
-	    //creating and staring the thread
+		this._featureRunnable = new Runnable() 
+		{
+			public void run() 
+			{
+				while (me._extractFeatures) 
+				{
+					long now = System.currentTimeMillis();
+					
+					boolean generateTone = false;
+						
+					//checking if the clip has moved since last time
+					if (me._accelerometerClip.getTimestamps().size() > 0) 
+					{
+						if (me._accelerometerClip.getLastTimestamp() == last_timestamp) 
+						{
+							Log.e("PR", "P20FeaturesProbe: Clip hasn't moved since last feature extraction!");
+							generateTone = true;
+						} 
+						else {
+							last_timestamp = me._accelerometerClip.getLastTimestamp();
+							Log.e("PR", "P20FeaturesProbe: n_samp = "+ me._accelerometerClip.getTimestamps().size());
+						}
+					}
+					
+					if (me._hasAccelerometer) 
+					{
+						synchronized(me._accelerometerClip)
+						{
+							Log.e("PR", "ACCEL");
+							me._featureValues.putAll(me._accelerometerExtractor.extractFeatures(me._accelerometerClip));
 
-		myThread = new Thread(myRunnable);
+							if (me._accelerometerClip.getValues().size() < 100) 
+								generateTone = true;
+						}
+					}
 
-		// Just to create a dead thread for isAlive() not to complain later on. But not running the 
-		// thread since the probe might be disabled.
-		extract_features = false;
+					if (me._hasGyroscope) 
+					{
+						synchronized(me._gyroscopeClip)
+						{
+							Log.e("PR", "GYRO");
+							me._featureValues.putAll(me._gyroscopeExtractor.extractFeatures(me._gyroscopeClip));
 
-	    myThread.start();
+							if (me._gyroscopeClip.getValues().size() < 100) 
+								generateTone = true;
+						}
+					}
+
+					if (me._hasBarometer) 
+					{
+						synchronized(me._barometerClip)
+						{
+							Log.e("PR", "BARO");
+							me._featureValues.putAll(me._barometerExtractor.extractFeatures(me._barometerClip));
+
+							if (me._barometerClip.getValues().size() < 100) 
+								generateTone = true;
+						}
+					}
+
+					//transmit feature values and time stamps
+					me.transmitAnalysis();
+
+					try 
+					{				
+						if (generateTone)
+						{
+							// creating a tone generator
+						    // the second argument is the volume (0-100)
+							ToneGenerator toneGenerator = new ToneGenerator(AudioManager.STREAM_ALARM, 50);
+
+							toneGenerator.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 200);
+						}
+						
+						//measuring the processing time
+						long deltaT = System.currentTimeMillis() - now;
+						
+						Log.e("PR", "P20FeaturesProbe: Processing Time : " + deltaT + " ms.");
+						
+						me._featureValues.put(Feature.PROCESSING_TIME, (double) deltaT);
+
+						//accounting for the processing time / also converting from ns to ms
+						
+						long sleepTime = P20FeaturesProbe.WINDOW_SHIFT / (long) 1e6 - deltaT;
+
+						//in the rare case that processing time is greater than window shift interval
+						
+						if (sleepTime < 0) 
+							sleepTime = 0;
+						
+						Thread.sleep(sleepTime);
+					} 
+					catch (Exception e) 
+					{
+						me._extractFeatures = false;
+						e.printStackTrace();
+					}
+				}
+			}
+		};
 
 	    Log.e("TEST", "Thread Started");
-
-
 	}
 
 	public String name(Context context) 
@@ -370,15 +372,16 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 	            this._lastFrequency = frequency;
 			}
 
-			extract_features = true;
+			this._extractFeatures = true;
 
 			// checking if the current thread is still running
-			if (!myThread.isAlive()) {
+			if (this._featureThread == null || this._featureThread.isAlive() == false) 
+			{
 				// A dead thread cannot be restarted. A new thread has to be created.
-				myThread = new Thread(myRunnable);
-			    myThread.start();
-	    	    Log.e("TEST", "Thread Started");
 
+				this._featureThread = new Thread(this._featureRunnable);
+				this._featureThread.start();
+	    	    Log.e("TEST", "Thread Started");
 			}
 
 			return true;
@@ -390,10 +393,8 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 
     		this._lastFrequency = -1;
 
-			extract_features = false;
-
+			this._extractFeatures = false;
     	}
-
 		
 		return false;
 	}
@@ -411,46 +412,51 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 		Sensor sensor = event.sensor;
 
 		final double[] values = new double[event.values.length];
-		for (int i=0; i<event.values.length; i++)
+		
+		for (int i = 0; i < event.values.length; i++)
 			values[i] = (double)event.values[i]; // values.length = 3: X, Y, Z
+		
 		final long timestamp = event.timestamp;
 
-		switch(sensor.getType())
+		try 
 		{
-			case Sensor.TYPE_ACCELEROMETER:
-				if (has_acc) {
-					acc_writing = true;
-					acc_clip.add(values, timestamp);
-					acc_writing = false;
-				}
-				break;
-			case Sensor.TYPE_GYROSCOPE:
-				if (has_gyr) {
-					gyr_writing = true;
-					gyr_clip.add(values, timestamp);
-					gyr_writing = false;
-				}
-				break;
-			case Sensor.TYPE_PRESSURE:
-				if (has_bar) {
-					bar_writing = true;
-					bar_clip.add(values, timestamp);
-					bar_writing = false;
-				}
-				break;
+			switch(sensor.getType())
+			{
+				case Sensor.TYPE_ACCELEROMETER:
+					if (this._hasAccelerometer) 
+					{
+						synchronized(this._accelerometerClip)
+						{
+							this._accelerometerClip.appendValues(values, timestamp);
+						}
+					}
+	
+					break;
+				case Sensor.TYPE_GYROSCOPE:
+					if (this._hasGyroscope) 
+					{
+						synchronized(this._gyroscopeClip)
+						{
+							this._gyroscopeClip.appendValues(values, timestamp);
+						}
+					}
+					
+					break;
+				case Sensor.TYPE_PRESSURE:
+					if (this._hasBarometer) 
+					{
+						synchronized(this._barometerClip)
+						{
+							this._barometerClip.appendValues(values, timestamp);
+						}
+					}
+					break;
+			}
+		} 
+		catch (ClipException e) 
+		{
+			LogManager.getInstance(this._context).logException(e);
 		}
-/*
-		if (timestamp-lastprocessingtime > window_shift) {
-
-			features_acc = f0.ExtractFeatures(acc_clip);
-
-			lastprocessingtime = timestamp;
-
-			this.transmitAnalysis();
-
-		}
-*/				
-		
 	}
 	
 	public void transmitAnalysis()
@@ -459,14 +465,12 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 		bundle.putString("PROBE", this.name(this._context)); // Required
 		bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000); // Required
 		
-		//bundle.putDouble("MY_FEATURE_A", 1.23456); 		// define your own keys and values 
-		//bundle.putLong("MY_FEATURE_B", Long.MAX_VALUE); // for the models & data collection
+		for (Feature f : this._featureValues.keySet())
+		{
+			Log.e("PR", f.toString() + " -- " + this._featureValues.get(f));
 
-		for (int i=0; i<features.size(); i++)
-			bundle.putDouble(feature_list_sorted.get(i), features.get(i));
-		
-		bundle.putLong("PT", deltat);	// processing time
-				
+			bundle.putDouble(f.toString(), this._featureValues.get(f));
+		}
 
 		//bundle.putInt("CNT", counter);
 		//bundle.putLong("T", deltat);
@@ -475,5 +479,4 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 
 		this.transmitData(this._context, bundle);
 	}
-
 }
