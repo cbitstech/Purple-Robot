@@ -1,707 +1,820 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.features.p20;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 
-import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.transform.DftNormalization;
 import org.apache.commons.math3.transform.FastFourierTransformer;
-import org.apache.commons.math3.transform.TransformType;
 
 import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
+
 
 import android.util.Log;
 
-public class FeatureExtractor {
-    
+public class FeatureExtractor 
+{
+    private long _windowSize = -1;
+    private int _dimensions = -1;
 
-    private long window_size;
-    private List<String> feature_list;
-    //private double[] features;
-    private boolean hasFFT = false;
-    private boolean hasDiff = false;
-    private boolean hasHist = false;
-    private boolean hasCross = false;
-    private boolean hasNormCross = false;
+    private boolean _hasFFT = false;
+    private boolean _hasDiff = false;
+    private boolean _hasHist = false;
+    private boolean _hasCross = false;
+    private boolean _hasNormCross = false;
 
-    private int dim;
-
-    private FastFourierTransformer fft;
+//    private FastFourierTransformer _fft = null;
 
     // bin edges must be in ascending order and equally spaced.
-    private double[] bin_edges = new double[]{-3, -2, -1, 0, 1, 2, 3};
+    private double[] _binEdges = new double[]{-3, -2, -1, 0, 1, 2, 3};
+    
+    public static enum Feature
+    {
+    	ACC_NUM_SAMPLES, 
+    	ACC_MEAN, ACCX_MEAN, ACCY_MEAN, ACCZ_MEAN, 
+    	ACC_MEAN_ABS, ACCX_MEAN_ABS, ACCY_MEAN_ABS, ACCZ_MEAN_ABS, 
+    	ACCX_STD, ACCY_STD, ACCZ_STD, 
+    	ACCX_SKEW, ACCY_SKEW, ACCZ_SKEW, 
+    	ACCX_KURT, ACCY_KURT, ACCZ_KURT, 
+    	ACCX_DIFF_MEAN, ACCY_DIFF_MEAN, ACCZ_DIFF_MEAN, 
+    	ACCX_DIFF_STD, ACCY_DIFF_STD, ACCZ_DIFF_STD, 
+    	ACCX_DIFF_SKEW, ACCY_DIFF_SKEW, ACCZ_DIFF_SKEW, 
+    	ACCX_DIFF_KURT, ACCY_DIFF_KURT, ACCZ_DIFF_KURT, 
+    	ACCX_MAX, ACCY_MAX, ACCZ_MAX, 
+    	ACCX_MIN, ACCY_MIN, ACCZ_MIN, 
+    	ACCX_MAX_ABS, ACCY_MAX_ABS, ACCZ_MAX_ABS, 
+    	ACCX_MIN_ABS, ACCY_MIN_ABS, ACCZ_MIN_ABS, 
+    	ACCX_RMS, ACCY_RMS, ACCZ_RMS, 
+    	ACC_CROSS_XY, ACC_CROSS_YZ, ACC_CROSS_ZX, 
+    	ACC_CROSS_XY_ABS, ACC_CROSS_YZ_ABS, ACC_CROSS_ZX_ABS, 
+    	ACC_CROSS_XY_NORM, ACC_CROSS_YZ_NORM, ACC_CROSS_ZX_NORM, 
+    	ACC_CROSS_XY_NORM_ABS, ACC_CROSS_YZ_NORM_ABS, ACC_CROSS_ZX_NORM_ABS, 
+    	ACCX_FFT_1, ACCX_FFT_2, ACCX_FFT_3, ACCX_FFT_4, ACCX_FFT_5, ACCX_FFT_6, ACCX_FFT_7, ACCX_FFT_8, ACCX_FFT_9, ACCX_FFT_10, 
+    	ACCY_FFT_1, ACCY_FFT_2, ACCY_FFT_3, ACCY_FFT_4, ACCY_FFT_5, ACCY_FFT_6, ACCY_FFT_7, ACCY_FFT_8, ACCY_FFT_9, ACCY_FFT_10, 
+    	ACCZ_FFT_1, ACCZ_FFT_2, ACCZ_FFT_3, ACCZ_FFT_4, ACCZ_FFT_5, ACCZ_FFT_6, ACCZ_FFT_7, ACCZ_FFT_8, ACCZ_FFT_9, ACCZ_FFT_10, 
+    	ACCX_HIST1, ACCX_HIST2, ACCX_HIST3, ACCX_HIST4, ACCX_HIST5, ACCX_HIST6, 
+    	ACCY_HIST1, ACCY_HIST2, ACCY_HIST3, ACCY_HIST4, ACCY_HIST5, ACCY_HIST6, 
+    	ACCZ_HIST1, ACCZ_HIST2, ACCZ_HIST3, ACCZ_HIST4, ACCZ_HIST5, ACCZ_HIST6,
+    	GYR_NUM_SAMPLES, 
+    	GYR_MEAN, GYRX_MEAN, GYRY_MEAN, GYRZ_MEAN, 
+    	GYR_MEAN_ABS, GYRX_MEAN_ABS, GYRY_MEAN_ABS, GYRZ_MEAN_ABS, 
+    	GYRX_STD, GYRY_STD, GYRZ_STD, 
+    	GYRX_SKEW, GYRY_SKEW, GYRZ_SKEW, 
+    	GYRX_KURT, GYRY_KURT, GYRZ_KURT, 
+    	GYRX_DIFF_MEAN, GYRY_DIFF_MEAN, GYRZ_DIFF_MEAN, 
+    	GYRX_DIFF_STD, GYRY_DIFF_STD, GYRZ_DIFF_STD, 
+    	GYRX_DIFF_SKEW, GYRY_DIFF_SKEW, GYRZ_DIFF_SKEW, 
+    	GYRX_DIFF_KURT, GYRY_DIFF_KURT, GYRZ_DIFF_KURT, 
+    	GYRX_MAX, GYRY_MAX, GYRZ_MAX, GYRX_MIN, GYRY_MIN, GYRZ_MIN, 
+    	GYRX_MAX_ABS, GYRY_MAX_ABS, GYRZ_MAX_ABS, GYRX_MIN_ABS, GYRY_MIN_ABS, GYRZ_MIN_ABS, 
+    	GYRX_RMS, GYRY_RMS, GYRZ_RMS, 
+    	GYR_CROSS_XY, GYR_CROSS_YZ, GYR_CROSS_ZX, 
+    	GYR_CROSS_XY_ABS, GYR_CROSS_YZ_ABS, GYR_CROSS_ZX_ABS, 
+    	GYR_CROSS_XY_NORM, GYR_CROSS_YZ_NORM, GYR_CROSS_ZX_NORM, 
+    	GYR_CROSS_XY_NORM_ABS, GYR_CROSS_YZ_NORM_ABS, GYR_CROSS_ZX_NORM_ABS, 
+    	GYRX_FFT_1, GYRX_FFT_2, GYRX_FFT_3, GYRX_FFT_4, GYRX_FFT_5, GYRX_FFT_6, GYRX_FFT_7, GYRX_FFT_8, GYRX_FFT_9, GYRX_FFT_10, 
+    	GYRY_FFT_1, GYRY_FFT_2, GYRY_FFT_3, GYRY_FFT_4, GYRY_FFT_5, GYRY_FFT_6, GYRY_FFT_7, GYRY_FFT_8, GYRY_FFT_9, GYRY_FFT_10, 
+    	GYRZ_FFT_1, GYRZ_FFT_2, GYRZ_FFT_3, GYRZ_FFT_4, GYRZ_FFT_5, GYRZ_FFT_6, GYRZ_FFT_7, GYRZ_FFT_8, GYRZ_FFT_9, GYRZ_FFT_10, 
+    	GYRX_HIST1, GYRX_HIST2, GYRX_HIST3, GYRX_HIST4, GYRX_HIST5, GYRX_HIST6, 
+    	GYRY_HIST1, GYRY_HIST2, GYRY_HIST3, GYRY_HIST4, GYRY_HIST5, GYRY_HIST6, 
+    	GYRZ_HIST1, GYRZ_HIST2, GYRZ_HIST3, GYRZ_HIST4, GYRZ_HIST5, GYRZ_HIST6, 
+    	PROCESSING_TIME 
+    }
 
-    public FeatureExtractor(long window_size, List<String> feature_list, int dim) {
+    public FeatureExtractor(long windowSize, List<Feature> features, int dimensions) 
+    {
+        this._windowSize = windowSize;
+        this._dimensions = dimensions;
 
-        this.window_size = window_size;
-        this.feature_list = feature_list;
-        this.dim = dim;
-
-        for (String s: feature_list) {
-
-            if ((!hasFFT)&&(s.contains("fft"))) {
-                hasFFT = true;
-                fft = new FastFourierTransformer(DftNormalization.STANDARD);
+        for (Feature f : features) 
+        {
+        	String featureName = f.toString();
+        	
+        	if (featureName.contains("FFT"))
+        	{
+        		this._hasFFT = true;
+                // this._fft = new FastFourierTransformer(DftNormalization.STANDARD);
             }
-            
-            if ((!hasDiff)&&(s.contains("diff")))
-                hasDiff = true;
-            
-            if ((!hasHist)&&(s.contains("hist")))
-                hasHist = true;
+        	else if (featureName.contains("DIFF"))
+                this._hasDiff = true;
+        	else if (featureName.contains("HIST"))
+                this._hasHist = true;
+        	else if (featureName.contains("CROSS"))
+        	{
+                this._hasCross = true;
 
-            if ((!hasCross)&&(s.contains("cross")))
-                hasCross = true;
-
-            if((!hasNormCross)&&(s.contains("cross"))&&(s.contains("norm")))
-                hasNormCross = true;
-
+            	if (featureName.contains("NORM"))
+                    this._hasNormCross = true;
+        	}
         }
-
     }
 
-    public void SetBinEdges(double[] edges) {
-        
-        this.bin_edges = new double[edges.length];
-        System.arraycopy(edges, 0, this.bin_edges, 0, edges.length);
-
+    public void setBinEdges(double[] edges) 
+    {
+        this._binEdges = Arrays.copyOf(edges, edges.length);
     }
 
-    public List<Double> ExtractFeatures(Clip clp) {
-        
+    public Map<Feature, Double> extractFeatures(Clip clp) 
+    {
+    	HashMap<Feature, Double> features = new HashMap<Feature, Double>();
+
         // build a copy of the clip. because it sometimes crashes suspiciously.
         Clip clip = new Clip(clp);
 
         //Spline Interpolation
-        List<double[]> signal = Interpolate(clip.value, clip.timestamp, 50);
+        List<double[]> signal = this.interpolate(clip.getValues(), clip.getTimestamps(), 50);
 
         //Calculating the statistical moments
-        double[] mean = new double[dim];
-        double[] std = new double[dim];
-        double[] skewness = new double[dim];
-        double[] kurtosis = new double[dim];
-        for (int i=0; i<dim; i++) {
-            double[] moments = getMoments(signal, i);
+        double[] mean = new double[this._dimensions];
+        double[] std = new double[this._dimensions];
+        double[] skewness = new double[this._dimensions];
+        double[] kurtosis = new double[this._dimensions];
+
+        for (int i = 0; i < this._dimensions; i++) 
+        {
+            double[] moments = this.getMoments(signal, i);
+
             mean[i] = moments[0];
             std[i] = moments[1]; 
             skewness[i] = moments[2];
             kurtosis[i] = moments[3];
         }
+        
+        switch (clip.getType())
+        {
+        	case Clip.ACCELEROMETER:
+    	    	features.put(Feature.ACC_NUM_SAMPLES, (double) signal.size()); 
+    	    	features.put(Feature.ACC_MEAN, this.getOverallMean(signal)); 
 
-        double[] diff_mean = new double[dim];
-        double[] diff_std = new double[dim];
-        double[] diff_skewness = new double[dim];
-        double[] diff_kurtosis = new double[dim];
-        List<double[]> signal_diff = new ArrayList<double[]>();
-        if (hasDiff) {
-            signal_diff = getDiff(signal);
-            //Calculating the statistical moments of the difference signal
-            for (int i=0; i<dim; i++) {
-                double[] moments = getMoments(signal_diff, i);
-                diff_mean[i] = moments[0];
-                diff_std[i] = moments[1]; 
-                diff_skewness[i] = moments[2];
-                diff_kurtosis[i] = moments[3];
-            }
+    	    	features.put(Feature.ACCX_MEAN, mean[0]); 
+    	    	features.put(Feature.ACCY_MEAN, mean[1]); 
+    	    	features.put(Feature.ACCZ_MEAN, mean[2]); 
+    	
+    	    	features.put(Feature.ACCX_MEAN_ABS, Math.abs(mean[0])); 
+    	    	features.put(Feature.ACCY_MEAN_ABS, Math.abs(mean[1])); 
+    	    	features.put(Feature.ACCZ_MEAN_ABS, Math.abs(mean[2])); 
 
+    	    	features.put(Feature.ACCX_STD, std[0]); 
+    	    	features.put(Feature.ACCY_STD, std[1]); 
+    	    	features.put(Feature.ACCZ_STD, std[2]); 
+
+    	    	features.put(Feature.ACCX_SKEW, skewness[0]); 
+    	    	features.put(Feature.ACCY_SKEW, skewness[1]); 
+    	    	features.put(Feature.ACCZ_SKEW, skewness[2]); 
+
+    	    	features.put(Feature.ACCX_KURT, kurtosis[0]); 
+    	    	features.put(Feature.ACCY_KURT, kurtosis[1]); 
+    	    	features.put(Feature.ACCZ_KURT, kurtosis[2]); 
+    	    	
+    	    	features.put(Feature.ACCX_RMS, this.getRMS(signal, 0)); 
+    	    	features.put(Feature.ACCY_RMS, this.getRMS(signal, 1)); 
+    	    	features.put(Feature.ACCZ_RMS, this.getRMS(signal, 2)); 
+        		
+        		break;
+        	case Clip.GYROSCOPE:
+    	    	features.put(Feature.GYR_NUM_SAMPLES, (double) signal.size()); 
+    	    	features.put(Feature.GYR_MEAN, this.getOverallMean(signal)); 
+
+    	    	features.put(Feature.GYRX_MEAN, mean[0]); 
+    	    	features.put(Feature.GYRY_MEAN, mean[1]); 
+    	    	features.put(Feature.GYRZ_MEAN, mean[2]); 
+    	
+    	    	features.put(Feature.GYRX_MEAN_ABS, Math.abs(mean[0])); 
+    	    	features.put(Feature.GYRY_MEAN_ABS, Math.abs(mean[1])); 
+    	    	features.put(Feature.GYRZ_MEAN_ABS, Math.abs(mean[2])); 
+
+    	    	features.put(Feature.GYRX_STD, std[0]); 
+    	    	features.put(Feature.GYRY_STD, std[1]); 
+    	    	features.put(Feature.GYRZ_STD, std[2]); 
+
+    	    	features.put(Feature.GYRX_SKEW, skewness[0]); 
+    	    	features.put(Feature.GYRY_SKEW, skewness[1]); 
+    	    	features.put(Feature.GYRZ_SKEW, skewness[2]); 
+
+    	    	features.put(Feature.GYRX_KURT, kurtosis[0]); 
+    	    	features.put(Feature.GYRY_KURT, kurtosis[1]); 
+    	    	features.put(Feature.GYRZ_KURT, kurtosis[2]); 
+
+    	    	features.put(Feature.GYRX_RMS, this.getRMS(signal, 0)); 
+    	    	features.put(Feature.GYRY_RMS, this.getRMS(signal, 1)); 
+    	    	features.put(Feature.GYRZ_RMS, this.getRMS(signal, 2)); 
+
+    	    	break;
         }
+    	
+        if (this._hasDiff) 
+        {
+    	    double[] diffMean = new double[this._dimensions];
+            double[] diffStd = new double[this._dimensions];
+            double[] diffSkewness = new double[this._dimensions];
+            double[] diffKurtosis = new double[this._dimensions];
 
-        int[][] hist = new int[dim][bin_edges.length-1];
-        List<double[]> signal_zscore = new ArrayList<double[]>();
-        int bin = 0;
-        if (hasHist) {
+            List<double[]> signalDiff = new ArrayList<double[]>();
             
+            signalDiff = this.getDiff(signal);
+            
+            //Calculating the statistical moments of the difference signal
+            for (int i=0; i< this._dimensions; i++) 
+            {
+                double[] moments = this.getMoments(signalDiff, i);
+                diffMean[i] = moments[0];
+                diffStd[i] = moments[1]; 
+                diffSkewness[i] = moments[2];
+                diffKurtosis[i] = moments[3];
+            }
+            
+            switch (clip.getType())
+            {
+            	case Clip.ACCELEROMETER:
+        	    	features.put(Feature.ACCX_DIFF_MEAN, diffMean[0]); 
+        	    	features.put(Feature.ACCY_DIFF_MEAN, diffMean[1]); 
+        	    	features.put(Feature.ACCZ_DIFF_MEAN, diffMean[2]); 
+        	
+        	    	features.put(Feature.ACCX_DIFF_STD, diffStd[0]); 
+        	    	features.put(Feature.ACCY_DIFF_STD, diffStd[1]); 
+        	    	features.put(Feature.ACCZ_DIFF_STD, diffStd[2]); 
+
+        	    	features.put(Feature.ACCX_DIFF_SKEW, diffSkewness[0]); 
+        	    	features.put(Feature.ACCY_DIFF_SKEW, diffSkewness[1]); 
+        	    	features.put(Feature.ACCZ_DIFF_SKEW, diffSkewness[2]); 
+
+        	    	features.put(Feature.ACCX_DIFF_KURT, diffKurtosis[0]); 
+        	    	features.put(Feature.ACCY_DIFF_KURT, diffKurtosis[1]); 
+        	    	features.put(Feature.ACCZ_DIFF_KURT, diffKurtosis[2]); 
+            		
+            		break;
+            	case Clip.GYROSCOPE:
+        	    	features.put(Feature.GYRX_DIFF_MEAN, diffMean[0]); 
+        	    	features.put(Feature.GYRY_DIFF_MEAN, diffMean[1]); 
+        	    	features.put(Feature.GYRZ_DIFF_MEAN, diffMean[2]); 
+        	
+        	    	features.put(Feature.GYRX_DIFF_STD, diffStd[0]); 
+        	    	features.put(Feature.GYRY_DIFF_STD, diffStd[1]); 
+        	    	features.put(Feature.GYRZ_DIFF_STD, diffStd[2]); 
+
+        	    	features.put(Feature.GYRX_DIFF_SKEW, diffSkewness[0]); 
+        	    	features.put(Feature.GYRY_DIFF_SKEW, diffSkewness[1]); 
+        	    	features.put(Feature.GYRZ_DIFF_SKEW, diffSkewness[2]); 
+
+        	    	features.put(Feature.GYRX_DIFF_KURT, diffKurtosis[0]); 
+        	    	features.put(Feature.GYRY_DIFF_KURT, diffKurtosis[1]); 
+        	    	features.put(Feature.GYRZ_DIFF_KURT, diffKurtosis[2]); 
+        	    	
+        	    	break;
+            }
+        }
+        
+        if (this._hasHist) 
+        {
             //histogram of zscore values
-            signal_zscore = getZScore(signal, mean, std);
-            for (int i=0; i<dim; i++) {
-                for (int j=0; j<bin_edges.length-1; j++)
+
+            int[][] hist = new int[this._dimensions][this._binEdges.length - 1];
+
+            int bin = 0;
+
+        	List<double[]> signalZScore = this.getZScore(signal, mean, std);
+            
+            for (int i = 0; i < this._dimensions; i++) 
+            {
+                for (int j = 0; j < this._binEdges.length - 1; j++)
                     hist[i][j] = 0;
-                for (int j=0; j<signal_zscore.size(); j++) {
-                    bin = (int)((signal_zscore.get(j)[i]-bin_edges[0])/(bin_edges[1]-bin_edges[0]));
-                    if ((bin<bin_edges.length-1)&&(bin>=0)) //values outside the range are neglected
+                
+                for (int j = 0; j < signalZScore.size(); j++) 
+                {
+                    bin = (int) ((signalZScore.get(j)[i] - this._binEdges[0]) /
+                    		     (this._binEdges[1] - this._binEdges[0]));
+                    
+                    if ((bin < this._binEdges.length - 1) && (bin >= 0)) //values outside the range are neglected
                         hist[i][bin]++;
                 }
             }
-
-            //TODO
+            
+            // TODO
             // Add another set of histograms on raw signals (not zscore)
-            //TBD also on MATLAB side
+            // TBD also on MATLAB side
+            
+            switch (clip.getType())
+            {
+            	case Clip.ACCELEROMETER:
+        	    	features.put(Feature.ACCX_HIST1, (double) hist[0][0]); 
+        	    	features.put(Feature.ACCX_HIST2, (double) hist[0][1]); 
+        	    	features.put(Feature.ACCX_HIST3, (double) hist[0][2]); 
+        	    	features.put(Feature.ACCX_HIST4, (double) hist[0][3]); 
+        	    	features.put(Feature.ACCX_HIST5, (double) hist[0][4]); 
+        	    	features.put(Feature.ACCX_HIST6, (double) hist[0][5]); 
+
+        	    	features.put(Feature.ACCY_HIST1, (double) hist[1][0]); 
+        	    	features.put(Feature.ACCY_HIST2, (double) hist[1][1]); 
+        	    	features.put(Feature.ACCY_HIST3, (double) hist[1][2]); 
+        	    	features.put(Feature.ACCY_HIST4, (double) hist[1][3]); 
+        	    	features.put(Feature.ACCY_HIST5, (double) hist[1][4]); 
+        	    	features.put(Feature.ACCY_HIST6, (double) hist[1][5]); 
+
+        	    	features.put(Feature.ACCZ_HIST1, (double) hist[2][0]); 
+        	    	features.put(Feature.ACCZ_HIST2, (double) hist[2][1]); 
+        	    	features.put(Feature.ACCZ_HIST3, (double) hist[2][2]); 
+        	    	features.put(Feature.ACCZ_HIST4, (double) hist[2][3]); 
+        	    	features.put(Feature.ACCZ_HIST5, (double) hist[2][4]); 
+        	    	features.put(Feature.ACCZ_HIST6, (double) hist[2][5]); 
+        	    	
+            		break;
+            	case Clip.GYROSCOPE:
+        	    	features.put(Feature.GYRX_HIST1, (double) hist[0][0]); 
+        	    	features.put(Feature.GYRX_HIST2, (double) hist[0][1]); 
+        	    	features.put(Feature.GYRX_HIST3, (double) hist[0][2]); 
+        	    	features.put(Feature.GYRX_HIST4, (double) hist[0][3]); 
+        	    	features.put(Feature.GYRX_HIST5, (double) hist[0][4]); 
+        	    	features.put(Feature.GYRX_HIST6, (double) hist[0][5]); 
+
+        	    	features.put(Feature.GYRY_HIST1, (double) hist[1][0]); 
+        	    	features.put(Feature.GYRY_HIST2, (double) hist[1][1]); 
+        	    	features.put(Feature.GYRY_HIST3, (double) hist[1][2]); 
+        	    	features.put(Feature.GYRY_HIST4, (double) hist[1][3]); 
+        	    	features.put(Feature.GYRY_HIST5, (double) hist[1][4]); 
+        	    	features.put(Feature.GYRY_HIST6, (double) hist[1][5]); 
+
+        	    	features.put(Feature.GYRZ_HIST1, (double) hist[2][0]); 
+        	    	features.put(Feature.GYRZ_HIST2, (double) hist[2][1]); 
+        	    	features.put(Feature.GYRZ_HIST3, (double) hist[2][2]); 
+        	    	features.put(Feature.GYRZ_HIST4, (double) hist[2][3]); 
+        	    	features.put(Feature.GYRZ_HIST5, (double) hist[2][4]); 
+        	    	features.put(Feature.GYRZ_HIST6, (double) hist[2][5]); 
+        	    	
+        	    	break;
+            }
         }
 
-        double[] cross = new double[dim];
-        if (hasCross) {
-            for (int i=0; i<dim; i++)
+        if (this._hasCross) 
+        {
+            double[] cross = new double[this._dimensions];
+
+            for (int i = 0; i < this._dimensions; i++)
                 cross[i] = 0;
-            if (dim==3) {
-                cross = getInnerProds3(signal);
+            
+            if (this._dimensions == 3) 
+            {
+                cross = this.get3DInnerProds(signal);
+
+                switch (clip.getType())
+                {
+                	case Clip.ACCELEROMETER:
+            	    	features.put(Feature.ACC_CROSS_XY, cross[0]); 
+            	    	features.put(Feature.ACC_CROSS_YZ, cross[1]); 
+            	    	features.put(Feature.ACC_CROSS_ZX, cross[2]); 
+
+            	    	features.put(Feature.ACC_CROSS_XY_ABS, Math.abs(cross[0])); 
+            	    	features.put(Feature.ACC_CROSS_YZ_ABS, Math.abs(cross[1])); 
+            	    	features.put(Feature.ACC_CROSS_ZX_ABS, Math.abs(cross[2])); 
+            	    	
+                		break;
+                	case Clip.GYROSCOPE:
+            	    	features.put(Feature.GYR_CROSS_XY, cross[0]); 
+            	    	features.put(Feature.GYR_CROSS_YZ, cross[1]); 
+            	    	features.put(Feature.GYR_CROSS_ZX, cross[2]); 
+
+            	    	features.put(Feature.GYR_CROSS_XY_ABS, Math.abs(cross[0])); 
+            	    	features.put(Feature.GYR_CROSS_YZ_ABS, Math.abs(cross[1])); 
+            	    	features.put(Feature.GYR_CROSS_ZX_ABS, Math.abs(cross[2])); 
+
+            	    	break;
+                }
+            }
+            else
+                Log.e("PR", "FeatureExtractor: Calculating cross-dimensional inner-products for a non-3D signal - values set to zero!");
+        }
+
+        if (this._hasNormCross)
+        {
+            double[] crossNorm = new double[this._dimensions];
+
+            for (int i = 0; i < this._dimensions; i++)
+                crossNorm[i] = 0;
+
+            if (this._dimensions == 3) 
+            {
+            	crossNorm = this.get3DNormInnerProds(signal);
+
+                switch (clip.getType())
+                {
+                	case Clip.ACCELEROMETER:
+            	    	features.put(Feature.ACC_CROSS_XY_NORM, crossNorm[0]); 
+            	    	features.put(Feature.ACC_CROSS_YZ_NORM, crossNorm[1]); 
+            	    	features.put(Feature.ACC_CROSS_ZX_NORM, crossNorm[2]); 
+
+            	    	features.put(Feature.ACC_CROSS_XY_NORM_ABS, Math.abs(crossNorm[0])); 
+            	    	features.put(Feature.ACC_CROSS_YZ_NORM_ABS, Math.abs(crossNorm[1])); 
+            	    	features.put(Feature.ACC_CROSS_ZX_NORM_ABS, Math.abs(crossNorm[2])); 
+            	    	
+                		break;
+                	case Clip.GYROSCOPE:
+            	    	features.put(Feature.GYR_CROSS_XY_NORM, crossNorm[0]); 
+            	    	features.put(Feature.GYR_CROSS_YZ_NORM, crossNorm[1]); 
+            	    	features.put(Feature.GYR_CROSS_ZX_NORM, crossNorm[2]); 
+
+            	    	features.put(Feature.GYR_CROSS_XY_NORM_ABS, Math.abs(crossNorm[0])); 
+            	    	features.put(Feature.GYR_CROSS_YZ_NORM_ABS, Math.abs(crossNorm[1])); 
+            	    	features.put(Feature.GYR_CROSS_ZX_NORM_ABS, Math.abs(crossNorm[2])); 
+
+            	    	break;
+                }
             }
             else
                 Log.e("Warning","Calculating cross-dimensional inner-products for a non-3D signal - values set to zero!");
         }
+        
+        // TODO: MAX, MIN, ABS_MAX, ABS_MIN, RMS?
 
-        double[] cross_norm = new double[dim];
-        if (hasNormCross) {
-            for (int i=0; i<dim; i++)
-                cross_norm[i] = 0;
-            if (dim==3) {
-                cross_norm = getNormInnerProds3(signal);
+        /*
+        	if (hasFFT)
+            	Complex[] fft_values = fft.transform(signal, TransformType.FORWARD);
+
+        	//	int i=0;
+         */
+
+        if (this._hasFFT)
+        {
+        	// TODO: Update & uncomment FFT code below...
+	    
+            switch (clip.getType())
+            {
+            	case Clip.ACCELEROMETER:
+        	    	features.put(Feature.ACCX_FFT_1, 0.0); 
+        	    	features.put(Feature.ACCX_FFT_2, 0.0); 
+        	    	features.put(Feature.ACCX_FFT_3, 0.0); 
+        	    	features.put(Feature.ACCX_FFT_4, 0.0); 
+        	    	features.put(Feature.ACCX_FFT_5, 0.0); 
+        	    	features.put(Feature.ACCX_FFT_6, 0.0); 
+        	    	features.put(Feature.ACCX_FFT_7, 0.0); 
+        	    	features.put(Feature.ACCX_FFT_8, 0.0); 
+        	    	features.put(Feature.ACCX_FFT_9, 0.0); 
+        	    	features.put(Feature.ACCX_FFT_10, 0.0); 
+
+        	    	features.put(Feature.ACCY_FFT_1, 0.0); 
+        	    	features.put(Feature.ACCY_FFT_2, 0.0); 
+        	    	features.put(Feature.ACCY_FFT_3, 0.0); 
+        	    	features.put(Feature.ACCY_FFT_4, 0.0); 
+        	    	features.put(Feature.ACCY_FFT_5, 0.0); 
+        	    	features.put(Feature.ACCY_FFT_6, 0.0); 
+        	    	features.put(Feature.ACCY_FFT_7, 0.0); 
+        	    	features.put(Feature.ACCY_FFT_8, 0.0); 
+        	    	features.put(Feature.ACCY_FFT_9, 0.0); 
+        	    	features.put(Feature.ACCY_FFT_10, 0.0); 
+
+        	    	features.put(Feature.ACCZ_FFT_1, 0.0); 
+        	    	features.put(Feature.ACCZ_FFT_2, 0.0); 
+        	    	features.put(Feature.ACCZ_FFT_3, 0.0); 
+        	    	features.put(Feature.ACCZ_FFT_4, 0.0); 
+        	    	features.put(Feature.ACCZ_FFT_5, 0.0); 
+        	    	features.put(Feature.ACCZ_FFT_6, 0.0); 
+        	    	features.put(Feature.ACCZ_FFT_7, 0.0); 
+        	    	features.put(Feature.ACCZ_FFT_8, 0.0); 
+        	    	features.put(Feature.ACCZ_FFT_9, 0.0); 
+        	    	features.put(Feature.ACCZ_FFT_10, 0.0); 
+
+            		break;
+            	case Clip.GYROSCOPE:
+        	    	features.put(Feature.GYRX_FFT_1, 0.0); 
+        	    	features.put(Feature.GYRX_FFT_2, 0.0); 
+        	    	features.put(Feature.GYRX_FFT_3, 0.0); 
+        	    	features.put(Feature.GYRX_FFT_4, 0.0); 
+        	    	features.put(Feature.GYRX_FFT_5, 0.0); 
+        	    	features.put(Feature.GYRX_FFT_6, 0.0); 
+        	    	features.put(Feature.GYRX_FFT_7, 0.0); 
+        	    	features.put(Feature.GYRX_FFT_8, 0.0); 
+        	    	features.put(Feature.GYRX_FFT_9, 0.0); 
+        	    	features.put(Feature.GYRX_FFT_10, 0.0); 
+
+        	    	features.put(Feature.GYRY_FFT_1, 0.0); 
+        	    	features.put(Feature.GYRY_FFT_2, 0.0); 
+        	    	features.put(Feature.GYRY_FFT_3, 0.0); 
+        	    	features.put(Feature.GYRY_FFT_4, 0.0); 
+        	    	features.put(Feature.GYRY_FFT_5, 0.0); 
+        	    	features.put(Feature.GYRY_FFT_6, 0.0); 
+        	    	features.put(Feature.GYRY_FFT_7, 0.0); 
+        	    	features.put(Feature.GYRY_FFT_8, 0.0); 
+        	    	features.put(Feature.GYRY_FFT_9, 0.0); 
+        	    	features.put(Feature.GYRY_FFT_10, 0.0); 
+
+        	    	features.put(Feature.GYRZ_FFT_1, 0.0); 
+        	    	features.put(Feature.GYRZ_FFT_2, 0.0); 
+        	    	features.put(Feature.GYRZ_FFT_3, 0.0); 
+        	    	features.put(Feature.GYRZ_FFT_4, 0.0); 
+        	    	features.put(Feature.GYRZ_FFT_5, 0.0); 
+        	    	features.put(Feature.GYRZ_FFT_6, 0.0); 
+        	    	features.put(Feature.GYRZ_FFT_7, 0.0); 
+        	    	features.put(Feature.GYRZ_FFT_8, 0.0); 
+        	    	features.put(Feature.GYRZ_FFT_9, 0.0); 
+        	    	features.put(Feature.GYRZ_FFT_10, 0.0); 
+
+        	    	break;
             }
-            else
-                Log.e("Warning","Calculating cross-dimensional inner-products for a non-3D signal - values set to zero!");
-        }
-
-
-/*
-        if (hasFFT)
-            Complex[] fft_values = fft.transform(signal, TransformType.FORWARD);
-*/
-
-        List<Double> features = new ArrayList<Double>();
-
-        //int i=0;
-
-        for (String s: feature_list) {
-
-            switch (s) {
-             
-                case "_nsamp": //for debugging purpose. can be removed later
-                    features.add((double)signal.size());
-                    break;
-
-                // overall mean square
-                case "_mean":
-                    features.add(getOverallMean(signal));
-                    break;
-
-                // mean
-                case "x_mean":
-                    features.add(mean[0]);
-                    break;
-                case "y_mean":
-                    features.add(mean[1]);
-                    break;
-                case "z_mean":
-                    features.add(mean[2]);
-                    break;
-
-                // absolute mean
-                case "_mean_abs":
-                case "x_mean_abs":
-                    features.add(Math.abs(mean[0]));
-                    break;
-                case "y_mean_abs":
-                    features.add(Math.abs(mean[1]));
-                    break;
-                case "z_mean_abs":
-                    features.add(Math.abs(mean[2]));
-                    break;
-
-                // standard deviation
-                case "_std":
-                case "x_std":
-                    features.add(std[0]);
-                    break;
-                case "y_std":
-                    features.add(std[1]);
-                    break;
-                case "z_std":
-                    features.add(std[2]);
-                    break;
-
-                // skewness
-                case "_skew":
-                case "x_skew":
-                    features.add(skewness[0]);
-                    break;
-                case "y_skew":
-                    features.add(skewness[1]);
-                    break;
-                case "z_skew":
-                    features.add(skewness[2]);
-                    break;
-
-                // kurtosis
-                case "_kurt":
-                case "x_kurt":
-                    features.add(kurtosis[0]);
-                    break;
-                case "y_kurt":
-                    features.add(kurtosis[1]);
-                    break;
-                case "z_kurt":
-                    features.add(kurtosis[2]);
-                    break;
-
-                // mean of difference
-                case "_diff_mean":
-                case "x_diff_mean":
-                    features.add(diff_mean[0]);
-                    break;
-                case "y_diff_mean":
-                    features.add(diff_mean[1]);
-                    break;
-                case "z_diff_mean":
-                    features.add(diff_mean[2]);
-                    break;
-
-                // standard deviation of difference
-                case "_diff_std":
-                case "x_diff_std":
-                    features.add(diff_std[0]);
-                    break;
-                case "y_diff_std":
-                    features.add(diff_std[1]);
-                    break;
-                case "z_diff_std":
-                    features.add(diff_std[2]);
-                    break;
-
-                // skewness of difference
-                case "_diff_skew":
-                case "x_diff_skew":
-                    features.add(diff_skewness[0]);
-                    break;
-                case "y_diff_skew":
-                    features.add(diff_skewness[1]);
-                    break;
-                case "z_diff_skew":
-                    features.add(diff_skewness[2]);
-                    break;
-
-                // kurtosis of difference
-                case "_diff_kurt":
-                case "x_diff_kurt":
-                    features.add(diff_kurtosis[0]);
-                    break;
-                case "y_diff_kurt":
-                    features.add(diff_kurtosis[1]);
-                    break;
-                case "z_diff_kurt":
-                    features.add(diff_kurtosis[2]);
-                    break;
-
-                // maximum
-                case "_max":
-                case "x_max":
-                    features.add(getMax(signal, 0));
-                    break;
-                case "y_max":
-                    features.add(getMax(signal, 1));
-                    break;
-                case "z_max":
-                    features.add(getMax(signal, 2));
-                    break;
-
-                // minimum
-                case "_min":
-                case "x_min":
-                    features.add(getMin(signal, 0));
-                    break;
-                case "y_min":
-                    features.add(getMin(signal, 1));
-                    break;
-                case "z_min":
-                    features.add(getMin(signal, 2));
-                    break;
-
-                // absolute maximum
-                case "_max_abs":
-                case "x_max_abs":
-                    features.add(Math.abs(getMax(signal, 0)));
-                    break;
-                case "y_max_abs":
-                    features.add(Math.abs(getMax(signal, 1)));
-                    break;
-                case "z_max_abs":
-                    features.add(Math.abs(getMax(signal, 2)));
-                    break;
-
-                // absolute minimum
-                case "_min_abs":
-                case "x_min_abs":
-                    features.add(Math.abs(getMin(signal, 0)));
-                    break;
-                case "y_min_abs":
-                    features.add(Math.abs(getMin(signal, 1)));
-                    break;
-                case "z_min_abs":
-                    features.add(Math.abs(getMin(signal, 2)));
-                    break;
-
-                // root mean square
-                case "_rms":
-                case "x_rms":
-                    features.add(getRMS(signal, 0));
-                    break;
-                case "y_rms":
-                    features.add(getRMS(signal, 1));
-                    break;
-                case "z_rms":
-                    features.add(getRMS(signal, 2));
-                    break;
-
-                // inner products
-                case "_cross_xy":
-                    features.add(cross[0]);
-                    break;
-                case "_cross_yz":
-                    features.add(cross[1]);
-                    break;
-                case "_cross_zx":
-                    features.add(cross[2]);
-                    break;
-
-                // absolute inner products
-                case "_cross_xy_abs":
-                    features.add(Math.abs(cross[0]));
-                    break;
-                case "_cross_yz_abs":
-                    features.add(Math.abs(cross[1]));
-                    break;
-                case "_cross_zx_abs":
-                    features.add(Math.abs(cross[2]));
-                    break;
-
-                // normalized inner products
-                case "_cross_xy_norm":
-                    features.add(cross_norm[0]);
-                    break;
-                case "_cross_yz_norm":
-                    features.add(cross_norm[1]);
-                    break;
-                case "_cross_zx_norm":
-                    features.add(cross_norm[2]);
-                    break;
-
-                // absolute normalized inner products
-                case "_cross_xy_norm_abs":
-                    features.add(Math.abs(cross_norm[0]));
-                    break;
-                case "_cross_yz_norm_abs":
-                    features.add(Math.abs(cross_norm[1]));
-                    break;
-                case "_cross_zx_norm_abs":
-                    features.add(Math.abs(cross_norm[2]));
-                    break;
-
-                // fast fourier transform coeficients
-                case "_fft_1":
-                    features.add(0.0);
-                    break;
-                case "_fft_2":
-                    features.add(0.0);
-                    break;
-                case "_fft_3":
-                    features.add(0.0);
-                    break;
-                case "_fft_4":
-                    features.add(0.0);
-                    break;
-                case "_fft_5":
-                    features.add(0.0);
-                    break;
-                case "_fft_6":
-                    features.add(0.0);
-                    break;
-                case "_fft_7":
-                    features.add(0.0);
-                    break;
-                case "_fft_8":
-                    features.add(0.0);
-                    break;
-                case "_fft_9":
-                    features.add(0.0);
-                    break;
-                case "_fft_10":
-                    features.add(0.0);
-                    break;
-
-                default:
-
-            }
-
-            // histogram
-            if (s.contains("hist")) {
-                String number = s.replaceAll("[^0-9]", "");
-                int hist_ind = Integer.parseInt(number) - 1;
-                if (s.startsWith("h")||s.startsWith("x"))
-                    features.add((double)hist[0][hist_ind]);
-                else if (s.startsWith("y"))
-                    features.add((double)hist[1][hist_ind]);
-                else if (s.startsWith("z"))
-                    features.add((double)hist[2][hist_ind]);
-                else
-                    Log.e("WARNING", "Bad histogram feature name!");
-            }
-
-            //i++;
-
         }
 
         return features;
-
     }
 
-  
-    private List<double[]> Interpolate(List<double[]> signal, List<Long> t, int freq) {
+    private List<double[]> interpolate(List<double[]> signal, List<Long> ts, int freq) 
+    {
+        List<double[]> signalOut = new ArrayList<double[]>();
 
-        
-        List<double[]> signal_out = new ArrayList<double[]>();
+        if (ts.size() < 2) // CJK TODO: Ok returning uninitialized signalOut?
+            return signalOut;
 
-        if (t.size()<2)
-            return signal_out;
-
-        double step_size = (double)1e9/(double)freq; //step size in nanosec
+        double stepSize = (double) 1e9 / (double) freq; //step size in nanosec
         
         //checking if the timestamps are incremental - if not, the datapoint is removed
+
         List<Long> t2 = new ArrayList<Long>();
+        
         List<double[]> signal2 = new ArrayList<double[]>();
-        t2.add(t.get(0));
-        signal2.add(new double[dim]);
-        signal2.set(0, signal.get(0));
-        for (int j=1; j<t.size(); j++) {
-            if (t.get(j)>t2.get(t2.size()-1)) {
-                t2.add(t.get(j));
-                signal2.add(new double[dim]);
-                signal2.set(signal2.size()-1, signal.get(j));
-            } else
-                Log.e("WARNING", "Non-increasing timestamp found!");
+        
+        t2.add(ts.get(0));
+
+        signal2.add(Arrays.copyOf(signal.get(0), signal.get(0).length));
+
+        for (int j = 1; j < ts.size(); j++) 
+        {
+            if (ts.get(j) > t2.get(t2.size() - 1)) 
+            {
+                t2.add(ts.get(j));
+                
+                signal2.add(Arrays.copyOf(signal.get(j), signal.get(j).length));
+            } 
+            else
+            {
+                Log.e("PR", "FeatureExtractor: Non-increasing timestamp found!");
+            }
         }
 
         //converting time instances to double and getting rid of big numbers
-        long t_start = t2.get(0);
-        double[] t_double = new double[signal2.size()];
-        for (int j=0; j<signal2.size(); j++)
-            t_double[j] = t2.get(j) - t_start;
+        long tStart = t2.get(0);
+        double[] tDouble = new double[signal2.size()];
+
+        for (int j = 0; j < signal2.size(); j++)
+            tDouble[j] = t2.get(j) - tStart;
         
         //calculating the number of interpolated samples
-        int n_samp = (int)Math.floor(t_double[signal2.size()-1]/step_size);
+        int nSamp = (int) Math.floor(tDouble[signal2.size() - 1] / stepSize);
 
         //creating new, regular time instances 
-        double[] t_new = new double[n_samp];
-        for (int j=0; j<n_samp; j++)
-            t_new[j] = t_double[signal2.size()-1] - (double)j*step_size;
+        double[] tNew = new double[nSamp];
+        for (int j = 0; j < nSamp; j++)
+            tNew[j] = tDouble[signal2.size()-1] - (double) j * stepSize;
 
 
-        double[][] signal_out_temp = new double[n_samp][dim];
+        double[][] signalOutTemp = new double[nSamp][this._dimensions];
 
-        for (int i=0; i<dim; i++) {
-            
+        for (int i = 0; i < this._dimensions; i++) 
+        {
             //building a separate array for the current axis
             double[] signal1D = new double[signal2.size()];
-            for (int j=0; j<signal2.size(); j++)
-                signal1D[j] = signal2.get(j)[i];
             
+            for (int j = 0; j < signal2.size(); j++)
+                signal1D[j] = signal2.get(j)[i];
 
             //spline interpolation
             SplineInterpolator interp = new SplineInterpolator();
-            PolynomialSplineFunction func = interp.interpolate(t_double, signal1D);
+            PolynomialSplineFunction func = interp.interpolate(tDouble, signal1D);
             
             //interpolating onto new instances
-            for (int j=0; j<n_samp; j++)
-                signal_out_temp[j][i] = func.value(t_new[j]);
-
+            for (int j = 0; j < nSamp; j++)
+                signalOutTemp[j][i] = func.value(tNew[j]);
         }
 
-        for (int i=0; i<n_samp; i++) {
-            signal_out.add(new double[dim]);
-            signal_out.set(signal_out.size()-1, signal_out_temp[i]);
+        for (int i = 0; i < nSamp; i++) 
+        {
+            signalOut.add(new double[this._dimensions]);
+            signalOut.set(signalOut.size() - 1, signalOutTemp[i]);
         }
         
-        return signal_out;
-
-
+        return signalOut;
     }
 
+    private List<double[]> getDiff(List<double[]> signal) 
+    {
+        List<double[]> signalDiff = new ArrayList<double[]>();
 
-    private List<double[]> getDiff(List<double[]> signal) {
-
-        List<double[]> signal_diff = new ArrayList<double[]>();
-
-        for (int i=0; i<signal.size()-1; i++) {
-
+        for (int i = 0; i < signal.size() - 1; i++) 
+        {
             double[] sig = signal.get(i);
-            double[] sig_next = signal.get(i+1);
+            double[] sigNext = signal.get(i+1);
 
-            double[] sig_diff = new double[sig.length];
+            double[] sigDiff = new double[sig.length];
 
-            for (int j=0; j<sig.length; j++)
-                sig_diff[j] = sig_next[j] - sig[j];
+            for (int j = 0; j < sig.length; j++)
+            	sigDiff[j] = sigNext[j] - sig[j];
 
-            signal_diff.add(sig_diff);
-
+            signalDiff.add(sigDiff);
         }
 
-        return signal_diff;
-
+        return signalDiff;
     }
 
-    private List<double[]> getZScore(List<double[]> signal, double[] mean, double[] std) {
-        
-        List<double[]> signal_zscore = new ArrayList<double[]>();
+    private List<double[]> getZScore(List<double[]> signal, double[] mean, double[] std) 
+    {
+        List<double[]> signalZScore = new ArrayList<double[]>();
 
-        for (int i=0; i<signal.size(); i++) {
-
+        for (int i = 0; i < signal.size(); i++) 
+        {
             double[] sig = signal.get(i);
-            double[] sig_zscore = new double[dim];
+            double[] sigZScore = new double[this._dimensions];
 
-            for (int j=0; j<dim; j++)
-                sig_zscore[j] = (sig[j] - mean[j])/std[j];
+            for (int j = 0; j< this._dimensions; j++)
+            	sigZScore[j] = (sig[j] - mean[j])/std[j];
 
-            signal_zscore.add(sig_zscore);
+            signalZScore.add(sigZScore);
         }
 
-        return signal_zscore;
+        return signalZScore;
     }
-
 
     // This method will calculate mean, standard deviation, skewness, and kurtosis.
     // each member of the list is one statistical moment, which consists of an array, with
     // each element accounting for one dimension
 
-    private double[] getMoments(List<double[]> signal, int axis) {
+    private double[] getMoments(List<double[]> signal, int axis) 
+    {
+        final double n = (double) signal.size();
 
-        int N = signal.size();
-
-        if (N<2) {
-            double[] out = {0, 0, 0, 0};
+        if (n < 2) 
+        {
+            double[] out = {0.0, 0.0, 0.0, 0.0};
+            
             return out;
         }
 
-        double sum = 0f;
-        // For some reason, the following commented-out code generates "concurrent modification exception"!
-        //for (double[] value : signal)
-            //sum += value[axis];
-        for (int i=0; i<N; i++)
+        double sum = 0.0;
+        
+        // For some reason, the following commented-out code generates 
+        // "concurrent modification exception"!
+        // for (double[] value : signal)
+        //     sum += value[axis];
+        // CJK TODO: Solve mystery ^
+        
+        for (int i = 0; i < n; i++)
             sum += signal.get(i)[axis];
-            
         
-        double mean = sum/N;
+        double mean = sum / n;
 
-        double m2 = 0f;
-        double m3 = 0f;
-        double m4 = 0f;
-        double t2,t3,t4;
+        double m2 = 0.0;
+        double m3 = 0.0;
+        double m4 = 0.0;
         
-        for (int i=0; i<N; i++) {
+        double t2 = 0.0;
+        double t3 = 0.0;
+        double t4 = 0.0;
 
-            t2 = (signal.get(i)[axis]-mean)*(signal.get(i)[axis]-mean);
+        for (int i = 0; i < n; i++) 
+        {
+            t2 = (signal.get(i)[axis] - mean) * (signal.get(i)[axis] - mean);
             m2 += t2;
 
-            t3 = t2*(signal.get(i)[axis]-mean);
+            t3 = t2 * (signal.get(i)[axis] - mean);
             m3 += t3;
 
-            t4 = t3*(signal.get(i)[axis]-mean);
+            t4 = t3 * (signal.get(i)[axis] - mean);
             m4 += t4;
         }
 
-        double std = (double)Math.sqrt(m2/(N-1)); //unbiased
+        double std = (double) Math.sqrt(m2 / (n - 1)); //unbiased
         
-        m2 /= N;
-        m3 /= N;
-        m4 /= N;
+        m2 /= n;
+        m3 /= n;
+        m4 /= n;
  
-        double skewness = m3/(std*std*std); //unbiased
+        double skewness = m3 /(std * std * std); //unbiased
 
-        double kurtosis = m4/(m2*m2) - 3; //unbiased
+        double kurtosis = m4 / (m2 * m2) - 3; //unbiased
 
         double out[] = {mean, std, skewness, kurtosis};
         return out;
-
     }
 
     //overall mean of squares
-    private double getOverallMean(List<double[]> signal) {
-
+    private double getOverallMean(List<double[]> signal) 
+    {
         double ms = 0;
-        for (int i=0; i<signal.size(); i++)
-            for (int j=0; j<dim; j++)
-                ms += signal.get(i)[j]*signal.get(i)[j]/dim;
+        
+        for (int i = 0; i < signal.size(); i++)
+        {
+            for (int j = 0; j < this._dimensions; j++)
+                ms += signal.get(i)[j] * signal.get(i)[j] / this._dimensions;
+        }
+        
         ms /= signal.size();
+
         return ms;
     }
 
-    private double getRMS(List<double[]> signal, int axis) {
-
+    private double getRMS(List<double[]> signal, int axis) 
+    {
         double rms = 0;
-        for (int i=0; i<signal.size(); i++)
-            rms += signal.get(i)[axis]*signal.get(i)[axis];
-        rms /= (double)signal.size();
-        return rms;
 
-    }
-
-    private double getMax(List<double[]> signal, int axis) {
-
-        if (signal.size()==0)
-            return 0;
-        double max = signal.get(0)[axis];
-        for (int i=1; i<signal.size(); i++)
-            if (max<signal.get(i)[axis]) max = signal.get(i)[axis];
-        return max;
-
-    }
-
-    private double getMin(List<double[]> signal, int axis) {
-
-        if (signal.size()==0)
-            return 0;
-        double min = signal.get(0)[axis];
-        for (int i=1; i<signal.size(); i++)
-            if (min>signal.get(i)[axis]) min = signal.get(i)[axis];
-        return min;
-
-    }
-
-    //This feature only works for 3D signals (acceleration, magnetic field, etc).
-    private double[] getInnerProds3(List<double[]> signal) {
+        for (int i = 0; i < signal.size(); i++)
+            rms += signal.get(i)[axis] * signal.get(i)[axis];
         
-        double[] inner_prods = new double[3];
-        if (dim!=3) return inner_prods; // double-check for dimension
+        rms /= (double) signal.size();
 
-        inner_prods[0] = 0;
-        for (int j=0; j<signal.size(); j++)
-            inner_prods[0] += signal.get(j)[0]*signal.get(j)[1];
-        inner_prods[0] /= (double)signal.size(); //mean
-        inner_prods[1] = 0;
-        for (int j=0; j<signal.size(); j++)
-            inner_prods[1] += signal.get(j)[1]*signal.get(j)[2];
-        inner_prods[1] /= (double)signal.size(); //mean
-        inner_prods[2] = 0;
-        for (int j=0; j<signal.size(); j++)
-            inner_prods[2] += signal.get(j)[2]*signal.get(j)[0];
-        inner_prods[2] /= (double)signal.size(); //mean
-
-        return inner_prods;
-
+        return rms;
     }
 
-   private double[] getNormInnerProds3(List<double[]> signal) {
+    private double getMax(List<double[]> signal, int axis) 
+    {
+        if (signal.size() == 0) // CJK Question / TODO: Is this always the right answer?
+            return 0;
+        
+        double max = signal.get(0)[axis];
+        
+        for (int i = 1; i < signal.size(); i++)
+        {
+            if (max < signal.get(i)[axis]) 
+            	max = signal.get(i)[axis];
+        }
+        
+        return max;
+    }
 
-        double[] inner_prods = new double[3];
-        if (dim!=3) return inner_prods; // double-check for dimension
+    private double getMin(List<double[]> signal, int axis) 
+    {
+        if (signal.size() == 0) // CJK Question / TODO: Is this always the right answer?
+            return 0;
+        
+        double min = signal.get(0)[axis];
+        
+        for (int i = 1; i < signal.size(); i++)
+        {
+            if (min>signal.get(i)[axis])
+            	min = signal.get(i)[axis];
+        }
+
+        return min;
+    }
+
+    private double[] get3DInnerProds(List<double[]> signal) 
+    {
+        // This feature only works for 3D signals (acceleration, magnetic field, etc).
+        
+        double[] innerProds = new double[3];
+        
+        if (this._dimensions != 3) 
+        	return innerProds; // double-check for dimension
+
+        // CJK Question / TODO: what's in the uninitialized double above^?
+
+        innerProds[0] = 0;
+
+        for (int j = 0; j < signal.size(); j++)
+        	innerProds[0] += signal.get(j)[0] * signal.get(j)[1];
+        innerProds[0] /= (double) signal.size(); //mean
+        
+        innerProds[1] = 0;
+        for (int j = 0; j < signal.size(); j++)
+        	innerProds[1] += signal.get(j)[1] * signal.get(j)[2];
+        innerProds[1] /= (double)signal.size(); //mean
+        
+        innerProds[2] = 0;
+        for (int j = 0; j < signal.size(); j++)
+        	innerProds[2] += signal.get(j)[2] * signal.get(j)[0];
+        innerProds[2] /= (double)signal.size(); //mean
+
+        return innerProds;
+    }
+
+   private double[] get3DNormInnerProds(List<double[]> signal) 
+   {
+        double[] innerProds = new double[3];
+        
+        if (this._dimensions != 3) 
+        	return innerProds; // double-check for dimension
 
         double[] magnitude = new double[signal.size()];
-        for (int j=0; j<signal.size(); j++)
-            magnitude[j] = signal.get(j)[0]*signal.get(j)[0] + signal.get(j)[1]*signal.get(j)[1] + signal.get(j)[2]*signal.get(j)[2];
+        
+        for (int j = 0; j < signal.size(); j++)
+        {
+            magnitude[j] = (signal.get(j)[0] * signal.get(j)[0]) +
+            			   (signal.get(j)[1] * signal.get(j)[1]) + 
+            			   (signal.get(j)[2] * signal.get(j)[2]);
+        }
+        
+        innerProds[0] = 0;
+        for (int j = 0; j < signal.size(); j++)
+            innerProds[0] += signal.get(j)[0] * signal.get(j)[1] / magnitude[j];
+        innerProds[0] /= (double) signal.size(); //mean
 
-        inner_prods[0] = 0;
-        for (int j=0; j<signal.size(); j++)
-            inner_prods[0] += signal.get(j)[0]*signal.get(j)[1]/magnitude[j];
-        inner_prods[0] /= (double)signal.size(); //mean
-        inner_prods[1] = 0;
-        for (int j=0; j<signal.size(); j++)
-            inner_prods[1] += signal.get(j)[1]*signal.get(j)[2]/magnitude[j];
-        inner_prods[1] /= (double)signal.size(); //mean
-        inner_prods[2] = 0;
-        for (int j=0; j<signal.size(); j++)
-            inner_prods[2] += signal.get(j)[2]*signal.get(j)[0]/magnitude[j];
-        inner_prods[2] /= (double)signal.size(); //mean
+        innerProds[1] = 0;
+        for (int j = 0; j < signal.size(); j++)
+            innerProds[1] += signal.get(j)[1] * signal.get(j)[2] / magnitude[j];
+        innerProds[1] /= (double) signal.size(); //mean
 
-        return inner_prods;
+        innerProds[2] = 0;
+        for (int j = 0; j < signal.size(); j++)
+            innerProds[2] += signal.get(j)[2] * signal.get(j)[0] / magnitude[j];
+        innerProds[2] /= (double) signal.size(); //mean
 
+        return innerProds;
    }        
-
 }
