@@ -1249,6 +1249,7 @@
 	<string name="name_local_log_server_test">Local Logging Tests</string>
 	<string name="menu_test_label">Start Tests</string>
 	<string name="name_matlab_tree_model_test">Matlab Tree Model Tests</string>
+	<string name="name_matlab_forest_model_test">Matlab Forest Model Tests</string>
 	<string name="name_user_id_test">User ID Tests</string>
 	<string name="name_snapshot_test">Snapshot Tests</string>
 	<string name="name_local_http_server_test">Local HTTP Server Tests</string>

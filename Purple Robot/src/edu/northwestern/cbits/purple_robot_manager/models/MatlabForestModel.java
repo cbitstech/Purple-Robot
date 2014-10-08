@@ -1,6 +1,5 @@
 package edu.northwestern.cbits.purple_robot_manager.models;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,44 +9,24 @@ import org.json.JSONException;
 
 import android.content.Context;
 import android.net.Uri;
-
-import com.alexmerz.graphviz.ParseException;
-import com.alexmerz.graphviz.Parser;
-import com.alexmerz.graphviz.objects.Graph;
-import com.alexmerz.graphviz.objects.Id;
-import com.alexmerz.graphviz.objects.Node;
-
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.models.trees.LeafNode;
+import edu.northwestern.cbits.purple_robot_manager.models.trees.TreeNode;
+import edu.northwestern.cbits.purple_robot_manager.models.trees.TreeNode.TreeNodeException;
+import edu.northwestern.cbits.purple_robot_manager.models.trees.parsers.TreeNodeParser;
+import edu.northwestern.cbits.purple_robot_manager.models.trees.parsers.TreeNodeParser.ParserNotFound;
 
 public class MatlabForestModel extends WekaTreeModel
 {
-	// TODO
-	
 	public static final String TYPE = "matlab-forest";
 
-	private Map<String, Graph> _trees = new HashMap<String, Graph>();
+	private ArrayList<TreeNode> _trees = new ArrayList<TreeNode>();
 
 	public MatlabForestModel(Context context, Uri uri) 
 	{
 		super(context, uri);
-	}
-
-	private String findRootId(String model) 
-	{
-		String rootId = null;
-		
-		for (String line : model.split("[\r\n]+"))
-		{
-			if (line.contains("[label=\"1: "))
-			{
-				String[] tokens = line.split(" ");
-				if (tokens.length > 1)
-					return tokens[0];
-			}
-		}
-		
-		return rootId;
 	}
 
 	protected void generateModel(Context context, Object model) 
@@ -66,27 +45,16 @@ public class MatlabForestModel extends WekaTreeModel
 	
 						if (modelItem instanceof String)
 						{
-							String root = this.findRootId(modelItem.toString());
-							
-							StringReader reader = new StringReader(modelItem.toString());
-							
-							Parser parser = new Parser();
-							
 							try 
 							{
-								if (parser.parse(reader))
-								{
-									ArrayList<Graph> graphs = parser.getGraphs();
-									
-									if (graphs.size() > 0)
-									{
-										Graph tree = graphs.get(0);
-										
-										this._trees.put(root, tree);
-									}
-								}
+								TreeNode tree = TreeNodeParser.parseString(modelItem.toString());
+								this._trees.add(tree);
 							}
-							catch (ParseException e) 
+							catch (ParserNotFound e) 
+							{
+								LogManager.getInstance(context).logException(e);
+							} 
+							catch (TreeNodeException e) 
 							{
 								LogManager.getInstance(context).logException(e);
 							}
@@ -101,27 +69,24 @@ public class MatlabForestModel extends WekaTreeModel
 		}
 	}
 
-	protected Object evaluateModel(Context context, HashMap<String, Object> snapshot) 
+	protected Object evaluateModel(Context context, Map<String, Object> snapshot) 
 	{
+		Log.e("PR", "EVALUATING MODEL");
+		
 		String maxPrediction = null;
 
 		synchronized(this)
 		{
 			Map<String, Integer> counts = new HashMap<String, Integer>();
 			
-			for (String id : this._trees.keySet())
+			for (TreeNode tree : this._trees)
 			{
-				Graph tree = this._trees.get(id);
-				
-				Id rootId = new Id();
-				rootId.setId(id);
-				
-				Node root = tree.findNode(rootId);
-				
-				Object treePrediction = this.fetchPrediction(root, tree.getEdges(), snapshot);
-				
-				if (treePrediction != null)
+				try 
 				{
+					Map<String, Object> prediction = tree.fetchPrediction(snapshot);
+
+					String treePrediction = prediction.get(LeafNode.PREDICTION).toString();
+
 					Integer count = 0;
 					
 					if (counts.containsKey(treePrediction))
@@ -129,6 +94,10 @@ public class MatlabForestModel extends WekaTreeModel
 					
 					count = Integer.valueOf(count.intValue() + 1);
 					counts.put(treePrediction.toString(), count);
+				} 
+				catch (Exception e) 
+				{
+					LogManager.getInstance(context).logException(e);
 				}
 			}
 			

@@ -469,4 +469,14 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 
 		this.transmitData(this._context, bundle);
 	}
+	
+	public String summarizeValue(Context context, Bundle bundle)
+	{
+		return "TODO";
+		
+//		double humidity = bundle.getDoubleArray("HUMIDITY")[0];
+//
+//		return String.format(context.getResources().getString(R.string.summary_humidity_probe), humidity);
+	}
+
 }

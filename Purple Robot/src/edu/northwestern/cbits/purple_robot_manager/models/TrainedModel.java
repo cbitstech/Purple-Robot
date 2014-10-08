@@ -6,15 +6,19 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.net.Uri;
+import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -140,6 +144,9 @@ public abstract class TrainedModel extends Model
 				        me._accuracy = json.getDouble("accuracy");
 
 				        me.generateModel(context, json.get("model"));
+				        
+				        if (json.has("map"))
+				        	me.setFeatureMap(context, json.getJSONObject("map"));
 
 				        FileUtils.writeStringToFile(cachedModel, contents);
 
@@ -160,6 +167,27 @@ public abstract class TrainedModel extends Model
 	}
 	
 	
+	@SuppressWarnings("unchecked")
+	protected void setFeatureMap(Context context, JSONObject mapJson) 
+	{
+		Iterator<String> keys = mapJson.keys();
+		
+		while (keys.hasNext())
+		{
+			try 
+			{
+				String original = keys.next();
+				String replacement = mapJson.get(original).toString();
+
+				this._featureMap.put(original, replacement);
+			} 
+			catch (JSONException e) 
+			{
+				LogManager.getInstance(context).logException(e);
+			}
+		}
+	}
+
 	/**
 	 * Provides the name of the model, as specified by the "class" key in the 
 	 * JSON definition.
@@ -223,17 +251,32 @@ public abstract class TrainedModel extends Model
 	
 	public void predict(final Context context, final Map<String, Object> snapshot) 
 	{
+		Log.e("PR", "TM.1");
 		if (this._inited == false || this.enabled(context) == false)
 			return;
 		
 		long now = System.currentTimeMillis();
+
 		
+		Log.e("PR", "TM.2");
+
 		if (now - this._lastCheck < 1000)
 		{
 			this._lastCheck = now;
 			
 			return;
 		}
+
+		Log.e("PR", "TM.3");
+
+		for (String key : this._featureMap.keySet())
+		{
+			String newKey = this._featureMap.get(key);
+			
+			snapshot.put(newKey, snapshot.get(key));
+		}
+
+		Log.e("PR", "TM.4");
 
 		final TrainedModel me = this;
 		
@@ -242,31 +285,48 @@ public abstract class TrainedModel extends Model
 			@SuppressWarnings("unchecked")
 			public void run() 
 			{
+				Log.e("PR", "TM.10 " + me.getClass().getCanonicalName());
 				Object value = me.evaluateModel(context, snapshot);
+
+				Log.e("PR", "TM.10.1: " + value);
 
 				if (value == null)
 				{
-					
+					Log.e("PR", "TM.11");
 				}
 				else if (value instanceof Map<?, ?>)
 				{
+					Log.e("PR", "TM.12");
 					Map<String, Object> map = (Map<String, Object>) value;
 					
+					Log.e("PR", "TM.13 " + map);
+
 					me.transmitPrediction(context, map.get(LeafNode.PREDICTION).toString(), (Double) map.get(LeafNode.ACCURACY));
+
+					Log.e("PR", "TM.14");
 				}
 				else if (value instanceof Double)
 				{
+					Log.e("PR", "TM.15");
 					Double doubleValue = (Double) value;
 
 					me.transmitPrediction(context, doubleValue.doubleValue(), me._accuracy);
+					Log.e("PR", "TM.16");
 				}
 				else
 					me.transmitPrediction(context, value.toString(), me._accuracy);
+
+				Log.e("PR", "TM.17");
 			}
 		};
 		
+		Log.e("PR", "TM.5");
+
+		
 		Thread t = new Thread(r);
 		t.start();
+
+		Log.e("PR", "TM.6");
 	}
 
 	/**
