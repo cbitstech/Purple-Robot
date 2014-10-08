@@ -11,10 +11,10 @@ import org.apache.commons.math3.transform.FastFourierTransformer;
 import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 
+import android.util.Log;
+
 import edu.emory.mathcs.backport.java.util.Arrays;
 
-
-import android.util.Log;
 
 public class FeatureExtractor 
 {

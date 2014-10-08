@@ -34,3 +34,4 @@ lint.xml
 *.keystore
 gradle.properties
 keys.xml.template
+*~
