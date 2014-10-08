@@ -20,6 +20,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
@@ -110,6 +111,8 @@ public class ModelManager extends BroadcastReceiver
 	@SuppressLint("DefaultLocale")
 	public void onReceive(Context context, Intent intent) 
 	{
+		Log.e("PR", "MODEL MANAGER GOT INTENT");
+		
 		Bundle extras = intent.getExtras();
 
 		if (extras.containsKey("FROM_MODEL"))
@@ -142,9 +145,13 @@ public class ModelManager extends BroadcastReceiver
 				this._milieu.put(slug, extras.get(key));
 			}
 		}
+		
+		Log.e("PR", "1 " + this.allModels(context).size());
 
 		for (Model model : this.allModels(context))
 		{
+			Log.e("PR", "1.1");
+			
 			HashMap<String, Object> snapshot = new HashMap<String, Object>();
 			
 			synchronized(this._milieu)
@@ -152,15 +159,24 @@ public class ModelManager extends BroadcastReceiver
 				snapshot.putAll(this._milieu);
 			}
 			
+			Log.e("PR", "1.2 " + snapshot.keySet().size());
+			
 			if (model != null)
 				model.predict(context, snapshot);
+
+			Log.e("PR", "1.3");
 		}
+
+		Log.e("PR", "2");
 	}
 
 	public Model fetchModelByName(Context context, String name) 
 	{
+		Log.e("PR", "MODELS COUNT: " + this._models.size());
+		
 		for (Model model : this._models)
 		{
+			Log.e("PR", "MODEL SEARCH: " + name + " =? " + model.name(context));
 			if (name.equals(model.name(context)))
 				return model;
 		}
@@ -174,6 +190,7 @@ public class ModelManager extends BroadcastReceiver
 		
 		Model m = Model.modelForUrl(this._context, jsonUrl);
 		
+		Log.e("PR", "MODEL FOR " + jsonUrl + ": " + m);
 		if (m != null)
 			this._models.add(m);
 	}
@@ -244,11 +261,15 @@ public class ModelManager extends BroadcastReceiver
 
 	public Model fetchModelByTitle(Context context, String title) 
 	{
+		Log.e("PR", "LOOKING FOR MODEL NAMED: " + title);
+		
 		if (title == null)
 			return null;
 		
 		for (Model m : this._models)
 		{
+			Log.e("PR", "MODEL TITLE: " + title + " =? " + m.title(context));
+			
 			if (title.equals(m.title(context)))
 				return m;
 		}

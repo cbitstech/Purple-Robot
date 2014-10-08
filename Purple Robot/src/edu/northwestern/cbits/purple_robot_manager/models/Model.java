@@ -58,6 +58,8 @@ public abstract class Model
 	private static long _lastEnabledCheck = 0;
 	private static boolean _lastEnabled = false;
 
+	protected HashMap<String, String> _featureMap = new HashMap<String, String>();
+
 	// Cached values used to determine when the model state has changed.
 	private Object _latestPrediction = null;
 	private double _latestAccuracy = 0.0;
@@ -496,4 +498,9 @@ public abstract class Model
 	 */
 	
 	public abstract String modelType();
+
+	public String mappedFeatureName(String key) 
+	{
+		return this._featureMap.get(key);
+	}
 }
