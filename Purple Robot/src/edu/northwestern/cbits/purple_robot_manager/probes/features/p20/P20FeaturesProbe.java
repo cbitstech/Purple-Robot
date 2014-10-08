@@ -182,7 +182,6 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 					{
 						synchronized(me._accelerometerClip)
 						{
-							Log.e("PR", "ACCEL");
 							me._featureValues.putAll(me._accelerometerExtractor.extractFeatures(me._accelerometerClip));
 
 							if (me._accelerometerClip.getValues().size() < 100) 
@@ -194,7 +193,6 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 					{
 						synchronized(me._gyroscopeClip)
 						{
-							Log.e("PR", "GYRO");
 							me._featureValues.putAll(me._gyroscopeExtractor.extractFeatures(me._gyroscopeClip));
 
 							if (me._gyroscopeClip.getValues().size() < 100) 
@@ -206,7 +204,6 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 					{
 						synchronized(me._barometerClip)
 						{
-							Log.e("PR", "BARO");
 							me._featureValues.putAll(me._barometerExtractor.extractFeatures(me._barometerClip));
 
 							if (me._barometerClip.getValues().size() < 100) 
@@ -231,8 +228,6 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 						//measuring the processing time
 						long deltaT = System.currentTimeMillis() - now;
 						
-						Log.e("PR", "P20FeaturesProbe: Processing Time : " + deltaT + " ms.");
-						
 						me._featureValues.put(Feature.PROCESSING_TIME, (double) deltaT);
 
 						//accounting for the processing time / also converting from ns to ms
@@ -254,8 +249,6 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 				}
 			}
 		};
-
-	    Log.e("TEST", "Thread Started");
 	}
 
 	public String name(Context context) 
@@ -381,7 +374,6 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 
 				this._featureThread = new Thread(this._featureRunnable);
 				this._featureThread.start();
-	    	    Log.e("TEST", "Thread Started");
 			}
 
 			return true;
@@ -467,8 +459,6 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 		
 		for (Feature f : this._featureValues.keySet())
 		{
-			Log.e("PR", f.toString() + " -- " + this._featureValues.get(f));
-
 			bundle.putDouble(f.toString(), this._featureValues.get(f));
 		}
 
