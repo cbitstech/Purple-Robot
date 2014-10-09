@@ -150,6 +150,22 @@ public class FeatureExtractor
     	    	features.put(Feature.ACC_NUM_SAMPLES, (double) signal.size()); 
     	    	features.put(Feature.ACC_MEAN, this.getOverallMean(signal)); 
 
+    	    	features.put(Feature.ACCX_MAX, this.getMax(signal, 0)); 
+    	    	features.put(Feature.ACCY_MAX, this.getMax(signal, 1)); 
+    	    	features.put(Feature.ACCZ_MAX, this.getMax(signal, 2)); 
+
+    	    	features.put(Feature.ACCX_MIN, this.getMin(signal, 0)); 
+    	    	features.put(Feature.ACCY_MIN, this.getMin(signal, 1)); 
+    	    	features.put(Feature.ACCZ_MIN, this.getMin(signal, 2)); 
+
+    	    	features.put(Feature.ACCX_MAX_ABS, Math.abs(this.getMax(signal, 0))); 
+    	    	features.put(Feature.ACCY_MAX_ABS, Math.abs(this.getMax(signal, 1))); 
+    	    	features.put(Feature.ACCZ_MAX_ABS, Math.abs(this.getMax(signal, 2))); 
+
+    	    	features.put(Feature.ACCX_MIN_ABS, Math.abs(this.getMin(signal, 0))); 
+    	    	features.put(Feature.ACCY_MIN_ABS, Math.abs(this.getMin(signal, 1))); 
+    	    	features.put(Feature.ACCZ_MIN_ABS, Math.abs(this.getMin(signal, 2))); 
+
     	    	features.put(Feature.ACCX_MEAN, mean[0]); 
     	    	features.put(Feature.ACCY_MEAN, mean[1]); 
     	    	features.put(Feature.ACCZ_MEAN, mean[2]); 
@@ -178,6 +194,22 @@ public class FeatureExtractor
         	case Clip.GYROSCOPE:
     	    	features.put(Feature.GYR_NUM_SAMPLES, (double) signal.size()); 
     	    	features.put(Feature.GYR_MEAN, this.getOverallMean(signal)); 
+
+    	    	features.put(Feature.GYRX_MAX, this.getMax(signal, 0)); 
+    	    	features.put(Feature.GYRY_MAX, this.getMax(signal, 1)); 
+    	    	features.put(Feature.GYRZ_MAX, this.getMax(signal, 2)); 
+
+    	    	features.put(Feature.GYRX_MIN, this.getMin(signal, 0)); 
+    	    	features.put(Feature.GYRY_MIN, this.getMin(signal, 1)); 
+    	    	features.put(Feature.GYRZ_MIN, this.getMin(signal, 2)); 
+
+    	    	features.put(Feature.GYRX_MAX_ABS, Math.abs(this.getMax(signal, 0))); 
+    	    	features.put(Feature.GYRY_MAX_ABS, Math.abs(this.getMax(signal, 1))); 
+    	    	features.put(Feature.GYRZ_MAX_ABS, Math.abs(this.getMax(signal, 2))); 
+
+    	    	features.put(Feature.GYRX_MIN_ABS, Math.abs(this.getMin(signal, 0))); 
+    	    	features.put(Feature.GYRY_MIN_ABS, Math.abs(this.getMin(signal, 1))); 
+    	    	features.put(Feature.GYRZ_MIN_ABS, Math.abs(this.getMin(signal, 2))); 
 
     	    	features.put(Feature.GYRX_MEAN, mean[0]); 
     	    	features.put(Feature.GYRY_MEAN, mean[1]); 

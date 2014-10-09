@@ -424,9 +424,10 @@ public abstract class Model
 	 * @param context
 	 * @param prediction Value of the prediction.
 	 * @param accuracy Estimated accuracy of the prediction.
+	 * @param map 
 	 */
 
-	protected void transmitPrediction(Context context, String prediction, double accuracy) 
+	protected void transmitPrediction(Context context, String prediction, double accuracy, Map<String, Object> map) 
 	{
 		Bundle bundle = new Bundle();
 		bundle.putString("PROBE", this.title(context));
@@ -434,11 +435,31 @@ public abstract class Model
 		bundle.putString("PREDICTION", prediction);
 		bundle.putBoolean("FROM_MODEL", true);
 		bundle.putDouble("ACCURACY", accuracy);
-
+		
+		if (map != null)
+		{
+			for (String key : map.keySet())
+			{
+				Object value = map.get(key);
+				
+				if (value instanceof Double)
+					bundle.putDouble(key, (Double) value);
+				else if (value instanceof Integer)
+					bundle.putInt(key, (Integer) value);
+				else
+					bundle.putString(key, value.toString());
+			}
+		}
+		
 		this.transmitData(context, bundle);
 		
 		this._latestPrediction = prediction;
 		this._latestAccuracy = accuracy;
+	}
+	
+	protected void transmitPrediction(Context context, String prediction, double accuracy) 
+	{
+		this.transmitPrediction(context, prediction, accuracy, null);
 	}
 
 	
