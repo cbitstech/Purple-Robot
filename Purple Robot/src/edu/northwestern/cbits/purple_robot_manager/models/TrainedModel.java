@@ -269,11 +269,23 @@ public abstract class TrainedModel extends Model
 
 		Log.e("PR", "TM.3");
 
+		for (String key : snapshot.keySet())
+		{
+			Log.e("PR", "FEATURE " + key + " -- " + snapshot.get(key));
+		}
+
 		for (String key : this._featureMap.keySet())
 		{
 			String newKey = this._featureMap.get(key);
 			
-			snapshot.put(newKey, snapshot.get(key));
+			if (snapshot.get(key) == null)
+			{
+				Log.e("PR", "KEY XFER: " + key + " TO " + newKey + " -- " + snapshot.get(key));
+			}
+			else
+			{		
+				snapshot.put(newKey, snapshot.get(key));
+			}
 		}
 
 		Log.e("PR", "TM.4");
@@ -301,7 +313,7 @@ public abstract class TrainedModel extends Model
 					
 					Log.e("PR", "TM.13 " + map);
 
-					me.transmitPrediction(context, map.get(LeafNode.PREDICTION).toString(), (Double) map.get(LeafNode.ACCURACY));
+					me.transmitPrediction(context, map.get(LeafNode.PREDICTION).toString(), (Double) map.get(LeafNode.ACCURACY), map);
 
 					Log.e("PR", "TM.14");
 				}

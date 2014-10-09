@@ -22,6 +22,9 @@ public class MatlabForestModel extends WekaTreeModel
 {
 	public static final String TYPE = "matlab-forest";
 
+	private static final String VOTES = "VOTES";
+	private static final String TREE_COUNT = "TOTAL_VOTERS";
+
 	private ArrayList<TreeNode> _trees = new ArrayList<TreeNode>();
 
 	public MatlabForestModel(Context context, Uri uri) 
@@ -71,9 +74,8 @@ public class MatlabForestModel extends WekaTreeModel
 
 	protected Object evaluateModel(Context context, Map<String, Object> snapshot) 
 	{
-		Log.e("PR", "EVALUATING MODEL");
-		
 		String maxPrediction = null;
+		int maxCount = -1;
 
 		synchronized(this)
 		{
@@ -100,8 +102,6 @@ public class MatlabForestModel extends WekaTreeModel
 					LogManager.getInstance(context).logException(e);
 				}
 			}
-			
-			int maxCount = -1;
 	
 			for (String prediction : counts.keySet())
 			{
@@ -115,7 +115,13 @@ public class MatlabForestModel extends WekaTreeModel
 			}
 		}
 		
-		return maxPrediction;
+		HashMap<String, Object> prediction = new HashMap<String, Object>();
+		prediction.put(LeafNode.PREDICTION, maxPrediction);
+		prediction.put(LeafNode.ACCURACY, (double) maxCount / (double) this._trees.size());
+		prediction.put(MatlabForestModel.VOTES, maxCount);
+		prediction.put(MatlabForestModel.TREE_COUNT, this._trees.size());
+		
+		return prediction;
 	}
 	
 	public String summary(Context context)
