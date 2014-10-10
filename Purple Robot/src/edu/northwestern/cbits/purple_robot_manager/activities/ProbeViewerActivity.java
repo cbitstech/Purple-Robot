@@ -9,6 +9,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.util.Log;
+import edu.emory.mathcs.backport.java.util.Collections;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
@@ -170,7 +171,10 @@ public class ProbeViewerActivity extends PreferenceActivity
 		if (bundle.containsKey("KEY_ORDER"))
 			keys.addAll(bundle.getStringArrayList("KEY_ORDER"));
 		else
+		{
 			keys.addAll(bundle.keySet());
+			Collections.sort(keys);
+		}
 
 		for (String key : keys)
 		{

@@ -258,9 +258,7 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 
 	public String title(Context context) 
 	{
-		// TODO: Pull out into strings.xml
-		
-		return "P20 Features Probe";
+		return context.getString(R.string.title_probe_p20_features);
 	}
 
 	public String probeCategory(Context context) 
@@ -290,8 +288,7 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 	@Override
 	public String summary(Context context) 
 	{
-		// TODO
-		return "TODO";
+		return context.getString(R.string.summary_probe_p20_features);
 	}
 
 	public void enable(Context context) 
@@ -472,11 +469,6 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 	
 	public String summarizeValue(Context context, Bundle bundle)
 	{
-		return "TODO";
-		
-//		double humidity = bundle.getDoubleArray("HUMIDITY")[0];
-//
-//		return String.format(context.getResources().getString(R.string.summary_humidity_probe), humidity);
+		return String.format(context.getResources().getString(R.string.summary_p20_features_probe), (int) bundle.getDouble("PROCESSING_TIME"));
 	}
-
 }

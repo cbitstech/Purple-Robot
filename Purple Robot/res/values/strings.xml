@@ -1282,6 +1282,10 @@
     
     <string name="title_sample_probe">Sample Probe</string>
     <string name="summary_sample_probe_desc">An example probe that emits basic audio features to illustrate how to create new probes.</string>
+    
+    <string name="title_probe_p20_features">P20 Features Probe</string>
+    <string name="summary_probe_p20_features">A collection of accelerometer and gyroscope features used by CBITs P20 project.</string>
+    <string name="summary_p20_features_probe">%1$d ms processing time</string>
 </resources>
 
 
