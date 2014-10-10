@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -18,7 +17,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.net.Uri;
-import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -251,14 +249,10 @@ public abstract class TrainedModel extends Model
 	
 	public void predict(final Context context, final Map<String, Object> snapshot) 
 	{
-		Log.e("PR", "TM.1");
 		if (this._inited == false || this.enabled(context) == false)
 			return;
 		
 		long now = System.currentTimeMillis();
-
-		
-		Log.e("PR", "TM.2");
 
 		if (now - this._lastCheck < 1000)
 		{
@@ -267,28 +261,19 @@ public abstract class TrainedModel extends Model
 			return;
 		}
 
-		Log.e("PR", "TM.3");
-
-		for (String key : snapshot.keySet())
-		{
-			Log.e("PR", "FEATURE " + key + " -- " + snapshot.get(key));
-		}
-
 		for (String key : this._featureMap.keySet())
 		{
 			String newKey = this._featureMap.get(key);
 			
 			if (snapshot.get(key) == null)
 			{
-				Log.e("PR", "KEY XFER: " + key + " TO " + newKey + " -- " + snapshot.get(key));
+				// Do nothing.
 			}
 			else
 			{		
 				snapshot.put(newKey, snapshot.get(key));
 			}
 		}
-
-		Log.e("PR", "TM.4");
 
 		final TrainedModel me = this;
 		
@@ -297,48 +282,32 @@ public abstract class TrainedModel extends Model
 			@SuppressWarnings("unchecked")
 			public void run() 
 			{
-				Log.e("PR", "TM.10 " + me.getClass().getCanonicalName());
 				Object value = me.evaluateModel(context, snapshot);
-
-				Log.e("PR", "TM.10.1: " + value);
 
 				if (value == null)
 				{
-					Log.e("PR", "TM.11");
+					// Do nothing.
 				}
 				else if (value instanceof Map<?, ?>)
 				{
-					Log.e("PR", "TM.12");
 					Map<String, Object> map = (Map<String, Object>) value;
-					
-					Log.e("PR", "TM.13 " + map);
 
-					me.transmitPrediction(context, map.get(LeafNode.PREDICTION).toString(), (Double) map.get(LeafNode.ACCURACY), map);
-
-					Log.e("PR", "TM.14");
+					if (map.get(LeafNode.PREDICTION) != null)
+						me.transmitPrediction(context, map.get(LeafNode.PREDICTION).toString(), (Double) map.get(LeafNode.ACCURACY), map);
 				}
 				else if (value instanceof Double)
 				{
-					Log.e("PR", "TM.15");
 					Double doubleValue = (Double) value;
 
 					me.transmitPrediction(context, doubleValue.doubleValue(), me._accuracy);
-					Log.e("PR", "TM.16");
 				}
 				else
 					me.transmitPrediction(context, value.toString(), me._accuracy);
-
-				Log.e("PR", "TM.17");
 			}
 		};
 		
-		Log.e("PR", "TM.5");
-
-		
 		Thread t = new Thread(r);
 		t.start();
-
-		Log.e("PR", "TM.6");
 	}
 
 	/**

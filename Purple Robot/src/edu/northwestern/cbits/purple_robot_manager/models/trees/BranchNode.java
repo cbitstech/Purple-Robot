@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map;
 
-import android.util.Log;
-
 public class BranchNode extends TreeNode 
 {
 	/**
@@ -357,15 +355,8 @@ public class BranchNode extends TreeNode
 	
 	public Map<String, Object> fetchPrediction(Map<String, Object> features) throws TreeNode.TreeNodeException
 	{
-		for (String key : features.keySet())
-		{
-//			Log.e("PR", "FEATURE " + key + " -- " + features.get(key));
-		}
-		
 		for (Condition condition : this._conditions)
 		{
-//			Log.e("PR", "CONDITION: " + condition);
-			
 			if (condition.evaluate(features))
 			{
 				// Test passed - recurse down the test's associated node and

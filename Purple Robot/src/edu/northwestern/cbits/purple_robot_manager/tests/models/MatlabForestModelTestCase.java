@@ -44,34 +44,10 @@ public class MatlabForestModelTestCase extends RobotTestCase
 		
 		Assert.assertEquals("MATFOREST103", model.getClass().getCanonicalName(), MatlabForestModel.class.getCanonicalName());
 		
-		Assert.assertEquals("MATFOREST103", "x17", model.mappedFeatureName("ACCX_FFT1"));
+		Assert.assertEquals("MATFOREST103", "x17", model.mappedFeatureName("p20featuresprobe_accx_fft_1"));
 		
-/*
-  		HashMap<String, Object> world = new HashMap<String, Object>();
- 		
-		// Outputs class at line 508.
-		world.put("x10", Double.valueOf(-1.0));
-		world.put("x91", Double.valueOf(-1.0));
-		world.put("x41", Double.valueOf(-2.0));
-		world.put("x6", Double.valueOf(-1.0));
-		
-		Model matlab = models.fetchModelByTitle(this._context, "Matlab Tree Model Test");
-
-		matlab.predict(this._context, world);
-		
-		try 
-		{
-			Thread.sleep(2000);
-		}
-		catch (InterruptedException e) 
-		{
-
-		}
-
-		Assert.assertEquals("MATLAB203", "3", matlab.latestPrediction(this._context).get(LeafNode.PREDICTION));
-*/
 		// Commented out to test P20 feature extractor...
-		// models.deleteModel(MatlabForestModelTestCase.MODEL_URI);
+		models.deleteModel(MatlabForestModelTestCase.MODEL_URI);
 	}
 	
 	public int estimatedMinutes() 
