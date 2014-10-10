@@ -9,7 +9,7 @@ import org.json.JSONException;
 
 import android.content.Context;
 import android.net.Uri;
-import android.util.Log;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.models.trees.LeafNode;

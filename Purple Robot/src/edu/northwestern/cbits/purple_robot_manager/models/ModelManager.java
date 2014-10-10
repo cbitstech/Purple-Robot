@@ -2,9 +2,13 @@ package edu.northwestern.cbits.purple_robot_manager.models;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
@@ -12,6 +16,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -20,21 +25,25 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.util.Slugify;
 
 public class ModelManager extends BroadcastReceiver
 {
+	private static final String PERSISTED_MODELS = "model_manager_peristed_models";
+
 	private static ModelManager _instance = null;
 
 	private Context _context = null;
 	private List<Model> _models = new ArrayList<Model>();
 	private HashMap<String, Object> _milieu = new HashMap<String, Object>();
 	private HashMap<String, String> _keyCache = new HashMap<String, String>();
+	
+	private HashSet<String> _modelUrls = new HashSet<String>();
 	
     private ModelManager(Context context) 
     {
@@ -48,6 +57,8 @@ public class ModelManager extends BroadcastReceiver
 		
 		LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(context);
 		localManager.registerReceiver(this, intentFilter);
+		
+		this.loadPersistedModels();
     }
 
 	public static ModelManager getInstance(Context context) 
@@ -111,8 +122,6 @@ public class ModelManager extends BroadcastReceiver
 	@SuppressLint("DefaultLocale")
 	public void onReceive(Context context, Intent intent) 
 	{
-		Log.e("PR", "MODEL MANAGER GOT INTENT");
-		
 		Bundle extras = intent.getExtras();
 
 		if (extras.containsKey("FROM_MODEL"))
@@ -146,12 +155,8 @@ public class ModelManager extends BroadcastReceiver
 			}
 		}
 		
-		Log.e("PR", "1 " + this.allModels(context).size());
-
 		for (Model model : this.allModels(context))
 		{
-			Log.e("PR", "1.1");
-			
 			HashMap<String, Object> snapshot = new HashMap<String, Object>();
 			
 			synchronized(this._milieu)
@@ -159,24 +164,15 @@ public class ModelManager extends BroadcastReceiver
 				snapshot.putAll(this._milieu);
 			}
 			
-			Log.e("PR", "1.2 " + snapshot.keySet().size());
-			
 			if (model != null)
 				model.predict(context, snapshot);
-
-			Log.e("PR", "1.3");
 		}
-
-		Log.e("PR", "2");
 	}
 
 	public Model fetchModelByName(Context context, String name) 
 	{
-		Log.e("PR", "MODELS COUNT: " + this._models.size());
-		
 		for (Model model : this._models)
 		{
-			Log.e("PR", "MODEL SEARCH: " + name + " =? " + model.name(context));
 			if (name.equals(model.name(context)))
 				return model;
 		}
@@ -188,11 +184,50 @@ public class ModelManager extends BroadcastReceiver
 	{
 		this.deleteModel(jsonUrl);
 		
+		this._modelUrls.add(jsonUrl);
+		
 		Model m = Model.modelForUrl(this._context, jsonUrl);
 		
-		Log.e("PR", "MODEL FOR " + jsonUrl + ": " + m);
 		if (m != null)
 			this._models.add(m);
+		
+		this.persistModels();
+	}
+
+	private void persistModels() 
+	{
+		JSONArray urls = new JSONArray();
+		
+		for (String url : this._modelUrls)
+		{
+			urls.put(url);
+		}
+		
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+		Editor e = prefs.edit();
+		e.putString(ModelManager.PERSISTED_MODELS, urls.toString());
+		e.commit();
+	}
+	
+	private void loadPersistedModels()
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+
+		try 
+		{
+			JSONArray urls = new JSONArray(prefs.getString(ModelManager.PERSISTED_MODELS, "[]"));
+
+			for (int i = 0; i < urls.length(); i++)
+			{
+				String url = urls.getString(i);
+				
+				this.addModel(url);
+			}
+		} 
+		catch (JSONException e) 
+		{
+			LogManager.getInstance(this._context).logException(e);
+		}
 	}
 
 	public void deleteModel(String jsonUrl) 
@@ -211,6 +246,10 @@ public class ModelManager extends BroadcastReceiver
 			
 			this._models.removeAll(toRemove);
 		}
+		
+		this._modelUrls.remove(jsonUrl);
+		
+		this.persistModels();
 	}
 
 	public void enableModel(String jsonUrl) 
@@ -261,15 +300,11 @@ public class ModelManager extends BroadcastReceiver
 
 	public Model fetchModelByTitle(Context context, String title) 
 	{
-		Log.e("PR", "LOOKING FOR MODEL NAMED: " + title);
-		
 		if (title == null)
 			return null;
 		
 		for (Model m : this._models)
 		{
-			Log.e("PR", "MODEL TITLE: " + title + " =? " + m.title(context));
-			
 			if (title.equals(m.title(context)))
 				return m;
 		}

@@ -18,7 +18,6 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.net.Uri;
-import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.http.commands.ExecuteSchemeCommand;
 import edu.northwestern.cbits.purple_robot_manager.http.commands.ExecuteJavaScriptCommand;
@@ -58,11 +57,7 @@ public class JsonScriptRequestHandler implements HttpRequestHandler
             
             JSONObject arguments = null;
             
-            Log.e("PR", "OG ENTITY STRING: " + entityString);
-
         	String jsonArg = URLDecoder.decode(entityString.substring(5)); // u.getQueryParameter("json");
-
-            Log.e("PR", "JSON ARG: " + jsonArg);
 
             try 
             {
@@ -96,9 +91,6 @@ public class JsonScriptRequestHandler implements HttpRequestHandler
                     	arguments = new JSONObject(jsonArg);
             		}
             	}
-            	
-            	Log.e("PR", "FINAL JSON OBJECT: " + arguments.toString(2));
-            	
 			} 
             catch (JSONException e) 
             {
