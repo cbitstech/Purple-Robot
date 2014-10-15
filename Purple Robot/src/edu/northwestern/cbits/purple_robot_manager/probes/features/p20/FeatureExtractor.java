@@ -53,9 +53,9 @@ public class FeatureExtractor
     	ACC_CROSS_XY_ABS, ACC_CROSS_YZ_ABS, ACC_CROSS_ZX_ABS, 
     	ACC_CROSS_XY_NORM, ACC_CROSS_YZ_NORM, ACC_CROSS_ZX_NORM, 
     	ACC_CROSS_XY_NORM_ABS, ACC_CROSS_YZ_NORM_ABS, ACC_CROSS_ZX_NORM_ABS, 
-    	ACCX_FFT_1, ACCX_FFT_2, ACCX_FFT_3, ACCX_FFT_4, ACCX_FFT_5, ACCX_FFT_6, ACCX_FFT_7, ACCX_FFT_8, ACCX_FFT_9, ACCX_FFT_10, 
-    	ACCY_FFT_1, ACCY_FFT_2, ACCY_FFT_3, ACCY_FFT_4, ACCY_FFT_5, ACCY_FFT_6, ACCY_FFT_7, ACCY_FFT_8, ACCY_FFT_9, ACCY_FFT_10, 
-    	ACCZ_FFT_1, ACCZ_FFT_2, ACCZ_FFT_3, ACCZ_FFT_4, ACCZ_FFT_5, ACCZ_FFT_6, ACCZ_FFT_7, ACCZ_FFT_8, ACCZ_FFT_9, ACCZ_FFT_10, 
+    	ACCX_FFT1, ACCX_FFT2, ACCX_FFT3, ACCX_FFT4, ACCX_FFT5, ACCX_FFT6, ACCX_FFT7, ACCX_FFT8, ACCX_FFT9, ACCX_FFT10, 
+    	ACCY_FFT1, ACCY_FFT2, ACCY_FFT3, ACCY_FFT4, ACCY_FFT5, ACCY_FFT6, ACCY_FFT7, ACCY_FFT8, ACCY_FFT9, ACCY_FFT10, 
+    	ACCZ_FFT1, ACCZ_FFT2, ACCZ_FFT3, ACCZ_FFT4, ACCZ_FFT5, ACCZ_FFT6, ACCZ_FFT7, ACCZ_FFT8, ACCZ_FFT9, ACCZ_FFT10, 
     	ACCX_HIST1, ACCX_HIST2, ACCX_HIST3, ACCX_HIST4, ACCX_HIST5, ACCX_HIST6, 
     	ACCY_HIST1, ACCY_HIST2, ACCY_HIST3, ACCY_HIST4, ACCY_HIST5, ACCY_HIST6, 
     	ACCZ_HIST1, ACCZ_HIST2, ACCZ_HIST3, ACCZ_HIST4, ACCZ_HIST5, ACCZ_HIST6,
@@ -76,9 +76,9 @@ public class FeatureExtractor
     	GYR_CROSS_XY_ABS, GYR_CROSS_YZ_ABS, GYR_CROSS_ZX_ABS, 
     	GYR_CROSS_XY_NORM, GYR_CROSS_YZ_NORM, GYR_CROSS_ZX_NORM, 
     	GYR_CROSS_XY_NORM_ABS, GYR_CROSS_YZ_NORM_ABS, GYR_CROSS_ZX_NORM_ABS, 
-    	GYRX_FFT_1, GYRX_FFT_2, GYRX_FFT_3, GYRX_FFT_4, GYRX_FFT_5, GYRX_FFT_6, GYRX_FFT_7, GYRX_FFT_8, GYRX_FFT_9, GYRX_FFT_10, 
-    	GYRY_FFT_1, GYRY_FFT_2, GYRY_FFT_3, GYRY_FFT_4, GYRY_FFT_5, GYRY_FFT_6, GYRY_FFT_7, GYRY_FFT_8, GYRY_FFT_9, GYRY_FFT_10, 
-    	GYRZ_FFT_1, GYRZ_FFT_2, GYRZ_FFT_3, GYRZ_FFT_4, GYRZ_FFT_5, GYRZ_FFT_6, GYRZ_FFT_7, GYRZ_FFT_8, GYRZ_FFT_9, GYRZ_FFT_10, 
+    	GYRX_FFT1, GYRX_FFT2, GYRX_FFT3, GYRX_FFT4, GYRX_FFT5, GYRX_FFT6, GYRX_FFT7, GYRX_FFT8, GYRX_FFT9, GYRX_FFT10, 
+    	GYRY_FFT1, GYRY_FFT2, GYRY_FFT3, GYRY_FFT4, GYRY_FFT5, GYRY_FFT6, GYRY_FFT7, GYRY_FFT8, GYRY_FFT9, GYRY_FFT10, 
+    	GYRZ_FFT1, GYRZ_FFT2, GYRZ_FFT3, GYRZ_FFT4, GYRZ_FFT5, GYRZ_FFT6, GYRZ_FFT7, GYRZ_FFT8, GYRZ_FFT9, GYRZ_FFT10, 
     	GYRX_HIST1, GYRX_HIST2, GYRX_HIST3, GYRX_HIST4, GYRX_HIST5, GYRX_HIST6, 
     	GYRY_HIST1, GYRY_HIST2, GYRY_HIST3, GYRY_HIST4, GYRY_HIST5, GYRY_HIST6, 
     	GYRZ_HIST1, GYRZ_HIST2, GYRZ_HIST3, GYRZ_HIST4, GYRZ_HIST5, GYRZ_HIST6, 
@@ -178,9 +178,9 @@ public class FeatureExtractor
     	    	features.put(Feature.ACCY_STD, std[1]); 
     	    	features.put(Feature.ACCZ_STD, std[2]); 
 
-    	    	features.put(Feature.ACCX_SKEW, skewness[0]); 
-    	    	features.put(Feature.ACCY_SKEW, skewness[1]); 
-    	    	features.put(Feature.ACCZ_SKEW, skewness[2]); 
+    	    	features.put(Feature.ACCX_SKEW, skewness[0]);
+    	    	features.put(Feature.ACCY_SKEW, skewness[1]);
+    	    	features.put(Feature.ACCZ_SKEW, skewness[2]);
 
     	    	features.put(Feature.ACCX_KURT, kurtosis[0]); 
     	    	features.put(Feature.ACCY_KURT, kurtosis[1]); 
@@ -462,7 +462,7 @@ public class FeatureExtractor
 
         /*
         	if (hasFFT)
-            	Complex[] fft_values = fft.transform(signal, TransformType.FORWARD);
+            	Complex[] FFTvalues = fft.transform(signal, TransformType.FORWARD);
 
         	//	int i=0;
          */
@@ -474,73 +474,73 @@ public class FeatureExtractor
             switch (clip.getType())
             {
             	case Clip.ACCELEROMETER:
-        	    	features.put(Feature.ACCX_FFT_1, 0.0); 
-        	    	features.put(Feature.ACCX_FFT_2, 0.0); 
-        	    	features.put(Feature.ACCX_FFT_3, 0.0); 
-        	    	features.put(Feature.ACCX_FFT_4, 0.0); 
-        	    	features.put(Feature.ACCX_FFT_5, 0.0); 
-        	    	features.put(Feature.ACCX_FFT_6, 0.0); 
-        	    	features.put(Feature.ACCX_FFT_7, 0.0); 
-        	    	features.put(Feature.ACCX_FFT_8, 0.0); 
-        	    	features.put(Feature.ACCX_FFT_9, 0.0); 
-        	    	features.put(Feature.ACCX_FFT_10, 0.0); 
+        	    	features.put(Feature.ACCX_FFT1, 0.0); 
+        	    	features.put(Feature.ACCX_FFT2, 0.0); 
+        	    	features.put(Feature.ACCX_FFT3, 0.0); 
+        	    	features.put(Feature.ACCX_FFT4, 0.0); 
+        	    	features.put(Feature.ACCX_FFT5, 0.0); 
+        	    	features.put(Feature.ACCX_FFT6, 0.0); 
+        	    	features.put(Feature.ACCX_FFT7, 0.0); 
+        	    	features.put(Feature.ACCX_FFT8, 0.0); 
+        	    	features.put(Feature.ACCX_FFT9, 0.0); 
+        	    	features.put(Feature.ACCX_FFT10, 0.0); 
 
-        	    	features.put(Feature.ACCY_FFT_1, 0.0); 
-        	    	features.put(Feature.ACCY_FFT_2, 0.0); 
-        	    	features.put(Feature.ACCY_FFT_3, 0.0); 
-        	    	features.put(Feature.ACCY_FFT_4, 0.0); 
-        	    	features.put(Feature.ACCY_FFT_5, 0.0); 
-        	    	features.put(Feature.ACCY_FFT_6, 0.0); 
-        	    	features.put(Feature.ACCY_FFT_7, 0.0); 
-        	    	features.put(Feature.ACCY_FFT_8, 0.0); 
-        	    	features.put(Feature.ACCY_FFT_9, 0.0); 
-        	    	features.put(Feature.ACCY_FFT_10, 0.0); 
+        	    	features.put(Feature.ACCY_FFT1, 0.0); 
+        	    	features.put(Feature.ACCY_FFT2, 0.0); 
+        	    	features.put(Feature.ACCY_FFT3, 0.0); 
+        	    	features.put(Feature.ACCY_FFT4, 0.0); 
+        	    	features.put(Feature.ACCY_FFT5, 0.0); 
+        	    	features.put(Feature.ACCY_FFT6, 0.0); 
+        	    	features.put(Feature.ACCY_FFT7, 0.0); 
+        	    	features.put(Feature.ACCY_FFT8, 0.0); 
+        	    	features.put(Feature.ACCY_FFT9, 0.0); 
+        	    	features.put(Feature.ACCY_FFT10, 0.0); 
 
-        	    	features.put(Feature.ACCZ_FFT_1, 0.0); 
-        	    	features.put(Feature.ACCZ_FFT_2, 0.0); 
-        	    	features.put(Feature.ACCZ_FFT_3, 0.0); 
-        	    	features.put(Feature.ACCZ_FFT_4, 0.0); 
-        	    	features.put(Feature.ACCZ_FFT_5, 0.0); 
-        	    	features.put(Feature.ACCZ_FFT_6, 0.0); 
-        	    	features.put(Feature.ACCZ_FFT_7, 0.0); 
-        	    	features.put(Feature.ACCZ_FFT_8, 0.0); 
-        	    	features.put(Feature.ACCZ_FFT_9, 0.0); 
-        	    	features.put(Feature.ACCZ_FFT_10, 0.0); 
+        	    	features.put(Feature.ACCZ_FFT1, 0.0); 
+        	    	features.put(Feature.ACCZ_FFT2, 0.0); 
+        	    	features.put(Feature.ACCZ_FFT3, 0.0); 
+        	    	features.put(Feature.ACCZ_FFT4, 0.0); 
+        	    	features.put(Feature.ACCZ_FFT5, 0.0); 
+        	    	features.put(Feature.ACCZ_FFT6, 0.0); 
+        	    	features.put(Feature.ACCZ_FFT7, 0.0); 
+        	    	features.put(Feature.ACCZ_FFT8, 0.0); 
+        	    	features.put(Feature.ACCZ_FFT9, 0.0); 
+        	    	features.put(Feature.ACCZ_FFT10, 0.0); 
 
             		break;
             	case Clip.GYROSCOPE:
-        	    	features.put(Feature.GYRX_FFT_1, 0.0); 
-        	    	features.put(Feature.GYRX_FFT_2, 0.0); 
-        	    	features.put(Feature.GYRX_FFT_3, 0.0); 
-        	    	features.put(Feature.GYRX_FFT_4, 0.0); 
-        	    	features.put(Feature.GYRX_FFT_5, 0.0); 
-        	    	features.put(Feature.GYRX_FFT_6, 0.0); 
-        	    	features.put(Feature.GYRX_FFT_7, 0.0); 
-        	    	features.put(Feature.GYRX_FFT_8, 0.0); 
-        	    	features.put(Feature.GYRX_FFT_9, 0.0); 
-        	    	features.put(Feature.GYRX_FFT_10, 0.0); 
+        	    	features.put(Feature.GYRX_FFT1, 0.0); 
+        	    	features.put(Feature.GYRX_FFT2, 0.0); 
+        	    	features.put(Feature.GYRX_FFT3, 0.0); 
+        	    	features.put(Feature.GYRX_FFT4, 0.0); 
+        	    	features.put(Feature.GYRX_FFT5, 0.0); 
+        	    	features.put(Feature.GYRX_FFT6, 0.0); 
+        	    	features.put(Feature.GYRX_FFT7, 0.0); 
+        	    	features.put(Feature.GYRX_FFT8, 0.0); 
+        	    	features.put(Feature.GYRX_FFT9, 0.0); 
+        	    	features.put(Feature.GYRX_FFT10, 0.0); 
 
-        	    	features.put(Feature.GYRY_FFT_1, 0.0); 
-        	    	features.put(Feature.GYRY_FFT_2, 0.0); 
-        	    	features.put(Feature.GYRY_FFT_3, 0.0); 
-        	    	features.put(Feature.GYRY_FFT_4, 0.0); 
-        	    	features.put(Feature.GYRY_FFT_5, 0.0); 
-        	    	features.put(Feature.GYRY_FFT_6, 0.0); 
-        	    	features.put(Feature.GYRY_FFT_7, 0.0); 
-        	    	features.put(Feature.GYRY_FFT_8, 0.0); 
-        	    	features.put(Feature.GYRY_FFT_9, 0.0); 
-        	    	features.put(Feature.GYRY_FFT_10, 0.0); 
+        	    	features.put(Feature.GYRY_FFT1, 0.0); 
+        	    	features.put(Feature.GYRY_FFT2, 0.0); 
+        	    	features.put(Feature.GYRY_FFT3, 0.0); 
+        	    	features.put(Feature.GYRY_FFT4, 0.0); 
+        	    	features.put(Feature.GYRY_FFT5, 0.0); 
+        	    	features.put(Feature.GYRY_FFT6, 0.0); 
+        	    	features.put(Feature.GYRY_FFT7, 0.0); 
+        	    	features.put(Feature.GYRY_FFT8, 0.0); 
+        	    	features.put(Feature.GYRY_FFT9, 0.0); 
+        	    	features.put(Feature.GYRY_FFT10, 0.0); 
 
-        	    	features.put(Feature.GYRZ_FFT_1, 0.0); 
-        	    	features.put(Feature.GYRZ_FFT_2, 0.0); 
-        	    	features.put(Feature.GYRZ_FFT_3, 0.0); 
-        	    	features.put(Feature.GYRZ_FFT_4, 0.0); 
-        	    	features.put(Feature.GYRZ_FFT_5, 0.0); 
-        	    	features.put(Feature.GYRZ_FFT_6, 0.0); 
-        	    	features.put(Feature.GYRZ_FFT_7, 0.0); 
-        	    	features.put(Feature.GYRZ_FFT_8, 0.0); 
-        	    	features.put(Feature.GYRZ_FFT_9, 0.0); 
-        	    	features.put(Feature.GYRZ_FFT_10, 0.0); 
+        	    	features.put(Feature.GYRZ_FFT1, 0.0); 
+        	    	features.put(Feature.GYRZ_FFT2, 0.0); 
+        	    	features.put(Feature.GYRZ_FFT3, 0.0); 
+        	    	features.put(Feature.GYRZ_FFT4, 0.0); 
+        	    	features.put(Feature.GYRZ_FFT5, 0.0); 
+        	    	features.put(Feature.GYRZ_FFT6, 0.0); 
+        	    	features.put(Feature.GYRZ_FFT7, 0.0); 
+        	    	features.put(Feature.GYRZ_FFT8, 0.0); 
+        	    	features.put(Feature.GYRZ_FFT9, 0.0); 
+        	    	features.put(Feature.GYRZ_FFT10, 0.0); 
 
         	    	break;
             }
