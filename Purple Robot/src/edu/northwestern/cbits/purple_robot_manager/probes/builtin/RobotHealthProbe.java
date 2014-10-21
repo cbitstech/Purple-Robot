@@ -18,6 +18,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Looper;
 import android.os.StatFs;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
@@ -195,6 +196,9 @@ public class RobotHealthProbe extends Probe
 									if (me._checking)
 										return;
 
+									if (Looper.myLooper() == null)
+										Looper.prepare();
+									
 									me._checking = true;
 									
 									int pendingCount = 0;

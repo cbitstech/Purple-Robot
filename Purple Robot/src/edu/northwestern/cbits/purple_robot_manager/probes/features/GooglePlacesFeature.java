@@ -22,6 +22,7 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import edu.emory.mathcs.backport.java.util.Arrays;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -182,6 +183,8 @@ public class GooglePlacesFeature extends Feature
 
 		String jsonString = IOUtils.toString(in);
 		
+		Log.e("PR", "PLACES: " + jsonString);
+		
 		in.close();
 
 		JSONObject json = new JSONObject(jsonString);
@@ -194,30 +197,30 @@ public class GooglePlacesFeature extends Feature
 		
 		for (String type : availableTypes)
 		{
+			Log.e("PR", "GPLACE: PUT TYPE " + type);
+			
 			place.put(type, Integer.valueOf(0));
 		}
 		
-		if (results.length() > 0)
+		for (int i = 0; i < results.length(); i++)
 		{
-			for (int i = 0; i < results.length(); i++)
+			JSONObject result = results.getJSONObject(i);
+			
+			JSONArray types = result.getJSONArray("types");
+			
+			for (int j = 0; j < types.length(); j++)
 			{
-				JSONObject result = results.getJSONObject(i);
+				String type = types.getString(j);
 				
-				JSONArray types = result.getJSONArray("types");
+				Integer count = place.get(type);
 				
-				for (int j = 0; j < types.length(); j++)
-				{
-					String type = types.getString(j);
-					
-					Integer count = place.get(type);
-					
-					if (count == null)
-						count = Integer.valueOf(0);
-					
-					count = Integer.valueOf(count.intValue() + 1);
-					
-					place.put(type, count);
-				}
+				if (count == null)
+					count = Integer.valueOf(0);
+				
+				count = Integer.valueOf(count.intValue() + 1);
+				
+				Log.e("PR", "GPLACE: " + type + " -- " + count);
+				place.put(type, count);
 			}
 		}
 		
@@ -232,10 +235,24 @@ public class GooglePlacesFeature extends Feature
 		for (String key : bundle.keySet())
 		{
 			Object o = bundle.get(key);
-			
-			if (o instanceof Integer)
+
+			if ("TIMESTAMP".equals(key))
+			{
+				
+			}
+			else if (o instanceof Integer)
 			{
 				Integer count = (Integer) o;
+				
+				if (count.intValue() > maxCount)
+				{
+					frequentPlace = key;
+					maxCount = count.intValue();
+				}
+			}
+			else if (o instanceof Double)
+			{
+				Double count = (Double) o;
 				
 				if (count.intValue() > maxCount)
 				{

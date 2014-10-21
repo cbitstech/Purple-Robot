@@ -70,7 +70,6 @@ public class JSONHelper
 		return value;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private static JSONObject fromPairs(Pair pair) throws JSONException
 	{
 		JSONObject json = new JSONObject();

@@ -52,6 +52,7 @@ public class ContactCalibrationHelper
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public static String getGroup(Context context, String key, boolean isPhone) 
 	{
 		if (key == null)
@@ -99,7 +100,8 @@ public class ContactCalibrationHelper
 		e.commit();
 	}
 
-    public static List<ContactRecord> fetchContactRecords(Context context)
+    @SuppressWarnings("deprecation")
+	public static List<ContactRecord> fetchContactRecords(Context context)
     {
     	ArrayList<ContactRecord> contacts = new ArrayList<ContactRecord>();
     	

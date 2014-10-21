@@ -43,6 +43,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.net.Uri;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
@@ -211,12 +212,17 @@ public class LegacyJSONConfigFile
 							{
 								try
 								{
+									if (Looper.myLooper() == null)
+										Looper.prepare();
+									
 									SchemeEngine scheme = new SchemeEngine(context, null);
 									scheme.evaluateSource(scriptString);
 								}
 								catch (final Exception e)
 								{
 									LogManager.getInstance(context).logException(e);
+									
+									e.printStackTrace();
 									
 									if (context instanceof Activity)
 									{
@@ -226,7 +232,7 @@ public class LegacyJSONConfigFile
 										{
 											public void run()
 											{
-												Toast.makeText(activity, e.getMessage(), Toast.LENGTH_LONG).show();
+												Toast.makeText(activity, "100: " + e.getMessage(), Toast.LENGTH_LONG).show();
 											}
 										});
 									}
@@ -298,7 +304,7 @@ public class LegacyJSONConfigFile
 												{
 													public void run()
 													{
-														Toast.makeText(activity, e.getMessage(), Toast.LENGTH_LONG).show();
+														Toast.makeText(activity, "200: " + e.getMessage(), Toast.LENGTH_LONG).show();
 													}
 												});
 											}
@@ -315,7 +321,7 @@ public class LegacyJSONConfigFile
 												{
 													public void run()
 													{
-														Toast.makeText(activity, e.getMessage(), Toast.LENGTH_LONG).show();
+														Toast.makeText(activity, "300: " + e.getMessage(), Toast.LENGTH_LONG).show();
 													}
 												});
 											}
@@ -400,7 +406,6 @@ public class LegacyJSONConfigFile
 				
 				Map<String, Object> map = new HashMap<String, Object>();
 						
-				@SuppressWarnings("unchecked")
 				Iterator<String> keys = json.keys();
 				
 				while (keys.hasNext())

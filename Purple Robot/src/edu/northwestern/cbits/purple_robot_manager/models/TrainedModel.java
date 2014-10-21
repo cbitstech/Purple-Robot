@@ -164,8 +164,6 @@ public abstract class TrainedModel extends Model
 		t.start();
 	}
 	
-	
-	@SuppressWarnings("unchecked")
 	protected void setFeatureMap(Context context, JSONObject mapJson) 
 	{
 		Iterator<String> keys = mapJson.keys();

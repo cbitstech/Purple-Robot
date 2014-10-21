@@ -5,9 +5,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 
-import org.apache.commons.math3.transform.DftNormalization;
-import org.apache.commons.math3.transform.FastFourierTransformer;
-
 import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 
@@ -18,7 +15,8 @@ import edu.emory.mathcs.backport.java.util.Arrays;
 
 public class FeatureExtractor 
 {
-    private long _windowSize = -1;
+    @SuppressWarnings("unused")
+	private long _windowSize = -1;
     private int _dimensions = -1;
 
     private boolean _hasFFT = false;

@@ -414,4 +414,11 @@ public class JavaScriptEngine extends BaseScriptEngine
 			
 		return new NativeArray(values);
 	}
+	
+	public boolean updateProbe(NativeObject params)
+	{
+		Map<String, Object> values = JavaScriptEngine.nativeToMap(params);
+		
+		return super.updateProbe(values);
+	}
 }

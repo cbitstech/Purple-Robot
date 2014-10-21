@@ -1,7 +1,6 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -26,7 +25,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
-
 import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -312,7 +310,6 @@ public class ManagerService extends IntentService
 							{
 								JSONObject paramsObj = new JSONObject(launchParams);
 
-								@SuppressWarnings("unchecked")
 								Iterator<String> keys = paramsObj.keys();
 
 								while (keys.hasNext())

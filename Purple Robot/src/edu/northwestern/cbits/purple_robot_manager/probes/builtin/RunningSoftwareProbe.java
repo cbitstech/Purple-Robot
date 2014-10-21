@@ -94,6 +94,7 @@ public class RunningSoftwareProbe extends Probe
 						
 						Runnable r = new Runnable()
 						{
+							@SuppressWarnings("deprecation")
 							public void run() 
 							{
 								Bundle bundle = new Bundle();

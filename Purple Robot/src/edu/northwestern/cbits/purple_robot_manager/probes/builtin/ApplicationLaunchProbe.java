@@ -117,6 +117,7 @@ public class ApplicationLaunchProbe extends Probe
 			
 			context.registerReceiver(new BroadcastReceiver()
 			{
+				@SuppressWarnings("deprecation")
 				public void onReceive(final Context context, Intent intent)
 				{
 					ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);

@@ -36,7 +36,6 @@ import android.preference.PreferenceScreen;
 import android.widget.Toast;
 
 import edu.northwestern.cbits.anthracite.LogService;
-import edu.northwestern.cbits.anthracite.Logger;
 
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.PersistentService;

@@ -138,8 +138,9 @@ public class TouchEventsProbe extends Probe
 		else if (this._overlay != null)
 		{
 			WindowManager wm = (WindowManager) this._context.getSystemService(Context.WINDOW_SERVICE);
-
-			wm.removeView(this._overlay);
+			
+			if (this._overlay.isAttachedToWindow())
+				wm.removeView(this._overlay);
 			
 			this._overlay = null;
 		}

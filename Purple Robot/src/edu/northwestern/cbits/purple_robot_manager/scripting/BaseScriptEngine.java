@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -1348,7 +1347,6 @@ public abstract class BaseScriptEngine
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	private Map<String, Object> jsonToMap(JSONObject object) 
 	{
 		Map<String, Object> map = new HashMap<String, Object>();

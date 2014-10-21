@@ -42,8 +42,6 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class InstagramProbe extends Probe
 {
-	public static final String CONSUMER_KEY = "47f0718396bc4bafbfad940c7e15ab3b";
-	public static final String CONSUMER_SECRET = "f39d3b9a33b347a2bda462ef5f373935";
 // 	public static final String CALLBACK = "http://purple.robot.com/oauth/instagram";
 	public static final String CALLBACK = "http://tech.cbits.northwestern.edu/oauth/instagram";
 
@@ -141,8 +139,8 @@ public class InstagramProbe extends Probe
 							
 		                	ServiceBuilder builder = new ServiceBuilder();
 		                	builder = builder.provider(InstagramApi.class);
-		                	builder = builder.apiKey(InstagramProbe.CONSUMER_KEY);
-		                	builder = builder.apiSecret(InstagramProbe.CONSUMER_SECRET);
+		                	builder = builder.apiKey(context.getString(R.string.instagram_consumer_key));
+		                	builder = builder.apiSecret(context.getString(R.string.instagram_consumer_secret));
 		                	
 		                	final OAuthService service = builder.build();
 		                	
@@ -268,8 +266,8 @@ public class InstagramProbe extends Probe
         Intent intent = new Intent(context, OAuthActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		
-		intent.putExtra(OAuthActivity.CONSUMER_KEY, CONSUMER_KEY);
-		intent.putExtra(OAuthActivity.CONSUMER_SECRET, CONSUMER_SECRET);
+		intent.putExtra(OAuthActivity.CONSUMER_KEY, context.getString(R.string.instagram_consumer_key));
+		intent.putExtra(OAuthActivity.CONSUMER_SECRET, context.getString(R.string.instagram_consumer_secret));
 		intent.putExtra(OAuthActivity.REQUESTER, "instagram");
 		intent.putExtra(OAuthActivity.CALLBACK_URL, CALLBACK);
 		

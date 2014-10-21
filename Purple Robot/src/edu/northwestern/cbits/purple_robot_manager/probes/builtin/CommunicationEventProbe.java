@@ -89,6 +89,7 @@ public class CommunicationEventProbe extends Probe
 		e.commit();
 	}
 
+	@SuppressWarnings("deprecation")
 	public boolean isEnabled(Context context)
 	{
 		SharedPreferences prefs = Probe.getPreferences(context);
