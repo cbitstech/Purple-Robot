@@ -97,6 +97,10 @@ public class MatlabForestModel extends WekaTreeModel
 					count = Integer.valueOf(count.intValue() + 1);
 					counts.put(treePrediction.toString(), count);
 				} 
+				catch (TreeNode.TreeNodeException e)
+				{
+//					e.printStackTrace();
+				}
 				catch (Exception e) 
 				{
 					LogManager.getInstance(context).logException(e);

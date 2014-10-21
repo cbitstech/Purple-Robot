@@ -34,8 +34,6 @@ import edu.northwestern.cbits.purple_robot_manager.oauth.InstagramApi;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.FoursquareProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.InstagramProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LinkedInProbe;
-import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TwitterProbe;
-import edu.northwestern.cbits.purple_robot_manager.probes.features.FitbitApiFeature;
 
 public class OAuthActivity extends Activity
 {
@@ -189,34 +187,34 @@ public class OAuthActivity extends Activity
 	        			if ("fitbit".equals(requester))
 	        			{
 	            			apiClass = FitbitApi.class;
-	            			consumerKey = FitbitApiFeature.CONSUMER_KEY;
-	            			consumerSecret = FitbitApiFeature.CONSUMER_SECRET;
+	            			consumerKey = this.getString(R.string.fitbit_consumer_key);
+	            			consumerSecret = this.getString(R.string.fitbit_consumer_secret);
 	        			}
 	        			else if ("twitter".equals(requester))
 	        			{
 	            			apiClass = TwitterApi.SSL.class;
-	            			consumerKey = TwitterProbe.CONSUMER_KEY;
-	            			consumerSecret = TwitterProbe.CONSUMER_SECRET;
+	            			consumerKey = this.getString(R.string.twitter_consumer_key);
+	            			consumerSecret = this.getString(R.string.twitter_consumer_secret);
 	        			}
 	        			else if ("instagram".equals(requester))
 	        			{
 	            			apiClass = InstagramApi.class;
-	            			consumerKey = InstagramProbe.CONSUMER_KEY;
-	            			consumerSecret = InstagramProbe.CONSUMER_SECRET;
+	            			consumerKey = this.getString(R.string.instagram_consumer_key);
+	            			consumerSecret = this.getString(R.string.instagram_consumer_secret);
 	            			callback = InstagramProbe.CALLBACK;
 	        			}
 	                	else if ("linkedin".equalsIgnoreCase(requester))
 	                	{
 	            			apiClass = LinkedInApi.class;
-	            			consumerKey = LinkedInProbe.CONSUMER_KEY;
-	            			consumerSecret = LinkedInProbe.CONSUMER_SECRET;
+	            			consumerKey = this.getString(R.string.linkedin_consumer_key);
+	            			consumerSecret = this.getString(R.string.linkedin_consumer_secret);
 	            			callback = LinkedInProbe.CALLBACK;
 	                	}
 	                	else if ("foursquare".equalsIgnoreCase(requester))
 	                	{
 	            			apiClass = Foursquare2Api.class;
-	            			consumerKey = FoursquareProbe.CONSUMER_KEY;
-	            			consumerSecret = FoursquareProbe.CONSUMER_SECRET;
+	            			consumerKey = this.getString(R.string.foursquare_consumer_key);
+	            			consumerSecret = this.getString(R.string.foursquare_consumer_secret);
 	            			callback = FoursquareProbe.CALLBACK;
 	                	}
 	        			

@@ -56,57 +56,84 @@ public class Clip
         }
         else 
         {
-            if (this._timestamps.size() == 0)
-            {
-            	this.pushValues(values, timestamp);
-            }
-            else 
-            {
-            	Long first = this._timestamps.get(0);
-            	
-                while ((timestamp - first > this._windowSize) && (this._timestamps.size() > 1)) 
-                {
-                    this._timestamps.remove(0);
-                    this._values.remove(0);
-                    
-                    first = this._timestamps.get(0);
-                }
-                
-                if (timestamp - first > this._windowSize) 
-                {
-                	// Clear values if gap larger than _windowSize...
-                	
-                    this._values.clear();
-                    this._timestamps.clear();
-
-                    Log.e("PR", "Clip: There has been a gap longer than " + this._windowSize + "ms.");
-                }
-                
-            	this.pushValues(values, timestamp);
-            }
+    		synchronized(this)
+    		{
+	            if (this._timestamps.size() == 0)
+	            {
+	            	this.pushValues(values, timestamp);
+	            }
+	            else 
+	            {
+	            	Long first = this._timestamps.get(0);
+	            	
+	                while ((timestamp - first > this._windowSize) && (this._timestamps.size() > 1)) 
+	                {
+	                    this._timestamps.remove(0);
+	                    this._values.remove(0);
+	                    
+	                    first = this._timestamps.get(0);
+	                }
+	                
+	                if (timestamp - first > this._windowSize) 
+	                {
+	                	// Clear values if gap larger than _windowSize...
+	                	
+	                    this._values.clear();
+	                    this._timestamps.clear();
+	            		
+	                    Log.e("PR", "Clip: There has been a gap longer than " + this._windowSize + "ms.");
+	                }
+	                
+	            	this.pushValues(values, timestamp);
+	            }
+    		}
         }
     }
 
     private void pushValues(double[] values, long timestamp) 
     {
-        this._timestamps.add(timestamp);
-        
-        this._values.add(Arrays.copyOf(values, values.length));
+		synchronized(this)
+		{
+	        this._timestamps.add(timestamp);
+	        
+	        this._values.add(Arrays.copyOf(values, values.length));
+		}
     }
 
 	public List<double[]> getValues() 
 	{
-		return this._values;
+		List<double[]> values = new ArrayList<double[]>();
+
+		synchronized(this)
+		{
+			values.addAll(this._values);
+		}
+		
+		return values;
 	}
 
 	public List<Long> getTimestamps() 
 	{
-		return this._timestamps;
+		List<Long> timestamps = new ArrayList<Long>();
+
+		synchronized(this)
+		{
+			timestamps.addAll(this._timestamps);
+		}
+		
+		return timestamps;
 	}
 
 	public long getLastTimestamp() 
 	{
-		return this._timestamps.get(this._timestamps.size() - 1);
+		long timestamp = 0;
+		
+		synchronized(this)
+		{
+			timestamp = this._timestamps.get(this._timestamps.size() - 1);
+		}
+		
+		return timestamp;
 	}
 
 	public int getType() 

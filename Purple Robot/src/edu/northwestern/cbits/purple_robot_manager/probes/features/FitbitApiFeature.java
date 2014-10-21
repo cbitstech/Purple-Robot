@@ -35,9 +35,6 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class FitbitApiFeature extends Feature 
 {
-	public static final String CONSUMER_KEY = "7bc8998f319c43eb99c72f3e3d63dbd9";
-	public static final String CONSUMER_SECRET = "85c9ef8be7c14d668b4b9bf782f1c0b5";
-
 	protected static final String VERY_ACTIVE_MINUTES = "VERY_ACTIVE_MINUTES";
 	protected static final String LIGHTLY_ACTIVE_MINUTES = "LIGHTLY_ACTIVE_MINUTES";
 	protected static final String STEPS = "STEPS";
@@ -206,8 +203,8 @@ public class FitbitApiFeature extends Feature
 										
 					                	ServiceBuilder builder = new ServiceBuilder();
 					                	builder = builder.provider(FitbitApi.class);
-					                	builder = builder.apiKey(FitbitApiFeature.CONSUMER_KEY);
-					                	builder = builder.apiSecret(FitbitApiFeature.CONSUMER_SECRET);
+					                	builder = builder.apiKey(context.getString(R.string.fitbit_consumer_key));
+					                	builder = builder.apiSecret(context.getString(R.string.fitbit_consumer_secret));
 					                	
 					                	final OAuthService service = builder.build();
 					                	
@@ -439,8 +436,8 @@ public class FitbitApiFeature extends Feature
         Intent intent = new Intent(context, OAuthActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		
-		intent.putExtra(OAuthActivity.CONSUMER_KEY, CONSUMER_KEY);
-		intent.putExtra(OAuthActivity.CONSUMER_SECRET, CONSUMER_SECRET);
+		intent.putExtra(OAuthActivity.CONSUMER_KEY, context.getString(R.string.fitbit_consumer_key));
+		intent.putExtra(OAuthActivity.CONSUMER_SECRET, context.getString(R.string.fitbit_consumer_secret));
 		intent.putExtra(OAuthActivity.REQUESTER, "fitbit");
 		intent.putExtra(OAuthActivity.CALLBACK_URL, "http://pr-oauth/oauth/fitbit");
 		

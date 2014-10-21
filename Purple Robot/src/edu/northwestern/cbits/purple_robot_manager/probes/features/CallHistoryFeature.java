@@ -79,6 +79,7 @@ public class CallHistoryFeature extends Feature
 		e.commit();
 	}		
 
+	@SuppressWarnings("deprecation")
 	public boolean isEnabled(final Context context)
 	{
 		final SharedPreferences prefs = Probe.getPreferences(context);

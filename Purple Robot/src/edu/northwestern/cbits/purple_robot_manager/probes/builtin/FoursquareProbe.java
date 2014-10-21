@@ -33,6 +33,7 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.OAuthActivity;
@@ -43,8 +44,6 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class FoursquareProbe extends Probe
 {
-	public static final String CONSUMER_KEY = "LPF5BLAFJNO1MRGULIOYFKBLWMGQTFAR3WPHZJ1JLDD24S25";
-	public static final String CONSUMER_SECRET = "O1N4EAXORJSLT50PSUOSYYIONS0MCQMWAKK1I1ZLSP0TIKGU";
 	public static final String CALLBACK = "http://purple.robot.com/oauth/foursquare";
 
 	static final boolean DEFAULT_ENABLED = false;
@@ -142,8 +141,8 @@ public class FoursquareProbe extends Probe
 								
 			                	ServiceBuilder builder = new ServiceBuilder();
 			                	builder = builder.provider(TwitterApi.class);
-			                	builder = builder.apiKey(FoursquareProbe.CONSUMER_KEY);
-			                	builder = builder.apiSecret(FoursquareProbe.CONSUMER_SECRET);
+			                	builder = builder.apiKey(context.getString(R.string.foursquare_consumer_key));
+			                	builder = builder.apiSecret(context.getString(R.string.foursquare_consumer_secret));
 			                	
 			                	final OAuthService service = builder.build();
 			                	
@@ -275,8 +274,8 @@ public class FoursquareProbe extends Probe
         Intent intent = new Intent(context, OAuthActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		
-		intent.putExtra(OAuthActivity.CONSUMER_KEY, CONSUMER_KEY);
-		intent.putExtra(OAuthActivity.CONSUMER_SECRET, CONSUMER_SECRET);
+		intent.putExtra(OAuthActivity.CONSUMER_KEY, context.getString(R.string.foursquare_consumer_key));
+		intent.putExtra(OAuthActivity.CONSUMER_SECRET, context.getString(R.string.foursquare_consumer_secret));
 		intent.putExtra(OAuthActivity.REQUESTER, "foursquare");
 		intent.putExtra(OAuthActivity.CALLBACK_URL, "http://purple.robot.com/oauth/foursquare");
 		
@@ -444,7 +443,9 @@ public class FoursquareProbe extends Probe
 
 		if (prefs.getBoolean("config_probe_foursquare_enabled", FoursquareProbe.DEFAULT_ENABLED))
 		{
-			String urlString = "https://api.foursquare.com/v2/venues/search?client_id=" + FoursquareProbe.CONSUMER_KEY + "&client_secret=" + FoursquareProbe.CONSUMER_SECRET + "&v=20130815&ll=";
+			String urlString = "https://api.foursquare.com/v2/venues/search?client_id=" + 
+						       context.getString(R.string.foursquare_consumer_key) + "&client_secret=" + 
+						       context.getString(R.string.foursquare_consumer_secret) + "&v=20130815&ll=";
 			
 			double latitude = bundle.getDouble(LocationProbe.LATITUDE);
 			double longitude = bundle.getDouble(LocationProbe.LONGITUDE);
@@ -458,6 +459,9 @@ public class FoursquareProbe extends Probe
 				InputStream in = u.openStream();
 
 				String jsonString = IOUtils.toString(in);
+				
+				Log.e("PR","FS JSON: " + jsonString);
+				
 				
 				in.close();
 				
@@ -493,13 +497,19 @@ public class FoursquareProbe extends Probe
 					
 					JSONArray categories = venue.getJSONArray("categories");
 					
+					String[] venueCategories = new String[categories.length()];
+					
 					for (int j = 0; j < categories.length(); j++)
 					{
 						JSONObject category = categories.getJSONObject(j);
 						
+						venueCategories[j] = category.getString("name");
+						
 						if (category.getBoolean("primary"))
 							bundle.putString("FOURSQUARE_VENUE_CATEGORY", category.getString("name"));
 					}
+					
+					bundle.putStringArray("FOURSQUARE_VENUE_CATEGORIES", venueCategories);
 				}
 			}
 			catch (MalformedURLException e) 

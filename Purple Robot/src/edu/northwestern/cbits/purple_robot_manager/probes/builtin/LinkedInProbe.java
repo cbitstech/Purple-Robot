@@ -42,8 +42,6 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class LinkedInProbe extends Probe
 {
-	public static final String CONSUMER_KEY = "75ayz3gl4v7pv2";
-	public static final String CONSUMER_SECRET = "ndaAazgBiNTefTgJ";
 	public static final String CALLBACK = "http://purple.robot.com/oauth/linkedin";
 
 	private static final boolean DEFAULT_ENABLED = false;
@@ -140,8 +138,8 @@ public class LinkedInProbe extends Probe
 							
 		                	ServiceBuilder builder = new ServiceBuilder();
 		                	builder = builder.provider(LinkedInApi.class);
-		                	builder = builder.apiKey(LinkedInProbe.CONSUMER_KEY);
-		                	builder = builder.apiSecret(LinkedInProbe.CONSUMER_SECRET);
+		                	builder = builder.apiKey(context.getString(R.string.linkedin_consumer_key));
+		                	builder = builder.apiSecret(context.getString(R.string.linkedin_consumer_secret));
 		                	
 		                	final OAuthService service = builder.build();
 		                	
@@ -264,8 +262,8 @@ public class LinkedInProbe extends Probe
         Intent intent = new Intent(context, OAuthActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		
-		intent.putExtra(OAuthActivity.CONSUMER_KEY, CONSUMER_KEY);
-		intent.putExtra(OAuthActivity.CONSUMER_SECRET, CONSUMER_SECRET);
+		intent.putExtra(OAuthActivity.CONSUMER_KEY, context.getString(R.string.linkedin_consumer_key));
+		intent.putExtra(OAuthActivity.CONSUMER_SECRET, context.getString(R.string.linkedin_consumer_secret));
 		intent.putExtra(OAuthActivity.REQUESTER, "linkedin");
 		intent.putExtra(OAuthActivity.CALLBACK_URL, CALLBACK);
 		

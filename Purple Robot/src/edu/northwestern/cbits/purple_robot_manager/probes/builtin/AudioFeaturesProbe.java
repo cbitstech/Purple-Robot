@@ -22,6 +22,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 public class AudioFeaturesProbe extends Probe
 {
 	private static final boolean DEFAULT_ENABLED = false;
+	private static final String ENABLED_KEY = "config_probe_audio_feature_enabled";
 	
 	private double[] samples = new double[32768];
 
@@ -53,7 +54,7 @@ public class AudioFeaturesProbe extends Probe
 
 		CheckBoxPreference enabled = new CheckBoxPreference(activity);
 		enabled.setTitle(R.string.title_enable_probe);
-		enabled.setKey("config_probe_audio_feature_enabled");
+		enabled.setKey(AudioFeaturesProbe.ENABLED_KEY);
 		enabled.setDefaultValue(AudioFeaturesProbe.DEFAULT_ENABLED);
 
 		screen.addPreference(enabled);
@@ -66,8 +67,10 @@ public class AudioFeaturesProbe extends Probe
 		if (super.isEnabled(context))
 		{
 			SharedPreferences prefs = Probe.getPreferences(context);
+			
+			boolean enabled = prefs.getBoolean(AudioFeaturesProbe.ENABLED_KEY, AudioFeaturesProbe.DEFAULT_ENABLED);
 
-			if (this._recording == false && prefs.getBoolean("config_probe_audio_feature_enabled", AudioFeaturesProbe.DEFAULT_ENABLED))
+			if (this._recording == false && enabled)
 			{
 				this._recording = true;
 
@@ -181,9 +184,9 @@ public class AudioFeaturesProbe extends Probe
 				
 				Thread t = new Thread(r);
 				t.start();
-				
-				return true;
 			}
+			
+			return enabled;
 		}
 
 		return false;
@@ -199,7 +202,7 @@ public class AudioFeaturesProbe extends Probe
 		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
-		e.putBoolean("config_probe_audio_feature_enabled", true);
+		e.putBoolean(AudioFeaturesProbe.ENABLED_KEY, true);
 		
 		e.commit();
 	}
@@ -209,7 +212,7 @@ public class AudioFeaturesProbe extends Probe
 		SharedPreferences prefs = Probe.getPreferences(context);
 		
 		Editor e = prefs.edit();
-		e.putBoolean("config_probe_audio_feature_enabled", false);
+		e.putBoolean(AudioFeaturesProbe.ENABLED_KEY, false);
 		
 		e.commit();
 	}

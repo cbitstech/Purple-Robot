@@ -44,9 +44,6 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class TwitterProbe extends Probe
 {
-	public static final String CONSUMER_KEY = "q2JL6t5LenW1f8DPFqag";
-	public static final String CONSUMER_SECRET = "zsB6bELsZfj47kRHvXfinvBSgbddTzq7vgyqg5E3jn0";
-
 	private static final boolean DEFAULT_ENABLED = false;
 	private static final boolean DEFAULT_ENCRYPT = false;
 
@@ -141,8 +138,8 @@ public class TwitterProbe extends Probe
 							
 		                	ServiceBuilder builder = new ServiceBuilder();
 		                	builder = builder.provider(TwitterApi.class);
-		                	builder = builder.apiKey(TwitterProbe.CONSUMER_KEY);
-		                	builder = builder.apiSecret(TwitterProbe.CONSUMER_SECRET);
+		                	builder = builder.apiKey(context.getString(R.string.twitter_consumer_key));
+		                	builder = builder.apiSecret(context.getString(R.string.twitter_consumer_secret));
 		                	
 		                	final OAuthService service = builder.build();
 		                	
@@ -260,8 +257,8 @@ public class TwitterProbe extends Probe
         Intent intent = new Intent(context, OAuthActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		
-		intent.putExtra(OAuthActivity.CONSUMER_KEY, CONSUMER_KEY);
-		intent.putExtra(OAuthActivity.CONSUMER_SECRET, CONSUMER_SECRET);
+		intent.putExtra(OAuthActivity.CONSUMER_KEY, context.getString(R.string.twitter_consumer_key));
+		intent.putExtra(OAuthActivity.CONSUMER_SECRET, context.getString(R.string.twitter_consumer_secret));
 		intent.putExtra(OAuthActivity.REQUESTER, "twitter");
 		intent.putExtra(OAuthActivity.CALLBACK_URL, "http://pr-oauth/oauth/twitter");
 		
