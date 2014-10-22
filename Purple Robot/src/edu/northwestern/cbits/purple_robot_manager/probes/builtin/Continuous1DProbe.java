@@ -14,51 +14,44 @@ import edu.northwestern.cbits.purple_robot_manager.activities.RealTimeProbeViewA
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
-public abstract class Continuous1DProbe extends ContinuousProbe 
-{
-	protected static final String[] fieldNames = { "VALUE_KEY" };
+public abstract class Continuous1DProbe extends ContinuousProbe {
+    protected static final String[] fieldNames = { "VALUE_KEY" };
 
-	public String getDisplayContent(Activity activity)
-	{
-		try
-		{
-			String template = WebkitActivity.stringForAsset(activity, "webkit/epoch_chart_line_1_value.html");
-			
-			JSONArray valueSeries = new JSONArray();
+    public String getDisplayContent(Activity activity) {
+        try {
+            String template = WebkitActivity.stringForAsset(activity,
+                    "webkit/epoch_chart_line_1_value.html");
 
-			JSONArray data = new JSONArray();
+            JSONArray valueSeries = new JSONArray();
 
-			JSONObject valueData = new JSONObject();
-			valueData.put("label", "VALUE");
-			valueData.put("values", valueSeries);
-			
-			data.put(valueData);
+            JSONArray data = new JSONArray();
 
-			template = template.replace("{{{ data_json }}}", data.toString());
+            JSONObject valueData = new JSONObject();
+            valueData.put("label", "VALUE");
+            valueData.put("values", valueSeries);
 
-		    return template;
-		}
-		catch (IOException e)
-		{
-			LogManager.getInstance(activity).logException(e);
-		}
-		catch (JSONException e)
-		{
-			LogManager.getInstance(activity).logException(e);
-		}
+            data.put(valueData);
 
-		return null;
-	}
+            template = template.replace("{{{ data_json }}}", data.toString());
 
-	public Intent viewIntent(Context context)
-	{
-		Intent i = new Intent(context, RealTimeProbeViewActivity.class);
-		i.putExtra(RealTimeProbeViewActivity.PROBE_ID, this.getTitleResource());
+            return template;
+        } catch (IOException e) {
+            LogManager.getInstance(activity).logException(e);
+        } catch (JSONException e) {
+            LogManager.getInstance(activity).logException(e);
+        }
 
-		return i;
-	}
+        return null;
+    }
 
-	protected abstract String tableName();
+    public Intent viewIntent(Context context) {
+        Intent i = new Intent(context, RealTimeProbeViewActivity.class);
+        i.putExtra(RealTimeProbeViewActivity.PROBE_ID, this.getTitleResource());
 
-	protected abstract Map<String, String> databaseSchema();
+        return i;
+    }
+
+    protected abstract String tableName();
+
+    protected abstract Map<String, String> databaseSchema();
 }

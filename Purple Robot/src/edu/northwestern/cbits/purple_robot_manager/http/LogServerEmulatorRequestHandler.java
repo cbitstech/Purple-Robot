@@ -25,119 +25,109 @@ import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 
-public class LogServerEmulatorRequestHandler implements HttpRequestHandler 
-{
-	public static final String LOG_COUNT = "edu.northwestern.cbits.purple_robot_manager.logging.LogManager.LOG_COUNT";
-	
-	private Context _context = null;
-	
-	public LogServerEmulatorRequestHandler(Context context)
-	{
-		super();
-		
-		this._context = context;
-	}
+public class LogServerEmulatorRequestHandler implements HttpRequestHandler {
+    public static final String LOG_COUNT = "edu.northwestern.cbits.purple_robot_manager.logging.LogManager.LOG_COUNT";
 
-	@SuppressWarnings("deprecation")
-	public void handle(HttpRequest request, HttpResponse response, HttpContext argument) throws HttpException, IOException 
-	{
-    	response.setStatusCode(HttpStatus.SC_OK);
-		
-        if (request instanceof HttpEntityEnclosingRequest) 
-        { 
-        	HttpEntityEnclosingRequest enclosingRequest = (HttpEntityEnclosingRequest) request;
-    		
+    private Context _context = null;
+
+    public LogServerEmulatorRequestHandler(Context context) {
+        super();
+
+        this._context = context;
+    }
+
+    @SuppressWarnings("deprecation")
+    public void handle(HttpRequest request, HttpResponse response,
+            HttpContext argument) throws HttpException, IOException {
+        response.setStatusCode(HttpStatus.SC_OK);
+
+        if (request instanceof HttpEntityEnclosingRequest) {
+            HttpEntityEnclosingRequest enclosingRequest = (HttpEntityEnclosingRequest) request;
+
             HttpEntity entity = enclosingRequest.getEntity();
 
             String entityString = EntityUtils.toString(entity);
-            
+
             Uri u = Uri.parse("http://localhost/?" + entityString);
 
             JSONObject arguments = null;
 
-        	String jsonArg = URLDecoder.decode(entityString.substring(5));
+            String jsonArg = URLDecoder.decode(entityString.substring(5));
 
-            try 
-            {
-            	try
-            	{
-                	jsonArg = URLDecoder.decode(u.getQueryParameter("json"), "UTF-16");
+            try {
+                try {
+                    jsonArg = URLDecoder.decode(u.getQueryParameter("json"),
+                            "UTF-16");
 
-                	arguments = new JSONObject(jsonArg);
-            	}
-            	catch (JSONException e)
-            	{
-                	jsonArg = URLDecoder.decode(u.getQueryParameter("json"), "UTF-16");
+                    arguments = new JSONObject(jsonArg);
+                } catch (JSONException e) {
+                    jsonArg = URLDecoder.decode(u.getQueryParameter("json"),
+                            "UTF-16");
 
-                	arguments = new JSONObject(jsonArg);
-            	}
-			} 
-            catch (JSONException e) 
-            {
-				LogManager.getInstance(this._context).logException(e);
-
-				response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-                
-                StringEntity body = new StringEntity(e.toString());
-                body.setContentType("text/plain");
-
-                response.setEntity(body);
-                
-                return;
-            }
-            catch (NullPointerException e) 
-            {
-				LogManager.getInstance(this._context).logException(e);
+                    arguments = new JSONObject(jsonArg);
+                }
+            } catch (JSONException e) {
+                LogManager.getInstance(this._context).logException(e);
 
                 response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-                
+
                 StringEntity body = new StringEntity(e.toString());
                 body.setContentType("text/plain");
 
                 response.setEntity(body);
-                
+
+                return;
+            } catch (NullPointerException e) {
+                LogManager.getInstance(this._context).logException(e);
+
+                response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+
+                StringEntity body = new StringEntity(e.toString());
+                body.setContentType("text/plain");
+
+                response.setEntity(body);
+
                 return;
             }
 
-            if (arguments != null)
-            {
-	            try 
-	            {
-	            	if ("test_event".equals(arguments.get("event_type")))
-	            	{
-	            		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
-	            		
-	            		int count = prefs.getInt(LogServerEmulatorRequestHandler.LOG_COUNT, 0);
-	            		
-	            		Editor e = prefs.edit();
-	            		e.putInt(LogServerEmulatorRequestHandler.LOG_COUNT, count + 1);
-	            		e.commit();
+            if (arguments != null) {
+                try {
+                    if ("test_event".equals(arguments.get("event_type"))) {
+                        SharedPreferences prefs = PreferenceManager
+                                .getDefaultSharedPreferences(this._context);
 
-		                StringEntity body = new StringEntity(arguments.toString(2));
-		                body.setContentType("application/json");
-		
-		                response.setEntity(body);
-	            	}
-	            	else
-	            	{
-		                response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-		                
-		                StringEntity body = new StringEntity(this._context.getString(R.string.error_only_logs_test));
-		                body.setContentType("text/plain");
+                        int count = prefs.getInt(
+                                LogServerEmulatorRequestHandler.LOG_COUNT, 0);
 
-		                response.setEntity(body);
-	            	}
-	    		}
-	            catch (JSONException e) 
-	            {
-	                response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-	                
-	                StringEntity body = new StringEntity(e.toString());
-	                body.setContentType("text/plain");
+                        Editor e = prefs.edit();
+                        e.putInt(LogServerEmulatorRequestHandler.LOG_COUNT,
+                                count + 1);
+                        e.commit();
 
-	                response.setEntity(body);
-	            }
+                        StringEntity body = new StringEntity(
+                                arguments.toString(2));
+                        body.setContentType("application/json");
+
+                        response.setEntity(body);
+                    } else {
+                        response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+
+                        StringEntity body = new StringEntity(
+                                this._context
+                                        .getString(R.string.error_only_logs_test));
+                        body.setContentType("text/plain");
+
+                        response.setEntity(body);
+                    }
+                } catch (JSONException e) {
+                    response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+
+                    StringEntity body = new StringEntity(e.toString());
+                    body.setContentType("text/plain");
+
+                    response.setEntity(body);
+                }
             }
         }
-	}
+    }
 }

@@ -29,250 +29,244 @@ import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
 
-public class GooglePlacesFeature extends Feature 
-{
-	private static final String DEFAULT_RADIUS = "1000";
+public class GooglePlacesFeature extends Feature {
+    private static final String DEFAULT_RADIUS = "1000";
 
-	private static String[] EXCLUDED_TYPES = { "establishment" };
-	
-	private BroadcastReceiver _receiver = null;
-	protected long _lastCheck = 0;
+    private static String[] EXCLUDED_TYPES = { "establishment" };
 
-	protected String featureKey() 
-	{
-		return "google_places";
-	}
+    private BroadcastReceiver _receiver = null;
+    protected long _lastCheck = 0;
 
-	public String summary(Context context) 
-	{
-		return context.getString(R.string.summary_google_places_feature_desc);
-	}
+    protected String featureKey() {
+        return "google_places";
+    }
 
-	public String name(Context context) 
-	{
-		return "edu.northwestern.cbits.purple_robot_manager.probes.features.GooglePlacesFeature";
-	}
+    public String summary(Context context) {
+        return context.getString(R.string.summary_google_places_feature_desc);
+    }
 
-	public String title(Context context) 
-	{
-		return context.getString(R.string.title_google_places_feature);
-	}
+    public String name(Context context) {
+        return "edu.northwestern.cbits.purple_robot_manager.probes.features.GooglePlacesFeature";
+    }
 
-	public String probeCategory(Context context)
-	{
-		return context.getResources().getString(R.string.probe_external_services_category);
-	}
+    public String title(Context context) {
+        return context.getString(R.string.title_google_places_feature);
+    }
 
-	public void enable(Context context) 
-	{
-		SharedPreferences prefs = Probe.getPreferences(context);
-		
-		Editor e = prefs.edit();
-		e.putBoolean("config_probe_google_places_enabled", true);
-		e.commit();
-	}
+    public String probeCategory(Context context) {
+        return context.getResources().getString(
+                R.string.probe_external_services_category);
+    }
 
-	public void disable(Context context) 
-	{
-		SharedPreferences prefs = Probe.getPreferences(context);
-		
-		Editor e = prefs.edit();
-		e.putBoolean("config_probe_google_places_enabled", false);
-		e.commit();
-	}
+    public void enable(Context context) {
+        SharedPreferences prefs = Probe.getPreferences(context);
 
-	public boolean isEnabled(Context context)
-	{
-		LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(context);
+        Editor e = prefs.edit();
+        e.putBoolean("config_probe_google_places_enabled", true);
+        e.commit();
+    }
 
-		if (super.isEnabled(context))
-		{
-			SharedPreferences prefs = Probe.getPreferences(context);
-			
-			if (prefs.getBoolean("config_probe_google_places_enabled", true))
-			{
-				if (this._receiver == null)
-				{		
-					IntentFilter intentFilter = new IntentFilter(Probe.PROBE_READING);
+    public void disable(Context context) {
+        SharedPreferences prefs = Probe.getPreferences(context);
 
-					final GooglePlacesFeature me = this;
-					
-					this._receiver = new BroadcastReceiver()
-					{
-						public void onReceive(final Context context, Intent intent)
-						{
-							final Bundle extras = intent.getExtras();
-							
-							long now = System.currentTimeMillis();
-							
-							if (now - me._lastCheck > 300000) // 5 minutes
-							{
-								String probeName = extras.getString("PROBE");
-								
-								if (probeName != null && (LocationProbe.NAME.equals(probeName)))
-								{
-									Runnable r = new Runnable()
-									{
-										public void run() 
-										{
-											try 
-											{
-												Map<String, Integer> place = GooglePlacesFeature.nearestLocation(context, extras.getDouble(LocationProbe.LATITUDE), extras.getDouble(LocationProbe.LONGITUDE));
-			
-												Bundle bundle = new Bundle();
-												bundle.putString("PROBE", me.name(context));
-												bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
-												
-												if (place != null)
-												{
-													for (String key : place.keySet())
-													{
-														if (Arrays.asList(GooglePlacesFeature.EXCLUDED_TYPES).contains(key) == false)
-															bundle.putInt(key, place.get(key).intValue());
-													}
-			
-													me.transmitData(context, bundle);
-												}
-											} 
-											catch (IOException e) 
-											{
-												LogManager.getInstance(context).logException(e);
-											} 
-											catch (JSONException e) 
-											{
-												LogManager.getInstance(context).logException(e);
-											}
-										}
-									};
-									
-									Thread t = new Thread(r);
-									t.start();
-									
-									me._lastCheck = now;
-								}
-							}
-						}
-					};
+        Editor e = prefs.edit();
+        e.putBoolean("config_probe_google_places_enabled", false);
+        e.commit();
+    }
 
-					localManager.registerReceiver(this._receiver, intentFilter);
-				}
-				
-				return true;
-			}
-		}
-		
-		if (this._receiver != null)
-		{
-			localManager.unregisterReceiver(this._receiver);
-			this._receiver = null;
-		}
+    public boolean isEnabled(Context context) {
+        LocalBroadcastManager localManager = LocalBroadcastManager
+                .getInstance(context);
 
-		return false;
-	}
+        if (super.isEnabled(context)) {
+            SharedPreferences prefs = Probe.getPreferences(context);
 
-	protected static Map<String, Integer> nearestLocation(Context context, double latitude, double longitude) throws IOException, JSONException 
-	{
-		SharedPreferences prefs = Probe.getPreferences(context);
-		
-		String key = context.getString(R.string.google_places_browser_key);
-		
-		String radius = prefs.getString("config_feature_google_places_radius", GooglePlacesFeature.DEFAULT_RADIUS);
-		
-		URL u = new URL("https://maps.googleapis.com/maps/api/place/search/json?location=" + latitude + "," + longitude + "&radius=" + radius + "&sensor=false&key=" + key);
-		InputStream in = u.openStream();
+            if (prefs.getBoolean("config_probe_google_places_enabled", true)) {
+                if (this._receiver == null) {
+                    IntentFilter intentFilter = new IntentFilter(
+                            Probe.PROBE_READING);
 
-		String jsonString = IOUtils.toString(in);
-		
-		in.close();
+                    final GooglePlacesFeature me = this;
 
-		JSONObject json = new JSONObject(jsonString);
-		
-		JSONArray results = json.getJSONArray("results");
-		
-		HashMap<String, Integer> place = new HashMap<String, Integer>();
+                    this._receiver = new BroadcastReceiver() {
+                        public void onReceive(final Context context,
+                                Intent intent) {
+                            final Bundle extras = intent.getExtras();
 
-		String[] availableTypes = context.getResources().getStringArray(R.array.google_places_types);
-		
-		for (String type : availableTypes)
-		{
-			place.put(type, Integer.valueOf(0));
-		}
-		
-		for (int i = 0; i < results.length(); i++)
-		{
-			JSONObject result = results.getJSONObject(i);
-			
-			JSONArray types = result.getJSONArray("types");
-			
-			for (int j = 0; j < types.length(); j++)
-			{
-				String type = types.getString(j);
-				
-				Integer count = place.get(type);
-				
-				if (count == null)
-					count = Integer.valueOf(0);
-				
-				count = Integer.valueOf(count.intValue() + 1);
-				
-				place.put(type, count);
-			}
-		}
-		
-		return place;
-	}
-	
-	public String summarizeValue(Context context, Bundle bundle)
-	{
-		String frequentPlace = "none";
-		int maxCount = 0;
-		
-		for (String key : bundle.keySet())
-		{
-			Object o = bundle.get(key);
+                            long now = System.currentTimeMillis();
 
-			if ("TIMESTAMP".equals(key))
-			{
-				
-			}
-			else if (o instanceof Integer)
-			{
-				Integer count = (Integer) o;
-				
-				if (count.intValue() > maxCount)
-				{
-					frequentPlace = key;
-					maxCount = count.intValue();
-				}
-			}
-			else if (o instanceof Double)
-			{
-				Double count = (Double) o;
-				
-				if (count.intValue() > maxCount)
-				{
-					frequentPlace = key;
-					maxCount = count.intValue();
-				}
-			}
-		}
+                            if (now - me._lastCheck > 300000) // 5 minutes
+                            {
+                                String probeName = extras.getString("PROBE");
 
-		return String.format(context.getResources().getString(R.string.summary_google_places), frequentPlace.replaceAll("_", " "), maxCount);
-	}
-	
-	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
-	{
-		PreferenceScreen screen = super.preferenceScreen(activity);
+                                if (probeName != null
+                                        && (LocationProbe.NAME
+                                                .equals(probeName))) {
+                                    Runnable r = new Runnable() {
+                                        public void run() {
+                                            try {
+                                                Map<String, Integer> place = GooglePlacesFeature
+                                                        .nearestLocation(
+                                                                context,
+                                                                extras.getDouble(LocationProbe.LATITUDE),
+                                                                extras.getDouble(LocationProbe.LONGITUDE));
 
-		ListPreference radius = new ListPreference(activity);
-		radius.setKey("config_feature_google_places_radius");
-		radius.setEntryValues(R.array.feature_google_places_values);
-		radius.setEntries(R.array.feature_google_places_labels);
-		radius.setTitle(R.string.feature_google_places_radius_label);
-		radius.setDefaultValue(GooglePlacesFeature.DEFAULT_RADIUS);
+                                                Bundle bundle = new Bundle();
+                                                bundle.putString("PROBE",
+                                                        me.name(context));
+                                                bundle.putLong(
+                                                        "TIMESTAMP",
+                                                        System.currentTimeMillis() / 1000);
 
-		screen.addPreference(radius);
+                                                if (place != null) {
+                                                    for (String key : place
+                                                            .keySet()) {
+                                                        if (Arrays
+                                                                .asList(GooglePlacesFeature.EXCLUDED_TYPES)
+                                                                .contains(key) == false)
+                                                            bundle.putInt(
+                                                                    key,
+                                                                    place.get(
+                                                                            key)
+                                                                            .intValue());
+                                                    }
 
-		return screen;
-	}
+                                                    me.transmitData(context,
+                                                            bundle);
+                                                }
+                                            } catch (IOException e) {
+                                                LogManager.getInstance(context)
+                                                        .logException(e);
+                                            } catch (JSONException e) {
+                                                LogManager.getInstance(context)
+                                                        .logException(e);
+                                            }
+                                        }
+                                    };
+
+                                    Thread t = new Thread(r);
+                                    t.start();
+
+                                    me._lastCheck = now;
+                                }
+                            }
+                        }
+                    };
+
+                    localManager.registerReceiver(this._receiver, intentFilter);
+                }
+
+                return true;
+            }
+        }
+
+        if (this._receiver != null) {
+            localManager.unregisterReceiver(this._receiver);
+            this._receiver = null;
+        }
+
+        return false;
+    }
+
+    protected static Map<String, Integer> nearestLocation(Context context,
+            double latitude, double longitude) throws IOException,
+            JSONException {
+        SharedPreferences prefs = Probe.getPreferences(context);
+
+        String key = context.getString(R.string.google_places_browser_key);
+
+        String radius = prefs.getString("config_feature_google_places_radius",
+                GooglePlacesFeature.DEFAULT_RADIUS);
+
+        URL u = new URL(
+                "https://maps.googleapis.com/maps/api/place/search/json?location="
+                        + latitude + "," + longitude + "&radius=" + radius
+                        + "&sensor=false&key=" + key);
+        InputStream in = u.openStream();
+
+        String jsonString = IOUtils.toString(in);
+
+        in.close();
+
+        JSONObject json = new JSONObject(jsonString);
+
+        JSONArray results = json.getJSONArray("results");
+
+        HashMap<String, Integer> place = new HashMap<String, Integer>();
+
+        String[] availableTypes = context.getResources().getStringArray(
+                R.array.google_places_types);
+
+        for (String type : availableTypes) {
+            place.put(type, Integer.valueOf(0));
+        }
+
+        for (int i = 0; i < results.length(); i++) {
+            JSONObject result = results.getJSONObject(i);
+
+            JSONArray types = result.getJSONArray("types");
+
+            for (int j = 0; j < types.length(); j++) {
+                String type = types.getString(j);
+
+                Integer count = place.get(type);
+
+                if (count == null)
+                    count = Integer.valueOf(0);
+
+                count = Integer.valueOf(count.intValue() + 1);
+
+                place.put(type, count);
+            }
+        }
+
+        return place;
+    }
+
+    public String summarizeValue(Context context, Bundle bundle) {
+        String frequentPlace = "none";
+        int maxCount = 0;
+
+        for (String key : bundle.keySet()) {
+            Object o = bundle.get(key);
+
+            if ("TIMESTAMP".equals(key)) {
+
+            } else if (o instanceof Integer) {
+                Integer count = (Integer) o;
+
+                if (count.intValue() > maxCount) {
+                    frequentPlace = key;
+                    maxCount = count.intValue();
+                }
+            } else if (o instanceof Double) {
+                Double count = (Double) o;
+
+                if (count.intValue() > maxCount) {
+                    frequentPlace = key;
+                    maxCount = count.intValue();
+                }
+            }
+        }
+
+        return String.format(
+                context.getResources()
+                        .getString(R.string.summary_google_places),
+                frequentPlace.replaceAll("_", " "), maxCount);
+    }
+
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+        PreferenceScreen screen = super.preferenceScreen(activity);
+
+        ListPreference radius = new ListPreference(activity);
+        radius.setKey("config_feature_google_places_radius");
+        radius.setEntryValues(R.array.feature_google_places_values);
+        radius.setEntries(R.array.feature_google_places_labels);
+        radius.setTitle(R.string.feature_google_places_radius_label);
+        radius.setDefaultValue(GooglePlacesFeature.DEFAULT_RADIUS);
+
+        screen.addPreference(radius);
+
+        return screen;
+    }
 }

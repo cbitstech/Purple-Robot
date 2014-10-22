@@ -25,143 +25,130 @@ import edu.northwestern.cbits.purple_robot_manager.models.Model;
 import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
-public class AppDisplayPlugin extends OutputPlugin
-{
-	private long _lastUpdate = 0;
+public class AppDisplayPlugin extends OutputPlugin {
+    private long _lastUpdate = 0;
 
-	private ArrayList<ContentValues> _valuesQueue = new ArrayList<ContentValues>();
-	
-	public String[] respondsTo()
-	{
-		String[] activeActions = { Probe.PROBE_READING, OutputPlugin.LOG_EVENT, AppDisplayPlugin.DISPLAY_MESSAGE };
+    private ArrayList<ContentValues> _valuesQueue = new ArrayList<ContentValues>();
 
-		return activeActions;
-	}
+    public String[] respondsTo() {
+        String[] activeActions = { Probe.PROBE_READING, OutputPlugin.LOG_EVENT,
+                AppDisplayPlugin.DISPLAY_MESSAGE };
 
-	@SuppressLint("NewApi")
-	public void processIntent(final Intent intent)
-	{
-		Bundle extras = intent.getExtras();
-		
-		final Context context = this.getContext();
+        return activeActions;
+    }
 
-		if (AppDisplayPlugin.DISPLAY_MESSAGE.equals(intent.getAction()))
-		{
-			Intent displayIntent = new Intent(StartActivity.UPDATE_MESSAGE);
-			displayIntent.putExtra(StartActivity.DISPLAY_MESSAGE, extras.getString("MESSAGE"));
+    @SuppressLint("NewApi")
+    public void processIntent(final Intent intent) {
+        Bundle extras = intent.getExtras();
 
-			LocalBroadcastManager manager = LocalBroadcastManager.getInstance(context);
-			manager.sendBroadcast(displayIntent);
-		}
-		else
-		{
-			final ContentValues values = new ContentValues();
+        final Context context = this.getContext();
 
-			Object ts = extras.get("TIMESTAMP");
-			
-			if (ts instanceof Long)
-				values.put("recorded", ((Long) ts).longValue());
-			else if (ts instanceof Double)
-				values.put("recorded", ((Double) ts).longValue());
-			
-			values.put("source", extras.getString("PROBE"));
+        if (AppDisplayPlugin.DISPLAY_MESSAGE.equals(intent.getAction())) {
+            Intent displayIntent = new Intent(StartActivity.UPDATE_MESSAGE);
+            displayIntent.putExtra(StartActivity.DISPLAY_MESSAGE,
+                    extras.getString("MESSAGE"));
 
-			if (extras.containsKey("FROM_MODEL"))
-			{
-				Model m = ModelManager.getInstance(context).fetchModelByTitle(context, extras.getString("PROBE"));
-				values.put("source", m.name(context));
-			}
-			
-			try 
-			{
-				JsonFactory factory = new JsonFactory();
+            LocalBroadcastManager manager = LocalBroadcastManager
+                    .getInstance(context);
+            manager.sendBroadcast(displayIntent);
+        } else {
+            final ContentValues values = new ContentValues();
 
-				StringWriter outputWriter = new StringWriter();
+            Object ts = extras.get("TIMESTAMP");
 
-				JsonGenerator generator = factory.createGenerator(outputWriter);
-				
-				StreamingJacksonUploadPlugin.writeBundle(this.getContext(), generator, extras);
-				generator.close();
+            if (ts instanceof Long)
+                values.put("recorded", ((Long) ts).longValue());
+            else if (ts instanceof Double)
+                values.put("recorded", ((Double) ts).longValue());
 
-				values.put("value", outputWriter.toString());
-			}
-			catch (IOException e) 
-			{
-     			LogManager.getInstance(context).logException(e);
-			}
-			
-			ContentValues toRemove = null;
-			
-			synchronized(this._valuesQueue)
-			{
-				do
-				{
-					toRemove = null;
-					
-					for (ContentValues check : this._valuesQueue)
-					{
-						if (check.getAsString("source").equals(values.getAsString("source")))
-							toRemove = check;
-					}
-					
-					if (toRemove != null)
-						this._valuesQueue.remove(toRemove);
-				}
-				while (toRemove != null);
+            values.put("source", extras.getString("PROBE"));
 
-				this._valuesQueue.add(values);
-			}
+            if (extras.containsKey("FROM_MODEL")) {
+                Model m = ModelManager.getInstance(context).fetchModelByTitle(
+                        context, extras.getString("PROBE"));
+                values.put("source", m.name(context));
+            }
 
-			if (System.currentTimeMillis() - this._lastUpdate > 1000)
-			{
-				this._lastUpdate = System.currentTimeMillis();
-				
-				final ArrayList<ContentValues> toUpdate = new ArrayList<ContentValues>();
-				
-				synchronized(this._valuesQueue)
-				{
-					while (this._valuesQueue.size() > 0)
-					{
-						toUpdate.add(this._valuesQueue.remove(0));
-					}
-				}
-				
-				Handler mainHandler = new Handler(context.getMainLooper());
-				
-				mainHandler.post(new Runnable()
-				{
-					public void run() 
-					{
-						String where = "source = ?";
-						
-						ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
+            try {
+                JsonFactory factory = new JsonFactory();
 
-						for (ContentValues value: toUpdate)
-						{
-							String[] whereArgs = { value.getAsString("source") };
+                StringWriter outputWriter = new StringWriter();
 
-							ContentProviderOperation.Builder update = ContentProviderOperation.newUpdate(RobotContentProvider.RECENT_PROBE_VALUES).withSelection(where, whereArgs).withValues(value);
-							
-							ops.add(update.build());
-						}
+                JsonGenerator generator = factory.createGenerator(outputWriter);
 
-						try 
-						{
-							context.getContentResolver().applyBatch(RobotContentProvider.AUTHORITY, ops);
-						}
-						catch (RemoteException e) 
-						{
-		         			LogManager.getInstance(context).logException(e);
-						} 
-						catch (OperationApplicationException e) 
-						{
-		         			LogManager.getInstance(context).logException(e);
-						}
+                StreamingJacksonUploadPlugin.writeBundle(this.getContext(),
+                        generator, extras);
+                generator.close();
 
-						context.getContentResolver().notifyChange(RobotContentProvider.RECENT_PROBE_VALUES, null);
-					}
-				});
-			}
-		}
-	}
+                values.put("value", outputWriter.toString());
+            } catch (IOException e) {
+                LogManager.getInstance(context).logException(e);
+            }
+
+            ContentValues toRemove = null;
+
+            synchronized (this._valuesQueue) {
+                do {
+                    toRemove = null;
+
+                    for (ContentValues check : this._valuesQueue) {
+                        if (check.getAsString("source").equals(
+                                values.getAsString("source")))
+                            toRemove = check;
+                    }
+
+                    if (toRemove != null)
+                        this._valuesQueue.remove(toRemove);
+                } while (toRemove != null);
+
+                this._valuesQueue.add(values);
+            }
+
+            if (System.currentTimeMillis() - this._lastUpdate > 1000) {
+                this._lastUpdate = System.currentTimeMillis();
+
+                final ArrayList<ContentValues> toUpdate = new ArrayList<ContentValues>();
+
+                synchronized (this._valuesQueue) {
+                    while (this._valuesQueue.size() > 0) {
+                        toUpdate.add(this._valuesQueue.remove(0));
+                    }
+                }
+
+                Handler mainHandler = new Handler(context.getMainLooper());
+
+                mainHandler.post(new Runnable() {
+                    public void run() {
+                        String where = "source = ?";
+
+                        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
+
+                        for (ContentValues value : toUpdate) {
+                            String[] whereArgs = { value.getAsString("source") };
+
+                            ContentProviderOperation.Builder update = ContentProviderOperation
+                                    .newUpdate(
+                                            RobotContentProvider.RECENT_PROBE_VALUES)
+                                    .withSelection(where, whereArgs)
+                                    .withValues(value);
+
+                            ops.add(update.build());
+                        }
+
+                        try {
+                            context.getContentResolver().applyBatch(
+                                    RobotContentProvider.AUTHORITY, ops);
+                        } catch (RemoteException e) {
+                            LogManager.getInstance(context).logException(e);
+                        } catch (OperationApplicationException e) {
+                            LogManager.getInstance(context).logException(e);
+                        }
+
+                        context.getContentResolver().notifyChange(
+                                RobotContentProvider.RECENT_PROBE_VALUES, null);
+                    }
+                });
+            }
+        }
+    }
 }

@@ -40,393 +40,418 @@ import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.oauth.InstagramApi;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
-public class InstagramProbe extends Probe
-{
-// 	public static final String CALLBACK = "http://purple.robot.com/oauth/instagram";
-	public static final String CALLBACK = "http://tech.cbits.northwestern.edu/oauth/instagram";
+public class InstagramProbe extends Probe {
+    // public static final String CALLBACK =
+    // "http://purple.robot.com/oauth/instagram";
+    public static final String CALLBACK = "http://tech.cbits.northwestern.edu/oauth/instagram";
 
-	private static final boolean DEFAULT_ENABLED = false;
-	private static final boolean DEFAULT_ENCRYPT = false;
+    private static final boolean DEFAULT_ENABLED = false;
+    private static final boolean DEFAULT_ENCRYPT = false;
 
-	protected static final String HOUR_COUNT = "HOUR_COUNT";
+    protected static final String HOUR_COUNT = "HOUR_COUNT";
 
-	private long _lastCheck = 0;
-	
-	private String _token = null;
-	private String _secret = null;
+    private long _lastCheck = 0;
 
-	public String name(Context context)
-	{
-		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.InstagramProbe";
-	}
+    private String _token = null;
+    private String _secret = null;
 
-	public String title(Context context)
-	{
-		return context.getString(R.string.title_instagram_probe);
-	}
+    public String name(Context context) {
+        return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.InstagramProbe";
+    }
 
-	public String probeCategory(Context context)
-	{
-		return context.getResources().getString(R.string.probe_external_services_category);
-	}
+    public String title(Context context) {
+        return context.getString(R.string.title_instagram_probe);
+    }
 
-	public void enable(Context context)
-	{
-		SharedPreferences prefs = Probe.getPreferences(context);
-		
-		Editor e = prefs.edit();
-		e.putBoolean("config_probe_instagram_enabled", true);
-		
-		e.commit();
-	}
+    public String probeCategory(Context context) {
+        return context.getResources().getString(
+                R.string.probe_external_services_category);
+    }
 
-	public void disable(Context context)
-	{
-		SharedPreferences prefs = Probe.getPreferences(context);
-		
-		Editor e = prefs.edit();
-		e.putBoolean("config_probe_instagram_enabled", false);
-		
-		e.commit();
-	}
+    public void enable(Context context) {
+        SharedPreferences prefs = Probe.getPreferences(context);
 
-	public boolean isEnabled(final Context context)
-	{
-		final SharedPreferences prefs = Probe.getPreferences(context);
+        Editor e = prefs.edit();
+        e.putBoolean("config_probe_instagram_enabled", true);
 
-		if (super.isEnabled(context))
-		{
-			final long now = System.currentTimeMillis();
+        e.commit();
+    }
 
-			if (prefs.getBoolean("config_probe_instagram_enabled", InstagramProbe.DEFAULT_ENABLED))
-			{
-				synchronized(this)
-				{
-					long freq = Long.parseLong(prefs.getString("config_probe_instagram_frequency", Probe.DEFAULT_FREQUENCY));
-					final boolean doEncrypt = prefs.getBoolean("config_probe_instagram_encrypt_data", InstagramProbe.DEFAULT_ENCRYPT);
-					
-					final EncryptionManager em = EncryptionManager.getInstance();
-					
-					if (now - this._lastCheck  > freq)
-					{
-						final InstagramProbe me = this;
+    public void disable(Context context) {
+        SharedPreferences prefs = Probe.getPreferences(context);
 
-						this._token = prefs.getString("oauth_instagram_token", null);
-						this._secret = prefs.getString("oauth_instagram_secret", null);
+        Editor e = prefs.edit();
+        e.putBoolean("config_probe_instagram_enabled", false);
 
-	    				final String title = context.getString(R.string.title_instagram_check);
-	    				final SanityManager sanity = SanityManager.getInstance(context);
+        e.commit();
+    }
 
-	        			if (this._token == null || this._secret == null)
-	        			{
-	        				String message = context.getString(R.string.message_instagram_check);
-	        				
-	        				Runnable action = new Runnable()
-	        				{
-								public void run() 
-								{
-									me.fetchAuth(context);
-								}
-	        				};
-	        				
-	        				sanity.addAlert(SanityCheck.WARNING, title, message, action);
-	        			}
-						else
-						{
-							sanity.clearAlert(title);
-							
-							Token accessToken = new Token(this._token, this._secret);
-							
-		                	ServiceBuilder builder = new ServiceBuilder();
-		                	builder = builder.provider(InstagramApi.class);
-		                	builder = builder.apiKey(context.getString(R.string.instagram_consumer_key));
-		                	builder = builder.apiSecret(context.getString(R.string.instagram_consumer_secret));
-		                	
-		                	final OAuthService service = builder.build();
-		                	
-							final OAuthRequest request = new OAuthRequest(Verb.GET, "https://api.instagram.com/v1/users/self/feed");
-							service.signRequest(accessToken, request);
-	
-							Runnable r = new Runnable()
-							{
-								public void run() 
-								{
-									try 
-									{
-										long mostRecent = prefs.getLong("config_instagram_most_recent", 0);
-										
-										Response response = request.send();
+    public boolean isEnabled(final Context context) {
+        final SharedPreferences prefs = Probe.getPreferences(context);
 
-										JSONObject root = new JSONObject(response.getBody());
-										
-										JSONArray data = root.getJSONArray("data");
-										
-										for (int i = (data.length() - 1); i >= 0; i--)
-										{
-											JSONObject post = data.getJSONObject(i);
-											
-											long postTime = post.getLong("created_time") * 1000;
+        if (super.isEnabled(context)) {
+            final long now = System.currentTimeMillis();
 
-											if (postTime > mostRecent)
-											{
-												Bundle eventBundle = new Bundle();
-												eventBundle.putString("PROBE", me.name(context));
-												eventBundle.putLong("TIMESTAMP", postTime / 1000);
-												
-												JSONObject location = post.getJSONObject("location");
-												
-												if (location != null)
-												{
-													eventBundle.putDouble("LATITUDE", location.getDouble("latitude"));
-													eventBundle.putDouble("LONGITUDE", location.getDouble("longitude"));
-													
-													if (location.has("name"))
-													{
-														String name = location.getString("name");
-														
-														if (name != null)
-															eventBundle.putString("LOCATION_NAME", name);
-													}
-												}
-												
-												eventBundle.putString("LINK", post.getString("link"));
-												eventBundle.putString("TYPE", post.getString("type"));
-												eventBundle.putString("FILTER", post.getString("filter"));
-												
-												if (post.has("caption"))
-												{
-													String caption = post.getJSONObject("caption").getString("text");
-													
-													if (caption != null)
-													{
-														if (doEncrypt)
-															caption = em.encryptString(context, caption);
-	
-														eventBundle.putString("CAPTION", caption);
-													}
-												}
-												
-												eventBundle.putBoolean("IS_OBFUSCATED", doEncrypt);
-												me.transmitData(context, eventBundle);
-											}
-										}
-										
-										Editor e = prefs.edit();
-										e.putLong("config_instagram_most_recent", System.currentTimeMillis());
-										e.commit();
-									} 
-									catch (JSONException e) 
-									{
-						     			LogManager.getInstance(context).logException(e);
-									}
-									catch (OAuthException e)
-									{
-						     			LogManager.getInstance(context).logException(e);
-									} 
-									catch (IllegalBlockSizeException e) 
-									{
-						     			LogManager.getInstance(context).logException(e);
-									} 
-									catch (BadPaddingException e) 
-									{
-						     			LogManager.getInstance(context).logException(e);
-									} 
-									catch (UnsupportedEncodingException e) 
-									{
-						     			LogManager.getInstance(context).logException(e);
-									} 
-									catch (IllegalArgumentException e) 
-									{
-						     			LogManager.getInstance(context).logException(e);
-									} 
-									catch (IllegalStateException e) 
-									{
-						     			LogManager.getInstance(context).logException(e);
-									} 
-								}
-							};
-							
-							Thread t = new Thread(r);
-							t.start();
-						}
-	        			
-						me._lastCheck = now;
-					}
-				}
+            if (prefs.getBoolean("config_probe_instagram_enabled",
+                    InstagramProbe.DEFAULT_ENABLED)) {
+                synchronized (this) {
+                    long freq = Long.parseLong(prefs.getString(
+                            "config_probe_instagram_frequency",
+                            Probe.DEFAULT_FREQUENCY));
+                    final boolean doEncrypt = prefs.getBoolean(
+                            "config_probe_instagram_encrypt_data",
+                            InstagramProbe.DEFAULT_ENCRYPT);
 
-				return true;
-			}
-		}
+                    final EncryptionManager em = EncryptionManager
+                            .getInstance();
 
-		return false;
-	}
+                    if (now - this._lastCheck > freq) {
+                        final InstagramProbe me = this;
 
-	private void fetchAuth(Context context)
-	{
+                        this._token = prefs.getString("oauth_instagram_token",
+                                null);
+                        this._secret = prefs.getString(
+                                "oauth_instagram_secret", null);
+
+                        final String title = context
+                                .getString(R.string.title_instagram_check);
+                        final SanityManager sanity = SanityManager
+                                .getInstance(context);
+
+                        if (this._token == null || this._secret == null) {
+                            String message = context
+                                    .getString(R.string.message_instagram_check);
+
+                            Runnable action = new Runnable() {
+                                public void run() {
+                                    me.fetchAuth(context);
+                                }
+                            };
+
+                            sanity.addAlert(SanityCheck.WARNING, title,
+                                    message, action);
+                        } else {
+                            sanity.clearAlert(title);
+
+                            Token accessToken = new Token(this._token,
+                                    this._secret);
+
+                            ServiceBuilder builder = new ServiceBuilder();
+                            builder = builder.provider(InstagramApi.class);
+                            builder = builder
+                                    .apiKey(context
+                                            .getString(R.string.instagram_consumer_key));
+                            builder = builder
+                                    .apiSecret(context
+                                            .getString(R.string.instagram_consumer_secret));
+
+                            final OAuthService service = builder.build();
+
+                            final OAuthRequest request = new OAuthRequest(
+                                    Verb.GET,
+                                    "https://api.instagram.com/v1/users/self/feed");
+                            service.signRequest(accessToken, request);
+
+                            Runnable r = new Runnable() {
+                                public void run() {
+                                    try {
+                                        long mostRecent = prefs.getLong(
+                                                "config_instagram_most_recent",
+                                                0);
+
+                                        Response response = request.send();
+
+                                        JSONObject root = new JSONObject(
+                                                response.getBody());
+
+                                        JSONArray data = root
+                                                .getJSONArray("data");
+
+                                        for (int i = (data.length() - 1); i >= 0; i--) {
+                                            JSONObject post = data
+                                                    .getJSONObject(i);
+
+                                            long postTime = post
+                                                    .getLong("created_time") * 1000;
+
+                                            if (postTime > mostRecent) {
+                                                Bundle eventBundle = new Bundle();
+                                                eventBundle.putString("PROBE",
+                                                        me.name(context));
+                                                eventBundle.putLong(
+                                                        "TIMESTAMP",
+                                                        postTime / 1000);
+
+                                                JSONObject location = post
+                                                        .getJSONObject("location");
+
+                                                if (location != null) {
+                                                    eventBundle
+                                                            .putDouble(
+                                                                    "LATITUDE",
+                                                                    location.getDouble("latitude"));
+                                                    eventBundle
+                                                            .putDouble(
+                                                                    "LONGITUDE",
+                                                                    location.getDouble("longitude"));
+
+                                                    if (location.has("name")) {
+                                                        String name = location
+                                                                .getString("name");
+
+                                                        if (name != null)
+                                                            eventBundle
+                                                                    .putString(
+                                                                            "LOCATION_NAME",
+                                                                            name);
+                                                    }
+                                                }
+
+                                                eventBundle.putString("LINK",
+                                                        post.getString("link"));
+                                                eventBundle.putString("TYPE",
+                                                        post.getString("type"));
+                                                eventBundle
+                                                        .putString(
+                                                                "FILTER",
+                                                                post.getString("filter"));
+
+                                                if (post.has("caption")) {
+                                                    String caption = post
+                                                            .getJSONObject(
+                                                                    "caption")
+                                                            .getString("text");
+
+                                                    if (caption != null) {
+                                                        if (doEncrypt)
+                                                            caption = em
+                                                                    .encryptString(
+                                                                            context,
+                                                                            caption);
+
+                                                        eventBundle.putString(
+                                                                "CAPTION",
+                                                                caption);
+                                                    }
+                                                }
+
+                                                eventBundle.putBoolean(
+                                                        "IS_OBFUSCATED",
+                                                        doEncrypt);
+                                                me.transmitData(context,
+                                                        eventBundle);
+                                            }
+                                        }
+
+                                        Editor e = prefs.edit();
+                                        e.putLong(
+                                                "config_instagram_most_recent",
+                                                System.currentTimeMillis());
+                                        e.commit();
+                                    } catch (JSONException e) {
+                                        LogManager.getInstance(context)
+                                                .logException(e);
+                                    } catch (OAuthException e) {
+                                        LogManager.getInstance(context)
+                                                .logException(e);
+                                    } catch (IllegalBlockSizeException e) {
+                                        LogManager.getInstance(context)
+                                                .logException(e);
+                                    } catch (BadPaddingException e) {
+                                        LogManager.getInstance(context)
+                                                .logException(e);
+                                    } catch (UnsupportedEncodingException e) {
+                                        LogManager.getInstance(context)
+                                                .logException(e);
+                                    } catch (IllegalArgumentException e) {
+                                        LogManager.getInstance(context)
+                                                .logException(e);
+                                    } catch (IllegalStateException e) {
+                                        LogManager.getInstance(context)
+                                                .logException(e);
+                                    }
+                                }
+                            };
+
+                            Thread t = new Thread(r);
+                            t.start();
+                        }
+
+                        me._lastCheck = now;
+                    }
+                }
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void fetchAuth(Context context) {
         Intent intent = new Intent(context, OAuthActivity.class);
-		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		
-		intent.putExtra(OAuthActivity.CONSUMER_KEY, context.getString(R.string.instagram_consumer_key));
-		intent.putExtra(OAuthActivity.CONSUMER_SECRET, context.getString(R.string.instagram_consumer_secret));
-		intent.putExtra(OAuthActivity.REQUESTER, "instagram");
-		intent.putExtra(OAuthActivity.CALLBACK_URL, CALLBACK);
-		
-		context.startActivity(intent);
-	}
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-	public String summarizeValue(Context context, Bundle bundle)
-	{
-		if (bundle.containsKey("CAPTION"))
-			return bundle.getString("CAPTION") + " (" + bundle.getString("TYPE") + ")";
+        intent.putExtra(OAuthActivity.CONSUMER_KEY,
+                context.getString(R.string.instagram_consumer_key));
+        intent.putExtra(OAuthActivity.CONSUMER_SECRET,
+                context.getString(R.string.instagram_consumer_secret));
+        intent.putExtra(OAuthActivity.REQUESTER, "instagram");
+        intent.putExtra(OAuthActivity.CALLBACK_URL, CALLBACK);
 
-		return bundle.getString("TYPE");
-	}
-	
-	public Map<String, Object> configuration(Context context)
-	{
-		Map<String, Object> map = super.configuration(context);
-		
-		SharedPreferences prefs = Probe.getPreferences(context);
+        context.startActivity(intent);
+    }
 
-		long freq = Long.parseLong(prefs.getString("config_probe_instagram_frequency", Probe.DEFAULT_FREQUENCY));
-		map.put(Probe.PROBE_FREQUENCY, freq);
-		
-		boolean hash = prefs.getBoolean("config_probe_instagram_encrypt_data", InstagramProbe.DEFAULT_ENCRYPT);
-		map.put(Probe.ENCRYPT_DATA, hash);
+    public String summarizeValue(Context context, Bundle bundle) {
+        if (bundle.containsKey("CAPTION"))
+            return bundle.getString("CAPTION") + " ("
+                    + bundle.getString("TYPE") + ")";
 
-		return map;
-	}
+        return bundle.getString("TYPE");
+    }
 
-	public void updateFromMap(Context context, Map<String, Object> params) 
-	{
-		super.updateFromMap(context, params);
-		
-		if (params.containsKey(Probe.PROBE_FREQUENCY))
-		{
-			Object frequency = params.get(Probe.PROBE_FREQUENCY);
-			
-			if (frequency instanceof Long)
-			{
-				SharedPreferences prefs = Probe.getPreferences(context);
-				Editor e = prefs.edit();
-				
-				e.putString("config_probe_instagram_frequency", frequency.toString());
-				e.commit();
-			}
-		}
-		
-		if (params.containsKey(Probe.ENCRYPT_DATA))
-		{
-			Object encrypt = params.get(Probe.ENCRYPT_DATA);
-			
-			if ( encrypt instanceof Boolean)
-			{
-				Boolean encryptBoolean = (Boolean)  encrypt;
-				
-				SharedPreferences prefs = Probe.getPreferences(context);
-				Editor e = prefs.edit();
-				
-				e.putBoolean("config_probe_instagram_encrypt_data", encryptBoolean.booleanValue());
-				e.commit();
-			}
-		}
-	}
+    public Map<String, Object> configuration(Context context) {
+        Map<String, Object> map = super.configuration(context);
 
-	public String summary(Context context) 
-	{
-		return context.getString(R.string.summary_instagram_probe_desc);
-	}
+        SharedPreferences prefs = Probe.getPreferences(context);
 
-	@SuppressWarnings("deprecation")
-	public PreferenceScreen preferenceScreen(final PreferenceActivity activity)
-	{
-		PreferenceManager manager = activity.getPreferenceManager();
+        long freq = Long.parseLong(prefs.getString(
+                "config_probe_instagram_frequency", Probe.DEFAULT_FREQUENCY));
+        map.put(Probe.PROBE_FREQUENCY, freq);
 
-		final PreferenceScreen screen = manager.createPreferenceScreen(activity);
-		screen.setTitle(this.title(activity));
-		screen.setSummary(R.string.summary_instagram_probe_desc);
+        boolean hash = prefs.getBoolean("config_probe_instagram_encrypt_data",
+                InstagramProbe.DEFAULT_ENCRYPT);
+        map.put(Probe.ENCRYPT_DATA, hash);
 
-		final SharedPreferences prefs = Probe.getPreferences(activity);
+        return map;
+    }
 
-		String token = prefs.getString("oauth_instagram_token", null);
-		String secret = prefs.getString("oauth_instagram_secret", null);
+    public void updateFromMap(Context context, Map<String, Object> params) {
+        super.updateFromMap(context, params);
 
-		CheckBoxPreference enabled = new CheckBoxPreference(activity);
-		enabled.setTitle(R.string.title_enable_probe);
-		enabled.setKey("config_probe_instagram_enabled");
-		enabled.setDefaultValue(InstagramProbe.DEFAULT_ENABLED);
+        if (params.containsKey(Probe.PROBE_FREQUENCY)) {
+            Object frequency = params.get(Probe.PROBE_FREQUENCY);
 
-		screen.addPreference(enabled);
+            if (frequency instanceof Long) {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
 
-		ListPreference duration = new ListPreference(activity);
-		duration.setKey("config_probe_instagram_frequency");
-		duration.setEntryValues(R.array.probe_low_frequency_values);
-		duration.setEntries(R.array.probe_low_frequency_labels);
-		duration.setTitle(R.string.probe_frequency_label);
-		duration.setDefaultValue(Probe.DEFAULT_FREQUENCY);
+                e.putString("config_probe_instagram_frequency",
+                        frequency.toString());
+                e.commit();
+            }
+        }
 
-		screen.addPreference(duration);
+        if (params.containsKey(Probe.ENCRYPT_DATA)) {
+            Object encrypt = params.get(Probe.ENCRYPT_DATA);
 
-		CheckBoxPreference encrypt = new CheckBoxPreference(activity);
-		encrypt.setKey("config_probe_instagram_encrypt_data");
-		encrypt.setDefaultValue(InstagramProbe.DEFAULT_ENCRYPT);
-		encrypt.setTitle(R.string.config_probe_instagram_encrypt_title);
-		encrypt.setSummary(R.string.config_probe_instagram_encrypt_summary);
+            if (encrypt instanceof Boolean) {
+                Boolean encryptBoolean = (Boolean) encrypt;
 
-		screen.addPreference(encrypt);
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
 
-		final Preference authPreference = new Preference(activity);
-		authPreference.setTitle(R.string.title_authenticate_instagram_probe);
-		authPreference.setSummary(R.string.summary_authenticate_instagram_probe);
+                e.putBoolean("config_probe_instagram_encrypt_data",
+                        encryptBoolean.booleanValue());
+                e.commit();
+            }
+        }
+    }
 
-		final InstagramProbe me = this;
-		
-		final Preference logoutPreference = new Preference(activity);
-		logoutPreference.setTitle(R.string.title_logout_instagram_probe);
-		logoutPreference.setSummary(R.string.summary_logout_instagram_probe);
+    public String summary(Context context) {
+        return context.getString(R.string.summary_instagram_probe_desc);
+    }
 
-		authPreference.setOnPreferenceClickListener(new OnPreferenceClickListener()
-		{
-			public boolean onPreferenceClick(Preference preference) 
-			{
-				me.fetchAuth(activity);
-				
-				screen.addPreference(logoutPreference);
-				screen.removePreference(authPreference);
+    @SuppressWarnings("deprecation")
+    public PreferenceScreen preferenceScreen(final PreferenceActivity activity) {
+        PreferenceManager manager = activity.getPreferenceManager();
 
-				return true;
-			}
-		});
-		
-		logoutPreference.setOnPreferenceClickListener(new OnPreferenceClickListener()
-		{
-			public boolean onPreferenceClick(Preference preference) 
-			{
-				Editor e = prefs.edit();
-				e.remove("oauth_instagram_token");
-				e.remove("oauth_instagram_secret");
-				e.commit();
-				
-				screen.addPreference(authPreference);
-				screen.removePreference(logoutPreference);
-				
-				activity.runOnUiThread(new Runnable()
-				{
-					public void run() 
-					{
-						Toast.makeText(activity, activity.getString(R.string.toast_instagram_logout), Toast.LENGTH_LONG).show();
-					}
-				});
+        final PreferenceScreen screen = manager
+                .createPreferenceScreen(activity);
+        screen.setTitle(this.title(activity));
+        screen.setSummary(R.string.summary_instagram_probe_desc);
 
-				return true;
-			}
-		});
-		
-		if (token == null || secret == null)
-			screen.addPreference(authPreference);
-		else
-			screen.addPreference(logoutPreference);
+        final SharedPreferences prefs = Probe.getPreferences(activity);
 
-		return screen;
-	}
+        String token = prefs.getString("oauth_instagram_token", null);
+        String secret = prefs.getString("oauth_instagram_secret", null);
+
+        CheckBoxPreference enabled = new CheckBoxPreference(activity);
+        enabled.setTitle(R.string.title_enable_probe);
+        enabled.setKey("config_probe_instagram_enabled");
+        enabled.setDefaultValue(InstagramProbe.DEFAULT_ENABLED);
+
+        screen.addPreference(enabled);
+
+        ListPreference duration = new ListPreference(activity);
+        duration.setKey("config_probe_instagram_frequency");
+        duration.setEntryValues(R.array.probe_low_frequency_values);
+        duration.setEntries(R.array.probe_low_frequency_labels);
+        duration.setTitle(R.string.probe_frequency_label);
+        duration.setDefaultValue(Probe.DEFAULT_FREQUENCY);
+
+        screen.addPreference(duration);
+
+        CheckBoxPreference encrypt = new CheckBoxPreference(activity);
+        encrypt.setKey("config_probe_instagram_encrypt_data");
+        encrypt.setDefaultValue(InstagramProbe.DEFAULT_ENCRYPT);
+        encrypt.setTitle(R.string.config_probe_instagram_encrypt_title);
+        encrypt.setSummary(R.string.config_probe_instagram_encrypt_summary);
+
+        screen.addPreference(encrypt);
+
+        final Preference authPreference = new Preference(activity);
+        authPreference.setTitle(R.string.title_authenticate_instagram_probe);
+        authPreference
+                .setSummary(R.string.summary_authenticate_instagram_probe);
+
+        final InstagramProbe me = this;
+
+        final Preference logoutPreference = new Preference(activity);
+        logoutPreference.setTitle(R.string.title_logout_instagram_probe);
+        logoutPreference.setSummary(R.string.summary_logout_instagram_probe);
+
+        authPreference
+                .setOnPreferenceClickListener(new OnPreferenceClickListener() {
+                    public boolean onPreferenceClick(Preference preference) {
+                        me.fetchAuth(activity);
+
+                        screen.addPreference(logoutPreference);
+                        screen.removePreference(authPreference);
+
+                        return true;
+                    }
+                });
+
+        logoutPreference
+                .setOnPreferenceClickListener(new OnPreferenceClickListener() {
+                    public boolean onPreferenceClick(Preference preference) {
+                        Editor e = prefs.edit();
+                        e.remove("oauth_instagram_token");
+                        e.remove("oauth_instagram_secret");
+                        e.commit();
+
+                        screen.addPreference(authPreference);
+                        screen.removePreference(logoutPreference);
+
+                        activity.runOnUiThread(new Runnable() {
+                            public void run() {
+                                Toast.makeText(
+                                        activity,
+                                        activity.getString(R.string.toast_instagram_logout),
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        });
+
+                        return true;
+                    }
+                });
+
+        if (token == null || secret == null)
+            screen.addPreference(authPreference);
+        else
+            screen.addPreference(logoutPreference);
+
+        return screen;
+    }
 }
