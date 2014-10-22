@@ -540,6 +540,18 @@ public abstract class BaseScriptEngine
 		return prefs.getString(key, null);
 	}
 
+	public String fetchSetting(String key)
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+		
+		Object value = prefs.getAll().get(key);
+		
+		if (value != null)
+			return value.toString();
+
+		return null;
+	}
+
 	public void resetTrigger(String triggerId)
 	{
 		for (Trigger trigger : TriggerManager.getInstance(this._context).triggersForId(triggerId))

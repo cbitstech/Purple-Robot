@@ -19,6 +19,7 @@ import android.os.SystemClock;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.RealTimeProbeViewActivity;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
@@ -405,5 +406,12 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
 	protected String tableName() 
 	{
 		return AccelerometerProbe.DB_TABLE;
+	}
+
+	public double getThreshold() 
+	{
+		SharedPreferences prefs = Probe.getPreferences(this._context);
+		
+		return Double.parseDouble(prefs.getString("config_probe_accelerometer_threshold", "-1"));
 	}
 }

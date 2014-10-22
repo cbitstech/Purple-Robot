@@ -33,7 +33,6 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.OAuthActivity;
@@ -459,9 +458,6 @@ public class FoursquareProbe extends Probe
 				InputStream in = u.openStream();
 
 				String jsonString = IOUtils.toString(in);
-				
-				Log.e("PR","FS JSON: " + jsonString);
-				
 				
 				in.close();
 				

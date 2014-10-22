@@ -22,7 +22,7 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
+
 import edu.emory.mathcs.backport.java.util.Arrays;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -183,8 +183,6 @@ public class GooglePlacesFeature extends Feature
 
 		String jsonString = IOUtils.toString(in);
 		
-		Log.e("PR", "PLACES: " + jsonString);
-		
 		in.close();
 
 		JSONObject json = new JSONObject(jsonString);
@@ -197,8 +195,6 @@ public class GooglePlacesFeature extends Feature
 		
 		for (String type : availableTypes)
 		{
-			Log.e("PR", "GPLACE: PUT TYPE " + type);
-			
 			place.put(type, Integer.valueOf(0));
 		}
 		
@@ -219,7 +215,6 @@ public class GooglePlacesFeature extends Feature
 				
 				count = Integer.valueOf(count.intValue() + 1);
 				
-				Log.e("PR", "GPLACE: " + type + " -- " + count);
 				place.put(type, count);
 			}
 		}
