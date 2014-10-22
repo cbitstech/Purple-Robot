@@ -16,6 +16,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
@@ -33,6 +34,10 @@ public abstract class Probe
 	public static final boolean DEFAULT_HASH_DATA = true;
 
 	public static final String ENCRYPT_DATA = "encrypt_data";
+
+	public static final String PROBE_ENABLED = "enabled";
+	public static final String PROBE_NAME = "name";
+
 
 	public abstract String name(Context context);
 	public abstract String title(Context context);
@@ -207,9 +212,9 @@ public abstract class Probe
 	
 	public void updateFromMap(Context context, Map<String, Object> params) 
 	{
-		if (params.containsKey("enabled"))
+		if (params.containsKey(Probe.PROBE_ENABLED))
 		{
-			Object enabled = params.get("enabled");
+			Object enabled = params.get(Probe.PROBE_ENABLED);
 			
 			if (enabled instanceof Boolean)
 			{

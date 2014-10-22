@@ -16,12 +16,13 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public abstract class ContinuousProbe extends Probe
 {
-	protected static final String PROBE_THRESHOLD = "threshold";
+	public static final String PROBE_THRESHOLD = "threshold";
 
 	protected static final boolean DEFAULT_ENABLED = false;
 	protected static final String DEFAULT_FREQUENCY = "0";
@@ -134,8 +135,8 @@ public abstract class ContinuousProbe extends Probe
 		if (params.containsKey(Probe.PROBE_FREQUENCY))
 		{
 			Object frequency = params.get(Probe.PROBE_FREQUENCY);
-			
-			if (frequency instanceof Long)
+
+			if (frequency instanceof Long || frequency instanceof Integer)
 			{
 				String key = "config_probe_" + this.getPreferenceKey() + "_frequency";
 				
@@ -145,13 +146,23 @@ public abstract class ContinuousProbe extends Probe
 				e.putString(key, frequency.toString());
 				e.commit();
 			}
-			else if (frequency instanceof String)
+			if (frequency instanceof Double)
 			{
 				String key = "config_probe_" + this.getPreferenceKey() + "_frequency";
 				
 				SharedPreferences prefs = Probe.getPreferences(context);
 				Editor e = prefs.edit();
 				
+				e.putString(key, "" + ((Double) frequency).intValue());
+				e.commit();
+			}
+			else if (frequency instanceof String)
+			{
+				String key = "config_probe_" + this.getPreferenceKey() + "_frequency";
+				
+				SharedPreferences prefs = Probe.getPreferences(context);
+				Editor e = prefs.edit();
+
 				e.putString(key, frequency.toString());
 				e.commit();
 			}
