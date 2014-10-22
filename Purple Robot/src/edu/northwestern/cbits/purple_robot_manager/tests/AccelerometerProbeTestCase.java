@@ -12,125 +12,108 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.AccelerometerProbe;
 
-public class AccelerometerProbeTestCase extends RobotTestCase 
-{
-	public AccelerometerProbeTestCase(Context context, int priority) 
-	{
-		super(context, priority);
-	}
-	
-	public void test() 
-	{
-		if (this.isSelected(this._context) == false)
-			return;
-		
-		final ContentValues values = new ContentValues();
-		values.put("count", 0L);
-		values.put("start", Double.MAX_VALUE);
-		values.put("end", 0D);
-		
-		BroadcastReceiver receiver = new BroadcastReceiver()
-		{
-			public void onReceive(Context context, Intent intent) 
-			{
-				String name = intent.getStringExtra("PROBE");
-				
-				if (AccelerometerProbe.NAME.equals(name))
-				{
-					double[] times = intent.getDoubleArrayExtra("EVENT_TIMESTAMP");
+public class AccelerometerProbeTestCase extends RobotTestCase {
+    public AccelerometerProbeTestCase(Context context, int priority) {
+        super(context, priority);
+    }
 
-					long count = values.getAsLong("count");
-					double start = values.getAsDouble("start");
-					double end = values.getAsDouble("end");
-					
-					for (double time : times)
-					{
-						if (time < start)
-							start = time;
-						
-						if (time > end)
-							end = time;
-					}
-				
-					values.put("count", count + times.length);
-					values.put("start", start);
-					values.put("end", end);
-				}
-			}
-		};
+    public void test() {
+        if (this.isSelected(this._context) == false)
+            return;
 
-		IntentFilter intentFilter = new IntentFilter();
-		intentFilter.addAction(Probe.PROBE_READING);
+        final ContentValues values = new ContentValues();
+        values.put("count", 0L);
+        values.put("start", Double.MAX_VALUE);
+        values.put("end", 0D);
 
-		LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(this._context);
-		localManager.registerReceiver(receiver, intentFilter);
-		
-		try 
-		{
-			this.broadcastUpdate("Enabling probe...");
+        BroadcastReceiver receiver = new BroadcastReceiver() {
+            public void onReceive(Context context, Intent intent) {
+                String name = intent.getStringExtra("PROBE");
 
-			for (Probe probe : ProbeManager.allProbes(this._context))
-			{
-				if (probe instanceof AccelerometerProbe)
-				{
-					probe.enable(this._context);
-				}
-			}
+                if (AccelerometerProbe.NAME.equals(name)) {
+                    double[] times = intent
+                            .getDoubleArrayExtra("EVENT_TIMESTAMP");
 
-			Thread.sleep(2000);
+                    long count = values.getAsLong("count");
+                    double start = values.getAsDouble("start");
+                    double end = values.getAsDouble("end");
 
-			for (Probe probe : ProbeManager.allProbes(this._context))
-			{
-				if (probe instanceof AccelerometerProbe)
-				{
-					Assert.assertTrue("ATP0", probe.isEnabled(this._context));
-				}
-			}
+                    for (double time : times) {
+                        if (time < start)
+                            start = time;
 
-			this.broadcastUpdate("Sleeping. 60 seconds remaining...", 0);
-			Thread.sleep(15000);
-			this.broadcastUpdate("Sleeping. 45 seconds remaining...", 0);
-			Thread.sleep(15000);
-			this.broadcastUpdate("Sleeping. 30 seconds remaining...", 0);
-			Thread.sleep(15000);
-			this.broadcastUpdate("Sleeping. 15 seconds remaining...", 0);
-			Thread.sleep(15000);
+                        if (time > end)
+                            end = time;
+                    }
 
-			this.broadcastUpdate("Halting data collection...", 0);
-			localManager.unregisterReceiver(receiver);
-			Thread.sleep(2000);
-		} 
-		catch (InterruptedException e) 
-		{
-			Assert.fail("ATP1");
-		}
-		
-		long count = values.getAsLong("count");
-		double start = values.getAsDouble("start");
-		double end = values.getAsDouble("end");
-		
-		Assert.assertTrue("ATP2", count > 60);
-		Assert.assertTrue("ATP3", start > 0);
-		Assert.assertTrue("ATP3", end < System.currentTimeMillis());
-		Assert.assertTrue("ATP4", (end - start) > 45);
+                    values.put("count", count + times.length);
+                    values.put("start", start);
+                    values.put("end", end);
+                }
+            }
+        };
 
-		for (Probe probe : ProbeManager.allProbes(this._context))
-		{
-			if (probe instanceof AccelerometerProbe)
-			{
-				probe.disable(this._context);
-			}
-		}
-	}
-	
-	public int estimatedMinutes() 
-	{
-		return 1;
-	}
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Probe.PROBE_READING);
 
+        LocalBroadcastManager localManager = LocalBroadcastManager
+                .getInstance(this._context);
+        localManager.registerReceiver(receiver, intentFilter);
 
-	public String name(Context context) 
-	{
-		return context.getString(R.string.name_accelerometer_probe_test);
-	}
+        try {
+            this.broadcastUpdate("Enabling probe...");
+
+            for (Probe probe : ProbeManager.allProbes(this._context)) {
+                if (probe instanceof AccelerometerProbe) {
+                    probe.enable(this._context);
+                }
+            }
+
+            Thread.sleep(2000);
+
+            for (Probe probe : ProbeManager.allProbes(this._context)) {
+                if (probe instanceof AccelerometerProbe) {
+                    Assert.assertTrue("ATP0", probe.isEnabled(this._context));
+                }
+            }
+
+            this.broadcastUpdate("Sleeping. 60 seconds remaining...", 0);
+            Thread.sleep(15000);
+            this.broadcastUpdate("Sleeping. 45 seconds remaining...", 0);
+            Thread.sleep(15000);
+            this.broadcastUpdate("Sleeping. 30 seconds remaining...", 0);
+            Thread.sleep(15000);
+            this.broadcastUpdate("Sleeping. 15 seconds remaining...", 0);
+            Thread.sleep(15000);
+
+            this.broadcastUpdate("Halting data collection...", 0);
+            localManager.unregisterReceiver(receiver);
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            Assert.fail("ATP1");
+        }
+
+        long count = values.getAsLong("count");
+        double start = values.getAsDouble("start");
+        double end = values.getAsDouble("end");
+
+        Assert.assertTrue("ATP2", count > 60);
+        Assert.assertTrue("ATP3", start > 0);
+        Assert.assertTrue("ATP3", end < System.currentTimeMillis());
+        Assert.assertTrue("ATP4", (end - start) > 45);
+
+        for (Probe probe : ProbeManager.allProbes(this._context)) {
+            if (probe instanceof AccelerometerProbe) {
+                probe.disable(this._context);
+            }
+        }
+    }
+
+    public int estimatedMinutes() {
+        return 1;
+    }
+
+    public String name(Context context) {
+        return context.getString(R.string.name_accelerometer_probe_test);
+    }
 }

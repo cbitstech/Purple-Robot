@@ -15,77 +15,59 @@ import android.content.Context;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 
-public class ExecuteJavaScriptCommand extends JSONCommand 
-{
-	public static final String COMMAND_NAME = "execute_script";
-	
-	public static final String SCRIPT = "script";
-	
-	public ExecuteJavaScriptCommand(JSONObject arguments, Context context) 
-	{
-		super(arguments, context);
-	}
+public class ExecuteJavaScriptCommand extends JSONCommand {
+    public static final String COMMAND_NAME = "execute_script";
 
-	public JSONObject execute(Context context) 
-	{
-		JSONObject result = super.execute(context);
+    public static final String SCRIPT = "script";
 
-		try 
-		{
-			if (JSONCommand.STATUS_OK.equals(result.get(JSONCommand.STATUS)))
-			{
-				JavaScriptEngine engine = new JavaScriptEngine(this._context);
+    public ExecuteJavaScriptCommand(JSONObject arguments, Context context) {
+        super(arguments, context);
+    }
 
-				Object o = null;
-				
-				String script = this._arguments.getString(ExecuteJavaScriptCommand.SCRIPT);
-				
-				try
-				{
-					o = engine.runScript(script);
-				}
-				catch (EvaluatorException ee)
-				{
-					script = URLDecoder.decode(script, "UTF-8");
-					o = engine.runScript(script);
-				}				
+    public JSONObject execute(Context context) {
+        JSONObject result = super.execute(context);
 
-				if ((o instanceof Undefined) == false)
-				{
-					if (o instanceof NativeJavaObject)
-					{
-						NativeJavaObject nativeObj = (NativeJavaObject) o;
-						
-						o = nativeObj.unwrap();
-					}
-					else if (o instanceof NativeArray)
-					{
-						o = JavaScriptEngine.nativeToJson((NativeArray) o);
-					}
-					else if (o instanceof NativeObject)
-					{
-						o = JavaScriptEngine.nativeToJson((NativeObject) o);
-					}
+        try {
+            if (JSONCommand.STATUS_OK.equals(result.get(JSONCommand.STATUS))) {
+                JavaScriptEngine engine = new JavaScriptEngine(this._context);
 
-					result.put(JSONCommand.PAYLOAD, o);
-				}
-			}
-		}
-		catch (Exception e) 
-		{
-			LogManager.getInstance(context).logException(e);
-			
-			try 
-			{
-				result.put(JSONCommand.STATUS, JSONCommand.STATUS_ERROR);
-				result.put(JSONCommand.MESSAGE, e.toString());
-			}
-			catch (JSONException ee) 
-			{
-				LogManager.getInstance(context).logException(ee);
-			}
-		}
+                Object o = null;
 
-		return result;
-	}
+                String script = this._arguments
+                        .getString(ExecuteJavaScriptCommand.SCRIPT);
+
+                try {
+                    o = engine.runScript(script);
+                } catch (EvaluatorException ee) {
+                    script = URLDecoder.decode(script, "UTF-8");
+                    o = engine.runScript(script);
+                }
+
+                if ((o instanceof Undefined) == false) {
+                    if (o instanceof NativeJavaObject) {
+                        NativeJavaObject nativeObj = (NativeJavaObject) o;
+
+                        o = nativeObj.unwrap();
+                    } else if (o instanceof NativeArray) {
+                        o = JavaScriptEngine.nativeToJson((NativeArray) o);
+                    } else if (o instanceof NativeObject) {
+                        o = JavaScriptEngine.nativeToJson((NativeObject) o);
+                    }
+
+                    result.put(JSONCommand.PAYLOAD, o);
+                }
+            }
+        } catch (Exception e) {
+            LogManager.getInstance(context).logException(e);
+
+            try {
+                result.put(JSONCommand.STATUS, JSONCommand.STATUS_ERROR);
+                result.put(JSONCommand.MESSAGE, e.toString());
+            } catch (JSONException ee) {
+                LogManager.getInstance(context).logException(ee);
+            }
+        }
+
+        return result;
+    }
 }

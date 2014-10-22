@@ -19,170 +19,148 @@ import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("NewApi")
-public class BluetoothReceiverProbe extends Probe
-{
-	private boolean isRegistered = false;
+public class BluetoothReceiverProbe extends Probe {
+    private boolean isRegistered = false;
 
-	public String name(Context context)
-	{
-		return "Bluetooth test probe";
-	}
-	
-	public String summary(Context context) 
-	{
-		return "";
-	}
+    public String name(Context context) {
+        return "Bluetooth test probe";
+    }
 
-	public String title(Context context)
-	{
-		return this.name(context);
-	}
+    public String summary(Context context) {
+        return "";
+    }
 
-	public String probeCategory(Context context)
-	{
-		return "PIZZA PIE";
-	}
+    public String title(Context context) {
+        return this.name(context);
+    }
 
-	@SuppressWarnings("deprecation")
-	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
-	{
-		PreferenceManager manager = activity.getPreferenceManager();
+    public String probeCategory(Context context) {
+        return "PIZZA PIE";
+    }
 
-		PreferenceScreen screen = manager.createPreferenceScreen(activity);
-		screen.setTitle(this.title(activity));
+    @SuppressWarnings("deprecation")
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+        PreferenceManager manager = activity.getPreferenceManager();
 
-		return screen;
-	}
-	
-	public void enable(Context context)
-	{
-		SharedPreferences prefs = Probe.getPreferences(context);
-		
-		Editor e = prefs.edit();
-		e.putBoolean("CHANGEME", true);
-		
-		e.commit();
-	}
+        PreferenceScreen screen = manager.createPreferenceScreen(activity);
+        screen.setTitle(this.title(activity));
 
-	public void disable(Context context)
-	{
-		SharedPreferences prefs = Probe.getPreferences(context);
-		
-		Editor e = prefs.edit();
-		e.putBoolean("CHANGEME", false);
-		
-		e.commit();
-	}
+        return screen;
+    }
 
-	public boolean isEnabled(final Context context)
-	{
-		final BluetoothReceiverProbe me = this;
+    public void enable(Context context) {
+        SharedPreferences prefs = Probe.getPreferences(context);
 
-		if (!this.isRegistered)
-		{
-			// BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+        Editor e = prefs.edit();
+        e.putBoolean("CHANGEME", true);
 
-			/*
-			BroadcastReceiver mReceiver = new BroadcastReceiver()
-			{
-			    @SuppressLint("NewApi")
-				public void onReceive(Context context, Intent intent)
-			    {
-			        String action = intent.getAction();
+        e.commit();
+    }
 
-			        Log.e("PRM", "BT RECEIVER " + action);
+    public void disable(Context context) {
+        SharedPreferences prefs = Probe.getPreferences(context);
 
-			        if (BluetoothDevice.ACTION_FOUND.equals(action))
-			        {
-			            // Get the BluetoothDevice object from the Intent
-			            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-			            // Add the name and address to an array adapter to show in a ListView
-			            Log.e("PRM", device.getName() + "\n" + device.getAddress());
+        Editor e = prefs.edit();
+        e.putBoolean("CHANGEME", false);
 
-			            device.fetchUuidsWithSdp();
-			        }
-			        else if(BluetoothDevice.ACTION_UUID.equals(action))
-			        {
-			            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-			            Parcelable[] uuidExtra = intent.getParcelableArrayExtra(BluetoothDevice.EXTRA_UUID);
-			            for (int i=0; i<uuidExtra.length; i++) {
-			              Log.e("PRM", "Device: " + device.getName() + ", " + device + ", Service: " + uuidExtra[i].toString());
-			            }
-			        }
-			    }
-			};
-			// Register the BroadcastReceiver
-			IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-			filter.addAction(BluetoothDevice.ACTION_UUID);
+        e.commit();
+    }
 
-			context.registerReceiver(mReceiver, filter); // Don't forget to unregister during onDestroy
+    public boolean isEnabled(final Context context) {
+        final BluetoothReceiverProbe me = this;
 
-			adapter.startDiscovery();
-			*/
+        if (!this.isRegistered) {
+            // BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 
-			Thread t = new Thread(new Runnable()
-			{
-				public void run()
-				{
-					BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+            /*
+             * BroadcastReceiver mReceiver = new BroadcastReceiver() {
+             * 
+             * @SuppressLint("NewApi") public void onReceive(Context context,
+             * Intent intent) { String action = intent.getAction();
+             * 
+             * Log.e("PRM", "BT RECEIVER " + action);
+             * 
+             * if (BluetoothDevice.ACTION_FOUND.equals(action)) { // Get the
+             * BluetoothDevice object from the Intent BluetoothDevice device =
+             * intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE); // Add
+             * the name and address to an array adapter to show in a ListView
+             * Log.e("PRM", device.getName() + "\n" + device.getAddress());
+             * 
+             * device.fetchUuidsWithSdp(); } else
+             * if(BluetoothDevice.ACTION_UUID.equals(action)) { BluetoothDevice
+             * device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+             * Parcelable[] uuidExtra =
+             * intent.getParcelableArrayExtra(BluetoothDevice.EXTRA_UUID); for
+             * (int i=0; i<uuidExtra.length; i++) { Log.e("PRM", "Device: " +
+             * device.getName() + ", " + device + ", Service: " +
+             * uuidExtra[i].toString()); } } } }; // Register the
+             * BroadcastReceiver IntentFilter filter = new
+             * IntentFilter(BluetoothDevice.ACTION_FOUND);
+             * filter.addAction(BluetoothDevice.ACTION_UUID);
+             * 
+             * context.registerReceiver(mReceiver, filter); // Don't forget to
+             * unregister during onDestroy
+             * 
+             * adapter.startDiscovery();
+             */
 
-					try
-					{
-						BluetoothServerSocket server = adapter.listenUsingRfcommWithServiceRecord("Test Service", UUID.fromString("0000112f-0000-1000-8000-00805f9b34fb"));
-//						BluetoothServerSocket server = adapter.listenUsingRfcommWithServiceRecord("Test Service", UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66"));
+            Thread t = new Thread(new Runnable() {
+                public void run() {
+                    BluetoothAdapter adapter = BluetoothAdapter
+                            .getDefaultAdapter();
 
-				        BluetoothSocket socket = null;
+                    try {
+                        BluetoothServerSocket server = adapter.listenUsingRfcommWithServiceRecord(
+                                "Test Service",
+                                UUID.fromString("0000112f-0000-1000-8000-00805f9b34fb"));
+                        // BluetoothServerSocket server =
+                        // adapter.listenUsingRfcommWithServiceRecord("Test Service",
+                        // UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66"));
 
-				        while (true)
-				        {
-				            try
-				            {
-				                socket = server.accept();
-				            }
-				            catch (IOException e)
-				            {
-				                break;
-				            }
+                        BluetoothSocket socket = null;
 
-				            if (socket != null)
-				            	me.manageSocket(socket);
-				        }
-					}
-					catch (IOException e)
-					{
-						LogManager.getInstance(context).logException(e);
-					}
-				}
-			});
+                        while (true) {
+                            try {
+                                socket = server.accept();
+                            } catch (IOException e) {
+                                break;
+                            }
 
-			t.start();
+                            if (socket != null)
+                                me.manageSocket(socket);
+                        }
+                    } catch (IOException e) {
+                        LogManager.getInstance(context).logException(e);
+                    }
+                }
+            });
 
-			this.isRegistered = true;
-		}
-		return true;
-	}
+            t.start();
 
-	protected void manageSocket(BluetoothSocket socket) throws IOException
-	{
-		Log.e("PRM", "GOT BLUETOOTH CONNECTION: " + socket.getRemoteDevice().getName());
+            this.isRegistered = true;
+        }
+        return true;
+    }
 
-		int read = 0;
-		byte[] buffer = new byte[1024];
+    protected void manageSocket(BluetoothSocket socket) throws IOException {
+        Log.e("PRM", "GOT BLUETOOTH CONNECTION: "
+                + socket.getRemoteDevice().getName());
 
-		InputStream in = socket.getInputStream();
+        int read = 0;
+        byte[] buffer = new byte[1024];
 
-		while ((read = in.read(buffer, 0, buffer.length)) != -1)
-		{
-			String s = new String(buffer, 0, read);
+        InputStream in = socket.getInputStream();
 
-			Log.e("PRM", "READ " + s + " BYTES!");
-		}
+        while ((read = in.read(buffer, 0, buffer.length)) != -1) {
+            String s = new String(buffer, 0, read);
 
-		socket.close();
-	}
+            Log.e("PRM", "READ " + s + " BYTES!");
+        }
 
+        socket.close();
+    }
 
-	{
+    {
 
-	}
+    }
 }

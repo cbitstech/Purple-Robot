@@ -23,237 +23,237 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
-public class NetworkProbe extends Probe 
-{
-	private static final String HOSTNAME = "HOSTNAME";
-	private static final String IP_ADDRESS = "IP_ADDRESS";
-	private static final String IFACE_NAME = "INTERFACE_NAME";
-	private static final String IFACE_DISPLAY_NAME = "INTERFACE_DISPLAY";
+public class NetworkProbe extends Probe {
+    private static final String HOSTNAME = "HOSTNAME";
+    private static final String IP_ADDRESS = "IP_ADDRESS";
+    private static final String IFACE_NAME = "INTERFACE_NAME";
+    private static final String IFACE_DISPLAY_NAME = "INTERFACE_DISPLAY";
 
-	private static final boolean DEFAULT_ENABLED = true;
+    private static final boolean DEFAULT_ENABLED = true;
 
-	private long _lastCheck = 0;
+    private long _lastCheck = 0;
 
-	public String name(Context context)
-	{
-		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.NetworkProbe";
-	}
+    public String name(Context context) {
+        return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.NetworkProbe";
+    }
 
-	public String title(Context context)
-	{
-		return context.getString(R.string.title_network_probe);
-	}
+    public String title(Context context) {
+        return context.getString(R.string.title_network_probe);
+    }
 
-	public String probeCategory(Context context)
-	{
-		return context.getResources().getString(R.string.probe_device_info_category);
-	}
+    public String probeCategory(Context context) {
+        return context.getResources().getString(
+                R.string.probe_device_info_category);
+    }
 
-	public void enable(Context context)
-	{
-		SharedPreferences prefs = Probe.getPreferences(context);
-		
-		Editor e = prefs.edit();
-		e.putBoolean("config_probe_network_enabled", true);
-		
-		e.commit();
-	}
+    public void enable(Context context) {
+        SharedPreferences prefs = Probe.getPreferences(context);
 
-	public void disable(Context context)
-	{
-		SharedPreferences prefs = Probe.getPreferences(context);
-		
-		Editor e = prefs.edit();
-		e.putBoolean("config_probe_network_enabled", false);
-		
-		e.commit();
-	}
+        Editor e = prefs.edit();
+        e.putBoolean("config_probe_network_enabled", true);
 
-	public boolean isEnabled(final Context context)
-	{
-		SharedPreferences prefs = Probe.getPreferences(context);
+        e.commit();
+    }
 
-		if (super.isEnabled(context))
-		{
-			final long now = System.currentTimeMillis();
+    public void disable(Context context) {
+        SharedPreferences prefs = Probe.getPreferences(context);
 
-			if (prefs.getBoolean("config_probe_network_enabled", NetworkProbe.DEFAULT_ENABLED))
-			{
-				synchronized(this)
-				{
-					long freq = Long.parseLong(prefs.getString("config_probe_network_frequency", Probe.DEFAULT_FREQUENCY));
+        Editor e = prefs.edit();
+        e.putBoolean("config_probe_network_enabled", false);
 
-					if (now - this._lastCheck  > freq)
-					{
-						final NetworkProbe me = this;
-						
-						Runnable r = new Runnable()
-						{
-							@SuppressWarnings("deprecation")
-							public void run() 
-							{
-								Bundle bundle = new Bundle();
-								bundle.putString("PROBE", me.name(context));
-								bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+        e.commit();
+    }
 
-								WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-								WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-						   
-								if (wifiInfo != null)
-								{
-									int ip = wifiInfo.getIpAddress();
+    public boolean isEnabled(final Context context) {
+        SharedPreferences prefs = Probe.getPreferences(context);
 
-									String ipString = Formatter.formatIpAddress(ip);
-									
-									bundle.putString(NetworkProbe.IP_ADDRESS, ipString);
-									
-									try 
-									{
-										bundle.putString(NetworkProbe.HOSTNAME, InetAddress.getByName(ipString).getHostName());
-									}
-									catch (UnknownHostException e) 
-									{
-										bundle.putString(NetworkProbe.HOSTNAME, ipString);
-									}
-								}
-								else
-								{
-									try 
-									{
-										Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
+        if (super.isEnabled(context)) {
+            final long now = System.currentTimeMillis();
 
-										NetworkInterface iface = null;
-										
-										while (ifaces.hasMoreElements() && (iface = ifaces.nextElement()) != null && bundle.containsKey(NetworkProbe.IP_ADDRESS) == false)
-										{
-											if (iface.getName().equals("lo") == false)
-											{
-												Enumeration<InetAddress> ips = iface.getInetAddresses();
-												InetAddress ipAddr = null;
-												
-												while (ips.hasMoreElements() && (ipAddr = ips.nextElement()) != null)
-												{
-													bundle.putString(NetworkProbe.IP_ADDRESS, ipAddr.getHostAddress());
-													bundle.putString(NetworkProbe.HOSTNAME, ipAddr.getHostName());
-												}
-											}
-										}
-									} 
-									catch (SocketException e) 
-									{
-										LogManager.getInstance(context).logException(e);
-									}
-								}
-								
-								if (bundle.containsKey(NetworkProbe.IP_ADDRESS) == false)
-								{
-									bundle.putString(NetworkProbe.IP_ADDRESS, "127.0.0.1");
-									bundle.putString(NetworkProbe.HOSTNAME, "localhost");
-								}
+            if (prefs.getBoolean("config_probe_network_enabled",
+                    NetworkProbe.DEFAULT_ENABLED)) {
+                synchronized (this) {
+                    long freq = Long.parseLong(prefs.getString(
+                            "config_probe_network_frequency",
+                            Probe.DEFAULT_FREQUENCY));
 
-								try 
-								{
-									NetworkInterface iface = NetworkInterface.getByInetAddress(InetAddress.getByName("127.0.0.1"));
+                    if (now - this._lastCheck > freq) {
+                        final NetworkProbe me = this;
 
-									bundle.putString(NetworkProbe.IFACE_NAME, iface.getName());
-									bundle.putString(NetworkProbe.IFACE_DISPLAY_NAME, iface.getDisplayName());
-								}
-								catch (SocketException e) 
-								{
-									LogManager.getInstance(context).logException(e);
-								} 
-								catch (UnknownHostException e) 
-								{
-									LogManager.getInstance(context).logException(e);
-								}
+                        Runnable r = new Runnable() {
+                            @SuppressWarnings("deprecation")
+                            public void run() {
+                                Bundle bundle = new Bundle();
+                                bundle.putString("PROBE", me.name(context));
+                                bundle.putLong("TIMESTAMP",
+                                        System.currentTimeMillis() / 1000);
 
-								me.transmitData(context, bundle);
+                                WifiManager wifiManager = (WifiManager) context
+                                        .getSystemService(Context.WIFI_SERVICE);
+                                WifiInfo wifiInfo = wifiManager
+                                        .getConnectionInfo();
 
-								me._lastCheck = now;
-							}
-						};
-						
-						Thread t = new Thread(r);
-						t.start();
-					}
-				}
+                                if (wifiInfo != null) {
+                                    int ip = wifiInfo.getIpAddress();
 
-				return true;
-			}
-		}
+                                    String ipString = Formatter
+                                            .formatIpAddress(ip);
 
-		return false;
-	}
+                                    bundle.putString(NetworkProbe.IP_ADDRESS,
+                                            ipString);
 
-	public String summarizeValue(Context context, Bundle bundle)
-	{
-		String ipAddress = bundle.getString(NetworkProbe.IP_ADDRESS);
+                                    try {
+                                        bundle.putString(NetworkProbe.HOSTNAME,
+                                                InetAddress.getByName(ipString)
+                                                        .getHostName());
+                                    } catch (UnknownHostException e) {
+                                        bundle.putString(NetworkProbe.HOSTNAME,
+                                                ipString);
+                                    }
+                                } else {
+                                    try {
+                                        Enumeration<NetworkInterface> ifaces = NetworkInterface
+                                                .getNetworkInterfaces();
 
-		return String.format(context.getResources().getString(R.string.summary_network_probe), ipAddress);
-	}
+                                        NetworkInterface iface = null;
 
-	public Map<String, Object> configuration(Context context)
-	{
-		Map<String, Object> map = super.configuration(context);
-		
-		SharedPreferences prefs = Probe.getPreferences(context);
+                                        while (ifaces.hasMoreElements()
+                                                && (iface = ifaces
+                                                        .nextElement()) != null
+                                                && bundle
+                                                        .containsKey(NetworkProbe.IP_ADDRESS) == false) {
+                                            if (iface.getName().equals("lo") == false) {
+                                                Enumeration<InetAddress> ips = iface
+                                                        .getInetAddresses();
+                                                InetAddress ipAddr = null;
 
-		long freq = Long.parseLong(prefs.getString("config_probe_network_frequency", Probe.DEFAULT_FREQUENCY));
-		
-		map.put(Probe.PROBE_FREQUENCY, freq);
-		
-		return map;
-	}
-	
-	public void updateFromMap(Context context, Map<String, Object> params) 
-	{
-		super.updateFromMap(context, params);
-		
-		if (params.containsKey(Probe.PROBE_FREQUENCY))
-		{
-			Object frequency = params.get(Probe.PROBE_FREQUENCY);
-			
-			if (frequency instanceof Long)
-			{
-				SharedPreferences prefs = Probe.getPreferences(context);
-				Editor e = prefs.edit();
-				
-				e.putString("config_probe_network_frequency", frequency.toString());
-				e.commit();
-			}
-		}
-	}
-	
-	public String summary(Context context) 
-	{
-		return context.getString(R.string.summary_network_probe_desc);
-	}
+                                                while (ips.hasMoreElements()
+                                                        && (ipAddr = ips
+                                                                .nextElement()) != null) {
+                                                    bundle.putString(
+                                                            NetworkProbe.IP_ADDRESS,
+                                                            ipAddr.getHostAddress());
+                                                    bundle.putString(
+                                                            NetworkProbe.HOSTNAME,
+                                                            ipAddr.getHostName());
+                                                }
+                                            }
+                                        }
+                                    } catch (SocketException e) {
+                                        LogManager.getInstance(context)
+                                                .logException(e);
+                                    }
+                                }
 
-	@SuppressWarnings("deprecation")
-	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
-	{
-		PreferenceManager manager = activity.getPreferenceManager();
+                                if (bundle.containsKey(NetworkProbe.IP_ADDRESS) == false) {
+                                    bundle.putString(NetworkProbe.IP_ADDRESS,
+                                            "127.0.0.1");
+                                    bundle.putString(NetworkProbe.HOSTNAME,
+                                            "localhost");
+                                }
 
-		PreferenceScreen screen = manager.createPreferenceScreen(activity);
-		screen.setTitle(this.title(activity));
-		screen.setSummary(R.string.summary_network_probe_desc);
+                                try {
+                                    NetworkInterface iface = NetworkInterface
+                                            .getByInetAddress(InetAddress
+                                                    .getByName("127.0.0.1"));
 
-		CheckBoxPreference enabled = new CheckBoxPreference(activity);
-		enabled.setTitle(R.string.title_enable_probe);
-		enabled.setKey("config_probe_network_enabled");
-		enabled.setDefaultValue(NetworkProbe.DEFAULT_ENABLED);
+                                    bundle.putString(NetworkProbe.IFACE_NAME,
+                                            iface.getName());
+                                    bundle.putString(
+                                            NetworkProbe.IFACE_DISPLAY_NAME,
+                                            iface.getDisplayName());
+                                } catch (SocketException e) {
+                                    LogManager.getInstance(context)
+                                            .logException(e);
+                                } catch (UnknownHostException e) {
+                                    LogManager.getInstance(context)
+                                            .logException(e);
+                                }
 
-		screen.addPreference(enabled);
+                                me.transmitData(context, bundle);
 
-		ListPreference duration = new ListPreference(activity);
-		duration.setKey("config_probe_network_frequency");
-		duration.setEntryValues(R.array.probe_satellite_frequency_values);
-		duration.setEntries(R.array.probe_satellite_frequency_labels);
-		duration.setTitle(R.string.probe_frequency_label);
-		duration.setDefaultValue(Probe.DEFAULT_FREQUENCY);
+                                me._lastCheck = now;
+                            }
+                        };
 
-		screen.addPreference(duration);
+                        Thread t = new Thread(r);
+                        t.start();
+                    }
+                }
 
-		return screen;
-	}
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public String summarizeValue(Context context, Bundle bundle) {
+        String ipAddress = bundle.getString(NetworkProbe.IP_ADDRESS);
+
+        return String.format(
+                context.getResources()
+                        .getString(R.string.summary_network_probe), ipAddress);
+    }
+
+    public Map<String, Object> configuration(Context context) {
+        Map<String, Object> map = super.configuration(context);
+
+        SharedPreferences prefs = Probe.getPreferences(context);
+
+        long freq = Long.parseLong(prefs.getString(
+                "config_probe_network_frequency", Probe.DEFAULT_FREQUENCY));
+
+        map.put(Probe.PROBE_FREQUENCY, freq);
+
+        return map;
+    }
+
+    public void updateFromMap(Context context, Map<String, Object> params) {
+        super.updateFromMap(context, params);
+
+        if (params.containsKey(Probe.PROBE_FREQUENCY)) {
+            Object frequency = params.get(Probe.PROBE_FREQUENCY);
+
+            if (frequency instanceof Long) {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString("config_probe_network_frequency",
+                        frequency.toString());
+                e.commit();
+            }
+        }
+    }
+
+    public String summary(Context context) {
+        return context.getString(R.string.summary_network_probe_desc);
+    }
+
+    @SuppressWarnings("deprecation")
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+        PreferenceManager manager = activity.getPreferenceManager();
+
+        PreferenceScreen screen = manager.createPreferenceScreen(activity);
+        screen.setTitle(this.title(activity));
+        screen.setSummary(R.string.summary_network_probe_desc);
+
+        CheckBoxPreference enabled = new CheckBoxPreference(activity);
+        enabled.setTitle(R.string.title_enable_probe);
+        enabled.setKey("config_probe_network_enabled");
+        enabled.setDefaultValue(NetworkProbe.DEFAULT_ENABLED);
+
+        screen.addPreference(enabled);
+
+        ListPreference duration = new ListPreference(activity);
+        duration.setKey("config_probe_network_frequency");
+        duration.setEntryValues(R.array.probe_satellite_frequency_values);
+        duration.setEntries(R.array.probe_satellite_frequency_labels);
+        duration.setTitle(R.string.probe_frequency_label);
+        duration.setDefaultValue(Probe.DEFAULT_FREQUENCY);
+
+        screen.addPreference(duration);
+
+        return screen;
+    }
 }

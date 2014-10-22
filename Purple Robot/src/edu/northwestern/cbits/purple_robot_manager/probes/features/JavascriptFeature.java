@@ -26,299 +26,272 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 
 @SuppressLint("DefaultLocale")
-public class JavascriptFeature extends Feature
-{
-	private String _name = null;
-	private String _title = null;
+public class JavascriptFeature extends Feature {
+    private String _name = null;
+    private String _title = null;
 
-	private String _script = null;
-	private String _formatter = null;
+    private String _script = null;
+    private String _formatter = null;
 
-	private boolean _embedded = false;
-	private List<String> _sources = new ArrayList<String>();
+    private boolean _embedded = false;
+    private List<String> _sources = new ArrayList<String>();
 
-	public JavascriptFeature()
-	{
-		throw new RuntimeException("Invalid constructor. Please use JavascriptFeature(scriptName) instead...");
-	}
+    public JavascriptFeature() {
+        throw new RuntimeException(
+                "Invalid constructor. Please use JavascriptFeature(scriptName) instead...");
+    }
 
-	public String probeCategory(Context context) 
-	{
-		return context.getResources().getString(R.string.probe_misc_category);
-	}
+    public String probeCategory(Context context) {
+        return context.getResources().getString(R.string.probe_misc_category);
+    }
 
-	public JavascriptFeature(String title, String name, String script, String formatter, List<String> sources, boolean embedded)
-	{
-		this._name = name;
-		this._title = title;
+    public JavascriptFeature(String title, String name, String script,
+            String formatter, List<String> sources, boolean embedded) {
+        this._name = name;
+        this._title = title;
 
-		this._script = script;
-		this._formatter = formatter;
+        this._script = script;
+        this._formatter = formatter;
 
-		this._embedded = embedded;
+        this._embedded = embedded;
 
-		this._sources.addAll(sources);
-	}
+        this._sources.addAll(sources);
+    }
 
-	public boolean embedded()
-	{
-		return this._embedded;
-	}
+    public boolean embedded() {
+        return this._embedded;
+    }
 
-	protected String featureKey()
-	{
-		return this._name.replaceAll(".", "_");
-	}
+    protected String featureKey() {
+        return this._name.replaceAll(".", "_");
+    }
 
-	public String name(Context context)
-	{
-		return "javascript_" + this._name;
-	}
+    public String name(Context context) {
+        return "javascript_" + this._name;
+    }
 
-	public String title(Context context)
-	{
-		return this._title;
-	}
+    public String title(Context context) {
+        return this._title;
+    }
 
-	public static String[] availableFeatures(Context context)
-	{
-		return context.getResources().getStringArray(R.array.js_feature_files);
-	}
+    public static String[] availableFeatures(Context context) {
+        return context.getResources().getStringArray(R.array.js_feature_files);
+    }
 
-	public static String[] availableFeatureNames(Context context)
-	{
-		return context.getResources().getStringArray(R.array.js_feature_names);
-	}
+    public static String[] availableFeatureNames(Context context) {
+        return context.getResources().getStringArray(R.array.js_feature_names);
+    }
 
-	public void enable(Context context)
-	{
-		SharedPreferences prefs = Probe.getPreferences(context);
-		
-		Editor e = prefs.edit();
-		e.putBoolean("config_feature_" + this.featureKey() + "_enabled", true);
-		
-		e.commit();
-	}
+    public void enable(Context context) {
+        SharedPreferences prefs = Probe.getPreferences(context);
 
-	public void disable(Context context)
-	{
-		SharedPreferences prefs = Probe.getPreferences(context);
-		
-		Editor e = prefs.edit();
-		e.putBoolean("config_feature_" + this.featureKey() + "_enabled", false);
-		
-		e.commit();
-	}
-	
-	public boolean isEnabled(Context context)
-	{
-		boolean enabled = super.isEnabled(context);
+        Editor e = prefs.edit();
+        e.putBoolean("config_feature_" + this.featureKey() + "_enabled", true);
 
-		SharedPreferences prefs = Probe.getPreferences(context);
+        e.commit();
+    }
 
-		if (enabled && prefs.getBoolean("config_feature_" + this.featureKey() + "_enabled", true))
-			return true;
+    public void disable(Context context) {
+        SharedPreferences prefs = Probe.getPreferences(context);
 
-		return false;
-	}
+        Editor e = prefs.edit();
+        e.putBoolean("config_feature_" + this.featureKey() + "_enabled", false);
 
-	public static String scriptForFeature(Context context, String filename)
-	{
-	    String script = "";
+        e.commit();
+    }
 
-	    try
-		{
-			AssetManager am = context.getAssets();
+    public boolean isEnabled(Context context) {
+        boolean enabled = super.isEnabled(context);
 
-			InputStream jsStream = am.open("js/features/" + filename);
+        SharedPreferences prefs = Probe.getPreferences(context);
 
-			// http://stackoverflow.com/questions/309424/read-convert-an-inputstream-to-a-string
+        if (enabled
+                && prefs.getBoolean("config_feature_" + this.featureKey()
+                        + "_enabled", true))
+            return true;
 
-			Scanner js = new Scanner(jsStream);
-			Scanner s = js.useDelimiter("\\A");
+        return false;
+    }
 
-			if (s.hasNext())
-		    	script = s.next();
-			
-			s.close();
-			js.close();
-			jsStream.close();
-		}
-		catch (IOException e)
-		{
-			LogManager.getInstance(context).logException(e);
-		}
+    public static String scriptForFeature(Context context, String filename) {
+        String script = "";
 
-	    return script;
-	}
+        try {
+            AssetManager am = context.getAssets();
 
-	@SuppressLint("DefaultLocale")
-	public void processData(final Context context, final JSONObject json)
-	{
-		if (this.isEnabled(context) == false)
-			return;
+            InputStream jsStream = am.open("js/features/" + filename);
 
-		boolean sourceMatches = false;
+            // http://stackoverflow.com/questions/309424/read-convert-an-inputstream-to-a-string
 
-		try
-		{
-			String source = json.getString("PROBE");
+            Scanner js = new Scanner(jsStream);
+            Scanner s = js.useDelimiter("\\A");
 
-			for (int i = 0; i < this._sources.size() && sourceMatches == false; i++)
-			{
-				String probeSource = this._sources.get(i);
+            if (s.hasNext())
+                script = s.next();
 
-				if (source != null && source.toLowerCase().equals(probeSource.toLowerCase()))
-					sourceMatches = true;
-			}
+            s.close();
+            js.close();
+            jsStream.close();
+        } catch (IOException e) {
+            LogManager.getInstance(context).logException(e);
+        }
 
-			if (sourceMatches == false)
-				return;
-		}
-		catch (JSONException e)
-		{
+        return script;
+    }
 
-		}
+    @SuppressLint("DefaultLocale")
+    public void processData(final Context context, final JSONObject json) {
+        if (this.isEnabled(context) == false)
+            return;
 
-		if (this._script == null)
-			this._script = JavascriptFeature.scriptForFeature(context, this._name);
+        boolean sourceMatches = false;
 
-		final JavascriptFeature me = this;
-		
-		Runnable r = new Runnable()
-		{
-			public void run() 
-			{
-				Looper.prepare();
-				
-				String script = me._script;
+        try {
+            String source = json.getString("PROBE");
 
-				script = "var probe = " + json.toString() + "; " + script;
+            for (int i = 0; i < this._sources.size() && sourceMatches == false; i++) {
+                String probeSource = this._sources.get(i);
 
-				JavaScriptEngine engine = new JavaScriptEngine(context);
+                if (source != null
+                        && source.toLowerCase().equals(
+                                probeSource.toLowerCase()))
+                    sourceMatches = true;
+            }
 
-				try
-				{
-					Object o = engine.runScript(script);
-	
-					Bundle bundle = new Bundle();
-					bundle.putString("PROBE", me.name(context));
-					bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
-	
-					if (o instanceof String)
-						bundle.putString(Feature.FEATURE_VALUE, o.toString());
-					else if (o instanceof Double)
-					{
-						Double d = (Double) o;
-	
-						bundle.putDouble(Feature.FEATURE_VALUE, d.doubleValue());
-					}
-					else if (o instanceof NativeObject)
-					{
-						NativeObject nativeObj = (NativeObject) o;
-	
-						Bundle b = JavascriptFeature.bundleForNativeObject(nativeObj);
-	
-						bundle.putParcelable(Feature.FEATURE_VALUE, b);
-					}
-					else
-					{
-						Log.e("PRM", "JS PLUGIN GOT UNKNOWN VALUE " + o);
-	
-						if (o != null)
-							Log.e("PRM", "JS PLUGIN GOT UNKNOWN CLASS " + o.getClass());
-					}
-	
-					me.transmitData(context, bundle);
-				}
-				catch (Exception e)
-				{
-					LogManager.getInstance(context).logException(e);
-				}
-			}
-		};
-		
-		Thread t = new Thread(r);
-		t.start();
-	}
+            if (sourceMatches == false)
+                return;
+        } catch (JSONException e) {
 
-	public static Bundle bundleForNativeObject(NativeObject obj)
-	{
-		Bundle b = new Bundle();
+        }
 
-		for (Object key : obj.keySet())
-		{
-			String keyString = key.toString();
+        if (this._script == null)
+            this._script = JavascriptFeature.scriptForFeature(context,
+                    this._name);
 
-			Object value = obj.get(key);
+        final JavascriptFeature me = this;
 
-			if (value instanceof NativeObject)
-				b.putParcelable(keyString, JavascriptFeature.bundleForNativeObject((NativeObject) value));
-			else if (value instanceof NativeArray)
-			{
-				NativeArray array = (NativeArray) value;
-				
-				ArrayList<Bundle> items = new ArrayList<Bundle>();
-				
-				for (Object o : array.getIds()) 
-				{
-				    int index = (Integer) o;
-				    
-				    Object item = array.get(index);
-				    
-				    if (item instanceof NativeObject)
-				    	items.add(JavascriptFeature.bundleForNativeObject((NativeObject) item));
-				}
-				
-				b.putParcelableArrayList(keyString, items);
-			}
-			else if (value instanceof Double)
-				b.putDouble(keyString, ((Double) value).doubleValue());
-			else if (value instanceof Integer)
-				b.putInt(keyString, ((Integer) value).intValue());
-			else if (value == null)
-				b.putString(keyString, "(null)");
-			else
-				b.putString(keyString, value.toString());
-		}
+        Runnable r = new Runnable() {
+            public void run() {
+                Looper.prepare();
 
-		return b;
-	}
+                String script = me._script;
 
-	public String summary(Context context)
-	{
-		return null;
-	}
+                script = "var probe = " + json.toString() + "; " + script;
 
-	public String summarizeValue(Context context, Bundle bundle)
-	{
-		Object value = bundle.get(Feature.FEATURE_VALUE);
+                JavaScriptEngine engine = new JavaScriptEngine(context);
 
-		if (this._formatter == null)
-			return String.format(context.getString(R.string.summary_javascript_feature), this._name, value);
+                try {
+                    Object o = engine.runScript(script);
 
-		String script = this._formatter;
+                    Bundle bundle = new Bundle();
+                    bundle.putString("PROBE", me.name(context));
+                    bundle.putLong("TIMESTAMP",
+                            System.currentTimeMillis() / 1000);
 
-		if (value instanceof Double || value instanceof Integer)
-			script = "var result = " + value + "; " + script;
-		else if (value instanceof Bundle)
-		{
-			try
-			{
-				script = "var result = " + OutputPlugin.jsonForBundle((Bundle) value).toString() + "; " + script;
-			}
-			catch (JSONException e)
-			{
-				LogManager.getInstance(context).logException(e);
-			}
-		}
-		else
-			script = "var result = '" + value.toString() + "'; " + script;
+                    if (o instanceof String)
+                        bundle.putString(Feature.FEATURE_VALUE, o.toString());
+                    else if (o instanceof Double) {
+                        Double d = (Double) o;
 
-		JavaScriptEngine engine = new JavaScriptEngine(context);
+                        bundle.putDouble(Feature.FEATURE_VALUE, d.doubleValue());
+                    } else if (o instanceof NativeObject) {
+                        NativeObject nativeObj = (NativeObject) o;
 
-		Object o = engine.runScript(script);
+                        Bundle b = JavascriptFeature
+                                .bundleForNativeObject(nativeObj);
 
-		return o.toString();
-	}
+                        bundle.putParcelable(Feature.FEATURE_VALUE, b);
+                    } else {
+                        Log.e("PRM", "JS PLUGIN GOT UNKNOWN VALUE " + o);
+
+                        if (o != null)
+                            Log.e("PRM",
+                                    "JS PLUGIN GOT UNKNOWN CLASS "
+                                            + o.getClass());
+                    }
+
+                    me.transmitData(context, bundle);
+                } catch (Exception e) {
+                    LogManager.getInstance(context).logException(e);
+                }
+            }
+        };
+
+        Thread t = new Thread(r);
+        t.start();
+    }
+
+    public static Bundle bundleForNativeObject(NativeObject obj) {
+        Bundle b = new Bundle();
+
+        for (Object key : obj.keySet()) {
+            String keyString = key.toString();
+
+            Object value = obj.get(key);
+
+            if (value instanceof NativeObject)
+                b.putParcelable(keyString, JavascriptFeature
+                        .bundleForNativeObject((NativeObject) value));
+            else if (value instanceof NativeArray) {
+                NativeArray array = (NativeArray) value;
+
+                ArrayList<Bundle> items = new ArrayList<Bundle>();
+
+                for (Object o : array.getIds()) {
+                    int index = (Integer) o;
+
+                    Object item = array.get(index);
+
+                    if (item instanceof NativeObject)
+                        items.add(JavascriptFeature
+                                .bundleForNativeObject((NativeObject) item));
+                }
+
+                b.putParcelableArrayList(keyString, items);
+            } else if (value instanceof Double)
+                b.putDouble(keyString, ((Double) value).doubleValue());
+            else if (value instanceof Integer)
+                b.putInt(keyString, ((Integer) value).intValue());
+            else if (value == null)
+                b.putString(keyString, "(null)");
+            else
+                b.putString(keyString, value.toString());
+        }
+
+        return b;
+    }
+
+    public String summary(Context context) {
+        return null;
+    }
+
+    public String summarizeValue(Context context, Bundle bundle) {
+        Object value = bundle.get(Feature.FEATURE_VALUE);
+
+        if (this._formatter == null)
+            return String.format(
+                    context.getString(R.string.summary_javascript_feature),
+                    this._name, value);
+
+        String script = this._formatter;
+
+        if (value instanceof Double || value instanceof Integer)
+            script = "var result = " + value + "; " + script;
+        else if (value instanceof Bundle) {
+            try {
+                script = "var result = "
+                        + OutputPlugin.jsonForBundle((Bundle) value).toString()
+                        + "; " + script;
+            } catch (JSONException e) {
+                LogManager.getInstance(context).logException(e);
+            }
+        } else
+            script = "var result = '" + value.toString() + "'; " + script;
+
+        JavaScriptEngine engine = new JavaScriptEngine(context);
+
+        Object o = engine.runScript(script);
+
+        return o.toString();
+    }
 }

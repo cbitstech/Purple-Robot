@@ -22,107 +22,97 @@ import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
 import android.content.Context;
 
-public class StaticContentRequestHandler implements HttpRequestHandler 
-{
-	private static String WEB_PREFIX = "embedded_website";
-	
-	private Context _context = null;
-	
-	public StaticContentRequestHandler(Context context)
-	{
-		super();
-		
-		this._context = context;
-	}
-	
-    public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException
-    {
-    	String method = request.getRequestLine().getMethod().toUpperCase(Locale.ENGLISH);
+public class StaticContentRequestHandler implements HttpRequestHandler {
+    private static String WEB_PREFIX = "embedded_website";
 
-        if (!method.equals("GET") && !method.equals("HEAD") && !method.equals("POST"))
-            throw new MethodNotSupportedException(method + " method not supported"); 
+    private Context _context = null;
+
+    public StaticContentRequestHandler(Context context) {
+        super();
+
+        this._context = context;
+    }
+
+    public void handle(HttpRequest request, HttpResponse response,
+            HttpContext context) throws HttpException {
+        String method = request.getRequestLine().getMethod()
+                .toUpperCase(Locale.ENGLISH);
+
+        if (!method.equals("GET") && !method.equals("HEAD")
+                && !method.equals("POST"))
+            throw new MethodNotSupportedException(method
+                    + " method not supported");
 
         String target = request.getRequestLine().getUri();
-        
+
         if (target.trim().length() == 1)
-        	target = "/index.html";
-        
+            target = "/index.html";
+
         if (target.contains("?"))
-        	target = target.substring(0, target.indexOf("?"));
-        
-        if (request instanceof HttpEntityEnclosingRequest) 
-        {
-			try 
-			{
-                HttpEntity entity = ((HttpEntityEnclosingRequest) request).getEntity();
+            target = target.substring(0, target.indexOf("?"));
+
+        if (request instanceof HttpEntityEnclosingRequest) {
+            try {
+                HttpEntity entity = ((HttpEntityEnclosingRequest) request)
+                        .getEntity();
                 byte[] entityContent = EntityUtils.toByteArray(entity);
 
-                System.out.println("Incoming entity content (bytes): " + entityContent.length);
-			} 
-			catch (IOException e) 
-			{
-				LogManager.getInstance(this._context).logException(e);
-			}
+                System.out.println("Incoming entity content (bytes): "
+                        + entityContent.length);
+            } catch (IOException e) {
+                LogManager.getInstance(this._context).logException(e);
+            }
         }
 
         final String path = WEB_PREFIX + target;
 
-        try
-        {
-        	final InputStream in = this._context.getAssets().open(path);
+        try {
+            final InputStream in = this._context.getAssets().open(path);
 
             response.setStatusCode(HttpStatus.SC_OK);
             response.setHeader("Access-Control-Allow-Origin", "*");
 
-            EntityTemplate body = new EntityTemplate(new ContentProducer() 
-            {
-				public void writeTo(OutputStream out) throws IOException 
-				{
-					byte[] b = new byte[1024];
-					int read = 0;
-					
-					while ((read = in.read(b, 0, b.length)) != -1)
-						out.write(b, 0, read);
+            EntityTemplate body = new EntityTemplate(new ContentProducer() {
+                public void writeTo(OutputStream out) throws IOException {
+                    byte[] b = new byte[1024];
+                    int read = 0;
 
-					out.close();
-					in.close();
-				}
+                    while ((read = in.read(b, 0, b.length)) != -1)
+                        out.write(b, 0, read);
+
+                    out.close();
+                    in.close();
+                }
             });
 
             response.setEntity(body);
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             response.setStatusCode(HttpStatus.SC_NOT_FOUND);
 
-			try 
-			{
-                final InputStream in = this._context.getAssets().open("embedded_website/404.html");
+            try {
+                final InputStream in = this._context.getAssets().open(
+                        "embedded_website/404.html");
 
-                EntityTemplate body = new EntityTemplate(new ContentProducer() 
-                {
-					public void writeTo(OutputStream out) throws IOException 
-					{
-						byte[] b = new byte[1024];
-						int read = 0;
-						
-						while ((read = in.read(b, 0, b.length)) != -1)
-							out.write(b, 0, read);
+                EntityTemplate body = new EntityTemplate(new ContentProducer() {
+                    public void writeTo(OutputStream out) throws IOException {
+                        byte[] b = new byte[1024];
+                        int read = 0;
 
-						out.close();
-						in.close();
-					}
+                        while ((read = in.read(b, 0, b.length)) != -1)
+                            out.write(b, 0, read);
+
+                        out.close();
+                        in.close();
+                    }
                 });
 
                 response.setEntity(body);
 
                 body.setContentType("text/html; charset=UTF-8");
                 response.setEntity(body);
-			}
-			catch (IOException e1) 
-			{
-				LogManager.getInstance(this._context).logException(e1);
-			}
+            } catch (IOException e1) {
+                LogManager.getInstance(this._context).logException(e1);
+            }
         }
     }
 }

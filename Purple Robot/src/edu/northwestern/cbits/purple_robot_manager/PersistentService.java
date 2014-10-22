@@ -33,177 +33,181 @@ import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RandomNoiseProbe;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
-public class PersistentService extends Service
-{
-	public static final String NUDGE_PROBES = "purple_robot_manager_nudge_probe";
-	public static final String SCRIPT_ACTION = "edu.northwestern.cbits.purplerobot.run_script";
-	
-	private LocalHttpServer _httpServer = new LocalHttpServer();
+public class PersistentService extends Service {
+    public static final String NUDGE_PROBES = "purple_robot_manager_nudge_probe";
+    public static final String SCRIPT_ACTION = "edu.northwestern.cbits.purplerobot.run_script";
 
-	public IBinder onBind(Intent intent)
-	{
-		return null;
-	}
+    private LocalHttpServer _httpServer = new LocalHttpServer();
 
-	@SuppressLint("NewApi")
-	@SuppressWarnings("deprecation")
-	public void onCreate()
-	{
-		super.onCreate();
-		
-		LogManager.getInstance(this);
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
 
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+    @SuppressLint("NewApi")
+    @SuppressWarnings("deprecation")
+    public void onCreate() {
+        super.onCreate();
 
-		String title = this.getString(R.string.notify_running_title);
-		String message = this.getString(R.string.notify_running);
+        LogManager.getInstance(this);
 
-		Notification note = new Notification(R.drawable.ic_note_normal, title, System.currentTimeMillis());
-		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, StartActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
-		note.setLatestEventInfo(this, title, message, contentIntent);
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(this);
 
-		this.startForeground(SanityManager.NOTE_ID, note);
+        String title = this.getString(R.string.notify_running_title);
+        String message = this.getString(R.string.notify_running);
 
-		AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        Notification note = new Notification(R.drawable.ic_note_normal, title,
+                System.currentTimeMillis());
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+                new Intent(this, StartActivity.class),
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        note.setLatestEventInfo(this, title, message, contentIntent);
 
-		PendingIntent pi = PendingIntent.getService(this, 0, new Intent(PersistentService.NUDGE_PROBES), PendingIntent.FLAG_UPDATE_CURRENT);
-		
-		long now = System.currentTimeMillis();
-		
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-			alarmManager.setExact(AlarmManager.RTC_WAKEUP, now + 15000, pi);
-		else
-			alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 15000, pi);
+        this.startForeground(SanityManager.NOTE_ID, note);
 
-		OutputPlugin.loadPluginClasses(this);
+        AlarmManager alarmManager = (AlarmManager) this
+                .getSystemService(Context.ALARM_SERVICE);
 
-		if (prefs.getBoolean("config_http_server_enabled", true))
-			this._httpServer.start(this);
-		
-		BroadcastReceiver scriptReceiver = new BroadcastReceiver()
-		{
-			public void onReceive(Context context, Intent intent) 
-			{
-				if (intent.hasExtra("response_mode"))
-				{
-					if ("activity".equals(intent.getStringExtra("response_mode")))
-					{
-						if (intent.hasExtra("package_name") && intent.hasExtra("activity_class"))
-						{
-							String pkgName = intent.getStringExtra("package_name");
-							String clsName = intent.getStringExtra("activity_class");
+        PendingIntent pi = PendingIntent.getService(this, 0, new Intent(
+                PersistentService.NUDGE_PROBES),
+                PendingIntent.FLAG_UPDATE_CURRENT);
 
-							Intent response = new Intent();
-							response.setComponent(new ComponentName(pkgName, clsName));
-							response.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-							
-							if (intent.hasExtra("command"))
-							{
-					            try 
-					            {
-					            	JSONObject arguments = new JSONObject();
-					            	
-					            	for (String key : intent.getExtras().keySet())
-					            	{
-					            		arguments.put(key, intent.getStringExtra(key));
-					            	}
+        long now = System.currentTimeMillis();
 
-					                JSONCommand cmd = JsonScriptRequestHandler.commandForJson(arguments, context);
-					                
-					                JSONObject result = cmd.execute(context);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, now + 15000, pi);
+        else
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
+                    System.currentTimeMillis(), 15000, pi);
 
-					                response.putExtra("full_payload", result.toString(2));
-					                
-					                JSONArray names = result.names();
-					                
-					                for (int i = 0; i < names.length(); i++)
-					                {
-					                	String name = names.getString(i);
+        OutputPlugin.loadPluginClasses(this);
 
-					                	response.putExtra(name, result.getString(name));
-					                }
-					                
-									response.putExtra("full_payload", result.toString(2));
-					    		}
-					            catch (JSONException e) 
-					            {
-				         			LogManager.getInstance(context).logException(e);
-					            	
-									response.putExtra("error", e.toString());
-					            }
-							}
+        if (prefs.getBoolean("config_http_server_enabled", true))
+            this._httpServer.start(this);
 
-							context.startActivity(response);
-						}						
-					}
-				}
-			}
-		};
-		
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(PersistentService.SCRIPT_ACTION);
-		
-		this.registerReceiver(scriptReceiver, filter);
-		
-		final PersistentService me = this;
-		
-		final Thread.UncaughtExceptionHandler handler = Thread.getDefaultUncaughtExceptionHandler();
-		
-		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler()
-		{
-			public void uncaughtException(Thread thread, Throwable ex) 
-			{
-				HashMap<String, Object> payload = new HashMap<String, Object>();
-				payload.put("message", ex.getMessage());
-				LogManager.getInstance(me).log("pr_app_crashed", payload);
-				
-				handler.uncaughtException(thread, ex);
-			}
-		});
-	}
+        BroadcastReceiver scriptReceiver = new BroadcastReceiver() {
+            public void onReceive(Context context, Intent intent) {
+                if (intent.hasExtra("response_mode")) {
+                    if ("activity".equals(intent
+                            .getStringExtra("response_mode"))) {
+                        if (intent.hasExtra("package_name")
+                                && intent.hasExtra("activity_class")) {
+                            String pkgName = intent
+                                    .getStringExtra("package_name");
+                            String clsName = intent
+                                    .getStringExtra("activity_class");
 
-	@SuppressLint("NewApi")
-	public int onStartCommand(Intent intent, int flags, int startId)
-	{
-		if (intent != null)
-		{
-			String action = intent.getAction();
-			
-			if (NUDGE_PROBES.equals(action))
-			{
-				ProbeManager.nudgeProbes(this);
+                            Intent response = new Intent();
+                            response.setComponent(new ComponentName(pkgName,
+                                    clsName));
+                            response.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-				TriggerManager.getInstance(this).refreshTriggers(this);
-				ScheduleManager.runOverdueScripts(this);
+                            if (intent.hasExtra("command")) {
+                                try {
+                                    JSONObject arguments = new JSONObject();
 
-				OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(this, HttpUploadPlugin.class);
-				
-				if (plugin instanceof HttpUploadPlugin)
-				{
-					HttpUploadPlugin http = (HttpUploadPlugin) plugin;
-					http.uploadPendingObjects();
-				}
-				
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-				{
-					AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+                                    for (String key : intent.getExtras()
+                                            .keySet()) {
+                                        arguments.put(key,
+                                                intent.getStringExtra(key));
+                                    }
 
-					PendingIntent pi = PendingIntent.getService(this, 0, new Intent(PersistentService.NUDGE_PROBES), PendingIntent.FLAG_UPDATE_CURRENT);
+                                    JSONCommand cmd = JsonScriptRequestHandler
+                                            .commandForJson(arguments, context);
 
-					long now = System.currentTimeMillis();
+                                    JSONObject result = cmd.execute(context);
 
-					alarmManager.setExact(AlarmManager.RTC_WAKEUP, now + 15000, pi);
-				}
-			}
-			else if (RandomNoiseProbe.ACTION.equals(action) && RandomNoiseProbe.instance != null)
-				RandomNoiseProbe.instance.isEnabled(this);
-		}
+                                    response.putExtra("full_payload",
+                                            result.toString(2));
 
-		return Service.START_STICKY;
-	}
-	
-	public void onTaskRemoved(Intent rootIntent)
-	{
-		LogManager.getInstance(this).log("pr_service_stopped", null);
-	}
+                                    JSONArray names = result.names();
+
+                                    for (int i = 0; i < names.length(); i++) {
+                                        String name = names.getString(i);
+
+                                        response.putExtra(name,
+                                                result.getString(name));
+                                    }
+
+                                    response.putExtra("full_payload",
+                                            result.toString(2));
+                                } catch (JSONException e) {
+                                    LogManager.getInstance(context)
+                                            .logException(e);
+
+                                    response.putExtra("error", e.toString());
+                                }
+                            }
+
+                            context.startActivity(response);
+                        }
+                    }
+                }
+            }
+        };
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(PersistentService.SCRIPT_ACTION);
+
+        this.registerReceiver(scriptReceiver, filter);
+
+        final PersistentService me = this;
+
+        final Thread.UncaughtExceptionHandler handler = Thread
+                .getDefaultUncaughtExceptionHandler();
+
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            public void uncaughtException(Thread thread, Throwable ex) {
+                HashMap<String, Object> payload = new HashMap<String, Object>();
+                payload.put("message", ex.getMessage());
+                LogManager.getInstance(me).log("pr_app_crashed", payload);
+
+                handler.uncaughtException(thread, ex);
+            }
+        });
+    }
+
+    @SuppressLint("NewApi")
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent != null) {
+            String action = intent.getAction();
+
+            if (NUDGE_PROBES.equals(action)) {
+                ProbeManager.nudgeProbes(this);
+
+                TriggerManager.getInstance(this).refreshTriggers(this);
+                ScheduleManager.runOverdueScripts(this);
+
+                OutputPlugin plugin = OutputPluginManager.sharedInstance
+                        .pluginForClass(this, HttpUploadPlugin.class);
+
+                if (plugin instanceof HttpUploadPlugin) {
+                    HttpUploadPlugin http = (HttpUploadPlugin) plugin;
+                    http.uploadPendingObjects();
+                }
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    AlarmManager alarmManager = (AlarmManager) this
+                            .getSystemService(Context.ALARM_SERVICE);
+
+                    PendingIntent pi = PendingIntent.getService(this, 0,
+                            new Intent(PersistentService.NUDGE_PROBES),
+                            PendingIntent.FLAG_UPDATE_CURRENT);
+
+                    long now = System.currentTimeMillis();
+
+                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, now + 15000,
+                            pi);
+                }
+            } else if (RandomNoiseProbe.ACTION.equals(action)
+                    && RandomNoiseProbe.instance != null)
+                RandomNoiseProbe.instance.isEnabled(this);
+        }
+
+        return Service.START_STICKY;
+    }
+
+    public void onTaskRemoved(Intent rootIntent) {
+        LogManager.getInstance(this).log("pr_service_stopped", null);
+    }
 }

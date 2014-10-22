@@ -18,83 +18,78 @@ import android.webkit.WebView;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
-public class CodeViewerActivity extends ActionBarActivity 
-{
-	public static final String SOURCE_CODE = "SOURCE_CODE";
-	public static final String TITLE = "TITLE";
+public class CodeViewerActivity extends ActionBarActivity {
+    public static final String SOURCE_CODE = "SOURCE_CODE";
+    public static final String TITLE = "TITLE";
 
-	protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         this.setContentView(R.layout.layout_code_activity);
 
-        getWindow().setLayout(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        getWindow().setLayout(LayoutParams.MATCH_PARENT,
+                LayoutParams.MATCH_PARENT);
     }
-	
-	@SuppressWarnings("resource")
-	protected void onResume()
-	{
-		super.onResume();
-		
-		this.getSupportActionBar().setTitle(this.getIntent().getStringExtra(CodeViewerActivity.TITLE));
 
-		String code = this.getIntent().getStringExtra(CodeViewerActivity.SOURCE_CODE);
+    @SuppressWarnings("resource")
+    protected void onResume() {
+        super.onResume();
 
-		String language = "javascript";
-		
-		if (code.startsWith("(") && code.endsWith(")"))
-			language = "scheme";
-		
-		if (language.equals("javascript"))
-		{
-			Context js = Context.enter();
-			js.setOptimizationLevel(-1);
+        this.getSupportActionBar().setTitle(
+                this.getIntent().getStringExtra(CodeViewerActivity.TITLE));
 
-			Scriptable scope = js.initStandardObjects();
-			ScriptableObject.putProperty(scope, "sourceCode", code);
+        String code = this.getIntent().getStringExtra(
+                CodeViewerActivity.SOURCE_CODE);
 
-			AssetManager am = this.getAssets();
+        String language = "javascript";
 
-			try 
-			{
-				InputStream jsStream = am.open("js/beautify.js");
+        if (code.startsWith("(") && code.endsWith(")"))
+            language = "scheme";
 
-			    Scanner s = new Scanner(jsStream).useDelimiter("\\A");
+        if (language.equals("javascript")) {
+            Context js = Context.enter();
+            js.setOptimizationLevel(-1);
 
-			    String script = "";
+            Scriptable scope = js.initStandardObjects();
+            ScriptableObject.putProperty(scope, "sourceCode", code);
 
-			    if (s.hasNext())
-			    {
-			    	script = s.next();
-			    	
-			    	code = js.evaluateString(scope, "var exports = {};" + script + " exports.js_beautify(sourceCode);", "<engine>", 1, null).toString();
-			    }
-			} 
-			catch (IOException e) 
-			{
-	        	LogManager.getInstance(this).logException(e);
-			}
-			catch (StackOverflowError e)
-			{
-	        	LogManager.getInstance(this).logException(e);
-			}
-		}
-		
-		code = "<!DOCTYPE html><html><body style=\"background-color: #000; color: #00c000;\"><pre>" + code + "</pre></body></html>";
+            AssetManager am = this.getAssets();
 
-    	try 
-    	{
-			code = URLEncoder.encode(code, "utf-8").replaceAll("\\+", "%20");
-		}
-    	catch (UnsupportedEncodingException e) 
-    	{
-        	LogManager.getInstance(this).logException(e);
-		}
+            try {
+                InputStream jsStream = am.open("js/beautify.js");
 
-		WebView webView = (WebView) this.findViewById(R.id.code_web_view);
-		webView.getSettings().setLoadWithOverviewMode(true);
-		webView.getSettings().setUseWideViewPort(false);
-		webView.loadData(code, "text/html", null);
-	}
+                Scanner s = new Scanner(jsStream).useDelimiter("\\A");
+
+                String script = "";
+
+                if (s.hasNext()) {
+                    script = s.next();
+
+                    code = js.evaluateString(
+                            scope,
+                            "var exports = {};" + script
+                                    + " exports.js_beautify(sourceCode);",
+                            "<engine>", 1, null).toString();
+                }
+            } catch (IOException e) {
+                LogManager.getInstance(this).logException(e);
+            } catch (StackOverflowError e) {
+                LogManager.getInstance(this).logException(e);
+            }
+        }
+
+        code = "<!DOCTYPE html><html><body style=\"background-color: #000; color: #00c000;\"><pre>"
+                + code + "</pre></body></html>";
+
+        try {
+            code = URLEncoder.encode(code, "utf-8").replaceAll("\\+", "%20");
+        } catch (UnsupportedEncodingException e) {
+            LogManager.getInstance(this).logException(e);
+        }
+
+        WebView webView = (WebView) this.findViewById(R.id.code_web_view);
+        webView.getSettings().setLoadWithOverviewMode(true);
+        webView.getSettings().setUseWideViewPort(false);
+        webView.loadData(code, "text/html", null);
+    }
 }

@@ -13,142 +13,135 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CallStateProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ScreenProbe;
 
-public class DeviceInUseFeature extends Feature
-{
-	protected static final String DEVICE_ACTIVE = "DEVICE_ACTIVE";
-	private boolean _isInited = false;
-	private boolean _isEnabled = true;
+public class DeviceInUseFeature extends Feature {
+    protected static final String DEVICE_ACTIVE = "DEVICE_ACTIVE";
+    private boolean _isInited = false;
+    private boolean _isEnabled = true;
 
-	private boolean _lastXmit = false;
+    private boolean _lastXmit = false;
 
-	private boolean _callActive = false;
-	private boolean _screenActive = false;
+    private boolean _callActive = false;
+    private boolean _screenActive = false;
 
-	protected String featureKey()
-	{
-		return "device_use";
-	}
+    protected String featureKey() {
+        return "device_use";
+    }
 
-	public String name(Context context)
-	{
-		return "edu.northwestern.cbits.purple_robot_manager.probes.features.DeviceInUseFeature";
-	}
+    public String name(Context context) {
+        return "edu.northwestern.cbits.purple_robot_manager.probes.features.DeviceInUseFeature";
+    }
 
-	public String title(Context context)
-	{
-		return context.getString(R.string.title_device_use_feature);
-	}
+    public String title(Context context) {
+        return context.getString(R.string.title_device_use_feature);
+    }
 
-	public String summary(Context context)
-	{
-		return context.getString(R.string.summary_device_use_feature_desc);
-	}
+    public String summary(Context context) {
+        return context.getString(R.string.summary_device_use_feature_desc);
+    }
 
-	public String probeCategory(Context context)
-	{
-		return context.getResources().getString(R.string.probe_device_info_category);
-	}
+    public String probeCategory(Context context) {
+        return context.getResources().getString(
+                R.string.probe_device_info_category);
+    }
 
-	public String summarizeValue(Context context, Bundle bundle)
-	{
-		boolean inUse = bundle.getBoolean(DeviceInUseFeature.DEVICE_ACTIVE);
+    public String summarizeValue(Context context, Bundle bundle) {
+        boolean inUse = bundle.getBoolean(DeviceInUseFeature.DEVICE_ACTIVE);
 
-		if (inUse)
-			return context.getResources().getString(R.string.summary_device_active);
-		else
-			return context.getResources().getString(R.string.summary_device_inactive);
-	}
+        if (inUse)
+            return context.getResources().getString(
+                    R.string.summary_device_active);
+        else
+            return context.getResources().getString(
+                    R.string.summary_device_inactive);
+    }
 
-	public boolean isEnabled(Context context)
-	{
-		SharedPreferences prefs = Probe.getPreferences(context);
+    public boolean isEnabled(Context context) {
+        SharedPreferences prefs = Probe.getPreferences(context);
 
-		this._isEnabled = false;
+        this._isEnabled = false;
 
-		if (super.isEnabled(context))
-		{
-			if (prefs.getBoolean("config_probe_device_use_enabled", true))
-				this._isEnabled = true;
-		}
+        if (super.isEnabled(context)) {
+            if (prefs.getBoolean("config_probe_device_use_enabled", true))
+                this._isEnabled = true;
+        }
 
-		if (!this._isInited)
-		{
-			IntentFilter intentFilter = new IntentFilter(Probe.PROBE_READING);
+        if (!this._isInited) {
+            IntentFilter intentFilter = new IntentFilter(Probe.PROBE_READING);
 
-			final DeviceInUseFeature me = this;
+            final DeviceInUseFeature me = this;
 
-			BroadcastReceiver receiver = new BroadcastReceiver()
-			{
-				public void onReceive(Context context, Intent intent)
-				{
-					if (me._isEnabled == false)
-						return;
-					
-					Bundle extras = intent.getExtras();
+            BroadcastReceiver receiver = new BroadcastReceiver() {
+                public void onReceive(Context context, Intent intent) {
+                    if (me._isEnabled == false)
+                        return;
 
-					String probeName = extras.getString("PROBE");
+                    Bundle extras = intent.getExtras();
 
-					if (probeName != null && (ScreenProbe.NAME.equals(probeName) || CallStateProbe.NAME.equals(probeName)))
-					{
-						boolean xmit = false;
+                    String probeName = extras.getString("PROBE");
 
-						if (ScreenProbe.NAME.equals(probeName))
-							me._screenActive = extras.getBoolean(ScreenProbe.SCREEN_ACTIVE);
-						else if (CallStateProbe.NAME.equals(probeName))
-						{
-							String state = extras.getString(CallStateProbe.CALL_STATE);
+                    if (probeName != null
+                            && (ScreenProbe.NAME.equals(probeName) || CallStateProbe.NAME
+                                    .equals(probeName))) {
+                        boolean xmit = false;
 
-							me._callActive = CallStateProbe.STATE_OFF_HOOK.equals(state);
-						}
+                        if (ScreenProbe.NAME.equals(probeName))
+                            me._screenActive = extras
+                                    .getBoolean(ScreenProbe.SCREEN_ACTIVE);
+                        else if (CallStateProbe.NAME.equals(probeName)) {
+                            String state = extras
+                                    .getString(CallStateProbe.CALL_STATE);
 
-						xmit = me._callActive || me._screenActive;
+                            me._callActive = CallStateProbe.STATE_OFF_HOOK
+                                    .equals(state);
+                        }
 
-						if (me._lastXmit != xmit)
-						{
-							if (me._isEnabled)
-							{
-								Bundle bundle = new Bundle();
-								bundle.putString("PROBE", me.name(context));
-								bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+                        xmit = me._callActive || me._screenActive;
 
-								bundle.putBoolean(DeviceInUseFeature.DEVICE_ACTIVE, xmit);
+                        if (me._lastXmit != xmit) {
+                            if (me._isEnabled) {
+                                Bundle bundle = new Bundle();
+                                bundle.putString("PROBE", me.name(context));
+                                bundle.putLong("TIMESTAMP",
+                                        System.currentTimeMillis() / 1000);
 
-								me.transmitData(context, bundle);
-							}
+                                bundle.putBoolean(
+                                        DeviceInUseFeature.DEVICE_ACTIVE, xmit);
 
-							me._lastXmit = xmit;
-						}
-					}
-				}
-			};
+                                me.transmitData(context, bundle);
+                            }
 
-			LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(context);
-			localManager.registerReceiver(receiver, intentFilter);
+                            me._lastXmit = xmit;
+                        }
+                    }
+                }
+            };
 
-			this._isInited = true;
-		}
+            LocalBroadcastManager localManager = LocalBroadcastManager
+                    .getInstance(context);
+            localManager.registerReceiver(receiver, intentFilter);
 
-		return this._isEnabled;
-	}
-	
-	public void enable(Context context)
-	{
-		SharedPreferences prefs = Probe.getPreferences(context);
-		
-		Editor e = prefs.edit();
-		e.putBoolean("config_probe_device_use_enabled", true);
-		
-		e.commit();
-	}
+            this._isInited = true;
+        }
 
-	public void disable(Context context)
-	{
-		SharedPreferences prefs = Probe.getPreferences(context);
-		
-		Editor e = prefs.edit();
-		e.putBoolean("config_probe_device_use_enabled", false);
-		
-		e.commit();
-	}
+        return this._isEnabled;
+    }
+
+    public void enable(Context context) {
+        SharedPreferences prefs = Probe.getPreferences(context);
+
+        Editor e = prefs.edit();
+        e.putBoolean("config_probe_device_use_enabled", true);
+
+        e.commit();
+    }
+
+    public void disable(Context context) {
+        SharedPreferences prefs = Probe.getPreferences(context);
+
+        Editor e = prefs.edit();
+        e.putBoolean("config_probe_device_use_enabled", false);
+
+        e.commit();
+    }
 
 }
