@@ -268,7 +268,7 @@
     <string name="summary_running_software_probe">%1$d Active Applications</string>
 
     <string name="summary_shion_probe_controller">Network Health %1$.1f%% (%2$d devices)</string>
-    <string name="summary_shion_probe">%2$d devices</string>
+    <string name="summary_shion_probe">%1$d devices</string>
     
     <string name="summary_bluetooth_probe">Visible Bluetooth Devices: %1$d</string>
     <string name="summary_call_state_probe">Current Call State: %1$s</string>
@@ -1036,7 +1036,7 @@
 	<string name="title_foursquare_check">Foursquare probe requires authorization</string>	
 	<string name="message_foursquare_check">Please login to the Foursquare website from the settings to grant Purple Robot access to your Foursquare account.</string>	
 	<string name="config_probe_foursquare_pull_title">Fetch Foursquare Activity</string>	
-	<string name="config_probe_foursquare_pull_summary">Retrieves check-ins and other acctivity from your account.</string>	
+	<string name="config_probe_foursquare_pull_summary">Retrieves check-ins and other activity from your account.</string>	
 	<string name="summary_foursquare_checkin_summary">Most Recent Venue: %1$s</string>	
 	
 	<string name="label_trigger_original_start">Original Start Date String</string>	

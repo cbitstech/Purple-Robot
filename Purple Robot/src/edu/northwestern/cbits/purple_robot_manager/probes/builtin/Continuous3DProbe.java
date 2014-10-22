@@ -14,69 +14,62 @@ import edu.northwestern.cbits.purple_robot_manager.activities.RealTimeProbeViewA
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
-public abstract class Continuous3DProbe extends ContinuousProbe 
-{
-	protected static final String X_KEY = "X";
-	protected static final String Y_KEY = "Y";
-	protected static final String Z_KEY = "Z";
-	
-	protected static final String[] fieldNames = { X_KEY, Y_KEY, Z_KEY };
+public abstract class Continuous3DProbe extends ContinuousProbe {
+    protected static final String X_KEY = "X";
+    protected static final String Y_KEY = "Y";
+    protected static final String Z_KEY = "Z";
 
-	public String getDisplayContent(Activity activity)
-	{
-		try
-		{
-			String template = WebkitActivity.stringForAsset(activity, "webkit/epoch_chart_line_3_values.html");
-			
-			JSONArray xSeries = new JSONArray();
-			JSONArray ySeries = new JSONArray();
-			JSONArray zSeries = new JSONArray();
+    protected static final String[] fieldNames = { X_KEY, Y_KEY, Z_KEY };
 
-			JSONArray data = new JSONArray();
+    public String getDisplayContent(Activity activity) {
+        try {
+            String template = WebkitActivity.stringForAsset(activity,
+                    "webkit/epoch_chart_line_3_values.html");
 
-			JSONObject xData = new JSONObject();
-			xData.put("label", "X");
-			xData.put("values", xSeries);
-			
-			data.put(xData);
-			
-			JSONObject yData = new JSONObject();
-			yData.put("label", "Y");
-			yData.put("values", ySeries);
+            JSONArray xSeries = new JSONArray();
+            JSONArray ySeries = new JSONArray();
+            JSONArray zSeries = new JSONArray();
 
-			data.put(yData);
-			
-			JSONObject zData = new JSONObject();
-			zData.put("label", "Z");
-			zData.put("values", zSeries);
+            JSONArray data = new JSONArray();
 
-			data.put(zData);
+            JSONObject xData = new JSONObject();
+            xData.put("label", "X");
+            xData.put("values", xSeries);
 
-			template = template.replace("{{{ data_json }}}", data.toString());
+            data.put(xData);
 
-		    return template;
-		}
-		catch (IOException e)
-		{
-			LogManager.getInstance(activity).logException(e);
-		}
-		catch (JSONException e)
-		{
-			LogManager.getInstance(activity).logException(e);
-		}
+            JSONObject yData = new JSONObject();
+            yData.put("label", "Y");
+            yData.put("values", ySeries);
 
-		return null;
-	}
+            data.put(yData);
 
-	public Intent viewIntent(Context context)
-	{
-		Intent i = new Intent(context, RealTimeProbeViewActivity.class);
-		i.putExtra(RealTimeProbeViewActivity.PROBE_ID, this.getTitleResource());
+            JSONObject zData = new JSONObject();
+            zData.put("label", "Z");
+            zData.put("values", zSeries);
 
-		return i;
-	}
+            data.put(zData);
 
-	protected abstract String tableName();
+            template = template.replace("{{{ data_json }}}", data.toString());
 
-	protected abstract Map<String, String> databaseSchema();
+            return template;
+        } catch (IOException e) {
+            LogManager.getInstance(activity).logException(e);
+        } catch (JSONException e) {
+            LogManager.getInstance(activity).logException(e);
+        }
+
+        return null;
+    }
+
+    public Intent viewIntent(Context context) {
+        Intent i = new Intent(context, RealTimeProbeViewActivity.class);
+        i.putExtra(RealTimeProbeViewActivity.PROBE_ID, this.getTitleResource());
+
+        return i;
+    }
+
+    protected abstract String tableName();
+
+    protected abstract Map<String, String> databaseSchema();
 }

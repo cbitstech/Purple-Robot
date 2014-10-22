@@ -25,317 +25,283 @@ import edu.northwestern.cbits.purple_robot_manager.models.trees.LeafNode;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 /**
- * Provides the infrastructure for fetching model definitions by URL and 
- * generating dynamic model instances capable of evaluating incoming 
+ * Provides the infrastructure for fetching model definitions by URL and
+ * generating dynamic model instances capable of evaluating incoming
  * information.
  */
 
-public abstract class TrainedModel extends Model 
-{
-	protected Uri _source = null;
-	protected String _sourceHash = null;
-	protected boolean _inited = false;
-	protected String _name = null;
+public abstract class TrainedModel extends Model {
+    protected Uri _source = null;
+    protected String _sourceHash = null;
+    protected boolean _inited = false;
+    protected String _name = null;
 
-	protected double _accuracy = 0.0;
-	private long _lastCheck = 0;
+    protected double _accuracy = 0.0;
+    private long _lastCheck = 0;
 
-	/**
-	 * Returns the URL of the model as the identifying URI.
-	 * 
-	 * @see edu.northwestern.cbits.purple_robot_manager.models.Model#uri()
-	 */
-	
-	public Uri uri() 
-	{
-		return this._source;
-	}
+    /**
+     * Returns the URL of the model as the identifying URI.
+     * 
+     * @see edu.northwestern.cbits.purple_robot_manager.models.Model#uri()
+     */
 
-	public TrainedModel(final Context context, Uri uri) 
-	{
-		this._source = uri;
-		this._sourceHash = EncryptionManager.getInstance().createHash(context, uri.toString());
-		
-		final TrainedModel me = this;
-		
-		Runnable r = new Runnable()
-		{
-			public void run() 
-			{
-				String hash = EncryptionManager.getInstance().createHash(context, me._source.toString());
-				
-				SharedPreferences prefs = Probe.getPreferences(context);
+    public Uri uri() {
+        return this._source;
+    }
 
-				File internalStorage = context.getFilesDir();
+    public TrainedModel(final Context context, Uri uri) {
+        this._source = uri;
+        this._sourceHash = EncryptionManager.getInstance().createHash(context,
+                uri.toString());
 
-				if (prefs.getBoolean("config_external_storage", false))
-					internalStorage = context.getExternalFilesDir(null);
+        final TrainedModel me = this;
 
-				if (internalStorage != null && !internalStorage.exists())
-					internalStorage.mkdirs();
+        Runnable r = new Runnable() {
+            public void run() {
+                String hash = EncryptionManager.getInstance().createHash(
+                        context, me._source.toString());
 
-				File modelsFolder = new File(internalStorage, "persisted_models");
+                SharedPreferences prefs = Probe.getPreferences(context);
 
-				if (modelsFolder != null && !modelsFolder.exists())
-					modelsFolder.mkdirs();
-				
-				String contents = null;
-				File cachedModel = new File(modelsFolder, hash);
+                File internalStorage = context.getFilesDir();
 
-				try 
-				{
-					contents = FileUtils.readFileToString(cachedModel);
-				}
-				catch (IOException e) 
-				{
+                if (prefs.getBoolean("config_external_storage", false))
+                    internalStorage = context.getExternalFilesDir(null);
 
-				}
-				
-				try 
-				{					
-					BufferedReader in = null;
-					
-					if (me._source.toString().startsWith("file:///android_asset/"))
-					{
-						AssetManager assets = context.getAssets();
-						
-						in = new BufferedReader(new InputStreamReader(assets.open(me._source.toString().replace("file:///android_asset/", ""))));
-					}
-					else
-					{				
-						URL u = new URL(me._source.toString());
+                if (internalStorage != null && !internalStorage.exists())
+                    internalStorage.mkdirs();
 
-						in  = new BufferedReader(new InputStreamReader(u.openStream()));
-					}
+                File modelsFolder = new File(internalStorage,
+                        "persisted_models");
 
-			        
-			        StringBuffer sb = new StringBuffer();
-			        
-			        String inputLine = null;
-			        
-			        while ((inputLine = in.readLine()) != null)
-			        	sb.append(inputLine);
+                if (modelsFolder != null && !modelsFolder.exists())
+                    modelsFolder.mkdirs();
 
-			        in.close();
-			        
-			        contents = sb.toString();
-				} 
-				catch (MalformedURLException e) 
-				{
-					e.printStackTrace();
-					LogManager.getInstance(context).logException(e);
-				} 
-				catch (IOException e) 
-				{
-					e.printStackTrace();
-					LogManager.getInstance(context).logException(e);
-				} 
+                String contents = null;
+                File cachedModel = new File(modelsFolder, hash);
 
-				if (contents != null)
-				{
-					try
-					{
-				        JSONObject json = new JSONObject(contents);
-				        
-				        me._name = json.getString("name");
-				        
-				        me._accuracy = json.getDouble("accuracy");
+                try {
+                    contents = FileUtils.readFileToString(cachedModel);
+                } catch (IOException e) {
 
-				        me.generateModel(context, json.get("model"));
-				        
-				        if (json.has("map"))
-				        	me.setFeatureMap(context, json.getJSONObject("map"));
+                }
 
-				        FileUtils.writeStringToFile(cachedModel, contents);
+                try {
+                    BufferedReader in = null;
 
-				        me._inited = true;
-					}
-					catch (Exception e) 
-					{
-						LogManager.getInstance(context).logException(e);
-						
-						ModelManager.getInstance(context).deleteModel(me._source.toString());
-					}
-				}
-			}
-		};
-		
-		Thread t = new Thread(r);
-		t.start();
-	}
-	
-	
-	@SuppressWarnings("unchecked")
-	protected void setFeatureMap(Context context, JSONObject mapJson) 
-	{
-		Iterator<String> keys = mapJson.keys();
-		
-		while (keys.hasNext())
-		{
-			try 
-			{
-				String original = keys.next();
-				String replacement = mapJson.get(original).toString();
+                    if (me._source.toString().startsWith(
+                            "file:///android_asset/")) {
+                        AssetManager assets = context.getAssets();
 
-				this._featureMap.put(original, replacement);
-			} 
-			catch (JSONException e) 
-			{
-				LogManager.getInstance(context).logException(e);
-			}
-		}
-	}
+                        in = new BufferedReader(new InputStreamReader(
+                                assets.open(me._source.toString().replace(
+                                        "file:///android_asset/", ""))));
+                    } else {
+                        URL u = new URL(me._source.toString());
 
-	/**
-	 * Provides the name of the model, as specified by the "class" key in the 
-	 * JSON definition.
-	 * 
-	 * @see edu.northwestern.cbits.purple_robot_manager.models.Model#title(android.content.Context)
-	 */
+                        in = new BufferedReader(new InputStreamReader(
+                                u.openStream()));
+                    }
 
-	public String title(Context context) 
-	{
-		return this._name;
-	}
-	
-	
-	/**
-	 * Provides a placeholder summary. TODO: Add feature to specify description 
-	 * in JSON definition.
-	 * 
-	 * @see edu.northwestern.cbits.purple_robot_manager.models.Model#summary(android.content.Context)
-	 */
-	
-	public String summary(Context context)
-	{
-		return context.getString(R.string.summary_model_unknown);
-	}
+                    StringBuffer sb = new StringBuffer();
 
-	
-	/**
-	 * Returns an MD5 hash of the model's URL to be used a unique identifier by 
-	 * the rest of the system.
-	 * 
-	 * @see edu.northwestern.cbits.purple_robot_manager.models.Model#getPreferenceKey()
-	 */
+                    String inputLine = null;
 
-	public String getPreferenceKey() 
-	{
-		return this._sourceHash;
-	}
-	
-	
-	/**
-	 *  Returns the URL of the model definition to be used as the internal 
-	 * identifier within.
-	 * 
-	 * @see edu.northwestern.cbits.purple_robot_manager.models.Model#name(android.content.Context)
-	 */
+                    while ((inputLine = in.readLine()) != null)
+                        sb.append(inputLine);
 
-	public String name(Context context) 
-	{
-		return this._source.toString();
-	}
-	
-	
-	/**
-	 * Calls TrainedModel.evaluateModel method within a Thread on implementing 
-	 * subclasses to generate a prediction for the provided snapshot. When a
-	 * prediction becomes available, transmits the prediction through the rest
-	 * of the data processing pipeline.
-	 * 
-	 * @see edu.northwestern.cbits.purple_robot_manager.models.Model#predict(android.content.Context, java.util.Map)
-	 */
-	
-	public void predict(final Context context, final Map<String, Object> snapshot) 
-	{
-		if (this._inited == false || this.enabled(context) == false)
-			return;
-		
-		long now = System.currentTimeMillis();
+                    in.close();
 
-		if (now - this._lastCheck < 1000)
-		{
-			this._lastCheck = now;
-			
-			return;
-		}
+                    contents = sb.toString();
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                    LogManager.getInstance(context).logException(e);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    LogManager.getInstance(context).logException(e);
+                }
 
-		for (String key : this._featureMap.keySet())
-		{
-			String newKey = this._featureMap.get(key);
-			
-			if (snapshot.get(key) == null)
-			{
-				// Do nothing.
-			}
-			else
-			{		
-				snapshot.put(newKey, snapshot.get(key));
-			}
-		}
+                if (contents != null) {
+                    try {
+                        JSONObject json = new JSONObject(contents);
 
-		final TrainedModel me = this;
-		
-		Runnable r = new Runnable()
-		{
-			@SuppressWarnings("unchecked")
-			public void run() 
-			{
-				Object value = me.evaluateModel(context, snapshot);
+                        me._name = json.getString("name");
 
-				if (value == null)
-				{
-					// Do nothing.
-				}
-				else if (value instanceof Map<?, ?>)
-				{
-					Map<String, Object> map = (Map<String, Object>) value;
+                        me._accuracy = json.getDouble("accuracy");
 
-					if (map.get(LeafNode.PREDICTION) != null)
-						me.transmitPrediction(context, map.get(LeafNode.PREDICTION).toString(), (Double) map.get(LeafNode.ACCURACY), map);
-				}
-				else if (value instanceof Double)
-				{
-					Double doubleValue = (Double) value;
+                        me.generateModel(context, json.get("model"));
 
-					me.transmitPrediction(context, doubleValue.doubleValue(), me._accuracy);
-				}
-				else
-					me.transmitPrediction(context, value.toString(), me._accuracy);
-			}
-		};
-		
-		Thread t = new Thread(r);
-		t.start();
-	}
+                        if (json.has("map"))
+                            me.setFeatureMap(context, json.getJSONObject("map"));
 
-	/**
-	 * Generates the dynamic structures needed to evaluate the model provided. 
-	 * Subclasses will implement this method to provide custom parsing logic
-	 * depending upon the representation provided.
-	 * 
-	 * @param context
-	 * 
-	 * @param model Java object obtained from JSONObject.get that encodes the 
-	 *              desired model.
-	 * @throws Exception 
-	 */
-	
+                        FileUtils.writeStringToFile(cachedModel, contents);
 
-	protected abstract void generateModel(Context context, Object model) throws Exception; 
+                        me._inited = true;
+                    } catch (Exception e) {
+                        LogManager.getInstance(context).logException(e);
 
+                        ModelManager.getInstance(context).deleteModel(
+                                me._source.toString());
+                    }
+                }
+            }
+        };
 
-	/**
-	 * Evaluates the states provided to generate a prediction describing the 
-	 * world at that point in time. This method will evaluate the input provided 
-	 * against the data structure constructed in the generateModel method.
-	 *  
-	 * @param context
-	 * @param snapshot Key-value pairs describing the states to be evaluated.
-	 * 
-	 * @return Prediction generated by the model.
-	 */
-	
-	protected abstract Object evaluateModel(Context context, Map<String, Object> snapshot);
+        Thread t = new Thread(r);
+        t.start();
+    }
+
+    protected void setFeatureMap(Context context, JSONObject mapJson) {
+        Iterator<String> keys = mapJson.keys();
+
+        while (keys.hasNext()) {
+            try {
+                String original = keys.next();
+                String replacement = mapJson.get(original).toString();
+
+                this._featureMap.put(original, replacement);
+            } catch (JSONException e) {
+                LogManager.getInstance(context).logException(e);
+            }
+        }
+    }
+
+    /**
+     * Provides the name of the model, as specified by the "class" key in the
+     * JSON definition.
+     * 
+     * @see edu.northwestern.cbits.purple_robot_manager.models.Model#title(android.content.Context)
+     */
+
+    public String title(Context context) {
+        return this._name;
+    }
+
+    /**
+     * Provides a placeholder summary. TODO: Add feature to specify description
+     * in JSON definition.
+     * 
+     * @see edu.northwestern.cbits.purple_robot_manager.models.Model#summary(android.content.Context)
+     */
+
+    public String summary(Context context) {
+        return context.getString(R.string.summary_model_unknown);
+    }
+
+    /**
+     * Returns an MD5 hash of the model's URL to be used a unique identifier by
+     * the rest of the system.
+     * 
+     * @see edu.northwestern.cbits.purple_robot_manager.models.Model#getPreferenceKey()
+     */
+
+    public String getPreferenceKey() {
+        return this._sourceHash;
+    }
+
+    /**
+     * Returns the URL of the model definition to be used as the internal
+     * identifier within.
+     * 
+     * @see edu.northwestern.cbits.purple_robot_manager.models.Model#name(android.content.Context)
+     */
+
+    public String name(Context context) {
+        return this._source.toString();
+    }
+
+    /**
+     * Calls TrainedModel.evaluateModel method within a Thread on implementing
+     * subclasses to generate a prediction for the provided snapshot. When a
+     * prediction becomes available, transmits the prediction through the rest
+     * of the data processing pipeline.
+     * 
+     * @see edu.northwestern.cbits.purple_robot_manager.models.Model#predict(android.content.Context,
+     *      java.util.Map)
+     */
+
+    public void predict(final Context context,
+            final Map<String, Object> snapshot) {
+        if (this._inited == false || this.enabled(context) == false)
+            return;
+
+        long now = System.currentTimeMillis();
+
+        if (now - this._lastCheck < 1000) {
+            this._lastCheck = now;
+
+            return;
+        }
+
+        for (String key : this._featureMap.keySet()) {
+            String newKey = this._featureMap.get(key);
+
+            if (snapshot.get(key) == null) {
+                // Do nothing.
+            } else {
+                snapshot.put(newKey, snapshot.get(key));
+            }
+        }
+
+        final TrainedModel me = this;
+
+        Runnable r = new Runnable() {
+            @SuppressWarnings("unchecked")
+            public void run() {
+                Object value = me.evaluateModel(context, snapshot);
+
+                if (value == null) {
+                    // Do nothing.
+                } else if (value instanceof Map<?, ?>) {
+                    Map<String, Object> map = (Map<String, Object>) value;
+
+                    if (map.get(LeafNode.PREDICTION) != null)
+                        me.transmitPrediction(context,
+                                map.get(LeafNode.PREDICTION).toString(),
+                                (Double) map.get(LeafNode.ACCURACY), map);
+                } else if (value instanceof Double) {
+                    Double doubleValue = (Double) value;
+
+                    me.transmitPrediction(context, doubleValue.doubleValue(),
+                            me._accuracy);
+                } else
+                    me.transmitPrediction(context, value.toString(),
+                            me._accuracy);
+            }
+        };
+
+        Thread t = new Thread(r);
+        t.start();
+    }
+
+    /**
+     * Generates the dynamic structures needed to evaluate the model provided.
+     * Subclasses will implement this method to provide custom parsing logic
+     * depending upon the representation provided.
+     * 
+     * @param context
+     * 
+     * @param model
+     *            Java object obtained from JSONObject.get that encodes the
+     *            desired model.
+     * @throws Exception
+     */
+
+    protected abstract void generateModel(Context context, Object model)
+            throws Exception;
+
+    /**
+     * Evaluates the states provided to generate a prediction describing the
+     * world at that point in time. This method will evaluate the input provided
+     * against the data structure constructed in the generateModel method.
+     * 
+     * @param context
+     * @param snapshot
+     *            Key-value pairs describing the states to be evaluated.
+     * 
+     * @return Prediction generated by the model.
+     */
+
+    protected abstract Object evaluateModel(Context context,
+            Map<String, Object> snapshot);
 }

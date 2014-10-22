@@ -1,7 +1,6 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -26,7 +25,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
-
 import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -35,469 +33,444 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ActivityDetect
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
-public class ManagerService extends IntentService
-{
-	public static String RUN_SCRIPT_INTENT = "purple_robot_manager_run_script";
-	public static String RUN_SCRIPT = "run_script";
+public class ManagerService extends IntentService {
+    public static String RUN_SCRIPT_INTENT = "purple_robot_manager_run_script";
+    public static String RUN_SCRIPT = "run_script";
 
-	public static String APPLICATION_LAUNCH_INTENT = "purple_robot_manager_application_launch";
-	public static String APPLICATION_LAUNCH_INTENT_PACKAGE = "purple_robot_manager_widget_launch_package";
-	public static String APPLICATION_LAUNCH_INTENT_URL = "purple_robot_manager_widget_launch_url";
-	public static String APPLICATION_LAUNCH_INTENT_PARAMETERS = "purple_robot_manager_widget_launch_parameters";
-	public static String APPLICATION_LAUNCH_INTENT_POSTSCRIPT = "purple_robot_manager_widget_launch_postscript";
+    public static String APPLICATION_LAUNCH_INTENT = "purple_robot_manager_application_launch";
+    public static String APPLICATION_LAUNCH_INTENT_PACKAGE = "purple_robot_manager_widget_launch_package";
+    public static String APPLICATION_LAUNCH_INTENT_URL = "purple_robot_manager_widget_launch_url";
+    public static String APPLICATION_LAUNCH_INTENT_PARAMETERS = "purple_robot_manager_widget_launch_parameters";
+    public static String APPLICATION_LAUNCH_INTENT_POSTSCRIPT = "purple_robot_manager_widget_launch_postscript";
 
-	public static String UPDATE_WIDGETS = "purple_robot_manager_update_widgets";
-	public static String FIRE_TRIGGERS_INTENT = "purple_robot_manager_fire_triggers";
-	public static String INCOMING_DATA_INTENT = "purple_robot_manager_incoming_data";
-	public static String UPLOAD_LOGS_INTENT = "purple_robot_manager_upload_logs";
-	public static String REFRESH_ERROR_STATE_INTENT = "purple_robot_manager_refresh_errors";
+    public static String UPDATE_WIDGETS = "purple_robot_manager_update_widgets";
+    public static String FIRE_TRIGGERS_INTENT = "purple_robot_manager_fire_triggers";
+    public static String INCOMING_DATA_INTENT = "purple_robot_manager_incoming_data";
+    public static String UPLOAD_LOGS_INTENT = "purple_robot_manager_upload_logs";
+    public static String REFRESH_ERROR_STATE_INTENT = "purple_robot_manager_refresh_errors";
 
-	public static String GOOGLE_PLAY_ACTIVITY_DETECTED = "purple_robot_manager_google_play_activity_detected";
+    public static String GOOGLE_PLAY_ACTIVITY_DETECTED = "purple_robot_manager_google_play_activity_detected";
 
-	public static String HAPTIC_PATTERN_INTENT = "purple_robot_manager_haptic_pattern";
-	public static String HAPTIC_PATTERN_NAME = "purple_robot_manager_haptic_pattern_name";
-	public static String HAPTIC_PATTERN_VIBRATE = "purple_robot_manager_haptic_pattern_vibrates";
+    public static String HAPTIC_PATTERN_INTENT = "purple_robot_manager_haptic_pattern";
+    public static String HAPTIC_PATTERN_NAME = "purple_robot_manager_haptic_pattern_name";
+    public static String HAPTIC_PATTERN_VIBRATE = "purple_robot_manager_haptic_pattern_vibrates";
 
-	public static String RINGTONE_STOP_INTENT = "purple_robot_manager_stop_ringtone";
-	public static String RINGTONE_INTENT = "purple_robot_manager_ringtone";
-	public static String RINGTONE_NAME = "purple_robot_manager_ringtone_name";
-	public static String RINGTONE_LOOPS = "purple_robot_manager_ringtone_loops";
+    public static String RINGTONE_STOP_INTENT = "purple_robot_manager_stop_ringtone";
+    public static String RINGTONE_INTENT = "purple_robot_manager_ringtone";
+    public static String RINGTONE_NAME = "purple_robot_manager_ringtone_name";
+    public static String RINGTONE_LOOPS = "purple_robot_manager_ringtone_loops";
 
-	public static String REFRESH_CONFIGURATION = "purple_robot_manager_refresh_configuration";
+    public static String REFRESH_CONFIGURATION = "purple_robot_manager_refresh_configuration";
 
-	public static final String UPDATE_TRIGGER_SCHEDULE_INTENT = "purple_robot_manager_update_trigger_schedule";
-	
-	public static long startTimestamp = System.currentTimeMillis();
+    public static final String UPDATE_TRIGGER_SCHEDULE_INTENT = "purple_robot_manager_update_trigger_schedule";
 
-	private static boolean _checkSetup = false;
-	private static long _lastTriggerNudge = 0;
-	private static boolean _updatingTriggerSchedule = false;
-	protected static boolean _needsTriggerUpdate = false;
+    public static long startTimestamp = System.currentTimeMillis();
 
-	private static boolean _looping = false;
-	protected static MediaPlayer _player = null;
+    private static boolean _checkSetup = false;
+    private static long _lastTriggerNudge = 0;
+    private static boolean _updatingTriggerSchedule = false;
+    protected static boolean _needsTriggerUpdate = false;
 
-	public ManagerService()
-	{
-		super("ManagerService");
-	}
+    private static boolean _looping = false;
+    protected static MediaPlayer _player = null;
 
-	public ManagerService(String name)
-	{
-		super(name);
-	}
+    public ManagerService() {
+        super("ManagerService");
+    }
 
-	@SuppressWarnings("deprecation")
-	protected void onHandleIntent(final Intent intent)
-	{
-		String action = intent.getAction();
-		
-		final ManagerService me = this;
-		
-		if (GOOGLE_PLAY_ACTIVITY_DETECTED.equalsIgnoreCase(action))
-			ActivityDetectionProbe.activityDetected(this, intent);
-		else if (REFRESH_ERROR_STATE_INTENT.equalsIgnoreCase(action))
-		{
-			Runnable r = new Runnable()
-			{
-				public void run() 
-				{
-					SanityManager.getInstance(me).refreshState();
-				}
-			};
-			
-			Thread t = new Thread(r);
-			t.start();
-		}
-		else if (UPDATE_WIDGETS.equalsIgnoreCase(action))
-		{
-			Intent broadcast = new Intent("edu.northwestern.cbits.purple.UPDATE_WIDGET");
-			broadcast.putExtras(intent.getExtras());
-			
-			this.startService(broadcast);
-		}
-		else if (HAPTIC_PATTERN_INTENT.equalsIgnoreCase(action))
-		{
-			String pattern = intent.getStringExtra(HAPTIC_PATTERN_NAME);
+    public ManagerService(String name) {
+        super(name);
+    }
 
-			if (!pattern.startsWith("vibrator_"))
-				pattern = "vibrator_" + pattern;
+    @SuppressWarnings("deprecation")
+    protected void onHandleIntent(final Intent intent) {
+        String action = intent.getAction();
 
-			int[] patternSpec = this.getResources().getIntArray(R.array.vibrator_buzz);
+        final ManagerService me = this;
 
-			if ("vibrator_blip".equalsIgnoreCase(pattern))
-				patternSpec = this.getResources().getIntArray(R.array.vibrator_blip);
-			if ("vibrator_sos".equalsIgnoreCase(pattern))
-				patternSpec = this.getResources().getIntArray(R.array.vibrator_sos);
+        if (GOOGLE_PLAY_ACTIVITY_DETECTED.equalsIgnoreCase(action))
+            ActivityDetectionProbe.activityDetected(this, intent);
+        else if (REFRESH_ERROR_STATE_INTENT.equalsIgnoreCase(action)) {
+            Runnable r = new Runnable() {
+                public void run() {
+                    SanityManager.getInstance(me).refreshState();
+                }
+            };
 
-			long[] longSpec = new long[patternSpec.length];
+            Thread t = new Thread(r);
+            t.start();
+        } else if (UPDATE_WIDGETS.equalsIgnoreCase(action)) {
+            Intent broadcast = new Intent(
+                    "edu.northwestern.cbits.purple.UPDATE_WIDGET");
+            broadcast.putExtras(intent.getExtras());
 
-			for (int i = 0; i < patternSpec.length; i++)
-			{
-				longSpec[i] = (long) patternSpec[i];
-			}
+            this.startService(broadcast);
+        } else if (HAPTIC_PATTERN_INTENT.equalsIgnoreCase(action)) {
+            String pattern = intent.getStringExtra(HAPTIC_PATTERN_NAME);
 
-			// TODO: Implement looping...
-			
-			Vibrator v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
-			v.cancel();
-			v.vibrate(longSpec, -1);
-		}
-		else if (RINGTONE_STOP_INTENT.equalsIgnoreCase(action))
-		{
-			ManagerService._looping = false;
-			
-			if (ManagerService._player != null)
-				ManagerService._player.stop();
-			
-			ManagerService._player = null;
-		}
-		else if (RINGTONE_INTENT.equalsIgnoreCase(action))
-		{
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            if (!pattern.startsWith("vibrator_"))
+                pattern = "vibrator_" + pattern;
 
-			Uri toneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            int[] patternSpec = this.getResources().getIntArray(
+                    R.array.vibrator_buzz);
 
-			String toneString = prefs.getString(SettingsActivity.RINGTONE_KEY, null);
+            if ("vibrator_blip".equalsIgnoreCase(pattern))
+                patternSpec = this.getResources().getIntArray(
+                        R.array.vibrator_blip);
+            if ("vibrator_sos".equalsIgnoreCase(pattern))
+                patternSpec = this.getResources().getIntArray(
+                        R.array.vibrator_sos);
 
-			String name = null;
-			
-			if (intent.hasExtra(ManagerService.RINGTONE_NAME))
-				name = intent.getStringExtra(ManagerService.RINGTONE_NAME);
-			
-			try
-			{
-				if (toneString != null)
-				{
-					if (toneString.equals("0"))
-						toneUri = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_NOTIFICATION);
-					else if (toneString.startsWith("sounds/") == false) 
-						toneUri = Uri.parse(toneString);
-					else
-						toneUri = null;
-				}
-				else
-				{
-					if (name != null)
-					{
-						RingtoneManager rm = new RingtoneManager(this);
-						rm.setType(RingtoneManager.TYPE_NOTIFICATION);
+            long[] longSpec = new long[patternSpec.length];
 
-						Cursor cursor = rm.getCursor();
+            for (int i = 0; i < patternSpec.length; i++) {
+                longSpec[i] = (long) patternSpec[i];
+            }
 
-						do
-						{
-							String title = cursor.getString(RingtoneManager.TITLE_COLUMN_INDEX);
+            // TODO: Implement looping...
 
-							if (name.equalsIgnoreCase(title))
-								toneUri = rm.getRingtoneUri(cursor.getPosition());
-						}
-						while (cursor.moveToNext());
+            Vibrator v = (Vibrator) this
+                    .getSystemService(Context.VIBRATOR_SERVICE);
+            v.cancel();
+            v.vibrate(longSpec, -1);
+        } else if (RINGTONE_STOP_INTENT.equalsIgnoreCase(action)) {
+            ManagerService._looping = false;
 
-						cursor.deactivate();
-					}
-				}
-			}
-			catch(Exception e)
-			{
-				LogManager.getInstance(this).logException(e);
-			}
-			
-			if (toneUri != null)
-			{
-				final Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), toneUri);
-	
-			    ManagerService._looping  = intent.getBooleanExtra(ManagerService.RINGTONE_LOOPS, false);
+            if (ManagerService._player != null)
+                ManagerService._player.stop();
 
-				if (r != null)
-				{
-					Thread t = new Thread(new Runnable()
-					{
-						public void run()
-						{
-							r.play();
-	
-							try
-							{
-								while (r.isPlaying())
-									Thread.sleep(100);
-								
-								if (ManagerService._looping)
-								{
-									Thread t = new Thread(this);
-					
-									t.start();
-								}
-							}
-							catch (InterruptedException e)
-							{
-								LogManager.getInstance(me).logException(e);
-							}
-						}
-					});
-	
-					t.start();
-				}
-			}
-			else
-			{
-				try 
-				{
-					final AssetFileDescriptor afd = this.getAssets().openFd(ManagerService.pathForSound(this, toneString));
+            ManagerService._player = null;
+        } else if (RINGTONE_INTENT.equalsIgnoreCase(action)) {
+            SharedPreferences prefs = PreferenceManager
+                    .getDefaultSharedPreferences(this);
 
-					Runnable r = new Runnable()
-					{
-						public void run() 
-						{
-							ManagerService._player = new MediaPlayer();
-							
-							try 
-							{
-								ManagerService._player .setDataSource(afd.getFileDescriptor() ,afd.getStartOffset(),afd.getLength());
-								ManagerService._player.setLooping(intent.getBooleanExtra(ManagerService.RINGTONE_LOOPS, false));
-							    
-								ManagerService._player.prepare();
-							    
-								ManagerService._player.setOnCompletionListener(new OnCompletionListener()
-							    {
-									public void onCompletion(MediaPlayer player) 
-									{
-										ManagerService._player = null;										
-									}
-							    });
-							    
-								ManagerService._player.start();
-							}
-							catch (IllegalArgumentException e) 
-							{
-								LogManager.getInstance(me).logException(e);
-							} 
-							catch (IllegalStateException e) 
-							{
-								LogManager.getInstance(me).logException(e);
-							} 
-							catch (IOException e) 
-							{
-								LogManager.getInstance(me).logException(e);
-							}
-						}
-					};
-					
-					Thread t = new Thread(r);
-					t.start();
-				}
-				catch (IOException e) 
-				{
-					LogManager.getInstance(this).logException(e);
-				}
-			}
-		}
-		else if (APPLICATION_LAUNCH_INTENT.equalsIgnoreCase(action))
-		{
-			if (intent.hasExtra(APPLICATION_LAUNCH_INTENT_PACKAGE))
-			{
-				String packageName = intent.getStringExtra(APPLICATION_LAUNCH_INTENT_PACKAGE);
+            Uri toneUri = RingtoneManager
+                    .getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-				if (packageName != null)
-				{
-					Intent launchIntent = this.getPackageManager().getLaunchIntentForPackage(packageName);
+            String toneString = prefs.getString(SettingsActivity.RINGTONE_KEY,
+                    null);
 
-					if (launchIntent != null)
-					{
-						String launchParams = intent.getStringExtra(APPLICATION_LAUNCH_INTENT_PARAMETERS);
+            String name = null;
 
-						if (launchParams != null)
-						{
-							try
-							{
-								JSONObject paramsObj = new JSONObject(launchParams);
+            if (intent.hasExtra(ManagerService.RINGTONE_NAME))
+                name = intent.getStringExtra(ManagerService.RINGTONE_NAME);
 
-								@SuppressWarnings("unchecked")
-								Iterator<String> keys = paramsObj.keys();
+            try {
+                if (toneString != null) {
+                    if (toneString.equals("0"))
+                        toneUri = RingtoneManager.getActualDefaultRingtoneUri(
+                                this, RingtoneManager.TYPE_NOTIFICATION);
+                    else if (toneString.startsWith("sounds/") == false)
+                        toneUri = Uri.parse(toneString);
+                    else
+                        toneUri = null;
+                } else {
+                    if (name != null) {
+                        RingtoneManager rm = new RingtoneManager(this);
+                        rm.setType(RingtoneManager.TYPE_NOTIFICATION);
 
-								while (keys.hasNext())
-								{
-									String key = keys.next();
+                        Cursor cursor = rm.getCursor();
 
-									launchIntent.putExtra(key, paramsObj.getString(key));
-								}
-							}
-							catch (JSONException e)
-							{
-								LogManager.getInstance(this).logException(e);
-							}
-						}
+                        do {
+                            String title = cursor
+                                    .getString(RingtoneManager.TITLE_COLUMN_INDEX);
 
-						this.startActivity(launchIntent);
-					}
+                            if (name.equalsIgnoreCase(title))
+                                toneUri = rm.getRingtoneUri(cursor
+                                        .getPosition());
+                        } while (cursor.moveToNext());
 
-					String script = intent.getStringExtra(APPLICATION_LAUNCH_INTENT_POSTSCRIPT);
+                        cursor.deactivate();
+                    }
+                }
+            } catch (Exception e) {
+                LogManager.getInstance(this).logException(e);
+            }
 
-					if (script != null)
-						BaseScriptEngine.runScript(this, script);
-				}
-			}
-			else if (intent.hasExtra(APPLICATION_LAUNCH_INTENT_URL))
-			{
-				String url = intent.getStringExtra(APPLICATION_LAUNCH_INTENT_URL);
+            if (toneUri != null) {
+                final Ringtone r = RingtoneManager.getRingtone(
+                        getApplicationContext(), toneUri);
 
-				if (url != null)
-				{
-					Intent launchIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-					launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                ManagerService._looping = intent.getBooleanExtra(
+                        ManagerService.RINGTONE_LOOPS, false);
 
-					this.startActivity(launchIntent);
+                if (r != null) {
+                    Thread t = new Thread(new Runnable() {
+                        public void run() {
+                            r.play();
 
-					String script = intent.getStringExtra(APPLICATION_LAUNCH_INTENT_POSTSCRIPT);
+                            try {
+                                while (r.isPlaying())
+                                    Thread.sleep(100);
 
-					if (script != null)
-						BaseScriptEngine.runScript(this, script);
-				}
-			}
-		}
-		else if (RUN_SCRIPT_INTENT.equalsIgnoreCase(action))
-		{
-			if (intent.hasExtra(RUN_SCRIPT))
-			{
-				String script = intent.getStringExtra(RUN_SCRIPT);
+                                if (ManagerService._looping) {
+                                    Thread t = new Thread(this);
 
-				if (script != null)
-					BaseScriptEngine.runScript(this, script);
-			}
-		}
-		else if (FIRE_TRIGGERS_INTENT.equals(action))
-		{
-			TriggerManager.getInstance(this).nudgeTriggers(this);
-			
-			this.startService(new Intent(ManagerService.UPDATE_TRIGGER_SCHEDULE_INTENT));
-		}
-		else if (UPDATE_TRIGGER_SCHEDULE_INTENT.equals(action))
-		{
-			Runnable r = new Runnable()
-			{
-				public void run() 
-				{
-					if (ManagerService._updatingTriggerSchedule)
-					{
-						ManagerService._needsTriggerUpdate  = true;
+                                    t.start();
+                                }
+                            } catch (InterruptedException e) {
+                                LogManager.getInstance(me).logException(e);
+                            }
+                        }
+                    });
 
-						return;
-					}			
-					
-					ManagerService._updatingTriggerSchedule = true;
-					ManagerService._needsTriggerUpdate = false;
-					
-					List<Long> times = TriggerManager.getInstance(me).upcomingFireTimes(me);
-					
-					long now = System.currentTimeMillis();
-					
-					for (int index = 0; now > ManagerService._lastTriggerNudge && index < times.size(); index++)
-					{
-						Long fire = times.get(index);
+                    t.start();
+                }
+            } else {
+                try {
+                    final AssetFileDescriptor afd = this.getAssets().openFd(
+                            ManagerService.pathForSound(this, toneString));
 
-						if (Math.abs(ManagerService._lastTriggerNudge - fire.longValue()) >= 60000)
-						{
-							AlarmManager alarmManager = (AlarmManager) me.getSystemService(Context.ALARM_SERVICE);
-							
-							PendingIntent pi = PendingIntent.getService(me, 0, new Intent(ManagerService.FIRE_TRIGGERS_INTENT), PendingIntent.FLAG_UPDATE_CURRENT);
+                    Runnable r = new Runnable() {
+                        public void run() {
+                            ManagerService._player = new MediaPlayer();
 
-							alarmManager.cancel(pi);
+                            try {
+                                ManagerService._player.setDataSource(
+                                        afd.getFileDescriptor(),
+                                        afd.getStartOffset(), afd.getLength());
+                                ManagerService._player.setLooping(intent
+                                        .getBooleanExtra(
+                                                ManagerService.RINGTONE_LOOPS,
+                                                false));
 
-							ManagerService._lastTriggerNudge = fire.longValue();
-							
-							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-								alarmManager.setExact(AlarmManager.RTC_WAKEUP, fire.longValue(), pi);
-							else
-								alarmManager.set(AlarmManager.RTC_WAKEUP, fire.longValue(), pi);
+                                ManagerService._player.prepare();
 
-							break;
-						}
-					}
+                                ManagerService._player
+                                        .setOnCompletionListener(new OnCompletionListener() {
+                                            public void onCompletion(
+                                                    MediaPlayer player) {
+                                                ManagerService._player = null;
+                                            }
+                                        });
 
-					ManagerService._updatingTriggerSchedule = false;
-					
-					if (ManagerService._needsTriggerUpdate)
-						this.run();
-				}
-			};
-			
-			Thread t = new Thread(r);
-			t.start();
-		}
-		else if (REFRESH_CONFIGURATION.equals(action))
-			LegacyJSONConfigFile.update(this, false);
-	}
+                                ManagerService._player.start();
+                            } catch (IllegalArgumentException e) {
+                                LogManager.getInstance(me).logException(e);
+                            } catch (IllegalStateException e) {
+                                LogManager.getInstance(me).logException(e);
+                            } catch (IOException e) {
+                                LogManager.getInstance(me).logException(e);
+                            }
+                        }
+                    };
 
-	public static void setupPeriodicCheck(final Context context)
-	{
-		if (ManagerService._checkSetup)
-			return;
+                    Thread t = new Thread(r);
+                    t.start();
+                } catch (IOException e) {
+                    LogManager.getInstance(this).logException(e);
+                }
+            }
+        } else if (APPLICATION_LAUNCH_INTENT.equalsIgnoreCase(action)) {
+            if (intent.hasExtra(APPLICATION_LAUNCH_INTENT_PACKAGE)) {
+                String packageName = intent
+                        .getStringExtra(APPLICATION_LAUNCH_INTENT_PACKAGE);
 
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+                if (packageName != null) {
+                    Intent launchIntent = this.getPackageManager()
+                            .getLaunchIntentForPackage(packageName);
 
-		Editor editor = prefs.edit();
-		editor.putString(LegacyJSONConfigFile.JSON_LAST_HASH, "");
-		editor.commit();
+                    if (launchIntent != null) {
+                        String launchParams = intent
+                                .getStringExtra(APPLICATION_LAUNCH_INTENT_PARAMETERS);
 
-		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                        if (launchParams != null) {
+                            try {
+                                JSONObject paramsObj = new JSONObject(
+                                        launchParams);
 
-		PendingIntent pi = PendingIntent.getService(context, 0, new Intent(ManagerService.REFRESH_CONFIGURATION), PendingIntent.FLAG_UPDATE_CURRENT);
-		alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60000, pi);
+                                Iterator<String> keys = paramsObj.keys();
 
-		pi = PendingIntent.getService(context, 0, new Intent(ManagerService.UPDATE_TRIGGER_SCHEDULE_INTENT), PendingIntent.FLAG_UPDATE_CURRENT);
-		alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), (15 * 60 * 1000), pi);
+                                while (keys.hasNext()) {
+                                    String key = keys.next();
 
-		prefs.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener()
-		{
-	        public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
-	        {
-	        	Intent reloadIntent = new Intent(ManagerService.REFRESH_CONFIGURATION);
-	        	reloadIntent.setClass(context, ManagerService.class);
+                                    launchIntent.putExtra(key,
+                                            paramsObj.getString(key));
+                                }
+                            } catch (JSONException e) {
+                                LogManager.getInstance(this).logException(e);
+                            }
+                        }
 
-	        	context.startService(reloadIntent);
-	        }
-	    });
+                        this.startActivity(launchIntent);
+                    }
 
-		Intent nudgeIntent = new Intent(PersistentService.NUDGE_PROBES);
-		nudgeIntent.setClass(context, PersistentService.class);
+                    String script = intent
+                            .getStringExtra(APPLICATION_LAUNCH_INTENT_POSTSCRIPT);
 
-		context.startService(nudgeIntent);
-		
-		SanityManager.getInstance(context);
+                    if (script != null)
+                        BaseScriptEngine.runScript(this, script);
+                }
+            } else if (intent.hasExtra(APPLICATION_LAUNCH_INTENT_URL)) {
+                String url = intent
+                        .getStringExtra(APPLICATION_LAUNCH_INTENT_URL);
 
-		ManagerService._checkSetup = true;
-	}
+                if (url != null) {
+                    Intent launchIntent = new Intent(Intent.ACTION_VIEW,
+                            Uri.parse(url));
+                    launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-	public static String soundNameForPath(Context context, String path) 
-	{
-		String[] values = context.getResources().getStringArray(R.array.sound_effect_values);
-		String[] labels = context.getResources().getStringArray(R.array.sound_effect_labels);
-		
-		for (int i = 0; i < labels.length && i < values.length; i++)
-		{
-			if (values[i].toLowerCase(Locale.ENGLISH).equals(path.toLowerCase(Locale.getDefault())))
-				return labels[i];
-		}
-			
-		return path;
-	}
-	
-	private static String pathForSound(Context context, String name) 
-	{
-		String[] values = context.getResources().getStringArray(R.array.sound_effect_values);
-		String[] labels = context.getResources().getStringArray(R.array.sound_effect_labels);
-		
-		for (int i = 0; i < labels.length && i < values.length; i++)
-		{
-			if (labels[i].toLowerCase(Locale.getDefault()).equals(name.toLowerCase(Locale.getDefault())))
-				return values[i];
-		}
-			
-		return name;
-	}
+                    this.startActivity(launchIntent);
 
-	public static void resetTriggerNudgeDate() 
-	{
-		ManagerService._lastTriggerNudge = 0;
-	}
+                    String script = intent
+                            .getStringExtra(APPLICATION_LAUNCH_INTENT_POSTSCRIPT);
+
+                    if (script != null)
+                        BaseScriptEngine.runScript(this, script);
+                }
+            }
+        } else if (RUN_SCRIPT_INTENT.equalsIgnoreCase(action)) {
+            if (intent.hasExtra(RUN_SCRIPT)) {
+                String script = intent.getStringExtra(RUN_SCRIPT);
+
+                if (script != null)
+                    BaseScriptEngine.runScript(this, script);
+            }
+        } else if (FIRE_TRIGGERS_INTENT.equals(action)) {
+            TriggerManager.getInstance(this).nudgeTriggers(this);
+
+            this.startService(new Intent(
+                    ManagerService.UPDATE_TRIGGER_SCHEDULE_INTENT));
+        } else if (UPDATE_TRIGGER_SCHEDULE_INTENT.equals(action)) {
+            Runnable r = new Runnable() {
+                public void run() {
+                    if (ManagerService._updatingTriggerSchedule) {
+                        ManagerService._needsTriggerUpdate = true;
+
+                        return;
+                    }
+
+                    ManagerService._updatingTriggerSchedule = true;
+                    ManagerService._needsTriggerUpdate = false;
+
+                    List<Long> times = TriggerManager.getInstance(me)
+                            .upcomingFireTimes(me);
+
+                    long now = System.currentTimeMillis();
+
+                    for (int index = 0; now > ManagerService._lastTriggerNudge
+                            && index < times.size(); index++) {
+                        Long fire = times.get(index);
+
+                        if (Math.abs(ManagerService._lastTriggerNudge
+                                - fire.longValue()) >= 60000) {
+                            AlarmManager alarmManager = (AlarmManager) me
+                                    .getSystemService(Context.ALARM_SERVICE);
+
+                            PendingIntent pi = PendingIntent
+                                    .getService(
+                                            me,
+                                            0,
+                                            new Intent(
+                                                    ManagerService.FIRE_TRIGGERS_INTENT),
+                                            PendingIntent.FLAG_UPDATE_CURRENT);
+
+                            alarmManager.cancel(pi);
+
+                            ManagerService._lastTriggerNudge = fire.longValue();
+
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                                alarmManager.setExact(AlarmManager.RTC_WAKEUP,
+                                        fire.longValue(), pi);
+                            else
+                                alarmManager.set(AlarmManager.RTC_WAKEUP,
+                                        fire.longValue(), pi);
+
+                            break;
+                        }
+                    }
+
+                    ManagerService._updatingTriggerSchedule = false;
+
+                    if (ManagerService._needsTriggerUpdate)
+                        this.run();
+                }
+            };
+
+            Thread t = new Thread(r);
+            t.start();
+        } else if (REFRESH_CONFIGURATION.equals(action))
+            LegacyJSONConfigFile.update(this, false);
+    }
+
+    public static void setupPeriodicCheck(final Context context) {
+        if (ManagerService._checkSetup)
+            return;
+
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(context);
+
+        Editor editor = prefs.edit();
+        editor.putString(LegacyJSONConfigFile.JSON_LAST_HASH, "");
+        editor.commit();
+
+        AlarmManager alarmManager = (AlarmManager) context
+                .getSystemService(Context.ALARM_SERVICE);
+
+        PendingIntent pi = PendingIntent.getService(context, 0, new Intent(
+                ManagerService.REFRESH_CONFIGURATION),
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,
+                System.currentTimeMillis(), 60000, pi);
+
+        pi = PendingIntent.getService(context, 0, new Intent(
+                ManagerService.UPDATE_TRIGGER_SCHEDULE_INTENT),
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,
+                System.currentTimeMillis(), (15 * 60 * 1000), pi);
+
+        prefs.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
+            public void onSharedPreferenceChanged(SharedPreferences prefs,
+                    String key) {
+                Intent reloadIntent = new Intent(
+                        ManagerService.REFRESH_CONFIGURATION);
+                reloadIntent.setClass(context, ManagerService.class);
+
+                context.startService(reloadIntent);
+            }
+        });
+
+        Intent nudgeIntent = new Intent(PersistentService.NUDGE_PROBES);
+        nudgeIntent.setClass(context, PersistentService.class);
+
+        context.startService(nudgeIntent);
+
+        SanityManager.getInstance(context);
+
+        ManagerService._checkSetup = true;
+    }
+
+    public static String soundNameForPath(Context context, String path) {
+        String[] values = context.getResources().getStringArray(
+                R.array.sound_effect_values);
+        String[] labels = context.getResources().getStringArray(
+                R.array.sound_effect_labels);
+
+        for (int i = 0; i < labels.length && i < values.length; i++) {
+            if (values[i].toLowerCase(Locale.ENGLISH).equals(
+                    path.toLowerCase(Locale.getDefault())))
+                return labels[i];
+        }
+
+        return path;
+    }
+
+    private static String pathForSound(Context context, String name) {
+        String[] values = context.getResources().getStringArray(
+                R.array.sound_effect_values);
+        String[] labels = context.getResources().getStringArray(
+                R.array.sound_effect_labels);
+
+        for (int i = 0; i < labels.length && i < values.length; i++) {
+            if (labels[i].toLowerCase(Locale.getDefault()).equals(
+                    name.toLowerCase(Locale.getDefault())))
+                return values[i];
+        }
+
+        return name;
+    }
+
+    public static void resetTriggerNudgeDate() {
+        ManagerService._lastTriggerNudge = 0;
+    }
 }

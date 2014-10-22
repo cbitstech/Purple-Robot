@@ -16,28 +16,26 @@ import javax.net.ssl.X509TrustManager;
 
 import org.apache.http.conn.ssl.SSLSocketFactory;
 
-public class LiberalSSLSocketFactory extends SSLSocketFactory 
-{
+public class LiberalSSLSocketFactory extends SSLSocketFactory {
     SSLContext sslContext = SSLContext.getInstance("TLS");
 
-    public LiberalSSLSocketFactory(KeyStore truststore) throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException, UnrecoverableKeyException 
-    {
+    public LiberalSSLSocketFactory(KeyStore truststore)
+            throws NoSuchAlgorithmException, KeyManagementException,
+            KeyStoreException, UnrecoverableKeyException {
         super(truststore);
 
-        TrustManager tm = new X509TrustManager() 
-        {
-            public void checkClientTrusted(X509Certificate[] chain, String authType) 
-            {
-            	
+        TrustManager tm = new X509TrustManager() {
+            public void checkClientTrusted(X509Certificate[] chain,
+                    String authType) {
+
             }
 
-            public void checkServerTrusted(X509Certificate[] chain, String authType) 
-            {
-            
+            public void checkServerTrusted(X509Certificate[] chain,
+                    String authType) {
+
             }
 
-            public X509Certificate[] getAcceptedIssuers() 
-            {
+            public X509Certificate[] getAcceptedIssuers() {
                 return null;
             }
         };
@@ -45,13 +43,13 @@ public class LiberalSSLSocketFactory extends SSLSocketFactory
         sslContext.init(null, new TrustManager[] { tm }, null);
     }
 
-    public Socket createSocket(Socket socket, String host, int port, boolean autoClose) throws IOException, UnknownHostException 
-    {
-        return sslContext.getSocketFactory().createSocket(socket, host, port, autoClose);
+    public Socket createSocket(Socket socket, String host, int port,
+            boolean autoClose) throws IOException, UnknownHostException {
+        return sslContext.getSocketFactory().createSocket(socket, host, port,
+                autoClose);
     }
 
-    public Socket createSocket() throws IOException 
-    {
+    public Socket createSocket() throws IOException {
         return sslContext.getSocketFactory().createSocket();
     }
 }

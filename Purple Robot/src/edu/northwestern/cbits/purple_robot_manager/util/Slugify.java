@@ -6,45 +6,38 @@ import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
 
-public class Slugify 
-{
-	public static String slugify( String input )
-	{
-		String ret = StringUtils.trim( input );
-		if ( StringUtils.isBlank( input ) )
-		{
-			return "";
-		}
+public class Slugify {
+    public static String slugify(String input) {
+        String ret = StringUtils.trim(input);
+        if (StringUtils.isBlank(input)) {
+            return "";
+        }
 
-		ret = normalize( ret );
-		ret = removeDuplicateWhiteSpaces( ret );
-		return ret.replace( " ", "-" ).toLowerCase(Locale.getDefault());
-	}
+        ret = normalize(ret);
+        ret = removeDuplicateWhiteSpaces(ret);
+        return ret.replace(" ", "-").toLowerCase(Locale.getDefault());
+    }
 
-	@SuppressLint("InlinedApi")
-	private static String normalize( String input )
-	{
-		String ret = StringUtils.trim( input );
-		
-		if ( StringUtils.isBlank( ret ) )
-		{
-			return "";
-		}
+    @SuppressLint("InlinedApi")
+    private static String normalize(String input) {
+        String ret = StringUtils.trim(input);
 
-		// ret = ret.replace( "ß", "ss" );
-		return Normalizer.normalize( ret, Normalizer.Form.NFD )
-				.replaceAll( "[^\\p{ASCII}]", "")
-				.replaceAll( "[^a-zA-Z0-9 ]", "" );
-	}
+        if (StringUtils.isBlank(ret)) {
+            return "";
+        }
 
-	private static String removeDuplicateWhiteSpaces( String input )
-	{
-		String ret = StringUtils.trim( input );
-		if ( StringUtils.isBlank( ret ) )
-		{
-			return "";
-		}
+        // ret = ret.replace( "ß", "ss" );
+        return Normalizer.normalize(ret, Normalizer.Form.NFD)
+                .replaceAll("[^\\p{ASCII}]", "")
+                .replaceAll("[^a-zA-Z0-9 ]", "");
+    }
 
-		return ret.replaceAll( "\\s+", " " );
-	}
+    private static String removeDuplicateWhiteSpaces(String input) {
+        String ret = StringUtils.trim(input);
+        if (StringUtils.isBlank(ret)) {
+            return "";
+        }
+
+        return ret.replaceAll("\\s+", " ");
+    }
 }

@@ -8,55 +8,54 @@ import edu.northwestern.cbits.purple_robot_manager.models.Model;
 import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;
 import edu.northwestern.cbits.purple_robot_manager.tests.RobotTestCase;
 
-public class MatlabForestModelTestCase extends RobotTestCase 
-{
-	private static final String MODEL_URI = "file:///android_asset/test_data/matlab-forest.json";
-	
-	public MatlabForestModelTestCase(Context context, int priority) 
-	{
-		super(context, priority);
-	}
-	
-	public void test() 
-	{
-		if (this.isSelected(this._context) == false)
-			return;
+public class MatlabForestModelTestCase extends RobotTestCase {
+    private static final String MODEL_URI = "file:///android_asset/test_data/matlab-forest.json";
 
-		ModelManager models = ModelManager.getInstance(this._context);
-		
-		models.addModel(MatlabForestModelTestCase.MODEL_URI);
-		
-		try 
-		{
-			Thread.sleep(1000);
-		} 
-		catch (InterruptedException e) 
-		{
+    public MatlabForestModelTestCase(Context context, int priority) {
+        super(context, priority);
+    }
 
-		}
-		
-		Assert.assertNotNull("MATFOREST100", models.fetchModelByName(this._context, MatlabForestModelTestCase.MODEL_URI));
-		Assert.assertNull("MATFOREST101", models.fetchModelByTitle(this._context, MatlabForestModelTestCase.MODEL_URI));
-		
-		Assert.assertNotNull("MATFOREST102", models.fetchModelByTitle(this._context, "Matlab Forest Model Test"));
-		
-		Model model = models.fetchModelByName(this._context, MatlabForestModelTestCase.MODEL_URI);
-		
-		Assert.assertEquals("MATFOREST103", model.getClass().getCanonicalName(), MatlabForestModel.class.getCanonicalName());
-		
-		Assert.assertEquals("MATFOREST103", "x17", model.mappedFeatureName("p20featuresprobe_accx_fft_1"));
-		
-		// Commented out to test P20 feature extractor...
-		models.deleteModel(MatlabForestModelTestCase.MODEL_URI);
-	}
-	
-	public int estimatedMinutes() 
-	{
-		return 1;
-	}
+    public void test() {
+        if (this.isSelected(this._context) == false)
+            return;
 
-	public String name(Context context) 
-	{
-		return context.getString(R.string.name_matlab_forest_model_test);
-	}
+        ModelManager models = ModelManager.getInstance(this._context);
+
+        models.addModel(MatlabForestModelTestCase.MODEL_URI);
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+
+        }
+
+        Assert.assertNotNull("MATFOREST100", models.fetchModelByName(
+                this._context, MatlabForestModelTestCase.MODEL_URI));
+        Assert.assertNull("MATFOREST101", models.fetchModelByTitle(
+                this._context, MatlabForestModelTestCase.MODEL_URI));
+
+        Assert.assertNotNull("MATFOREST102", models.fetchModelByTitle(
+                this._context, "Matlab Forest Model Test"));
+
+        Model model = models.fetchModelByName(this._context,
+                MatlabForestModelTestCase.MODEL_URI);
+
+        Assert.assertEquals("MATFOREST103",
+                model.getClass().getCanonicalName(),
+                MatlabForestModel.class.getCanonicalName());
+
+        Assert.assertEquals("MATFOREST103", "x17",
+                model.mappedFeatureName("p20featuresprobe_accx_fft_1"));
+
+        // Commented out to test P20 feature extractor...
+        models.deleteModel(MatlabForestModelTestCase.MODEL_URI);
+    }
+
+    public int estimatedMinutes() {
+        return 1;
+    }
+
+    public String name(Context context) {
+        return context.getString(R.string.name_matlab_forest_model_test);
+    }
 }

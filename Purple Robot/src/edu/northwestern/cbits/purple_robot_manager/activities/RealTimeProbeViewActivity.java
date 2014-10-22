@@ -16,152 +16,138 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 
 @SuppressLint("SimpleDateFormat")
-public class RealTimeProbeViewActivity extends WebkitActivity
-{
-	public static final String PROBE_ID = "probe_id";
+public class RealTimeProbeViewActivity extends WebkitActivity {
+    public static final String PROBE_ID = "probe_id";
 
-	private static RealTimeProbeViewActivity _currentActivity = null;
+    private static RealTimeProbeViewActivity _currentActivity = null;
 
-	private static long _lastUpdate = 0;
-	
-	private boolean _inited = false;
+    private static long _lastUpdate = 0;
 
-	private int _probeId = -1;
+    private boolean _inited = false;
 
-	protected String contentString()
-	{
-		try
-		{
-			String name = this.getIntent().getStringExtra("probe_name");
+    private int _probeId = -1;
 
-			if (name != null)
-			{
-				Probe p = ProbeManager.probeForName(name, this);
+    protected String contentString() {
+        try {
+            String name = this.getIntent().getStringExtra("probe_name");
 
-				String content = p.getDisplayContent(this);
+            if (name != null) {
+                Probe p = ProbeManager.probeForName(name, this);
 
-				if (content != null)
-					return content;
-			}
+                String content = p.getDisplayContent(this);
 
-			return RealTimeProbeViewActivity.stringForAsset(this, "webkit/webview_epoch.html");
-		}
-		catch (IOException e)
-		{
-			LogManager.getInstance(this).logException(e);
-		}
+                if (content != null)
+                    return content;
+            }
 
-		return null;
-	}
-	
-	protected String contentSubtitle()
-	{
-		return this.getString(R.string.subtitle_streaming_live);
-	}
+            return RealTimeProbeViewActivity.stringForAsset(this,
+                    "webkit/webview_epoch.html");
+        } catch (IOException e) {
+            LogManager.getInstance(this).logException(e);
+        }
 
-	@SuppressLint("SetJavaScriptEnabled")
-	protected void onResume()
-	{
-		super.onResume();
-		
-		this._probeId = this.getIntent().getIntExtra(RealTimeProbeViewActivity.PROBE_ID, -1);
-		
-		WebView webview = (WebView) this.findViewById(R.id.webview);
+        return null;
+    }
 
-		webview.setWebChromeClient(new WebChromeClient()
-		{
-			  public boolean onConsoleMessage(ConsoleMessage cm)
-			  {
-				    Log.e("PRM", cm.message() + " -- From line "
-				                         + cm.lineNumber() + " of "
-				                         + cm.sourceId() );
-				    return true;
-			  }
-		});
+    protected String contentSubtitle() {
+        return this.getString(R.string.subtitle_streaming_live);
+    }
 
-		if (this._inited == false)
-		{
-			webview.addJavascriptInterface(this, "PurpleRobot");
-			
-			this._inited = true;
-		}
+    @SuppressLint("SetJavaScriptEnabled")
+    protected void onResume() {
+        super.onResume();
 
-		String contentString = this.contentString();
+        this._probeId = this.getIntent().getIntExtra(
+                RealTimeProbeViewActivity.PROBE_ID, -1);
 
-		if (contentString != null)
-		{
-			webview.getSettings().setJavaScriptEnabled(true);
-			webview.loadDataWithBaseURL("file:///android_asset/webkit/", contentString, "text/html", "UTF-8", null);
+        WebView webview = (WebView) this.findViewById(R.id.webview);
 
-			String title = this.contentTitle();
-			String subtitle = this.contentSubtitle();
+        webview.setWebChromeClient(new WebChromeClient() {
+            public boolean onConsoleMessage(ConsoleMessage cm) {
+                Log.e("PRM", cm.message() + " -- From line " + cm.lineNumber()
+                        + " of " + cm.sourceId());
+                return true;
+            }
+        });
 
-			ActionBar actionBar = this.getSupportActionBar();
+        if (this._inited == false) {
+            webview.addJavascriptInterface(this, "PurpleRobot");
 
-			actionBar.setTitle(title);
-			actionBar.setSubtitle(subtitle);
-		}
-		else
-		{
-			Intent dataIntent = new Intent(this, ProbeViewerActivity.class);
+            this._inited = true;
+        }
 
-			dataIntent.putExtra("probe_name", this.getIntent().getStringExtra("probe_name"));
-			dataIntent.putExtra("probe_bundle", this.getIntent().getParcelableExtra("probe_bundle"));
+        String contentString = this.contentString();
 
-			this.startActivity(dataIntent);
+        if (contentString != null) {
+            webview.getSettings().setJavaScriptEnabled(true);
+            webview.loadDataWithBaseURL("file:///android_asset/webkit/",
+                    contentString, "text/html", "UTF-8", null);
 
-			this.finish();
-		}
-		
-		IntentFilter intentFilter = new IntentFilter();
-		intentFilter.addAction(Probe.PROBE_READING);
-		
-		RealTimeProbeViewActivity._currentActivity = this;
-	}
-	
-	protected void onPause()
-	{
-		RealTimeProbeViewActivity._currentActivity = null;
+            String title = this.contentTitle();
+            String subtitle = this.contentSubtitle();
 
-		super.onPause();
-	}
-	
-	public static void plotIfVisible(final int probeId, final double[] values)
-	{
-		if (RealTimeProbeViewActivity._currentActivity  != null)
-		{
-			long now = System.currentTimeMillis();
-			
-			if (now - RealTimeProbeViewActivity._lastUpdate < 1000)
-				return;
+            ActionBar actionBar = this.getSupportActionBar();
 
-			final RealTimeProbeViewActivity me  = RealTimeProbeViewActivity._currentActivity;
+            actionBar.setTitle(title);
+            actionBar.setSubtitle(subtitle);
+        } else {
+            Intent dataIntent = new Intent(this, ProbeViewerActivity.class);
 
-			if (probeId != me._probeId )
-				return;
+            dataIntent.putExtra("probe_name",
+                    this.getIntent().getStringExtra("probe_name"));
+            dataIntent.putExtra("probe_bundle", this.getIntent()
+                    .getParcelableExtra("probe_bundle"));
 
-			RealTimeProbeViewActivity._lastUpdate = now;
-			
-			me.runOnUiThread(new Runnable()
-			{
-				public void run() 
-				{
-			        final WebView webview = (WebView) me.findViewById(R.id.webview);
+            this.startActivity(dataIntent);
 
-			        double t = values[0];
-					double x = values[1];
-					double y = 0;
-					double z = 0;
-					
-					if (values.length >= 4)
-					{
-						y = values[2];
-						z = values[3];
-					}
+            this.finish();
+        }
 
-					webview.loadUrl("javascript:newData(" + x + ", " + y + ", " + z + ", " + t + ");");
-				}
-			});
-		}
-	}
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Probe.PROBE_READING);
+
+        RealTimeProbeViewActivity._currentActivity = this;
+    }
+
+    protected void onPause() {
+        RealTimeProbeViewActivity._currentActivity = null;
+
+        super.onPause();
+    }
+
+    public static void plotIfVisible(final int probeId, final double[] values) {
+        if (RealTimeProbeViewActivity._currentActivity != null) {
+            long now = System.currentTimeMillis();
+
+            if (now - RealTimeProbeViewActivity._lastUpdate < 1000)
+                return;
+
+            final RealTimeProbeViewActivity me = RealTimeProbeViewActivity._currentActivity;
+
+            if (probeId != me._probeId)
+                return;
+
+            RealTimeProbeViewActivity._lastUpdate = now;
+
+            me.runOnUiThread(new Runnable() {
+                public void run() {
+                    final WebView webview = (WebView) me
+                            .findViewById(R.id.webview);
+
+                    double t = values[0];
+                    double x = values[1];
+                    double y = 0;
+                    double z = 0;
+
+                    if (values.length >= 4) {
+                        y = values[2];
+                        z = values[3];
+                    }
+
+                    webview.loadUrl("javascript:newData(" + x + ", " + y + ", "
+                            + z + ", " + t + ");");
+                }
+            });
+        }
+    }
 }

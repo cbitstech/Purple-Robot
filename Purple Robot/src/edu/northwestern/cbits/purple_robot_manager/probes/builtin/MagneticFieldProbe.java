@@ -25,386 +25,390 @@ import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("SimpleDateFormat")
-public class MagneticFieldProbe extends Continuous3DProbe implements SensorEventListener
-{
-	private static int BUFFER_SIZE = 1024;
+public class MagneticFieldProbe extends Continuous3DProbe implements
+        SensorEventListener {
+    private static int BUFFER_SIZE = 1024;
 
-	public static final String DB_TABLE = "magnetic_probe";
+    public static final String DB_TABLE = "magnetic_probe";
 
-	private static final String X_KEY = "X";
-	private static final String Y_KEY = "Y";
-	private static final String Z_KEY = "Z";
+    private static final String X_KEY = "X";
+    private static final String Y_KEY = "Y";
+    private static final String Z_KEY = "Z";
 
-	private static final String[] fieldNames = { X_KEY, Y_KEY, Z_KEY };
+    private static final String[] fieldNames = { X_KEY, Y_KEY, Z_KEY };
 
-	private static final String DEFAULT_THRESHOLD = "1.0";
+    private static final String DEFAULT_THRESHOLD = "1.0";
 
-	public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.MagneticFieldProbe";
+    public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.MagneticFieldProbe";
 
-	private double _lastX = Double.MAX_VALUE;
-	private double _lastY = Double.MAX_VALUE;
-	private double _lastZ = Double.MAX_VALUE;
+    private double _lastX = Double.MAX_VALUE;
+    private double _lastY = Double.MAX_VALUE;
+    private double _lastZ = Double.MAX_VALUE;
 
-	private long lastThresholdLookup = 0;
-	private double lastThreshold = 1.0;
+    private long lastThresholdLookup = 0;
+    private double lastThreshold = 1.0;
 
-	private float valueBuffer[][] = new float[3][BUFFER_SIZE];
-	private int accuracyBuffer[] = new int[BUFFER_SIZE];
-	private double timeBuffer[] = new double[BUFFER_SIZE];
+    private float valueBuffer[][] = new float[3][BUFFER_SIZE];
+    private int accuracyBuffer[] = new int[BUFFER_SIZE];
+    private double timeBuffer[] = new double[BUFFER_SIZE];
 
-	private Map<String, String> _schema = null;
+    private Map<String, String> _schema = null;
 
-	private int bufferIndex  = 0;
+    private int bufferIndex = 0;
 
-	private int _lastFrequency = -1;
+    private int _lastFrequency = -1;
 
-	public String probeCategory(Context context)
-	{
-		return context.getString(R.string.probe_sensor_category);
-	}
+    public String probeCategory(Context context) {
+        return context.getString(R.string.probe_sensor_category);
+    }
 
-	public Map<String, String> databaseSchema()
-	{
-		if (this._schema == null)
-		{
-			this._schema = new HashMap<String, String>();
+    public Map<String, String> databaseSchema() {
+        if (this._schema == null) {
+            this._schema = new HashMap<String, String>();
 
-			this._schema.put(MagneticFieldProbe.X_KEY, ProbeValuesProvider.REAL_TYPE);
-			this._schema.put(MagneticFieldProbe.Y_KEY, ProbeValuesProvider.REAL_TYPE);
-			this._schema.put(MagneticFieldProbe.Z_KEY, ProbeValuesProvider.REAL_TYPE);
-		}
+            this._schema.put(MagneticFieldProbe.X_KEY,
+                    ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(MagneticFieldProbe.Y_KEY,
+                    ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(MagneticFieldProbe.Z_KEY,
+                    ProbeValuesProvider.REAL_TYPE);
+        }
 
-		return this._schema;
-	}
+        return this._schema;
+    }
 
-	public long getFrequency()
-	{
-		SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
+    public long getFrequency() {
+        SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
 
-		return Long.parseLong(prefs.getString("config_probe_magnetic_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
-	}
+        return Long.parseLong(prefs.getString(
+                "config_probe_magnetic_built_in_frequency",
+                ContinuousProbe.DEFAULT_FREQUENCY));
+    }
 
-	public String name(Context context)
-	{
-		return MagneticFieldProbe.NAME;
-	}
+    public String name(Context context) {
+        return MagneticFieldProbe.NAME;
+    }
 
-	public int getTitleResource()
-	{
-		return R.string.title_magnetic_field_probe;
-	}
+    public int getTitleResource() {
+        return R.string.title_magnetic_field_probe;
+    }
 
-	public boolean isEnabled(Context context)
-	{
-    	SharedPreferences prefs = ContinuousProbe.getPreferences(context);
+    public boolean isEnabled(Context context) {
+        SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
-    	this._context = context.getApplicationContext();
+        this._context = context.getApplicationContext();
 
-    	SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-		Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-    	
-        if (super.isEnabled(context))
-        {
-        	if (prefs.getBoolean("config_probe_magnetic_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
-        	{
-				int frequency = Integer.parseInt(prefs.getString("config_probe_magnetic_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
+        SensorManager sensors = (SensorManager) context
+                .getSystemService(Context.SENSOR_SERVICE);
+        Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
-				if (this._lastFrequency  != frequency)
-				{
+        if (super.isEnabled(context)) {
+            if (prefs.getBoolean("config_probe_magnetic_built_in_enabled",
+                    ContinuousProbe.DEFAULT_ENABLED)) {
+                int frequency = Integer.parseInt(prefs.getString(
+                        "config_probe_magnetic_built_in_frequency",
+                        ContinuousProbe.DEFAULT_FREQUENCY));
 
-					sensors.unregisterListener(this, sensor);
-	                
-	                switch (frequency)
-	                {
-	                	case SensorManager.SENSOR_DELAY_FASTEST:
-		                	sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST, null);
-	                		break;
-	                	case SensorManager.SENSOR_DELAY_GAME:
-		                	sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME, null);
-	                		break;
-	                	case SensorManager.SENSOR_DELAY_UI:
-		                	sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI, null);
-	                		break;
-	                	case SensorManager.SENSOR_DELAY_NORMAL:
-		                	sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL, null);
-	                		break;
-	                	default:
-		                	sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME, null);
-	                		break;
-	                }
-	                
-	                this._lastFrequency = frequency;
-				}
-				
-				return true;
-        	}
-        	else
-        	{
+                if (this._lastFrequency != frequency) {
+
+                    sensors.unregisterListener(this, sensor);
+
+                    switch (frequency) {
+                    case SensorManager.SENSOR_DELAY_FASTEST:
+                        sensors.registerListener(this, sensor,
+                                SensorManager.SENSOR_DELAY_FASTEST, null);
+                        break;
+                    case SensorManager.SENSOR_DELAY_GAME:
+                        sensors.registerListener(this, sensor,
+                                SensorManager.SENSOR_DELAY_GAME, null);
+                        break;
+                    case SensorManager.SENSOR_DELAY_UI:
+                        sensors.registerListener(this, sensor,
+                                SensorManager.SENSOR_DELAY_UI, null);
+                        break;
+                    case SensorManager.SENSOR_DELAY_NORMAL:
+                        sensors.registerListener(this, sensor,
+                                SensorManager.SENSOR_DELAY_NORMAL, null);
+                        break;
+                    default:
+                        sensors.registerListener(this, sensor,
+                                SensorManager.SENSOR_DELAY_GAME, null);
+                        break;
+                    }
+
+                    this._lastFrequency = frequency;
+                }
+
+                return true;
+            } else {
                 sensors.unregisterListener(this, sensor);
                 this._lastFrequency = -1;
-        	}
-        }
-    	else
-    	{
+            }
+        } else {
             sensors.unregisterListener(this, sensor);
             this._lastFrequency = -1;
-    	}
+        }
 
         return false;
-	}
+    }
 
-	public Map<String, Object> configuration(Context context)
-	{
-		Map<String, Object> map = super.configuration(context);
-		
-		map.put(ContinuousProbe.PROBE_THRESHOLD, this.lastThreshold);
-		
-		return map;
-	}
-	
-	public void updateFromMap(Context context, Map<String, Object> params) 
-	{
-		super.updateFromMap(context, params);
-		
-		if (params.containsKey(ContinuousProbe.PROBE_THRESHOLD))
-		{
-			Object threshold = params.get(ContinuousProbe.PROBE_THRESHOLD);
-			
-			if (threshold instanceof Double)
-			{
-				SharedPreferences prefs = Probe.getPreferences(context);
-				Editor e = prefs.edit();
-				
-				e.putString("config_probe_magnetic_threshold", threshold.toString());
-				e.commit();
-			}
-		}
-	}
+    public Map<String, Object> configuration(Context context) {
+        Map<String, Object> map = super.configuration(context);
 
-	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
-	{
-		PreferenceScreen screen = super.preferenceScreen(activity);
+        map.put(ContinuousProbe.PROBE_THRESHOLD, this.lastThreshold);
 
-		ListPreference threshold = new ListPreference(activity);
-		threshold.setKey("config_probe_magnetic_threshold");
-		threshold.setDefaultValue(MagneticFieldProbe.DEFAULT_THRESHOLD);
-		threshold.setEntryValues(R.array.probe_magnetic_threshold);
-		threshold.setEntries(R.array.probe_magnetic_threshold_labels);
-		threshold.setTitle(R.string.probe_noise_threshold_label);
-		threshold.setSummary(R.string.probe_noise_threshold_summary);
+        return map;
+    }
 
-		screen.addPreference(threshold);
+    public void updateFromMap(Context context, Map<String, Object> params) {
+        super.updateFromMap(context, params);
 
-		return screen;
-	}
+        if (params.containsKey(ContinuousProbe.PROBE_THRESHOLD)) {
+            Object threshold = params.get(ContinuousProbe.PROBE_THRESHOLD);
 
-	protected boolean passesThreshold(SensorEvent event)
-	{
-		long now = System.currentTimeMillis();
-		
-		if (now - this.lastThresholdLookup > 5000)
-		{
-			SharedPreferences prefs = Probe.getPreferences(this._context);
-			this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_magnetic_threshold", MagneticFieldProbe.DEFAULT_THRESHOLD));
-			
-			this.lastThresholdLookup = now;
-		}
+            if (threshold instanceof Double) {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
 
-		double x = event.values[0];
-		double y = event.values[1];
-		double z = event.values[2];
+                e.putString("config_probe_magnetic_threshold",
+                        threshold.toString());
+                e.commit();
+            }
+        }
+    }
 
-		boolean passes = false;
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+        PreferenceScreen screen = super.preferenceScreen(activity);
 
-		if (Math.abs(x - this._lastX) >= this.lastThreshold)
-			passes = true;
-		else if (Math.abs(y - this._lastY) >= this.lastThreshold)
-			passes = true;
-		else if (Math.abs(z - this._lastZ) >= this.lastThreshold)
-			passes = true;
-		
-		if (passes)
-		{
-			this._lastX = x;
-			this._lastY = y;
-			this._lastZ = z;
-		}
-		
-		return passes;
-	}
+        ListPreference threshold = new ListPreference(activity);
+        threshold.setKey("config_probe_magnetic_threshold");
+        threshold.setDefaultValue(MagneticFieldProbe.DEFAULT_THRESHOLD);
+        threshold.setEntryValues(R.array.probe_magnetic_threshold);
+        threshold.setEntries(R.array.probe_magnetic_threshold_labels);
+        threshold.setTitle(R.string.probe_noise_threshold_label);
+        threshold.setSummary(R.string.probe_noise_threshold_summary);
 
-	public void onSensorChanged(SensorEvent event)
-	{
-		if (this.shouldProcessEvent(event) == false)
-			return;
+        screen.addPreference(threshold);
 
-		double now = (double) System.currentTimeMillis();
+        return screen;
+    }
 
-		if (this.passesThreshold(event))
-		{
-			synchronized(this)
-			{
-				double elapsed = SystemClock.uptimeMillis();
-				double boot = (now - elapsed) * 1000 * 1000;
+    protected boolean passesThreshold(SensorEvent event) {
+        long now = System.currentTimeMillis();
 
-				double timestamp = event.timestamp + boot;
+        if (now - this.lastThresholdLookup > 5000) {
+            SharedPreferences prefs = Probe.getPreferences(this._context);
+            this.lastThreshold = Double.parseDouble(prefs.getString(
+                    "config_probe_magnetic_threshold",
+                    MagneticFieldProbe.DEFAULT_THRESHOLD));
 
-				if (timestamp > now * (1000 * 1000) * 1.1) // Used to detect if sensors already have built-in times...
-					timestamp = event.timestamp;
+            this.lastThresholdLookup = now;
+        }
 
-				timeBuffer[bufferIndex] = timestamp / 1000000;
-				accuracyBuffer[bufferIndex] = event.accuracy;
+        double x = event.values[0];
+        double y = event.values[1];
+        double z = event.values[2];
 
-				for (int i = 0; i < event.values.length; i++)
-				{
-					valueBuffer[i][bufferIndex] = event.values[i];
-				}
-				
-				double[] plotValues = {timeBuffer[0] / 1000, valueBuffer[0][bufferIndex], valueBuffer[1][bufferIndex], valueBuffer[2][bufferIndex] }; 
-				RealTimeProbeViewActivity.plotIfVisible(this.getTitleResource(), plotValues);
+        boolean passes = false;
 
-				bufferIndex += 1;
+        if (Math.abs(x - this._lastX) >= this.lastThreshold)
+            passes = true;
+        else if (Math.abs(y - this._lastY) >= this.lastThreshold)
+            passes = true;
+        else if (Math.abs(z - this._lastZ) >= this.lastThreshold)
+            passes = true;
 
-				if (bufferIndex >= timeBuffer.length)
-				{
-					Sensor sensor = event.sensor;
+        if (passes) {
+            this._lastX = x;
+            this._lastY = y;
+            this._lastZ = z;
+        }
 
-					Bundle data = new Bundle();
+        return passes;
+    }
 
-					Bundle sensorBundle = new Bundle();
-					sensorBundle.putFloat("MAXIMUM_RANGE", sensor.getMaximumRange());
-					sensorBundle.putString("NAME", sensor.getName());
-					sensorBundle.putFloat("POWER", sensor.getPower());
-					sensorBundle.putFloat("RESOLUTION", sensor.getResolution());
-					sensorBundle.putInt("TYPE", sensor.getType());
-					sensorBundle.putString("VENDOR", sensor.getVendor());
-					sensorBundle.putInt("VERSION", sensor.getVersion());
+    public void onSensorChanged(SensorEvent event) {
+        if (this.shouldProcessEvent(event) == false)
+            return;
 
-					data.putString("PROBE", this.name(this._context));
+        double now = (double) System.currentTimeMillis();
 
-					data.putBundle("SENSOR", sensorBundle);
-					data.putDouble("TIMESTAMP", now / 1000);
+        if (this.passesThreshold(event)) {
+            synchronized (this) {
+                double elapsed = SystemClock.uptimeMillis();
+                double boot = (now - elapsed) * 1000 * 1000;
 
-					data.putDoubleArray("EVENT_TIMESTAMP", timeBuffer);
-					data.putIntArray("ACCURACY", accuracyBuffer);
+                double timestamp = event.timestamp + boot;
 
-					for (int i = 0; i < fieldNames.length; i++)
-					{
-						data.putFloatArray(fieldNames[i], valueBuffer[i]);
-					}
+                if (timestamp > now * (1000 * 1000) * 1.1) // Used to detect if
+                                                           // sensors already
+                                                           // have built-in
+                                                           // times...
+                    timestamp = event.timestamp;
 
-					this.transmitData(this._context, data);
+                timeBuffer[bufferIndex] = timestamp / 1000000;
+                accuracyBuffer[bufferIndex] = event.accuracy;
 
-					if (timeBuffer.length > 0)
-					{
-						double x = Double.NaN;
-						double y = Double.NaN;
-						double z = Double.NaN;
+                for (int i = 0; i < event.values.length; i++) {
+                    valueBuffer[i][bufferIndex] = event.values[i];
+                }
 
-						for (int i = 0; i < fieldNames.length; i++)
-						{
-							if (fieldNames[i].equals(MagneticFieldProbe.X_KEY))
-								x = valueBuffer[i][0];
-							else if (fieldNames[i].equals(MagneticFieldProbe.Y_KEY))
-								y = valueBuffer[i][0];
-							else if (fieldNames[i].equals(MagneticFieldProbe.Z_KEY))
-								z = valueBuffer[i][0];
-						}
+                double[] plotValues = { timeBuffer[0] / 1000,
+                        valueBuffer[0][bufferIndex],
+                        valueBuffer[1][bufferIndex],
+                        valueBuffer[2][bufferIndex] };
+                RealTimeProbeViewActivity.plotIfVisible(
+                        this.getTitleResource(), plotValues);
 
-						if (Double.isNaN(x) == false && Double.isNaN(y) == false && Double.isNaN(z) == false)
-						{
-							Map<String, Object> values = new HashMap<String, Object>(4);
+                bufferIndex += 1;
 
-							values.put(MagneticFieldProbe.X_KEY, x);
-							values.put(MagneticFieldProbe.Y_KEY, y);
-							values.put(MagneticFieldProbe.Z_KEY, z);
+                if (bufferIndex >= timeBuffer.length) {
+                    Sensor sensor = event.sensor;
 
-							values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[0] / 1000));
+                    Bundle data = new Bundle();
 
-							ProbeValuesProvider.getProvider(this._context).insertValue(this._context, MagneticFieldProbe.DB_TABLE, this.databaseSchema(), values);
-						}
-					}
+                    Bundle sensorBundle = new Bundle();
+                    sensorBundle.putFloat("MAXIMUM_RANGE",
+                            sensor.getMaximumRange());
+                    sensorBundle.putString("NAME", sensor.getName());
+                    sensorBundle.putFloat("POWER", sensor.getPower());
+                    sensorBundle.putFloat("RESOLUTION", sensor.getResolution());
+                    sensorBundle.putInt("TYPE", sensor.getType());
+                    sensorBundle.putString("VENDOR", sensor.getVendor());
+                    sensorBundle.putInt("VERSION", sensor.getVersion());
 
-					bufferIndex = 0;
-				}
-			}
-		}
-	}
+                    data.putString("PROBE", this.name(this._context));
 
-	public String getPreferenceKey()
-	{
-		return "magnetic_built_in";
-	}
+                    data.putBundle("SENSOR", sensorBundle);
+                    data.putDouble("TIMESTAMP", now / 1000);
 
-	public String summarizeValue(Context context, Bundle bundle)
-	{
-		double xReading = bundle.getDoubleArray("X")[0];
-		double yReading = bundle.getDoubleArray("Y")[0];
-		double zReading = bundle.getDoubleArray("Z")[0];
+                    data.putDoubleArray("EVENT_TIMESTAMP", timeBuffer);
+                    data.putIntArray("ACCURACY", accuracyBuffer);
 
-		return String.format(context.getResources().getString(R.string.summary_magnetic_probe), xReading, yReading, zReading);
-	}
+                    for (int i = 0; i < fieldNames.length; i++) {
+                        data.putFloatArray(fieldNames[i], valueBuffer[i]);
+                    }
 
-	public Bundle formattedBundle(Context context, Bundle bundle)
-	{
-		Bundle formatted = super.formattedBundle(context, bundle);
+                    this.transmitData(this._context, data);
 
-		double[] eventTimes = bundle.getDoubleArray("EVENT_TIMESTAMP");
-		double[] x = bundle.getDoubleArray("X");
-		double[] y = bundle.getDoubleArray("Y");
-		double[] z = bundle.getDoubleArray("Z");
+                    if (timeBuffer.length > 0) {
+                        double x = Double.NaN;
+                        double y = Double.NaN;
+                        double z = Double.NaN;
 
-		ArrayList<String> keys = new ArrayList<String>();
+                        for (int i = 0; i < fieldNames.length; i++) {
+                            if (fieldNames[i].equals(MagneticFieldProbe.X_KEY))
+                                x = valueBuffer[i][0];
+                            else if (fieldNames[i]
+                                    .equals(MagneticFieldProbe.Y_KEY))
+                                y = valueBuffer[i][0];
+                            else if (fieldNames[i]
+                                    .equals(MagneticFieldProbe.Z_KEY))
+                                z = valueBuffer[i][0];
+                        }
 
-		SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.display_date_format));
+                        if (Double.isNaN(x) == false
+                                && Double.isNaN(y) == false
+                                && Double.isNaN(z) == false) {
+                            Map<String, Object> values = new HashMap<String, Object>(
+                                    4);
 
-		if (eventTimes != null && x != null && y != null && z != null && eventTimes.length > 1)
-		{
-			Bundle readings = new Bundle();
+                            values.put(MagneticFieldProbe.X_KEY, x);
+                            values.put(MagneticFieldProbe.Y_KEY, y);
+                            values.put(MagneticFieldProbe.Z_KEY, z);
 
-			for (int i = 0; i < eventTimes.length; i++)
-			{
-				String formatString = String.format(context.getString(R.string.display_gyroscope_reading), x[i], y[i], z[i]);
+                            values.put(ProbeValuesProvider.TIMESTAMP,
+                                    Double.valueOf(timeBuffer[0] / 1000));
 
-				double time = eventTimes[i];
+                            ProbeValuesProvider.getProvider(this._context)
+                                    .insertValue(this._context,
+                                            MagneticFieldProbe.DB_TABLE,
+                                            this.databaseSchema(), values);
+                        }
+                    }
 
-				Date d = new Date((long) time);
+                    bufferIndex = 0;
+                }
+            }
+        }
+    }
 
-				readings.putString(sdf.format(d), formatString);
+    public String getPreferenceKey() {
+        return "magnetic_built_in";
+    }
 
-				String key = sdf.format(d);
+    public String summarizeValue(Context context, Bundle bundle) {
+        double xReading = bundle.getDoubleArray("X")[0];
+        double yReading = bundle.getDoubleArray("Y")[0];
+        double zReading = bundle.getDoubleArray("Z")[0];
 
-				readings.putString(key, formatString);
+        return String.format(
+                context.getResources().getString(
+                        R.string.summary_magnetic_probe), xReading, yReading,
+                zReading);
+    }
 
-				keys.add(key);
-			}
+    public Bundle formattedBundle(Context context, Bundle bundle) {
+        Bundle formatted = super.formattedBundle(context, bundle);
 
-			if (keys.size() > 0)
-				readings.putStringArrayList("KEY_ORDER", keys);
+        double[] eventTimes = bundle.getDoubleArray("EVENT_TIMESTAMP");
+        double[] x = bundle.getDoubleArray("X");
+        double[] y = bundle.getDoubleArray("Y");
+        double[] z = bundle.getDoubleArray("Z");
 
-			formatted.putBundle(context.getString(R.string.display_magnetic_readings), readings);
-		}
-		else if (eventTimes.length > 0)
-		{
-			String formatString = String.format(context.getString(R.string.display_gyroscope_reading), x[0], y[0], z[0]);
+        ArrayList<String> keys = new ArrayList<String>();
 
-			double time = eventTimes[0];
+        SimpleDateFormat sdf = new SimpleDateFormat(
+                context.getString(R.string.display_date_format));
 
-			Date d = new Date((long) time);
+        if (eventTimes != null && x != null && y != null && z != null
+                && eventTimes.length > 1) {
+            Bundle readings = new Bundle();
 
-			formatted.putString(sdf.format(d), formatString);
-		}
+            for (int i = 0; i < eventTimes.length; i++) {
+                String formatString = String.format(
+                        context.getString(R.string.display_gyroscope_reading),
+                        x[i], y[i], z[i]);
 
-		return formatted;
-	}
+                double time = eventTimes[i];
 
-	public int getSummaryResource()
-	{
-		return R.string.summary_magnetic_field_probe_desc;
-	}
+                Date d = new Date((long) time);
 
-	protected String tableName() 
-	{
-		return MagneticFieldProbe.DB_TABLE;
-	};
+                readings.putString(sdf.format(d), formatString);
+
+                String key = sdf.format(d);
+
+                readings.putString(key, formatString);
+
+                keys.add(key);
+            }
+
+            if (keys.size() > 0)
+                readings.putStringArrayList("KEY_ORDER", keys);
+
+            formatted.putBundle(
+                    context.getString(R.string.display_magnetic_readings),
+                    readings);
+        } else if (eventTimes.length > 0) {
+            String formatString = String.format(
+                    context.getString(R.string.display_gyroscope_reading),
+                    x[0], y[0], z[0]);
+
+            double time = eventTimes[0];
+
+            Date d = new Date((long) time);
+
+            formatted.putString(sdf.format(d), formatString);
+        }
+
+        return formatted;
+    }
+
+    public int getSummaryResource() {
+        return R.string.summary_magnetic_field_probe_desc;
+    }
+
+    protected String tableName() {
+        return MagneticFieldProbe.DB_TABLE;
+    };
 }
