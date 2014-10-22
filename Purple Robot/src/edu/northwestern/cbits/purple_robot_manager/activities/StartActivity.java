@@ -68,736 +68,726 @@ import edu.northwestern.cbits.purple_robot_manager.snapshots.SnapshotsActivity;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
-public class StartActivity extends ActionBarActivity
-{
-	public static final String UPDATE_MESSAGE = "UPDATE_LIST_MESSAGE";
-	public static final String DISPLAY_MESSAGE = "DISPLAY_MESSAGE";
-	
-	public static String UPDATE_DISPLAY = "UPDATE_LIST_DISPLAY";
-	public static String DISPLAY_PROBE_NAME = "DISPLAY_PROBE_NAME";
-	public static String DISPLAY_PROBE_VALUE = "DISPLAY_PROBE_VALUE";
+public class StartActivity extends ActionBarActivity {
+    public static final String UPDATE_MESSAGE = "UPDATE_LIST_MESSAGE";
+    public static final String DISPLAY_MESSAGE = "DISPLAY_MESSAGE";
 
-	private BroadcastReceiver _receiver = null;
+    public static String UPDATE_DISPLAY = "UPDATE_LIST_DISPLAY";
+    public static String DISPLAY_PROBE_NAME = "DISPLAY_PROBE_NAME";
+    public static String DISPLAY_PROBE_VALUE = "DISPLAY_PROBE_VALUE";
 
-	private static String _statusMessage = null;
+    private BroadcastReceiver _receiver = null;
 
-	private SharedPreferences prefs = null;
-	protected String _lastProbe = "";
-	
-	private Menu _menu = null;
-	
-	private ContentObserver _observer = null;
-	protected HashMap<String, Boolean> _enabledCache = new HashMap<String, Boolean>();
+    private static String _statusMessage = null;
 
-	private static OnSharedPreferenceChangeListener _prefListener = new OnSharedPreferenceChangeListener()
-    {
-		public void onSharedPreferenceChanged(SharedPreferences prefs, String key) 
-		{
-			if (SettingsActivity.USER_ID_KEY.equals(key))
-			{
-				Editor e = prefs.edit();
+    private SharedPreferences prefs = null;
+    protected String _lastProbe = "";
 
-				e.remove(SettingsActivity.USER_HASH_KEY);
-				e.commit();
-			}
-		}
+    private Menu _menu = null;
+
+    private ContentObserver _observer = null;
+    protected HashMap<String, Boolean> _enabledCache = new HashMap<String, Boolean>();
+
+    private static OnSharedPreferenceChangeListener _prefListener = new OnSharedPreferenceChangeListener() {
+        public void onSharedPreferenceChanged(SharedPreferences prefs,
+                String key) {
+            if (SettingsActivity.USER_ID_KEY.equals(key)) {
+                Editor e = prefs.edit();
+
+                e.remove(SettingsActivity.USER_HASH_KEY);
+                e.commit();
+            }
+        }
     };
 
-	private SharedPreferences getPreferences(Context context)
-	{
-		if (this.prefs == null)
-			this.prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
+    private SharedPreferences getPreferences(Context context) {
+        if (this.prefs == null)
+            this.prefs = PreferenceManager.getDefaultSharedPreferences(this
+                    .getApplicationContext());
 
-		return this.prefs;
-	}
+        return this.prefs;
+    }
 
-	private void launchPreferences()
-	{
-		Intent intent = new Intent();
-		intent.setClass(this, SettingsActivity.class);
+    private void launchPreferences() {
+        Intent intent = new Intent();
+        intent.setClass(this, SettingsActivity.class);
 
-		this.startActivity(intent);
-	}
+        this.startActivity(intent);
+    }
 
-	@SuppressLint("SimpleDateFormat")
-	protected void onCreate(Bundle savedInstanceState)
-    {
-		super.onCreate(savedInstanceState);
+    @SuppressLint("SimpleDateFormat")
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-		LogManager.getInstance(this);
-		ModelManager.getInstance(this);
-		
-		SharedPreferences sharedPrefs = this.getPreferences(this);
+        LogManager.getInstance(this);
+        ModelManager.getInstance(this);
 
-		if (this.getPackageManager().getInstallerPackageName(this.getPackageName()) == null) 
-		{
-			if (sharedPrefs.getBoolean(SettingsActivity.CHECK_UPDATES_KEY, false))
-				UpdateManager.register(this, "7550093e020b1a4a6df90f1e9dde68b6");
-		}
+        SharedPreferences sharedPrefs = this.getPreferences(this);
+
+        if (this.getPackageManager().getInstallerPackageName(
+                this.getPackageName()) == null) {
+            if (sharedPrefs.getBoolean(SettingsActivity.CHECK_UPDATES_KEY,
+                    false))
+                UpdateManager
+                        .register(this, "7550093e020b1a4a6df90f1e9dde68b6");
+        }
 
         this.getSupportActionBar().setTitle(R.string.title_probe_readings);
         this.setContentView(R.layout.layout_startup_activity);
 
         ManagerService.setupPeriodicCheck(this);
 
-        sharedPrefs.registerOnSharedPreferenceChangeListener(StartActivity._prefListener);
-        
+        sharedPrefs
+                .registerOnSharedPreferenceChangeListener(StartActivity._prefListener);
+
         final StartActivity me = this;
 
-        final ListView listView = (ListView) this.findViewById(R.id.list_probes);
+        final ListView listView = (ListView) this
+                .findViewById(R.id.list_probes);
 
-        this._receiver = new BroadcastReceiver()
-    	{
-    		public void onReceive(Context context, final Intent intent)
-    		{
-    			me.runOnUiThread(new Runnable()
-    			{
-    				public void run()
-    				{
-		    			if (StartActivity.UPDATE_MESSAGE.equals(intent.getAction()))
-		    			{
-		    				final String message = intent.getStringExtra(StartActivity.DISPLAY_MESSAGE);
+        this._receiver = new BroadcastReceiver() {
+            public void onReceive(Context context, final Intent intent) {
+                me.runOnUiThread(new Runnable() {
+                    public void run() {
+                        if (StartActivity.UPDATE_MESSAGE.equals(intent
+                                .getAction())) {
+                            final String message = intent
+                                    .getStringExtra(StartActivity.DISPLAY_MESSAGE);
 
-		    				me.runOnUiThread(new Runnable()
-		    				{
-								public void run()
-								{
-									if (me.getString(R.string.message_reading_complete).equals(message) && prefs.getBoolean("config_probes_enabled", false) == false)
-										StartActivity._statusMessage = null;
-									else
-									{
-										SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-										StartActivity._statusMessage = sdf.format(new Date())+ ": " + message;
-									}										
-									
-									ActionBar bar = me.getSupportActionBar();
-									bar.setSubtitle(StartActivity._statusMessage);
-								}
-		    				});
-		    			}
-    				}
-    			});
-    		}
-    	};
-    	
-    	LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(me);
+                            me.runOnUiThread(new Runnable() {
+                                public void run() {
+                                    if (me.getString(
+                                            R.string.message_reading_complete)
+                                            .equals(message)
+                                            && prefs.getBoolean(
+                                                    "config_probes_enabled",
+                                                    false) == false)
+                                        StartActivity._statusMessage = null;
+                                    else {
+                                        SimpleDateFormat sdf = new SimpleDateFormat(
+                                                "HH:mm");
+                                        StartActivity._statusMessage = sdf
+                                                .format(new Date())
+                                                + ": "
+                                                + message;
+                                    }
 
-    	IntentFilter filter = new IntentFilter();
+                                    ActionBar bar = me.getSupportActionBar();
+                                    bar.setSubtitle(StartActivity._statusMessage);
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        };
 
-    	filter.addAction(StartActivity.UPDATE_MESSAGE);
+        LocalBroadcastManager broadcastManager = LocalBroadcastManager
+                .getInstance(me);
 
-    	broadcastManager.registerReceiver(this._receiver, filter);
+        IntentFilter filter = new IntentFilter();
+
+        filter.addAction(StartActivity.UPDATE_MESSAGE);
+
+        broadcastManager.registerReceiver(this._receiver, filter);
 
         final SimpleDateFormat sdf = new SimpleDateFormat("MMM d, H:mm:ss");
 
-        Cursor c = this.getContentResolver().query(RobotContentProvider.RECENT_PROBE_VALUES, null, null, null, "recorded DESC");
-        
-        final CursorAdapter adapter = new CursorAdapter(this, c, true)
-        {
-			public void bindView(final View view, Context context, Cursor cursor) 
-			{
-        		final String sensorName = cursor.getString(cursor.getColumnIndex("source"));
+        Cursor c = this.getContentResolver().query(
+                RobotContentProvider.RECENT_PROBE_VALUES, null, null, null,
+                "recorded DESC");
 
-        		final Probe probe = ProbeManager.probeForName(sensorName, me);
-        		
-        		final Date sensorDate = new Date(cursor.getLong(cursor.getColumnIndex("recorded")) * 1000);
+        final CursorAdapter adapter = new CursorAdapter(this, c, true) {
+            public void bindView(final View view, Context context, Cursor cursor) {
+                final String sensorName = cursor.getString(cursor
+                        .getColumnIndex("source"));
 
-        		final String jsonString = cursor.getString(cursor.getColumnIndex("value"));
-        		
-        		Runnable r = new Runnable()
-        		{
-					public void run() 
-					{
-		        		Bundle value = OutputPlugin.bundleForJson(me, jsonString);
+                final Probe probe = ProbeManager.probeForName(sensorName, me);
 
-		        		String formattedValue = sensorName;
-		        				
-		        		String displayName = formattedValue;
+                final Date sensorDate = new Date(cursor.getLong(cursor
+                        .getColumnIndex("recorded")) * 1000);
 
-		        		boolean enabled = true;
-		        		
-		        		if (probe == null)
-		        			enabled = true;
-		        		else
-		        		{
-		        			Boolean probeEnabled = me._enabledCache.get(sensorName);
-		        			
-		        			if (probeEnabled == null)
-		        			{
-			        			probeEnabled = Boolean.valueOf(probe.isEnabled(me));
-			        			
-			        			me._enabledCache.put(sensorName, probeEnabled);
-		        			}
-		        			
-	        				enabled = probeEnabled.booleanValue();
-		        		}
-		        		
-		        		if (probe != null && value != null)
-		        		{
-		        			try
-		        			{
-		        				displayName = probe.title(me);
-		        				formattedValue = probe.summarizeValue(me, value);
-		        			}
-		        			catch (Exception e)
-		        			{
-		        				LogManager.getInstance(me).logException(e);
-		        			}
+                final String jsonString = cursor.getString(cursor
+                        .getColumnIndex("value"));
 
-		        			Bundle sensor = value.getBundle("SENSOR");
+                Runnable r = new Runnable() {
+                    public void run() {
+                        Bundle value = OutputPlugin.bundleForJson(me,
+                                jsonString);
 
-		        			if (sensor != null && sensor.containsKey("POWER"))
-		        			{
-		        		        DecimalFormat df = new DecimalFormat("#.##");
+                        String formattedValue = sensorName;
 
-		        		        formattedValue += " (" + df.format(sensor.getDouble("POWER")) + " mA)";
-		        			}
-		        		}
-		        		else if (value.containsKey(Feature.FEATURE_VALUE))
-		        			formattedValue = value.get(Feature.FEATURE_VALUE).toString();
-		        		else if (value.containsKey("PREDICTION") && value.containsKey("MODEL_NAME"))
-		        		{
-		        			formattedValue = value.get("PREDICTION").toString();
-		        			displayName = value.getString("MODEL_NAME");
-		        		}
+                        String displayName = formattedValue;
 
-						final String name = displayName + " (" + sdf.format(sensorDate) + ")";
-						final String display = formattedValue;
+                        boolean enabled = true;
 
-						final boolean tintProbe = (enabled == false);
-								
-		        		me.runOnUiThread(new Runnable()
-		        		{
-							public void run() 
-							{
-				        		TextView nameField = (TextView) view.findViewById(R.id.text_sensor_name);
-				        		TextView valueField = (TextView) view.findViewById(R.id.text_sensor_value);
-				        		
-				        		if (tintProbe)
-				        		{
-				        			nameField.setTextColor(0xff808080);
-				        			valueField.setTextColor(0xff808080);
-				        		}
-				        		else
-				        		{
-				        			nameField.setTextColor(0xfff3f3f3);
-				        			valueField.setTextColor(0xfff3f3f3);
-				        		}
+                        if (probe == null)
+                            enabled = true;
+                        else {
+                            Boolean probeEnabled = me._enabledCache
+                                    .get(sensorName);
 
-				        		nameField.setText(name);
-				        		valueField.setText(display);
-							}
-		        		});
-					}
-        		};
-        		
-        		Thread t = new Thread(r);
-        		t.start();
-			}
+                            if (probeEnabled == null) {
+                                probeEnabled = Boolean.valueOf(probe
+                                        .isEnabled(me));
 
-			public View newView(Context context, Cursor cursor, ViewGroup parent)
-			{
-    			LayoutInflater inflater = (LayoutInflater) me.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                                me._enabledCache.put(sensorName, probeEnabled);
+                            }
 
-    			View view = inflater.inflate(R.layout.layout_probe_row, null);
+                            enabled = probeEnabled.booleanValue();
+                        }
 
-    			this.bindView(view, context, cursor);
-    			
-				return view;
-			}
+                        if (probe != null && value != null) {
+                            try {
+                                displayName = probe.title(me);
+                                formattedValue = probe
+                                        .summarizeValue(me, value);
+                            } catch (Exception e) {
+                                LogManager.getInstance(me).logException(e);
+                            }
+
+                            Bundle sensor = value.getBundle("SENSOR");
+
+                            if (sensor != null && sensor.containsKey("POWER")) {
+                                DecimalFormat df = new DecimalFormat("#.##");
+
+                                formattedValue += " ("
+                                        + df.format(sensor.getDouble("POWER"))
+                                        + " mA)";
+                            }
+                        } else if (value.containsKey(Feature.FEATURE_VALUE))
+                            formattedValue = value.get(Feature.FEATURE_VALUE)
+                                    .toString();
+                        else if (value.containsKey("PREDICTION")
+                                && value.containsKey("MODEL_NAME")) {
+                            formattedValue = value.get("PREDICTION").toString();
+                            displayName = value.getString("MODEL_NAME");
+                        }
+
+                        final String name = displayName + " ("
+                                + sdf.format(sensorDate) + ")";
+                        final String display = formattedValue;
+
+                        final boolean tintProbe = (enabled == false);
+
+                        me.runOnUiThread(new Runnable() {
+                            public void run() {
+                                TextView nameField = (TextView) view
+                                        .findViewById(R.id.text_sensor_name);
+                                TextView valueField = (TextView) view
+                                        .findViewById(R.id.text_sensor_value);
+
+                                if (tintProbe) {
+                                    nameField.setTextColor(0xff808080);
+                                    valueField.setTextColor(0xff808080);
+                                } else {
+                                    nameField.setTextColor(0xfff3f3f3);
+                                    valueField.setTextColor(0xfff3f3f3);
+                                }
+
+                                nameField.setText(name);
+                                valueField.setText(display);
+                            }
+                        });
+                    }
+                };
+
+                Thread t = new Thread(r);
+                t.start();
+            }
+
+            public View newView(Context context, Cursor cursor, ViewGroup parent) {
+                LayoutInflater inflater = (LayoutInflater) me
+                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+                View view = inflater.inflate(R.layout.layout_probe_row, null);
+
+                this.bindView(view, context, cursor);
+
+                return view;
+            }
         };
-        
+
         listView.setAdapter(adapter);
-        
-        listView.setOnItemClickListener(new OnItemClickListener()
-        {
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) 
-			{
-				Uri uri = ContentUris.withAppendedId(RobotContentProvider.RECENT_PROBE_VALUES, id);
-				
-				Cursor c = me.getContentResolver().query(uri, null, null, null, null);
-				
-				if (c.moveToNext())
-				{
-					String sensorName = c.getString(c.getColumnIndex("source"));
-	        		String jsonString = c.getString(c.getColumnIndex("value"));
-	        		Bundle value = OutputPlugin.bundleForJson(me, jsonString);
-					
-					final Probe probe = ProbeManager.probeForName(sensorName, me);
 
-					if (probe != null)
-					{
-						Intent intent = probe.viewIntent(me);
+        listView.setOnItemClickListener(new OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view,
+                    int position, long id) {
+                Uri uri = ContentUris.withAppendedId(
+                        RobotContentProvider.RECENT_PROBE_VALUES, id);
 
-						if (intent == null)
-						{
-							Intent dataIntent = new Intent(me, ProbeViewerActivity.class);
+                Cursor c = me.getContentResolver().query(uri, null, null, null,
+                        null);
 
-							dataIntent.putExtra("probe_name", sensorName);
-							dataIntent.putExtra("probe_bundle", value);
+                if (c.moveToNext()) {
+                    String sensorName = c.getString(c.getColumnIndex("source"));
+                    String jsonString = c.getString(c.getColumnIndex("value"));
+                    Bundle value = OutputPlugin.bundleForJson(me, jsonString);
 
-							me.startActivity(dataIntent);
-						}
-						else
-						{
-							intent.putExtra("probe_name", sensorName);
-							intent.putExtra("probe_bundle", value);
+                    final Probe probe = ProbeManager.probeForName(sensorName,
+                            me);
 
-							me.startActivity(intent);
-						}
-					}
-					else
-					{
-						Model model = ModelManager.getInstance(me).fetchModelByName(me, sensorName);
+                    if (probe != null) {
+                        Intent intent = probe.viewIntent(me);
 
-						Intent dataIntent = new Intent(me, ProbeViewerActivity.class);
+                        if (intent == null) {
+                            Intent dataIntent = new Intent(me,
+                                    ProbeViewerActivity.class);
 
-						if (model != null)
-							dataIntent.putExtra("probe_name", model.title(me));
-						else
-							dataIntent.putExtra("probe_name", sensorName);
+                            dataIntent.putExtra("probe_name", sensorName);
+                            dataIntent.putExtra("probe_bundle", value);
 
-						dataIntent.putExtra("is_model", true);
-						dataIntent.putExtra("probe_bundle", value);
-						me.startActivity(dataIntent);
-					}
-				}
-			}
+                            me.startActivity(dataIntent);
+                        } else {
+                            intent.putExtra("probe_name", sensorName);
+                            intent.putExtra("probe_bundle", value);
+
+                            me.startActivity(intent);
+                        }
+                    } else {
+                        Model model = ModelManager.getInstance(me)
+                                .fetchModelByName(me, sensorName);
+
+                        Intent dataIntent = new Intent(me,
+                                ProbeViewerActivity.class);
+
+                        if (model != null)
+                            dataIntent.putExtra("probe_name", model.title(me));
+                        else
+                            dataIntent.putExtra("probe_name", sensorName);
+
+                        dataIntent.putExtra("is_model", true);
+                        dataIntent.putExtra("probe_bundle", value);
+                        me.startActivity(dataIntent);
+                    }
+                }
+            }
         });
-        
+
         final String savedPassword = prefs.getString("config_password", null);
 
-        listView.setOnItemLongClickListener(new OnItemLongClickListener()
-        {
-			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) 
-			{
-				Uri uri = ContentUris.withAppendedId(RobotContentProvider.RECENT_PROBE_VALUES, id);
-				
-				Cursor c = me.getContentResolver().query(uri, null, null, null, null);
-				
-				if (c.moveToNext())
-				{
-					String sensorName = c.getString(c.getColumnIndex("source"));
+        listView.setOnItemLongClickListener(new OnItemLongClickListener() {
+            public boolean onItemLongClick(AdapterView<?> parent, View view,
+                    int position, long id) {
+                Uri uri = ContentUris.withAppendedId(
+                        RobotContentProvider.RECENT_PROBE_VALUES, id);
 
-					final Probe probe = ProbeManager.probeForName(sensorName, me);
+                Cursor c = me.getContentResolver().query(uri, null, null, null,
+                        null);
 
-					AlertDialog.Builder builder = new AlertDialog.Builder(me);
-					boolean inited = false;
-					
-					if (probe != null)
-					{
-						builder = builder.setTitle(probe.title(me));
-						builder = builder.setMessage(probe.summary(me));
-						
-						if (savedPassword == null || savedPassword.trim().length() == 0)
-						{
-							if (probe.isEnabled(me))
-								builder.setPositiveButton(R.string.button_disable, new OnClickListener()
-								{
-									public void onClick(DialogInterface arg0, int arg1)
-									{
-										probe.disable(me);
-										
-										me._enabledCache.clear();
-										
-				        				adapter.notifyDataSetChanged();
-									}
-								});
-							else
-								builder.setPositiveButton(R.string.button_enable, new OnClickListener()
-								{
-									public void onClick(DialogInterface arg0, int arg1) 
-									{
-										probe.enable(me);
+                if (c.moveToNext()) {
+                    String sensorName = c.getString(c.getColumnIndex("source"));
 
-										me._enabledCache.clear();
+                    final Probe probe = ProbeManager.probeForName(sensorName,
+                            me);
 
-										adapter.notifyDataSetChanged();
-									}
-								});
-								
-							builder.setNegativeButton(R.string.button_close, null);
-							
-						}
-						else
-							builder.setPositiveButton(R.string.button_close, null);
-						
-						inited = true;
-					}
-					else
-					{
-						final Model model = ModelManager.getInstance(me).fetchModelByName(me, sensorName);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(me);
+                    boolean inited = false;
 
-						if (model != null)
-						{
-							builder = builder.setTitle(model.title(me));
-							builder = builder.setMessage(model.summary(me));
+                    if (probe != null) {
+                        builder = builder.setTitle(probe.title(me));
+                        builder = builder.setMessage(probe.summary(me));
 
-							if (savedPassword == null || savedPassword.trim().length() == 0)
-							{
-								if (model.isEnabled(me))
-									builder.setPositiveButton(R.string.button_disable, new OnClickListener()
-									{
-										public void onClick(DialogInterface arg0, int arg1) 
-										{
-											model.disable(me);
+                        if (savedPassword == null
+                                || savedPassword.trim().length() == 0) {
+                            if (probe.isEnabled(me))
+                                builder.setPositiveButton(
+                                        R.string.button_disable,
+                                        new OnClickListener() {
+                                            public void onClick(
+                                                    DialogInterface arg0,
+                                                    int arg1) {
+                                                probe.disable(me);
 
-											me._enabledCache.clear();
+                                                me._enabledCache.clear();
 
-					        				adapter.notifyDataSetChanged();
-										}
-									});
-								else
-									builder.setPositiveButton(R.string.button_enable, new OnClickListener()
-									{
-										public void onClick(DialogInterface arg0, int arg1) 
-										{
-											model.enable(me);
+                                                adapter.notifyDataSetChanged();
+                                            }
+                                        });
+                            else
+                                builder.setPositiveButton(
+                                        R.string.button_enable,
+                                        new OnClickListener() {
+                                            public void onClick(
+                                                    DialogInterface arg0,
+                                                    int arg1) {
+                                                probe.enable(me);
 
-											me._enabledCache.clear();
-											
-					        				adapter.notifyDataSetChanged();
-										}
-									});
-									
-								builder.setNegativeButton(R.string.button_close, null);
-							}
-							else
-								builder.setPositiveButton(R.string.button_close, null);
+                                                me._enabledCache.clear();
 
-							inited = true;
-						}
-						else
-							Log.e("PR", "Looking for model named " + sensorName);
-					}
-					
-					if (inited)
-						builder.create().show();
-				}
-				
-				return true;
-			}
+                                                adapter.notifyDataSetChanged();
+                                            }
+                                        });
+
+                            builder.setNegativeButton(R.string.button_close,
+                                    null);
+
+                        } else
+                            builder.setPositiveButton(R.string.button_close,
+                                    null);
+
+                        inited = true;
+                    } else {
+                        final Model model = ModelManager.getInstance(me)
+                                .fetchModelByName(me, sensorName);
+
+                        if (model != null) {
+                            builder = builder.setTitle(model.title(me));
+                            builder = builder.setMessage(model.summary(me));
+
+                            if (savedPassword == null
+                                    || savedPassword.trim().length() == 0) {
+                                if (model.isEnabled(me))
+                                    builder.setPositiveButton(
+                                            R.string.button_disable,
+                                            new OnClickListener() {
+                                                public void onClick(
+                                                        DialogInterface arg0,
+                                                        int arg1) {
+                                                    model.disable(me);
+
+                                                    me._enabledCache.clear();
+
+                                                    adapter.notifyDataSetChanged();
+                                                }
+                                            });
+                                else
+                                    builder.setPositiveButton(
+                                            R.string.button_enable,
+                                            new OnClickListener() {
+                                                public void onClick(
+                                                        DialogInterface arg0,
+                                                        int arg1) {
+                                                    model.enable(me);
+
+                                                    me._enabledCache.clear();
+
+                                                    adapter.notifyDataSetChanged();
+                                                }
+                                            });
+
+                                builder.setNegativeButton(
+                                        R.string.button_close, null);
+                            } else
+                                builder.setPositiveButton(
+                                        R.string.button_close, null);
+
+                            inited = true;
+                        } else
+                            Log.e("PR", "Looking for model named " + sensorName);
+                    }
+
+                    if (inited)
+                        builder.create().show();
+                }
+
+                return true;
+            }
         });
-    	
-    	LegacyJSONConfigFile.getSharedFile(this.getApplicationContext());
+
+        LegacyJSONConfigFile.getSharedFile(this.getApplicationContext());
     }
 
-	protected void onDestroy()
-	{
-    	LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
-    	broadcastManager.unregisterReceiver(this._receiver);
+    protected void onDestroy() {
+        LocalBroadcastManager broadcastManager = LocalBroadcastManager
+                .getInstance(this);
+        broadcastManager.unregisterReceiver(this._receiver);
 
-		super.onDestroy();
-	}
+        super.onDestroy();
+    }
 
-	protected void onPause()
-	{
-		super.onPause();
+    protected void onPause() {
+        super.onPause();
 
         ListView listView = (ListView) this.findViewById(R.id.list_probes);
-		
-		boolean probesEnabled = (listView.getVisibility() == View.VISIBLE);
 
-		HashMap <String, Object> payload = new HashMap<String, Object>();
-		payload.put("probes_enabled", probesEnabled);
-		LogManager.getInstance(this).log("pr_main_ui_dismissed", payload);
-		
-        if (this._observer != null)
-        {
-        	this.getContentResolver().unregisterContentObserver(this._observer);
-        	this._observer = null;
+        boolean probesEnabled = (listView.getVisibility() == View.VISIBLE);
+
+        HashMap<String, Object> payload = new HashMap<String, Object>();
+        payload.put("probes_enabled", probesEnabled);
+        LogManager.getInstance(this).log("pr_main_ui_dismissed", payload);
+
+        if (this._observer != null) {
+            this.getContentResolver().unregisterContentObserver(this._observer);
+            this._observer = null;
         }
-	}
+    }
 
-	private void setJsonUri(Uri jsonConfigUri)
-	{
-		if (jsonConfigUri.getScheme().equals("http") || jsonConfigUri.getScheme().equals("https"))
-			jsonConfigUri = Uri.parse(jsonConfigUri.toString().replace("//pr-config/", "//"));
-		else if (jsonConfigUri.getScheme().equals("cbits-prm") || jsonConfigUri.getScheme().equals("cbits-pr"))
-		{
-			Uri.Builder b = jsonConfigUri.buildUpon();
+    private void setJsonUri(Uri jsonConfigUri) {
+        if (jsonConfigUri.getScheme().equals("http")
+                || jsonConfigUri.getScheme().equals("https"))
+            jsonConfigUri = Uri.parse(jsonConfigUri.toString().replace(
+                    "//pr-config/", "//"));
+        else if (jsonConfigUri.getScheme().equals("cbits-prm")
+                || jsonConfigUri.getScheme().equals("cbits-pr")) {
+            Uri.Builder b = jsonConfigUri.buildUpon();
 
-			b.scheme("http");
- 
-			jsonConfigUri = b.build();
-		}
+            b.scheme("http");
 
-		EncryptionManager.getInstance().setConfigUri(this, jsonConfigUri);
-		
-		final StartActivity me = this;
-		
-		Runnable r = new Runnable()
-		{
-			public void run() 
-			{
-				try 
-				{
-					Thread.sleep(500);
-				}
-				catch (InterruptedException e) 
-				{
+            jsonConfigUri = b.build();
+        }
 
-				}
-				
-				me.runOnUiThread(new Runnable()
-				{
-					public void run() 
-					{
-						LegacyJSONConfigFile.updateFromOnline(me);
-					}
-				});
-			}
-		};
-		
-		Thread t = new Thread(r);
-		t.start();
-	}
+        EncryptionManager.getInstance().setConfigUri(this, jsonConfigUri);
 
-	protected void onResume()
-	{
-		super.onResume();
-		
-		CrashManager.register(this, "7550093e020b1a4a6df90f1e9dde68b6", new CrashManagerListener()
-		{
-			  public Boolean onCrashesFound()
-			  {
-				    return true;
-			  }
-		});
-		
-		this._enabledCache.clear();
+        final StartActivity me = this;
 
-		if (StartActivity._statusMessage != null)
-			this.getSupportActionBar().setSubtitle(StartActivity._statusMessage);
+        Runnable r = new Runnable() {
+            public void run() {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
 
-		Uri incomingUri = this.getIntent().getData();
+                }
 
-		final SharedPreferences prefs = this.getPreferences(this);
+                me.runOnUiThread(new Runnable() {
+                    public void run() {
+                        LegacyJSONConfigFile.updateFromOnline(me);
+                    }
+                });
+            }
+        };
+
+        Thread t = new Thread(r);
+        t.start();
+    }
+
+    protected void onResume() {
+        super.onResume();
+
+        CrashManager.register(this, "7550093e020b1a4a6df90f1e9dde68b6",
+                new CrashManagerListener() {
+                    public Boolean onCrashesFound() {
+                        return true;
+                    }
+                });
+
+        this._enabledCache.clear();
+
+        if (StartActivity._statusMessage != null)
+            this.getSupportActionBar()
+                    .setSubtitle(StartActivity._statusMessage);
+
+        Uri incomingUri = this.getIntent().getData();
+
+        final SharedPreferences prefs = this.getPreferences(this);
 
         final String savedPassword = prefs.getString("config_password", null);
 
-        if (incomingUri != null)
-        {
-        	if (savedPassword == null || savedPassword.equals(""))
-        		this.setJsonUri(incomingUri);
-        	else
-        		Toast.makeText(this, R.string.error_json_set_uri_password, Toast.LENGTH_LONG).show();
+        if (incomingUri != null) {
+            if (savedPassword == null || savedPassword.equals(""))
+                this.setJsonUri(incomingUri);
+            else
+                Toast.makeText(this, R.string.error_json_set_uri_password,
+                        Toast.LENGTH_LONG).show();
         }
 
-        final ListView listView = (ListView) this.findViewById(R.id.list_probes);
+        final ListView listView = (ListView) this
+                .findViewById(R.id.list_probes);
         ImageView logoView = (ImageView) this.findViewById(R.id.logo_view);
         logoView.setBackgroundColor(Color.WHITE);
-        
-        boolean probesEnabled = prefs.getBoolean("config_probes_enabled", false);
+
+        boolean probesEnabled = prefs
+                .getBoolean("config_probes_enabled", false);
 
         this.getSupportActionBar().setTitle(R.string.app_name);
 
-        if (probesEnabled)
-        {
-        	listView.setVisibility(View.VISIBLE);
-        	logoView.setVisibility(View.GONE);
-        }
-        else
-        {
-        	logoView.setImageResource(R.drawable.laptop);
+        if (probesEnabled) {
+            listView.setVisibility(View.VISIBLE);
+            logoView.setVisibility(View.GONE);
+        } else {
+            logoView.setImageResource(R.drawable.laptop);
 
-        	logoView.setScaleType(ScaleType.CENTER);
+            logoView.setScaleType(ScaleType.CENTER);
 
-        	listView.setVisibility(View.GONE);
-        	logoView.setVisibility(View.VISIBLE);
+            listView.setVisibility(View.GONE);
+            logoView.setVisibility(View.VISIBLE);
         }
-        
-        boolean showBackground = prefs.getBoolean("config_show_background", true);
-        
+
+        boolean showBackground = prefs.getBoolean("config_show_background",
+                true);
+
         if (showBackground == false)
-        	logoView.setVisibility(View.GONE);
-        
-		HashMap <String, Object> payload = new HashMap<String, Object>();
-		payload.put("probes_enabled", probesEnabled);
-		LogManager.getInstance(this).log("pr_main_ui_shown", payload);
+            logoView.setVisibility(View.GONE);
 
-		final StartActivity me = this;
+        HashMap<String, Object> payload = new HashMap<String, Object>();
+        payload.put("probes_enabled", probesEnabled);
+        LogManager.getInstance(this).log("pr_main_ui_shown", payload);
 
-        if (this._observer == null)
-        {
-        	this._observer = new ContentObserver(new Handler())
-        	{
-        		public void onChange(boolean selfChange, Uri uri)
-        		{
-        			ListAdapter listAdapter = listView.getAdapter();
+        final StartActivity me = this;
 
-    		        Cursor c = listView.getContext().getContentResolver().query(RobotContentProvider.RECENT_PROBE_VALUES, null, null, null, "recorded DESC");
+        if (this._observer == null) {
+            this._observer = new ContentObserver(new Handler()) {
+                public void onChange(boolean selfChange, Uri uri) {
+                    ListAdapter listAdapter = listView.getAdapter();
 
-        			if (listAdapter instanceof CursorAdapter)
-        			{
-        				CursorAdapter adapter = (CursorAdapter) listAdapter;
+                    Cursor c = listView
+                            .getContext()
+                            .getContentResolver()
+                            .query(RobotContentProvider.RECENT_PROBE_VALUES,
+                                    null, null, null, "recorded DESC");
 
-        				adapter.changeCursor(c);
-        			}
+                    if (listAdapter instanceof CursorAdapter) {
+                        CursorAdapter adapter = (CursorAdapter) listAdapter;
 
-        	        if (prefs.getBoolean("config_probes_enabled", false))
-        	        	me.getSupportActionBar().setTitle(String.format(me.getResources().getString(R.string.title_probes_count), c.getCount()));
-    	        	else
-        	        	me.getSupportActionBar().setTitle(R.string.app_name);
-        			
-	    	        me.updateAlertIcon();
-        		};
-        		
-        		 public void onChange(boolean selfChange) 
-        		 {
-        		     this.onChange(selfChange, null);
-        		 }
-        	};
+                        adapter.changeCursor(c);
+                    }
+
+                    if (prefs.getBoolean("config_probes_enabled", false))
+                        me.getSupportActionBar().setTitle(
+                                String.format(
+                                        me.getResources().getString(
+                                                R.string.title_probes_count),
+                                        c.getCount()));
+                    else
+                        me.getSupportActionBar().setTitle(R.string.app_name);
+
+                    me.updateAlertIcon();
+                };
+
+                public void onChange(boolean selfChange) {
+                    this.onChange(selfChange, null);
+                }
+            };
         }
-        
-        this.getContentResolver().registerContentObserver(RobotContentProvider.RECENT_PROBE_VALUES, true, this._observer);
-	}
-	
-	private void updateAlertIcon()
-	{
-        if (this._menu != null)
-        {
-        	MenuItem diagIcon = this._menu.findItem(R.id.menu_diagnostic_item);
 
-        	diagIcon.setIcon(SanityManager.getInstance(this).getErrorIconResource());
+        this.getContentResolver().registerContentObserver(
+                RobotContentProvider.RECENT_PROBE_VALUES, true, this._observer);
+    }
+
+    private void updateAlertIcon() {
+        if (this._menu != null) {
+            MenuItem diagIcon = this._menu.findItem(R.id.menu_diagnostic_item);
+
+            diagIcon.setIcon(SanityManager.getInstance(this)
+                    .getErrorIconResource());
         }
-	}
+    }
 
-	public boolean onCreateOptionsMenu(Menu menu)
-	{
+    public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = this.getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
 
         this._menu = menu;
-        
+
         this.updateAlertIcon();
 
         return true;
-	}
+    }
 
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-    	final StartActivity me = this;
+    public boolean onOptionsItemSelected(MenuItem item) {
+        final StartActivity me = this;
 
-    	final String savedPassword = this.getPreferences(this).getString("config_password", null);
-		
-    	AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    	
-    	final int itemId = item.getItemId();
-    	
-    	if(itemId == R.id.menu_snapshot_item)
-    	{
-				Intent snapIntent = new Intent(this, SnapshotsActivity.class);
-				
-				this.startActivity(snapIntent);
-    	}
-		if(itemId == R.id.menu_trigger_item)
-		{
-			builder.setTitle(R.string.title_fire_triggers);
-			
+        final String savedPassword = this.getPreferences(this).getString(
+                "config_password", null);
 
-			if (savedPassword == null || savedPassword.equals(""))
-			{
-				final List<Trigger> triggers = TriggerManager.getInstance(this).allTriggers();
-				
-				if (triggers.size() > 0)
-				{
-					ArrayAdapter<Trigger> adapter = new ArrayAdapter<Trigger>(this, android.R.layout.simple_list_item_1, triggers);
-					
-					builder.setAdapter(adapter, new OnClickListener()
-					{
-						public void onClick(DialogInterface dialog, int which) 
-						{
-							Trigger target = triggers.get(which);
-							
-							target.execute(me, true);
-						}
-					});
-				}
-				else
-				{
-					builder.setMessage(R.string.message_no_triggers);
-				
-					builder.setPositiveButton(R.string.button_close, new OnClickListener()
-					{
-						public void onClick(DialogInterface arg0, int arg1) 
-						{
-	
-						}
-					});
-				}
-			}				
-			else
-			{
-				builder.setMessage(R.string.message_no_user_triggers);
-				
-				builder.setPositiveButton(R.string.button_close, new OnClickListener()
-				{
-					public void onClick(DialogInterface arg0, int arg1) 
-					{
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-					}
-				});
-			}
-			builder.create().show();
-		}		
-		if(itemId == R.id.menu_label_item)
-		{
-				Intent labelIntent = new Intent();
-				labelIntent.setClass(this, LabelActivity.class);
-		
-				labelIntent.putExtra(LabelActivity.LABEL_CONTEXT, "Home Screen");
-				labelIntent.putExtra(LabelActivity.TIMESTAMP, ((double) System.currentTimeMillis()));
-				
-				this.startActivity(labelIntent);
-		}
-		if(itemId == R.id.menu_upload_item)
-		{
-    			LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(this);
-    			Intent intent = new Intent(OutputPlugin.FORCE_UPLOAD);
+        final int itemId = item.getItemId();
 
-    			localManager.sendBroadcast(intent);
-		}
-		if(itemId == R.id.menu_diagnostic_item)
-		{
-    			Intent diagIntent = new Intent();
-    			diagIntent.setClass(this, DiagnosticActivity.class);
+        if (itemId == R.id.menu_snapshot_item) {
+            Intent snapIntent = new Intent(this, SnapshotsActivity.class);
 
-    			this.startActivity(diagIntent);
-		}
-		if(itemId == R.id.menu_settings_item)
-		{
-			if (savedPassword == null || savedPassword.equals(""))
-				this.launchPreferences();
-			else
-			{
-    	        builder.setMessage(R.string.dialog_password_prompt);
-    	        builder.setPositiveButton(R.string.dialog_password_submit, new DialogInterface.OnClickListener()
-    	        {
-					public void onClick(DialogInterface dialog, int which)
-					{
-						AlertDialog alertDialog = (AlertDialog) dialog;
+            this.startActivity(snapIntent);
+        }
+        if (itemId == R.id.menu_trigger_item) {
+            builder.setTitle(R.string.title_fire_triggers);
 
-		    	        final EditText passwordField = (EditText) alertDialog.findViewById(R.id.text_dialog_password);
+            if (savedPassword == null || savedPassword.equals("")) {
+                final List<Trigger> triggers = TriggerManager.getInstance(this)
+                        .allTriggers();
 
-						Editable password = passwordField.getText();
+                if (triggers.size() > 0) {
+                    ArrayAdapter<Trigger> adapter = new ArrayAdapter<Trigger>(
+                            this, android.R.layout.simple_list_item_1, triggers);
 
-						if (password.toString().equals(savedPassword))
-							me.launchPreferences();
-						else
-							Toast.makeText(me, R.string.toast_incorrect_password, Toast.LENGTH_LONG).show();
+                    builder.setAdapter(adapter, new OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            Trigger target = triggers.get(which);
 
-						alertDialog.dismiss();
-					}
-				});
-    	        builder.setView(me.getLayoutInflater().inflate(R.layout.dialog_password, null));
+                            target.execute(me, true);
+                        }
+                    });
+                } else {
+                    builder.setMessage(R.string.message_no_triggers);
 
-    	        AlertDialog alert = builder.create();
+                    builder.setPositiveButton(R.string.button_close,
+                            new OnClickListener() {
+                                public void onClick(DialogInterface arg0,
+                                        int arg1) {
 
-    	        alert.show();
-			}
-		}
+                                }
+                            });
+                }
+            } else {
+                builder.setMessage(R.string.message_no_user_triggers);
 
-    	return true;
+                builder.setPositiveButton(R.string.button_close,
+                        new OnClickListener() {
+                            public void onClick(DialogInterface arg0, int arg1) {
+
+                            }
+                        });
+            }
+            builder.create().show();
+        }
+        if (itemId == R.id.menu_label_item) {
+            Intent labelIntent = new Intent();
+            labelIntent.setClass(this, LabelActivity.class);
+
+            labelIntent.putExtra(LabelActivity.LABEL_CONTEXT, "Home Screen");
+            labelIntent.putExtra(LabelActivity.TIMESTAMP,
+                    ((double) System.currentTimeMillis()));
+
+            this.startActivity(labelIntent);
+        }
+        if (itemId == R.id.menu_upload_item) {
+            LocalBroadcastManager localManager = LocalBroadcastManager
+                    .getInstance(this);
+            Intent intent = new Intent(OutputPlugin.FORCE_UPLOAD);
+
+            localManager.sendBroadcast(intent);
+        }
+        if (itemId == R.id.menu_diagnostic_item) {
+            Intent diagIntent = new Intent();
+            diagIntent.setClass(this, DiagnosticActivity.class);
+
+            this.startActivity(diagIntent);
+        }
+        if (itemId == R.id.menu_settings_item) {
+            if (savedPassword == null || savedPassword.equals(""))
+                this.launchPreferences();
+            else {
+                builder.setMessage(R.string.dialog_password_prompt);
+                builder.setPositiveButton(R.string.dialog_password_submit,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,
+                                    int which) {
+                                AlertDialog alertDialog = (AlertDialog) dialog;
+
+                                final EditText passwordField = (EditText) alertDialog
+                                        .findViewById(R.id.text_dialog_password);
+
+                                Editable password = passwordField.getText();
+
+                                if (password.toString().equals(savedPassword))
+                                    me.launchPreferences();
+                                else
+                                    Toast.makeText(me,
+                                            R.string.toast_incorrect_password,
+                                            Toast.LENGTH_LONG).show();
+
+                                alertDialog.dismiss();
+                            }
+                        });
+                builder.setView(me.getLayoutInflater().inflate(
+                        R.layout.dialog_password, null));
+
+                AlertDialog alert = builder.create();
+
+                alert.show();
+            }
+        }
+
+        return true;
     }
 }

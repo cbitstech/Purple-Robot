@@ -24,239 +24,234 @@ import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
-public class ApplicationLaunchProbe extends Probe
-{
-	private static final boolean DEFAULT_ENABLED = false;
+public class ApplicationLaunchProbe extends Probe {
+    private static final boolean DEFAULT_ENABLED = false;
 
-	private static final String WAKE_ACTION = "ACTIVITY_LAUNCH_WAKE";
-	private static final String DEFAULT_FREQUENCY = "100";
+    private static final String WAKE_ACTION = "ACTIVITY_LAUNCH_WAKE";
+    private static final String DEFAULT_FREQUENCY = "100";
 
-	private static final String ENABLED_KEY = "config_probe_application_launch_enabled";
-	private static final String FREQUENCY_KEY = "config_probe_application_launch_frequency";
-	
-	private PendingIntent _pollIntent = null;
-	private long _lastInterval = 0;
-	
-	private String _lastPkgName = null;
-	private String _lastName = null;
-	private long _lastStart = 0;
+    private static final String ENABLED_KEY = "config_probe_application_launch_enabled";
+    private static final String FREQUENCY_KEY = "config_probe_application_launch_frequency";
 
-	public String name(Context context)
-	{
-		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.ApplicationLaunchProbe";
-	}
+    private PendingIntent _pollIntent = null;
+    private long _lastInterval = 0;
 
-	public String title(Context context)
-	{
-		return context.getString(R.string.title_application_launch_probe);
-	}
+    private String _lastPkgName = null;
+    private String _lastName = null;
+    private long _lastStart = 0;
 
-	public String probeCategory(Context context)
-	{
-		return context.getResources().getString(R.string.probe_device_info_category);
-	}
+    public String name(Context context) {
+        return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.ApplicationLaunchProbe";
+    }
 
-	public void enable(Context context)
-	{
-		SharedPreferences prefs = Probe.getPreferences(context);
-		
-		Editor e = prefs.edit();
-		e.putBoolean(ApplicationLaunchProbe.ENABLED_KEY, true);
-		
-		e.commit();
-	}
+    public String title(Context context) {
+        return context.getString(R.string.title_application_launch_probe);
+    }
 
-	public void disable(Context context)
-	{
-		SharedPreferences prefs = Probe.getPreferences(context);
-		
-		Editor e = prefs.edit();
-		e.putBoolean(ApplicationLaunchProbe.ENABLED_KEY, false);
-		
-		e.commit();
-	}
+    public String probeCategory(Context context) {
+        return context.getResources().getString(
+                R.string.probe_device_info_category);
+    }
 
-	public boolean isEnabled(final Context context)
-	{
-		SharedPreferences prefs = Probe.getPreferences(context);
+    public void enable(Context context) {
+        SharedPreferences prefs = Probe.getPreferences(context);
 
-		AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-		
-		boolean disable = false;
-		long interval = 0;
-		boolean set = false;
-		
-		boolean isEnabled = false;
-		
-		if (super.isEnabled(context))
-		{
-			if (prefs.getBoolean(ApplicationLaunchProbe.ENABLED_KEY, ApplicationLaunchProbe.DEFAULT_ENABLED))
-			{
-				interval = Long.parseLong(prefs.getString(ApplicationLaunchProbe.FREQUENCY_KEY, "10"));
+        Editor e = prefs.edit();
+        e.putBoolean(ApplicationLaunchProbe.ENABLED_KEY, true);
 
-				if (interval != this._lastInterval)
-				{
-					disable = true;
-					set = true;
-					
-					isEnabled = true;
-				}
-			}
-			else 
-				disable = true;
-		}
-		else
-			disable = true;
-		
-		final ApplicationLaunchProbe me = this;
-		
-		if (this._pollIntent == null)
-		{
-			Intent intent = new Intent(ApplicationLaunchProbe.WAKE_ACTION);
-			this._pollIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-			
-			context.registerReceiver(new BroadcastReceiver()
-			{
-				@SuppressWarnings("deprecation")
-				public void onReceive(final Context context, Intent intent)
-				{
-					ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        e.commit();
+    }
 
-					RunningTaskInfo foregroundTaskInfo = activityManager.getRunningTasks(1).get(0);
-					final String pkgName = foregroundTaskInfo.topActivity.getPackageName();
+    public void disable(Context context) {
+        SharedPreferences prefs = Probe.getPreferences(context);
 
-					PackageManager packageManager = context.getPackageManager();
-					
-					ApplicationInfo applicationInfo = null;
-					
-					try 
-					{
-					    applicationInfo = packageManager.getApplicationInfo(pkgName, 0);
-					} 
-					catch (final NameNotFoundException e) 
-					{
-						
-					}
+        Editor e = prefs.edit();
+        e.putBoolean(ApplicationLaunchProbe.ENABLED_KEY, false);
 
-					final String name = (String)((applicationInfo != null) ? packageManager.getApplicationLabel(applicationInfo) : "???");
+        e.commit();
+    }
 
-					if (pkgName.equals(me._lastPkgName) == false)
-					{
-						Runnable r = new Runnable()
-						{
-							public void run() 
-							{
-								Bundle bundle = new Bundle();
+    public boolean isEnabled(final Context context) {
+        SharedPreferences prefs = Probe.getPreferences(context);
 
-								if (me._lastPkgName != null)
-								{
-									bundle.putString("PREVIOUS_APP_PKG", me._lastPkgName);
-									bundle.putString("PREVIOUS_APP_NAME", me._lastName);
-									bundle.putString("PREVIOUS_CATEGORY", RunningSoftwareProbe.fetchCategory(context, me._lastPkgName));
-									bundle.putLong("PREVIOUS_TIMESTAMP", me._lastStart);
-								}
+        AlarmManager alarm = (AlarmManager) context
+                .getSystemService(Context.ALARM_SERVICE);
 
-								me._lastPkgName = pkgName;
-								me._lastName = name;
+        boolean disable = false;
+        long interval = 0;
+        boolean set = false;
 
-								bundle.putString("PROBE", me.name(context));
-								bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
-								bundle.putString("CURRENT_APP_PKG", pkgName);
-								bundle.putString("CURRENT_APP_NAME", name);
-								bundle.putString("CURRENT_CATEGORY", RunningSoftwareProbe.fetchCategory(context, pkgName));
+        boolean isEnabled = false;
 
-								me.transmitData(context, bundle);
-								
-								me._lastStart = bundle.getLong("TIMESTAMP");
-							}
-						};
+        if (super.isEnabled(context)) {
+            if (prefs.getBoolean(ApplicationLaunchProbe.ENABLED_KEY,
+                    ApplicationLaunchProbe.DEFAULT_ENABLED)) {
+                interval = Long.parseLong(prefs.getString(
+                        ApplicationLaunchProbe.FREQUENCY_KEY, "10"));
 
-						Thread t = new Thread(r);
-						t.start();
-					}
-				}
-			}, new IntentFilter(ApplicationLaunchProbe.WAKE_ACTION));
-		}
-		
-		if (disable && this._pollIntent != null)
-			alarm.cancel(this._pollIntent);
-		
-		if (set)
-			alarm.setRepeating(AlarmManager.ELAPSED_REALTIME, 0, interval, this._pollIntent);
-			
-		return isEnabled;
-	}
+                if (interval != this._lastInterval) {
+                    disable = true;
+                    set = true;
 
-	public String summarizeValue(Context context, Bundle bundle)
-	{
-		String app = bundle.getString("CURRENT_APP_NAME");
-		String category = bundle.getString("CURRENT_CATEGORY");
+                    isEnabled = true;
+                }
+            } else
+                disable = true;
+        } else
+            disable = true;
 
-		return String.format(context.getResources().getString(R.string.summary_app_launch_probe), app, category);
-	}
+        final ApplicationLaunchProbe me = this;
 
-	public Map<String, Object> configuration(Context context)
-	{
-		Map<String, Object> map = super.configuration(context);
-		
-		SharedPreferences prefs = Probe.getPreferences(context);
+        if (this._pollIntent == null) {
+            Intent intent = new Intent(ApplicationLaunchProbe.WAKE_ACTION);
+            this._pollIntent = PendingIntent.getBroadcast(context, 0, intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT);
 
-		long freq = Long.parseLong(prefs.getString(ApplicationLaunchProbe.FREQUENCY_KEY, Probe.DEFAULT_FREQUENCY));
-		
-		map.put(Probe.PROBE_FREQUENCY, freq);
-		
-		return map;
-	}
-	
-	public void updateFromMap(Context context, Map<String, Object> params) 
-	{
-		super.updateFromMap(context, params);
-		
-		if (params.containsKey(Probe.PROBE_FREQUENCY))
-		{
-			Object frequency = params.get(Probe.PROBE_FREQUENCY);
-			
-			if (frequency instanceof Long)
-			{
-				SharedPreferences prefs = Probe.getPreferences(context);
-				Editor e = prefs.edit();
-				
-				e.putString(ApplicationLaunchProbe.FREQUENCY_KEY, frequency.toString());
-				e.commit();
-			}
-		}
-	}
-	
-	public String summary(Context context) 
-	{
-		return context.getString(R.string.summary_application_launch_probe_desc);
-	}
+            context.registerReceiver(new BroadcastReceiver() {
+                @SuppressWarnings("deprecation")
+                public void onReceive(final Context context, Intent intent) {
+                    ActivityManager activityManager = (ActivityManager) context
+                            .getSystemService(Context.ACTIVITY_SERVICE);
 
-	@SuppressWarnings("deprecation")
-	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
-	{
-		PreferenceManager manager = activity.getPreferenceManager();
+                    RunningTaskInfo foregroundTaskInfo = activityManager
+                            .getRunningTasks(1).get(0);
+                    final String pkgName = foregroundTaskInfo.topActivity
+                            .getPackageName();
 
-		PreferenceScreen screen = manager.createPreferenceScreen(activity);
-		screen.setTitle(this.title(activity));
-		screen.setSummary(R.string.summary_running_software_probe_desc);
+                    PackageManager packageManager = context.getPackageManager();
 
-		CheckBoxPreference enabled = new CheckBoxPreference(activity);
-		enabled.setTitle(R.string.title_enable_probe);
-		enabled.setKey(ApplicationLaunchProbe.ENABLED_KEY);
-		enabled.setDefaultValue(ApplicationLaunchProbe.DEFAULT_ENABLED);
+                    ApplicationInfo applicationInfo = null;
 
-		screen.addPreference(enabled);
+                    try {
+                        applicationInfo = packageManager.getApplicationInfo(
+                                pkgName, 0);
+                    } catch (final NameNotFoundException e) {
 
-		ListPreference duration = new ListPreference(activity);
-		duration.setKey("config_probe_application_launch_frequency");
-		duration.setEntryValues(R.array.probe_app_launch_frequency_values);
-		duration.setEntries(R.array.probe_app_launch_frequency_labels);
-		duration.setTitle(R.string.probe_frequency_label);
-		duration.setDefaultValue(ApplicationLaunchProbe.DEFAULT_FREQUENCY);
+                    }
 
-		screen.addPreference(duration);
+                    final String name = (String) ((applicationInfo != null) ? packageManager
+                            .getApplicationLabel(applicationInfo) : "???");
 
-		return screen;
-	}
+                    if (pkgName.equals(me._lastPkgName) == false) {
+                        Runnable r = new Runnable() {
+                            public void run() {
+                                Bundle bundle = new Bundle();
+
+                                if (me._lastPkgName != null) {
+                                    bundle.putString("PREVIOUS_APP_PKG",
+                                            me._lastPkgName);
+                                    bundle.putString("PREVIOUS_APP_NAME",
+                                            me._lastName);
+                                    bundle.putString("PREVIOUS_CATEGORY",
+                                            RunningSoftwareProbe.fetchCategory(
+                                                    context, me._lastPkgName));
+                                    bundle.putLong("PREVIOUS_TIMESTAMP",
+                                            me._lastStart);
+                                }
+
+                                me._lastPkgName = pkgName;
+                                me._lastName = name;
+
+                                bundle.putString("PROBE", me.name(context));
+                                bundle.putLong("TIMESTAMP",
+                                        System.currentTimeMillis() / 1000);
+                                bundle.putString("CURRENT_APP_PKG", pkgName);
+                                bundle.putString("CURRENT_APP_NAME", name);
+                                bundle.putString("CURRENT_CATEGORY",
+                                        RunningSoftwareProbe.fetchCategory(
+                                                context, pkgName));
+
+                                me.transmitData(context, bundle);
+
+                                me._lastStart = bundle.getLong("TIMESTAMP");
+                            }
+                        };
+
+                        Thread t = new Thread(r);
+                        t.start();
+                    }
+                }
+            }, new IntentFilter(ApplicationLaunchProbe.WAKE_ACTION));
+        }
+
+        if (disable && this._pollIntent != null)
+            alarm.cancel(this._pollIntent);
+
+        if (set)
+            alarm.setRepeating(AlarmManager.ELAPSED_REALTIME, 0, interval,
+                    this._pollIntent);
+
+        return isEnabled;
+    }
+
+    public String summarizeValue(Context context, Bundle bundle) {
+        String app = bundle.getString("CURRENT_APP_NAME");
+        String category = bundle.getString("CURRENT_CATEGORY");
+
+        return String.format(
+                context.getResources().getString(
+                        R.string.summary_app_launch_probe), app, category);
+    }
+
+    public Map<String, Object> configuration(Context context) {
+        Map<String, Object> map = super.configuration(context);
+
+        SharedPreferences prefs = Probe.getPreferences(context);
+
+        long freq = Long.parseLong(prefs.getString(
+                ApplicationLaunchProbe.FREQUENCY_KEY, Probe.DEFAULT_FREQUENCY));
+
+        map.put(Probe.PROBE_FREQUENCY, freq);
+
+        return map;
+    }
+
+    public void updateFromMap(Context context, Map<String, Object> params) {
+        super.updateFromMap(context, params);
+
+        if (params.containsKey(Probe.PROBE_FREQUENCY)) {
+            Object frequency = params.get(Probe.PROBE_FREQUENCY);
+
+            if (frequency instanceof Long) {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString(ApplicationLaunchProbe.FREQUENCY_KEY,
+                        frequency.toString());
+                e.commit();
+            }
+        }
+    }
+
+    public String summary(Context context) {
+        return context
+                .getString(R.string.summary_application_launch_probe_desc);
+    }
+
+    @SuppressWarnings("deprecation")
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+        PreferenceManager manager = activity.getPreferenceManager();
+
+        PreferenceScreen screen = manager.createPreferenceScreen(activity);
+        screen.setTitle(this.title(activity));
+        screen.setSummary(R.string.summary_running_software_probe_desc);
+
+        CheckBoxPreference enabled = new CheckBoxPreference(activity);
+        enabled.setTitle(R.string.title_enable_probe);
+        enabled.setKey(ApplicationLaunchProbe.ENABLED_KEY);
+        enabled.setDefaultValue(ApplicationLaunchProbe.DEFAULT_ENABLED);
+
+        screen.addPreference(enabled);
+
+        ListPreference duration = new ListPreference(activity);
+        duration.setKey("config_probe_application_launch_frequency");
+        duration.setEntryValues(R.array.probe_app_launch_frequency_values);
+        duration.setEntries(R.array.probe_app_launch_frequency_labels);
+        duration.setTitle(R.string.probe_frequency_label);
+        duration.setDefaultValue(ApplicationLaunchProbe.DEFAULT_FREQUENCY);
+
+        screen.addPreference(duration);
+
+        return screen;
+    }
 }

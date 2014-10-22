@@ -20,17 +20,18 @@ import android.net.Uri;
 import android.util.Log;
 
 /**
- * Implemements a trained decision tree model encoded using GraphViz generated 
+ * Implemements a trained decision tree model encoded using GraphViz generated
  * by Weka:
  * 
  * http://www.alexander-merz.com/graphviz/
  * 
- * Note that this class does not train the model, but instead expects the 
+ * Note that this class does not train the model, but instead expects the
  * representation of a model already trained.
  * 
  * A sample tree representation (spaces added for readability:
  * 
- * <pre>{@code
+ * <pre>
+ * {@code
  * digraph J48Tree {
  * N0 [label="telephonyprobe_psc" ]
  * N0->N1 [label="<= 305"]
@@ -60,208 +61,188 @@ import android.util.Log;
  *             N11->N13 [label="> -64"]
  *                  N13 [label="family (6.0)" shape=box style=filled ]
  * N0->N14 [label="> 305"]
- *     N14 [label="other (4.0/1.0)" shape=box style=filled ]}}</pre>
+ *     N14 [label="other (4.0/1.0)" shape=box style=filled ]}}
+ * </pre>
  */
 
-public class WekaTreeModel extends TrainedModel 
-{
-	public static final String TYPE = "weka-decision-tree";
-	
-	private Graph _tree = null;
-	
-	public WekaTreeModel(Context context, Uri uri) 
-	{
-		super(context, uri);
-	}
+public class WekaTreeModel extends TrainedModel {
+    public static final String TYPE = "weka-decision-tree";
 
-	
-	/**
-	 * Parses Graph object from the string provided in model to generate the 
-	 * data structure that evaluates data to generate predictions.
-	 * 
-	 * @see http://www.alexander-merz.com/graphviz/doc/com/alexmerz/graphviz/objects/Graph.html
-	 * @see edu.northwestern.cbits.purple_robot_manager.models.TrainedModel#generateModel(android.content.Context, java.lang.Object)
-	 */
-	
-	protected void generateModel(Context context, Object model) 
-	{
-		StringReader reader = new StringReader(model.toString());
-		
-		Parser parser = new Parser();
-		
-		try 
-		{
-			if (parser.parse(reader))
-			{
-				ArrayList<Graph> graphs = parser.getGraphs();
-				
-				if (graphs.size() > 0)
-					this._tree = graphs.get(0);
-			}
-		}
-		catch (ParseException e) 
-		{
-			LogManager.getInstance(context).logException(e);
-		}
-	}
+    private Graph _tree = null;
 
-	
-	/**
-	 * Finds the root node of the tree and begins evaluating the model.
-	 * @see edu.northwestern.cbits.purple_robot_manager.models.TrainedModel#evaluateModel(android.content.Context, java.util.Map)
-	 */
-	
-	protected Object evaluateModel(Context context, Map<String, Object> snapshot) 
-	{
-		if (this._tree == null)
-			return null;
-		
-		Id rootId = new Id();
-		rootId.setId("N0");
-		
-		Node root = this._tree.findNode(rootId);
-					
-		return this.fetchPrediction(root, this._tree.getEdges(), snapshot);
-	}
+    public WekaTreeModel(Context context, Uri uri) {
+        super(context, uri);
+    }
 
-	/**
-	 * Evaluates the state of the world in relation to the provided node. Based
-	 * on the value of the node, recursively passes control to the next node in
-	 * the evaluation sequence until encountering a leaf node containing the 
-	 * prediction. The prediction value is returned up the tree and becomes the
-	 * final prediction for the model. Returns null if an error is encountered
-	 * or data needed to evaluate the model is missing.
-	 *  
-	 * @param node Node object representing the current location in the tree.
-	 * @param edges Edges of the graph connecting nodes. Encodes comparison 
-	 *              operators.
-	 * @param snapshot States used to generate prediction.
-	 * 
-	 * @return Prediction given states.
-	 */
-	
-	protected String fetchPrediction(Node node, List<Edge> edges, Map<String, Object> snapshot) 
-	{
-		synchronized(this)
-		{
-			String nodeLabel = node.getAttribute("label").replaceAll("_", "");
-			
-			String[] tokens = nodeLabel.split(" ");
-			
-			nodeLabel = tokens[tokens.length - 1];
-	
-			List<Edge> testEdges = new ArrayList<Edge>();
-			
-			for (Edge edge : edges)
-			{
-				if (edge.getSource().getNode() == node)
-					testEdges.add(edge);
-			}
-			
-			if (testEdges.size() == 0)
-			{
-				String prediction = node.getAttribute("label");
-				
-				int colonIndex = prediction.indexOf(":");
-				
-				prediction = prediction.substring(colonIndex + 1).trim();
+    /**
+     * Parses Graph object from the string provided in model to generate the
+     * data structure that evaluates data to generate predictions.
+     * 
+     * @see http
+     *      ://www.alexander-merz.com/graphviz/doc/com/alexmerz/graphviz/objects
+     *      /Graph.html
+     * @see edu.northwestern.cbits.purple_robot_manager.models.TrainedModel#generateModel(android.content.Context,
+     *      java.lang.Object)
+     */
 
-				int index = prediction.indexOf(" ");
+    protected void generateModel(Context context, Object model) {
+        StringReader reader = new StringReader(model.toString());
 
-				if (index != -1)
-					prediction = prediction.substring(0, index).trim();
+        Parser parser = new Parser();
 
-				return prediction;
-			}
-	
-			for (String key : snapshot.keySet())
-			{
-				String testKey = key.replaceAll("_", "");
-				
-				if (testKey.equalsIgnoreCase(nodeLabel))
-				{
-					Object value = snapshot.get(key);
-					
-					double testValue = Double.NaN;
+        try {
+            if (parser.parse(reader)) {
+                ArrayList<Graph> graphs = parser.getGraphs();
 
-					if (value instanceof Integer)
-						testValue = ((Integer) value).doubleValue();
-					else if (value instanceof Double)
-						testValue = ((Double) value).doubleValue();
-					else if (value instanceof Float)
-						testValue = ((Float) value).doubleValue();
-					else if (value instanceof Long)
-						testValue = ((Long) value).doubleValue();
-					
-					Node nextNode = null;
+                if (graphs.size() > 0)
+                    this._tree = graphs.get(0);
+            }
+        } catch (ParseException e) {
+            LogManager.getInstance(context).logException(e);
+        }
+    }
 
-					for (Edge edge : testEdges)
-					{
-						String edgeLabel = edge.getAttribute("label").trim();
+    /**
+     * Finds the root node of the tree and begins evaluating the model.
+     * 
+     * @see edu.northwestern.cbits.purple_robot_manager.models.TrainedModel#evaluateModel(android.content.Context,
+     *      java.util.Map)
+     */
 
-						int index = edgeLabel.indexOf(" ");
-						
-						String operation = edgeLabel.substring(0, index);
-						String edgeValue = edgeLabel.substring(index + 1);
-						
-						if (Double.isNaN(testValue) == false)
-						{
-							double edgeQuantity = Double.parseDouble(edgeValue);
-							
-							if ("<=".equals(operation))
-							{
-								if (testValue <= edgeQuantity)
-									nextNode = edge.getTarget().getNode();
-							}
-							else if (">=".equals(operation))
-							{
-								if (testValue >= edgeQuantity)
-									nextNode = edge.getTarget().getNode();
-							}
-							else if (">".equals(operation))
-							{
-								if (testValue > edgeQuantity)
-									nextNode = edge.getTarget().getNode();
-							}
-							else if ("<".equals(operation))
-							{
-								if (testValue < edgeQuantity)
-									nextNode = edge.getTarget().getNode();
-							}
-							else
-								Log.e("PR", "UNKNOWN OP: -" + operation + "-");
-						}
-						else if ("=".equals(operation))
-						{
-							String valueString = value.toString().replaceAll("\\.",  "");
-							// ^ TODO: Normalize
-							
-							if (nextNode == null && "= ?".equals(edgeLabel))
-								nextNode = edge.getTarget().getNode();
-							else if (valueString.equalsIgnoreCase(edgeValue))
-								nextNode = edge.getTarget().getNode();
-						}
-						else
-							Log.e("PR", "UNKNOWN OP: -" + operation + "-");
-					}
-					
-					if (nextNode != null)
-						return this.fetchPrediction(nextNode, edges, snapshot);
-				}
-			}
-		}		
-		
-		return null;
-	}
-	
-	public String modelType() 
-	{
-		return WekaTreeModel.TYPE;
-	}
-	
-	public String summary(Context context)
-	{
-		return context.getString(R.string.summary_model_tree);
-	}
+    protected Object evaluateModel(Context context, Map<String, Object> snapshot) {
+        if (this._tree == null)
+            return null;
 
- }
+        Id rootId = new Id();
+        rootId.setId("N0");
+
+        Node root = this._tree.findNode(rootId);
+
+        return this.fetchPrediction(root, this._tree.getEdges(), snapshot);
+    }
+
+    /**
+     * Evaluates the state of the world in relation to the provided node. Based
+     * on the value of the node, recursively passes control to the next node in
+     * the evaluation sequence until encountering a leaf node containing the
+     * prediction. The prediction value is returned up the tree and becomes the
+     * final prediction for the model. Returns null if an error is encountered
+     * or data needed to evaluate the model is missing.
+     * 
+     * @param node
+     *            Node object representing the current location in the tree.
+     * @param edges
+     *            Edges of the graph connecting nodes. Encodes comparison
+     *            operators.
+     * @param snapshot
+     *            States used to generate prediction.
+     * 
+     * @return Prediction given states.
+     */
+
+    protected String fetchPrediction(Node node, List<Edge> edges,
+            Map<String, Object> snapshot) {
+        synchronized (this) {
+            String nodeLabel = node.getAttribute("label").replaceAll("_", "");
+
+            String[] tokens = nodeLabel.split(" ");
+
+            nodeLabel = tokens[tokens.length - 1];
+
+            List<Edge> testEdges = new ArrayList<Edge>();
+
+            for (Edge edge : edges) {
+                if (edge.getSource().getNode() == node)
+                    testEdges.add(edge);
+            }
+
+            if (testEdges.size() == 0) {
+                String prediction = node.getAttribute("label");
+
+                int colonIndex = prediction.indexOf(":");
+
+                prediction = prediction.substring(colonIndex + 1).trim();
+
+                int index = prediction.indexOf(" ");
+
+                if (index != -1)
+                    prediction = prediction.substring(0, index).trim();
+
+                return prediction;
+            }
+
+            for (String key : snapshot.keySet()) {
+                String testKey = key.replaceAll("_", "");
+
+                if (testKey.equalsIgnoreCase(nodeLabel)) {
+                    Object value = snapshot.get(key);
+
+                    double testValue = Double.NaN;
+
+                    if (value instanceof Integer)
+                        testValue = ((Integer) value).doubleValue();
+                    else if (value instanceof Double)
+                        testValue = ((Double) value).doubleValue();
+                    else if (value instanceof Float)
+                        testValue = ((Float) value).doubleValue();
+                    else if (value instanceof Long)
+                        testValue = ((Long) value).doubleValue();
+
+                    Node nextNode = null;
+
+                    for (Edge edge : testEdges) {
+                        String edgeLabel = edge.getAttribute("label").trim();
+
+                        int index = edgeLabel.indexOf(" ");
+
+                        String operation = edgeLabel.substring(0, index);
+                        String edgeValue = edgeLabel.substring(index + 1);
+
+                        if (Double.isNaN(testValue) == false) {
+                            double edgeQuantity = Double.parseDouble(edgeValue);
+
+                            if ("<=".equals(operation)) {
+                                if (testValue <= edgeQuantity)
+                                    nextNode = edge.getTarget().getNode();
+                            } else if (">=".equals(operation)) {
+                                if (testValue >= edgeQuantity)
+                                    nextNode = edge.getTarget().getNode();
+                            } else if (">".equals(operation)) {
+                                if (testValue > edgeQuantity)
+                                    nextNode = edge.getTarget().getNode();
+                            } else if ("<".equals(operation)) {
+                                if (testValue < edgeQuantity)
+                                    nextNode = edge.getTarget().getNode();
+                            } else
+                                Log.e("PR", "UNKNOWN OP: -" + operation + "-");
+                        } else if ("=".equals(operation)) {
+                            String valueString = value.toString().replaceAll(
+                                    "\\.", "");
+                            // ^ TODO: Normalize
+
+                            if (nextNode == null && "= ?".equals(edgeLabel))
+                                nextNode = edge.getTarget().getNode();
+                            else if (valueString.equalsIgnoreCase(edgeValue))
+                                nextNode = edge.getTarget().getNode();
+                        } else
+                            Log.e("PR", "UNKNOWN OP: -" + operation + "-");
+                    }
+
+                    if (nextNode != null)
+                        return this.fetchPrediction(nextNode, edges, snapshot);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public String modelType() {
+        return WekaTreeModel.TYPE;
+    }
+
+    public String summary(Context context) {
+        return context.getString(R.string.summary_model_tree);
+    }
+
+}

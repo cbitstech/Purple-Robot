@@ -15,43 +15,42 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 
-public class BootUpReceiver extends BroadcastReceiver
-{
-	public static final String BOOT_KEY = "system_last_boot";
+public class BootUpReceiver extends BroadcastReceiver {
+    public static final String BOOT_KEY = "system_last_boot";
 
-    public void onReceive(Context context, Intent intent)
-    {
-    	long now = System.currentTimeMillis();
-    	
-    	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-    	
-    	Editor e = prefs.edit();
-    	
-    	e.putLong(BootUpReceiver.BOOT_KEY, now);
-    	
-    	e.commit();
+    public void onReceive(Context context, Intent intent) {
+        long now = System.currentTimeMillis();
 
-    	ManagerService.setupPeriodicCheck(context);
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(context);
 
-    	LegacyJSONConfigFile.getSharedFile(context.getApplicationContext());
-    	
-    	TriggerManager.getInstance(context).fireMissedTriggers(context, now);
-    	
-    	if (prefs.contains(BaseScriptEngine.STICKY_NOTIFICATION_PARAMS))
-    	{
-    		try 
-    		{
-				JSONObject json = new JSONObject(prefs.getString(BaseScriptEngine.STICKY_NOTIFICATION_PARAMS, "{}"));
+        Editor e = prefs.edit();
 
-				JavaScriptEngine engine = new JavaScriptEngine(context);
-				
-				engine.showScriptNotification(json.getString("title"), json.getString("message"), json.getBoolean("persistent"), json.getBoolean("sticky"), json.getString("script"));
-			}
-    		catch (JSONException ex) 
-    		{
-    			LogManager.getInstance(context).logException(ex);
-			}
-    		
-    	}
+        e.putLong(BootUpReceiver.BOOT_KEY, now);
+
+        e.commit();
+
+        ManagerService.setupPeriodicCheck(context);
+
+        LegacyJSONConfigFile.getSharedFile(context.getApplicationContext());
+
+        TriggerManager.getInstance(context).fireMissedTriggers(context, now);
+
+        if (prefs.contains(BaseScriptEngine.STICKY_NOTIFICATION_PARAMS)) {
+            try {
+                JSONObject json = new JSONObject(prefs.getString(
+                        BaseScriptEngine.STICKY_NOTIFICATION_PARAMS, "{}"));
+
+                JavaScriptEngine engine = new JavaScriptEngine(context);
+
+                engine.showScriptNotification(json.getString("title"),
+                        json.getString("message"),
+                        json.getBoolean("persistent"),
+                        json.getBoolean("sticky"), json.getString("script"));
+            } catch (JSONException ex) {
+                LogManager.getInstance(context).logException(ex);
+            }
+
+        }
     }
 }

@@ -4,8 +4,7 @@ import junit.framework.TestSuite;
 
 public class RobotTestSuite extends TestSuite {
 
-	public RobotTestSuite() 
-	{
-		super();
-	}
+    public RobotTestSuite() {
+        super();
+    }
 }

@@ -52,31 +52,30 @@ import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
-public class SettingsActivity extends PreferenceActivity implements OnPreferenceClickListener, OnPreferenceChangeListener
-{
-	public static final String PROBES_SCREEN_KEY = "config_probes_screen";
-	private static final String MANUAL_REFRESH_KEY = "config_json_refresh_manually";
-	private static final String LOG_REFRESH_KEY = "config_log_refresh_manually";
-	private static final String HAPTIC_PATTERN_KEY = "config_json_haptic_pattern";
-	public static final String RINGTONE_KEY = "config_default_notification_sound";
-	public static final String ZIP_ARCHIVES_KEY = "config_mail_archives";
-	public static final String DELETE_ARCHIVES_KEY = "config_delete_archives";
-	public static final CharSequence USER_ID_KEY = "config_user_id";
-	protected static final String USER_HASH_KEY = "config_user_hash";
-	public static final String CHECK_UPDATES_KEY = "config_hockey_update";
-	public static final String TRIGGERS_SCREEN_KEY = "config_triggers_screen";
-	public static final String MODELS_SCREEN_KEY = "config_models_screen";
-	private static final String DUMP_JSON_KEY = "config_dump_json";
-	private static final String RESET_KEY = "config_reset";
-	public static final String PROBES_DISABLE_EACH_KEY = "config_disable_each_probe";
-	private static final String RUN_TESTS_KEY = "config_run_tests";
+public class SettingsActivity extends PreferenceActivity implements
+        OnPreferenceClickListener, OnPreferenceChangeListener {
+    public static final String PROBES_SCREEN_KEY = "config_probes_screen";
+    private static final String MANUAL_REFRESH_KEY = "config_json_refresh_manually";
+    private static final String LOG_REFRESH_KEY = "config_log_refresh_manually";
+    private static final String HAPTIC_PATTERN_KEY = "config_json_haptic_pattern";
+    public static final String RINGTONE_KEY = "config_default_notification_sound";
+    public static final String ZIP_ARCHIVES_KEY = "config_mail_archives";
+    public static final String DELETE_ARCHIVES_KEY = "config_delete_archives";
+    public static final CharSequence USER_ID_KEY = "config_user_id";
+    protected static final String USER_HASH_KEY = "config_user_hash";
+    public static final String CHECK_UPDATES_KEY = "config_hockey_update";
+    public static final String TRIGGERS_SCREEN_KEY = "config_triggers_screen";
+    public static final String MODELS_SCREEN_KEY = "config_models_screen";
+    private static final String DUMP_JSON_KEY = "config_dump_json";
+    private static final String RESET_KEY = "config_reset";
+    public static final String PROBES_DISABLE_EACH_KEY = "config_disable_each_probe";
+    private static final String RUN_TESTS_KEY = "config_run_tests";
 
-	@SuppressWarnings("deprecation")
-	public void onCreate(Bundle savedInstanceState)
-    {
+    @SuppressWarnings("deprecation")
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-		PurpleRobotApplication.fixPreferences(this, true);
+        PurpleRobotApplication.fixPreferences(this, true);
 
         this.addPreferencesFromResource(R.layout.layout_settings_activity);
 
@@ -90,36 +89,42 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 
         final SettingsActivity me = this;
 
-        ListPreference haptic = (ListPreference) prefs.findPreference(HAPTIC_PATTERN_KEY);
-        haptic.setOnPreferenceChangeListener(new OnPreferenceChangeListener()
-        {
-			public boolean onPreferenceChange(Preference preference, Object newValue)
-			{
-				String pattern = (String) newValue;
+        ListPreference haptic = (ListPreference) prefs
+                .findPreference(HAPTIC_PATTERN_KEY);
+        haptic.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+            public boolean onPreferenceChange(Preference preference,
+                    Object newValue) {
+                String pattern = (String) newValue;
 
-				Intent intent = new Intent(ManagerService.HAPTIC_PATTERN_INTENT);
-				intent.putExtra(ManagerService.HAPTIC_PATTERN_NAME, pattern);
-				intent.setClass(me, ManagerService.class);
+                Intent intent = new Intent(ManagerService.HAPTIC_PATTERN_INTENT);
+                intent.putExtra(ManagerService.HAPTIC_PATTERN_NAME, pattern);
+                intent.setClass(me, ManagerService.class);
 
-				me.startService(intent);
+                me.startService(intent);
 
-				return true;
-			}
+                return true;
+            }
         });
-        
-        PreferenceScreen probesScreen = ProbeManager.buildPreferenceScreen(this);
 
-        PreferenceCategory category = (PreferenceCategory) prefs.findPreference("config_settings_probe_category");
+        PreferenceScreen probesScreen = ProbeManager
+                .buildPreferenceScreen(this);
+
+        PreferenceCategory category = (PreferenceCategory) prefs
+                .findPreference("config_settings_probe_category");
         category.addPreference(probesScreen);
 
-        PreferenceScreen triggersScreen = TriggerManager.getInstance(this).buildPreferenceScreen(this);
+        PreferenceScreen triggersScreen = TriggerManager.getInstance(this)
+                .buildPreferenceScreen(this);
 
-        PreferenceCategory triggerCategory = (PreferenceCategory) prefs.findPreference("config_settings_trigger_category");
+        PreferenceCategory triggerCategory = (PreferenceCategory) prefs
+                .findPreference("config_settings_trigger_category");
         triggerCategory.addPreference(triggersScreen);
 
-        PreferenceScreen modelsScreen = ModelManager.getInstance(this).buildPreferenceScreen(this);
+        PreferenceScreen modelsScreen = ModelManager.getInstance(this)
+                .buildPreferenceScreen(this);
 
-        PreferenceCategory modelCategory = (PreferenceCategory) prefs.findPreference("config_settings_models_category");
+        PreferenceCategory modelCategory = (PreferenceCategory) prefs
+                .findPreference("config_settings_models_category");
         modelCategory.addPreference(modelsScreen);
 
         Preference archive = prefs.findPreference(ZIP_ARCHIVES_KEY);
@@ -134,10 +139,12 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
         Preference test = prefs.findPreference(RUN_TESTS_KEY);
         test.setOnPreferenceClickListener(this);
 
-        CheckBoxPreference update = (CheckBoxPreference) prefs.findPreference(CHECK_UPDATES_KEY);
+        CheckBoxPreference update = (CheckBoxPreference) prefs
+                .findPreference(CHECK_UPDATES_KEY);
         update.setOnPreferenceChangeListener(this);
 
-        ListPreference listUpdate = (ListPreference) prefs.findPreference(RINGTONE_KEY);
+        ListPreference listUpdate = (ListPreference) prefs
+                .findPreference(RINGTONE_KEY);
         listUpdate.setOnPreferenceChangeListener(this);
 
         Preference reset = prefs.findPreference(RESET_KEY);
@@ -145,314 +152,287 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 
         LogManager.getInstance(me).log("pr_settings_visited", null);
     }
-	
-	protected void onDestroy()
-	{
-		super.onDestroy();
 
-		LogManager.getInstance(this).log("pr_settings_exited", null);
-	}
+    protected void onDestroy() {
+        super.onDestroy();
 
-	@SuppressWarnings("deprecation")
-	public boolean onPreferenceClick(Preference preference)
-	{
-		final SettingsActivity me = this;
-		
-        if (HAPTIC_PATTERN_KEY.equals(preference.getKey()))
-        {
-        	ListPreference listPref = (ListPreference) preference;
+        LogManager.getInstance(this).log("pr_settings_exited", null);
+    }
 
-			String pattern = listPref.getValue();
+    @SuppressWarnings("deprecation")
+    public boolean onPreferenceClick(Preference preference) {
+        final SettingsActivity me = this;
 
-			Intent intent = new Intent(ManagerService.HAPTIC_PATTERN_INTENT);
-			intent.putExtra(ManagerService.HAPTIC_PATTERN_NAME, pattern);
-			intent.setClass(me, ManagerService.class);
+        if (HAPTIC_PATTERN_KEY.equals(preference.getKey())) {
+            ListPreference listPref = (ListPreference) preference;
 
-			this.startService(intent);
+            String pattern = listPref.getValue();
 
-			return true;
-        }
-        else if (PROBES_SCREEN_KEY.equals(preference.getKey()))
-			return true;
-        else if (MANUAL_REFRESH_KEY.equals(preference.getKey()))
-        {
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
-			Editor editor = prefs.edit();
+            Intent intent = new Intent(ManagerService.HAPTIC_PATTERN_INTENT);
+            intent.putExtra(ManagerService.HAPTIC_PATTERN_NAME, pattern);
+            intent.setClass(me, ManagerService.class);
 
-			editor.putLong(LegacyJSONConfigFile.JSON_LAST_UPDATE, 0);
-			editor.putString(LegacyJSONConfigFile.JSON_LAST_HASH, "");
-
-			editor.commit();
-			LegacyJSONConfigFile.update(this, true);
-
-			ProbeManager.nudgeProbes(this);
-			TriggerManager.getInstance(this).refreshTriggers(this);
+            this.startService(intent);
 
             return true;
-        }
-        else if (LOG_REFRESH_KEY.equals(preference.getKey()))
-        {
-			try 
-			{
-				PackageInfo info = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
+        } else if (PROBES_SCREEN_KEY.equals(preference.getKey()))
+            return true;
+        else if (MANUAL_REFRESH_KEY.equals(preference.getKey())) {
+            SharedPreferences prefs = PreferenceManager
+                    .getDefaultSharedPreferences(this.getApplicationContext());
+            Editor editor = prefs.edit();
 
-				Intent refreshIntent = new Intent(info.packageName + ".UPLOAD_LOGS_INTENT");
-	        	refreshIntent.putExtra(LogService.LOG_FORCE_UPLOAD, true);
-	        	refreshIntent.setClass(me, ManagerService.class);
+            editor.putLong(LegacyJSONConfigFile.JSON_LAST_UPDATE, 0);
+            editor.putString(LegacyJSONConfigFile.JSON_LAST_HASH, "");
 
-	        	this.startService(refreshIntent);
-			} 
-			catch (NameNotFoundException e) 
-			{
-				LogManager.getInstance(this).logException(e);
-			}
+            editor.commit();
+            LegacyJSONConfigFile.update(this, true);
+
+            ProbeManager.nudgeProbes(this);
+            TriggerManager.getInstance(this).refreshTriggers(this);
 
             return true;
-        }
-        else if (ZIP_ARCHIVES_KEY.equals(preference.getKey()))
-        {
-        	HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance.pluginForClass(this, HttpUploadPlugin.class);
+        } else if (LOG_REFRESH_KEY.equals(preference.getKey())) {
+            try {
+                PackageInfo info = this.getPackageManager().getPackageInfo(
+                        this.getPackageName(), 0);
 
-        	if (plugin != null)
-        	{
-	        	plugin.mailArchiveFiles(this);
-	
-	        	return true;
-        	}
-        }
-        else if (DELETE_ARCHIVES_KEY.equals(preference.getKey()))
-        {
-        	HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance.pluginForClass(this, HttpUploadPlugin.class);
-        	
-        	if (plugin != null)
-        	{
-        		plugin.deleteArchiveFiles(this);
+                Intent refreshIntent = new Intent(info.packageName
+                        + ".UPLOAD_LOGS_INTENT");
+                refreshIntent.putExtra(LogService.LOG_FORCE_UPLOAD, true);
+                refreshIntent.setClass(me, ManagerService.class);
 
-        		return true;
-        	}
-        }
-        else if (RUN_TESTS_KEY.equals(preference.getKey()))
-        {
-        	Intent intent = new Intent(this, TestActivity.class);
-        	this.startActivity(intent);
-        }
-        else if (DUMP_JSON_KEY.equals(preference.getKey()))
-        {
-        	try 
-        	{
-            	JSONObject root = new JSONObject();
+                this.startService(refreshIntent);
+            } catch (NameNotFoundException e) {
+                LogManager.getInstance(this).logException(e);
+            }
 
-            	ApplicationInfo info = this.getApplicationInfo();
-            	root.put("name", this.getString(info.labelRes)); 
-            
-            	PackageInfo pkgInfo = this.getPackageManager().getPackageInfo(info.packageName, 0); 
+            return true;
+        } else if (ZIP_ARCHIVES_KEY.equals(preference.getKey())) {
+            HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance
+                    .pluginForClass(this, HttpUploadPlugin.class);
 
-            	root.put("package_name", pkgInfo.packageName); 
-            	root.put("version", pkgInfo.versionCode); 
-            	root.put("version_name", pkgInfo.versionName); 
+            if (plugin != null) {
+                plugin.mailArchiveFiles(this);
 
-       			JSONObject config = this.dumpJson(this.getPreferenceScreen());
-            	root.put("configuration", config); 
-            	
-            	File cacheDir = this.getExternalCacheDir();
-            	File configJsonFile = new File(cacheDir, "config.json");
-            	
-        		FileOutputStream fout = new FileOutputStream(configJsonFile);
+                return true;
+            }
+        } else if (DELETE_ARCHIVES_KEY.equals(preference.getKey())) {
+            HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance
+                    .pluginForClass(this, HttpUploadPlugin.class);
 
-        		fout.write(root.toString(2).getBytes(Charset.defaultCharset().name()));
+            if (plugin != null) {
+                plugin.deleteArchiveFiles(this);
 
-        		fout.flush();
-        		fout.close();
-        		
-        		Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
-        		emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, this.getString(R.string.message_mail_app_schema));
-        		emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, this.getString(R.string.subject_mail_app_schema));
-        		emailIntent.setType("text/plain");
+                return true;
+            }
+        } else if (RUN_TESTS_KEY.equals(preference.getKey())) {
+            Intent intent = new Intent(this, TestActivity.class);
+            this.startActivity(intent);
+        } else if (DUMP_JSON_KEY.equals(preference.getKey())) {
+            try {
+                JSONObject root = new JSONObject();
 
-        		Uri uri = Uri.fromFile(configJsonFile);
-        		emailIntent.putExtra(Intent.EXTRA_STREAM, uri);
-        		this.startActivity(emailIntent);
-			}
-        	catch (JSONException e) 
-        	{
-     			LogManager.getInstance(this).logException(e);
-			}
-        	catch (NameNotFoundException e) 
-        	{
-     			LogManager.getInstance(this).logException(e);
-			} 
-        	catch (FileNotFoundException e) 
-        	{
-     			LogManager.getInstance(this).logException(e);
-			} 
-        	catch (IOException e) 
-        	{
-     			LogManager.getInstance(this).logException(e);
-			}
-        }
-        else if (RESET_KEY.equals(preference.getKey()))
-        {
-        	AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        	
-        	builder = builder.setTitle(R.string.title_clear_configuration);
-        	builder = builder.setMessage(R.string.message_clear_configuration);
-        	
-        	builder = builder.setPositiveButton(R.string.button_clear_yes, new OnClickListener()
-        	{
-				public void onClick(DialogInterface dialog, int which) 
-				{
-					SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(me);
-					Editor e = prefs.edit();
+                ApplicationInfo info = this.getApplicationInfo();
+                root.put("name", this.getString(info.labelRes));
 
-					Map<String, ?> prefMap = prefs.getAll();
-					
-					for (String key : prefMap.keySet())
-					{
-						e.remove(key);
-					}
-					
-					e.commit();
+                PackageInfo pkgInfo = this.getPackageManager().getPackageInfo(
+                        info.packageName, 0);
 
-					Intent intent = new Intent(PersistentService.NUDGE_PROBES);
-					intent.setClass(me, PersistentService.class);
+                root.put("package_name", pkgInfo.packageName);
+                root.put("version", pkgInfo.versionCode);
+                root.put("version_name", pkgInfo.versionName);
 
-					me.startService(intent);
-					
-					TriggerManager.getInstance(me).removeAllTriggers();
-					TriggerManager.getInstance(me).refreshTriggers(me);
-					HttpUploadPlugin.clearFiles(me);
-					
-					String where = "_id != -1";
-					
-					me.getContentResolver().delete(RobotContentProvider.RECENT_PROBE_VALUES, where, null);
-					me.getContentResolver().delete(RobotContentProvider.SNAPSHOTS, where, null);
-					me.getContentResolver().delete(DistancesProvider.CONTENT_URI, where, null);
-					
-					ProbeValuesProvider.getProvider(me).clear(me);
-					
-					android.os.Process.killProcess(android.os.Process.myPid());
-				}
-        	});
-        	
-        	builder = builder.setNegativeButton(R.string.button_clear_no, new OnClickListener()
-        	{
-				public void onClick(DialogInterface dialog, int which) 
-				{
-					// TODO Auto-generated method stub
-					
-				}
-        	});
-        	
-        	builder.create().show();
-        }
-        else if (PROBES_DISABLE_EACH_KEY.equals(preference.getKey()))
-        {
-        	ProbeManager.disableEachProbe(this);
-        	
-        	Toast.makeText(this, R.string.message_disable_each_probe, Toast.LENGTH_LONG).show();
+                JSONObject config = this.dumpJson(this.getPreferenceScreen());
+                root.put("configuration", config);
+
+                File cacheDir = this.getExternalCacheDir();
+                File configJsonFile = new File(cacheDir, "config.json");
+
+                FileOutputStream fout = new FileOutputStream(configJsonFile);
+
+                fout.write(root.toString(2).getBytes(
+                        Charset.defaultCharset().name()));
+
+                fout.flush();
+                fout.close();
+
+                Intent emailIntent = new Intent(
+                        android.content.Intent.ACTION_SEND);
+                emailIntent.putExtra(android.content.Intent.EXTRA_TEXT,
+                        this.getString(R.string.message_mail_app_schema));
+                emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
+                        this.getString(R.string.subject_mail_app_schema));
+                emailIntent.setType("text/plain");
+
+                Uri uri = Uri.fromFile(configJsonFile);
+                emailIntent.putExtra(Intent.EXTRA_STREAM, uri);
+                this.startActivity(emailIntent);
+            } catch (JSONException e) {
+                LogManager.getInstance(this).logException(e);
+            } catch (NameNotFoundException e) {
+                LogManager.getInstance(this).logException(e);
+            } catch (FileNotFoundException e) {
+                LogManager.getInstance(this).logException(e);
+            } catch (IOException e) {
+                LogManager.getInstance(this).logException(e);
+            }
+        } else if (RESET_KEY.equals(preference.getKey())) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+            builder = builder.setTitle(R.string.title_clear_configuration);
+            builder = builder.setMessage(R.string.message_clear_configuration);
+
+            builder = builder.setPositiveButton(R.string.button_clear_yes,
+                    new OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            SharedPreferences prefs = PreferenceManager
+                                    .getDefaultSharedPreferences(me);
+                            Editor e = prefs.edit();
+
+                            Map<String, ?> prefMap = prefs.getAll();
+
+                            for (String key : prefMap.keySet()) {
+                                e.remove(key);
+                            }
+
+                            e.commit();
+
+                            Intent intent = new Intent(
+                                    PersistentService.NUDGE_PROBES);
+                            intent.setClass(me, PersistentService.class);
+
+                            me.startService(intent);
+
+                            TriggerManager.getInstance(me).removeAllTriggers();
+                            TriggerManager.getInstance(me).refreshTriggers(me);
+                            HttpUploadPlugin.clearFiles(me);
+
+                            String where = "_id != -1";
+
+                            me.getContentResolver().delete(
+                                    RobotContentProvider.RECENT_PROBE_VALUES,
+                                    where, null);
+                            me.getContentResolver()
+                                    .delete(RobotContentProvider.SNAPSHOTS,
+                                            where, null);
+                            me.getContentResolver().delete(
+                                    DistancesProvider.CONTENT_URI, where, null);
+
+                            ProbeValuesProvider.getProvider(me).clear(me);
+
+                            android.os.Process.killProcess(android.os.Process
+                                    .myPid());
+                        }
+                    });
+
+            builder = builder.setNegativeButton(R.string.button_clear_no,
+                    new OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // TODO Auto-generated method stub
+
+                        }
+                    });
+
+            builder.create().show();
+        } else if (PROBES_DISABLE_EACH_KEY.equals(preference.getKey())) {
+            ProbeManager.disableEachProbe(this);
+
+            Toast.makeText(this, R.string.message_disable_each_probe,
+                    Toast.LENGTH_LONG).show();
         }
 
         return false;
-	}
+    }
 
-	private JSONObject dumpJson(Preference preference) throws JSONException 
-	{
-		JSONObject prefJson = new JSONObject();
-		
-		if (preference.getKey() != null)
-			prefJson.put("key", preference.getKey());
+    private JSONObject dumpJson(Preference preference) throws JSONException {
+        JSONObject prefJson = new JSONObject();
 
-		if (preference.getTitle() != null)
-			prefJson.put("title", preference.getTitle());
+        if (preference.getKey() != null)
+            prefJson.put("key", preference.getKey());
 
-		if (preference.getSummary() != null)
-			prefJson.put("summary", preference.getSummary());
+        if (preference.getTitle() != null)
+            prefJson.put("title", preference.getTitle());
 
-		if (preference instanceof PreferenceGroup)
-		{
-			if ("config_settings_trigger_category".equals(preference.getKey()))
-				return null;
-			else
-			{
-				PreferenceGroup group = (PreferenceGroup) preference;
-				
-				if (group.getPreferenceCount() == 0)
-					return null;
-				
-				prefJson.put("type", "group");
-				
-				JSONArray children = new JSONArray();
-				
-				for (int i = 0; i < group.getPreferenceCount(); i++)
-				{
-					JSONObject child = this.dumpJson(group.getPreference(i));
-					
-					if (child != null)
-						children.put(child);
-				}
-	
-				prefJson.put("children", children);
-			}
-		}
-		else if (preference instanceof CheckBoxPreference)
-			prefJson.put("type", "boolean");
-		else if (preference instanceof EditTextPreference)
-			prefJson.put("type", "string");
-		else if (preference instanceof ListPreference)
-		{
-			ListPreference list = (ListPreference) preference;
-			prefJson.put("type", "list");
-			
-			JSONArray entries = new JSONArray();
-			
-			for (CharSequence cs : list.getEntries())
-				entries.put(cs);
+        if (preference.getSummary() != null)
+            prefJson.put("summary", preference.getSummary());
 
-			prefJson.put("labels", entries);
+        if (preference instanceof PreferenceGroup) {
+            if ("config_settings_trigger_category".equals(preference.getKey()))
+                return null;
+            else {
+                PreferenceGroup group = (PreferenceGroup) preference;
 
-			JSONArray values = new JSONArray();
-			
-			for (CharSequence cs : list.getEntryValues())
-				values.put(cs);
+                if (group.getPreferenceCount() == 0)
+                    return null;
 
-			prefJson.put("values", values);
-		}
-		else
-			prefJson = null;
-		
-		return prefJson;
-	}
+                prefJson.put("type", "group");
 
-	public boolean onPreferenceChange(Preference pref, Object value) 
-	{
-		if (CHECK_UPDATES_KEY.equals(pref.getKey()))
-		{
-			Toast.makeText(this, R.string.message_update_check, Toast.LENGTH_LONG).show();
+                JSONArray children = new JSONArray();
 
-			return true;
-		}
-		else if (RINGTONE_KEY.equals(pref.getKey()))
-		{
-			String name = ManagerService.soundNameForPath(this, value.toString());
-			
-        	Intent playIntent = new Intent(ManagerService.RINGTONE_INTENT);
-        	
-        	if (name != null)
-        		playIntent.putExtra(SettingsActivity.RINGTONE_KEY, name);
-        	
-        	playIntent.setClass(this, ManagerService.class);
+                for (int i = 0; i < group.getPreferenceCount(); i++) {
+                    JSONObject child = this.dumpJson(group.getPreference(i));
 
-			this.startService(playIntent);
-        	
-        	return true;
-		}
-		else if (LogManager.ENABLED.equals(pref.getKey()))
-		{
-			LogManager.getInstance(this).setEnabled(((Boolean) value).booleanValue());
-			
-        	return true;
-		}
+                    if (child != null)
+                        children.put(child);
+                }
 
-		return false;
-	}
+                prefJson.put("children", children);
+            }
+        } else if (preference instanceof CheckBoxPreference)
+            prefJson.put("type", "boolean");
+        else if (preference instanceof EditTextPreference)
+            prefJson.put("type", "string");
+        else if (preference instanceof ListPreference) {
+            ListPreference list = (ListPreference) preference;
+            prefJson.put("type", "list");
+
+            JSONArray entries = new JSONArray();
+
+            for (CharSequence cs : list.getEntries())
+                entries.put(cs);
+
+            prefJson.put("labels", entries);
+
+            JSONArray values = new JSONArray();
+
+            for (CharSequence cs : list.getEntryValues())
+                values.put(cs);
+
+            prefJson.put("values", values);
+        } else
+            prefJson = null;
+
+        return prefJson;
+    }
+
+    public boolean onPreferenceChange(Preference pref, Object value) {
+        if (CHECK_UPDATES_KEY.equals(pref.getKey())) {
+            Toast.makeText(this, R.string.message_update_check,
+                    Toast.LENGTH_LONG).show();
+
+            return true;
+        } else if (RINGTONE_KEY.equals(pref.getKey())) {
+            String name = ManagerService.soundNameForPath(this,
+                    value.toString());
+
+            Intent playIntent = new Intent(ManagerService.RINGTONE_INTENT);
+
+            if (name != null)
+                playIntent.putExtra(SettingsActivity.RINGTONE_KEY, name);
+
+            playIntent.setClass(this, ManagerService.class);
+
+            this.startService(playIntent);
+
+            return true;
+        } else if (LogManager.ENABLED.equals(pref.getKey())) {
+            LogManager.getInstance(this).setEnabled(
+                    ((Boolean) value).booleanValue());
+
+            return true;
+        }
+
+        return false;
+    }
 }

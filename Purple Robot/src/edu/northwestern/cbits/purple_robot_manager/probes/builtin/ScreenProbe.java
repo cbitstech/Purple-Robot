@@ -14,150 +14,142 @@ import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
-public class ScreenProbe extends Probe
-{
-	public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.ScreenProbe";
+public class ScreenProbe extends Probe {
+    public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.ScreenProbe";
 
-	public static final String SCREEN_ACTIVE = "SCREEN_ACTIVE";
+    public static final String SCREEN_ACTIVE = "SCREEN_ACTIVE";
 
-	private static final boolean DEFAULT_ENABLED = true;
+    private static final boolean DEFAULT_ENABLED = true;
 
-	private boolean _isInited = false;
-	private boolean _isEnabled = false;
+    private boolean _isInited = false;
+    private boolean _isEnabled = false;
 
-	private BroadcastReceiver _receiver = null;
+    private BroadcastReceiver _receiver = null;
 
-	public String name(Context context)
-	{
-		return ScreenProbe.NAME;
-	}
-	
-	public String title(Context context)
-	{
-		return context.getString(R.string.title_screen_probe);
-	}
+    public String name(Context context) {
+        return ScreenProbe.NAME;
+    }
 
-	public String probeCategory(Context context)
-	{
-		return context.getResources().getString(R.string.probe_device_info_category);
-	}
+    public String title(Context context) {
+        return context.getString(R.string.title_screen_probe);
+    }
 
-	public boolean isEnabled(Context context)
-	{
-		if (!this._isInited)
-		{
-			IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
-			filter.addAction(Intent.ACTION_SCREEN_OFF);
+    public String probeCategory(Context context) {
+        return context.getResources().getString(
+                R.string.probe_device_info_category);
+    }
 
-			final ScreenProbe me = this;
+    public boolean isEnabled(Context context) {
+        if (!this._isInited) {
+            IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
+            filter.addAction(Intent.ACTION_SCREEN_OFF);
 
-			this._receiver  = new BroadcastReceiver()
-			{
-				public void onReceive(Context context, Intent intent)
-				{
-					if (me._isEnabled)
-					{
-						Bundle bundle = new Bundle();
-						bundle.putString("PROBE", me.name(context));
-						bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+            final ScreenProbe me = this;
 
-						final String action = intent.getAction();
+            this._receiver = new BroadcastReceiver() {
+                public void onReceive(Context context, Intent intent) {
+                    if (me._isEnabled) {
+                        Bundle bundle = new Bundle();
+                        bundle.putString("PROBE", me.name(context));
+                        bundle.putLong("TIMESTAMP",
+                                System.currentTimeMillis() / 1000);
 
-						if (Intent.ACTION_SCREEN_OFF.equals(action))
-							bundle.putBoolean(ScreenProbe.SCREEN_ACTIVE, false);
-						else if (Intent.ACTION_SCREEN_ON.equals(action))
-							bundle.putBoolean(ScreenProbe.SCREEN_ACTIVE, true);
+                        final String action = intent.getAction();
 
-						me.transmitData(context, bundle);
-					}
-				}
-			};
-			
-			context.registerReceiver(this._receiver, filter);
+                        if (Intent.ACTION_SCREEN_OFF.equals(action))
+                            bundle.putBoolean(ScreenProbe.SCREEN_ACTIVE, false);
+                        else if (Intent.ACTION_SCREEN_ON.equals(action))
+                            bundle.putBoolean(ScreenProbe.SCREEN_ACTIVE, true);
 
-			this._isInited = true;
-		}
+                        me.transmitData(context, bundle);
+                    }
+                }
+            };
 
-		SharedPreferences prefs = Probe.getPreferences(context);
+            context.registerReceiver(this._receiver, filter);
 
-		if (super.isEnabled(context))
-		{
-			if (prefs.getBoolean("config_probe_screen_enabled", ScreenProbe.DEFAULT_ENABLED))
-				this._isEnabled = true;
-			else
-				this._isEnabled = false;
-		}
-		else
-			this._isEnabled = false;
+            this._isInited = true;
+        }
 
-		return this._isEnabled;
-	}
+        SharedPreferences prefs = Probe.getPreferences(context);
 
-	public void enable(Context context)
-	{
-		SharedPreferences prefs = Probe.getPreferences(context);
-		
-		Editor e = prefs.edit();
-		e.putBoolean("config_probe_screen_enabled", true);
-		
-		e.commit();
-	}
+        if (super.isEnabled(context)) {
+            if (prefs.getBoolean("config_probe_screen_enabled",
+                    ScreenProbe.DEFAULT_ENABLED))
+                this._isEnabled = true;
+            else
+                this._isEnabled = false;
+        } else
+            this._isEnabled = false;
 
-	public void disable(Context context)
-	{
-		SharedPreferences prefs = Probe.getPreferences(context);
-		
-		Editor e = prefs.edit();
-		e.putBoolean("config_probe_screen_enabled", false);
-		
-		e.commit();
-	}
+        return this._isEnabled;
+    }
 
-	public String summarizeValue(Context context, Bundle bundle)
-	{
-		boolean active = bundle.getBoolean(ScreenProbe.SCREEN_ACTIVE, false);
+    public void enable(Context context) {
+        SharedPreferences prefs = Probe.getPreferences(context);
 
-		if (active)
-			return context.getResources().getString(R.string.summary_screen_probe_active);
+        Editor e = prefs.edit();
+        e.putBoolean("config_probe_screen_enabled", true);
 
-		return context.getResources().getString(R.string.summary_screen_probe_inactive);
-	}
+        e.commit();
+    }
 
-	public Bundle formattedBundle(Context context, Bundle bundle)
-	{
-		Bundle formatted = super.formattedBundle(context, bundle);
+    public void disable(Context context) {
+        SharedPreferences prefs = Probe.getPreferences(context);
 
-		boolean active = bundle.getBoolean(ScreenProbe.SCREEN_ACTIVE, false);
+        Editor e = prefs.edit();
+        e.putBoolean("config_probe_screen_enabled", false);
 
-		if (active)
-			formatted.putString(context.getString(R.string.display_screen_label), context.getString(R.string.display_screen_active_label));
-		else
-			formatted.putString(context.getString(R.string.display_screen_label), context.getString(R.string.display_screen_inactive_label));
-		
-		return formatted;
-	};
+        e.commit();
+    }
 
-	public String summary(Context context) 
-	{
-		return context.getString(R.string.summary_screen_probe_desc);
-	}
+    public String summarizeValue(Context context, Bundle bundle) {
+        boolean active = bundle.getBoolean(ScreenProbe.SCREEN_ACTIVE, false);
 
-	@SuppressWarnings("deprecation")
-	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
-	{
-		PreferenceManager manager = activity.getPreferenceManager();
+        if (active)
+            return context.getResources().getString(
+                    R.string.summary_screen_probe_active);
 
-		PreferenceScreen screen = manager.createPreferenceScreen(activity);
-		screen.setTitle(this.title(activity));
-		screen.setSummary(R.string.summary_screen_probe_desc);
+        return context.getResources().getString(
+                R.string.summary_screen_probe_inactive);
+    }
 
-		CheckBoxPreference enabled = new CheckBoxPreference(activity);
-		enabled.setTitle(R.string.title_enable_probe);
-		enabled.setKey("config_probe_screen_enabled");
-		enabled.setDefaultValue(ScreenProbe.DEFAULT_ENABLED);
+    public Bundle formattedBundle(Context context, Bundle bundle) {
+        Bundle formatted = super.formattedBundle(context, bundle);
 
-		screen.addPreference(enabled);
+        boolean active = bundle.getBoolean(ScreenProbe.SCREEN_ACTIVE, false);
 
-		return screen;
-	}
+        if (active)
+            formatted.putString(
+                    context.getString(R.string.display_screen_label),
+                    context.getString(R.string.display_screen_active_label));
+        else
+            formatted.putString(
+                    context.getString(R.string.display_screen_label),
+                    context.getString(R.string.display_screen_inactive_label));
+
+        return formatted;
+    };
+
+    public String summary(Context context) {
+        return context.getString(R.string.summary_screen_probe_desc);
+    }
+
+    @SuppressWarnings("deprecation")
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+        PreferenceManager manager = activity.getPreferenceManager();
+
+        PreferenceScreen screen = manager.createPreferenceScreen(activity);
+        screen.setTitle(this.title(activity));
+        screen.setSummary(R.string.summary_screen_probe_desc);
+
+        CheckBoxPreference enabled = new CheckBoxPreference(activity);
+        enabled.setTitle(R.string.title_enable_probe);
+        enabled.setKey("config_probe_screen_enabled");
+        enabled.setDefaultValue(ScreenProbe.DEFAULT_ENABLED);
+
+        screen.addPreference(enabled);
+
+        return screen;
+    }
 }

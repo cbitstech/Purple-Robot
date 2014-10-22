@@ -18,175 +18,177 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
 
-public class SunriseSunsetFeature extends Feature 
-{
-	private static final String FEATURE_KEY = "sunrise_sunset";
+public class SunriseSunsetFeature extends Feature {
+    private static final String FEATURE_KEY = "sunrise_sunset";
 
-	protected static final String LONGITUDE = "LONGITUDE";
-	protected static final String LATITUDE = "LATITUDE";
-	protected static final String SUNRISE_DISTANCE = "SUNRISE_DISTANCE";
-	protected static final String SUNSET_DISTANCE = "SUNSET_DISTANCE";
-	protected static final String IS_DAY = "IS_DAY";
-	protected static final String SUNRISE = "SUNRISE";
-	protected static final String SUNSET = "SUNSET";
-	protected static final String DAY_DURATION = "DAY_DURATION";
+    protected static final String LONGITUDE = "LONGITUDE";
+    protected static final String LATITUDE = "LATITUDE";
+    protected static final String SUNRISE_DISTANCE = "SUNRISE_DISTANCE";
+    protected static final String SUNSET_DISTANCE = "SUNSET_DISTANCE";
+    protected static final String IS_DAY = "IS_DAY";
+    protected static final String SUNRISE = "SUNRISE";
+    protected static final String SUNSET = "SUNSET";
+    protected static final String DAY_DURATION = "DAY_DURATION";
 
-	private boolean _isEnabled = false;
-	private boolean _isInited = false;
+    private boolean _isEnabled = false;
+    private boolean _isInited = false;
 
-	public String summarizeValue(Context context, Bundle bundle)
-	{
-		long now = System.currentTimeMillis();
-		
-		long sunrise = (long) bundle.getDouble(SunriseSunsetFeature.SUNRISE);
-		long sunset = (long) bundle.getDouble(SunriseSunsetFeature.SUNSET);
-		
-		long diff = (now - sunset) / (60 * 1000);
-		
-		int stringId = R.string.summary_after_sunset_probe;
-		
-		if (now < sunrise)
-		{
-			stringId = R.string.summary_before_sunrise_probe;			
-			diff = (sunrise - now) / (60 * 1000);
-		}
-		if (now < sunset)
-		{
-			stringId = R.string.summary_before_sunset_probe;			
-			diff = (sunset - now) / (60 * 1000);
-		}
+    public String summarizeValue(Context context, Bundle bundle) {
+        long now = System.currentTimeMillis();
 
-		return context.getResources().getString(stringId, diff);
-	}
+        long sunrise = (long) bundle.getDouble(SunriseSunsetFeature.SUNRISE);
+        long sunset = (long) bundle.getDouble(SunriseSunsetFeature.SUNSET);
 
-	public String probeCategory(Context context)
-	{
-		return context.getString(R.string.probe_external_environment_category);
-	}
+        long diff = (now - sunset) / (60 * 1000);
 
-	protected String featureKey() 
-	{
-		return SunriseSunsetFeature.FEATURE_KEY;
-	}
+        int stringId = R.string.summary_after_sunset_probe;
 
-	public String summary(Context context) 
-	{
-		return context.getString(R.string.summary_sunrise_sunset_feature_desc);
-	}
+        if (now < sunrise) {
+            stringId = R.string.summary_before_sunrise_probe;
+            diff = (sunrise - now) / (60 * 1000);
+        }
+        if (now < sunset) {
+            stringId = R.string.summary_before_sunset_probe;
+            diff = (sunset - now) / (60 * 1000);
+        }
 
-	public String name(Context context) 
-	{
-		return "edu.northwestern.cbits.purple_robot_manager.probes.features.SunriseSunsetFeature";
-	}
+        return context.getResources().getString(stringId, diff);
+    }
 
-	public String title(Context context) 
-	{
-		return context.getString(R.string.title_sunrise_sunset_feature);
-	}
+    public String probeCategory(Context context) {
+        return context.getString(R.string.probe_external_environment_category);
+    }
 
-	public void enable(Context context) 
-	{
-		SharedPreferences prefs = Probe.getPreferences(context);
-		
-		Editor e = prefs.edit();
-		e.putBoolean("config_feature_sunrise_sunset_enabled", true);
-		
-		e.commit();
-	}
+    protected String featureKey() {
+        return SunriseSunsetFeature.FEATURE_KEY;
+    }
 
-	public void disable(Context context) 
-	{
-		SharedPreferences prefs = Probe.getPreferences(context);
-		
-		Editor e = prefs.edit();
-		e.putBoolean("config_feature_sunrise_sunset_enabled", false);
-		
-		e.commit();
-	}
-	
-	public boolean isEnabled(Context context)
-	{
-		if (!this._isInited )
-		{
-			IntentFilter intentFilter = new IntentFilter(Probe.PROBE_READING);
+    public String summary(Context context) {
+        return context.getString(R.string.summary_sunrise_sunset_feature_desc);
+    }
 
-			final SunriseSunsetFeature me = this;
+    public String name(Context context) {
+        return "edu.northwestern.cbits.purple_robot_manager.probes.features.SunriseSunsetFeature";
+    }
 
-			BroadcastReceiver receiver = new BroadcastReceiver()
-			{
-				public void onReceive(final Context context, Intent intent)
-				{
-					Bundle extras = intent.getExtras();
+    public String title(Context context) {
+        return context.getString(R.string.title_sunrise_sunset_feature);
+    }
 
-					String probeName = extras.getString("PROBE");
+    public void enable(Context context) {
+        SharedPreferences prefs = Probe.getPreferences(context);
 
-					if (probeName != null && (LocationProbe.NAME.equals(probeName)))
-					{
-						final double latitude = extras.getDouble(LocationProbe.LATITUDE);
-						final double longitude = extras.getDouble(LocationProbe.LONGITUDE);
-							
-						Runnable r = new Runnable()
-						{
-							public void run() 
-							{
-								if (me._isEnabled == false)
-									return;
+        Editor e = prefs.edit();
+        e.putBoolean("config_feature_sunrise_sunset_enabled", true);
 
-								Calendar c = Calendar.getInstance();
-								Location location = new Location("" + latitude, "" + longitude);
-								SunriseSunsetCalculator calc = new SunriseSunsetCalculator(location, c.getTimeZone());
-								
-								Bundle bundle = new Bundle();
-								bundle.putString("PROBE", me.name(context));
-								bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+        e.commit();
+    }
 
-								bundle.putDouble(SunriseSunsetFeature.LATITUDE, latitude);
-								bundle.putDouble(SunriseSunsetFeature.LONGITUDE, longitude);
-								
-								Calendar civilSunrise = calc.getCivilSunriseCalendarForDate(c);
-								Calendar civilSunset = calc.getCivilSunsetCalendarForDate(c);
-								
-								long now = c.getTime().getTime();
-								
-								long sunrise = civilSunrise.getTime().getTime();
-								long sunset = civilSunset.getTime().getTime();
-								
-								bundle.putLong(SunriseSunsetFeature.SUNRISE, sunrise);
-								bundle.putLong(SunriseSunsetFeature.SUNSET, sunset);
-								bundle.putLong(SunriseSunsetFeature.DAY_DURATION, sunset - sunrise);
-								bundle.putLong(SunriseSunsetFeature.SUNRISE_DISTANCE, now - sunrise);
-								bundle.putLong(SunriseSunsetFeature.SUNSET_DISTANCE, now - sunset);
-								
-								boolean isDay = (now >= sunrise && now <= sunset);
-								
-								bundle.putBoolean(SunriseSunsetFeature.IS_DAY, isDay);
+    public void disable(Context context) {
+        SharedPreferences prefs = Probe.getPreferences(context);
 
-								me.transmitData(context, bundle);
-							}
-						};
-						
-						Thread t = new Thread(r);
-						t.start();
-					}
-				}
-			};
+        Editor e = prefs.edit();
+        e.putBoolean("config_feature_sunrise_sunset_enabled", false);
 
-			LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(context);
-			localManager.registerReceiver(receiver, intentFilter);
+        e.commit();
+    }
 
-			this._isInited = true;
-		}
+    public boolean isEnabled(Context context) {
+        if (!this._isInited) {
+            IntentFilter intentFilter = new IntentFilter(Probe.PROBE_READING);
 
-		SharedPreferences prefs = Probe.getPreferences(context);
+            final SunriseSunsetFeature me = this;
 
-		this._isEnabled = false;
+            BroadcastReceiver receiver = new BroadcastReceiver() {
+                public void onReceive(final Context context, Intent intent) {
+                    Bundle extras = intent.getExtras();
 
-		if (super.isEnabled(context))
-		{
-			if (prefs.getBoolean("config_feature_sunrise_sunset_enabled", true))
-				this._isEnabled = true;
-		}
+                    String probeName = extras.getString("PROBE");
 
-		return this._isEnabled;
-	}
+                    if (probeName != null
+                            && (LocationProbe.NAME.equals(probeName))) {
+                        final double latitude = extras
+                                .getDouble(LocationProbe.LATITUDE);
+                        final double longitude = extras
+                                .getDouble(LocationProbe.LONGITUDE);
+
+                        Runnable r = new Runnable() {
+                            public void run() {
+                                if (me._isEnabled == false)
+                                    return;
+
+                                Calendar c = Calendar.getInstance();
+                                Location location = new Location("" + latitude,
+                                        "" + longitude);
+                                SunriseSunsetCalculator calc = new SunriseSunsetCalculator(
+                                        location, c.getTimeZone());
+
+                                Bundle bundle = new Bundle();
+                                bundle.putString("PROBE", me.name(context));
+                                bundle.putLong("TIMESTAMP",
+                                        System.currentTimeMillis() / 1000);
+
+                                bundle.putDouble(SunriseSunsetFeature.LATITUDE,
+                                        latitude);
+                                bundle.putDouble(
+                                        SunriseSunsetFeature.LONGITUDE,
+                                        longitude);
+
+                                Calendar civilSunrise = calc
+                                        .getCivilSunriseCalendarForDate(c);
+                                Calendar civilSunset = calc
+                                        .getCivilSunsetCalendarForDate(c);
+
+                                long now = c.getTime().getTime();
+
+                                long sunrise = civilSunrise.getTime().getTime();
+                                long sunset = civilSunset.getTime().getTime();
+
+                                bundle.putLong(SunriseSunsetFeature.SUNRISE,
+                                        sunrise);
+                                bundle.putLong(SunriseSunsetFeature.SUNSET,
+                                        sunset);
+                                bundle.putLong(
+                                        SunriseSunsetFeature.DAY_DURATION,
+                                        sunset - sunrise);
+                                bundle.putLong(
+                                        SunriseSunsetFeature.SUNRISE_DISTANCE,
+                                        now - sunrise);
+                                bundle.putLong(
+                                        SunriseSunsetFeature.SUNSET_DISTANCE,
+                                        now - sunset);
+
+                                boolean isDay = (now >= sunrise && now <= sunset);
+
+                                bundle.putBoolean(SunriseSunsetFeature.IS_DAY,
+                                        isDay);
+
+                                me.transmitData(context, bundle);
+                            }
+                        };
+
+                        Thread t = new Thread(r);
+                        t.start();
+                    }
+                }
+            };
+
+            LocalBroadcastManager localManager = LocalBroadcastManager
+                    .getInstance(context);
+            localManager.registerReceiver(receiver, intentFilter);
+
+            this._isInited = true;
+        }
+
+        SharedPreferences prefs = Probe.getPreferences(context);
+
+        this._isEnabled = false;
+
+        if (super.isEnabled(context)) {
+            if (prefs.getBoolean("config_feature_sunrise_sunset_enabled", true))
+                this._isEnabled = true;
+        }
+
+        return this._isEnabled;
+    }
 }

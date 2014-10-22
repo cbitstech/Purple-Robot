@@ -26,371 +26,364 @@ import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("SimpleDateFormat")
-public class LightProbe extends Continuous1DProbe implements SensorEventListener
-{
-	public static final String DB_TABLE = "light_probe";
+public class LightProbe extends Continuous1DProbe implements
+        SensorEventListener {
+    public static final String DB_TABLE = "light_probe";
 
-	private static final String LIGHT_KEY = "LUX";
+    private static final String LIGHT_KEY = "LUX";
 
-	private static final String DEFAULT_THRESHOLD = "10.0";
+    private static final String DEFAULT_THRESHOLD = "10.0";
 
-	public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.LightProbe";
+    public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.LightProbe";
 
-	private static int BUFFER_SIZE = 128;
+    private static int BUFFER_SIZE = 128;
 
-	private static String[] fieldNames = { LIGHT_KEY };
+    private static String[] fieldNames = { LIGHT_KEY };
 
-	private double _lastValue = Double.MAX_VALUE;
+    private double _lastValue = Double.MAX_VALUE;
 
-	private long lastThresholdLookup = 0;
-	private double lastThreshold = 10.0;
+    private long lastThresholdLookup = 0;
+    private double lastThreshold = 10.0;
 
-	private float valueBuffer[][] = new float[1][BUFFER_SIZE];
-	private double timeBuffer[] = new double[BUFFER_SIZE];
+    private float valueBuffer[][] = new float[1][BUFFER_SIZE];
+    private double timeBuffer[] = new double[BUFFER_SIZE];
 
-	private Map<String, String> _schema = null;
+    private Map<String, String> _schema = null;
 
-	private int bufferIndex  = 0;
+    private int bufferIndex = 0;
 
-	private int _lastFrequency = -1;
+    private int _lastFrequency = -1;
 
-	public String probeCategory(Context context)
-	{
-		return context.getString(R.string.probe_sensor_category);
-	}
+    public String probeCategory(Context context) {
+        return context.getString(R.string.probe_sensor_category);
+    }
 
-	public String contentSubtitle(Context context)
-	{
-		Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(context, LightProbe.DB_TABLE, this.databaseSchema());
+    public String contentSubtitle(Context context) {
+        Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(
+                context, LightProbe.DB_TABLE, this.databaseSchema());
 
-		int count = -1;
+        int count = -1;
 
-		if (c != null)
-		{
-			count = c.getCount();
-			c.close();
-		}
+        if (c != null) {
+            count = c.getCount();
+            c.close();
+        }
 
-		return String.format(context.getString(R.string.display_item_count), count);
-	}
+        return String.format(context.getString(R.string.display_item_count),
+                count);
+    }
 
-	public Map<String, String> databaseSchema()
-	{
-		if (this._schema == null)
-		{
-			this._schema = new HashMap<String, String>();
+    public Map<String, String> databaseSchema() {
+        if (this._schema == null) {
+            this._schema = new HashMap<String, String>();
 
-			this._schema.put(LightProbe.LIGHT_KEY, ProbeValuesProvider.REAL_TYPE);
-		}
+            this._schema.put(LightProbe.LIGHT_KEY,
+                    ProbeValuesProvider.REAL_TYPE);
+        }
 
-		return this._schema;
-	}
+        return this._schema;
+    }
 
-	public Bundle formattedBundle(Context context, Bundle bundle)
-	{
-		Bundle formatted = super.formattedBundle(context, bundle);
+    public Bundle formattedBundle(Context context, Bundle bundle) {
+        Bundle formatted = super.formattedBundle(context, bundle);
 
-		double[] eventTimes = bundle.getDoubleArray("EVENT_TIMESTAMP");
-		float[] lux = bundle.getFloatArray("LUX");
+        double[] eventTimes = bundle.getDoubleArray("EVENT_TIMESTAMP");
+        float[] lux = bundle.getFloatArray("LUX");
 
-		ArrayList<String> keys = new ArrayList<String>();
+        ArrayList<String> keys = new ArrayList<String>();
 
-		if (lux != null && eventTimes != null)
-		{
-			SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.display_date_format));
+        if (lux != null && eventTimes != null) {
+            SimpleDateFormat sdf = new SimpleDateFormat(
+                    context.getString(R.string.display_date_format));
 
-			if (eventTimes.length > 1)
-			{
-				Bundle readings = new Bundle();
+            if (eventTimes.length > 1) {
+                Bundle readings = new Bundle();
 
-				for (int i = 0; i < eventTimes.length; i++)
-				{
-					String formatString = String.format(context.getString(R.string.display_light_reading), lux[i]);
+                for (int i = 0; i < eventTimes.length; i++) {
+                    String formatString = String.format(
+                            context.getString(R.string.display_light_reading),
+                            lux[i]);
 
-					double time = eventTimes[i];
+                    double time = eventTimes[i];
 
-					Date d = new Date((long) time);
+                    Date d = new Date((long) time);
 
-					String key = sdf.format(d);
+                    String key = sdf.format(d);
 
-					readings.putString(key, formatString);
+                    readings.putString(key, formatString);
 
-					keys.add(key);
-				}
+                    keys.add(key);
+                }
 
-				if (keys.size() > 0)
-					readings.putStringArrayList("KEY_ORDER", keys);
+                if (keys.size() > 0)
+                    readings.putStringArrayList("KEY_ORDER", keys);
 
-				formatted.putBundle(context.getString(R.string.display_light_readings), readings);
-			}
-			else if (eventTimes.length > 0)
-			{
-				String formatString = String.format(context.getString(R.string.display_light_reading), lux[0]);
+                formatted.putBundle(
+                        context.getString(R.string.display_light_readings),
+                        readings);
+            } else if (eventTimes.length > 0) {
+                String formatString = String.format(
+                        context.getString(R.string.display_light_reading),
+                        lux[0]);
 
-				double time = eventTimes[0];
+                double time = eventTimes[0];
 
-				Date d = new Date((long) time);
+                Date d = new Date((long) time);
 
-				formatted.putString(sdf.format(d), formatString);
-			}
-		}
+                formatted.putString(sdf.format(d), formatString);
+            }
+        }
 
-		return formatted;
-	};
+        return formatted;
+    };
 
-	public long getFrequency()
-	{
-		SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
+    public long getFrequency() {
+        SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
 
-		return Long.parseLong(prefs.getString("config_probe_light_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
-	}
+        return Long.parseLong(prefs.getString(
+                "config_probe_light_built_in_frequency",
+                ContinuousProbe.DEFAULT_FREQUENCY));
+    }
 
-	public String name(Context context)
-	{
-		return LightProbe.NAME;
-	}
+    public String name(Context context) {
+        return LightProbe.NAME;
+    }
 
-	public int getTitleResource()
-	{
-		return R.string.title_light_probe;
-	}
+    public int getTitleResource() {
+        return R.string.title_light_probe;
+    }
 
-	public boolean isEnabled(Context context)
-	{
-    	SharedPreferences prefs = ContinuousProbe.getPreferences(context);
+    public boolean isEnabled(Context context) {
+        SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
-    	this._context = context.getApplicationContext();
+        this._context = context.getApplicationContext();
 
-    	SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-		Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_LIGHT);
+        SensorManager sensors = (SensorManager) context
+                .getSystemService(Context.SENSOR_SERVICE);
+        Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_LIGHT);
 
-        if (super.isEnabled(context))
-        {
-        	if (prefs.getBoolean("config_probe_light_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
-        	{
-            	int frequency = Integer.parseInt(prefs.getString("config_probe_light_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
+        if (super.isEnabled(context)) {
+            if (prefs.getBoolean("config_probe_light_built_in_enabled",
+                    ContinuousProbe.DEFAULT_ENABLED)) {
+                int frequency = Integer.parseInt(prefs.getString(
+                        "config_probe_light_built_in_frequency",
+                        ContinuousProbe.DEFAULT_FREQUENCY));
 
-				if (this._lastFrequency != frequency)
-				{
-					sensors.unregisterListener(this, sensor);
-	                
-	                switch (frequency)
-	                {
-	                	case SensorManager.SENSOR_DELAY_FASTEST:
-		                	sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST, null);
-	                		break;
-	                	case SensorManager.SENSOR_DELAY_UI:
-		                	sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI, null);
-	                		break;
-	                	case SensorManager.SENSOR_DELAY_NORMAL:
-		                	sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL, null);
-	                		break;
-	                	default:
-		                	sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME, null);
-	                		break;
-	                }
-	                
-	                this._lastFrequency = frequency;
-				}
-				
-				return true;
-        	}
-        	else
-        	{
+                if (this._lastFrequency != frequency) {
+                    sensors.unregisterListener(this, sensor);
+
+                    switch (frequency) {
+                    case SensorManager.SENSOR_DELAY_FASTEST:
+                        sensors.registerListener(this, sensor,
+                                SensorManager.SENSOR_DELAY_FASTEST, null);
+                        break;
+                    case SensorManager.SENSOR_DELAY_UI:
+                        sensors.registerListener(this, sensor,
+                                SensorManager.SENSOR_DELAY_UI, null);
+                        break;
+                    case SensorManager.SENSOR_DELAY_NORMAL:
+                        sensors.registerListener(this, sensor,
+                                SensorManager.SENSOR_DELAY_NORMAL, null);
+                        break;
+                    default:
+                        sensors.registerListener(this, sensor,
+                                SensorManager.SENSOR_DELAY_GAME, null);
+                        break;
+                    }
+
+                    this._lastFrequency = frequency;
+                }
+
+                return true;
+            } else {
                 sensors.unregisterListener(this, sensor);
                 this._lastFrequency = -1;
-        	}
-        }
-    	else
-    	{
+            }
+        } else {
             sensors.unregisterListener(this, sensor);
             this._lastFrequency = -1;
-    	}
+        }
 
         return false;
-	
-	}
 
-	protected boolean passesThreshold(SensorEvent event)
-	{
-		long now = System.currentTimeMillis();
-		
-		if (now - this.lastThresholdLookup > 5000)
-		{
-			SharedPreferences prefs = Probe.getPreferences(this._context);
-			this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_light_threshold", LightProbe.DEFAULT_THRESHOLD));
-			
-			this.lastThresholdLookup = now;
-		}
+    }
 
-		double value = event.values[0];
-		
-		boolean passes = false;
+    protected boolean passesThreshold(SensorEvent event) {
+        long now = System.currentTimeMillis();
 
-		if (Math.abs(value - this._lastValue) >= this.lastThreshold)
-			passes = true;
-		
-		if (passes)
-			this._lastValue = value;
-		
-		return passes;
-	}
-	
-	public Map<String, Object> configuration(Context context)
-	{
-		Map<String, Object> map = super.configuration(context);
-		
-		map.put(ContinuousProbe.PROBE_THRESHOLD, this.lastThreshold);
-		
-		return map;
-	}
-	
-	public void updateFromMap(Context context, Map<String, Object> params) 
-	{
-		super.updateFromMap(context, params);
-		
-		if (params.containsKey(ContinuousProbe.PROBE_THRESHOLD))
-		{
-			Object threshold = params.get(ContinuousProbe.PROBE_THRESHOLD);
-			
-			if (threshold instanceof Double)
-			{
-				SharedPreferences prefs = Probe.getPreferences(context);
-				Editor e = prefs.edit();
-				
-				e.putString("config_probe_light_threshold", threshold.toString());
-				e.commit();
-			}
-		}
-	}
+        if (now - this.lastThresholdLookup > 5000) {
+            SharedPreferences prefs = Probe.getPreferences(this._context);
+            this.lastThreshold = Double.parseDouble(prefs.getString(
+                    "config_probe_light_threshold",
+                    LightProbe.DEFAULT_THRESHOLD));
 
-	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
-	{
-		PreferenceScreen screen = super.preferenceScreen(activity);
+            this.lastThresholdLookup = now;
+        }
 
-		ListPreference threshold = new ListPreference(activity);
-		threshold.setKey("config_probe_light_threshold");
-		threshold.setDefaultValue(LightProbe.DEFAULT_THRESHOLD);
-		threshold.setEntryValues(R.array.probe_light_threshold);
-		threshold.setEntries(R.array.probe_light_threshold_labels);
-		threshold.setTitle(R.string.probe_noise_threshold_label);
-		threshold.setSummary(R.string.probe_noise_threshold_summary);
+        double value = event.values[0];
 
-		screen.addPreference(threshold);
+        boolean passes = false;
 
-		return screen;
-	}
-	
-	@SuppressLint("NewApi")
-	public void onSensorChanged(SensorEvent event)
-	{
-		if (this.shouldProcessEvent(event) == false)
-			return;
+        if (Math.abs(value - this._lastValue) >= this.lastThreshold)
+            passes = true;
 
-		double now = System.currentTimeMillis();
+        if (passes)
+            this._lastValue = value;
 
-		if (this.passesThreshold(event))
-		{
-			synchronized(this)
-			{
-				double elapsed = SystemClock.uptimeMillis();
-				double boot = (now - elapsed) * 1000 * 1000;
+        return passes;
+    }
 
-				double timestamp = event.timestamp + boot;
+    public Map<String, Object> configuration(Context context) {
+        Map<String, Object> map = super.configuration(context);
 
-				if (timestamp > now * (1000 * 1000) * 1.1) // Used to detect if sensors already have built-in times...
-					timestamp = event.timestamp;
+        map.put(ContinuousProbe.PROBE_THRESHOLD, this.lastThreshold);
 
-				timeBuffer[bufferIndex] = timestamp / 1000000;
-				valueBuffer[0][bufferIndex] = event.values[0];
+        return map;
+    }
 
-				double[] plotValues = {timeBuffer[0] / 1000, valueBuffer[0][bufferIndex] }; 
-				RealTimeProbeViewActivity.plotIfVisible(this.getTitleResource(), plotValues);
+    public void updateFromMap(Context context, Map<String, Object> params) {
+        super.updateFromMap(context, params);
 
-				bufferIndex += 1;
+        if (params.containsKey(ContinuousProbe.PROBE_THRESHOLD)) {
+            Object threshold = params.get(ContinuousProbe.PROBE_THRESHOLD);
 
-				if (bufferIndex >= timeBuffer.length)
-				{
-					Sensor sensor = event.sensor;
+            if (threshold instanceof Double) {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
 
-					Bundle data = new Bundle();
+                e.putString("config_probe_light_threshold",
+                        threshold.toString());
+                e.commit();
+            }
+        }
+    }
 
-					Bundle sensorBundle = new Bundle();
-					sensorBundle.putFloat("MAXIMUM_RANGE", sensor.getMaximumRange());
-					sensorBundle.putString("NAME", sensor.getName());
-					sensorBundle.putFloat("POWER", sensor.getPower());
-					sensorBundle.putFloat("RESOLUTION", sensor.getResolution());
-					sensorBundle.putInt("TYPE", sensor.getType());
-					sensorBundle.putString("VENDOR", sensor.getVendor());
-					sensorBundle.putInt("VERSION", sensor.getVersion());
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+        PreferenceScreen screen = super.preferenceScreen(activity);
 
-					data.putString("PROBE", this.name(this._context));
+        ListPreference threshold = new ListPreference(activity);
+        threshold.setKey("config_probe_light_threshold");
+        threshold.setDefaultValue(LightProbe.DEFAULT_THRESHOLD);
+        threshold.setEntryValues(R.array.probe_light_threshold);
+        threshold.setEntries(R.array.probe_light_threshold_labels);
+        threshold.setTitle(R.string.probe_noise_threshold_label);
+        threshold.setSummary(R.string.probe_noise_threshold_summary);
 
-					data.putBundle("SENSOR", sensorBundle);
-					data.putDouble("TIMESTAMP", now / 1000);
+        screen.addPreference(threshold);
 
-					data.putDoubleArray("EVENT_TIMESTAMP", timeBuffer);
+        return screen;
+    }
 
-					for (int i = 0; i < fieldNames.length; i++)
-					{
-						double[] values = new double[valueBuffer[i].length];
-						
-						for (int j = 0; j < values.length; j++)
-							values[j] = valueBuffer[i][j];
-						
-						data.putDoubleArray(fieldNames[i], values);
-					}
+    @SuppressLint("NewApi")
+    public void onSensorChanged(SensorEvent event) {
+        if (this.shouldProcessEvent(event) == false)
+            return;
 
-					this.transmitData(this._context, data);
+        double now = System.currentTimeMillis();
 
-					for (int j = 0; j < timeBuffer.length; j++)
-					{
-						Double light = null;
+        if (this.passesThreshold(event)) {
+            synchronized (this) {
+                double elapsed = SystemClock.uptimeMillis();
+                double boot = (now - elapsed) * 1000 * 1000;
 
-						for (int i = 0; i < fieldNames.length; i++)
-						{
-							if (fieldNames[i].equals(LightProbe.LIGHT_KEY))
-								light = Double.valueOf(valueBuffer[i][j]);
-						}
+                double timestamp = event.timestamp + boot;
 
-						if (light != null)
-						{
-							Map<String, Object> values = new HashMap<String, Object>();
+                if (timestamp > now * (1000 * 1000) * 1.1) // Used to detect if
+                                                           // sensors already
+                                                           // have built-in
+                                                           // times...
+                    timestamp = event.timestamp;
 
-							values.put(LightProbe.LIGHT_KEY, light);
+                timeBuffer[bufferIndex] = timestamp / 1000000;
+                valueBuffer[0][bufferIndex] = event.values[0];
 
-							values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[j] / 1000));
+                double[] plotValues = { timeBuffer[0] / 1000,
+                        valueBuffer[0][bufferIndex] };
+                RealTimeProbeViewActivity.plotIfVisible(
+                        this.getTitleResource(), plotValues);
 
-							ProbeValuesProvider.getProvider(this._context).insertValue(this._context, LightProbe.DB_TABLE, this.databaseSchema(), values);
-						}
-					}
+                bufferIndex += 1;
 
-					bufferIndex = 0;
-				}
-			}
-		}
-	}
+                if (bufferIndex >= timeBuffer.length) {
+                    Sensor sensor = event.sensor;
 
-	public String getPreferenceKey()
-	{
-		return "light_built_in";
-	}
+                    Bundle data = new Bundle();
 
-	public String summarizeValue(Context context, Bundle bundle)
-	{
-		double lux = bundle.getDoubleArray(LIGHT_KEY)[0];
-		
-		return String.format(context.getResources().getString(R.string.summary_light_probe), lux);
-	}
+                    Bundle sensorBundle = new Bundle();
+                    sensorBundle.putFloat("MAXIMUM_RANGE",
+                            sensor.getMaximumRange());
+                    sensorBundle.putString("NAME", sensor.getName());
+                    sensorBundle.putFloat("POWER", sensor.getPower());
+                    sensorBundle.putFloat("RESOLUTION", sensor.getResolution());
+                    sensorBundle.putInt("TYPE", sensor.getType());
+                    sensorBundle.putString("VENDOR", sensor.getVendor());
+                    sensorBundle.putInt("VERSION", sensor.getVersion());
 
-	public int getSummaryResource()
-	{
-		return R.string.summary_light_probe_desc;
-	}
+                    data.putString("PROBE", this.name(this._context));
 
-	@Override
-	protected String tableName() 
-	{
-		return LightProbe.DB_TABLE;
-	}
+                    data.putBundle("SENSOR", sensorBundle);
+                    data.putDouble("TIMESTAMP", now / 1000);
+
+                    data.putDoubleArray("EVENT_TIMESTAMP", timeBuffer);
+
+                    for (int i = 0; i < fieldNames.length; i++) {
+                        double[] values = new double[valueBuffer[i].length];
+
+                        for (int j = 0; j < values.length; j++)
+                            values[j] = valueBuffer[i][j];
+
+                        data.putDoubleArray(fieldNames[i], values);
+                    }
+
+                    this.transmitData(this._context, data);
+
+                    for (int j = 0; j < timeBuffer.length; j++) {
+                        Double light = null;
+
+                        for (int i = 0; i < fieldNames.length; i++) {
+                            if (fieldNames[i].equals(LightProbe.LIGHT_KEY))
+                                light = Double.valueOf(valueBuffer[i][j]);
+                        }
+
+                        if (light != null) {
+                            Map<String, Object> values = new HashMap<String, Object>();
+
+                            values.put(LightProbe.LIGHT_KEY, light);
+
+                            values.put(ProbeValuesProvider.TIMESTAMP,
+                                    Double.valueOf(timeBuffer[j] / 1000));
+
+                            ProbeValuesProvider.getProvider(this._context)
+                                    .insertValue(this._context,
+                                            LightProbe.DB_TABLE,
+                                            this.databaseSchema(), values);
+                        }
+                    }
+
+                    bufferIndex = 0;
+                }
+            }
+        }
+    }
+
+    public String getPreferenceKey() {
+        return "light_built_in";
+    }
+
+    public String summarizeValue(Context context, Bundle bundle) {
+        double lux = bundle.getDoubleArray(LIGHT_KEY)[0];
+
+        return String.format(
+                context.getResources().getString(R.string.summary_light_probe),
+                lux);
+    }
+
+    public int getSummaryResource() {
+        return R.string.summary_light_probe_desc;
+    }
+
+    @Override
+    protected String tableName() {
+        return LightProbe.DB_TABLE;
+    }
 }

@@ -27,312 +27,315 @@ import edu.northwestern.cbits.purple_robot_manager.WiFiHelper;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
-public class RunningSoftwareProbe extends Probe
-{
-	private static final String PACKAGE_NAME = "PACKAGE_NAME";
-	private static final String RUNNING_TASKS = "RUNNING_TASKS";
-	private static final String RUNNING_TASK_COUNT = "RUNNING_TASK_COUNT";
-	private static final String PACKAGE_CATEGORY = "PACKAGE_CATEGORY";
-	private static final String TASK_STACK_INDEX = "TASK_STACK_INDEX";
+public class RunningSoftwareProbe extends Probe {
+    private static final String PACKAGE_NAME = "PACKAGE_NAME";
+    private static final String RUNNING_TASKS = "RUNNING_TASKS";
+    private static final String RUNNING_TASK_COUNT = "RUNNING_TASK_COUNT";
+    private static final String PACKAGE_CATEGORY = "PACKAGE_CATEGORY";
+    private static final String TASK_STACK_INDEX = "TASK_STACK_INDEX";
 
-	private static final boolean DEFAULT_ENABLED = true;
+    private static final boolean DEFAULT_ENABLED = true;
 
-	private long _lastCheck = 0;
+    private long _lastCheck = 0;
 
-	public String name(Context context)
-	{
-		return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.RunningSoftwareProbe";
-	}
+    public String name(Context context) {
+        return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.RunningSoftwareProbe";
+    }
 
-	public String title(Context context)
-	{
-		return context.getString(R.string.title_running_software_probe);
-	}
+    public String title(Context context) {
+        return context.getString(R.string.title_running_software_probe);
+    }
 
-	public String probeCategory(Context context)
-	{
-		return context.getResources().getString(R.string.probe_device_info_category);
-	}
+    public String probeCategory(Context context) {
+        return context.getResources().getString(
+                R.string.probe_device_info_category);
+    }
 
-	public void enable(Context context)
-	{
-		SharedPreferences prefs = Probe.getPreferences(context);
-		
-		Editor e = prefs.edit();
-		e.putBoolean("config_probe_running_software_enabled", true);
-		
-		e.commit();
-	}
+    public void enable(Context context) {
+        SharedPreferences prefs = Probe.getPreferences(context);
 
-	public void disable(Context context)
-	{
-		SharedPreferences prefs = Probe.getPreferences(context);
-		
-		Editor e = prefs.edit();
-		e.putBoolean("config_probe_running_software_enabled", false);
-		
-		e.commit();
-	}
+        Editor e = prefs.edit();
+        e.putBoolean("config_probe_running_software_enabled", true);
 
-	public boolean isEnabled(final Context context)
-	{
-		SharedPreferences prefs = Probe.getPreferences(context);
+        e.commit();
+    }
 
-		if (super.isEnabled(context))
-		{
-			final long now = System.currentTimeMillis();
+    public void disable(Context context) {
+        SharedPreferences prefs = Probe.getPreferences(context);
 
-			if (prefs.getBoolean("config_probe_running_software_enabled", RunningSoftwareProbe.DEFAULT_ENABLED))
-			{
-				synchronized(this)
-				{
-					long freq = Long.parseLong(prefs.getString("config_probe_running_software_frequency", Probe.DEFAULT_FREQUENCY));
+        Editor e = prefs.edit();
+        e.putBoolean("config_probe_running_software_enabled", false);
 
-					if (now - this._lastCheck  > freq)
-					{
-						final RunningSoftwareProbe me = this;
-						
-						Runnable r = new Runnable()
-						{
-							@SuppressWarnings("deprecation")
-							public void run() 
-							{
-								Bundle bundle = new Bundle();
-								bundle.putString("PROBE", me.name(context));
-								bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+        e.commit();
+    }
 
-								ActivityManager am = (ActivityManager) context.getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
+    public boolean isEnabled(final Context context) {
+        SharedPreferences prefs = Probe.getPreferences(context);
 
-								List<RunningTaskInfo> tasks = am.getRunningTasks(9999);
+        if (super.isEnabled(context)) {
+            final long now = System.currentTimeMillis();
 
-								if (tasks != null)
-								{
-									ArrayList<Bundle> running = new ArrayList<Bundle>();
-			
-									for (int i = 0; i < tasks.size(); i++)
-									{
-										RunningTaskInfo info = tasks.get(i);
-										
-										Bundle taskBundle = new Bundle();
-			
-										taskBundle.putString(RunningSoftwareProbe.PACKAGE_NAME, info.baseActivity.getPackageName());
-										taskBundle.putInt(RunningSoftwareProbe.TASK_STACK_INDEX, i);
+            if (prefs.getBoolean("config_probe_running_software_enabled",
+                    RunningSoftwareProbe.DEFAULT_ENABLED)) {
+                synchronized (this) {
+                    long freq = Long.parseLong(prefs.getString(
+                            "config_probe_running_software_frequency",
+                            Probe.DEFAULT_FREQUENCY));
 
-										String category = RunningSoftwareProbe.fetchCategory(context, info.baseActivity.getPackageName());
-										taskBundle.putString(RunningSoftwareProbe.PACKAGE_CATEGORY, category);
-										
-										running.add(taskBundle);
-									}
-			
-									bundle.putParcelableArrayList(RunningSoftwareProbe.RUNNING_TASKS, running);
-									bundle.putInt(RunningSoftwareProbe.RUNNING_TASK_COUNT, running.size());
-			
-									me.transmitData(context, bundle);
-								}
-							}
-						};
-						
-						Thread t = new Thread(r);
-						t.start();
+                    if (now - this._lastCheck > freq) {
+                        final RunningSoftwareProbe me = this;
 
-						me._lastCheck = now;
-					}
-				}
+                        Runnable r = new Runnable() {
+                            @SuppressWarnings("deprecation")
+                            public void run() {
+                                Bundle bundle = new Bundle();
+                                bundle.putString("PROBE", me.name(context));
+                                bundle.putLong("TIMESTAMP",
+                                        System.currentTimeMillis() / 1000);
 
-				return true;
-			}
-		}
+                                ActivityManager am = (ActivityManager) context
+                                        .getApplicationContext()
+                                        .getSystemService(
+                                                Context.ACTIVITY_SERVICE);
 
-		return false;
-	}
+                                List<RunningTaskInfo> tasks = am
+                                        .getRunningTasks(9999);
 
-	protected static String fetchCategory(Context context, String packageName) 
-	{
-		SharedPreferences prefs = Probe.getPreferences(context);
-		
-		String key = "category_" + packageName;
-		
-		if (prefs.contains(key))
-			return prefs.getString(key, context.getString(R.string.app_category_unknown));
+                                if (tasks != null) {
+                                    ArrayList<Bundle> running = new ArrayList<Bundle>();
 
-		try
-		{
-			if (prefs.getBoolean("config_restrict_data_wifi", true))
-			{
-				if (WiFiHelper.wifiAvailable(context) == false)
-					return context.getString(R.string.app_category_unknown);
-			}
-		}
-		catch (ClassCastException e)
-		{
-			if (prefs.getString("config_restrict_data_wifi", "true").equalsIgnoreCase("true"))
-			{
-				Editor ed = prefs.edit();
-				ed.putBoolean("config_restrict_data_wifi", true);
-				ed.commit();
-				
-				if (WiFiHelper.wifiAvailable(context) == false)
-					return context.getString(R.string.app_category_unknown);
-			}
-			else
-			{
-				Editor ed = prefs.edit();
-				ed.putBoolean("config_restrict_data_wifi", false);
-				ed.commit();
-			}
-		}
-			
-		String category = null;
-		
-		try 
-		{
-			String url = "https://play.google.com/store/apps/details?id=" + packageName;
-			
-			Document doc = Jsoup.connect(url).get();
+                                    for (int i = 0; i < tasks.size(); i++) {
+                                        RunningTaskInfo info = tasks.get(i);
 
-			Element detailsTab = doc.select("a.category").first();
-			
-			if (detailsTab != null)
-			{
-				Elements spans = detailsTab.select("span");
-				
-				for (Element span : spans)
-				{
-					category = span.text();
-				}
-			}
-		}
-		catch (HttpStatusException ex) 
-		{
-			if (ex.getStatusCode() == 404)
-				category = context.getString(R.string.app_category_bundled);
-			else
-				LogManager.getInstance(context).logException(ex);
-		}
-		catch (IOException ex) 
-		{
-			LogManager.getInstance(context).logException(ex);
-		}
-		
-		if (category == null)
-			category = context.getString(R.string.app_category_unknown);
+                                        Bundle taskBundle = new Bundle();
 
-		Editor e = prefs.edit();
-		
-		e.putString(key, category);
-		
-		e.commit();
-		
-		return category;
-	}
+                                        taskBundle
+                                                .putString(
+                                                        RunningSoftwareProbe.PACKAGE_NAME,
+                                                        info.baseActivity
+                                                                .getPackageName());
+                                        taskBundle
+                                                .putInt(RunningSoftwareProbe.TASK_STACK_INDEX,
+                                                        i);
 
-	public String summarizeValue(Context context, Bundle bundle)
-	{
-		int count = (int) bundle.getDouble(RunningSoftwareProbe.RUNNING_TASK_COUNT);
+                                        String category = RunningSoftwareProbe
+                                                .fetchCategory(
+                                                        context,
+                                                        info.baseActivity
+                                                                .getPackageName());
+                                        taskBundle
+                                                .putString(
+                                                        RunningSoftwareProbe.PACKAGE_CATEGORY,
+                                                        category);
 
-		return String.format(context.getResources().getString(R.string.summary_running_software_probe), count);
-	}
+                                        running.add(taskBundle);
+                                    }
 
-	private Bundle bundleForTaskArray(Context context, ArrayList<Bundle> objects)
-	{
-		Bundle bundle = new Bundle();
-		
-		ArrayList<String> keys = new ArrayList<String>();
+                                    bundle.putParcelableArrayList(
+                                            RunningSoftwareProbe.RUNNING_TASKS,
+                                            running);
+                                    bundle.putInt(
+                                            RunningSoftwareProbe.RUNNING_TASK_COUNT,
+                                            running.size());
 
-		for (int i = 0; i < objects.size(); i++)
-		{
-			Bundle value = objects.get(i);
-			String name = value.getString(RunningSoftwareProbe.PACKAGE_NAME);
+                                    me.transmitData(context, bundle);
+                                }
+                            }
+                        };
 
-			String key = String.format(context.getString(R.string.display_running_task_title), (i + 1));
+                        Thread t = new Thread(r);
+                        t.start();
 
-			keys.add(key);
-			bundle.putString(key, name);
-		}
-		
-		bundle.putStringArrayList("KEY_ORDER", keys);
+                        me._lastCheck = now;
+                    }
+                }
 
-		return bundle;
-	}
+                return true;
+            }
+        }
 
-	@SuppressWarnings("unchecked")
-	public Bundle formattedBundle(Context context, Bundle bundle)
-	{
-		Bundle formatted = super.formattedBundle(context, bundle);
+        return false;
+    }
 
-		ArrayList<Bundle> array = (ArrayList<Bundle>) bundle.get(RunningSoftwareProbe.RUNNING_TASKS);
+    protected static String fetchCategory(Context context, String packageName) {
+        SharedPreferences prefs = Probe.getPreferences(context);
 
-		int count = (int) bundle.getDouble(RunningSoftwareProbe.RUNNING_TASK_COUNT);
+        String key = "category_" + packageName;
 
-		Bundle tasksBundle = this.bundleForTaskArray(context, array);
+        if (prefs.contains(key))
+            return prefs.getString(key,
+                    context.getString(R.string.app_category_unknown));
 
-		formatted.putBundle(String.format(context.getString(R.string.display_running_tasks_title), count), tasksBundle);
+        try {
+            if (prefs.getBoolean("config_restrict_data_wifi", true)) {
+                if (WiFiHelper.wifiAvailable(context) == false)
+                    return context.getString(R.string.app_category_unknown);
+            }
+        } catch (ClassCastException e) {
+            if (prefs.getString("config_restrict_data_wifi", "true")
+                    .equalsIgnoreCase("true")) {
+                Editor ed = prefs.edit();
+                ed.putBoolean("config_restrict_data_wifi", true);
+                ed.commit();
 
-		return formatted;
-	};
+                if (WiFiHelper.wifiAvailable(context) == false)
+                    return context.getString(R.string.app_category_unknown);
+            } else {
+                Editor ed = prefs.edit();
+                ed.putBoolean("config_restrict_data_wifi", false);
+                ed.commit();
+            }
+        }
 
-	public Map<String, Object> configuration(Context context)
-	{
-		Map<String, Object> map = super.configuration(context);
-		
-		SharedPreferences prefs = Probe.getPreferences(context);
+        String category = null;
 
-		long freq = Long.parseLong(prefs.getString("config_probe_running_software_frequency", Probe.DEFAULT_FREQUENCY));
-		
-		map.put(Probe.PROBE_FREQUENCY, freq);
-		
-		return map;
-	}
-	
-	public void updateFromMap(Context context, Map<String, Object> params) 
-	{
-		super.updateFromMap(context, params);
-		
-		if (params.containsKey(Probe.PROBE_FREQUENCY))
-		{
-			Object frequency = params.get(Probe.PROBE_FREQUENCY);
-			
-			if (frequency instanceof Long)
-			{
-				SharedPreferences prefs = Probe.getPreferences(context);
-				Editor e = prefs.edit();
-				
-				e.putString("config_probe_running_software_frequency", frequency.toString());
-				e.commit();
-			}
-		}
-	}
+        try {
+            String url = "https://play.google.com/store/apps/details?id="
+                    + packageName;
 
-	public String summary(Context context) 
-	{
-		return context.getString(R.string.summary_running_software_probe_desc);
-	}
+            Document doc = Jsoup.connect(url).get();
 
-	@SuppressWarnings("deprecation")
-	public PreferenceScreen preferenceScreen(PreferenceActivity activity)
-	{
-		PreferenceManager manager = activity.getPreferenceManager();
+            Element detailsTab = doc.select("a.category").first();
 
-		PreferenceScreen screen = manager.createPreferenceScreen(activity);
-		screen.setTitle(this.title(activity));
-		screen.setSummary(R.string.summary_running_software_probe_desc);
+            if (detailsTab != null) {
+                Elements spans = detailsTab.select("span");
 
-		CheckBoxPreference enabled = new CheckBoxPreference(activity);
-		enabled.setTitle(R.string.title_enable_probe);
-		enabled.setKey("config_probe_running_software_enabled");
-		enabled.setDefaultValue(RunningSoftwareProbe.DEFAULT_ENABLED);
+                for (Element span : spans) {
+                    category = span.text();
+                }
+            }
+        } catch (HttpStatusException ex) {
+            if (ex.getStatusCode() == 404)
+                category = context.getString(R.string.app_category_bundled);
+            else
+                LogManager.getInstance(context).logException(ex);
+        } catch (IOException ex) {
+            LogManager.getInstance(context).logException(ex);
+        }
 
-		screen.addPreference(enabled);
+        if (category == null)
+            category = context.getString(R.string.app_category_unknown);
 
-		ListPreference duration = new ListPreference(activity);
-		duration.setKey("config_probe_running_software_frequency");
-		duration.setEntryValues(R.array.probe_low_frequency_values);
-		duration.setEntries(R.array.probe_low_frequency_labels);
-		duration.setTitle(R.string.probe_frequency_label);
-		duration.setDefaultValue(Probe.DEFAULT_FREQUENCY);
+        Editor e = prefs.edit();
 
-		screen.addPreference(duration);
+        e.putString(key, category);
 
-		return screen;
-	}
+        e.commit();
+
+        return category;
+    }
+
+    public String summarizeValue(Context context, Bundle bundle) {
+        int count = (int) bundle
+                .getDouble(RunningSoftwareProbe.RUNNING_TASK_COUNT);
+
+        return String.format(
+                context.getResources().getString(
+                        R.string.summary_running_software_probe), count);
+    }
+
+    private Bundle bundleForTaskArray(Context context, ArrayList<Bundle> objects) {
+        Bundle bundle = new Bundle();
+
+        ArrayList<String> keys = new ArrayList<String>();
+
+        for (int i = 0; i < objects.size(); i++) {
+            Bundle value = objects.get(i);
+            String name = value.getString(RunningSoftwareProbe.PACKAGE_NAME);
+
+            String key = String.format(
+                    context.getString(R.string.display_running_task_title),
+                    (i + 1));
+
+            keys.add(key);
+            bundle.putString(key, name);
+        }
+
+        bundle.putStringArrayList("KEY_ORDER", keys);
+
+        return bundle;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Bundle formattedBundle(Context context, Bundle bundle) {
+        Bundle formatted = super.formattedBundle(context, bundle);
+
+        ArrayList<Bundle> array = (ArrayList<Bundle>) bundle
+                .get(RunningSoftwareProbe.RUNNING_TASKS);
+
+        int count = (int) bundle
+                .getDouble(RunningSoftwareProbe.RUNNING_TASK_COUNT);
+
+        Bundle tasksBundle = this.bundleForTaskArray(context, array);
+
+        formatted
+                .putBundle(
+                        String.format(
+                                context.getString(R.string.display_running_tasks_title),
+                                count), tasksBundle);
+
+        return formatted;
+    };
+
+    public Map<String, Object> configuration(Context context) {
+        Map<String, Object> map = super.configuration(context);
+
+        SharedPreferences prefs = Probe.getPreferences(context);
+
+        long freq = Long.parseLong(prefs.getString(
+                "config_probe_running_software_frequency",
+                Probe.DEFAULT_FREQUENCY));
+
+        map.put(Probe.PROBE_FREQUENCY, freq);
+
+        return map;
+    }
+
+    public void updateFromMap(Context context, Map<String, Object> params) {
+        super.updateFromMap(context, params);
+
+        if (params.containsKey(Probe.PROBE_FREQUENCY)) {
+            Object frequency = params.get(Probe.PROBE_FREQUENCY);
+
+            if (frequency instanceof Long) {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString("config_probe_running_software_frequency",
+                        frequency.toString());
+                e.commit();
+            }
+        }
+    }
+
+    public String summary(Context context) {
+        return context.getString(R.string.summary_running_software_probe_desc);
+    }
+
+    @SuppressWarnings("deprecation")
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+        PreferenceManager manager = activity.getPreferenceManager();
+
+        PreferenceScreen screen = manager.createPreferenceScreen(activity);
+        screen.setTitle(this.title(activity));
+        screen.setSummary(R.string.summary_running_software_probe_desc);
+
+        CheckBoxPreference enabled = new CheckBoxPreference(activity);
+        enabled.setTitle(R.string.title_enable_probe);
+        enabled.setKey("config_probe_running_software_enabled");
+        enabled.setDefaultValue(RunningSoftwareProbe.DEFAULT_ENABLED);
+
+        screen.addPreference(enabled);
+
+        ListPreference duration = new ListPreference(activity);
+        duration.setKey("config_probe_running_software_frequency");
+        duration.setEntryValues(R.array.probe_low_frequency_values);
+        duration.setEntries(R.array.probe_low_frequency_labels);
+        duration.setTitle(R.string.probe_frequency_label);
+        duration.setDefaultValue(Probe.DEFAULT_FREQUENCY);
+
+        screen.addPreference(duration);
+
+        return screen;
+    }
 }
