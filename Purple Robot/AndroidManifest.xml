@@ -39,6 +39,7 @@
 		android:allowBackup="true"
 		android:persistent="true"
 		tools:replace="android:theme"
+		android:debuggable="true"
 		android:theme="@style/Theme.AppCompat">
 		<uses-library android:name="com.google.android.maps" android:required="false" />
 		<uses-library android:name="android.test.runner" />
