@@ -64,6 +64,7 @@ import edu.northwestern.cbits.purple_robot_manager.activities.WebActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;
+import edu.northwestern.cbits.purple_robot_manager.plugins.DataUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.snapshots.EmptySnapshotException;
 import edu.northwestern.cbits.purple_robot_manager.snapshots.SnapshotManager;
@@ -84,7 +85,7 @@ public abstract class BaseScriptEngine {
     protected Context _context = null;
     private static Map<String, String> packageMap = null;
 
-    private Handler _handler = new Handler(Looper.getMainLooper());
+    private final Handler _handler = new Handler(Looper.getMainLooper());
 
     protected abstract String language();
 
@@ -233,14 +234,17 @@ public abstract class BaseScriptEngine {
         try {
             if (lenient) {
                 TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+                    @Override
                     public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                         return null;
                     }
 
+                    @Override
                     public void checkClientTrusted(X509Certificate[] certs,
                             String authType) {
                     }
 
+                    @Override
                     public void checkServerTrusted(X509Certificate[] certs,
                             String authType) {
                     }
@@ -253,6 +257,7 @@ public abstract class BaseScriptEngine {
 
                 // Create all-trusting host name verifier
                 HostnameVerifier allHostsValid = new HostnameVerifier() {
+                    @Override
                     public boolean verify(String hostname, SSLSession session) {
                         // TODO Auto-generated method stub
                         return true;
@@ -300,6 +305,7 @@ public abstract class BaseScriptEngine {
         final BaseScriptEngine me = this;
 
         this._handler.post(new Runnable() {
+            @Override
             public void run() {
                 if (longDuration)
                     Toast.makeText(me._context, message, Toast.LENGTH_LONG)
@@ -1517,5 +1523,27 @@ public abstract class BaseScriptEngine {
 
     public void disableModel(String jsonUrl) {
         ModelManager.getInstance(this._context).disableModel(jsonUrl);
+    }
+
+    public void setUploadUrl(String uploadUrl) {
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(this._context);
+
+        Editor e = prefs.edit();
+
+        if (uploadUrl != null) {
+            if (Uri.parse(uploadUrl) != null)
+                e.putString(DataUploadPlugin.UPLOAD_URI, uploadUrl);
+        } else
+            e.remove(DataUploadPlugin.UPLOAD_URI);
+
+        e.commit();
+    }
+
+    public String getUploadUrl() {
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(this._context);
+
+        return prefs.getString(DataUploadPlugin.UPLOAD_URI, null);
     }
 }

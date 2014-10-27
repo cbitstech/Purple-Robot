@@ -4,6 +4,7 @@ import junit.framework.Assert;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.mozilla.javascript.NativeJavaObject;
 
 import android.content.Context;
 import android.hardware.SensorManager;
@@ -19,6 +20,7 @@ public class JavascriptTestCase extends RobotTestCase {
         super(context, priority);
     }
 
+    @Override
     public void test() {
         if (this.isSelected(this._context) == false)
             return;
@@ -77,19 +79,50 @@ public class JavascriptTestCase extends RobotTestCase {
                     probeSettings.getInt(Probe.PROBE_FREQUENCY));
             Assert.assertEquals("JST10", probe.getThreshold(),
                     probeSettings.getDouble(ContinuousProbe.PROBE_THRESHOLD));
-        } catch (JSONException e) {
-            e.printStackTrace();
 
+            NativeJavaObject value = (NativeJavaObject) BaseScriptEngine
+                    .runScript(this._context, "PurpleRobot.getUploadUrl();");
+
+            String original = "null";
+
+            if (value != null)
+                original = value.unwrap().toString();
+
+            BaseScriptEngine.runScript(this._context,
+                    "PurpleRobot.setUploadUrl('http://www.example.com/pr/');");
+
+            value = (NativeJavaObject) BaseScriptEngine.runScript(
+                    this._context, "PurpleRobot.getUploadUrl();");
+
+            Assert.assertNotNull("JST11", value);
+            Assert.assertEquals("JST12", value.unwrap().toString(),
+                    "http://www.example.com/pr/");
+
+            BaseScriptEngine.runScript(this._context,
+                    "PurpleRobot.setUploadUrl('" + original + "');");
+
+            value = (NativeJavaObject) BaseScriptEngine.runScript(
+                    this._context, "PurpleRobot.getUploadUrl();");
+
+            if (value == null) {
+
+            } else {
+                Assert.assertEquals("JST13", value.unwrap().toString(),
+                        original);
+            }
+        } catch (JSONException e) {
             Assert.fail("JST1000");
         } catch (InterruptedException e) {
             Assert.fail("JST1001");
         }
     }
 
+    @Override
     public int estimatedMinutes() {
         return 1;
     }
 
+    @Override
     public String name(Context context) {
         return context.getString(R.string.name_javascript_test);
     }
