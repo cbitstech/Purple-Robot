@@ -33,6 +33,8 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 	private static final long WINDOW_SIZE = (long) 4e9; // sensor timestamps are in nanoseconds
 	private static final long WINDOW_SHIFT = (long) 3e9; // sensor timestamps are in nanoseconds
 
+	private final int f_interp = 50;	// (Hz) sampling frequency of interpolation prior to feature extraction
+
 	private FeatureExtractor _accelerometerExtractor = null;
 	private FeatureExtractor _gyroscopeExtractor = null;
 	private FeatureExtractor _barometerExtractor = null;
@@ -182,7 +184,7 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 					{
 						synchronized(me._accelerometerClip)
 						{
-							me._featureValues.putAll(me._accelerometerExtractor.extractFeatures(me._accelerometerClip));
+							me._featureValues.putAll(me._accelerometerExtractor.extractFeatures(me._accelerometerClip, f_interp));
 
 							if (me._accelerometerClip.getValues().size() < 100) 
 								generateTone = true;
@@ -193,7 +195,7 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 					{
 						synchronized(me._gyroscopeClip)
 						{
-							me._featureValues.putAll(me._gyroscopeExtractor.extractFeatures(me._gyroscopeClip));
+							me._featureValues.putAll(me._gyroscopeExtractor.extractFeatures(me._gyroscopeClip, f_interp));
 
 							if (me._gyroscopeClip.getValues().size() < 100) 
 								generateTone = true;
@@ -204,7 +206,7 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 					{
 						synchronized(me._barometerClip)
 						{
-							me._featureValues.putAll(me._barometerExtractor.extractFeatures(me._barometerClip));
+							me._featureValues.putAll(me._barometerExtractor.extractFeatures(me._barometerClip, f_interp));
 
 							if (me._barometerClip.getValues().size() < 100) 
 								generateTone = true;

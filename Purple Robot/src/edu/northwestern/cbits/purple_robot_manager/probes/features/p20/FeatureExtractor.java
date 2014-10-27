@@ -59,7 +59,7 @@ public class FeatureExtractor {
         this._binEdges = Arrays.copyOf(edges, edges.length);
     }
 
-    public Map<Feature, Double> extractFeatures(Clip clp) {
+    public Map<Feature, Double> extractFeatures(Clip clp, int f_interp) {
         HashMap<Feature, Double> features = new HashMap<Feature, Double>();
 
         // build a copy of the clip. because it sometimes crashes suspiciously.
@@ -67,7 +67,7 @@ public class FeatureExtractor {
 
         // Spline Interpolation
         List<double[]> signal = this.interpolate(clip.getValues(),
-                clip.getTimestamps(), 50);
+                clip.getTimestamps(), f_interp);
 
         // Calculating the statistical moments
         double[] mean = new double[this._dimensions];
@@ -485,11 +485,13 @@ public class FeatureExtractor {
         return features;
     }
 
-    private List<double[]> interpolate(List<double[]> signal, List<Long> ts,
-            int freq) {
+    private List<double[]> interpolate(List<double[]> signal, List<Long> ts, int freq) {
+
         List<double[]> signalOut = new ArrayList<double[]>();
 
-        if (ts.size() < 2) // CJK TODO: Ok returning uninitialized signalOut?
+        int N = ts.size();
+
+        if (N < 2) // CJK TODO: Ok returning uninitialized signalOut?
             return signalOut;
 
         double stepSize = (double) 1e9 / (double) freq; // step size in nanosec
@@ -505,63 +507,51 @@ public class FeatureExtractor {
 
         signal2.add(Arrays.copyOf(signal.get(0), signal.get(0).length));
 
-        // TODO: Pull out into own variable: ts.size()
-
-        for (int j = 1; j < ts.size(); j++) {
-            // TODO: Pull out into own variable: ts.get(j)
-            // TODO: Pull out into own variable: t2.size()
-
+        for (int j = 1; j < N; j++) {
             if (ts.get(j) > t2.get(t2.size() - 1)) {
                 t2.add(ts.get(j));
-
-                // TODO: Pull out into own variable: signal.get(j)
-
                 signal2.add(Arrays.copyOf(signal.get(j), signal.get(j).length));
-            } else {
-                Log.e("PR", "FeatureExtractor: Non-increasing timestamp found!");
+            } 
+            else {
+                Log.e("PR", "FeatureExtractor: Non-incremental timestamp found and removed!");
             }
         }
 
-        // converting time instances to double and getting rid of big numbers
+        int N2 = signal2.size();
+
+        // converting time instances to double
         long tStart = t2.get(0);
-        double[] tDouble = new double[signal2.size()];
+        double[] tDouble = new double[N2];
 
-        // TODO: Pull out into own variable: signal2.size()
-
-        for (int j = 0; j < signal2.size(); j++)
+        // getting rid of big numbers
+        for (int j = 0; j < N2; j++)
             tDouble[j] = t2.get(j) - tStart;
 
-        // calculating the number of interpolated samples
-        int nSamp = (int) Math.floor(tDouble[signal2.size() - 1] / stepSize);
+        // calculating the number of samples to be interpolated
+        int nSamp = (int) Math.floor(tDouble[N2 - 1] / stepSize);
 
-        // creating new, regular time instances
-
-        // TODO: Reminder - pull out into own variable: signal2.size()
-
+        // creating new regular time instances for interpolation
         double[] tNew = new double[nSamp];
         for (int j = 0; j < nSamp; j++)
-            tNew[j] = tDouble[signal2.size() - 1] - (double) j * stepSize;
+            tNew[j] = tDouble[N2 - 1] - (double) j * stepSize;
 
         double[][] signalOutTemp = new double[nSamp][this._dimensions];
 
         for (int i = 0; i < this._dimensions; i++) {
-            // building a separate array for the current axis
-            double[] signal1D = new double[signal2.size()];
-
-            for (int j = 0; j < signal2.size(); j++)
+            
+            // building a 1D array for the current axis
+            double[] signal1D = new double[N2];
+            for (int j = 0; j < N2; j++)
                 signal1D[j] = signal2.get(j)[i];
 
             // spline interpolation
             SplineInterpolator interp = new SplineInterpolator();
-            PolynomialSplineFunction func = interp.interpolate(tDouble,
-                    signal1D);
+            PolynomialSplineFunction func = interp.interpolate(tDouble, signal1D);
 
             // interpolating onto new instances
             for (int j = 0; j < nSamp; j++)
                 signalOutTemp[j][i] = func.value(tNew[j]);
         }
-
-        // TODO: Pull out into own variable: signalOut.size()
 
         for (int i = 0; i < nSamp; i++) {
             signalOut.add(new double[this._dimensions]);
@@ -572,11 +562,12 @@ public class FeatureExtractor {
     }
 
     private List<double[]> getDiff(List<double[]> signal) {
+        
         List<double[]> signalDiff = new ArrayList<double[]>();
 
-        // TODO: Pull out into own variable: signal.size()
+        int N = signal.size();
 
-        for (int i = 0; i < signal.size() - 1; i++) {
+        for (int i = 0; i < N - 1; i++) {
             double[] sig = signal.get(i);
             double[] sigNext = signal.get(i + 1);
 
@@ -591,13 +582,13 @@ public class FeatureExtractor {
         return signalDiff;
     }
 
-    private List<double[]> getZScore(List<double[]> signal, double[] mean,
-            double[] std) {
+    private List<double[]> getZScore(List<double[]> signal, double[] mean, double[] std) {
+        
         List<double[]> signalZScore = new ArrayList<double[]>();
 
-        // TODO: Pull out into own variable: signal.size()
+        int N = signal.size();
 
-        for (int i = 0; i < signal.size(); i++) {
+        for (int i = 0; i < N; i++) {
             double[] sig = signal.get(i);
             double[] sigZScore = new double[this._dimensions];
 
@@ -617,15 +608,19 @@ public class FeatureExtractor {
     // each element accounting for one dimension
 
     private double[] getMoments(List<double[]> signal, int axis) {
-        double[][] signalArray = new double[signal.size()][this._dimensions];
+        
+        int N = signal.size();
 
-        for (int i = 0; i < signalArray.length; i++) {
+        double[][] signalArray = new double[N][this._dimensions];
+
+        for (int i = 0; i < N; i++) {
             signalArray[i] = signal.get(i);
         }
 
-        if (signalArray.length < 2) {
+        // Calculation of moments is not possible with less than 2 samples. Returning zeros in that case.
+        if (N < 2) {
+            
             double[] out = { 0.0, 0.0, 0.0, 0.0 };
-
             return out;
         }
 
@@ -637,10 +632,10 @@ public class FeatureExtractor {
         // sum += value[axis];
         // CJK TODO: Solve mystery ^
 
-        for (int i = 0; i < signalArray.length; i++)
+        for (int i = 0; i < N; i++)
             sum += signalArray[i][axis];
 
-        double mean = sum / signalArray.length;
+        double mean = sum / N;
 
         double m2 = 0.0;
         double m3 = 0.0;
@@ -650,7 +645,7 @@ public class FeatureExtractor {
         double t3 = 0.0;
         double t4 = 0.0;
 
-        for (int i = 0; i < signalArray.length; i++) {
+        for (int i = 0; i < N; i++) {
             t2 = (signalArray[i][axis] - mean) * (signalArray[i][axis] - mean);
             m2 += t2;
 
@@ -661,31 +656,33 @@ public class FeatureExtractor {
             m4 += t4;
         }
 
-        double std = (double) Math.sqrt(m2 / (signalArray.length - 1)); // unbiased
+        double std = (double) Math.sqrt(m2 / (N - 1)); // unbiased estimator
 
-        m2 /= signalArray.length;
-        m3 /= signalArray.length;
-        m4 /= signalArray.length;
+        m2 /= N;
+        m3 /= N;
+        m4 /= N;
 
-        double skewness = m3 / (std * std * std); // unbiased
+        double skewness = m3 / (std * std * std); // unbiased estimator
 
-        double kurtosis = m4 / (m2 * m2) - 3; // unbiased
+        double kurtosis = m4 / (m2 * m2) - 3; // unbiased estimator
 
         double out[] = { mean, std, skewness, kurtosis };
         return out;
+
     }
 
     // overall mean of squares
     private double getOverallMean(List<double[]> signal) {
-        double[][] signalArray = new double[signal.size()][this._dimensions];
+        
+        int N = signal.size();
 
-        for (int i = 0; i < signalArray.length; i++) {
+        double[][] signalArray = new double[N][this._dimensions];
+
+        for (int i = 0; i < N; i++) {
             signalArray[i] = signal.get(i);
         }
 
         double ms = 0;
-
-        // TODO: Pull out into own variable: signal.size()
 
         /*
          * for (int i = 0; i < signal.size(); i++) { for (int j = 0; j <
@@ -693,39 +690,40 @@ public class FeatureExtractor {
          * this._dimensions; }
          */
 
-        for (int i = 0; i < signalArray.length; i++) {
+        for (int i = 0; i < N; i++) {
             for (int j = 0; j < this._dimensions; j++)
                 ms += signalArray[i][j] * signalArray[i][j] / this._dimensions;
         }
 
-        ms /= signalArray.length;
+        ms /= N;
 
         return ms;
     }
 
     private double getRMS(List<double[]> signal, int axis) {
+
+        int N = signal.size();
+
         double rms = 0;
 
-        // TODO: Pull out into own variable: signal.size()
-
-        for (int i = 0; i < signal.size(); i++)
+        for (int i = 0; i < N; i++)
             rms += signal.get(i)[axis] * signal.get(i)[axis];
 
-        rms /= (double) signal.size();
+        rms /= (double) N;
 
         return rms;
     }
 
     private double getMax(List<double[]> signal, int axis) {
-        if (signal.size() == 0) // CJK Question / TODO: Is this always the right
-                                // answer?
+
+        int N = signal.size();
+
+        if (N == 0) // CJK Question / TODO: Is this always the right answer?
             return 0;
 
         double max = signal.get(0)[axis];
 
-        // TODO: Pull out into own variable: signal.size()
-
-        for (int i = 1; i < signal.size(); i++) {
+        for (int i = 1; i < N; i++) {
             if (max < signal.get(i)[axis])
                 max = signal.get(i)[axis];
         }
@@ -734,15 +732,15 @@ public class FeatureExtractor {
     }
 
     private double getMin(List<double[]> signal, int axis) {
-        if (signal.size() == 0) // CJK Question / TODO: Is this always the right
-                                // answer?
+
+        int N = signal.size();
+
+        if (N == 0) // CJK Question / TODO: Is this always the right answer?
             return 0;
 
         double min = signal.get(0)[axis];
 
-        // TODO: Pull out into own variable: signal.size()
-
-        for (int i = 1; i < signal.size(); i++) {
+        for (int i = 1; i < N; i++) {
             if (min > signal.get(i)[axis])
                 min = signal.get(i)[axis];
         }
@@ -751,65 +749,62 @@ public class FeatureExtractor {
     }
 
     private double[] get3DInnerProds(List<double[]> signal) {
+        
         // This feature only works for 3D signals (acceleration, magnetic field,
         // etc).
 
-        double[] innerProds = new double[3];
+        double[] innerProds = {0, 0, 0};
 
+        // double-check for the dimension - returning zeros if it is different from three
         if (this._dimensions != 3)
-            return innerProds; // double-check for dimension
+            return innerProds;
 
-        // CJK Question / TODO: what's in the uninitialized double above^?
+        int N = signal.size();
 
-        innerProds[0] = 0;
-
-        // TODO: Pull out into own variable: signal.size()
-
-        for (int j = 0; j < signal.size(); j++)
+        for (int j = 0; j < N; j++)
             innerProds[0] += signal.get(j)[0] * signal.get(j)[1];
-        innerProds[0] /= (double) signal.size(); // mean
+        innerProds[0] /= (double) N; // mean
 
-        innerProds[1] = 0;
-        for (int j = 0; j < signal.size(); j++)
+        for (int j = 0; j < N; j++)
             innerProds[1] += signal.get(j)[1] * signal.get(j)[2];
-        innerProds[1] /= (double) signal.size(); // mean
+        innerProds[1] /= (double) N; // mean
 
-        innerProds[2] = 0;
-        for (int j = 0; j < signal.size(); j++)
+        for (int j = 0; j < N; j++)
             innerProds[2] += signal.get(j)[2] * signal.get(j)[0];
-        innerProds[2] /= (double) signal.size(); // mean
+        innerProds[2] /= (double) N; // mean
 
         return innerProds;
     }
 
     private double[] get3DNormInnerProds(List<double[]> signal) {
-        double[] innerProds = new double[3];
+        
+        double[] innerProds = {0, 0, 0};
 
+        // double-check for the dimension - returning zeros if it is different from three
         if (this._dimensions != 3)
-            return innerProds; // double-check for dimension
+            return innerProds; 
 
-        double[] magnitude = new double[signal.size()];
+        int N = signal.size();
 
-        for (int j = 0; j < signal.size(); j++) {
+        double[] magnitude = new double[N];
+
+        for (int j = 0; j < N; j++) {
             magnitude[j] = (signal.get(j)[0] * signal.get(j)[0])
                     + (signal.get(j)[1] * signal.get(j)[1])
                     + (signal.get(j)[2] * signal.get(j)[2]);
         }
 
-        innerProds[0] = 0;
-        for (int j = 0; j < signal.size(); j++)
+        for (int j = 0; j < N; j++)
             innerProds[0] += signal.get(j)[0] * signal.get(j)[1] / magnitude[j];
-        innerProds[0] /= (double) signal.size(); // mean
+        innerProds[0] /= (double) N; // mean
 
-        innerProds[1] = 0;
-        for (int j = 0; j < signal.size(); j++)
+        for (int j = 0; j < N; j++)
             innerProds[1] += signal.get(j)[1] * signal.get(j)[2] / magnitude[j];
-        innerProds[1] /= (double) signal.size(); // mean
+        innerProds[1] /= (double) N; // mean
 
-        innerProds[2] = 0;
-        for (int j = 0; j < signal.size(); j++)
+        for (int j = 0; j < N; j++)
             innerProds[2] += signal.get(j)[2] * signal.get(j)[0] / magnitude[j];
-        innerProds[2] /= (double) signal.size(); // mean
+        innerProds[2] /= (double) N; // mean
 
         return innerProds;
     }

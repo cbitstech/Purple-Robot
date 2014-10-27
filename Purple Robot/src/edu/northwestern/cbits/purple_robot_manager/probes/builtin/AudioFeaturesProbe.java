@@ -19,6 +19,9 @@ import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
+import android.util.Log;    // added by Sohrob
+
+
 public class AudioFeaturesProbe extends Probe {
     private static final boolean DEFAULT_ENABLED = false;
     private static final String ENABLED_KEY = "config_probe_audio_feature_enabled";
@@ -76,7 +79,7 @@ public class AudioFeaturesProbe extends Probe {
                                 AudioFormat.CHANNEL_CONFIGURATION_MONO,
                                 AudioFormat.ENCODING_PCM_16BIT);
 
-                        AudioRecord recorder = null;
+                        AudioRecord recorder = null;  // Sohrob: Is it OK to re-initialize every time?
 
                         int[] rates = new int[] { 44100, 22050, 11025, 8000 };
 
@@ -88,8 +91,10 @@ public class AudioFeaturesProbe extends Probe {
                                         AudioFormat.ENCODING_PCM_16BIT,
                                         bufferSize);
 
-                                if (newRecorder.getState() == AudioRecord.STATE_INITIALIZED)
+                                if (newRecorder.getState() == AudioRecord.STATE_INITIALIZED) {
                                     recorder = newRecorder;
+                                    Log.e("INFO","Audio recorder initialized at "+rate+" Hz."); // added by Sohrob
+                                }
                                 else
                                     newRecorder.release();
                             }

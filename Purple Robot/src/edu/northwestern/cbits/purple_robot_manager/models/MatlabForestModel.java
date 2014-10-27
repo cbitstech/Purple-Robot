@@ -18,6 +18,11 @@ import edu.northwestern.cbits.purple_robot_manager.models.trees.TreeNode.TreeNod
 import edu.northwestern.cbits.purple_robot_manager.models.trees.parsers.TreeNodeParser;
 import edu.northwestern.cbits.purple_robot_manager.models.trees.parsers.TreeNodeParser.ParserNotFound;
 
+import android.media.ToneGenerator; // added by Sohrob
+import android.media.AudioManager;  // added by Sohrob
+import android.util.Log;    // added by Sohrob
+
+
 public class MatlabForestModel extends WekaTreeModel {
     public static final String TYPE = "matlab-forest";
 
@@ -96,6 +101,20 @@ public class MatlabForestModel extends WekaTreeModel {
                 }
             }
         }
+
+        // added by Sohrob -- TEMPORARY **********************
+        // Apparrently sometimes maxPrediction is null!!!
+        Log.e("INF", "Class: "+maxPrediction);
+        if ((maxPrediction!=null)&&(maxPrediction.equals("1"))) {
+            try {
+                ToneGenerator toneGenerator = new ToneGenerator(AudioManager.STREAM_ALARM, 50);
+                toneGenerator.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 200);
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        // ****************************************************
 
         HashMap<String, Object> prediction = new HashMap<String, Object>();
         prediction.put(LeafNode.PREDICTION, maxPrediction);
