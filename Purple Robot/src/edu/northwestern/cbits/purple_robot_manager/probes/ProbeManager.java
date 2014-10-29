@@ -49,6 +49,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RunningSoftwar
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.SaintProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ScreenProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ShionProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.SignificantMotionProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.SoftwareInformationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.StepCounterProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TelephonyProbe;
@@ -189,6 +190,11 @@ public class ProbeManager {
                 BatteryProbe battery = (BatteryProbe) probe;
 
                 if (battery.name(context).equalsIgnoreCase(name))
+                    found = true;
+            } else if (probe instanceof SignificantMotionProbe) {
+                SignificantMotionProbe motion = (SignificantMotionProbe) probe;
+
+                if (motion.name(context).equalsIgnoreCase(name))
                     found = true;
             } else if (probe instanceof AccelerometerBasicStatisticsFeature) {
                 AccelerometerBasicStatisticsFeature stats = (AccelerometerBasicStatisticsFeature) probe;
