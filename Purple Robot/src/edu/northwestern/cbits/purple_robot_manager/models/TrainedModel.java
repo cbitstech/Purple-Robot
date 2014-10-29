@@ -17,7 +17,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.net.Uri;
-
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -45,6 +44,7 @@ public abstract class TrainedModel extends Model {
      * @see edu.northwestern.cbits.purple_robot_manager.models.Model#uri()
      */
 
+    @Override
     public Uri uri() {
         return this._source;
     }
@@ -57,6 +57,7 @@ public abstract class TrainedModel extends Model {
         final TrainedModel me = this;
 
         Runnable r = new Runnable() {
+            @Override
             public void run() {
                 String hash = EncryptionManager.getInstance().createHash(
                         context, me._source.toString());
@@ -173,6 +174,7 @@ public abstract class TrainedModel extends Model {
      * @see edu.northwestern.cbits.purple_robot_manager.models.Model#title(android.content.Context)
      */
 
+    @Override
     public String title(Context context) {
         return this._name;
     }
@@ -184,6 +186,7 @@ public abstract class TrainedModel extends Model {
      * @see edu.northwestern.cbits.purple_robot_manager.models.Model#summary(android.content.Context)
      */
 
+    @Override
     public String summary(Context context) {
         return context.getString(R.string.summary_model_unknown);
     }
@@ -195,6 +198,7 @@ public abstract class TrainedModel extends Model {
      * @see edu.northwestern.cbits.purple_robot_manager.models.Model#getPreferenceKey()
      */
 
+    @Override
     public String getPreferenceKey() {
         return this._sourceHash;
     }
@@ -206,6 +210,7 @@ public abstract class TrainedModel extends Model {
      * @see edu.northwestern.cbits.purple_robot_manager.models.Model#name(android.content.Context)
      */
 
+    @Override
     public String name(Context context) {
         return this._source.toString();
     }
@@ -220,18 +225,20 @@ public abstract class TrainedModel extends Model {
      *      java.util.Map)
      */
 
+    @Override
     public void predict(final Context context,
             final Map<String, Object> snapshot) {
+
         if (this._inited == false || this.enabled(context) == false)
             return;
 
         long now = System.currentTimeMillis();
 
         if (now - this._lastCheck < 1000) {
-            this._lastCheck = now;
-
             return;
         }
+
+        this._lastCheck = now;
 
         for (String key : this._featureMap.keySet()) {
             String newKey = this._featureMap.get(key);
@@ -246,6 +253,7 @@ public abstract class TrainedModel extends Model {
         final TrainedModel me = this;
 
         Runnable r = new Runnable() {
+            @Override
             @SuppressWarnings("unchecked")
             public void run() {
                 Object value = me.evaluateModel(context, snapshot);

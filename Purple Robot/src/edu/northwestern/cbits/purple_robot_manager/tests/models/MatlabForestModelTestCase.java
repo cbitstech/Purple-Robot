@@ -15,6 +15,7 @@ public class MatlabForestModelTestCase extends RobotTestCase {
         super(context, priority);
     }
 
+    @Override
     public void test() {
         if (this.isSelected(this._context) == false)
             return;
@@ -48,13 +49,15 @@ public class MatlabForestModelTestCase extends RobotTestCase {
                 model.mappedFeatureName("p20featuresprobe_accx_fft_1"));
 
         // Commented out to test P20 feature extractor...
-        models.deleteModel(MatlabForestModelTestCase.MODEL_URI);
+        // models.deleteModel(MatlabForestModelTestCase.MODEL_URI);
     }
 
+    @Override
     public int estimatedMinutes() {
         return 1;
     }
 
+    @Override
     public String name(Context context) {
         return context.getString(R.string.name_matlab_forest_model_test);
     }
