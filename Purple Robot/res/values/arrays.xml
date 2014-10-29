@@ -65,6 +65,7 @@
         <item>builtin.GeomagneticRotationProbe</item>
         <item>builtin.AmbientHumidityProbe</item>
         <item>builtin.ActivityDetectionProbe</item>
+        <item>builtin.SignificantMotionProbe</item>
         
         <item>builtin.FacebookProbe</item>
         <item>builtin.FacebookEventsProbe</item>
