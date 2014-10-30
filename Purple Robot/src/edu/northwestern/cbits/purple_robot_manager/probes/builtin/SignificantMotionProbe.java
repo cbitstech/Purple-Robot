@@ -62,45 +62,46 @@ public class SignificantMotionProbe extends Probe {
     public boolean isEnabled(final Context context) {
         final SignificantMotionProbe me = this;
 
-        if (this._trigger == null) {
-            this._trigger = new TriggerEventListener() {
-                @Override
-                public void onTrigger(TriggerEvent event) {
-                    Sensor sensor = event.sensor;
-
-                    double now = System.currentTimeMillis();
-
-                    double elapsed = SystemClock.uptimeMillis();
-                    double boot = (now - elapsed) * 1000 * 1000;
-
-                    double timestamp = event.timestamp + boot;
-
-                    Bundle data = new Bundle();
-
-                    Bundle sensorBundle = new Bundle();
-                    sensorBundle.putFloat("MAXIMUM_RANGE",
-                            sensor.getMaximumRange());
-                    sensorBundle.putString("NAME", sensor.getName());
-                    sensorBundle.putFloat("POWER", sensor.getPower());
-                    sensorBundle.putFloat("RESOLUTION", sensor.getResolution());
-                    sensorBundle.putInt("TYPE", sensor.getType());
-                    sensorBundle.putString("VENDOR", sensor.getVendor());
-                    sensorBundle.putInt("VERSION", sensor.getVersion());
-
-                    data.putString("PROBE", me.name(context));
-
-                    data.putBundle("SENSOR", sensorBundle);
-                    data.putDouble("TIMESTAMP", now / 1000);
-                    data.putDouble("EVENT_TIMESTAMP", timestamp);
-
-                    me.transmitData(me._context, data);
-
-                    me.isEnabled(context);
-                }
-            };
-        }
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            if (this._trigger == null) {
+                this._trigger = new TriggerEventListener() {
+                    @Override
+                    public void onTrigger(TriggerEvent event) {
+                        Sensor sensor = event.sensor;
+
+                        double now = System.currentTimeMillis();
+
+                        double elapsed = SystemClock.uptimeMillis();
+                        double boot = (now - elapsed) * 1000 * 1000;
+
+                        double timestamp = event.timestamp + boot;
+
+                        Bundle data = new Bundle();
+
+                        Bundle sensorBundle = new Bundle();
+                        sensorBundle.putFloat("MAXIMUM_RANGE",
+                                sensor.getMaximumRange());
+                        sensorBundle.putString("NAME", sensor.getName());
+                        sensorBundle.putFloat("POWER", sensor.getPower());
+                        sensorBundle.putFloat("RESOLUTION",
+                                sensor.getResolution());
+                        sensorBundle.putInt("TYPE", sensor.getType());
+                        sensorBundle.putString("VENDOR", sensor.getVendor());
+                        sensorBundle.putInt("VERSION", sensor.getVersion());
+
+                        data.putString("PROBE", me.name(context));
+
+                        data.putBundle("SENSOR", sensorBundle);
+                        data.putDouble("TIMESTAMP", now / 1000);
+                        data.putDouble("EVENT_TIMESTAMP", timestamp);
+
+                        me.transmitData(me._context, data);
+
+                        me.isEnabled(context);
+                    }
+                };
+            }
+
             SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
             this._context = context.getApplicationContext();

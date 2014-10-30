@@ -213,6 +213,10 @@ public abstract class BaseScriptEngine {
                 this._context, key);
     }
 
+    public void vibrate(String pattern) {
+        this.vibrate(pattern, false);
+    }
+
     public void vibrate(String pattern, boolean repeats) {
         Intent intent = new Intent(ManagerService.HAPTIC_PATTERN_INTENT);
         intent.putExtra(ManagerService.HAPTIC_PATTERN_NAME, pattern);
