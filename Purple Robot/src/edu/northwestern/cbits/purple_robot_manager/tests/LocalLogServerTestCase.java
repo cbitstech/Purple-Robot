@@ -14,6 +14,7 @@ public class LocalLogServerTestCase extends RobotTestCase {
         super(context, priority);
     }
 
+    @Override
     public void test() {
         if (this.isSelected(this._context) == false)
             return;
@@ -69,10 +70,12 @@ public class LocalLogServerTestCase extends RobotTestCase {
         }
     }
 
+    @Override
     public int estimatedMinutes() {
         return 1;
     }
 
+    @Override
     public String name(Context context) {
         return context.getString(R.string.name_local_log_server_test);
     }

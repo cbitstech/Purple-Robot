@@ -19,7 +19,6 @@ import android.os.SystemClock;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
-
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.RealTimeProbeViewActivity;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
@@ -36,6 +35,8 @@ public class AccelerometerProbe extends Continuous3DProbe implements
 
     public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.AccelerometerProbe";
 
+    private static final String PROBE_ACCEL_THRESHOLD = "config_probe_accelerometer_threshold";
+
     private long lastThresholdLookup = 0;
     private double lastThreshold = 0.5;
 
@@ -43,9 +44,9 @@ public class AccelerometerProbe extends Continuous3DProbe implements
     private double _lastY = Double.MAX_VALUE;
     private double _lastZ = Double.MAX_VALUE;
 
-    private float valueBuffer[][] = new float[3][BUFFER_SIZE];
-    private int accuracyBuffer[] = new int[BUFFER_SIZE];
-    private double timeBuffer[] = new double[BUFFER_SIZE];
+    private final float valueBuffer[][] = new float[3][BUFFER_SIZE];
+    private final int accuracyBuffer[] = new int[BUFFER_SIZE];
+    private final double timeBuffer[] = new double[BUFFER_SIZE];
 
     private Map<String, String> _schema = null;
 
@@ -53,10 +54,12 @@ public class AccelerometerProbe extends Continuous3DProbe implements
 
     private int bufferIndex = 0;
 
+    @Override
     public String probeCategory(Context context) {
         return context.getString(R.string.probe_sensor_category);
     }
 
+    @Override
     public Map<String, String> databaseSchema() {
         if (this._schema == null) {
             this._schema = new HashMap<String, String>();
@@ -72,6 +75,7 @@ public class AccelerometerProbe extends Continuous3DProbe implements
         return this._schema;
     }
 
+    @Override
     public Bundle formattedBundle(Context context, Bundle bundle) {
         Bundle formatted = super.formattedBundle(context, bundle);
 
@@ -127,6 +131,7 @@ public class AccelerometerProbe extends Continuous3DProbe implements
         return formatted;
     };
 
+    @Override
     public long getFrequency() {
         SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
 
@@ -135,14 +140,17 @@ public class AccelerometerProbe extends Continuous3DProbe implements
                 ContinuousProbe.DEFAULT_FREQUENCY));
     }
 
+    @Override
     public String name(Context context) {
         return AccelerometerProbe.NAME;
     }
 
+    @Override
     public int getTitleResource() {
         return R.string.title_accelerometer_probe;
     }
 
+    @Override
     public boolean isEnabled(Context context) {
         SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
@@ -201,6 +209,7 @@ public class AccelerometerProbe extends Continuous3DProbe implements
         return false;
     }
 
+    @Override
     protected boolean passesThreshold(SensorEvent event) {
         long now = System.currentTimeMillis();
 
@@ -208,7 +217,7 @@ public class AccelerometerProbe extends Continuous3DProbe implements
             SharedPreferences prefs = Probe.getPreferences(this._context);
 
             this.lastThreshold = Double.parseDouble(prefs.getString(
-                    "config_probe_accelerometer_threshold",
+                    AccelerometerProbe.PROBE_ACCEL_THRESHOLD,
                     AccelerometerProbe.DEFAULT_THRESHOLD));
 
             this.lastThresholdLookup = now;
@@ -236,6 +245,7 @@ public class AccelerometerProbe extends Continuous3DProbe implements
         return passes;
     }
 
+    @Override
     public Map<String, Object> configuration(Context context) {
         Map<String, Object> map = super.configuration(context);
 
@@ -244,6 +254,7 @@ public class AccelerometerProbe extends Continuous3DProbe implements
         return map;
     }
 
+    @Override
     public void updateFromMap(Context context, Map<String, Object> params) {
         super.updateFromMap(context, params);
 
@@ -261,11 +272,12 @@ public class AccelerometerProbe extends Continuous3DProbe implements
         }
     }
 
+    @Override
     public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
         PreferenceScreen screen = super.preferenceScreen(activity);
 
         ListPreference threshold = new ListPreference(activity);
-        threshold.setKey("config_probe_accelerometer_threshold");
+        threshold.setKey(AccelerometerProbe.PROBE_ACCEL_THRESHOLD);
         threshold.setDefaultValue(AccelerometerProbe.DEFAULT_THRESHOLD);
         threshold.setEntryValues(R.array.probe_accelerometer_threshold);
         threshold.setEntries(R.array.probe_accelerometer_threshold_labels);
@@ -277,6 +289,7 @@ public class AccelerometerProbe extends Continuous3DProbe implements
         return screen;
     }
 
+    @Override
     public void onSensorChanged(SensorEvent event) {
         if (this.shouldProcessEvent(event) == false)
             return;
@@ -385,10 +398,12 @@ public class AccelerometerProbe extends Continuous3DProbe implements
         }
     }
 
+    @Override
     public String getPreferenceKey() {
         return "accelerometer_built_in";
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle) {
         double xReading = bundle.getDoubleArray("X")[0];
         double yReading = bundle.getDoubleArray("Y")[0];
@@ -400,10 +415,12 @@ public class AccelerometerProbe extends Continuous3DProbe implements
                 yReading, zReading);
     }
 
+    @Override
     public int getSummaryResource() {
         return R.string.summary_accelerometer_probe_desc;
     }
 
+    @Override
     protected String tableName() {
         return AccelerometerProbe.DB_TABLE;
     }
@@ -412,6 +429,14 @@ public class AccelerometerProbe extends Continuous3DProbe implements
         SharedPreferences prefs = Probe.getPreferences(this._context);
 
         return Double.parseDouble(prefs.getString(
-                "config_probe_accelerometer_threshold", "-1"));
+                AccelerometerProbe.PROBE_ACCEL_THRESHOLD, "-1"));
+    }
+
+    public void setThreshold(double threshold) {
+        SharedPreferences prefs = Probe.getPreferences(this._context);
+
+        Editor e = prefs.edit();
+        e.putString(AccelerometerProbe.PROBE_ACCEL_THRESHOLD, "0.0");
+        e.commit();
     }
 }
