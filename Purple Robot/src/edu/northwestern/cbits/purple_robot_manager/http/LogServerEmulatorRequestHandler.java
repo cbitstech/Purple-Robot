@@ -16,14 +16,13 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
 public class LogServerEmulatorRequestHandler implements HttpRequestHandler {
     public static final String LOG_COUNT = "edu.northwestern.cbits.purple_robot_manager.logging.LogManager.LOG_COUNT";
@@ -36,6 +35,7 @@ public class LogServerEmulatorRequestHandler implements HttpRequestHandler {
         this._context = context;
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public void handle(HttpRequest request, HttpResponse response,
             HttpContext argument) throws HttpException, IOException {

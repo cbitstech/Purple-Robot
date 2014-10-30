@@ -16,7 +16,6 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
-
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
@@ -36,6 +35,9 @@ public abstract class Probe {
 
     public static final String PROBE_ENABLED = "enabled";
     public static final String PROBE_NAME = "name";
+
+    protected static final String BUNDLE_PROBE = "PROBE";
+    protected static final String BUNDLE_TIMESTAMP = "TIMESTAMP";
 
     public abstract String name(Context context);
 

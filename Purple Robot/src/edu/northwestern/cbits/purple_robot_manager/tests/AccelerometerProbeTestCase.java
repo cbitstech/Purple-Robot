@@ -17,6 +17,7 @@ public class AccelerometerProbeTestCase extends RobotTestCase {
         super(context, priority);
     }
 
+    @Override
     public void test() {
         if (this.isSelected(this._context) == false)
             return;
@@ -27,6 +28,7 @@ public class AccelerometerProbeTestCase extends RobotTestCase {
         values.put("end", 0D);
 
         BroadcastReceiver receiver = new BroadcastReceiver() {
+            @Override
             public void onReceive(Context context, Intent intent) {
                 String name = intent.getStringExtra("PROBE");
 
@@ -74,6 +76,10 @@ public class AccelerometerProbeTestCase extends RobotTestCase {
             for (Probe probe : ProbeManager.allProbes(this._context)) {
                 if (probe instanceof AccelerometerProbe) {
                     Assert.assertTrue("ATP0", probe.isEnabled(this._context));
+
+                    AccelerometerProbe accel = (AccelerometerProbe) probe;
+
+                    accel.setThreshold(0.0);
                 }
             }
 
@@ -109,10 +115,12 @@ public class AccelerometerProbeTestCase extends RobotTestCase {
         }
     }
 
+    @Override
     public int estimatedMinutes() {
         return 1;
     }
 
+    @Override
     public String name(Context context) {
         return context.getString(R.string.name_accelerometer_probe_test);
     }

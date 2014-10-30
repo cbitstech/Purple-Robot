@@ -26,45 +26,52 @@ public class CallStateProbe extends Probe {
 
     private static final boolean DEFAULT_ENABLED = true;
 
+    private static final String IS_ENABLED = "config_probe_call_state_enabled";
+
     private long _lastXmit = 0;
     private BroadcastReceiver _receiver = null;
 
+    @Override
     public String name(Context context) {
         return CallStateProbe.NAME;
     }
 
+    @Override
     public String title(Context context) {
         return context.getString(R.string.title_call_state_probe);
     }
 
+    @Override
     public String probeCategory(Context context) {
         return context.getResources().getString(
                 R.string.probe_device_info_category);
     }
 
+    @Override
     public boolean isEnabled(Context context) {
         if (super.isEnabled(context)) {
             SharedPreferences prefs = Probe.getPreferences(context);
 
-            if (prefs.getBoolean("config_probe_call_state_enabled",
+            if (prefs.getBoolean(CallStateProbe.IS_ENABLED,
                     CallStateProbe.DEFAULT_ENABLED)) {
                 if (this._receiver == null) {
                     final CallStateProbe me = this;
 
                     this._receiver = new BroadcastReceiver() {
+                        @Override
                         public void onReceive(Context context, Intent intent) {
                             SharedPreferences prefs = Probe
                                     .getPreferences(context);
 
-                            if (prefs.getBoolean(
-                                    "config_probe_call_state_enabled",
+                            if (prefs.getBoolean(CallStateProbe.IS_ENABLED,
                                     CallStateProbe.DEFAULT_ENABLED)) {
                                 TelephonyManager tm = (TelephonyManager) context
                                         .getSystemService(Context.TELEPHONY_SERVICE);
 
                                 Bundle bundle = new Bundle();
-                                bundle.putString("PROBE", me.name(context));
-                                bundle.putLong("TIMESTAMP",
+                                bundle.putString(Probe.BUNDLE_PROBE,
+                                        me.name(context));
+                                bundle.putLong(Probe.BUNDLE_TIMESTAMP,
                                         System.currentTimeMillis() / 1000);
 
                                 bundle.putString(CallStateProbe.CALL_STATE,
@@ -87,8 +94,8 @@ public class CallStateProbe extends Probe {
                             .getSystemService(Context.TELEPHONY_SERVICE);
 
                     Bundle bundle = new Bundle();
-                    bundle.putString("PROBE", this.name(context));
-                    bundle.putLong("TIMESTAMP", now / 1000);
+                    bundle.putString(Probe.BUNDLE_PROBE, this.name(context));
+                    bundle.putLong(Probe.BUNDLE_TIMESTAMP, now / 1000);
 
                     bundle.putString(CallStateProbe.CALL_STATE,
                             this.getCallState(tm.getCallState()));
@@ -115,6 +122,7 @@ public class CallStateProbe extends Probe {
         return false;
     }
 
+    @Override
     public Bundle formattedBundle(Context context, Bundle bundle) {
         Bundle formatted = super.formattedBundle(context, bundle);
 
@@ -142,6 +150,7 @@ public class CallStateProbe extends Probe {
         return state;
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle) {
         String state = bundle.getString(CallStateProbe.CALL_STATE);
 
@@ -150,26 +159,30 @@ public class CallStateProbe extends Probe {
                         R.string.summary_call_state_probe), state);
     }
 
+    @Override
     public void enable(Context context) {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_call_state_enabled", true);
+        e.putBoolean(CallStateProbe.IS_ENABLED, true);
         e.commit();
     }
 
+    @Override
     public void disable(Context context) {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_call_state_enabled", false);
+        e.putBoolean(CallStateProbe.IS_ENABLED, false);
         e.commit();
     }
 
+    @Override
     public String summary(Context context) {
         return context.getString(R.string.summary_call_state_probe_desc);
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
         PreferenceManager manager = activity.getPreferenceManager();
@@ -180,7 +193,7 @@ public class CallStateProbe extends Probe {
 
         CheckBoxPreference enabled = new CheckBoxPreference(activity);
         enabled.setTitle(R.string.title_enable_probe);
-        enabled.setKey("config_probe_call_state_enabled");
+        enabled.setKey(CallStateProbe.IS_ENABLED);
         enabled.setDefaultValue(CallStateProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
