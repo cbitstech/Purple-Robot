@@ -105,15 +105,15 @@ public class MatlabForestModel extends WekaTreeModel {
         // added by Sohrob -- TEMPORARY **********************
         // Apparrently sometimes maxPrediction is null!!!
         Log.e("INF", "Class: "+maxPrediction);
-        if ((maxPrediction!=null)&&(maxPrediction.equals("1"))) {
+        /*if (true) ((maxPrediction!=null)&&(maxPrediction.equals("1"))) {
             try {
-                ToneGenerator toneGenerator = new ToneGenerator(AudioManager.STREAM_ALARM, 50);
-                toneGenerator.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 200);
+                ToneGenerator toneGenerator = new ToneGenerator(AudioManager.STREAM_ALARM, 25);
+                toneGenerator.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 100);
             }
             catch (Exception e) {
                 e.printStackTrace();
             }
-        }
+        }*/
         // ****************************************************
 
         HashMap<String, Object> prediction = new HashMap<String, Object>();

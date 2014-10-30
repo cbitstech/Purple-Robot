@@ -105,7 +105,8 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
     private boolean _hasGyroscope = false;
     private boolean _hasBarometer = false;
 
-    private long last_timestamp;
+    private long last_timestamp_acc = 0;
+    private long last_timestamp_gyr = 0;
 
     boolean acc_writing = false;
     boolean gyr_writing = false;
@@ -169,17 +170,30 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 					//checking if the clip has moved since last time
 					if (me._accelerometerClip.getTimestamps().size() > 0) 
 					{
-						if (me._accelerometerClip.getLastTimestamp() == last_timestamp) 
+						if (me._accelerometerClip.getLastTimestamp() == last_timestamp_acc) 
 						{
 							Log.e("PR", "P20FeaturesProbe: Clip hasn't moved since last feature extraction!");
 							generateTone = true;
 						} 
 						else {
-							last_timestamp = me._accelerometerClip.getLastTimestamp();
-							Log.e("PR", "P20FeaturesProbe: n_samp = "+ me._accelerometerClip.getTimestamps().size());
+							last_timestamp_acc = me._accelerometerClip.getLastTimestamp();
+							Log.e("PR", "P20FeaturesProbe: n_samp (acc) = "+ me._accelerometerClip.getTimestamps().size());
 						}
 					}
 					
+					if (me._gyroscopeClip.getTimestamps().size() > 0) 
+					{
+						if (me._gyroscopeClip.getLastTimestamp() == last_timestamp_gyr) 
+						{
+							Log.e("PR", "P20FeaturesProbe: Clip hasn't moved since last feature extraction!");
+							generateTone = true;
+						} 
+						else {
+							last_timestamp_gyr = me._gyroscopeClip.getLastTimestamp();
+							Log.e("PR", "P20FeaturesProbe: n_samp (gyr) = "+ me._gyroscopeClip.getTimestamps().size());
+						}
+					}
+
 					if (me._hasAccelerometer) 
 					{
 						synchronized(me._accelerometerClip)
@@ -452,6 +466,18 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 	
 	public void transmitAnalysis()
 	{
+
+
+		/*try {
+			ToneGenerator toneGenerator = new ToneGenerator(AudioManager.STREAM_ALARM, 25);
+			toneGenerator.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 200);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}*/
+
+		Log.e("INF", "Features Transmitted.");
+
 		Bundle bundle = new Bundle();
 		bundle.putString("PROBE", this.name(this._context)); // Required
 		bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000); // Required
