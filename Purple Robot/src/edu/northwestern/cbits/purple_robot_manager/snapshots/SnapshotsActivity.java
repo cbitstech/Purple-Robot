@@ -29,9 +29,11 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.RobotContentProvider;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
-public class SnapshotsActivity extends ActionBarActivity {
+public class SnapshotsActivity extends ActionBarActivity
+{
     @SuppressLint("SimpleDateFormat")
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
         this.setContentView(R.layout.layout_snapshots_activity);
@@ -39,72 +41,66 @@ public class SnapshotsActivity extends ActionBarActivity {
         this.getSupportActionBar().setTitle(R.string.title_snapshots);
     }
 
-    protected void onResume() {
+    protected void onResume()
+    {
         super.onResume();
 
         this.refresh();
     }
 
-    public void refresh() {
+    public void refresh()
+    {
         final SnapshotsActivity me = this;
 
         ListView listView = (ListView) this.findViewById(R.id.list_snapshots);
 
         final SimpleDateFormat sdf = new SimpleDateFormat("MMM d, H:mm:ss");
 
-        Cursor c = this.getContentResolver().query(
-                RobotContentProvider.SNAPSHOTS, null, null, null,
-                "recorded DESC");
+        Cursor c = this.getContentResolver().query(RobotContentProvider.SNAPSHOTS, null, null, null, "recorded DESC");
 
-        final CursorAdapter adapter = new CursorAdapter(this, c, true) {
-            public void bindView(View view, Context context, Cursor cursor) {
-                final String source = cursor.getString(cursor
-                        .getColumnIndex("source"));
-                final String audioFile = cursor.getString(cursor
-                        .getColumnIndex("audio_file"));
+        final CursorAdapter adapter = new CursorAdapter(this, c, true)
+        {
+            public void bindView(View view, Context context, Cursor cursor)
+            {
+                final String source = cursor.getString(cursor.getColumnIndex("source"));
+                final String audioFile = cursor.getString(cursor.getColumnIndex("audio_file"));
 
-                ImageView micIcon = (ImageView) view
-                        .findViewById(R.id.mic_icon);
+                ImageView micIcon = (ImageView) view.findViewById(R.id.mic_icon);
 
                 if (audioFile != null)
                     micIcon.setVisibility(View.VISIBLE);
                 else
                     micIcon.setVisibility(View.GONE);
 
-                Date date = new Date(cursor.getLong(cursor
-                        .getColumnIndex("recorded")));
+                Date date = new Date(cursor.getLong(cursor.getColumnIndex("recorded")));
 
-                TextView dateLabel = (TextView) view
-                        .findViewById(R.id.date_label);
+                TextView dateLabel = (TextView) view.findViewById(R.id.date_label);
                 dateLabel.setText(sdf.format(date));
 
-                TextView sourceLabel = (TextView) view
-                        .findViewById(R.id.source_label);
+                TextView sourceLabel = (TextView) view.findViewById(R.id.source_label);
 
-                try {
-                    JSONArray array = new JSONArray(cursor.getString(cursor
-                            .getColumnIndex("value")));
+                try
+                {
+                    JSONArray array = new JSONArray(cursor.getString(cursor.getColumnIndex("value")));
 
                     if (array.length() == 1)
-                        sourceLabel.setText(me.getString(
-                                R.string.snapshot_single_desc, source));
+                        sourceLabel.setText(me.getString(R.string.snapshot_single_desc, source));
                     else
-                        sourceLabel
-                                .setText(me.getString(R.string.snapshot_desc,
-                                        source, array.length()));
-                } catch (JSONException e) {
+                        sourceLabel.setText(me.getString(R.string.snapshot_desc, source, array.length()));
+                }
+                catch (JSONException e)
+                {
                     LogManager.getInstance(me).logException(e);
 
                     sourceLabel.setText(source);
                 }
             }
 
-            public View newView(Context context, Cursor cursor, ViewGroup parent) {
-                LayoutInflater inflater = (LayoutInflater) me
-                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            public View newView(Context context, Cursor cursor, ViewGroup parent)
+            {
+                LayoutInflater inflater = (LayoutInflater) me.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-                View view = inflater
-                        .inflate(R.layout.layout_snapshot_row, null);
+                View view = inflater.inflate(R.layout.layout_snapshot_row, null);
 
                 this.bindView(view, context, cursor);
 
@@ -112,9 +108,10 @@ public class SnapshotsActivity extends ActionBarActivity {
             }
         };
 
-        listView.setOnItemClickListener(new OnItemClickListener() {
-            public void onItemClick(AdapterView<?> listView, View view1,
-                    int which, long id) {
+        listView.setOnItemClickListener(new OnItemClickListener()
+        {
+            public void onItemClick(AdapterView<?> listView, View view1, int which, long id)
+            {
                 Intent intent = new Intent(me, SnapshotActivity.class);
                 intent.putExtra("id", id);
 
@@ -125,33 +122,41 @@ public class SnapshotsActivity extends ActionBarActivity {
         listView.setAdapter(adapter);
     }
 
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
         MenuInflater inflater = this.getMenuInflater();
         inflater.inflate(R.menu.menu_snapshot_activity, menu);
 
         return true;
     }
 
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
         final SnapshotsActivity me = this;
 
-        if (item.getItemId() == R.id.menu_snapshot) {
+        if (item.getItemId() == R.id.menu_snapshot)
+        {
             String label = this.getString(R.string.snapshot_user_initiated);
 
-            try {
-                SnapshotManager.getInstance(this).takeSnapshot(this, label,
-                        new Runnable() {
-                            public void run() {
-                                me.runOnUiThread(new Runnable() {
-                                    public void run() {
-                                        me.refresh();
-                                    }
-                                });
+            try
+            {
+                SnapshotManager.getInstance(this).takeSnapshot(this, label, new Runnable()
+                {
+                    public void run()
+                    {
+                        me.runOnUiThread(new Runnable()
+                        {
+                            public void run()
+                            {
+                                me.refresh();
                             }
                         });
-            } catch (EmptySnapshotException e) {
-                Toast.makeText(this, R.string.empty_snapshot_error,
-                        Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch (EmptySnapshotException e)
+            {
+                Toast.makeText(this, R.string.empty_snapshot_error, Toast.LENGTH_SHORT).show();
             }
         }
 

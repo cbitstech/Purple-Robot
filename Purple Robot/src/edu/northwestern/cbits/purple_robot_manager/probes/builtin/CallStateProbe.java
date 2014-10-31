@@ -15,7 +15,8 @@ import android.telephony.TelephonyManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
-public class CallStateProbe extends Probe {
+public class CallStateProbe extends Probe
+{
     public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.CallStateProbe";
 
     public static final String STATE_IDLE = "Idle";
@@ -32,73 +33,74 @@ public class CallStateProbe extends Probe {
     private BroadcastReceiver _receiver = null;
 
     @Override
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return CallStateProbe.NAME;
     }
 
     @Override
-    public String title(Context context) {
+    public String title(Context context)
+    {
         return context.getString(R.string.title_call_state_probe);
     }
 
     @Override
-    public String probeCategory(Context context) {
-        return context.getResources().getString(
-                R.string.probe_device_info_category);
+    public String probeCategory(Context context)
+    {
+        return context.getResources().getString(R.string.probe_device_info_category);
     }
 
     @Override
-    public boolean isEnabled(Context context) {
-        if (super.isEnabled(context)) {
+    public boolean isEnabled(Context context)
+    {
+        if (super.isEnabled(context))
+        {
             SharedPreferences prefs = Probe.getPreferences(context);
 
-            if (prefs.getBoolean(CallStateProbe.IS_ENABLED,
-                    CallStateProbe.DEFAULT_ENABLED)) {
-                if (this._receiver == null) {
+            if (prefs.getBoolean(CallStateProbe.IS_ENABLED, CallStateProbe.DEFAULT_ENABLED))
+            {
+                if (this._receiver == null)
+                {
                     final CallStateProbe me = this;
 
-                    this._receiver = new BroadcastReceiver() {
+                    this._receiver = new BroadcastReceiver()
+                    {
                         @Override
-                        public void onReceive(Context context, Intent intent) {
-                            SharedPreferences prefs = Probe
-                                    .getPreferences(context);
+                        public void onReceive(Context context, Intent intent)
+                        {
+                            SharedPreferences prefs = Probe.getPreferences(context);
 
-                            if (prefs.getBoolean(CallStateProbe.IS_ENABLED,
-                                    CallStateProbe.DEFAULT_ENABLED)) {
+                            if (prefs.getBoolean(CallStateProbe.IS_ENABLED, CallStateProbe.DEFAULT_ENABLED))
+                            {
                                 TelephonyManager tm = (TelephonyManager) context
                                         .getSystemService(Context.TELEPHONY_SERVICE);
 
                                 Bundle bundle = new Bundle();
-                                bundle.putString(Probe.BUNDLE_PROBE,
-                                        me.name(context));
-                                bundle.putLong(Probe.BUNDLE_TIMESTAMP,
-                                        System.currentTimeMillis() / 1000);
+                                bundle.putString(Probe.BUNDLE_PROBE, me.name(context));
+                                bundle.putLong(Probe.BUNDLE_TIMESTAMP, System.currentTimeMillis() / 1000);
 
-                                bundle.putString(CallStateProbe.CALL_STATE,
-                                        me.getCallState(tm.getCallState()));
+                                bundle.putString(CallStateProbe.CALL_STATE, me.getCallState(tm.getCallState()));
 
                                 me.transmitData(context, bundle);
                             }
                         }
                     };
 
-                    IntentFilter filter = new IntentFilter(
-                            TelephonyManager.ACTION_PHONE_STATE_CHANGED);
+                    IntentFilter filter = new IntentFilter(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
                     context.registerReceiver(this._receiver, filter);
                 }
 
                 long now = System.currentTimeMillis();
 
-                if (now - this._lastXmit > 60000) {
-                    TelephonyManager tm = (TelephonyManager) context
-                            .getSystemService(Context.TELEPHONY_SERVICE);
+                if (now - this._lastXmit > 60000)
+                {
+                    TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 
                     Bundle bundle = new Bundle();
                     bundle.putString(Probe.BUNDLE_PROBE, this.name(context));
                     bundle.putLong(Probe.BUNDLE_TIMESTAMP, now / 1000);
 
-                    bundle.putString(CallStateProbe.CALL_STATE,
-                            this.getCallState(tm.getCallState()));
+                    bundle.putString(CallStateProbe.CALL_STATE, this.getCallState(tm.getCallState()));
 
                     this.transmitData(context, bundle);
 
@@ -109,10 +111,14 @@ public class CallStateProbe extends Probe {
             }
         }
 
-        if (this._receiver != null) {
-            try {
+        if (this._receiver != null)
+        {
+            try
+            {
                 context.unregisterReceiver(this._receiver);
-            } catch (RuntimeException e) {
+            }
+            catch (RuntimeException e)
+            {
 
             }
 
@@ -123,19 +129,21 @@ public class CallStateProbe extends Probe {
     }
 
     @Override
-    public Bundle formattedBundle(Context context, Bundle bundle) {
+    public Bundle formattedBundle(Context context, Bundle bundle)
+    {
         Bundle formatted = super.formattedBundle(context, bundle);
 
-        formatted.putString(context.getString(R.string.call_state_label),
-                bundle.getString(CallStateProbe.CALL_STATE));
+        formatted.putString(context.getString(R.string.call_state_label), bundle.getString(CallStateProbe.CALL_STATE));
 
         return formatted;
     };
 
-    protected String getCallState(int callState) {
+    protected String getCallState(int callState)
+    {
         String state = "Unknown";
 
-        switch (callState) {
+        switch (callState)
+        {
         case TelephonyManager.CALL_STATE_IDLE:
             state = CallStateProbe.STATE_IDLE;
             break;
@@ -151,16 +159,16 @@ public class CallStateProbe extends Probe {
     }
 
     @Override
-    public String summarizeValue(Context context, Bundle bundle) {
+    public String summarizeValue(Context context, Bundle bundle)
+    {
         String state = bundle.getString(CallStateProbe.CALL_STATE);
 
-        return String.format(
-                context.getResources().getString(
-                        R.string.summary_call_state_probe), state);
+        return String.format(context.getResources().getString(R.string.summary_call_state_probe), state);
     }
 
     @Override
-    public void enable(Context context) {
+    public void enable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -169,7 +177,8 @@ public class CallStateProbe extends Probe {
     }
 
     @Override
-    public void disable(Context context) {
+    public void disable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -178,13 +187,15 @@ public class CallStateProbe extends Probe {
     }
 
     @Override
-    public String summary(Context context) {
+    public String summary(Context context)
+    {
         return context.getString(R.string.summary_call_state_probe_desc);
     }
 
     @Override
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    {
         PreferenceManager manager = activity.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(activity);

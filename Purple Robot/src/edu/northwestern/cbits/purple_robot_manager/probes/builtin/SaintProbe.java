@@ -19,7 +19,8 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
-public class SaintProbe extends Probe {
+public class SaintProbe extends Probe
+{
     public static final String FETCH_INTENT = "edu.cornell.cs.pac.saint.helper.fetch";
     private static final String DATA = "saint_data";
 
@@ -29,35 +30,41 @@ public class SaintProbe extends Probe {
 
     private long _lastCheck = 0;
 
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.SaintProbe";
     }
 
-    public String title(Context context) {
+    public String title(Context context)
+    {
         return context.getString(R.string.title_saint_probe);
     }
 
-    public String probeCategory(Context context) {
+    public String probeCategory(Context context)
+    {
         return context.getResources().getString(R.string.probe_misc_category);
     }
 
-    public boolean isEnabled(final Context context) {
-        if (super.isEnabled(context)) {
+    public boolean isEnabled(final Context context)
+    {
+        if (super.isEnabled(context))
+        {
             SharedPreferences prefs = Probe.getPreferences(context);
 
-            if (prefs.getBoolean("config_probe_saint_enabled",
-                    SaintProbe.DEFAULT_ENABLED)) {
-                if (this._receiver == null) {
+            if (prefs.getBoolean("config_probe_saint_enabled", SaintProbe.DEFAULT_ENABLED))
+            {
+                if (this._receiver == null)
+                {
                     final SaintProbe me = this;
 
-                    this._receiver = new BroadcastReceiver() {
-                        public void onReceive(Context context, Intent intent) {
-                            Bundle bundle = intent
-                                    .getBundleExtra(SaintProbe.DATA);
+                    this._receiver = new BroadcastReceiver()
+                    {
+                        public void onReceive(Context context, Intent intent)
+                        {
+                            Bundle bundle = intent.getBundleExtra(SaintProbe.DATA);
 
                             bundle.putString("PROBE", me.name(context));
-                            bundle.putLong("TIMESTAMP",
-                                    System.currentTimeMillis() / 1000);
+                            bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
 
                             me.transmitData(context, bundle);
                         }
@@ -71,12 +78,13 @@ public class SaintProbe extends Probe {
 
                 final long now = System.currentTimeMillis();
 
-                synchronized (this) {
-                    long freq = Long.parseLong(prefs.getString(
-                            "config_probe_saint_frequency",
-                            Probe.DEFAULT_FREQUENCY));
+                synchronized (this)
+                {
+                    long freq = Long
+                            .parseLong(prefs.getString("config_probe_saint_frequency", Probe.DEFAULT_FREQUENCY));
 
-                    if (now - this._lastCheck > freq) {
+                    if (now - this._lastCheck > freq)
+                    {
                         this._lastCheck = now;
 
                         Intent fetchIntent = new Intent(SaintProbe.FETCH_INTENT);
@@ -89,10 +97,14 @@ public class SaintProbe extends Probe {
             }
         }
 
-        if (this._receiver != null) {
-            try {
+        if (this._receiver != null)
+        {
+            try
+            {
                 context.unregisterReceiver(this._receiver);
-            } catch (IllegalArgumentException e) {
+            }
+            catch (IllegalArgumentException e)
+            {
                 LogManager.getInstance(context).logException(e);
             }
 
@@ -102,7 +114,8 @@ public class SaintProbe extends Probe {
         return false;
     }
 
-    public void enable(Context context) {
+    public void enable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -111,7 +124,8 @@ public class SaintProbe extends Probe {
         e.commit();
     }
 
-    public void disable(Context context) {
+    public void disable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -120,7 +134,8 @@ public class SaintProbe extends Probe {
         e.commit();
     }
 
-    public String summarizeValue(Context context, Bundle bundle) {
+    public String summarizeValue(Context context, Bundle bundle)
+    {
         int lastSpeech = (int) bundle.getDouble("LAST_SPEECH_READING");
 
         int speechResource = R.string.label_speech_none;
@@ -132,7 +147,8 @@ public class SaintProbe extends Probe {
 
         int activityResource = R.string.label_activity_unknown;
 
-        switch (lastActivity) {
+        switch (lastActivity)
+        {
         case 1:
             activityResource = R.string.label_activity_stationary;
             break;
@@ -144,43 +160,45 @@ public class SaintProbe extends Probe {
             break;
         }
 
-        return context.getString(R.string.summary_saint_probe,
-                context.getString(activityResource),
+        return context.getString(R.string.summary_saint_probe, context.getString(activityResource),
                 context.getString(speechResource));
     }
 
-    public Map<String, Object> configuration(Context context) {
+    public Map<String, Object> configuration(Context context)
+    {
         Map<String, Object> map = super.configuration(context);
 
         SharedPreferences prefs = Probe.getPreferences(context);
 
-        long freq = Long.parseLong(prefs.getString(
-                "config_probe_saint_frequency", Probe.DEFAULT_FREQUENCY));
+        long freq = Long.parseLong(prefs.getString("config_probe_saint_frequency", Probe.DEFAULT_FREQUENCY));
 
         map.put(Probe.PROBE_FREQUENCY, freq);
 
         return map;
     }
 
-    public void updateFromMap(Context context, Map<String, Object> params) {
+    public void updateFromMap(Context context, Map<String, Object> params)
+    {
         super.updateFromMap(context, params);
 
-        if (params.containsKey(Probe.PROBE_FREQUENCY)) {
+        if (params.containsKey(Probe.PROBE_FREQUENCY))
+        {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
 
-            if (frequency instanceof Long) {
+            if (frequency instanceof Long)
+            {
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putString("config_probe_saint_frequency",
-                        frequency.toString());
+                e.putString("config_probe_saint_frequency", frequency.toString());
                 e.commit();
             }
         }
     }
 
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    {
         PreferenceManager manager = activity.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(activity);
@@ -206,7 +224,8 @@ public class SaintProbe extends Probe {
         return screen;
     }
 
-    public String summary(Context context) {
+    public String summary(Context context)
+    {
         return context.getString(R.string.summary_saint_probe_desc);
     }
 }

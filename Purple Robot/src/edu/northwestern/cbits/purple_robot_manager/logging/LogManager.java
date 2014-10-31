@@ -9,7 +9,8 @@ import android.preference.PreferenceManager;
 import edu.northwestern.cbits.anthracite.Logger;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 
-public class LogManager {
+public class LogManager
+{
     public static final String ENABLED = "config_enable_log_server";
     private static final boolean ENABLED_DEFAULT = false;
 
@@ -32,73 +33,76 @@ public class LogManager {
 
     private Logger _logger = null;
 
-    public LogManager(Context context) {
-        String userId = EncryptionManager.getInstance().getUserHash(context,
-                false);
+    public LogManager(Context context)
+    {
+        String userId = EncryptionManager.getInstance().getUserHash(context, false);
 
         this._logger = Logger.getInstance(context, userId);
 
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(context);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        this._logger.setEnabled(prefs.getBoolean(LogManager.ENABLED,
-                LogManager.ENABLED_DEFAULT));
-        this._logger.setIncludeLocation(prefs.getBoolean(
-                LogManager.INCLUDE_LOCATION,
+        this._logger.setEnabled(prefs.getBoolean(LogManager.ENABLED, LogManager.ENABLED_DEFAULT));
+        this._logger.setIncludeLocation(prefs.getBoolean(LogManager.INCLUDE_LOCATION,
                 LogManager.INCLUDE_LOCATION_DEFAULT));
-        this._logger.setWifiOnly(prefs.getBoolean(LogManager.WIFI_ONLY,
-                LogManager.WIFI_ONLY_DEFAULT));
-        this._logger.setLiberalSsl(prefs.getBoolean(LogManager.LIBERAL_SSL,
-                LogManager.LIBERAL_SSL_ONLY));
+        this._logger.setWifiOnly(prefs.getBoolean(LogManager.WIFI_ONLY, LogManager.WIFI_ONLY_DEFAULT));
+        this._logger.setLiberalSsl(prefs.getBoolean(LogManager.LIBERAL_SSL, LogManager.LIBERAL_SSL_ONLY));
 
-        try {
-            this._logger.setUploadUri(Uri.parse(prefs.getString(LogManager.URI,
-                    LogManager.URI_DEFAULT)));
-        } catch (RuntimeException e) {
+        try
+        {
+            this._logger.setUploadUri(Uri.parse(prefs.getString(LogManager.URI, LogManager.URI_DEFAULT)));
+        }
+        catch (RuntimeException e)
+        {
             e.printStackTrace();
         }
 
-        try {
-            this._logger.setUploadInterval(prefs.getLong(
-                    LogManager.UPLOAD_INTERVAL,
-                    LogManager.UPLOAD_INTERVAL_DEFAULT));
-        } catch (ClassCastException e) {
-            this._logger.setUploadInterval(Long.parseLong(prefs.getString(
-                    LogManager.UPLOAD_INTERVAL, ""
-                            + LogManager.UPLOAD_INTERVAL_DEFAULT)));
+        try
+        {
+            this._logger.setUploadInterval(prefs
+                    .getLong(LogManager.UPLOAD_INTERVAL, LogManager.UPLOAD_INTERVAL_DEFAULT));
+        }
+        catch (ClassCastException e)
+        {
+            this._logger.setUploadInterval(Long.parseLong(prefs.getString(LogManager.UPLOAD_INTERVAL, ""
+                    + LogManager.UPLOAD_INTERVAL_DEFAULT)));
         }
     }
 
-    public static LogManager getInstance(Context context) {
+    public static LogManager getInstance(Context context)
+    {
         if (LogManager._sharedInstance != null)
             return LogManager._sharedInstance;
 
         if (context != null)
-            LogManager._sharedInstance = new LogManager(
-                    context.getApplicationContext());
+            LogManager._sharedInstance = new LogManager(context.getApplicationContext());
 
         LogManager._sharedInstance.log("pr_log_manager_initialized", null);
 
         return LogManager._sharedInstance;
     }
 
-    public boolean log(String event, Map<String, Object> payload) {
+    public boolean log(String event, Map<String, Object> payload)
+    {
         return this._logger.log(event, payload);
     }
 
-    public void logException(Throwable e) {
+    public void logException(Throwable e)
+    {
         this._logger.logException(e);
     }
 
-    public void upload() {
+    public void upload()
+    {
         this._logger.attemptUploads(true);
     }
 
-    public void setEndpoint(String endpoint) {
+    public void setEndpoint(String endpoint)
+    {
         this._logger.setUploadUri(Uri.parse(endpoint));
     }
 
-    public String getEndpoint() {
+    public String getEndpoint()
+    {
         Uri u = this._logger.getUploadUri();
 
         if (u != null)
@@ -107,11 +111,13 @@ public class LogManager {
         return null;
     }
 
-    public boolean getEnabled() {
+    public boolean getEnabled()
+    {
         return this._logger.getEnabled();
     }
 
-    public void setEnabled(boolean enabled) {
+    public void setEnabled(boolean enabled)
+    {
         this._logger.setEnabled(enabled);
     }
 }

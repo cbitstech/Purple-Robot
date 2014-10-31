@@ -12,7 +12,8 @@ import android.net.Uri;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.util.Slugify;
 
-public class RegressionModel extends TrainedModel {
+public class RegressionModel extends TrainedModel
+{
     public static final String TYPE = "linear-regression";
 
     private double _intercept = 0.0;
@@ -20,11 +21,13 @@ public class RegressionModel extends TrainedModel {
     private Map<String, Double> _coefficients = new HashMap<String, Double>();
     private Set<String> _variables = new HashSet<String>();
 
-    public RegressionModel(Context context, Uri uri) {
+    public RegressionModel(Context context, Uri uri)
+    {
         super(context, uri);
     }
 
-    protected void generateModel(Context context, Object modelString) {
+    protected void generateModel(Context context, Object modelString)
+    {
         /*
          * 08-01 11:39:30.163: E/PR(15876): undefined_feature_value_dt_calmr1 =
          * 08-01 11:39:30.163: E/PR(15876): 0.4026 *
@@ -45,11 +48,16 @@ public class RegressionModel extends TrainedModel {
          * 11:39:30.163: E/PR(15876): 2.3794
          */
 
-        for (String line : modelString.toString().split("[\\r\\n]+")) {
-            if (line.startsWith("  ")) {
-                try {
+        for (String line : modelString.toString().split("[\\r\\n]+"))
+        {
+            if (line.startsWith("  "))
+            {
+                try
+                {
                     this._intercept = Double.parseDouble(line);
-                } catch (NumberFormatException e) {
+                }
+                catch (NumberFormatException e)
+                {
                     String[] toks = line.split("\\*");
 
                     String coef = toks[0].trim();
@@ -57,12 +65,15 @@ public class RegressionModel extends TrainedModel {
 
                     int index = line.indexOf("=");
 
-                    if (index == -1) {
+                    if (index == -1)
+                    {
                         args = args.replaceAll(Pattern.quote("+"), "").trim();
                         this._coefficients.put(args, Double.parseDouble(coef));
 
                         this._variables.add(args);
-                    } else {
+                    }
+                    else
+                    {
                         String[] argToks = args.split("=");
 
                         String probe = argToks[0].trim();
@@ -74,22 +85,23 @@ public class RegressionModel extends TrainedModel {
 
                         if (probeValues.indexOf(",") == -1)
                             values.add(probeValues);
-                        else {
+                        else
+                        {
                             String[] valueToks = probeValues.split(",");
 
-                            for (String tok : valueToks) {
+                            for (String tok : valueToks)
+                            {
                                 values.add(tok.trim());
                             }
                         }
 
-                        for (String value : values) {
-                            value = value.replaceAll(Pattern.quote("+"), "")
-                                    .trim();
+                        for (String value : values)
+                        {
+                            value = value.replaceAll(Pattern.quote("+"), "").trim();
 
                             String coefKey = probe + "_" + value;
 
-                            this._coefficients.put(coefKey,
-                                    Double.parseDouble(coef));
+                            this._coefficients.put(coefKey, Double.parseDouble(coef));
                         }
                     }
                 }
@@ -97,29 +109,33 @@ public class RegressionModel extends TrainedModel {
         }
     }
 
-    protected Object evaluateModel(Context context, Map<String, Object> snapshot) {
+    protected Object evaluateModel(Context context, Map<String, Object> snapshot)
+    {
         ArrayList<String> requiredKeys = new ArrayList<String>();
         requiredKeys.addAll(this._variables);
 
         double prediction = this._intercept;
 
-        for (String key : snapshot.keySet()) {
+        for (String key : snapshot.keySet())
+        {
             Object value = snapshot.get(key);
 
-            if (requiredKeys.contains(key)) {
+            if (requiredKeys.contains(key))
+            {
                 Double coef = this._coefficients.get(key);
 
                 double valueValue = 1.0;
 
-                if (value instanceof Double || value instanceof Float
-                        || value instanceof Long || value instanceof Integer)
+                if (value instanceof Double || value instanceof Float || value instanceof Long
+                        || value instanceof Integer)
                     valueValue = Double.parseDouble("" + value);
 
-                if (coef == null) {
-                    coef = this._coefficients.get(key + "_"
-                            + Slugify.slugify(value.toString()));
+                if (coef == null)
+                {
+                    coef = this._coefficients.get(key + "_" + Slugify.slugify(value.toString()));
 
-                    if (coef == null) {
+                    if (coef == null)
+                    {
                         coef = this._coefficients.get(key + "_?");
 
                         if (coef == null)
@@ -136,11 +152,13 @@ public class RegressionModel extends TrainedModel {
         return Double.valueOf(prediction);
     }
 
-    public String modelType() {
+    public String modelType()
+    {
         return RegressionModel.TYPE;
     }
 
-    public String summary(Context context) {
+    public String summary(Context context)
+    {
         return context.getString(R.string.summary_model_regression);
     }
 }

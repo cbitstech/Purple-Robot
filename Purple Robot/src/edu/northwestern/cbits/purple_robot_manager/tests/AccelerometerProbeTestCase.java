@@ -12,13 +12,16 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.AccelerometerProbe;
 
-public class AccelerometerProbeTestCase extends RobotTestCase {
-    public AccelerometerProbeTestCase(Context context, int priority) {
+public class AccelerometerProbeTestCase extends RobotTestCase
+{
+    public AccelerometerProbeTestCase(Context context, int priority)
+    {
         super(context, priority);
     }
 
     @Override
-    public void test() {
+    public void test()
+    {
         if (this.isSelected(this._context) == false)
             return;
 
@@ -27,20 +30,23 @@ public class AccelerometerProbeTestCase extends RobotTestCase {
         values.put("start", Double.MAX_VALUE);
         values.put("end", 0D);
 
-        BroadcastReceiver receiver = new BroadcastReceiver() {
+        BroadcastReceiver receiver = new BroadcastReceiver()
+        {
             @Override
-            public void onReceive(Context context, Intent intent) {
+            public void onReceive(Context context, Intent intent)
+            {
                 String name = intent.getStringExtra("PROBE");
 
-                if (AccelerometerProbe.NAME.equals(name)) {
-                    double[] times = intent
-                            .getDoubleArrayExtra("EVENT_TIMESTAMP");
+                if (AccelerometerProbe.NAME.equals(name))
+                {
+                    double[] times = intent.getDoubleArrayExtra("EVENT_TIMESTAMP");
 
                     long count = values.getAsLong("count");
                     double start = values.getAsDouble("start");
                     double end = values.getAsDouble("end");
 
-                    for (double time : times) {
+                    for (double time : times)
+                    {
                         if (time < start)
                             start = time;
 
@@ -58,23 +64,27 @@ public class AccelerometerProbeTestCase extends RobotTestCase {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Probe.PROBE_READING);
 
-        LocalBroadcastManager localManager = LocalBroadcastManager
-                .getInstance(this._context);
+        LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(this._context);
         localManager.registerReceiver(receiver, intentFilter);
 
-        try {
+        try
+        {
             this.broadcastUpdate("Enabling probe...");
 
-            for (Probe probe : ProbeManager.allProbes(this._context)) {
-                if (probe instanceof AccelerometerProbe) {
+            for (Probe probe : ProbeManager.allProbes(this._context))
+            {
+                if (probe instanceof AccelerometerProbe)
+                {
                     probe.enable(this._context);
                 }
             }
 
             Thread.sleep(2000);
 
-            for (Probe probe : ProbeManager.allProbes(this._context)) {
-                if (probe instanceof AccelerometerProbe) {
+            for (Probe probe : ProbeManager.allProbes(this._context))
+            {
+                if (probe instanceof AccelerometerProbe)
+                {
                     Assert.assertTrue("ATP0", probe.isEnabled(this._context));
 
                     AccelerometerProbe accel = (AccelerometerProbe) probe;
@@ -95,7 +105,9 @@ public class AccelerometerProbeTestCase extends RobotTestCase {
             this.broadcastUpdate("Halting data collection...", 0);
             localManager.unregisterReceiver(receiver);
             Thread.sleep(2000);
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e)
+        {
             Assert.fail("ATP1");
         }
 
@@ -108,20 +120,24 @@ public class AccelerometerProbeTestCase extends RobotTestCase {
         Assert.assertTrue("ATP3", end < System.currentTimeMillis());
         Assert.assertTrue("ATP4", (end - start) > 45);
 
-        for (Probe probe : ProbeManager.allProbes(this._context)) {
-            if (probe instanceof AccelerometerProbe) {
+        for (Probe probe : ProbeManager.allProbes(this._context))
+        {
+            if (probe instanceof AccelerometerProbe)
+            {
                 probe.disable(this._context);
             }
         }
     }
 
     @Override
-    public int estimatedMinutes() {
+    public int estimatedMinutes()
+    {
         return 1;
     }
 
     @Override
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return context.getString(R.string.name_accelerometer_probe_test);
     }
 }

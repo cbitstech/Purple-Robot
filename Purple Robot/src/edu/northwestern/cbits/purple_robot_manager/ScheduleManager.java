@@ -20,33 +20,38 @@ import android.preference.PreferenceManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
-public class ScheduleManager {
+public class ScheduleManager
+{
     private static final String DATE_FORMAT = "yyyyMMdd'T'HHmmss";
 
     @SuppressLint("SimpleDateFormat")
-    public static String formatString(Date date) {
+    public static String formatString(Date date)
+    {
         SimpleDateFormat sdf = new SimpleDateFormat(ScheduleManager.DATE_FORMAT);
 
         return sdf.format(date);
     }
 
     @SuppressLint("SimpleDateFormat")
-    public static void runOverdueScripts(Context context) {
-        List<Map<String, String>> scripts = ScheduleManager
-                .fetchScripts(context);
+    public static void runOverdueScripts(Context context)
+    {
+        List<Map<String, String>> scripts = ScheduleManager.fetchScripts(context);
 
         long now = System.currentTimeMillis();
         SimpleDateFormat sdf = new SimpleDateFormat(ScheduleManager.DATE_FORMAT);
 
         List<Map<String, String>> executed = new ArrayList<Map<String, String>>();
 
-        for (Map<String, String> script : scripts) {
+        for (Map<String, String> script : scripts)
+        {
             String dateString = script.get("date").toString();
 
-            try {
+            try
+            {
                 Date d = sdf.parse(dateString);
 
-                if (d.getTime() < now) {
+                if (d.getTime() < now)
+                {
                     executed.add(script);
 
                     String action = script.get("action");
@@ -58,10 +63,11 @@ public class ScheduleManager {
                     payload.put("scheduled_timestamp", d.getTime());
                     payload.put("action", action);
 
-                    LogManager.getInstance(context).log(
-                            "pr_scheduled_script_run", payload);
+                    LogManager.getInstance(context).log("pr_scheduled_script_run", payload);
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 LogManager.getInstance(context).logException(e);
 
                 executed.add(script);
@@ -73,29 +79,32 @@ public class ScheduleManager {
         ScheduleManager.persistScripts(context, scripts);
     }
 
-    private static void persistScripts(Context context,
-            List<Map<String, String>> scripts) {
+    private static void persistScripts(Context context, List<Map<String, String>> scripts)
+    {
         JSONArray array = new JSONArray();
 
-        for (Map<String, String> script : scripts) {
+        for (Map<String, String> script : scripts)
+        {
             JSONObject json = new JSONObject();
 
-            if (script.containsKey("identifier") && script.containsKey("date")
-                    && script.containsKey("action")) {
-                try {
+            if (script.containsKey("identifier") && script.containsKey("date") && script.containsKey("action"))
+            {
+                try
+                {
                     json.put("identifier", script.get("identifier"));
                     json.put("date", script.get("date"));
                     json.put("action", script.get("action"));
 
                     array.put(json);
-                } catch (JSONException e) {
+                }
+                catch (JSONException e)
+                {
                     LogManager.getInstance(context).logException(e);
                 }
             }
         }
 
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(context);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         Editor e = prefs.edit();
 
         e.putString("scheduled_scripts", array.toString());
@@ -103,23 +112,24 @@ public class ScheduleManager {
         e.commit();
     }
 
-    private static List<Map<String, String>> fetchScripts(Context context) {
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(context);
+    private static List<Map<String, String>> fetchScripts(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         ArrayList<Map<String, String>> scripts = new ArrayList<Map<String, String>>();
 
-        try {
-            JSONArray array = new JSONArray(prefs.getString(
-                    "scheduled_scripts", "[]"));
+        try
+        {
+            JSONArray array = new JSONArray(prefs.getString("scheduled_scripts", "[]"));
 
-            for (int i = 0; i < array.length(); i++) {
+            for (int i = 0; i < array.length(); i++)
+            {
                 JSONObject json = (JSONObject) array.get(i);
 
                 HashMap<String, String> script = new HashMap<String, String>();
 
-                if (json.has("identifier") && json.has("date")
-                        && json.has("action")) {
+                if (json.has("identifier") && json.has("date") && json.has("action"))
+                {
                     script.put("identifier", json.get("identifier").toString());
                     script.put("date", json.get("date").toString());
                     script.put("action", json.get("action").toString());
@@ -127,22 +137,25 @@ public class ScheduleManager {
                     scripts.add(script);
                 }
             }
-        } catch (JSONException e) {
+        }
+        catch (JSONException e)
+        {
             LogManager.getInstance(context).logException(e);
         }
 
         return scripts;
     }
 
-    public static void updateScript(Context context, String identifier,
-            String dateString, String action) {
-        List<Map<String, String>> scripts = ScheduleManager
-                .fetchScripts(context);
+    public static void updateScript(Context context, String identifier, String dateString, String action)
+    {
+        List<Map<String, String>> scripts = ScheduleManager.fetchScripts(context);
 
         boolean found = false;
 
-        for (Map<String, String> script : scripts) {
-            if (identifier.equals(script.get("identifier"))) {
+        for (Map<String, String> script : scripts)
+        {
+            if (identifier.equals(script.get("identifier")))
+            {
                 script.put("date", dateString);
                 script.put("action", action);
 
@@ -150,7 +163,8 @@ public class ScheduleManager {
             }
         }
 
-        if (found == false) {
+        if (found == false)
+        {
             HashMap<String, String> script = new HashMap<String, String>();
 
             script.put("date", dateString);
@@ -170,7 +184,8 @@ public class ScheduleManager {
         ScheduleManager.persistScripts(context, scripts);
     }
 
-    public static Date clearMillis(Date d) {
+    public static Date clearMillis(Date d)
+    {
         long time = d.getTime();
 
         time = time - (time % 1000);
@@ -179,16 +194,23 @@ public class ScheduleManager {
     }
 
     @SuppressLint("SimpleDateFormat")
-    public static Date parseString(String dateString) {
+    public static Date parseString(String dateString)
+    {
         SimpleDateFormat sdf = new SimpleDateFormat(ScheduleManager.DATE_FORMAT);
 
-        try {
+        try
+        {
             return ScheduleManager.clearMillis(sdf.parse(dateString));
 
-        } catch (ParseException e) {
-            try {
+        }
+        catch (ParseException e)
+        {
+            try
+            {
                 LogManager.getInstance(null).logException(e);
-            } catch (NullPointerException ee) {
+            }
+            catch (NullPointerException ee)
+            {
                 // No LogManager available yet.
             }
 

@@ -20,29 +20,29 @@ import edu.northwestern.cbits.purple_robot_manager.activities.probes.AddressBook
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 
-public class ContactCalibrationHelper {
+public class ContactCalibrationHelper
+{
     private static Map<String, String> _cache = new HashMap<String, String>();
     private static SharedPreferences _cachedPrefs = null;
 
-    public static void check(final Context context) {
+    public static void check(final Context context)
+    {
         if (ContactCalibrationHelper._cachedPrefs == null)
-            ContactCalibrationHelper._cachedPrefs = PreferenceManager
-                    .getDefaultSharedPreferences(context
-                            .getApplicationContext());
+            ContactCalibrationHelper._cachedPrefs = PreferenceManager.getDefaultSharedPreferences(context
+                    .getApplicationContext());
 
-        if (ContactCalibrationHelper._cachedPrefs
-                .contains("last_address_book_calibration") == false) {
+        if (ContactCalibrationHelper._cachedPrefs.contains("last_address_book_calibration") == false)
+        {
             final SanityManager sanity = SanityManager.getInstance(context);
 
-            final String title = context
-                    .getString(R.string.title_address_book_label_check);
-            String message = context
-                    .getString(R.string.message_address_book_label_check);
+            final String title = context.getString(R.string.title_address_book_label_check);
+            String message = context.getString(R.string.message_address_book_label_check);
 
-            Runnable action = new Runnable() {
-                public void run() {
-                    Intent intent = new Intent(context,
-                            AddressBookLabelActivity.class);
+            Runnable action = new Runnable()
+            {
+                public void run()
+                {
+                    Intent intent = new Intent(context, AddressBookLabelActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
                     context.startActivity(intent);
@@ -54,25 +54,26 @@ public class ContactCalibrationHelper {
     }
 
     @SuppressWarnings("deprecation")
-    public static String getGroup(Context context, String key, boolean isPhone) {
+    public static String getGroup(Context context, String key, boolean isPhone)
+    {
         if (key == null)
             return null;
 
         if (ContactCalibrationHelper._cachedPrefs == null)
-            ContactCalibrationHelper._cachedPrefs = PreferenceManager
-                    .getDefaultSharedPreferences(context
-                            .getApplicationContext());
+            ContactCalibrationHelper._cachedPrefs = PreferenceManager.getDefaultSharedPreferences(context
+                    .getApplicationContext());
 
-        String group = ContactCalibrationHelper._cachedPrefs.getString(
-                "contact_calibration_" + key + "_group", null);
+        String group = ContactCalibrationHelper._cachedPrefs.getString("contact_calibration_" + key + "_group", null);
 
         if (group != null)
             return group;
 
-        if (isPhone) {
+        if (isPhone)
+        {
             String newKey = ContactCalibrationHelper._cache.get(key);
 
-            if (newKey == null) {
+            if (newKey == null)
+            {
                 String numbersOnly = key.replaceAll("[^\\d]", "");
 
                 if (numbersOnly.length() == 10)
@@ -88,15 +89,14 @@ public class ContactCalibrationHelper {
             key = newKey;
         }
 
-        return ContactCalibrationHelper._cachedPrefs.getString(
-                "contact_calibration_" + key + "_group", null);
+        return ContactCalibrationHelper._cachedPrefs.getString("contact_calibration_" + key + "_group", null);
     }
 
-    public static void setGroup(Context context, String key, String group) {
+    public static void setGroup(Context context, String key, String group)
+    {
         if (ContactCalibrationHelper._cachedPrefs == null)
-            ContactCalibrationHelper._cachedPrefs = PreferenceManager
-                    .getDefaultSharedPreferences(context
-                            .getApplicationContext());
+            ContactCalibrationHelper._cachedPrefs = PreferenceManager.getDefaultSharedPreferences(context
+                    .getApplicationContext());
 
         Editor e = ContactCalibrationHelper._cachedPrefs.edit();
         e.putString("contact_calibration_" + key + "_group", group);
@@ -104,26 +104,26 @@ public class ContactCalibrationHelper {
     }
 
     @SuppressWarnings("deprecation")
-    public static List<ContactRecord> fetchContactRecords(Context context) {
+    public static List<ContactRecord> fetchContactRecords(Context context)
+    {
         ArrayList<ContactRecord> contacts = new ArrayList<ContactRecord>();
 
-        Cursor c = context.getContentResolver().query(
-                CallLog.Calls.CONTENT_URI, null, null, null, null);
+        Cursor c = context.getContentResolver().query(CallLog.Calls.CONTENT_URI, null, null, null, null);
 
-        while (c.moveToNext()) {
-            String numberName = c
-                    .getString(c.getColumnIndex(Calls.CACHED_NAME));
-            String phoneNumber = PhoneNumberUtils.formatNumber(c.getString(c
-                    .getColumnIndex(Calls.NUMBER)));
+        while (c.moveToNext())
+        {
+            String numberName = c.getString(c.getColumnIndex(Calls.CACHED_NAME));
+            String phoneNumber = PhoneNumberUtils.formatNumber(c.getString(c.getColumnIndex(Calls.NUMBER)));
 
             boolean found = false;
 
             if (numberName == null)
                 numberName = "";
 
-            for (ContactRecord contact : contacts) {
-                if (contact.number.endsWith(phoneNumber)
-                        || phoneNumber.endsWith(contact.number)) {
+            for (ContactRecord contact : contacts)
+            {
+                if (contact.number.endsWith(phoneNumber) || phoneNumber.endsWith(contact.number))
+                {
                     String largerNumber = contact.number;
 
                     if (phoneNumber.length() > largerNumber.length())
@@ -134,13 +134,13 @@ public class ContactCalibrationHelper {
                     found = true;
                     contact.count += 1;
 
-                    if ("".equals(numberName) == false
-                            && "".equals(contact.name))
+                    if ("".equals(numberName) == false && "".equals(contact.name))
                         contact.name = numberName;
                 }
             }
 
-            if (found == false) {
+            if (found == false)
+            {
                 ContactRecord contact = new ContactRecord();
                 contact.name = numberName;
                 contact.number = phoneNumber;
@@ -149,13 +149,13 @@ public class ContactCalibrationHelper {
 
                 boolean isPhone = false;
 
-                if ("".equals(key)) {
+                if ("".equals(key))
+                {
                     key = contact.number;
                     isPhone = true;
                 }
 
-                String group = ContactCalibrationHelper.getGroup(context, key,
-                        isPhone);
+                String group = ContactCalibrationHelper.getGroup(context, key, isPhone);
 
                 if (group != null)
                     contact.group = group;
@@ -168,12 +168,16 @@ public class ContactCalibrationHelper {
 
         ArrayList<ContactRecord> normalizedContacts = new ArrayList<ContactRecord>();
 
-        for (ContactRecord contact : contacts) {
-            if ("".equals(contact.name) == false) {
+        for (ContactRecord contact : contacts)
+        {
+            if ("".equals(contact.name) == false)
+            {
                 boolean found = false;
 
-                for (ContactRecord normalized : normalizedContacts) {
-                    if (contact.name.equals(normalized.name)) {
+                for (ContactRecord normalized : normalizedContacts)
+                {
+                    if (contact.name.equals(normalized.name))
+                    {
                         found = true;
 
                         normalized.count += contact.count;
@@ -182,7 +186,8 @@ public class ContactCalibrationHelper {
 
                 if (found == false)
                     normalizedContacts.add(contact);
-            } else
+            }
+            else
                 normalizedContacts.add(contact);
         }
 
@@ -191,10 +196,10 @@ public class ContactCalibrationHelper {
         return normalizedContacts;
     }
 
-    public static void clear(Context context) {
+    public static void clear(Context context)
+    {
         final SanityManager sanity = SanityManager.getInstance(context);
 
-        sanity.clearAlert(context
-                .getString(R.string.title_address_book_label_check));
+        sanity.clearAlert(context.getString(R.string.title_address_book_label_check));
     }
 }

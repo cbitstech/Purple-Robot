@@ -19,28 +19,27 @@ import com.google.android.gms.maps.model.LatLng;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
 
-public class LocationProbeFragment extends SupportMapFragment {
-    public void onActivityCreated(Bundle savedInstanceState) {
+public class LocationProbeFragment extends SupportMapFragment
+{
+    public void onActivityCreated(Bundle savedInstanceState)
+    {
         super.onActivityCreated(savedInstanceState);
 
         MapsInitializer.initialize(this.getActivity());
 
         List<Location> locations = new ArrayList<Location>();
 
-        Cursor cursor = ProbeValuesProvider.getProvider(this.getActivity())
-                .retrieveValues(this.getActivity(), LocationProbe.DB_TABLE,
-                        LocationProbe.databaseSchema());
+        Cursor cursor = ProbeValuesProvider.getProvider(this.getActivity()).retrieveValues(this.getActivity(),
+                LocationProbe.DB_TABLE, LocationProbe.databaseSchema());
 
-        while (cursor.moveToNext()) {
+        while (cursor.moveToNext())
+        {
             Location l = new Location(this.getClass().getCanonicalName());
 
-            l.setLatitude(cursor.getDouble(cursor
-                    .getColumnIndex(LocationProbe.LATITUDE_KEY)));
-            l.setLongitude(cursor.getDouble(cursor
-                    .getColumnIndex(LocationProbe.LONGITUDE_KEY)));
+            l.setLatitude(cursor.getDouble(cursor.getColumnIndex(LocationProbe.LATITUDE_KEY)));
+            l.setLongitude(cursor.getDouble(cursor.getColumnIndex(LocationProbe.LONGITUDE_KEY)));
 
-            l.setTime(((long) cursor.getDouble(cursor
-                    .getColumnIndex(ProbeValuesProvider.TIMESTAMP))) * 1000);
+            l.setTime(((long) cursor.getDouble(cursor.getColumnIndex(ProbeValuesProvider.TIMESTAMP))) * 1000);
 
             locations.add(l);
         }
@@ -55,7 +54,8 @@ public class LocationProbeFragment extends SupportMapFragment {
         long minTime = Long.MAX_VALUE;
         long maxTime = Long.MIN_VALUE;
 
-        for (Location l : locations) {
+        for (Location l : locations)
+        {
             double latitude = l.getLatitude();
             double longitude = l.getLongitude();
 
@@ -85,16 +85,15 @@ public class LocationProbeFragment extends SupportMapFragment {
         map.setIndoorEnabled(true);
         map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 
-        LatLng lookAt = new LatLng((minLat + ((maxLat - minLat) / 2)),
-                (minLon + ((maxLon - minLon) / 2)));
+        LatLng lookAt = new LatLng((minLat + ((maxLat - minLat) / 2)), (minLon + ((maxLon - minLon) / 2)));
 
         CameraPosition camera = CameraPosition.fromLatLngZoom(lookAt, 12);
         map.moveCamera(CameraUpdateFactory.newCameraPosition(camera));
 
-        for (Location location : locations) {
+        for (Location location : locations)
+        {
             CircleOptions options = new CircleOptions();
-            options.center(new LatLng(location.getLatitude(), location
-                    .getLongitude()));
+            options.center(new LatLng(location.getLatitude(), location.getLongitude()));
             options.fillColor(Color.parseColor("#AA66CC"));
             options.strokeColor(Color.parseColor("#AA66CC"));
             options.strokeWidth(20.0f);
@@ -104,7 +103,8 @@ public class LocationProbeFragment extends SupportMapFragment {
         }
     }
 
-    protected boolean isRouteDisplayed() {
+    protected boolean isRouteDisplayed()
+    {
         return false;
     }
 }

@@ -1,12 +1,14 @@
 package edu.northwestern.cbits.purple_robot_manager.calibration;
 
-public class ContactRecord implements Comparable<ContactRecord> {
+public class ContactRecord implements Comparable<ContactRecord>
+{
     public int count = 1;
     public String number = null;
     public String name = null;
     public String group = null;
 
-    public int compareTo(ContactRecord other) {
+    public int compareTo(ContactRecord other)
+    {
         if (this.count > other.count)
             return -1;
         else if (this.count < other.count)

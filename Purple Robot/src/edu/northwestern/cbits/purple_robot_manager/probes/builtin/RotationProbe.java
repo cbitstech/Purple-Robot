@@ -37,8 +37,8 @@ import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("SimpleDateFormat")
-public class RotationProbe extends ContinuousProbe implements
-        SensorEventListener {
+public class RotationProbe extends ContinuousProbe implements SensorEventListener
+{
     private static int BUFFER_SIZE = 1024;
 
     public static final String DB_TABLE = "rotation_probe";
@@ -49,8 +49,8 @@ public class RotationProbe extends ContinuousProbe implements
     private static final String COSINE = "COSINE";
     private static final String ACCURACY = "ACCURACY";
 
-    private static final String[] fieldNames = { X_KEY, Y_KEY, Z_KEY, COSINE,
-            ACCURACY };
+    private static final String[] fieldNames =
+    { X_KEY, Y_KEY, Z_KEY, COSINE, ACCURACY };
 
     protected static final String DEFAULT_THRESHOLD = "15.0";
 
@@ -74,54 +74,55 @@ public class RotationProbe extends ContinuousProbe implements
 
     protected int bufferIndex = 0;
 
-    public Intent viewIntent(Context context) {
+    public Intent viewIntent(Context context)
+    {
         Intent i = new Intent(context, WebkitLandscapeActivity.class);
 
         return i;
     }
 
-    public String probeCategory(Context context) {
+    public String probeCategory(Context context)
+    {
         return context.getString(R.string.probe_sensor_category);
     }
 
-    public String contentSubtitle(Context context) {
-        Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(
-                context, RotationProbe.DB_TABLE, this.databaseSchema());
+    public String contentSubtitle(Context context)
+    {
+        Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(context, RotationProbe.DB_TABLE,
+                this.databaseSchema());
 
         int count = -1;
 
-        if (c != null) {
+        if (c != null)
+        {
             count = c.getCount();
             c.close();
         }
 
-        return String.format(context.getString(R.string.display_item_count),
-                count);
+        return String.format(context.getString(R.string.display_item_count), count);
     }
 
-    public Map<String, String> databaseSchema() {
-        if (this._schema == null) {
+    public Map<String, String> databaseSchema()
+    {
+        if (this._schema == null)
+        {
             this._schema = new HashMap<String, String>();
 
-            this._schema
-                    .put(RotationProbe.X_KEY, ProbeValuesProvider.REAL_TYPE);
-            this._schema
-                    .put(RotationProbe.Y_KEY, ProbeValuesProvider.REAL_TYPE);
-            this._schema
-                    .put(RotationProbe.Z_KEY, ProbeValuesProvider.REAL_TYPE);
-            this._schema.put(RotationProbe.COSINE,
-                    ProbeValuesProvider.REAL_TYPE);
-            this._schema.put(RotationProbe.ACCURACY,
-                    ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(RotationProbe.X_KEY, ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(RotationProbe.Y_KEY, ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(RotationProbe.Z_KEY, ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(RotationProbe.COSINE, ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(RotationProbe.ACCURACY, ProbeValuesProvider.REAL_TYPE);
         }
 
         return this._schema;
     }
 
-    public String getDisplayContent(Activity activity) {
-        try {
-            String template = WebkitActivity.stringForAsset(activity,
-                    "webkit/chart_spline_full.html");
+    public String getDisplayContent(Activity activity)
+    {
+        try
+        {
+            String template = WebkitActivity.stringForAsset(activity, "webkit/chart_spline_full.html");
 
             ArrayList<Double> x = new ArrayList<Double>();
             ArrayList<Double> y = new ArrayList<Double>();
@@ -130,29 +131,24 @@ public class RotationProbe extends ContinuousProbe implements
             ArrayList<Double> a = new ArrayList<Double>();
             ArrayList<Double> time = new ArrayList<Double>();
 
-            Cursor cursor = ProbeValuesProvider.getProvider(activity)
-                    .retrieveValues(activity, RotationProbe.DB_TABLE,
-                            this.databaseSchema());
+            Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(activity, RotationProbe.DB_TABLE,
+                    this.databaseSchema());
 
             int count = -1;
 
-            if (cursor != null) {
+            if (cursor != null)
+            {
                 count = cursor.getCount();
 
-                while (cursor.moveToNext()) {
-                    double xd = cursor.getDouble(cursor
-                            .getColumnIndex(RotationProbe.X_KEY));
-                    double yd = cursor.getDouble(cursor
-                            .getColumnIndex(RotationProbe.Y_KEY));
-                    double zd = cursor.getDouble(cursor
-                            .getColumnIndex(RotationProbe.Z_KEY));
-                    double cd = cursor.getDouble(cursor
-                            .getColumnIndex(RotationProbe.COSINE));
-                    double ad = cursor.getDouble(cursor
-                            .getColumnIndex(RotationProbe.ACCURACY));
+                while (cursor.moveToNext())
+                {
+                    double xd = cursor.getDouble(cursor.getColumnIndex(RotationProbe.X_KEY));
+                    double yd = cursor.getDouble(cursor.getColumnIndex(RotationProbe.Y_KEY));
+                    double zd = cursor.getDouble(cursor.getColumnIndex(RotationProbe.Z_KEY));
+                    double cd = cursor.getDouble(cursor.getColumnIndex(RotationProbe.COSINE));
+                    double ad = cursor.getDouble(cursor.getColumnIndex(RotationProbe.ACCURACY));
 
-                    double t = cursor.getDouble(cursor
-                            .getColumnIndex(ProbeValuesProvider.TIMESTAMP));
+                    double t = cursor.getDouble(cursor.getColumnIndex(ProbeValuesProvider.TIMESTAMP));
 
                     x.add(xd);
                     y.add(yd);
@@ -177,21 +173,25 @@ public class RotationProbe extends ContinuousProbe implements
 
             JSONObject json = ch.dataJson(activity);
 
-            template = template.replace("{{{ highchart_json }}}",
-                    json.toString());
+            template = template.replace("{{{ highchart_json }}}", json.toString());
             template = template.replace("{{{ highchart_count }}}", "" + count);
 
             return template;
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             LogManager.getInstance(activity).logException(e);
-        } catch (JSONException e) {
+        }
+        catch (JSONException e)
+        {
             LogManager.getInstance(activity).logException(e);
         }
 
         return null;
     }
 
-    public Bundle formattedBundle(Context context, Bundle bundle) {
+    public Bundle formattedBundle(Context context, Bundle bundle)
+    {
         Bundle formatted = super.formattedBundle(context, bundle);
 
         double[] eventTimes = bundle.getDoubleArray("EVENT_TIMESTAMP");
@@ -203,18 +203,20 @@ public class RotationProbe extends ContinuousProbe implements
 
         ArrayList<String> keys = new ArrayList<String>();
 
-        SimpleDateFormat sdf = new SimpleDateFormat(
-                context.getString(R.string.display_date_format));
+        SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.display_date_format));
 
-        if (x == null || y == null || z == null || c == null || a == null) {
+        if (x == null || y == null || z == null || c == null || a == null)
+        {
 
-        } else if (eventTimes.length > 1) {
+        }
+        else if (eventTimes.length > 1)
+        {
             Bundle readings = new Bundle();
 
-            for (int i = 0; i < eventTimes.length; i++) {
-                String formatString = String.format(
-                        context.getString(R.string.display_gyroscope_reading),
-                        x[i], y[i], z[i]);
+            for (int i = 0; i < eventTimes.length; i++)
+            {
+                String formatString = String.format(context.getString(R.string.display_gyroscope_reading), x[i], y[i],
+                        z[i]);
 
                 double time = eventTimes[i];
 
@@ -230,13 +232,12 @@ public class RotationProbe extends ContinuousProbe implements
             if (keys.size() > 0)
                 readings.putStringArrayList("KEY_ORDER", keys);
 
-            formatted.putBundle(
-                    context.getString(R.string.display_rotation_readings),
-                    readings);
-        } else if (eventTimes.length > 0) {
-            String formatString = String.format(
-                    context.getString(R.string.display_gyroscope_reading),
-                    x[0], y[0], z[0]);
+            formatted.putBundle(context.getString(R.string.display_rotation_readings), readings);
+        }
+        else if (eventTimes.length > 0)
+        {
+            String formatString = String
+                    .format(context.getString(R.string.display_gyroscope_reading), x[0], y[0], z[0]);
 
             double time = eventTimes[0];
 
@@ -248,24 +249,27 @@ public class RotationProbe extends ContinuousProbe implements
         return formatted;
     };
 
-    public long getFrequency() {
+    public long getFrequency()
+    {
         SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
 
-        return Long.parseLong(prefs.getString(
-                "config_probe_rotation_built_in_frequency",
+        return Long.parseLong(prefs.getString("config_probe_rotation_built_in_frequency",
                 ContinuousProbe.DEFAULT_FREQUENCY));
     }
 
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return RotationProbe.NAME;
     }
 
-    public int getTitleResource() {
+    public int getTitleResource()
+    {
         return R.string.title_rotation_probe;
     }
 
     @SuppressLint("InlinedApi")
-    public boolean isEnabled(Context context) {
+    public boolean isEnabled(Context context)
+    {
         if (Build.VERSION.SDK_INT < 9)
             return false;
 
@@ -273,40 +277,36 @@ public class RotationProbe extends ContinuousProbe implements
 
         this._context = context.getApplicationContext();
 
-        SensorManager sensors = (SensorManager) context
-                .getSystemService(Context.SENSOR_SERVICE);
+        SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
 
-        if (super.isEnabled(context)) {
-            if (prefs.getBoolean("config_probe_rotation_built_in_enabled",
-                    ContinuousProbe.DEFAULT_ENABLED)) {
-                int frequency = Integer.parseInt(prefs.getString(
-                        "config_probe_rotation_built_in_frequency",
+        if (super.isEnabled(context))
+        {
+            if (prefs.getBoolean("config_probe_rotation_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
+            {
+                int frequency = Integer.parseInt(prefs.getString("config_probe_rotation_built_in_frequency",
                         ContinuousProbe.DEFAULT_FREQUENCY));
 
-                if (this._lastFrequency != frequency) {
+                if (this._lastFrequency != frequency)
+                {
                     sensors.unregisterListener(this, sensor);
 
-                    switch (frequency) {
+                    switch (frequency)
+                    {
                     case SensorManager.SENSOR_DELAY_FASTEST:
-                        sensors.registerListener(this, sensor,
-                                SensorManager.SENSOR_DELAY_FASTEST, null);
+                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST, null);
                         break;
                     case SensorManager.SENSOR_DELAY_GAME:
-                        sensors.registerListener(this, sensor,
-                                SensorManager.SENSOR_DELAY_GAME, null);
+                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME, null);
                         break;
                     case SensorManager.SENSOR_DELAY_UI:
-                        sensors.registerListener(this, sensor,
-                                SensorManager.SENSOR_DELAY_UI, null);
+                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI, null);
                         break;
                     case SensorManager.SENSOR_DELAY_NORMAL:
-                        sensors.registerListener(this, sensor,
-                                SensorManager.SENSOR_DELAY_NORMAL, null);
+                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL, null);
                         break;
                     default:
-                        sensors.registerListener(this, sensor,
-                                SensorManager.SENSOR_DELAY_GAME, null);
+                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME, null);
                         break;
                     }
 
@@ -314,11 +314,15 @@ public class RotationProbe extends ContinuousProbe implements
                 }
 
                 return true;
-            } else {
+            }
+            else
+            {
                 sensors.unregisterListener(this, sensor);
                 this._lastFrequency = -1;
             }
-        } else {
+        }
+        else
+        {
             sensors.unregisterListener(this, sensor);
             this._lastFrequency = -1;
         }
@@ -326,14 +330,15 @@ public class RotationProbe extends ContinuousProbe implements
         return false;
     }
 
-    protected boolean passesThreshold(SensorEvent event) {
+    protected boolean passesThreshold(SensorEvent event)
+    {
         long now = System.currentTimeMillis();
 
-        if (now - this.lastThresholdLookup > 5000) {
+        if (now - this.lastThresholdLookup > 5000)
+        {
             SharedPreferences prefs = Probe.getPreferences(this._context);
 
-            this.lastThreshold = Double.parseDouble(prefs.getString(
-                    "config_probe_rotation_threshold",
+            this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_rotation_threshold",
                     RotationProbe.DEFAULT_THRESHOLD));
 
             this.lastThresholdLookup = now;
@@ -355,7 +360,8 @@ public class RotationProbe extends ContinuousProbe implements
         else if (Math.abs(c - this._lastC) >= this.lastThreshold)
             passes = true;
 
-        if (passes) {
+        if (passes)
+        {
             this._lastX = x;
             this._lastY = y;
             this._lastZ = z;
@@ -365,7 +371,8 @@ public class RotationProbe extends ContinuousProbe implements
         return passes;
     }
 
-    public Map<String, Object> configuration(Context context) {
+    public Map<String, Object> configuration(Context context)
+    {
         Map<String, Object> map = super.configuration(context);
 
         map.put(ContinuousProbe.PROBE_THRESHOLD, this.lastThreshold);
@@ -373,24 +380,27 @@ public class RotationProbe extends ContinuousProbe implements
         return map;
     }
 
-    public void updateFromMap(Context context, Map<String, Object> params) {
+    public void updateFromMap(Context context, Map<String, Object> params)
+    {
         super.updateFromMap(context, params);
 
-        if (params.containsKey(ContinuousProbe.PROBE_THRESHOLD)) {
+        if (params.containsKey(ContinuousProbe.PROBE_THRESHOLD))
+        {
             Object threshold = params.get(ContinuousProbe.PROBE_THRESHOLD);
 
-            if (threshold instanceof Double) {
+            if (threshold instanceof Double)
+            {
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putString("config_probe_rotation_threshold",
-                        threshold.toString());
+                e.putString("config_probe_rotation_threshold", threshold.toString());
                 e.commit();
             }
         }
     }
 
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    {
         PreferenceScreen screen = super.preferenceScreen(activity);
 
         ListPreference threshold = new ListPreference(activity);
@@ -406,14 +416,17 @@ public class RotationProbe extends ContinuousProbe implements
         return screen;
     }
 
-    public void onSensorChanged(SensorEvent event) {
+    public void onSensorChanged(SensorEvent event)
+    {
         if (this.shouldProcessEvent(event) == false)
             return;
 
         final double now = (double) System.currentTimeMillis();
 
-        if (this.passesThreshold(event)) {
-            synchronized (this) {
+        if (this.passesThreshold(event))
+        {
+            synchronized (this)
+            {
                 double elapsed = (double) SystemClock.uptimeMillis();
                 double boot = (now - elapsed) * 1000 * 1000;
 
@@ -429,20 +442,21 @@ public class RotationProbe extends ContinuousProbe implements
 
                 accuracyBuffer[bufferIndex] = event.accuracy;
 
-                for (int i = 0; i < event.values.length; i++) {
+                for (int i = 0; i < event.values.length; i++)
+                {
                     valueBuffer[i][bufferIndex] = event.values[i];
                 }
 
                 bufferIndex += 1;
 
-                if (bufferIndex >= timeBuffer.length) {
+                if (bufferIndex >= timeBuffer.length)
+                {
                     Sensor sensor = event.sensor;
 
                     Bundle data = new Bundle();
 
                     Bundle sensorBundle = new Bundle();
-                    sensorBundle.putFloat("MAXIMUM_RANGE",
-                            sensor.getMaximumRange());
+                    sensorBundle.putFloat("MAXIMUM_RANGE", sensor.getMaximumRange());
                     sensorBundle.putString("NAME", sensor.getName());
                     sensorBundle.putFloat("POWER", sensor.getPower());
                     sensorBundle.putFloat("RESOLUTION", sensor.getResolution());
@@ -459,20 +473,23 @@ public class RotationProbe extends ContinuousProbe implements
                     data.putDoubleArray("EVENT_TIMESTAMP", timeBuffer);
                     data.putIntArray("ACCURACY", accuracyBuffer);
 
-                    for (int i = 0; i < fieldNames.length; i++) {
+                    for (int i = 0; i < fieldNames.length; i++)
+                    {
                         data.putFloatArray(fieldNames[i], valueBuffer[i]);
                     }
 
                     this.transmitData(this._context, data);
 
-                    for (int j = 0; j < timeBuffer.length; j++) {
+                    for (int j = 0; j < timeBuffer.length; j++)
+                    {
                         Double x = null;
                         Double y = null;
                         Double z = null;
                         Double c = null;
                         Double a = null;
 
-                        for (int i = 0; i < fieldNames.length; i++) {
+                        for (int i = 0; i < fieldNames.length; i++)
+                        {
                             if (fieldNames[i].equals(RotationProbe.X_KEY))
                                 x = Double.valueOf(valueBuffer[i][j]);
                             else if (fieldNames[i].equals(RotationProbe.Y_KEY))
@@ -481,12 +498,12 @@ public class RotationProbe extends ContinuousProbe implements
                                 z = Double.valueOf(valueBuffer[i][j]);
                             else if (fieldNames[i].equals(RotationProbe.COSINE))
                                 c = Double.valueOf(valueBuffer[i][j]);
-                            else if (fieldNames[i]
-                                    .equals(RotationProbe.ACCURACY))
+                            else if (fieldNames[i].equals(RotationProbe.ACCURACY))
                                 a = Double.valueOf(valueBuffer[i][j]);
                         }
 
-                        if (x != null && y != null && z != null) {
+                        if (x != null && y != null && z != null)
+                        {
                             Map<String, Object> values = new HashMap<String, Object>();
 
                             values.put(RotationProbe.X_KEY, x);
@@ -495,12 +512,10 @@ public class RotationProbe extends ContinuousProbe implements
                             values.put(RotationProbe.COSINE, c);
                             values.put(RotationProbe.ACCURACY, a);
 
-                            values.put(ProbeValuesProvider.TIMESTAMP,
-                                    Double.valueOf(timeBuffer[j] / 1000));
+                            values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[j] / 1000));
 
-                            ProbeValuesProvider.getProvider(this._context)
-                                    .insertValue(this._context, this.dbTable(),
-                                            this.databaseSchema(), values);
+                            ProbeValuesProvider.getProvider(this._context).insertValue(this._context, this.dbTable(),
+                                    this.databaseSchema(), values);
                         }
                     }
 
@@ -510,31 +525,34 @@ public class RotationProbe extends ContinuousProbe implements
         }
     }
 
-    protected String dbTable() {
+    protected String dbTable()
+    {
         return RotationProbe.DB_TABLE;
     }
 
-    public String getPreferenceKey() {
+    public String getPreferenceKey()
+    {
         return "rotation_built_in";
     }
 
-    public String summarizeValue(Context context, Bundle bundle) {
+    public String summarizeValue(Context context, Bundle bundle)
+    {
         double xReading = bundle.getDoubleArray("X")[0];
         double yReading = bundle.getDoubleArray("Y")[0];
         double zReading = bundle.getDoubleArray("Z")[0];
         double cReading = bundle.getDoubleArray("COSINE")[0];
 
-        return String.format(
-                context.getResources().getString(
-                        R.string.summary_rotation_probe), xReading, yReading,
+        return String.format(context.getResources().getString(R.string.summary_rotation_probe), xReading, yReading,
                 zReading, cReading);
     }
 
-    public int getSummaryResource() {
+    public int getSummaryResource()
+    {
         return R.string.summary_rotation_probe_desc;
     }
 
-    public boolean isSuperEnabled(Context context) {
+    public boolean isSuperEnabled(Context context)
+    {
         return super.isEnabled(context);
     }
 }

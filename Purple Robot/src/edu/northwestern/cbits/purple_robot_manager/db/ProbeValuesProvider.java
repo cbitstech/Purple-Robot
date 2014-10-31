@@ -28,7 +28,8 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LightProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.MagneticFieldProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.PressureProbe;
 
-public class ProbeValuesProvider {
+public class ProbeValuesProvider
+{
     public static final String INTEGER_TYPE = "integer";
     public static final String REAL_TYPE = "real";
     public static final String TEXT_TYPE = "text";
@@ -47,20 +48,24 @@ public class ProbeValuesProvider {
 
     private HashMap<String, Long> _lastUpdates = new HashMap<String, Long>();
 
-    public static ProbeValuesProvider getProvider(Context context) {
+    public static ProbeValuesProvider getProvider(Context context)
+    {
         if (ProbeValuesProvider._instance == null)
-            ProbeValuesProvider._instance = new ProbeValuesProvider(
-                    context.getApplicationContext());
+            ProbeValuesProvider._instance = new ProbeValuesProvider(context.getApplicationContext());
 
         return ProbeValuesProvider._instance;
     }
 
-    public ProbeValuesProvider(Context context) {
+    public ProbeValuesProvider(Context context)
+    {
         this._dbHelper = new ProbeValuesSqlHelper(context);
 
-        try {
+        try
+        {
             this._database = this._dbHelper.getWritableDatabase();
-        } catch (SQLException e) {
+        }
+        catch (SQLException e)
+        {
             LogManager.getInstance(context).logException(e);
         }
 
@@ -111,48 +116,60 @@ public class ProbeValuesProvider {
         this._filters.add(new ValueDeltaFilter(5.0, fiveDelta));
     }
 
-    public void close() {
+    public void close()
+    {
         this._dbHelper.close();
     }
 
-    private String tableName(Context context, String name,
-            Map<String, String> schema) {
+    private String tableName(Context context, String name, Map<String, String> schema)
+    {
         String tableName = name;
 
         ArrayList<String> columns = new ArrayList<String>(schema.keySet());
         Collections.sort(columns);
 
-        for (String key : columns) {
+        for (String key : columns)
+        {
             tableName += (key + schema.get(key));
         }
 
-        try {
+        try
+        {
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] digest = md.digest(tableName.getBytes("UTF-8"));
 
             tableName = "table_" + (new BigInteger(1, digest)).toString(16);
-        } catch (NoSuchAlgorithmException e) {
+        }
+        catch (NoSuchAlgorithmException e)
+        {
             LogManager.getInstance(context).logException(e);
-        } catch (UnsupportedEncodingException e) {
+        }
+        catch (UnsupportedEncodingException e)
+        {
             LogManager.getInstance(context).logException(e);
         }
 
         return tableName;
     }
 
-    private boolean tableExists(Context context, String tableName) {
+    private boolean tableExists(Context context, String tableName)
+    {
         Cursor c = null;
 
         boolean tableExists = false;
 
-        try {
-            c = this._database.query(tableName, null, null, null, null, null,
-                    null);
+        try
+        {
+            c = this._database.query(tableName, null, null, null, null, null, null);
 
             tableExists = true;
-        } catch (SQLiteException e) {
+        }
+        catch (SQLiteException e)
+        {
             // LogManager.getInstance(context).logException(e);
-        } finally {
+        }
+        finally
+        {
             if (c != null)
                 c.close();
         }
@@ -160,20 +177,24 @@ public class ProbeValuesProvider {
         return tableExists;
     }
 
-    private boolean isValidColumn(String key) {
+    private boolean isValidColumn(String key)
+    {
         // TODO: Add more checks...
 
         return true;
     }
 
-    private boolean createTable(String name, Map<String, String> schema) {
-        String createSql = "create table " + name + " ("
-                + ProbeValuesProvider.ID + " integer primary key autoincrement";
+    private boolean createTable(String name, Map<String, String> schema)
+    {
+        String createSql = "create table " + name + " (" + ProbeValuesProvider.ID
+                + " integer primary key autoincrement";
 
         createSql += (", " + ProbeValuesProvider.TIMESTAMP + " real");
 
-        for (String key : schema.keySet()) {
-            if (this.isValidColumn(key)) {
+        for (String key : schema.keySet())
+        {
+            if (this.isValidColumn(key))
+            {
                 String dbType = null;
 
                 String type = schema.get(key);
@@ -197,8 +218,9 @@ public class ProbeValuesProvider {
         return false;
     }
 
-    public void insertValue(final Context context, final String name,
-            final Map<String, String> schema, final Map<String, Object> values) {
+    public void insertValue(final Context context, final String name, final Map<String, String> schema,
+            final Map<String, Object> values)
+    {
         long now = System.currentTimeMillis();
 
         long lastUpdate = 0;
@@ -213,10 +235,14 @@ public class ProbeValuesProvider {
 
         final ProbeValuesProvider me = this;
 
-        Runnable r = new Runnable() {
-            public void run() {
-                synchronized (me._database) {
-                    for (Filter f : me._filters) {
+        Runnable r = new Runnable()
+        {
+            public void run()
+            {
+                synchronized (me._database)
+                {
+                    for (Filter f : me._filters)
+                    {
                         if (f.allow(name, values) == false)
                             return;
                     }
@@ -234,80 +260,91 @@ public class ProbeValuesProvider {
 
                     ContentValues toInsert = new ContentValues();
 
-                    for (String key : schema.keySet()) {
+                    for (String key : schema.keySet())
+                    {
                         String type = schema.get(key);
 
-                        if (ProbeValuesProvider.REAL_TYPE.equals(type)) {
-                            try {
+                        if (ProbeValuesProvider.REAL_TYPE.equals(type))
+                        {
+                            try
+                            {
                                 Double d = (Double) values.get(key);
                                 toInsert.put(key, d);
-                            } catch (ClassCastException e) {
-                                try {
+                            }
+                            catch (ClassCastException e)
+                            {
+                                try
+                                {
                                     Float f = (Float) values.get(key);
                                     toInsert.put(key, f.doubleValue());
-                                } catch (ClassCastException ee) {
+                                }
+                                catch (ClassCastException ee)
+                                {
                                     Integer i = (Integer) values.get(key);
                                     toInsert.put(key, i.doubleValue());
                                 }
                             }
-                        } else if (ProbeValuesProvider.INTEGER_TYPE
-                                .equals(type)) {
+                        }
+                        else if (ProbeValuesProvider.INTEGER_TYPE.equals(type))
+                        {
                             Integer i = (Integer) values.get(key);
 
                             toInsert.put(key, i);
-                        } else if (ProbeValuesProvider.TEXT_TYPE.equals(type))
+                        }
+                        else if (ProbeValuesProvider.TEXT_TYPE.equals(type))
                             toInsert.put(key, values.get(key).toString());
                     }
 
-                    toInsert.put(ProbeValuesProvider.TIMESTAMP,
-                            (Double) values.get(ProbeValuesProvider.TIMESTAMP));
+                    toInsert.put(ProbeValuesProvider.TIMESTAMP, (Double) values.get(ProbeValuesProvider.TIMESTAMP));
 
                     me._database.insert(localName, null, toInsert);
                 }
             }
         };
 
-        try {
+        try
+        {
             Thread t = new Thread(r);
             t.start();
-        } catch (OutOfMemoryError e) {
+        }
+        catch (OutOfMemoryError e)
+        {
             LogManager.getInstance(context).logException(e);
         }
     }
 
-    private void cleanup(Context context) {
+    private void cleanup(Context context)
+    {
         this._lastCleanup = System.currentTimeMillis();
 
         String tableSelect = "select name from sqlite_master where type='table';";
 
         Cursor c = this._database.rawQuery(tableSelect, null);
 
-        while (c.moveToNext()) {
+        while (c.moveToNext())
+        {
             String tableName = c.getString(c.getColumnIndex("name"));
 
-            try {
-                if (tableName.startsWith("table_")) {
-                    Cursor cursor = this._database.query(tableName, null, null,
-                            null, null, null, null);
+            try
+            {
+                if (tableName.startsWith("table_"))
+                {
+                    Cursor cursor = this._database.query(tableName, null, null, null, null, null, null);
 
                     cursor.close();
 
-                    SQLiteStatement delete = this._database
-                            .compileStatement("delete from " + tableName
-                                    + " where " + ProbeValuesProvider.ID
-                                    + " not in (select "
-                                    + ProbeValuesProvider.ID + " from "
-                                    + tableName + " order by "
-                                    + ProbeValuesProvider.TIMESTAMP
-                                    + " desc limit 2048);");
+                    SQLiteStatement delete = this._database.compileStatement("delete from " + tableName + " where "
+                            + ProbeValuesProvider.ID + " not in (select " + ProbeValuesProvider.ID + " from "
+                            + tableName + " order by " + ProbeValuesProvider.TIMESTAMP + " desc limit 2048);");
                     delete.execute();
 
-                    cursor = this._database.query(tableName, null, null, null,
-                            null, null, null);
+                    cursor = this._database.query(tableName, null, null, null, null, null, null);
 
                     cursor.close();
                 }
-            } catch (SQLException e) {
+            }
+            catch (SQLException e)
+            {
                 LogManager.getInstance(context).logException(e);
             }
         }
@@ -315,7 +352,8 @@ public class ProbeValuesProvider {
         c.close();
     }
 
-    public void clear(Context context) {
+    public void clear(Context context)
+    {
         String tableSelect = "select name from sqlite_master where type='table';";
 
         Cursor c = this._database.rawQuery(tableSelect, null);
@@ -327,32 +365,37 @@ public class ProbeValuesProvider {
 
         c.close();
 
-        for (String name : names) {
-            try {
-                SQLiteStatement delete = this._database
-                        .compileStatement("delete from " + name
-                                + " where (_id != -1)");
+        for (String name : names)
+        {
+            try
+            {
+                SQLiteStatement delete = this._database.compileStatement("delete from " + name + " where (_id != -1)");
                 delete.execute();
-            } catch (SQLException e) {
+            }
+            catch (SQLException e)
+            {
                 LogManager.getInstance(context).logException(e);
             }
         }
     }
 
-    public Cursor retrieveValues(Context context, String name,
-            Map<String, String> schema) {
+    public Cursor retrieveValues(Context context, String name, Map<String, String> schema)
+    {
         Cursor c = null;
 
-        synchronized (this._database) {
+        synchronized (this._database)
+        {
             String localName = this.tableName(context, name, schema);
 
             if (this.tableExists(context, localName) == false)
                 this.createTable(localName, schema);
 
-            try {
-                c = this._database.query(localName, null, null, null, null,
-                        null, ProbeValuesProvider.TIMESTAMP);
-            } catch (Exception e) {
+            try
+            {
+                c = this._database.query(localName, null, null, null, null, null, ProbeValuesProvider.TIMESTAMP);
+            }
+            catch (Exception e)
+            {
                 LogManager.getInstance(context).logException(e);
             }
         }

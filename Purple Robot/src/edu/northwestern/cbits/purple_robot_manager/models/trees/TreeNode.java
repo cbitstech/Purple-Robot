@@ -6,16 +6,19 @@ import java.util.Map;
  * Abstract class that defines the required elements of a tree node class.
  */
 
-public abstract class TreeNode {
+public abstract class TreeNode
+{
     public static final String NAME = "name";
 
     private String _name = null;
 
-    public TreeNode(String name) {
+    public TreeNode(String name)
+    {
         this._name = name;
     }
 
-    public String getName() {
+    public String getName()
+    {
         return this._name;
     }
 
@@ -34,15 +37,16 @@ public abstract class TreeNode {
      *             exception's message for details.
      */
 
-    public abstract Map<String, Object> fetchPrediction(
-            Map<String, Object> features) throws TreeNodeException;
+    public abstract Map<String, Object> fetchPrediction(Map<String, Object> features) throws TreeNodeException;
 
     /**
      * Encapsulates tree-related exceptions.
      */
 
-    public static class TreeNodeException extends Exception {
-        public TreeNodeException(String message) {
+    public static class TreeNodeException extends Exception
+    {
+        public TreeNodeException(String message)
+        {
             super(message);
         }
 
@@ -72,10 +76,14 @@ public abstract class TreeNode {
      * @see java.lang.Object#toString()
      */
 
-    public String toString() {
-        try {
+    public String toString()
+    {
+        try
+        {
             return this.toString(0);
-        } catch (TreeNodeException e) {
+        }
+        catch (TreeNodeException e)
+        {
             throw new RuntimeException(e);
         }
     }

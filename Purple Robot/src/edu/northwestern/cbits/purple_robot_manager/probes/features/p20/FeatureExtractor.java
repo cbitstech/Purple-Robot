@@ -11,7 +11,8 @@ import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 import android.util.Log;
 import edu.emory.mathcs.backport.java.util.Arrays;
 
-public class FeatureExtractor {
+public class FeatureExtractor
+{
     private long _windowSize = -1;
     private int _dimensions = -1;
 
@@ -24,29 +25,35 @@ public class FeatureExtractor {
     // private FastFourierTransformer _fft = null;
 
     // bin edges must be in ascending order and equally spaced.
-    private double[] _binEdges = new double[] { -3, -2, -1, 0, 1, 2, 3 };
+    private double[] _binEdges = new double[]
+    { -3, -2, -1, 0, 1, 2, 3 };
 
-    public static enum Feature {
+    public static enum Feature
+    {
         ACC_NUM_SAMPLES, ACC_MEAN, ACCX_MEAN, ACCY_MEAN, ACCZ_MEAN, ACC_MEAN_ABS, ACCX_MEAN_ABS, ACCY_MEAN_ABS, ACCZ_MEAN_ABS, ACCX_STD, ACCY_STD, ACCZ_STD, ACCX_SKEW, ACCY_SKEW, ACCZ_SKEW, ACCX_KURT, ACCY_KURT, ACCZ_KURT, ACCX_DIFF_MEAN, ACCY_DIFF_MEAN, ACCZ_DIFF_MEAN, ACCX_DIFF_STD, ACCY_DIFF_STD, ACCZ_DIFF_STD, ACCX_DIFF_SKEW, ACCY_DIFF_SKEW, ACCZ_DIFF_SKEW, ACCX_DIFF_KURT, ACCY_DIFF_KURT, ACCZ_DIFF_KURT, ACCX_MAX, ACCY_MAX, ACCZ_MAX, ACCX_MIN, ACCY_MIN, ACCZ_MIN, ACCX_MAX_ABS, ACCY_MAX_ABS, ACCZ_MAX_ABS, ACCX_MIN_ABS, ACCY_MIN_ABS, ACCZ_MIN_ABS, ACCX_RMS, ACCY_RMS, ACCZ_RMS, ACC_CROSS_XY, ACC_CROSS_YZ, ACC_CROSS_ZX, ACC_CROSS_XY_ABS, ACC_CROSS_YZ_ABS, ACC_CROSS_ZX_ABS, ACC_CROSS_XY_NORM, ACC_CROSS_YZ_NORM, ACC_CROSS_ZX_NORM, ACC_CROSS_XY_NORM_ABS, ACC_CROSS_YZ_NORM_ABS, ACC_CROSS_ZX_NORM_ABS, ACCX_FFT1, ACCX_FFT2, ACCX_FFT3, ACCX_FFT4, ACCX_FFT5, ACCX_FFT6, ACCX_FFT7, ACCX_FFT8, ACCX_FFT9, ACCX_FFT10, ACCY_FFT1, ACCY_FFT2, ACCY_FFT3, ACCY_FFT4, ACCY_FFT5, ACCY_FFT6, ACCY_FFT7, ACCY_FFT8, ACCY_FFT9, ACCY_FFT10, ACCZ_FFT1, ACCZ_FFT2, ACCZ_FFT3, ACCZ_FFT4, ACCZ_FFT5, ACCZ_FFT6, ACCZ_FFT7, ACCZ_FFT8, ACCZ_FFT9, ACCZ_FFT10, ACCX_HIST1, ACCX_HIST2, ACCX_HIST3, ACCX_HIST4, ACCX_HIST5, ACCX_HIST6, ACCY_HIST1, ACCY_HIST2, ACCY_HIST3, ACCY_HIST4, ACCY_HIST5, ACCY_HIST6, ACCZ_HIST1, ACCZ_HIST2, ACCZ_HIST3, ACCZ_HIST4, ACCZ_HIST5, ACCZ_HIST6, GYR_NUM_SAMPLES, GYR_MEAN, GYRX_MEAN, GYRY_MEAN, GYRZ_MEAN, GYR_MEAN_ABS, GYRX_MEAN_ABS, GYRY_MEAN_ABS, GYRZ_MEAN_ABS, GYRX_STD, GYRY_STD, GYRZ_STD, GYRX_SKEW, GYRY_SKEW, GYRZ_SKEW, GYRX_KURT, GYRY_KURT, GYRZ_KURT, GYRX_DIFF_MEAN, GYRY_DIFF_MEAN, GYRZ_DIFF_MEAN, GYRX_DIFF_STD, GYRY_DIFF_STD, GYRZ_DIFF_STD, GYRX_DIFF_SKEW, GYRY_DIFF_SKEW, GYRZ_DIFF_SKEW, GYRX_DIFF_KURT, GYRY_DIFF_KURT, GYRZ_DIFF_KURT, GYRX_MAX, GYRY_MAX, GYRZ_MAX, GYRX_MIN, GYRY_MIN, GYRZ_MIN, GYRX_MAX_ABS, GYRY_MAX_ABS, GYRZ_MAX_ABS, GYRX_MIN_ABS, GYRY_MIN_ABS, GYRZ_MIN_ABS, GYRX_RMS, GYRY_RMS, GYRZ_RMS, GYR_CROSS_XY, GYR_CROSS_YZ, GYR_CROSS_ZX, GYR_CROSS_XY_ABS, GYR_CROSS_YZ_ABS, GYR_CROSS_ZX_ABS, GYR_CROSS_XY_NORM, GYR_CROSS_YZ_NORM, GYR_CROSS_ZX_NORM, GYR_CROSS_XY_NORM_ABS, GYR_CROSS_YZ_NORM_ABS, GYR_CROSS_ZX_NORM_ABS, GYRX_FFT1, GYRX_FFT2, GYRX_FFT3, GYRX_FFT4, GYRX_FFT5, GYRX_FFT6, GYRX_FFT7, GYRX_FFT8, GYRX_FFT9, GYRX_FFT10, GYRY_FFT1, GYRY_FFT2, GYRY_FFT3, GYRY_FFT4, GYRY_FFT5, GYRY_FFT6, GYRY_FFT7, GYRY_FFT8, GYRY_FFT9, GYRY_FFT10, GYRZ_FFT1, GYRZ_FFT2, GYRZ_FFT3, GYRZ_FFT4, GYRZ_FFT5, GYRZ_FFT6, GYRZ_FFT7, GYRZ_FFT8, GYRZ_FFT9, GYRZ_FFT10, GYRX_HIST1, GYRX_HIST2, GYRX_HIST3, GYRX_HIST4, GYRX_HIST5, GYRX_HIST6, GYRY_HIST1, GYRY_HIST2, GYRY_HIST3, GYRY_HIST4, GYRY_HIST5, GYRY_HIST6, GYRZ_HIST1, GYRZ_HIST2, GYRZ_HIST3, GYRZ_HIST4, GYRZ_HIST5, GYRZ_HIST6, PROCESSING_TIME
     }
 
-    public FeatureExtractor(long windowSize, List<Feature> features,
-            int dimensions) {
+    public FeatureExtractor(long windowSize, List<Feature> features, int dimensions)
+    {
         this._windowSize = windowSize;
         this._dimensions = dimensions;
 
-        for (Feature f : features) {
+        for (Feature f : features)
+        {
             String featureName = f.toString();
 
-            if (featureName.contains("FFT")) {
+            if (featureName.contains("FFT"))
+            {
                 this._hasFFT = true;
                 // this._fft = new
                 // FastFourierTransformer(DftNormalization.STANDARD);
-            } else if (featureName.contains("DIFF"))
+            }
+            else if (featureName.contains("DIFF"))
                 this._hasDiff = true;
             else if (featureName.contains("HIST"))
                 this._hasHist = true;
-            else if (featureName.contains("CROSS")) {
+            else if (featureName.contains("CROSS"))
+            {
                 this._hasCross = true;
 
                 if (featureName.contains("NORM"))
@@ -55,19 +62,20 @@ public class FeatureExtractor {
         }
     }
 
-    public void setBinEdges(double[] edges) {
+    public void setBinEdges(double[] edges)
+    {
         this._binEdges = Arrays.copyOf(edges, edges.length);
     }
 
-    public Map<Feature, Double> extractFeatures(Clip clp) {
+    public Map<Feature, Double> extractFeatures(Clip clp)
+    {
         HashMap<Feature, Double> features = new HashMap<Feature, Double>();
 
         // build a copy of the clip. because it sometimes crashes suspiciously.
         Clip clip = new Clip(clp);
 
         // Spline Interpolation
-        List<double[]> signal = this.interpolate(clip.getValues(),
-                clip.getTimestamps(), 50);
+        List<double[]> signal = this.interpolate(clip.getValues(), clip.getTimestamps(), 50);
 
         // Calculating the statistical moments
         double[] mean = new double[this._dimensions];
@@ -75,7 +83,8 @@ public class FeatureExtractor {
         double[] skewness = new double[this._dimensions];
         double[] kurtosis = new double[this._dimensions];
 
-        for (int i = 0; i < this._dimensions; i++) {
+        for (int i = 0; i < this._dimensions; i++)
+        {
             double[] moments = this.getMoments(signal, i);
 
             mean[i] = moments[0];
@@ -84,7 +93,8 @@ public class FeatureExtractor {
             kurtosis[i] = moments[3];
         }
 
-        switch (clip.getType()) {
+        switch (clip.getType())
+        {
         case Clip.ACCELEROMETER:
             features.put(Feature.ACC_NUM_SAMPLES, (double) signal.size());
             features.put(Feature.ACC_MEAN, this.getOverallMean(signal));
@@ -177,7 +187,8 @@ public class FeatureExtractor {
             break;
         }
 
-        if (this._hasDiff) {
+        if (this._hasDiff)
+        {
             double[] diffMean = new double[this._dimensions];
             double[] diffStd = new double[this._dimensions];
             double[] diffSkewness = new double[this._dimensions];
@@ -188,7 +199,8 @@ public class FeatureExtractor {
             signalDiff = this.getDiff(signal);
 
             // Calculating the statistical moments of the difference signal
-            for (int i = 0; i < this._dimensions; i++) {
+            for (int i = 0; i < this._dimensions; i++)
+            {
                 double[] moments = this.getMoments(signalDiff, i);
                 diffMean[i] = moments[0];
                 diffStd[i] = moments[1];
@@ -196,7 +208,8 @@ public class FeatureExtractor {
                 diffKurtosis[i] = moments[3];
             }
 
-            switch (clip.getType()) {
+            switch (clip.getType())
+            {
             case Clip.ACCELEROMETER:
                 features.put(Feature.ACCX_DIFF_MEAN, diffMean[0]);
                 features.put(Feature.ACCY_DIFF_MEAN, diffMean[1]);
@@ -236,7 +249,8 @@ public class FeatureExtractor {
             }
         }
 
-        if (this._hasHist) {
+        if (this._hasHist)
+        {
             // histogram of zscore values
 
             int[][] hist = new int[this._dimensions][this._binEdges.length - 1];
@@ -245,13 +259,15 @@ public class FeatureExtractor {
 
             List<double[]> signalZScore = this.getZScore(signal, mean, std);
 
-            for (int i = 0; i < this._dimensions; i++) {
+            for (int i = 0; i < this._dimensions; i++)
+            {
                 for (int j = 0; j < this._binEdges.length - 1; j++)
                     hist[i][j] = 0;
 
                 // TODO: Pull out into it's own variable: signalZScore.size()
 
-                for (int j = 0; j < signalZScore.size(); j++) {
+                for (int j = 0; j < signalZScore.size(); j++)
+                {
                     bin = (int) ((signalZScore.get(j)[i] - this._binEdges[0]) / (this._binEdges[1] - this._binEdges[0]));
 
                     if ((bin < this._binEdges.length - 1) && (bin >= 0)) // values
@@ -268,7 +284,8 @@ public class FeatureExtractor {
             // Add another set of histograms on raw signals (not zscore)
             // TBD also on MATLAB side
 
-            switch (clip.getType()) {
+            switch (clip.getType())
+            {
             case Clip.ACCELEROMETER:
                 features.put(Feature.ACCX_HIST1, (double) hist[0][0]);
                 features.put(Feature.ACCX_HIST2, (double) hist[0][1]);
@@ -318,16 +335,19 @@ public class FeatureExtractor {
             }
         }
 
-        if (this._hasCross) {
+        if (this._hasCross)
+        {
             double[] cross = new double[this._dimensions];
 
             for (int i = 0; i < this._dimensions; i++)
                 cross[i] = 0;
 
-            if (this._dimensions == 3) {
+            if (this._dimensions == 3)
+            {
                 cross = this.get3DInnerProds(signal);
 
-                switch (clip.getType()) {
+                switch (clip.getType())
+                {
                 case Clip.ACCELEROMETER:
                     features.put(Feature.ACC_CROSS_XY, cross[0]);
                     features.put(Feature.ACC_CROSS_YZ, cross[1]);
@@ -349,32 +369,33 @@ public class FeatureExtractor {
 
                     break;
                 }
-            } else
+            }
+            else
                 Log.e("PR",
                         "FeatureExtractor: Calculating cross-dimensional inner-products for a non-3D signal - values set to zero!");
         }
 
-        if (this._hasNormCross) {
+        if (this._hasNormCross)
+        {
             double[] crossNorm = new double[this._dimensions];
 
             for (int i = 0; i < this._dimensions; i++)
                 crossNorm[i] = 0;
 
-            if (this._dimensions == 3) {
+            if (this._dimensions == 3)
+            {
                 crossNorm = this.get3DNormInnerProds(signal);
 
-                switch (clip.getType()) {
+                switch (clip.getType())
+                {
                 case Clip.ACCELEROMETER:
                     features.put(Feature.ACC_CROSS_XY_NORM, crossNorm[0]);
                     features.put(Feature.ACC_CROSS_YZ_NORM, crossNorm[1]);
                     features.put(Feature.ACC_CROSS_ZX_NORM, crossNorm[2]);
 
-                    features.put(Feature.ACC_CROSS_XY_NORM_ABS,
-                            Math.abs(crossNorm[0]));
-                    features.put(Feature.ACC_CROSS_YZ_NORM_ABS,
-                            Math.abs(crossNorm[1]));
-                    features.put(Feature.ACC_CROSS_ZX_NORM_ABS,
-                            Math.abs(crossNorm[2]));
+                    features.put(Feature.ACC_CROSS_XY_NORM_ABS, Math.abs(crossNorm[0]));
+                    features.put(Feature.ACC_CROSS_YZ_NORM_ABS, Math.abs(crossNorm[1]));
+                    features.put(Feature.ACC_CROSS_ZX_NORM_ABS, Math.abs(crossNorm[2]));
 
                     break;
                 case Clip.GYROSCOPE:
@@ -382,16 +403,14 @@ public class FeatureExtractor {
                     features.put(Feature.GYR_CROSS_YZ_NORM, crossNorm[1]);
                     features.put(Feature.GYR_CROSS_ZX_NORM, crossNorm[2]);
 
-                    features.put(Feature.GYR_CROSS_XY_NORM_ABS,
-                            Math.abs(crossNorm[0]));
-                    features.put(Feature.GYR_CROSS_YZ_NORM_ABS,
-                            Math.abs(crossNorm[1]));
-                    features.put(Feature.GYR_CROSS_ZX_NORM_ABS,
-                            Math.abs(crossNorm[2]));
+                    features.put(Feature.GYR_CROSS_XY_NORM_ABS, Math.abs(crossNorm[0]));
+                    features.put(Feature.GYR_CROSS_YZ_NORM_ABS, Math.abs(crossNorm[1]));
+                    features.put(Feature.GYR_CROSS_ZX_NORM_ABS, Math.abs(crossNorm[2]));
 
                     break;
                 }
-            } else
+            }
+            else
                 Log.e("Warning",
                         "Calculating cross-dimensional inner-products for a non-3D signal - values set to zero!");
         }
@@ -405,10 +424,12 @@ public class FeatureExtractor {
          * // int i=0;
          */
 
-        if (this._hasFFT) {
+        if (this._hasFFT)
+        {
             // TODO: Update & uncomment FFT code below...
 
-            switch (clip.getType()) {
+            switch (clip.getType())
+            {
             case Clip.ACCELEROMETER:
                 features.put(Feature.ACCX_FFT1, 0.0);
                 features.put(Feature.ACCX_FFT2, 0.0);
@@ -485,8 +506,8 @@ public class FeatureExtractor {
         return features;
     }
 
-    private List<double[]> interpolate(List<double[]> signal, List<Long> ts,
-            int freq) {
+    private List<double[]> interpolate(List<double[]> signal, List<Long> ts, int freq)
+    {
         List<double[]> signalOut = new ArrayList<double[]>();
 
         if (ts.size() < 2) // CJK TODO: Ok returning uninitialized signalOut?
@@ -507,17 +528,21 @@ public class FeatureExtractor {
 
         // TODO: Pull out into own variable: ts.size()
 
-        for (int j = 1; j < ts.size(); j++) {
+        for (int j = 1; j < ts.size(); j++)
+        {
             // TODO: Pull out into own variable: ts.get(j)
             // TODO: Pull out into own variable: t2.size()
 
-            if (ts.get(j) > t2.get(t2.size() - 1)) {
+            if (ts.get(j) > t2.get(t2.size() - 1))
+            {
                 t2.add(ts.get(j));
 
                 // TODO: Pull out into own variable: signal.get(j)
 
                 signal2.add(Arrays.copyOf(signal.get(j), signal.get(j).length));
-            } else {
+            }
+            else
+            {
                 Log.e("PR", "FeatureExtractor: Non-increasing timestamp found!");
             }
         }
@@ -544,7 +569,8 @@ public class FeatureExtractor {
 
         double[][] signalOutTemp = new double[nSamp][this._dimensions];
 
-        for (int i = 0; i < this._dimensions; i++) {
+        for (int i = 0; i < this._dimensions; i++)
+        {
             // building a separate array for the current axis
             double[] signal1D = new double[signal2.size()];
 
@@ -553,8 +579,7 @@ public class FeatureExtractor {
 
             // spline interpolation
             SplineInterpolator interp = new SplineInterpolator();
-            PolynomialSplineFunction func = interp.interpolate(tDouble,
-                    signal1D);
+            PolynomialSplineFunction func = interp.interpolate(tDouble, signal1D);
 
             // interpolating onto new instances
             for (int j = 0; j < nSamp; j++)
@@ -563,7 +588,8 @@ public class FeatureExtractor {
 
         // TODO: Pull out into own variable: signalOut.size()
 
-        for (int i = 0; i < nSamp; i++) {
+        for (int i = 0; i < nSamp; i++)
+        {
             signalOut.add(new double[this._dimensions]);
             signalOut.set(signalOut.size() - 1, signalOutTemp[i]);
         }
@@ -571,12 +597,14 @@ public class FeatureExtractor {
         return signalOut;
     }
 
-    private List<double[]> getDiff(List<double[]> signal) {
+    private List<double[]> getDiff(List<double[]> signal)
+    {
         List<double[]> signalDiff = new ArrayList<double[]>();
 
         // TODO: Pull out into own variable: signal.size()
 
-        for (int i = 0; i < signal.size() - 1; i++) {
+        for (int i = 0; i < signal.size() - 1; i++)
+        {
             double[] sig = signal.get(i);
             double[] sigNext = signal.get(i + 1);
 
@@ -591,13 +619,14 @@ public class FeatureExtractor {
         return signalDiff;
     }
 
-    private List<double[]> getZScore(List<double[]> signal, double[] mean,
-            double[] std) {
+    private List<double[]> getZScore(List<double[]> signal, double[] mean, double[] std)
+    {
         List<double[]> signalZScore = new ArrayList<double[]>();
 
         // TODO: Pull out into own variable: signal.size()
 
-        for (int i = 0; i < signal.size(); i++) {
+        for (int i = 0; i < signal.size(); i++)
+        {
             double[] sig = signal.get(i);
             double[] sigZScore = new double[this._dimensions];
 
@@ -616,15 +645,19 @@ public class FeatureExtractor {
     // array, with
     // each element accounting for one dimension
 
-    private double[] getMoments(List<double[]> signal, int axis) {
+    private double[] getMoments(List<double[]> signal, int axis)
+    {
         double[][] signalArray = new double[signal.size()][this._dimensions];
 
-        for (int i = 0; i < signalArray.length; i++) {
+        for (int i = 0; i < signalArray.length; i++)
+        {
             signalArray[i] = signal.get(i);
         }
 
-        if (signalArray.length < 2) {
-            double[] out = { 0.0, 0.0, 0.0, 0.0 };
+        if (signalArray.length < 2)
+        {
+            double[] out =
+            { 0.0, 0.0, 0.0, 0.0 };
 
             return out;
         }
@@ -650,7 +683,8 @@ public class FeatureExtractor {
         double t3 = 0.0;
         double t4 = 0.0;
 
-        for (int i = 0; i < signalArray.length; i++) {
+        for (int i = 0; i < signalArray.length; i++)
+        {
             t2 = (signalArray[i][axis] - mean) * (signalArray[i][axis] - mean);
             m2 += t2;
 
@@ -671,15 +705,18 @@ public class FeatureExtractor {
 
         double kurtosis = m4 / (m2 * m2) - 3; // unbiased
 
-        double out[] = { mean, std, skewness, kurtosis };
+        double out[] =
+        { mean, std, skewness, kurtosis };
         return out;
     }
 
     // overall mean of squares
-    private double getOverallMean(List<double[]> signal) {
+    private double getOverallMean(List<double[]> signal)
+    {
         double[][] signalArray = new double[signal.size()][this._dimensions];
 
-        for (int i = 0; i < signalArray.length; i++) {
+        for (int i = 0; i < signalArray.length; i++)
+        {
             signalArray[i] = signal.get(i);
         }
 
@@ -693,7 +730,8 @@ public class FeatureExtractor {
          * this._dimensions; }
          */
 
-        for (int i = 0; i < signalArray.length; i++) {
+        for (int i = 0; i < signalArray.length; i++)
+        {
             for (int j = 0; j < this._dimensions; j++)
                 ms += signalArray[i][j] * signalArray[i][j] / this._dimensions;
         }
@@ -703,7 +741,8 @@ public class FeatureExtractor {
         return ms;
     }
 
-    private double getRMS(List<double[]> signal, int axis) {
+    private double getRMS(List<double[]> signal, int axis)
+    {
         double rms = 0;
 
         // TODO: Pull out into own variable: signal.size()
@@ -716,7 +755,8 @@ public class FeatureExtractor {
         return rms;
     }
 
-    private double getMax(List<double[]> signal, int axis) {
+    private double getMax(List<double[]> signal, int axis)
+    {
         if (signal.size() == 0) // CJK Question / TODO: Is this always the right
                                 // answer?
             return 0;
@@ -725,7 +765,8 @@ public class FeatureExtractor {
 
         // TODO: Pull out into own variable: signal.size()
 
-        for (int i = 1; i < signal.size(); i++) {
+        for (int i = 1; i < signal.size(); i++)
+        {
             if (max < signal.get(i)[axis])
                 max = signal.get(i)[axis];
         }
@@ -733,7 +774,8 @@ public class FeatureExtractor {
         return max;
     }
 
-    private double getMin(List<double[]> signal, int axis) {
+    private double getMin(List<double[]> signal, int axis)
+    {
         if (signal.size() == 0) // CJK Question / TODO: Is this always the right
                                 // answer?
             return 0;
@@ -742,7 +784,8 @@ public class FeatureExtractor {
 
         // TODO: Pull out into own variable: signal.size()
 
-        for (int i = 1; i < signal.size(); i++) {
+        for (int i = 1; i < signal.size(); i++)
+        {
             if (min > signal.get(i)[axis])
                 min = signal.get(i)[axis];
         }
@@ -750,7 +793,8 @@ public class FeatureExtractor {
         return min;
     }
 
-    private double[] get3DInnerProds(List<double[]> signal) {
+    private double[] get3DInnerProds(List<double[]> signal)
+    {
         // This feature only works for 3D signals (acceleration, magnetic field,
         // etc).
 
@@ -782,7 +826,8 @@ public class FeatureExtractor {
         return innerProds;
     }
 
-    private double[] get3DNormInnerProds(List<double[]> signal) {
+    private double[] get3DNormInnerProds(List<double[]> signal)
+    {
         double[] innerProds = new double[3];
 
         if (this._dimensions != 3)
@@ -790,9 +835,9 @@ public class FeatureExtractor {
 
         double[] magnitude = new double[signal.size()];
 
-        for (int j = 0; j < signal.size(); j++) {
-            magnitude[j] = (signal.get(j)[0] * signal.get(j)[0])
-                    + (signal.get(j)[1] * signal.get(j)[1])
+        for (int j = 0; j < signal.size(); j++)
+        {
+            magnitude[j] = (signal.get(j)[0] * signal.get(j)[0]) + (signal.get(j)[1] * signal.get(j)[1])
                     + (signal.get(j)[2] * signal.get(j)[2]);
         }
 

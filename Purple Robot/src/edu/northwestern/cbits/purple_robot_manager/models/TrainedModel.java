@@ -29,7 +29,8 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
  * information.
  */
 
-public abstract class TrainedModel extends Model {
+public abstract class TrainedModel extends Model
+{
     protected Uri _source = null;
     protected String _sourceHash = null;
     protected boolean _inited = false;
@@ -45,22 +46,24 @@ public abstract class TrainedModel extends Model {
      */
 
     @Override
-    public Uri uri() {
+    public Uri uri()
+    {
         return this._source;
     }
 
-    public TrainedModel(final Context context, Uri uri) {
+    public TrainedModel(final Context context, Uri uri)
+    {
         this._source = uri;
-        this._sourceHash = EncryptionManager.getInstance().createHash(context,
-                uri.toString());
+        this._sourceHash = EncryptionManager.getInstance().createHash(context, uri.toString());
 
         final TrainedModel me = this;
 
-        Runnable r = new Runnable() {
+        Runnable r = new Runnable()
+        {
             @Override
-            public void run() {
-                String hash = EncryptionManager.getInstance().createHash(
-                        context, me._source.toString());
+            public void run()
+            {
+                String hash = EncryptionManager.getInstance().createHash(context, me._source.toString());
 
                 SharedPreferences prefs = Probe.getPreferences(context);
 
@@ -72,8 +75,7 @@ public abstract class TrainedModel extends Model {
                 if (internalStorage != null && !internalStorage.exists())
                     internalStorage.mkdirs();
 
-                File modelsFolder = new File(internalStorage,
-                        "persisted_models");
+                File modelsFolder = new File(internalStorage, "persisted_models");
 
                 if (modelsFolder != null && !modelsFolder.exists())
                     modelsFolder.mkdirs();
@@ -81,27 +83,31 @@ public abstract class TrainedModel extends Model {
                 String contents = null;
                 File cachedModel = new File(modelsFolder, hash);
 
-                try {
+                try
+                {
                     contents = FileUtils.readFileToString(cachedModel);
-                } catch (IOException e) {
+                }
+                catch (IOException e)
+                {
 
                 }
 
-                try {
+                try
+                {
                     BufferedReader in = null;
 
-                    if (me._source.toString().startsWith(
-                            "file:///android_asset/")) {
+                    if (me._source.toString().startsWith("file:///android_asset/"))
+                    {
                         AssetManager assets = context.getAssets();
 
-                        in = new BufferedReader(new InputStreamReader(
-                                assets.open(me._source.toString().replace(
-                                        "file:///android_asset/", ""))));
-                    } else {
+                        in = new BufferedReader(new InputStreamReader(assets.open(me._source.toString().replace(
+                                "file:///android_asset/", ""))));
+                    }
+                    else
+                    {
                         URL u = new URL(me._source.toString());
 
-                        in = new BufferedReader(new InputStreamReader(
-                                u.openStream()));
+                        in = new BufferedReader(new InputStreamReader(u.openStream()));
                     }
 
                     StringBuffer sb = new StringBuffer();
@@ -114,16 +120,22 @@ public abstract class TrainedModel extends Model {
                     in.close();
 
                     contents = sb.toString();
-                } catch (MalformedURLException e) {
+                }
+                catch (MalformedURLException e)
+                {
                     e.printStackTrace();
                     LogManager.getInstance(context).logException(e);
-                } catch (IOException e) {
+                }
+                catch (IOException e)
+                {
                     e.printStackTrace();
                     LogManager.getInstance(context).logException(e);
                 }
 
-                if (contents != null) {
-                    try {
+                if (contents != null)
+                {
+                    try
+                    {
                         JSONObject json = new JSONObject(contents);
 
                         me._name = json.getString("name");
@@ -138,11 +150,12 @@ public abstract class TrainedModel extends Model {
                         FileUtils.writeStringToFile(cachedModel, contents);
 
                         me._inited = true;
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         LogManager.getInstance(context).logException(e);
 
-                        ModelManager.getInstance(context).deleteModel(
-                                me._source.toString());
+                        ModelManager.getInstance(context).deleteModel(me._source.toString());
                     }
                 }
             }
@@ -152,16 +165,21 @@ public abstract class TrainedModel extends Model {
         t.start();
     }
 
-    protected void setFeatureMap(Context context, JSONObject mapJson) {
+    protected void setFeatureMap(Context context, JSONObject mapJson)
+    {
         Iterator<String> keys = mapJson.keys();
 
-        while (keys.hasNext()) {
-            try {
+        while (keys.hasNext())
+        {
+            try
+            {
                 String original = keys.next();
                 String replacement = mapJson.get(original).toString();
 
                 this._featureMap.put(original, replacement);
-            } catch (JSONException e) {
+            }
+            catch (JSONException e)
+            {
                 LogManager.getInstance(context).logException(e);
             }
         }
@@ -175,7 +193,8 @@ public abstract class TrainedModel extends Model {
      */
 
     @Override
-    public String title(Context context) {
+    public String title(Context context)
+    {
         return this._name;
     }
 
@@ -187,7 +206,8 @@ public abstract class TrainedModel extends Model {
      */
 
     @Override
-    public String summary(Context context) {
+    public String summary(Context context)
+    {
         return context.getString(R.string.summary_model_unknown);
     }
 
@@ -199,7 +219,8 @@ public abstract class TrainedModel extends Model {
      */
 
     @Override
-    public String getPreferenceKey() {
+    public String getPreferenceKey()
+    {
         return this._sourceHash;
     }
 
@@ -211,7 +232,8 @@ public abstract class TrainedModel extends Model {
      */
 
     @Override
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return this._source.toString();
     }
 
@@ -226,55 +248,65 @@ public abstract class TrainedModel extends Model {
      */
 
     @Override
-    public void predict(final Context context,
-            final Map<String, Object> snapshot) {
+    public void predict(final Context context, final Map<String, Object> snapshot)
+    {
 
         if (this._inited == false || this.enabled(context) == false)
             return;
 
         long now = System.currentTimeMillis();
 
-        if (now - this._lastCheck < 1000) {
+        if (now - this._lastCheck < 1000)
+        {
             return;
         }
 
         this._lastCheck = now;
 
-        for (String key : this._featureMap.keySet()) {
+        for (String key : this._featureMap.keySet())
+        {
             String newKey = this._featureMap.get(key);
 
-            if (snapshot.get(key) == null) {
+            if (snapshot.get(key) == null)
+            {
                 // Do nothing.
-            } else {
+            }
+            else
+            {
                 snapshot.put(newKey, snapshot.get(key));
             }
         }
 
         final TrainedModel me = this;
 
-        Runnable r = new Runnable() {
+        Runnable r = new Runnable()
+        {
             @Override
             @SuppressWarnings("unchecked")
-            public void run() {
+            public void run()
+            {
                 Object value = me.evaluateModel(context, snapshot);
 
-                if (value == null) {
+                if (value == null)
+                {
                     // Do nothing.
-                } else if (value instanceof Map<?, ?>) {
+                }
+                else if (value instanceof Map<?, ?>)
+                {
                     Map<String, Object> map = (Map<String, Object>) value;
 
                     if (map.get(LeafNode.PREDICTION) != null)
-                        me.transmitPrediction(context,
-                                map.get(LeafNode.PREDICTION).toString(),
+                        me.transmitPrediction(context, map.get(LeafNode.PREDICTION).toString(),
                                 (Double) map.get(LeafNode.ACCURACY), map);
-                } else if (value instanceof Double) {
+                }
+                else if (value instanceof Double)
+                {
                     Double doubleValue = (Double) value;
 
-                    me.transmitPrediction(context, doubleValue.doubleValue(),
-                            me._accuracy);
-                } else
-                    me.transmitPrediction(context, value.toString(),
-                            me._accuracy);
+                    me.transmitPrediction(context, doubleValue.doubleValue(), me._accuracy);
+                }
+                else
+                    me.transmitPrediction(context, value.toString(), me._accuracy);
             }
         };
 
@@ -295,8 +327,7 @@ public abstract class TrainedModel extends Model {
      * @throws Exception
      */
 
-    protected abstract void generateModel(Context context, Object model)
-            throws Exception;
+    protected abstract void generateModel(Context context, Object model) throws Exception;
 
     /**
      * Evaluates the states provided to generate a prediction describing the
@@ -310,6 +341,5 @@ public abstract class TrainedModel extends Model {
      * @return Prediction generated by the model.
      */
 
-    protected abstract Object evaluateModel(Context context,
-            Map<String, Object> snapshot);
+    protected abstract Object evaluateModel(Context context, Map<String, Object> snapshot);
 }

@@ -18,35 +18,36 @@ import android.webkit.WebView;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
-public class CodeViewerActivity extends ActionBarActivity {
+public class CodeViewerActivity extends ActionBarActivity
+{
     public static final String SOURCE_CODE = "SOURCE_CODE";
     public static final String TITLE = "TITLE";
 
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
         this.setContentView(R.layout.layout_code_activity);
 
-        getWindow().setLayout(LayoutParams.MATCH_PARENT,
-                LayoutParams.MATCH_PARENT);
+        getWindow().setLayout(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
     }
 
     @SuppressWarnings("resource")
-    protected void onResume() {
+    protected void onResume()
+    {
         super.onResume();
 
-        this.getSupportActionBar().setTitle(
-                this.getIntent().getStringExtra(CodeViewerActivity.TITLE));
+        this.getSupportActionBar().setTitle(this.getIntent().getStringExtra(CodeViewerActivity.TITLE));
 
-        String code = this.getIntent().getStringExtra(
-                CodeViewerActivity.SOURCE_CODE);
+        String code = this.getIntent().getStringExtra(CodeViewerActivity.SOURCE_CODE);
 
         String language = "javascript";
 
         if (code.startsWith("(") && code.endsWith(")"))
             language = "scheme";
 
-        if (language.equals("javascript")) {
+        if (language.equals("javascript"))
+        {
             Context js = Context.enter();
             js.setOptimizationLevel(-1);
 
@@ -55,35 +56,41 @@ public class CodeViewerActivity extends ActionBarActivity {
 
             AssetManager am = this.getAssets();
 
-            try {
+            try
+            {
                 InputStream jsStream = am.open("js/beautify.js");
 
                 Scanner s = new Scanner(jsStream).useDelimiter("\\A");
 
                 String script = "";
 
-                if (s.hasNext()) {
+                if (s.hasNext())
+                {
                     script = s.next();
 
-                    code = js.evaluateString(
-                            scope,
-                            "var exports = {};" + script
-                                    + " exports.js_beautify(sourceCode);",
+                    code = js.evaluateString(scope, "var exports = {};" + script + " exports.js_beautify(sourceCode);",
                             "<engine>", 1, null).toString();
                 }
-            } catch (IOException e) {
+            }
+            catch (IOException e)
+            {
                 LogManager.getInstance(this).logException(e);
-            } catch (StackOverflowError e) {
+            }
+            catch (StackOverflowError e)
+            {
                 LogManager.getInstance(this).logException(e);
             }
         }
 
-        code = "<!DOCTYPE html><html><body style=\"background-color: #000; color: #00c000;\"><pre>"
-                + code + "</pre></body></html>";
+        code = "<!DOCTYPE html><html><body style=\"background-color: #000; color: #00c000;\"><pre>" + code
+                + "</pre></body></html>";
 
-        try {
+        try
+        {
             code = URLEncoder.encode(code, "utf-8").replaceAll("\\+", "%20");
-        } catch (UnsupportedEncodingException e) {
+        }
+        catch (UnsupportedEncodingException e)
+        {
             LogManager.getInstance(this).logException(e);
         }
 

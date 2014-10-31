@@ -11,33 +11,38 @@ import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
-public class NfcProbe extends Probe {
+public class NfcProbe extends Probe
+{
 
     private static final String IS_ENABLED = "config_probe_network_enabled";
     private static final boolean DEFAULT_ENABLED = true;
 
     @Override
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.NfcProbe";
     }
 
     @Override
-    public String title(Context context) {
+    public String title(Context context)
+    {
         return context.getString(R.string.title_nfc_probe);
     }
 
     @Override
-    public String probeCategory(Context context) {
+    public String probeCategory(Context context)
+    {
         return context.getResources().getString(R.string.probe_sensor_category);
     }
 
     @Override
-    public boolean isEnabled(final Context context) {
+    public boolean isEnabled(final Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
-        if (super.isEnabled(context)) {
-            return prefs.getBoolean(NfcProbe.IS_ENABLED,
-                    NfcProbe.DEFAULT_ENABLED);
+        if (super.isEnabled(context))
+        {
+            return prefs.getBoolean(NfcProbe.IS_ENABLED, NfcProbe.DEFAULT_ENABLED);
         }
 
         return false;
@@ -45,7 +50,8 @@ public class NfcProbe extends Probe {
 
     @SuppressWarnings("deprecation")
     @Override
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    {
         PreferenceManager manager = activity.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(activity);
@@ -63,12 +69,14 @@ public class NfcProbe extends Probe {
     }
 
     @Override
-    public String summary(Context context) {
+    public String summary(Context context)
+    {
         return context.getString(R.string.summary_nfc_probe_desc);
     }
 
     @Override
-    public void enable(Context context) {
+    public void enable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -78,7 +86,8 @@ public class NfcProbe extends Probe {
     }
 
     @Override
-    public void disable(Context context) {
+    public void disable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -88,11 +97,10 @@ public class NfcProbe extends Probe {
     }
 
     @Override
-    public String summarizeValue(Context context, Bundle bundle) {
+    public String summarizeValue(Context context, Bundle bundle)
+    {
         String tagId = bundle.getString("TAG_ID");
 
-        return String.format(
-                context.getResources().getString(R.string.summary_nfc_probe),
-                tagId);
+        return String.format(context.getResources().getString(R.string.summary_nfc_probe), tagId);
     }
 }

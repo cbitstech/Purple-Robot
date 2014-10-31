@@ -14,13 +14,16 @@ import edu.northwestern.cbits.purple_robot_manager.activities.RealTimeProbeViewA
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
-public abstract class Continuous1DProbe extends ContinuousProbe {
-    protected static final String[] fieldNames = { "VALUE_KEY" };
+public abstract class Continuous1DProbe extends ContinuousProbe
+{
+    protected static final String[] fieldNames =
+    { "VALUE_KEY" };
 
-    public String getDisplayContent(Activity activity) {
-        try {
-            String template = WebkitActivity.stringForAsset(activity,
-                    "webkit/epoch_chart_line_1_value.html");
+    public String getDisplayContent(Activity activity)
+    {
+        try
+        {
+            String template = WebkitActivity.stringForAsset(activity, "webkit/epoch_chart_line_1_value.html");
 
             JSONArray valueSeries = new JSONArray();
 
@@ -35,16 +38,21 @@ public abstract class Continuous1DProbe extends ContinuousProbe {
             template = template.replace("{{{ data_json }}}", data.toString());
 
             return template;
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             LogManager.getInstance(activity).logException(e);
-        } catch (JSONException e) {
+        }
+        catch (JSONException e)
+        {
             LogManager.getInstance(activity).logException(e);
         }
 
         return null;
     }
 
-    public Intent viewIntent(Context context) {
+    public Intent viewIntent(Context context)
+    {
         Intent i = new Intent(context, RealTimeProbeViewActivity.class);
         i.putExtra(RealTimeProbeViewActivity.PROBE_ID, this.getTitleResource());
 

@@ -29,7 +29,8 @@ import edu.northwestern.cbits.purple_robot_manager.config.SchemeConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
-public class TriggerManager {
+public class TriggerManager
+{
     private static TriggerManager _instance = null;
 
     private List<Trigger> _triggers = new ArrayList<Trigger>();
@@ -37,15 +38,17 @@ public class TriggerManager {
 
     private boolean _triggersInited = false;
 
-    private TriggerManager(Context context) {
+    private TriggerManager(Context context)
+    {
         if (TriggerManager._instance != null)
             throw new IllegalStateException("Already instantiated");
     }
 
-    public static TriggerManager getInstance(Context context) {
-        if (TriggerManager._instance == null) {
-            TriggerManager._instance = new TriggerManager(
-                    context.getApplicationContext());
+    public static TriggerManager getInstance(Context context)
+    {
+        if (TriggerManager._instance == null)
+        {
+            TriggerManager._instance = new TriggerManager(context.getApplicationContext());
             TriggerManager._instance.restoreTriggers(context);
         }
 
@@ -53,26 +56,29 @@ public class TriggerManager {
     }
 
     @SuppressLint("Wakelock")
-    public void nudgeTriggers(Context context) {
-        PowerManager pm = (PowerManager) context
-                .getSystemService(Context.POWER_SERVICE);
-        WakeLock wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK
-                | PowerManager.ACQUIRE_CAUSES_WAKEUP
+    public void nudgeTriggers(Context context)
+    {
+        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        WakeLock wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP
                 | PowerManager.ON_AFTER_RELEASE, "trigger_wakelock");
         wakeLock.acquire();
 
         Date now = new Date();
 
-        synchronized (this._triggers) {
-            for (Trigger trigger : this._triggers) {
+        synchronized (this._triggers)
+        {
+            for (Trigger trigger : this._triggers)
+            {
                 boolean execute = false;
 
-                if (trigger instanceof DateTrigger) {
+                if (trigger instanceof DateTrigger)
+                {
                     if (trigger.matches(context, now))
                         execute = true;
                 }
 
-                if (execute) {
+                if (execute)
+                {
                     trigger.execute(context, false);
                 }
             }
@@ -81,15 +87,20 @@ public class TriggerManager {
         wakeLock.release();
     }
 
-    public void updateTriggers(Context context, List<Trigger> triggerList) {
+    public void updateTriggers(Context context, List<Trigger> triggerList)
+    {
         ArrayList<Trigger> toAdd = new ArrayList<Trigger>();
 
-        synchronized (this._triggers) {
-            for (Trigger newTrigger : triggerList) {
+        synchronized (this._triggers)
+        {
+            for (Trigger newTrigger : triggerList)
+            {
                 boolean found = false;
 
-                for (Trigger trigger : this._triggers) {
-                    if (trigger.equals(newTrigger)) {
+                for (Trigger trigger : this._triggers)
+                {
+                    if (trigger.equals(newTrigger))
+                    {
                         trigger.merge(newTrigger);
 
                         found = true;
@@ -109,37 +120,43 @@ public class TriggerManager {
         this.persistTriggers(context);
     }
 
-    private void restoreTriggers(Context context) {
+    private void restoreTriggers(Context context)
+    {
         if (this._triggersInited)
             return;
 
         this._triggersInited = true;
 
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(context);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        if (prefs.contains("triggers_scheme_script")) {
-            String script = prefs
-                    .getString("triggers_scheme_script", "(begin)");
+        if (prefs.contains("triggers_scheme_script"))
+        {
+            String script = prefs.getString("triggers_scheme_script", "(begin)");
 
-            try {
+            try
+            {
                 BaseScriptEngine.runScript(context, script);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 LogManager.getInstance(context).logException(e);
             }
         }
     }
 
-    protected void persistTriggers(final Context context) {
-        if (this._timer == null) {
+    protected void persistTriggers(final Context context)
+    {
+        if (this._timer == null)
+        {
             this._timer = new Timer();
 
             final TriggerManager me = this;
 
-            this._timer.schedule(new TimerTask() {
-                public void run() {
-                    SharedPreferences prefs = PreferenceManager
-                            .getDefaultSharedPreferences(context);
+            this._timer.schedule(new TimerTask()
+            {
+                public void run()
+                {
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
                     Editor e = prefs.edit();
 
                     SchemeConfigFile config = new SchemeConfigFile(context);
@@ -155,29 +172,32 @@ public class TriggerManager {
             }, 5000);
         }
 
-        Intent intent = new Intent(
-                ManagerService.UPDATE_TRIGGER_SCHEDULE_INTENT);
+        Intent intent = new Intent(ManagerService.UPDATE_TRIGGER_SCHEDULE_INTENT);
         context.startService(intent);
     }
 
-    public List<Trigger> triggersForId(String triggerId) {
+    public List<Trigger> triggersForId(String triggerId)
+    {
         ArrayList<Trigger> matches = new ArrayList<Trigger>();
 
-        synchronized (this._triggers) {
-            for (Trigger trigger : this._triggers) {
-                if (trigger.identifier() != null
-                        && trigger.identifier().equals(triggerId))
+        synchronized (this._triggers)
+        {
+            for (Trigger trigger : this._triggers)
+            {
+                if (trigger.identifier() != null && trigger.identifier().equals(triggerId))
                     matches.add(trigger);
             }
         }
         return matches;
     }
 
-    public List<Trigger> allTriggers() {
+    public List<Trigger> allTriggers()
+    {
         return this._triggers;
     }
 
-    public void addTrigger(Context context, Trigger t) {
+    public void addTrigger(Context context, Trigger t)
+    {
         ArrayList<Trigger> ts = new ArrayList<Trigger>();
 
         ts.add(t);
@@ -185,34 +205,35 @@ public class TriggerManager {
         this.updateTriggers(context, ts);
     }
 
-    public void removeAllTriggers() {
-        synchronized (this._triggers) {
+    public void removeAllTriggers()
+    {
+        synchronized (this._triggers)
+        {
             this._triggers.clear();
         }
     }
 
     @SuppressWarnings("deprecation")
-    public PreferenceScreen buildPreferenceScreen(
-            PreferenceActivity settingsActivity) {
+    public PreferenceScreen buildPreferenceScreen(PreferenceActivity settingsActivity)
+    {
         PreferenceManager manager = settingsActivity.getPreferenceManager();
 
-        PreferenceScreen screen = manager
-                .createPreferenceScreen(settingsActivity);
+        PreferenceScreen screen = manager.createPreferenceScreen(settingsActivity);
         screen.setOrder(0);
         screen.setTitle(R.string.title_preference_triggers_screen);
         screen.setKey(SettingsActivity.TRIGGERS_SCREEN_KEY);
 
-        PreferenceCategory triggersCategory = new PreferenceCategory(
-                settingsActivity);
+        PreferenceCategory triggersCategory = new PreferenceCategory(settingsActivity);
         triggersCategory.setTitle(R.string.title_preference_triggers_category);
         triggersCategory.setKey("key_available_triggers");
 
         screen.addPreference(triggersCategory);
 
-        synchronized (this._triggers) {
-            for (Trigger trigger : this._triggers) {
-                PreferenceScreen triggerScreen = trigger
-                        .preferenceScreen(settingsActivity);
+        synchronized (this._triggers)
+        {
+            for (Trigger trigger : this._triggers)
+            {
+                PreferenceScreen triggerScreen = trigger.preferenceScreen(settingsActivity);
 
                 if (triggerScreen != null)
                     screen.addPreference(triggerScreen);
@@ -222,11 +243,14 @@ public class TriggerManager {
         return screen;
     }
 
-    public List<Map<String, Object>> triggerConfigurations(Context context) {
+    public List<Map<String, Object>> triggerConfigurations(Context context)
+    {
         List<Map<String, Object>> configs = new ArrayList<Map<String, Object>>();
 
-        synchronized (this._triggers) {
-            for (Trigger t : this._triggers) {
+        synchronized (this._triggers)
+        {
+            for (Trigger t : this._triggers)
+            {
                 Map<String, Object> config = t.configuration(context);
 
                 configs.add(config);
@@ -236,18 +260,23 @@ public class TriggerManager {
         return configs;
     }
 
-    public void refreshTriggers(Context context) {
-        synchronized (this._triggers) {
+    public void refreshTriggers(Context context)
+    {
+        synchronized (this._triggers)
+        {
             for (Trigger t : this._triggers)
                 t.refresh(context);
         }
     }
 
-    public List<String> triggerIds() {
+    public List<String> triggerIds()
+    {
         ArrayList<String> triggerIds = new ArrayList<String>();
 
-        synchronized (this._triggers) {
-            for (Trigger t : this._triggers) {
+        synchronized (this._triggers)
+        {
+            for (Trigger t : this._triggers)
+            {
                 String id = t.identifier();
 
                 if (id != null && triggerIds.contains(id) == false)
@@ -258,7 +287,8 @@ public class TriggerManager {
         return triggerIds;
     }
 
-    public Map<String, Object> fetchTrigger(Context context, String id) {
+    public Map<String, Object> fetchTrigger(Context context, String id)
+    {
         List<Trigger> triggers = this.triggersForId(id);
 
         if (triggers.size() > 0)
@@ -267,21 +297,26 @@ public class TriggerManager {
         return null;
     }
 
-    public boolean deleteTrigger(String id) {
+    public boolean deleteTrigger(String id)
+    {
         List<Trigger> triggers = this.triggersForId(id);
 
-        synchronized (this._triggers) {
+        synchronized (this._triggers)
+        {
             this._triggers.removeAll(triggers);
         }
 
         return triggers.size() > 0;
     }
 
-    public ArrayList<Bundle> allTriggersBundles(Context context) {
+    public ArrayList<Bundle> allTriggersBundles(Context context)
+    {
         ArrayList<Bundle> triggers = new ArrayList<Bundle>();
 
-        synchronized (this._triggers) {
-            for (Trigger trigger : this._triggers) {
+        synchronized (this._triggers)
+        {
+            for (Trigger trigger : this._triggers)
+            {
                 triggers.add(trigger.bundle(context));
             }
         }
@@ -289,18 +324,21 @@ public class TriggerManager {
         return triggers;
     }
 
-    public void fireMissedTriggers(Context context, long now) {
+    public void fireMissedTriggers(Context context, long now)
+    {
         HashMap<Long, String> fireDates = new HashMap<Long, String>();
 
-        for (Trigger trigger : this._triggers) {
-            if (trigger instanceof DateTrigger) {
+        for (Trigger trigger : this._triggers)
+        {
+            if (trigger instanceof DateTrigger)
+            {
                 DateTrigger dateTrig = (DateTrigger) trigger;
 
-                if (dateTrig.missedFire(context, now)) {
+                if (dateTrig.missedFire(context, now))
+                {
                     long lastFired = dateTrig.lastFireTime(context);
 
-                    fireDates.put(Long.valueOf(lastFired),
-                            dateTrig.identifier());
+                    fireDates.put(Long.valueOf(lastFired), dateTrig.identifier());
                 }
             }
         }
@@ -311,33 +349,36 @@ public class TriggerManager {
 
         Collections.sort(fireTimes);
 
-        for (Long time : fireTimes) {
-            for (Trigger t : this.triggersForId(fireDates.get(time))) {
+        for (Long time : fireTimes)
+        {
+            for (Trigger t : this.triggersForId(fireDates.get(time)))
+            {
                 t.execute(context, true);
             }
         }
     }
 
     @SuppressLint("Wakelock")
-    public List<Long> upcomingFireTimes(Context context) {
+    public List<Long> upcomingFireTimes(Context context)
+    {
         ArrayList<Long> upcoming = new ArrayList<Long>();
 
-        PowerManager pm = (PowerManager) context
-                .getSystemService(Context.POWER_SERVICE);
-        WakeLock wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK
-                | PowerManager.ACQUIRE_CAUSES_WAKEUP
+        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        WakeLock wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP
                 | PowerManager.ON_AFTER_RELEASE, "trigger_wakelock");
         wakeLock.acquire();
 
         long now = System.currentTimeMillis();
 
-        synchronized (this._triggers) {
-            for (Trigger trigger : this._triggers) {
-                if (trigger instanceof DateTrigger) {
+        synchronized (this._triggers)
+        {
+            for (Trigger trigger : this._triggers)
+            {
+                if (trigger instanceof DateTrigger)
+                {
                     DateTrigger dateTrigger = (DateTrigger) trigger;
 
-                    upcoming.addAll(dateTrigger.fireTimes(context, now, now
-                            + (60 * 60 * 1000)));
+                    upcoming.addAll(dateTrigger.fireTimes(context, now, now + (60 * 60 * 1000)));
                 }
             }
         }

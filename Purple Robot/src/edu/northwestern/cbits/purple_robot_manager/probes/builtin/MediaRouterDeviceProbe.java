@@ -22,7 +22,8 @@ import android.support.v7.media.MediaRouter;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
-public class MediaRouterDeviceProbe extends Probe {
+public class MediaRouterDeviceProbe extends Probe
+{
     private static final boolean DEFAULT_ENABLED = false;
     protected static final String ROUTES = "ROUTES";
     protected static final String ROUTE_COUNT = "ROUTE_COUNT";
@@ -33,144 +34,137 @@ public class MediaRouterDeviceProbe extends Probe {
     private long _lastScan = 0;
     private boolean _isScanning = false;
 
-    private MediaRouter.Callback _callback = new MediaRouter.Callback() {
-        public void onProviderAdded(MediaRouter router,
-                MediaRouter.ProviderInfo info) {
+    private MediaRouter.Callback _callback = new MediaRouter.Callback()
+    {
+        public void onProviderAdded(MediaRouter router, MediaRouter.ProviderInfo info)
+        {
             // Log.e("PR", "PROVIDER ADD: " + info + " -- " +
             // info.getPackageName());
         }
 
-        public void onProviderChanged(MediaRouter router,
-                MediaRouter.ProviderInfo info) {
+        public void onProviderChanged(MediaRouter router, MediaRouter.ProviderInfo info)
+        {
             // Log.e("PR", "PROVIDER CHANGE: " + info + " -- " +
             // info.getPackageName());
         }
 
-        public void onProviderRemoved(MediaRouter router,
-                MediaRouter.ProviderInfo info) {
+        public void onProviderRemoved(MediaRouter router, MediaRouter.ProviderInfo info)
+        {
             // Log.e("PR", "PROVIDER REMOVE: " + info + " -- " +
             // info.getPackageName());
         }
 
-        public void onRouteAdded(MediaRouter router, MediaRouter.RouteInfo route) {
+        public void onRouteAdded(MediaRouter router, MediaRouter.RouteInfo route)
+        {
             // Log.e("PR", "ROUTE ADD: " + route.getName() + " -- " +
             // route.getPlaybackType() + " -- " + route.getVolume() + "/" +
             // route.getVolumeMax());
         }
 
-        public void onRouteChanged(MediaRouter router,
-                MediaRouter.RouteInfo route) {
+        public void onRouteChanged(MediaRouter router, MediaRouter.RouteInfo route)
+        {
             // Log.e("PR", "ROUTE CHANGE: " + route.getName() + " -- " +
             // route.getPlaybackType() + " -- " + route.getVolume() + "/" +
             // route.getVolumeMax());
         }
 
-        public void onRouteRemoved(MediaRouter router,
-                MediaRouter.RouteInfo route) {
+        public void onRouteRemoved(MediaRouter router, MediaRouter.RouteInfo route)
+        {
             // Log.e("PR", "ROUTE REMOVE: " + route.getName() + " -- " +
             // route.getPlaybackType() + " -- " + route.getVolume() + "/" +
             // route.getVolumeMax());
         }
     };
 
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.MediaRouterDeviceProbe";
     }
 
-    public String title(Context context) {
+    public String title(Context context)
+    {
         return context.getString(R.string.title_mediarouter_probe);
     }
 
-    public String probeCategory(Context context) {
-        return context.getResources().getString(
-                R.string.probe_other_devices_category);
+    public String probeCategory(Context context)
+    {
+        return context.getResources().getString(R.string.probe_other_devices_category);
     }
 
-    public boolean isEnabled(final Context context) {
-        if (super.isEnabled(context)) {
+    public boolean isEnabled(final Context context)
+    {
+        if (super.isEnabled(context))
+        {
             SharedPreferences prefs = Probe.getPreferences(context);
 
-            if (prefs.getBoolean("config_probe_mediarouter_enabled",
-                    MediaRouterDeviceProbe.DEFAULT_ENABLED)) {
+            if (prefs.getBoolean("config_probe_mediarouter_enabled", MediaRouterDeviceProbe.DEFAULT_ENABLED))
+            {
                 final long now = System.currentTimeMillis();
 
-                synchronized (this) {
-                    long freq = Long.parseLong(prefs.getString(
-                            "config_probe_mediarouter_frequency",
+                synchronized (this)
+                {
+                    long freq = Long.parseLong(prefs.getString("config_probe_mediarouter_frequency",
                             Probe.DEFAULT_FREQUENCY));
 
                     final MediaRouterDeviceProbe me = this;
 
-                    if (now - this._lastCheck > freq) {
+                    if (now - this._lastCheck > freq)
+                    {
                         this._lastCheck = now;
 
-                        this._handler.post(new Runnable() {
-                            public void run() {
-                                MediaRouter router = MediaRouter
-                                        .getInstance(context);
+                        this._handler.post(new Runnable()
+                        {
+                            public void run()
+                            {
+                                MediaRouter router = MediaRouter.getInstance(context);
 
                                 Bundle bundle = new Bundle();
 
                                 bundle.putString("PROBE", me.name(context));
-                                bundle.putLong("TIMESTAMP",
-                                        System.currentTimeMillis() / 1000);
+                                bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
 
-                                if (now - me._lastScan > 30000
-                                        && me._isScanning) {
+                                if (now - me._lastScan > 30000 && me._isScanning)
+                                {
                                     router.removeCallback(me._callback);
 
                                     me._isScanning = false;
-                                } else if (now - me._lastScan > 300000
-                                        && me._isScanning == false) {
+                                }
+                                else if (now - me._lastScan > 300000 && me._isScanning == false)
+                                {
                                     MediaRouteSelector.Builder builder = new MediaRouteSelector.Builder();
-                                    builder = builder
-                                            .addControlCategory(MediaControlIntent.CATEGORY_LIVE_AUDIO);
-                                    builder = builder
-                                            .addControlCategory(MediaControlIntent.CATEGORY_LIVE_VIDEO);
-                                    builder = builder
-                                            .addControlCategory(MediaControlIntent.CATEGORY_REMOTE_PLAYBACK);
-                                    builder = builder
-                                            .addControlCategory(CastMediaControlIntent.CATEGORY_CAST);
+                                    builder = builder.addControlCategory(MediaControlIntent.CATEGORY_LIVE_AUDIO);
+                                    builder = builder.addControlCategory(MediaControlIntent.CATEGORY_LIVE_VIDEO);
+                                    builder = builder.addControlCategory(MediaControlIntent.CATEGORY_REMOTE_PLAYBACK);
+                                    builder = builder.addControlCategory(CastMediaControlIntent.CATEGORY_CAST);
 
-                                    router.addCallback(
-                                            builder.build(),
-                                            me._callback,
+                                    router.addCallback(builder.build(), me._callback,
                                             MediaRouter.CALLBACK_FLAG_PERFORM_ACTIVE_SCAN);
                                 }
 
                                 ArrayList<Bundle> routes = new ArrayList<Bundle>();
 
-                                for (MediaRouter.ProviderInfo info : router
-                                        .getProviders()) {
-                                    for (MediaRouter.RouteInfo route : info
-                                            .getRoutes()) {
+                                for (MediaRouter.ProviderInfo info : router.getProviders())
+                                {
+                                    for (MediaRouter.RouteInfo route : info.getRoutes())
+                                    {
                                         Bundle routeBundle = new Bundle();
-                                        routeBundle.putString("PACKAGE",
-                                                info.getPackageName());
+                                        routeBundle.putString("PACKAGE", info.getPackageName());
 
-                                        routeBundle.putString("NAME",
-                                                route.getName());
-                                        routeBundle.putString("DESCRIPTION",
-                                                route.getDescription());
-                                        routeBundle.putBoolean("ENABLED",
-                                                route.isEnabled());
-                                        routeBundle.putBoolean("DEFAULT",
-                                                route.isDefault());
-                                        routeBundle.putBoolean("SELECTED",
-                                                route.isSelected());
-                                        routeBundle.putInt("VOLUME",
-                                                route.getVolume());
-                                        routeBundle.putInt("VOLUME_MAX",
-                                                route.getVolumeMax());
+                                        routeBundle.putString("NAME", route.getName());
+                                        routeBundle.putString("DESCRIPTION", route.getDescription());
+                                        routeBundle.putBoolean("ENABLED", route.isEnabled());
+                                        routeBundle.putBoolean("DEFAULT", route.isDefault());
+                                        routeBundle.putBoolean("SELECTED", route.isSelected());
+                                        routeBundle.putInt("VOLUME", route.getVolume());
+                                        routeBundle.putInt("VOLUME_MAX", route.getVolumeMax());
 
-                                        switch (route.getPlaybackType()) {
+                                        switch (route.getPlaybackType())
+                                        {
                                         case MediaRouter.RouteInfo.PLAYBACK_TYPE_LOCAL:
-                                            routeBundle.putString("TYPE",
-                                                    "local");
+                                            routeBundle.putString("TYPE", "local");
                                             break;
                                         case MediaRouter.RouteInfo.PLAYBACK_TYPE_REMOTE:
-                                            routeBundle.putString("TYPE",
-                                                    "remote");
+                                            routeBundle.putString("TYPE", "remote");
                                             break;
                                         }
 
@@ -181,16 +175,11 @@ public class MediaRouterDeviceProbe extends Probe {
                                     }
                                 }
 
-                                bundle.putParcelableArrayList(
-                                        MediaRouterDeviceProbe.ROUTES, routes);
-                                bundle.putInt(
-                                        MediaRouterDeviceProbe.ROUTE_COUNT,
-                                        routes.size());
+                                bundle.putParcelableArrayList(MediaRouterDeviceProbe.ROUTES, routes);
+                                bundle.putInt(MediaRouterDeviceProbe.ROUTE_COUNT, routes.size());
 
-                                bundle.putString("SELECTED_ROUTE", router
-                                        .getSelectedRoute().getName());
-                                bundle.putString("DEFAULT_ROUTE", router
-                                        .getDefaultRoute().getName());
+                                bundle.putString("SELECTED_ROUTE", router.getSelectedRoute().getName());
+                                bundle.putString("DEFAULT_ROUTE", router.getDefaultRoute().getName());
 
                                 me.transmitData(context, bundle);
                             }
@@ -205,7 +194,8 @@ public class MediaRouterDeviceProbe extends Probe {
         return false;
     }
 
-    public void enable(Context context) {
+    public void enable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -214,7 +204,8 @@ public class MediaRouterDeviceProbe extends Probe {
         e.commit();
     }
 
-    public void disable(Context context) {
+    public void disable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -223,7 +214,8 @@ public class MediaRouterDeviceProbe extends Probe {
         e.commit();
     }
 
-    public String summarizeValue(Context context, Bundle bundle) {
+    public String summarizeValue(Context context, Bundle bundle)
+    {
         String name = bundle.getString("SELECTED_ROUTE");
 
         double volume = -1;
@@ -231,49 +223,53 @@ public class MediaRouterDeviceProbe extends Probe {
 
         ArrayList<Bundle> bundles = bundle.getParcelableArrayList("ROUTES");
 
-        for (Bundle route : bundles) {
-            if (name.equals(route.get("NAME"))) {
+        for (Bundle route : bundles)
+        {
+            if (name.equals(route.get("NAME")))
+            {
                 volume = route.getDouble("VOLUME");
                 volumeMax = route.getDouble("VOLUME_MAX");
             }
         }
 
-        return context.getString(R.string.summary_mediarouter_probe, name,
-                volume, volumeMax);
+        return context.getString(R.string.summary_mediarouter_probe, name, volume, volumeMax);
     }
 
-    public Map<String, Object> configuration(Context context) {
+    public Map<String, Object> configuration(Context context)
+    {
         Map<String, Object> map = super.configuration(context);
 
         SharedPreferences prefs = Probe.getPreferences(context);
 
-        long freq = Long.parseLong(prefs.getString(
-                "config_probe_mediarouter_frequency", Probe.DEFAULT_FREQUENCY));
+        long freq = Long.parseLong(prefs.getString("config_probe_mediarouter_frequency", Probe.DEFAULT_FREQUENCY));
 
         map.put(Probe.PROBE_FREQUENCY, freq);
 
         return map;
     }
 
-    public void updateFromMap(Context context, Map<String, Object> params) {
+    public void updateFromMap(Context context, Map<String, Object> params)
+    {
         super.updateFromMap(context, params);
 
-        if (params.containsKey(Probe.PROBE_FREQUENCY)) {
+        if (params.containsKey(Probe.PROBE_FREQUENCY))
+        {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
 
-            if (frequency instanceof Long) {
+            if (frequency instanceof Long)
+            {
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putString("config_probe_mediarouter_frequency",
-                        frequency.toString());
+                e.putString("config_probe_mediarouter_frequency", frequency.toString());
                 e.commit();
             }
         }
     }
 
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    {
         PreferenceManager manager = activity.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(activity);
@@ -299,7 +295,8 @@ public class MediaRouterDeviceProbe extends Probe {
         return screen;
     }
 
-    public String summary(Context context) {
+    public String summary(Context context)
+    {
         return context.getString(R.string.summary_mediarouter_probe_desc);
     }
 }

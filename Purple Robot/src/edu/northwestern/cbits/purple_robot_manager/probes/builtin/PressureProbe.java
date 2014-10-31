@@ -26,8 +26,8 @@ import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("SimpleDateFormat")
-public class PressureProbe extends Continuous1DProbe implements
-        SensorEventListener {
+public class PressureProbe extends Continuous1DProbe implements SensorEventListener
+{
     public static final String DB_TABLE = "pressure_probe";
 
     private static final String DEFAULT_THRESHOLD = "0.5";
@@ -39,7 +39,8 @@ public class PressureProbe extends Continuous1DProbe implements
     private static String PRESSURE_KEY = "PRESSURE";
     private static String ALTITUDE_KEY = "ALTITUDE";
 
-    private static String[] fieldNames = { PRESSURE_KEY, ALTITUDE_KEY };
+    private static String[] fieldNames =
+    { PRESSURE_KEY, ALTITUDE_KEY };
 
     private double _lastValue = Double.MAX_VALUE;
 
@@ -56,26 +57,29 @@ public class PressureProbe extends Continuous1DProbe implements
 
     private int _lastFrequency = -1;
 
-    public String probeCategory(Context context) {
+    public String probeCategory(Context context)
+    {
         return context.getString(R.string.probe_sensor_category);
     }
 
-    public String contentSubtitle(Context context) {
-        Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(
-                context, PressureProbe.DB_TABLE, this.databaseSchema());
+    public String contentSubtitle(Context context)
+    {
+        Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(context, PressureProbe.DB_TABLE,
+                this.databaseSchema());
 
         int count = -1;
 
-        if (c != null) {
+        if (c != null)
+        {
             count = c.getCount();
             c.close();
         }
 
-        return String.format(context.getString(R.string.display_item_count),
-                count);
+        return String.format(context.getString(R.string.display_item_count), count);
     }
 
-    public Bundle formattedBundle(Context context, Bundle bundle) {
+    public Bundle formattedBundle(Context context, Bundle bundle)
+    {
         Bundle formatted = super.formattedBundle(context, bundle);
 
         double[] eventTimes = bundle.getDoubleArray("EVENT_TIMESTAMP");
@@ -84,16 +88,17 @@ public class PressureProbe extends Continuous1DProbe implements
 
         ArrayList<String> keys = new ArrayList<String>();
 
-        if (altitudes != null && pressures != null && eventTimes != null) {
-            SimpleDateFormat sdf = new SimpleDateFormat(
-                    context.getString(R.string.display_date_format));
+        if (altitudes != null && pressures != null && eventTimes != null)
+        {
+            SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.display_date_format));
 
-            if (eventTimes.length > 1) {
+            if (eventTimes.length > 1)
+            {
                 Bundle readings = new Bundle();
 
-                for (int i = 0; i < eventTimes.length; i++) {
-                    String formatString = String.format(context
-                            .getString(R.string.display_pressure_reading),
+                for (int i = 0; i < eventTimes.length; i++)
+                {
+                    String formatString = String.format(context.getString(R.string.display_pressure_reading),
                             pressures[i], altitudes[i]);
 
                     double time = eventTimes[i];
@@ -110,13 +115,12 @@ public class PressureProbe extends Continuous1DProbe implements
                 if (keys.size() > 0)
                     readings.putStringArrayList("KEY_ORDER", keys);
 
-                formatted.putBundle(
-                        context.getString(R.string.display_pressure_readings),
-                        readings);
-            } else if (eventTimes.length > 0) {
-                String formatString = String.format(
-                        context.getString(R.string.display_pressure_reading),
-                        pressures[0], altitudes[0]);
+                formatted.putBundle(context.getString(R.string.display_pressure_readings), readings);
+            }
+            else if (eventTimes.length > 0)
+            {
+                String formatString = String.format(context.getString(R.string.display_pressure_reading), pressures[0],
+                        altitudes[0]);
 
                 double time = eventTimes[0];
 
@@ -129,60 +133,59 @@ public class PressureProbe extends Continuous1DProbe implements
         return formatted;
     };
 
-    public long getFrequency() {
+    public long getFrequency()
+    {
         SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
-        return Long.parseLong(prefs.getString(
-                "config_probe_pressure_built_in_frequency",
+        return Long.parseLong(prefs.getString("config_probe_pressure_built_in_frequency",
                 ContinuousProbe.DEFAULT_FREQUENCY));
     }
 
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return PressureProbe.NAME;
     }
 
-    public int getTitleResource() {
+    public int getTitleResource()
+    {
         return R.string.title_pressure_probe;
     }
 
-    public boolean isEnabled(Context context) {
+    public boolean isEnabled(Context context)
+    {
         SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
         this._context = context.getApplicationContext();
 
-        SensorManager sensors = (SensorManager) context
-                .getSystemService(Context.SENSOR_SERVICE);
+        SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_PRESSURE);
 
-        if (super.isEnabled(context)) {
-            if (prefs.getBoolean("config_probe_pressure_built_in_enabled",
-                    ContinuousProbe.DEFAULT_ENABLED)) {
-                int frequency = Integer.parseInt(prefs.getString(
-                        "config_probe_pressure_built_in_frequency",
+        if (super.isEnabled(context))
+        {
+            if (prefs.getBoolean("config_probe_pressure_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
+            {
+                int frequency = Integer.parseInt(prefs.getString("config_probe_pressure_built_in_frequency",
                         ContinuousProbe.DEFAULT_FREQUENCY));
 
-                if (this._lastFrequency != frequency) {
+                if (this._lastFrequency != frequency)
+                {
                     sensors.unregisterListener(this, sensor);
 
-                    switch (frequency) {
+                    switch (frequency)
+                    {
                     case SensorManager.SENSOR_DELAY_FASTEST:
-                        sensors.registerListener(this, sensor,
-                                SensorManager.SENSOR_DELAY_FASTEST, null);
+                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST, null);
                         break;
                     case SensorManager.SENSOR_DELAY_GAME:
-                        sensors.registerListener(this, sensor,
-                                SensorManager.SENSOR_DELAY_GAME, null);
+                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME, null);
                         break;
                     case SensorManager.SENSOR_DELAY_UI:
-                        sensors.registerListener(this, sensor,
-                                SensorManager.SENSOR_DELAY_UI, null);
+                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI, null);
                         break;
                     case SensorManager.SENSOR_DELAY_NORMAL:
-                        sensors.registerListener(this, sensor,
-                                SensorManager.SENSOR_DELAY_NORMAL, null);
+                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL, null);
                         break;
                     default:
-                        sensors.registerListener(this, sensor,
-                                SensorManager.SENSOR_DELAY_GAME, null);
+                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME, null);
                         break;
                     }
 
@@ -190,11 +193,15 @@ public class PressureProbe extends Continuous1DProbe implements
                 }
 
                 return true;
-            } else {
+            }
+            else
+            {
                 sensors.unregisterListener(this, sensor);
                 this._lastFrequency = -1;
             }
-        } else {
+        }
+        else
+        {
             sensors.unregisterListener(this, sensor);
             this._lastFrequency = -1;
         }
@@ -202,7 +209,8 @@ public class PressureProbe extends Continuous1DProbe implements
         return false;
     }
 
-    public Map<String, Object> configuration(Context context) {
+    public Map<String, Object> configuration(Context context)
+    {
         Map<String, Object> map = super.configuration(context);
 
         map.put(ContinuousProbe.PROBE_THRESHOLD, this.lastThreshold);
@@ -210,24 +218,27 @@ public class PressureProbe extends Continuous1DProbe implements
         return map;
     }
 
-    public void updateFromMap(Context context, Map<String, Object> params) {
+    public void updateFromMap(Context context, Map<String, Object> params)
+    {
         super.updateFromMap(context, params);
 
-        if (params.containsKey(ContinuousProbe.PROBE_THRESHOLD)) {
+        if (params.containsKey(ContinuousProbe.PROBE_THRESHOLD))
+        {
             Object threshold = params.get(ContinuousProbe.PROBE_THRESHOLD);
 
-            if (threshold instanceof Double) {
+            if (threshold instanceof Double)
+            {
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putString("config_probe_pressure_threshold",
-                        threshold.toString());
+                e.putString("config_probe_pressure_threshold", threshold.toString());
                 e.commit();
             }
         }
     }
 
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    {
         PreferenceScreen screen = super.preferenceScreen(activity);
 
         ListPreference threshold = new ListPreference(activity);
@@ -243,13 +254,14 @@ public class PressureProbe extends Continuous1DProbe implements
         return screen;
     }
 
-    protected boolean passesThreshold(SensorEvent event) {
+    protected boolean passesThreshold(SensorEvent event)
+    {
         long now = System.currentTimeMillis();
 
-        if (now - this.lastThresholdLookup > 5000) {
+        if (now - this.lastThresholdLookup > 5000)
+        {
             SharedPreferences prefs = Probe.getPreferences(this._context);
-            this.lastThreshold = Double.parseDouble(prefs.getString(
-                    "config_probe_pressure_threshold",
+            this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_pressure_threshold",
                     PressureProbe.DEFAULT_THRESHOLD));
 
             this.lastThresholdLookup = now;
@@ -269,14 +281,17 @@ public class PressureProbe extends Continuous1DProbe implements
     }
 
     @SuppressLint("NewApi")
-    public void onSensorChanged(SensorEvent event) {
+    public void onSensorChanged(SensorEvent event)
+    {
         if (this.shouldProcessEvent(event) == false)
             return;
 
         double now = System.currentTimeMillis();
 
-        if (this.passesThreshold(event)) {
-            synchronized (this) {
+        if (this.passesThreshold(event))
+        {
+            synchronized (this)
+            {
                 double elapsed = SystemClock.uptimeMillis();
                 double boot = (now - elapsed) * 1000 * 1000;
 
@@ -293,29 +308,30 @@ public class PressureProbe extends Continuous1DProbe implements
 
                 valueBuffer[0][bufferIndex] = event.values[0];
 
-                double[] plotValues = { timeBuffer[0] / 1000,
-                        valueBuffer[0][bufferIndex] };
-                RealTimeProbeViewActivity.plotIfVisible(
-                        this.getTitleResource(), plotValues);
+                double[] plotValues =
+                { timeBuffer[0] / 1000, valueBuffer[0][bufferIndex] };
+                RealTimeProbeViewActivity.plotIfVisible(this.getTitleResource(), plotValues);
 
-                try {
-                    valueBuffer[1][bufferIndex] = SensorManager.getAltitude(
-                            SensorManager.PRESSURE_STANDARD_ATMOSPHERE,
+                try
+                {
+                    valueBuffer[1][bufferIndex] = SensorManager.getAltitude(SensorManager.PRESSURE_STANDARD_ATMOSPHERE,
                             event.values[0]);
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     valueBuffer[1][bufferIndex] = 0;
                 }
 
                 bufferIndex += 1;
 
-                if (bufferIndex >= timeBuffer.length) {
+                if (bufferIndex >= timeBuffer.length)
+                {
                     Sensor sensor = event.sensor;
 
                     Bundle data = new Bundle();
 
                     Bundle sensorBundle = new Bundle();
-                    sensorBundle.putFloat("MAXIMUM_RANGE",
-                            sensor.getMaximumRange());
+                    sensorBundle.putFloat("MAXIMUM_RANGE", sensor.getMaximumRange());
                     sensorBundle.putString("NAME", sensor.getName());
                     sensorBundle.putFloat("POWER", sensor.getPower());
                     sensorBundle.putFloat("RESOLUTION", sensor.getResolution());
@@ -331,38 +347,37 @@ public class PressureProbe extends Continuous1DProbe implements
                     data.putDoubleArray("EVENT_TIMESTAMP", timeBuffer);
                     data.putIntArray("ACCURACY", accuracyBuffer);
 
-                    for (int i = 0; i < fieldNames.length; i++) {
+                    for (int i = 0; i < fieldNames.length; i++)
+                    {
                         data.putFloatArray(fieldNames[i], valueBuffer[i]);
                     }
 
                     this.transmitData(this._context, data);
 
-                    for (int j = 0; j < timeBuffer.length; j++) {
+                    for (int j = 0; j < timeBuffer.length; j++)
+                    {
                         Double pressure = null;
                         Double altitude = null;
 
-                        for (int i = 0; i < fieldNames.length; i++) {
-                            if (fieldNames[i]
-                                    .equals(PressureProbe.PRESSURE_KEY))
+                        for (int i = 0; i < fieldNames.length; i++)
+                        {
+                            if (fieldNames[i].equals(PressureProbe.PRESSURE_KEY))
                                 pressure = Double.valueOf(valueBuffer[i][j]);
-                            else if (fieldNames[i]
-                                    .equals(PressureProbe.ALTITUDE_KEY))
+                            else if (fieldNames[i].equals(PressureProbe.ALTITUDE_KEY))
                                 altitude = Double.valueOf(valueBuffer[i][j]);
                         }
 
-                        if (pressure != null && altitude != null) {
+                        if (pressure != null && altitude != null)
+                        {
                             Map<String, Object> values = new HashMap<String, Object>();
 
                             values.put(PressureProbe.PRESSURE_KEY, pressure);
                             values.put(PressureProbe.ALTITUDE_KEY, altitude);
 
-                            values.put(ProbeValuesProvider.TIMESTAMP,
-                                    Double.valueOf(timeBuffer[j] / 1000));
+                            values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[j] / 1000));
 
-                            ProbeValuesProvider.getProvider(this._context)
-                                    .insertValue(this._context,
-                                            PressureProbe.DB_TABLE,
-                                            this.databaseSchema(), values);
+                            ProbeValuesProvider.getProvider(this._context).insertValue(this._context,
+                                    PressureProbe.DB_TABLE, this.databaseSchema(), values);
                         }
                     }
 
@@ -372,37 +387,39 @@ public class PressureProbe extends Continuous1DProbe implements
         }
     }
 
-    public Map<String, String> databaseSchema() {
-        if (this._schema == null) {
+    public Map<String, String> databaseSchema()
+    {
+        if (this._schema == null)
+        {
             this._schema = new HashMap<String, String>();
 
-            this._schema.put(PressureProbe.PRESSURE_KEY,
-                    ProbeValuesProvider.REAL_TYPE);
-            this._schema.put(PressureProbe.ALTITUDE_KEY,
-                    ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(PressureProbe.PRESSURE_KEY, ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(PressureProbe.ALTITUDE_KEY, ProbeValuesProvider.REAL_TYPE);
         }
 
         return this._schema;
     }
 
-    public String getPreferenceKey() {
+    public String getPreferenceKey()
+    {
         return "pressure_built_in";
     }
 
-    public String summarizeValue(Context context, Bundle bundle) {
+    public String summarizeValue(Context context, Bundle bundle)
+    {
         double pressure = bundle.getDoubleArray(PressureProbe.PRESSURE_KEY)[0];
         double altitude = bundle.getDoubleArray(PressureProbe.ALTITUDE_KEY)[0];
 
-        return String.format(
-                context.getResources().getString(
-                        R.string.summary_pressure_probe), pressure, altitude);
+        return String.format(context.getResources().getString(R.string.summary_pressure_probe), pressure, altitude);
     }
 
-    public int getSummaryResource() {
+    public int getSummaryResource()
+    {
         return R.string.summary_pressure_probe_desc;
     }
 
-    protected String tableName() {
+    protected String tableName()
+    {
         return PressureProbe.DB_TABLE;
     }
 }

@@ -9,7 +9,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 
-public class DistancesProvider extends ContentProvider {
+public class DistancesProvider extends ContentProvider
+{
     public static final Uri CONTENT_URI = Uri
             .parse("content://edu.northwestern.cbits.purple_robot_manager.distances/distances");
 
@@ -24,17 +25,20 @@ public class DistancesProvider extends ContentProvider {
 
     private SQLiteOpenHelper _openHelper = null;
 
-    public int delete(Uri arg0, String selection, String[] selectionArgs) {
+    public int delete(Uri arg0, String selection, String[] selectionArgs)
+    {
         SQLiteDatabase db = this._openHelper.getWritableDatabase();
 
         return db.delete(DistancesProvider.DB_NAME, selection, selectionArgs);
     }
 
-    public String getType(Uri arg0) {
+    public String getType(Uri arg0)
+    {
         return "vnd.android.cursor.item/vnd.purple-bot.distance";
     }
 
-    public Uri insert(Uri uri, ContentValues values) {
+    public Uri insert(Uri uri, ContentValues values)
+    {
         SQLiteDatabase db = this._openHelper.getWritableDatabase();
 
         db.insert(DistancesProvider.DB_NAME, null, values);
@@ -42,13 +46,15 @@ public class DistancesProvider extends ContentProvider {
         return uri;
     }
 
-    public boolean onCreate() {
+    public boolean onCreate()
+    {
         final DistancesProvider me = this;
 
-        this._openHelper = new SQLiteOpenHelper(this.getContext(),
-                DistancesProvider.TABLE_NAME, null,
-                DistancesProvider.DATABASE_VERSION) {
-            public void onCreate(SQLiteDatabase db) {
+        this._openHelper = new SQLiteOpenHelper(this.getContext(), DistancesProvider.TABLE_NAME, null,
+                DistancesProvider.DATABASE_VERSION)
+        {
+            public void onCreate(SQLiteDatabase db)
+            {
                 Context context = me.getContext().getApplicationContext();
 
                 db.execSQL(context.getString(R.string.create_distances_table));
@@ -56,9 +62,10 @@ public class DistancesProvider extends ContentProvider {
                 this.onUpgrade(db, 0, DistancesProvider.DATABASE_VERSION);
             }
 
-            public void onUpgrade(SQLiteDatabase db, int oldVersion,
-                    int newVersion) {
-                switch (oldVersion) {
+            public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
+            {
+                switch (oldVersion)
+                {
                 case 1:
                 case 2:
                     // db.execSQL(context.getString(R.string.upgrade_issues_add_reprint));
@@ -71,15 +78,15 @@ public class DistancesProvider extends ContentProvider {
         return false;
     }
 
-    public Cursor query(Uri uri, String[] projection, String selection,
-            String[] selectionArgs, String orderBy) {
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String orderBy)
+    {
         SQLiteDatabase db = this._openHelper.getReadableDatabase();
 
-        return db.query(DistancesProvider.DB_NAME, projection, selection,
-                selectionArgs, null, null, orderBy);
+        return db.query(DistancesProvider.DB_NAME, projection, selection, selectionArgs, null, null, orderBy);
     }
 
-    public int update(Uri arg0, ContentValues arg1, String arg2, String[] arg3) {
+    public int update(Uri arg0, ContentValues arg1, String arg2, String[] arg3)
+    {
         return 0;
     }
 }

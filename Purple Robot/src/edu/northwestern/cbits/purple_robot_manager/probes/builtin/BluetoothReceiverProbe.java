@@ -19,27 +19,33 @@ import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("NewApi")
-public class BluetoothReceiverProbe extends Probe {
+public class BluetoothReceiverProbe extends Probe
+{
     private boolean isRegistered = false;
 
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return "Bluetooth test probe";
     }
 
-    public String summary(Context context) {
+    public String summary(Context context)
+    {
         return "";
     }
 
-    public String title(Context context) {
+    public String title(Context context)
+    {
         return this.name(context);
     }
 
-    public String probeCategory(Context context) {
+    public String probeCategory(Context context)
+    {
         return "PIZZA PIE";
     }
 
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    {
         PreferenceManager manager = activity.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(activity);
@@ -48,7 +54,8 @@ public class BluetoothReceiverProbe extends Probe {
         return screen;
     }
 
-    public void enable(Context context) {
+    public void enable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -57,7 +64,8 @@ public class BluetoothReceiverProbe extends Probe {
         e.commit();
     }
 
-    public void disable(Context context) {
+    public void disable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -66,10 +74,12 @@ public class BluetoothReceiverProbe extends Probe {
         e.commit();
     }
 
-    public boolean isEnabled(final Context context) {
+    public boolean isEnabled(final Context context)
+    {
         final BluetoothReceiverProbe me = this;
 
-        if (!this.isRegistered) {
+        if (!this.isRegistered)
+        {
             // BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 
             /*
@@ -104,14 +114,15 @@ public class BluetoothReceiverProbe extends Probe {
              * adapter.startDiscovery();
              */
 
-            Thread t = new Thread(new Runnable() {
-                public void run() {
-                    BluetoothAdapter adapter = BluetoothAdapter
-                            .getDefaultAdapter();
+            Thread t = new Thread(new Runnable()
+            {
+                public void run()
+                {
+                    BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 
-                    try {
-                        BluetoothServerSocket server = adapter.listenUsingRfcommWithServiceRecord(
-                                "Test Service",
+                    try
+                    {
+                        BluetoothServerSocket server = adapter.listenUsingRfcommWithServiceRecord("Test Service",
                                 UUID.fromString("0000112f-0000-1000-8000-00805f9b34fb"));
                         // BluetoothServerSocket server =
                         // adapter.listenUsingRfcommWithServiceRecord("Test Service",
@@ -119,17 +130,23 @@ public class BluetoothReceiverProbe extends Probe {
 
                         BluetoothSocket socket = null;
 
-                        while (true) {
-                            try {
+                        while (true)
+                        {
+                            try
+                            {
                                 socket = server.accept();
-                            } catch (IOException e) {
+                            }
+                            catch (IOException e)
+                            {
                                 break;
                             }
 
                             if (socket != null)
                                 me.manageSocket(socket);
                         }
-                    } catch (IOException e) {
+                    }
+                    catch (IOException e)
+                    {
                         LogManager.getInstance(context).logException(e);
                     }
                 }
@@ -142,16 +159,17 @@ public class BluetoothReceiverProbe extends Probe {
         return true;
     }
 
-    protected void manageSocket(BluetoothSocket socket) throws IOException {
-        Log.e("PRM", "GOT BLUETOOTH CONNECTION: "
-                + socket.getRemoteDevice().getName());
+    protected void manageSocket(BluetoothSocket socket) throws IOException
+    {
+        Log.e("PRM", "GOT BLUETOOTH CONNECTION: " + socket.getRemoteDevice().getName());
 
         int read = 0;
         byte[] buffer = new byte[1024];
 
         InputStream in = socket.getInputStream();
 
-        while ((read = in.read(buffer, 0, buffer.length)) != -1) {
+        while ((read = in.read(buffer, 0, buffer.length)) != -1)
+        {
             String s = new String(buffer, 0, read);
 
             Log.e("PRM", "READ " + s + " BYTES!");

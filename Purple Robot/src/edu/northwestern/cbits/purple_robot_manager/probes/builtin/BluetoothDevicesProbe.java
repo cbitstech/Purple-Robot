@@ -27,7 +27,8 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
-public class BluetoothDevicesProbe extends Probe {
+public class BluetoothDevicesProbe extends Probe
+{
     protected static final String NAME = "BLUETOOTH_NAME";
     protected static final String ADDRESS = "BLUETOOTH_ADDRESS";
     protected static final String MAJOR_CLASS = "DEVICE MAJOR CLASS";
@@ -45,23 +46,27 @@ public class BluetoothDevicesProbe extends Probe {
 
     private ArrayList<Bundle> _foundDevices = new ArrayList<Bundle>();
 
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.BluetoothDevicesProbe";
     }
 
-    public String title(Context context) {
+    public String title(Context context)
+    {
         return context.getString(R.string.title_bluetooth_probe);
     }
 
-    public String probeCategory(Context context) {
-        return context.getResources().getString(
-                R.string.probe_other_devices_category);
+    public String probeCategory(Context context)
+    {
+        return context.getResources().getString(R.string.probe_other_devices_category);
     }
 
-    public static String majorDeviceClass(int majorClass) {
+    public static String majorDeviceClass(int majorClass)
+    {
         String deviceClassName = "Unknown";
 
-        switch (majorClass) {
+        switch (majorClass)
+        {
         case BluetoothClass.Device.Major.AUDIO_VIDEO:
             deviceClassName = "Audio/Video";
             break;
@@ -100,10 +105,12 @@ public class BluetoothDevicesProbe extends Probe {
         return String.format("0x%08x %s", majorClass, deviceClassName);
     }
 
-    public static String minorDeviceClass(int minorClass) {
+    public static String minorDeviceClass(int minorClass)
+    {
         String deviceClassName = "Unknown";
 
-        switch (minorClass) {
+        switch (minorClass)
+        {
         case BluetoothClass.Device.AUDIO_VIDEO_CAMCORDER:
             deviceClassName = "Camcorder";
             break;
@@ -259,7 +266,8 @@ public class BluetoothDevicesProbe extends Probe {
         return String.format("0x%08x %s", minorClass, deviceClassName);
     }
 
-    public void enable(Context context) {
+    public void enable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -268,7 +276,8 @@ public class BluetoothDevicesProbe extends Probe {
         e.commit();
     }
 
-    public void disable(Context context) {
+    public void disable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -278,87 +287,76 @@ public class BluetoothDevicesProbe extends Probe {
     }
 
     @SuppressLint("InlinedApi")
-    public boolean isEnabled(Context context) {
+    public boolean isEnabled(Context context)
+    {
         final SharedPreferences prefs = Probe.getPreferences(context);
         final EncryptionManager em = EncryptionManager.getInstance();
 
         final BluetoothDevicesProbe me = this;
 
-        if (this._receiver == null) {
-            this._receiver = new BroadcastReceiver() {
+        if (this._receiver == null)
+        {
+            this._receiver = new BroadcastReceiver()
+            {
                 @SuppressWarnings("unchecked")
-                public void onReceive(Context context, Intent intent) {
-                    try {
-                        if (BluetoothDevice.ACTION_FOUND.equals(intent
-                                .getAction())) {
-                            boolean doHash = prefs.getBoolean(
-                                    "config_probe_bluetooth_hash_data",
+                public void onReceive(Context context, Intent intent)
+                {
+                    try
+                    {
+                        if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction()))
+                        {
+                            boolean doHash = prefs.getBoolean("config_probe_bluetooth_hash_data",
                                     Probe.DEFAULT_HASH_DATA);
 
-                            BluetoothDevice device = intent
-                                    .getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
                             Bundle deviceBundle = new Bundle();
 
-                            if (doHash) {
-                                deviceBundle.putString(
-                                        BluetoothDevicesProbe.NAME, em
-                                                .createHash(context,
-                                                        device.getName()));
-                                deviceBundle.putString(
-                                        BluetoothDevicesProbe.ADDRESS,
-                                        em.createHash(context,
-                                                device.getAddress()));
-                            } else {
-                                deviceBundle.putString(
-                                        BluetoothDevicesProbe.NAME,
-                                        device.getName());
-                                deviceBundle.putString(
-                                        BluetoothDevicesProbe.ADDRESS,
-                                        device.getAddress());
+                            if (doHash)
+                            {
+                                deviceBundle.putString(BluetoothDevicesProbe.NAME,
+                                        em.createHash(context, device.getName()));
+                                deviceBundle.putString(BluetoothDevicesProbe.ADDRESS,
+                                        em.createHash(context, device.getAddress()));
+                            }
+                            else
+                            {
+                                deviceBundle.putString(BluetoothDevicesProbe.NAME, device.getName());
+                                deviceBundle.putString(BluetoothDevicesProbe.ADDRESS, device.getAddress());
                             }
 
-                            deviceBundle.putString(
-                                    BluetoothDevicesProbe.BOND_STATE,
-                                    BluetoothDevicesProbe.bondState(device
-                                            .getBondState()));
+                            deviceBundle.putString(BluetoothDevicesProbe.BOND_STATE,
+                                    BluetoothDevicesProbe.bondState(device.getBondState()));
 
-                            BluetoothClass deviceClass = device
-                                    .getBluetoothClass();
+                            BluetoothClass deviceClass = device.getBluetoothClass();
 
-                            deviceBundle.putString(
-                                    BluetoothDevicesProbe.MAJOR_CLASS,
-                                    BluetoothDevicesProbe
-                                            .majorDeviceClass(deviceClass
-                                                    .getMajorDeviceClass()));
-                            deviceBundle.putString(
-                                    BluetoothDevicesProbe.MINOR_CLASS,
-                                    BluetoothDevicesProbe
-                                            .minorDeviceClass(deviceClass
-                                                    .getDeviceClass()));
+                            deviceBundle.putString(BluetoothDevicesProbe.MAJOR_CLASS,
+                                    BluetoothDevicesProbe.majorDeviceClass(deviceClass.getMajorDeviceClass()));
+                            deviceBundle.putString(BluetoothDevicesProbe.MINOR_CLASS,
+                                    BluetoothDevicesProbe.minorDeviceClass(deviceClass.getDeviceClass()));
 
                             me._foundDevices.add(deviceBundle);
-                        } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED
-                                .equals(intent.getAction())) {
+                        }
+                        else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction()))
+                        {
                             Bundle bundle = new Bundle();
 
                             bundle.putString("PROBE", me.name(context));
-                            bundle.putLong("TIMESTAMP",
-                                    System.currentTimeMillis() / 1000);
-                            bundle.putParcelableArrayList(
-                                    BluetoothDevicesProbe.DEVICES,
-                                    (ArrayList<Bundle>) me._foundDevices
-                                            .clone());
-                            bundle.putInt(BluetoothDevicesProbe.DEVICES_COUNT,
-                                    me._foundDevices.size());
+                            bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+                            bundle.putParcelableArrayList(BluetoothDevicesProbe.DEVICES,
+                                    (ArrayList<Bundle>) me._foundDevices.clone());
+                            bundle.putInt(BluetoothDevicesProbe.DEVICES_COUNT, me._foundDevices.size());
 
-                            synchronized (me) {
+                            synchronized (me)
+                            {
                                 me.transmitData(context, bundle);
                             }
-                        } else if (BluetoothAdapter.ACTION_STATE_CHANGED
-                                .equals(intent.getAction()))
+                        }
+                        else if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(intent.getAction()))
                             me._lastCheck = 0;
-                    } catch (RuntimeException e) {
+                    }
+                    catch (RuntimeException e)
+                    {
                         LogManager.getInstance(context).logException(e);
                     }
                 }
@@ -384,27 +382,29 @@ public class BluetoothDevicesProbe extends Probe {
         boolean enabled = super.isEnabled(context);
 
         if (enabled)
-            enabled = prefs.getBoolean("config_probe_bluetooth_enabled",
-                    BluetoothDevicesProbe.DEFAULT_ENABLED);
+            enabled = prefs.getBoolean("config_probe_bluetooth_enabled", BluetoothDevicesProbe.DEFAULT_ENABLED);
 
-        if (enabled) {
-            synchronized (this) {
-                try {
-                    long freq = Long.parseLong(prefs.getString(
-                            "config_probe_bluetooth_frequency",
+        if (enabled)
+        {
+            synchronized (this)
+            {
+                try
+                {
+                    long freq = Long.parseLong(prefs.getString("config_probe_bluetooth_frequency",
                             Probe.DEFAULT_FREQUENCY));
 
-                    if (now - this._lastCheck > freq) {
+                    if (now - this._lastCheck > freq)
+                    {
                         Looper looper = Looper.myLooper();
 
                         if (looper == null)
                             Looper.prepare();
 
                         if (this._adapter == null)
-                            this._adapter = BluetoothAdapter
-                                    .getDefaultAdapter();
+                            this._adapter = BluetoothAdapter.getDefaultAdapter();
 
-                        if (this._adapter != null && this._adapter.isEnabled()) {
+                        if (this._adapter != null && this._adapter.isEnabled())
+                        {
                             this._foundDevices.clear();
 
                             this._adapter.startDiscovery();
@@ -412,14 +412,19 @@ public class BluetoothDevicesProbe extends Probe {
 
                         this._lastCheck = now;
                     }
-                } catch (SecurityException e) {
+                }
+                catch (SecurityException e)
+                {
                     LogManager.getInstance(context).logException(e);
                 }
             }
 
             return true;
-        } else {
-            if (this._adapter != null) {
+        }
+        else
+        {
+            if (this._adapter != null)
+            {
                 this._adapter.cancelDiscovery();
 
                 this._adapter = null;
@@ -429,8 +434,10 @@ public class BluetoothDevicesProbe extends Probe {
         return false;
     }
 
-    protected static String bondState(int bondState) {
-        switch (bondState) {
+    protected static String bondState(int bondState)
+    {
+        switch (bondState)
+        {
         case BluetoothDevice.BOND_BONDED:
             return "Paired";
         case BluetoothDevice.BOND_BONDING:
@@ -442,52 +449,42 @@ public class BluetoothDevicesProbe extends Probe {
         return "Unknown or Error";
     }
 
-    public String summarizeValue(Context context, Bundle bundle) {
+    public String summarizeValue(Context context, Bundle bundle)
+    {
         int count = (int) bundle.getDouble(BluetoothDevicesProbe.DEVICES_COUNT);
 
-        return String.format(
-                context.getResources().getString(
-                        R.string.summary_bluetooth_probe), count);
+        return String.format(context.getResources().getString(R.string.summary_bluetooth_probe), count);
     }
 
-    private Bundle bundleForDevicesArray(Context context,
-            ArrayList<Bundle> objects) {
+    private Bundle bundleForDevicesArray(Context context, ArrayList<Bundle> objects)
+    {
         Bundle bundle = new Bundle();
 
         if (objects == null)
             return bundle;
 
-        for (Bundle value : objects) {
+        for (Bundle value : objects)
+        {
             ArrayList<String> keys = new ArrayList<String>();
 
-            String key = String.format(
-                    context.getString(R.string.display_bluetooth_device_title),
-                    value.getString(BluetoothDevicesProbe.NAME),
-                    value.getString(BluetoothDevicesProbe.ADDRESS));
+            String key = String.format(context.getString(R.string.display_bluetooth_device_title),
+                    value.getString(BluetoothDevicesProbe.NAME), value.getString(BluetoothDevicesProbe.ADDRESS));
 
             Bundle deviceBundle = new Bundle();
 
-            deviceBundle.putString(context
-                    .getString(R.string.display_bluetooth_device_title_label),
+            deviceBundle.putString(context.getString(R.string.display_bluetooth_device_title_label),
                     value.getString(BluetoothDevicesProbe.NAME));
-            deviceBundle
-                    .putString(
-                            context.getString(R.string.display_bluetooth_device_address_label),
-                            value.getString(BluetoothDevicesProbe.ADDRESS));
-            deviceBundle.putString(
-                    context.getString(R.string.display_bluetooth_device_pair),
+            deviceBundle.putString(context.getString(R.string.display_bluetooth_device_address_label),
+                    value.getString(BluetoothDevicesProbe.ADDRESS));
+            deviceBundle.putString(context.getString(R.string.display_bluetooth_device_pair),
                     value.getString(BluetoothDevicesProbe.BOND_STATE));
-            deviceBundle.putString(
-                    context.getString(R.string.display_bluetooth_device_major),
+            deviceBundle.putString(context.getString(R.string.display_bluetooth_device_major),
                     value.getString(BluetoothDevicesProbe.MAJOR_CLASS));
-            deviceBundle.putString(
-                    context.getString(R.string.display_bluetooth_device_minor),
+            deviceBundle.putString(context.getString(R.string.display_bluetooth_device_minor),
                     value.getString(BluetoothDevicesProbe.MINOR_CLASS));
 
-            keys.add(context
-                    .getString(R.string.display_bluetooth_device_title_label));
-            keys.add(context
-                    .getString(R.string.display_bluetooth_device_address_label));
+            keys.add(context.getString(R.string.display_bluetooth_device_title_label));
+            keys.add(context.getString(R.string.display_bluetooth_device_address_label));
             keys.add(context.getString(R.string.display_bluetooth_device_pair));
             keys.add(context.getString(R.string.display_bluetooth_device_major));
             keys.add(context.getString(R.string.display_bluetooth_device_minor));
@@ -500,77 +497,80 @@ public class BluetoothDevicesProbe extends Probe {
         return bundle;
     }
 
-    public Bundle formattedBundle(Context context, Bundle bundle) {
+    public Bundle formattedBundle(Context context, Bundle bundle)
+    {
         Bundle formatted = super.formattedBundle(context, bundle);
 
         @SuppressWarnings("unchecked")
-        ArrayList<Bundle> array = (ArrayList<Bundle>) bundle
-                .get(BluetoothDevicesProbe.DEVICES);
+        ArrayList<Bundle> array = (ArrayList<Bundle>) bundle.get(BluetoothDevicesProbe.DEVICES);
         int count = (int) bundle.getDouble(BluetoothDevicesProbe.DEVICES_COUNT);
 
         Bundle devicesBundle = this.bundleForDevicesArray(context, array);
 
-        formatted.putBundle(String.format(
-                context.getString(R.string.display_bluetooth_devices_title),
-                count), devicesBundle);
+        formatted.putBundle(String.format(context.getString(R.string.display_bluetooth_devices_title), count),
+                devicesBundle);
 
         return formatted;
     };
 
-    public Map<String, Object> configuration(Context context) {
+    public Map<String, Object> configuration(Context context)
+    {
         Map<String, Object> map = super.configuration(context);
 
         SharedPreferences prefs = Probe.getPreferences(context);
 
         // TODO: include whether enabled?
 
-        long freq = Long.parseLong(prefs.getString(
-                "config_probe_bluetooth_frequency", Probe.DEFAULT_FREQUENCY));
+        long freq = Long.parseLong(prefs.getString("config_probe_bluetooth_frequency", Probe.DEFAULT_FREQUENCY));
         map.put(Probe.PROBE_FREQUENCY, freq);
 
-        boolean hash = prefs.getBoolean("config_probe_bluetooth_hash_data",
-                Probe.DEFAULT_HASH_DATA);
+        boolean hash = prefs.getBoolean("config_probe_bluetooth_hash_data", Probe.DEFAULT_HASH_DATA);
         map.put(Probe.HASH_DATA, hash);
 
         return map;
     }
 
-    public void updateFromMap(Context context, Map<String, Object> params) {
+    public void updateFromMap(Context context, Map<String, Object> params)
+    {
         super.updateFromMap(context, params);
 
-        if (params.containsKey(Probe.PROBE_FREQUENCY)) {
+        if (params.containsKey(Probe.PROBE_FREQUENCY))
+        {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
 
-            if (frequency instanceof Long) {
+            if (frequency instanceof Long)
+            {
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putString("config_probe_bluetooth_frequency",
-                        frequency.toString());
+                e.putString("config_probe_bluetooth_frequency", frequency.toString());
                 e.commit();
             }
         }
 
-        if (params.containsKey(Probe.HASH_DATA)) {
+        if (params.containsKey(Probe.HASH_DATA))
+        {
             Object hash = params.get(Probe.HASH_DATA);
 
-            if (hash instanceof Boolean) {
+            if (hash instanceof Boolean)
+            {
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putBoolean("config_probe_bluetooth_hash_data",
-                        ((Boolean) hash).booleanValue());
+                e.putBoolean("config_probe_bluetooth_hash_data", ((Boolean) hash).booleanValue());
                 e.commit();
             }
         }
     }
 
-    public String summary(Context context) {
+    public String summary(Context context)
+    {
         return context.getString(R.string.summary_bluetooth_probe_desc);
     }
 
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    {
         PreferenceManager manager = activity.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(activity);

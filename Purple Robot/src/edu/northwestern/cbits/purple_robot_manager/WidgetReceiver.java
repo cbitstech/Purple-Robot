@@ -8,8 +8,10 @@ import android.content.Intent;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
-public class WidgetReceiver extends BroadcastReceiver {
-    public void onReceive(Context context, Intent intent) {
+public class WidgetReceiver extends BroadcastReceiver
+{
+    public void onReceive(Context context, Intent intent)
+    {
 
         String action = intent.getStringExtra("widget_action");
 
@@ -32,10 +34,14 @@ public class WidgetReceiver extends BroadcastReceiver {
         payload.put("widget_action", action);
         LogManager.getInstance(context).log("pr_widget_tapped", payload);
 
-        if (script != null) {
-            try {
+        if (script != null)
+        {
+            try
+            {
                 BaseScriptEngine.runScript(context, script);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 LogManager.getInstance(context).logException(e);
             }
         }

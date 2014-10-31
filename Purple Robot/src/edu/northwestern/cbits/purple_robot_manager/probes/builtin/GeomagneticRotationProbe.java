@@ -19,49 +19,54 @@ import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("SimpleDateFormat")
-public class GeomagneticRotationProbe extends RotationProbe {
+public class GeomagneticRotationProbe extends RotationProbe
+{
     public static final String DB_TABLE = "geomagnetic_rotation_probe";
 
     public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.GeomagneticRotationProbe";
 
-    public String contentSubtitle(Context context) {
-        Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(
-                context, GeomagneticRotationProbe.DB_TABLE,
+    public String contentSubtitle(Context context)
+    {
+        Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(context, GeomagneticRotationProbe.DB_TABLE,
                 this.databaseSchema());
 
         int count = -1;
 
-        if (c != null) {
+        if (c != null)
+        {
             count = c.getCount();
             c.close();
         }
 
-        return String.format(context.getString(R.string.display_item_count),
-                count);
+        return String.format(context.getString(R.string.display_item_count), count);
     }
 
-    public long getFrequency() {
+    public long getFrequency()
+    {
         SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
 
-        return Long.parseLong(prefs.getString(
-                "config_probe_geomagnetic_rotation_built_in_frequency",
+        return Long.parseLong(prefs.getString("config_probe_geomagnetic_rotation_built_in_frequency",
                 ContinuousProbe.DEFAULT_FREQUENCY));
     }
 
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return GeomagneticRotationProbe.NAME;
     }
 
-    public int getTitleResource() {
+    public int getTitleResource()
+    {
         return R.string.title_geomagnetic_rotation_probe;
     }
 
-    protected String dbTable() {
+    protected String dbTable()
+    {
         return GeomagneticRotationProbe.DB_TABLE;
     }
 
     @SuppressLint("InlinedApi")
-    public boolean isEnabled(Context context) {
+    public boolean isEnabled(Context context)
+    {
         if (Build.VERSION.SDK_INT < 19)
             return false;
 
@@ -69,42 +74,36 @@ public class GeomagneticRotationProbe extends RotationProbe {
 
         this._context = context.getApplicationContext();
 
-        SensorManager sensors = (SensorManager) context
-                .getSystemService(Context.SENSOR_SERVICE);
-        Sensor sensor = sensors
-                .getDefaultSensor(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR);
+        SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+        Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR);
 
-        if (super.isSuperEnabled(context)) {
-            if (prefs.getBoolean(
-                    "config_probe_geomagnetic_rotation_built_in_enabled",
-                    ContinuousProbe.DEFAULT_ENABLED)) {
+        if (super.isSuperEnabled(context))
+        {
+            if (prefs.getBoolean("config_probe_geomagnetic_rotation_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
+            {
                 int frequency = Integer.parseInt(prefs.getString(
-                        "config_probe_geomagnetic_rotation_built_in_frequency",
-                        ContinuousProbe.DEFAULT_FREQUENCY));
+                        "config_probe_geomagnetic_rotation_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
 
-                if (this._lastFrequency != frequency) {
+                if (this._lastFrequency != frequency)
+                {
                     sensors.unregisterListener(this, sensor);
 
-                    switch (frequency) {
+                    switch (frequency)
+                    {
                     case SensorManager.SENSOR_DELAY_FASTEST:
-                        sensors.registerListener(this, sensor,
-                                SensorManager.SENSOR_DELAY_FASTEST, null);
+                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST, null);
                         break;
                     case SensorManager.SENSOR_DELAY_GAME:
-                        sensors.registerListener(this, sensor,
-                                SensorManager.SENSOR_DELAY_GAME, null);
+                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME, null);
                         break;
                     case SensorManager.SENSOR_DELAY_UI:
-                        sensors.registerListener(this, sensor,
-                                SensorManager.SENSOR_DELAY_UI, null);
+                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI, null);
                         break;
                     case SensorManager.SENSOR_DELAY_NORMAL:
-                        sensors.registerListener(this, sensor,
-                                SensorManager.SENSOR_DELAY_NORMAL, null);
+                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL, null);
                         break;
                     default:
-                        sensors.registerListener(this, sensor,
-                                SensorManager.SENSOR_DELAY_GAME, null);
+                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME, null);
                         break;
                     }
 
@@ -112,11 +111,15 @@ public class GeomagneticRotationProbe extends RotationProbe {
                 }
 
                 return true;
-            } else {
+            }
+            else
+            {
                 sensors.unregisterListener(this, sensor);
                 this._lastFrequency = -1;
             }
-        } else {
+        }
+        else
+        {
             sensors.unregisterListener(this, sensor);
             this._lastFrequency = -1;
         }
@@ -124,28 +127,30 @@ public class GeomagneticRotationProbe extends RotationProbe {
         return false;
     }
 
-    public void updateFromMap(Context context, Map<String, Object> params) {
+    public void updateFromMap(Context context, Map<String, Object> params)
+    {
         super.updateFromMap(context, params);
 
-        if (params.containsKey(ContinuousProbe.PROBE_THRESHOLD)) {
+        if (params.containsKey(ContinuousProbe.PROBE_THRESHOLD))
+        {
             Object threshold = params.get(ContinuousProbe.PROBE_THRESHOLD);
 
-            if (threshold instanceof Double) {
+            if (threshold instanceof Double)
+            {
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putString("config_probe_geomagnetic_rotation_threshold",
-                        threshold.toString());
+                e.putString("config_probe_geomagnetic_rotation_threshold", threshold.toString());
                 e.commit();
             }
         }
     }
 
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    {
         PreferenceScreen screen = super.preferenceScreen(activity);
 
-        screen.removePreference(screen
-                .findPreference("config_probe_rotation_threshold"));
+        screen.removePreference(screen.findPreference("config_probe_rotation_threshold"));
 
         ListPreference threshold = new ListPreference(activity);
         threshold.setKey("config_probe_geomagnetic_rotation_threshold");
@@ -160,11 +165,13 @@ public class GeomagneticRotationProbe extends RotationProbe {
         return screen;
     }
 
-    public String getPreferenceKey() {
+    public String getPreferenceKey()
+    {
         return "geomagnetic_rotation_built_in";
     }
 
-    public int getSummaryResource() {
+    public int getSummaryResource()
+    {
         return R.string.summary_geomagnetic_rotation_probe_desc;
     }
 }

@@ -16,12 +16,15 @@ import edu.northwestern.cbits.purple_robot_manager.triggers.DateTrigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
-public class HalfHourDateTriggerTestCase extends RobotTestCase {
-    public HalfHourDateTriggerTestCase(Context context, int priority) {
+public class HalfHourDateTriggerTestCase extends RobotTestCase
+{
+    public HalfHourDateTriggerTestCase(Context context, int priority)
+    {
         super(context, priority);
     }
 
-    public void test() {
+    public void test()
+    {
         if (this.isSelected(this._context) == false)
             return;
 
@@ -39,7 +42,8 @@ public class HalfHourDateTriggerTestCase extends RobotTestCase {
 
         long now = System.currentTimeMillis();
 
-        try {
+        try
+        {
             JSONObject triggerDef = new JSONObject();
             triggerDef.put("type", "datetime");
 
@@ -48,23 +52,23 @@ public class HalfHourDateTriggerTestCase extends RobotTestCase {
             triggerDef
                     .put(Trigger.ACTION,
                             "PurpleRobot.playDefaultTone(); PurpleRobot.testLog('Date Test: Half Hour Fired!'); PurpleRobot.vibrate('SOS');");
-            triggerDef.put(DateTrigger.DATETIME_START,
-                    sdf.format(new Date(now + (30 * 60 * 1000))));
+            triggerDef.put(DateTrigger.DATETIME_START, sdf.format(new Date(now + (30 * 60 * 1000))));
 
-            String script = "PurpleRobot.updateTrigger('"
-                    + triggerId
-                    + "', "
-                    + triggerDef.toString().replace("'", "\\'")
-                            .replace("\"", "'") + ");";
+            String script = "PurpleRobot.updateTrigger('" + triggerId + "', "
+                    + triggerDef.toString().replace("'", "\\'").replace("\"", "'") + ");";
 
             BaseScriptEngine.runScript(this._context, script);
 
             this.broadcastUpdate("Created half-hour trigger.");
 
             Thread.sleep(2000);
-        } catch (JSONException e) {
+        }
+        catch (JSONException e)
+        {
             Assert.fail("HHDT1");
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e)
+        {
             Assert.fail("HHDT2");
         }
 
@@ -80,46 +84,46 @@ public class HalfHourDateTriggerTestCase extends RobotTestCase {
 
         DateTrigger dateTrigger = (DateTrigger) trigger;
 
-        Assert.assertTrue(
-                "HHDT6",
-                dateTrigger.matches(this._context, new Date(now
-                        + (30 * 60 * 1000) + 15000)));
+        Assert.assertTrue("HHDT6", dateTrigger.matches(this._context, new Date(now + (30 * 60 * 1000) + 15000)));
 
         List<Long> upcomingTimes = triggers.upcomingFireTimes(this._context);
 
         Assert.assertTrue("HHDT7", upcomingTimes.size() > 0);
 
-        try {
+        try
+        {
             long wait = (31 * 60 * 1000);
 
-            while (wait > 0) {
-                this.broadcastUpdate("Sleeping. " + (wait / (60 * 1000))
-                        + " minutes remaining...", 0);
+            while (wait > 0)
+            {
+                this.broadcastUpdate("Sleeping. " + (wait / (60 * 1000)) + " minutes remaining...", 0);
                 Thread.sleep(60 * 1000);
 
                 wait = wait - 60 * 1000;
             }
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e)
+        {
             Assert.fail();
         }
 
         this.broadcastUpdate("Verifying that half-hour trigger fired...");
 
         Assert.assertTrue("HHDT8", dateTrigger.lastFireTime(this._context) > 0);
-        Assert.assertTrue("HHDT9",
-                dateTrigger.lastFireTime(this._context) < System
-                        .currentTimeMillis());
+        Assert.assertTrue("HHDT9", dateTrigger.lastFireTime(this._context) < System.currentTimeMillis());
 
         this.broadcastUpdate("Clearing triggers...");
 
         triggers.removeAllTriggers();
     }
 
-    public int estimatedMinutes() {
+    public int estimatedMinutes()
+    {
         return 33;
     }
 
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return context.getString(R.string.name_half_hour_date_trigger_test);
     }
 }

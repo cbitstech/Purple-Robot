@@ -56,7 +56,8 @@ import edu.northwestern.cbits.purple_robot_manager.scripting.SchemeEngine;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
-public class LegacyJSONConfigFile {
+public class LegacyJSONConfigFile
+{
     public static final String FIRST_RUN = "json_config_first_run";
 
     public static final String USER_ID = "user_id";
@@ -74,94 +75,104 @@ public class LegacyJSONConfigFile {
     private static SharedPreferences prefs;
 
     @SuppressLint("DefaultLocale")
-    public static void updateFromOnline(final Context context) {
-        Runnable r = new Runnable() {
-            public void run() {
+    public static void updateFromOnline(final Context context)
+    {
+        Runnable r = new Runnable()
+        {
+            public void run()
+            {
                 Runnable next = null;
 
-                final EncryptionManager encryption = EncryptionManager
-                        .getInstance();
+                final EncryptionManager encryption = EncryptionManager.getInstance();
 
                 Uri uri = encryption.getConfigUri(context, null);
 
-                if (uri != null && uri.toString().trim().length() > 0) {
-                    try {
+                if (uri != null && uri.toString().trim().length() > 0)
+                {
+                    try
+                    {
                         URL u = new URL(uri.toString());
 
-                        final SharedPreferences prefs = LegacyJSONConfigFile
-                                .getPreferences(context);
+                        final SharedPreferences prefs = LegacyJSONConfigFile.getPreferences(context);
 
                         Editor edit = prefs.edit();
 
-                        X509TrustManager trust = new X509TrustManager() {
-                            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                                return new java.security.cert.X509Certificate[] {};
+                        X509TrustManager trust = new X509TrustManager()
+                        {
+                            public java.security.cert.X509Certificate[] getAcceptedIssuers()
+                            {
+                                return new java.security.cert.X509Certificate[]
+                                {};
                             }
 
-                            public void checkClientTrusted(
-                                    X509Certificate[] chain, String authType)
-                                    throws CertificateException {
+                            public void checkClientTrusted(X509Certificate[] chain, String authType)
+                                    throws CertificateException
+                            {
 
                             }
 
-                            public void checkServerTrusted(
-                                    X509Certificate[] chain, String authType)
-                                    throws CertificateException {
+                            public void checkServerTrusted(X509Certificate[] chain, String authType)
+                                    throws CertificateException
+                            {
 
                             }
                         };
 
-                        TrustManager[] trustAllCerts = { trust };
+                        TrustManager[] trustAllCerts =
+                        { trust };
 
                         SSLContext sc = null;
 
-                        try {
+                        try
+                        {
                             sc = SSLContext.getInstance("TLS");
-                            sc.init(null, trustAllCerts,
-                                    new java.security.SecureRandom());
-                        } catch (Exception e) {
+                            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+                        }
+                        catch (Exception e)
+                        {
                             LogManager.getInstance(context).logException(e);
                         }
 
-                        HttpURLConnection conn = (HttpURLConnection) u
-                                .openConnection();
+                        HttpURLConnection conn = (HttpURLConnection) u.openConnection();
 
-                        if (conn instanceof HttpsURLConnection) {
+                        if (conn instanceof HttpsURLConnection)
+                        {
                             HttpsURLConnection conns = (HttpsURLConnection) conn;
 
-                            if (prefs.getBoolean("config_http_liberal_ssl",
-                                    true)) {
+                            if (prefs.getBoolean("config_http_liberal_ssl", true))
+                            {
                                 conns.setSSLSocketFactory(sc.getSocketFactory());
 
-                                conns.setHostnameVerifier(new HostnameVerifier() {
-                                    public boolean verify(String hostname,
-                                            SSLSession session) {
+                                conns.setHostnameVerifier(new HostnameVerifier()
+                                {
+                                    public boolean verify(String hostname, SSLSession session)
+                                    {
                                         return true;
                                     }
                                 });
                             }
                         }
 
-                        for (int z = 0; z < 16
-                                && conn.getHeaderField("Location") != null; z++) {
-                            URL newUrl = new URL(
-                                    conn.getHeaderField("Location"));
+                        for (int z = 0; z < 16 && conn.getHeaderField("Location") != null; z++)
+                        {
+                            URL newUrl = new URL(conn.getHeaderField("Location"));
 
                             conn.disconnect();
 
                             conn = (HttpURLConnection) newUrl.openConnection();
 
-                            if (conn instanceof HttpsURLConnection) {
+                            if (conn instanceof HttpsURLConnection)
+                            {
                                 HttpsURLConnection conns = (HttpsURLConnection) conn;
 
-                                if (prefs.getBoolean("config_http_liberal_ssl",
-                                        true)) {
-                                    conns.setSSLSocketFactory(sc
-                                            .getSocketFactory());
+                                if (prefs.getBoolean("config_http_liberal_ssl", true))
+                                {
+                                    conns.setSSLSocketFactory(sc.getSocketFactory());
 
-                                    conns.setHostnameVerifier(new HostnameVerifier() {
-                                        public boolean verify(String hostname,
-                                                SSLSession session) {
+                                    conns.setHostnameVerifier(new HostnameVerifier()
+                                    {
+                                        public boolean verify(String hostname, SSLSession session)
+                                        {
                                             return true;
                                         }
                                     });
@@ -169,33 +180,30 @@ public class LegacyJSONConfigFile {
                             }
                         }
 
-                        BufferedInputStream bin = new BufferedInputStream(
-                                conn.getInputStream());
+                        BufferedInputStream bin = new BufferedInputStream(conn.getInputStream());
                         ByteArrayOutputStream bout = new ByteArrayOutputStream();
 
                         byte[] buffer = new byte[4096];
                         int read = 0;
 
-                        while ((read = bin.read(buffer, 0, buffer.length)) != -1) {
+                        while ((read = bin.read(buffer, 0, buffer.length)) != -1)
+                        {
                             bout.write(buffer, 0, read);
                         }
 
                         bin.close();
 
-                        String scriptString = new String(bout.toByteArray(),
-                                "UTF-8");
+                        String scriptString = new String(bout.toByteArray(), "UTF-8");
 
-                        String oldHash = prefs.getString(
-                                LegacyJSONConfigFile.JSON_LAST_HASH, "");
-                        final String newHash = encryption.createHash(context,
-                                scriptString);
+                        String oldHash = prefs.getString(LegacyJSONConfigFile.JSON_LAST_HASH, "");
+                        final String newHash = encryption.createHash(context, scriptString);
 
                         PurpleRobotApplication.fixPreferences(context, true);
 
                         if (scriptString.toLowerCase().startsWith("(begin ")
-                                || (conn.getContentType() != null && conn
-                                        .getContentType().toLowerCase()
-                                        .startsWith("text/x-scheme"))) {
+                                || (conn.getContentType() != null && conn.getContentType().toLowerCase()
+                                        .startsWith("text/x-scheme")))
+                        {
                             // TODO: Temp code until we get a more flexible
                             // parsing system in place...
 
@@ -204,125 +212,126 @@ public class LegacyJSONConfigFile {
 
                             oldHash = "";
 
-                            edit.putString("scheme_config_contents",
-                                    scriptString);
+                            edit.putString("scheme_config_contents", scriptString);
 
-                            if (oldHash.equals(newHash) == false) {
-                                try {
+                            if (oldHash.equals(newHash) == false)
+                            {
+                                try
+                                {
                                     if (Looper.myLooper() == null)
                                         Looper.prepare();
 
-                                    SchemeEngine scheme = new SchemeEngine(
-                                            context, null);
+                                    SchemeEngine scheme = new SchemeEngine(context, null);
                                     scheme.evaluateSource(scriptString);
-                                } catch (final Exception e) {
-                                    LogManager.getInstance(context)
-                                            .logException(e);
+                                }
+                                catch (final Exception e)
+                                {
+                                    LogManager.getInstance(context).logException(e);
 
                                     e.printStackTrace();
 
-                                    if (context instanceof Activity) {
+                                    if (context instanceof Activity)
+                                    {
                                         final Activity activity = (Activity) context;
 
-                                        activity.runOnUiThread(new Runnable() {
-                                            public void run() {
-                                                Toast.makeText(
-                                                        activity,
-                                                        "100: "
-                                                                + e.getMessage(),
-                                                        Toast.LENGTH_LONG)
+                                        activity.runOnUiThread(new Runnable()
+                                        {
+                                            public void run()
+                                            {
+                                                Toast.makeText(activity, "100: " + e.getMessage(), Toast.LENGTH_LONG)
                                                         .show();
                                             }
                                         });
                                     }
                                 }
 
-                                edit.putString(
-                                        LegacyJSONConfigFile.JSON_LAST_HASH,
-                                        newHash);
+                                edit.putString(LegacyJSONConfigFile.JSON_LAST_HASH, newHash);
                                 edit.commit();
 
-                                if (context instanceof Activity) {
+                                if (context instanceof Activity)
+                                {
                                     final Activity activity = (Activity) context;
 
-                                    activity.runOnUiThread(new Runnable() {
-                                        public void run() {
-                                            Toast.makeText(
-                                                    activity,
-                                                    R.string.success_json_set_uri,
-                                                    Toast.LENGTH_LONG).show();
+                                    activity.runOnUiThread(new Runnable()
+                                    {
+                                        public void run()
+                                        {
+                                            Toast.makeText(activity, R.string.success_json_set_uri, Toast.LENGTH_LONG)
+                                                    .show();
                                         }
                                     });
                                 }
                             }
-                        } else {
+                        }
+                        else
+                        {
                             if ("".equals(scriptString.trim()))
                                 scriptString = "{}";
 
                             final JSONObject json = new JSONObject(scriptString);
 
-                            if (oldHash.equals(newHash) == false) {
-                                edit.putString(
-                                        LegacyJSONConfigFile.JSON_CONFIGURATION,
-                                        scriptString);
+                            if (oldHash.equals(newHash) == false)
+                            {
+                                edit.putString(LegacyJSONConfigFile.JSON_CONFIGURATION, scriptString);
                                 edit.commit();
 
                                 // TriggerManager.getInstance(context).removeAllTriggers();
 
-                                next = new Runnable() {
-                                    public void run() {
-                                        try {
-                                            if (json.has(LegacyJSONConfigFile.JSON_INIT_SCRIPT)) {
-                                                String script = json
-                                                        .getString(LegacyJSONConfigFile.JSON_INIT_SCRIPT);
+                                next = new Runnable()
+                                {
+                                    public void run()
+                                    {
+                                        try
+                                        {
+                                            if (json.has(LegacyJSONConfigFile.JSON_INIT_SCRIPT))
+                                            {
+                                                String script = json.getString(LegacyJSONConfigFile.JSON_INIT_SCRIPT);
 
-                                                JavaScriptEngine engine = new JavaScriptEngine(
-                                                        context);
+                                                JavaScriptEngine engine = new JavaScriptEngine(context);
 
                                                 engine.runScript(script);
                                             }
 
                                             Editor edit = prefs.edit();
-                                            edit.putString(
-                                                    LegacyJSONConfigFile.JSON_LAST_HASH,
-                                                    newHash);
+                                            edit.putString(LegacyJSONConfigFile.JSON_LAST_HASH, newHash);
                                             edit.commit();
-                                        } catch (JSONException e) {
-                                            LogManager.getInstance(context)
-                                                    .logException(e);
-                                        } catch (final EcmaError e) {
-                                            LogManager.getInstance(context)
-                                                    .logException(e);
+                                        }
+                                        catch (JSONException e)
+                                        {
+                                            LogManager.getInstance(context).logException(e);
+                                        }
+                                        catch (final EcmaError e)
+                                        {
+                                            LogManager.getInstance(context).logException(e);
 
-                                            if (context instanceof Activity) {
+                                            if (context instanceof Activity)
+                                            {
                                                 final Activity activity = (Activity) context;
 
-                                                activity.runOnUiThread(new Runnable() {
-                                                    public void run() {
-                                                        Toast.makeText(
-                                                                activity,
-                                                                "200: "
-                                                                        + e.getMessage(),
-                                                                Toast.LENGTH_LONG)
-                                                                .show();
+                                                activity.runOnUiThread(new Runnable()
+                                                {
+                                                    public void run()
+                                                    {
+                                                        Toast.makeText(activity, "200: " + e.getMessage(),
+                                                                Toast.LENGTH_LONG).show();
                                                     }
                                                 });
                                             }
-                                        } catch (final EvaluatorException e) {
-                                            LogManager.getInstance(context)
-                                                    .logException(e);
+                                        }
+                                        catch (final EvaluatorException e)
+                                        {
+                                            LogManager.getInstance(context).logException(e);
 
-                                            if (context instanceof Activity) {
+                                            if (context instanceof Activity)
+                                            {
                                                 final Activity activity = (Activity) context;
 
-                                                activity.runOnUiThread(new Runnable() {
-                                                    public void run() {
-                                                        Toast.makeText(
-                                                                activity,
-                                                                "300: "
-                                                                        + e.getMessage(),
-                                                                Toast.LENGTH_LONG)
-                                                                .show();
+                                                activity.runOnUiThread(new Runnable()
+                                                {
+                                                    public void run()
+                                                    {
+                                                        Toast.makeText(activity, "300: " + e.getMessage(),
+                                                                Toast.LENGTH_LONG).show();
                                                     }
                                                 });
                                             }
@@ -331,41 +340,49 @@ public class LegacyJSONConfigFile {
                                 };
                             }
 
-                            if (context instanceof Activity) {
+                            if (context instanceof Activity)
+                            {
                                 final Activity activity = (Activity) context;
 
-                                activity.runOnUiThread(new Runnable() {
-                                    public void run() {
-                                        Toast.makeText(activity,
-                                                R.string.success_json_set_uri,
-                                                Toast.LENGTH_LONG).show();
+                                activity.runOnUiThread(new Runnable()
+                                {
+                                    public void run()
+                                    {
+                                        Toast.makeText(activity, R.string.success_json_set_uri, Toast.LENGTH_LONG)
+                                                .show();
                                     }
                                 });
                             }
                         }
-                    } catch (MalformedURLException e) {
+                    }
+                    catch (MalformedURLException e)
+                    {
                         LogManager.getInstance(context).logException(e);
-                    } catch (IOException e) {
+                    }
+                    catch (IOException e)
+                    {
                         LogManager.getInstance(context).logException(e);
-                    } catch (JSONException e) {
+                    }
+                    catch (JSONException e)
+                    {
                         LogManager.getInstance(context).logException(e);
-                    } catch (NullPointerException e) {
+                    }
+                    catch (NullPointerException e)
+                    {
                         LogManager.getInstance(context).logException(e);
                     }
 
-                    LegacyJSONConfigFile._sharedFile = new LegacyJSONConfigFile(
-                            context, next);
-                } else {
-                    final SharedPreferences prefs = LegacyJSONConfigFile
-                            .getPreferences(context);
+                    LegacyJSONConfigFile._sharedFile = new LegacyJSONConfigFile(context, next);
+                }
+                else
+                {
+                    final SharedPreferences prefs = LegacyJSONConfigFile.getPreferences(context);
 
-                    if (prefs.getString(
-                            LegacyJSONConfigFile.JSON_CONFIGURATION, "{}")
-                            .length() > 4) {
+                    if (prefs.getString(LegacyJSONConfigFile.JSON_CONFIGURATION, "{}").length() > 4)
+                    {
                         Editor edit = prefs.edit();
 
-                        edit.putString(LegacyJSONConfigFile.JSON_CONFIGURATION,
-                                "{}");
+                        edit.putString(LegacyJSONConfigFile.JSON_CONFIGURATION, "{}");
                         edit.commit();
                     }
                 }
@@ -374,29 +391,36 @@ public class LegacyJSONConfigFile {
 
         Thread t = new Thread(r);
 
-        try {
+        try
+        {
             t.start();
-        } catch (OutOfMemoryError e) {
+        }
+        catch (OutOfMemoryError e)
+        {
             System.gc();
 
             LogManager.getInstance(context).logException(e);
         }
     }
 
-    protected void updateTriggers(Context context) {
+    protected void updateTriggers(Context context)
+    {
         List<Trigger> triggerList = new ArrayList<Trigger>();
 
-        try {
+        try
+        {
             JSONArray triggers = this.parameters.getJSONArray("triggers");
 
-            for (int i = 0; triggers != null && i < triggers.length(); i++) {
+            for (int i = 0; triggers != null && i < triggers.length(); i++)
+            {
                 JSONObject json = triggers.getJSONObject(i);
 
                 Map<String, Object> map = new HashMap<String, Object>();
 
                 Iterator<String> keys = json.keys();
 
-                while (keys.hasNext()) {
+                while (keys.hasNext())
+                {
                     String key = keys.next();
 
                     map.put(key, json.get(key));
@@ -407,18 +431,21 @@ public class LegacyJSONConfigFile {
                 if (t != null)
                     triggerList.add(t);
             }
-        } catch (JSONException e) {
+        }
+        catch (JSONException e)
+        {
 
         }
 
-        TriggerManager.getInstance(context)
-                .updateTriggers(context, triggerList);
+        TriggerManager.getInstance(context).updateTriggers(context, triggerList);
     }
 
-    public static LegacyJSONConfigFile getSharedFile(Context context) {
+    public static LegacyJSONConfigFile getSharedFile(Context context)
+    {
         SharedPreferences prefs = LegacyJSONConfigFile.getPreferences(context);
 
-        if (prefs.getBoolean(LegacyJSONConfigFile.FIRST_RUN, true)) {
+        if (prefs.getBoolean(LegacyJSONConfigFile.FIRST_RUN, true))
+        {
             EncryptionManager.getInstance().setConfigUri(context,
                     Uri.parse(context.getString(R.string.json_config_url)));
 
@@ -429,74 +456,83 @@ public class LegacyJSONConfigFile {
 
         ProbeManager.allProbes(context);
 
-        if (LegacyJSONConfigFile._sharedFile == null) {
-            LegacyJSONConfigFile._sharedFile = new LegacyJSONConfigFile(
-                    context, null);
+        if (LegacyJSONConfigFile._sharedFile == null)
+        {
+            LegacyJSONConfigFile._sharedFile = new LegacyJSONConfigFile(context, null);
             LegacyJSONConfigFile.update(context, false);
         }
 
         return LegacyJSONConfigFile._sharedFile;
     }
 
-    public String getStringParameter(String key) {
-        try {
+    public String getStringParameter(String key)
+    {
+        try
+        {
             if (this.parameters != null)
                 return this.parameters.getString(key);
-        } catch (JSONException e) {
+        }
+        catch (JSONException e)
+        {
 
         }
 
         return null;
     }
 
-    private static SharedPreferences getPreferences(Context context) {
+    private static SharedPreferences getPreferences(Context context)
+    {
         if (LegacyJSONConfigFile.prefs == null)
-            LegacyJSONConfigFile.prefs = PreferenceManager
-                    .getDefaultSharedPreferences(context
-                            .getApplicationContext());
+            LegacyJSONConfigFile.prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
 
         return LegacyJSONConfigFile.prefs;
     }
 
-    private LegacyJSONConfigFile(Context context, Runnable next) {
+    private LegacyJSONConfigFile(Context context, Runnable next)
+    {
         SharedPreferences prefs = LegacyJSONConfigFile.getPreferences(context);
 
-        try {
-            this.parameters = new JSONObject(prefs.getString(
-                    LegacyJSONConfigFile.JSON_CONFIGURATION, "{}"));
+        try
+        {
+            this.parameters = new JSONObject(prefs.getString(LegacyJSONConfigFile.JSON_CONFIGURATION, "{}"));
 
             this.updateSharedPreferences(context);
             this.updateTriggers(context);
 
-            String script = this.parameters
-                    .getString(LegacyJSONConfigFile.JSON_INIT_SCRIPT);
+            String script = this.parameters.getString(LegacyJSONConfigFile.JSON_INIT_SCRIPT);
             JavaScriptEngine engine = new JavaScriptEngine(context);
             engine.runScript(script);
 
             if (next != null)
                 next.run();
-        } catch (JSONException e) {
+        }
+        catch (JSONException e)
+        {
             this.parameters = new JSONObject();
-        } catch (RhinoException e) {
+        }
+        catch (RhinoException e)
+        {
             LogManager.getInstance(context).logException(e);
 
             this.parameters = new JSONObject();
         }
     }
 
-    private void updateSharedPreferences(Context context) {
+    private void updateSharedPreferences(Context context)
+    {
         String userId = null;
         String userHash = null;
 
-        try {
+        try
+        {
             if (this.parameters.has(LegacyJSONConfigFile.USER_ID))
-                userId = this.parameters
-                        .getString(LegacyJSONConfigFile.USER_ID);
+                userId = this.parameters.getString(LegacyJSONConfigFile.USER_ID);
 
             if (this.parameters.has(LegacyJSONConfigFile.USER_HASH))
-                userHash = this.parameters
-                        .getString(LegacyJSONConfigFile.USER_HASH);
-        } catch (JSONException e) {
+                userHash = this.parameters.getString(LegacyJSONConfigFile.USER_HASH);
+        }
+        catch (JSONException e)
+        {
             LogManager.getInstance(context).logException(e);
         }
 
@@ -506,32 +542,40 @@ public class LegacyJSONConfigFile {
         if (userId == null)
             userId = prefs.getString("config_user_id", null);
 
-        if (userId == null) {
-            AccountManager manager = (AccountManager) context
-                    .getSystemService(Context.ACCOUNT_SERVICE);
+        if (userId == null)
+        {
+            AccountManager manager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
             Account[] list = manager.getAccountsByType("com.google");
 
             if (list.length == 0)
                 list = manager.getAccounts();
 
-            if (list.length > 0) {
+            if (list.length > 0)
+            {
                 userId = list[0].name;
             }
         }
 
-        if (userId != null && userHash == null) {
-            try {
+        if (userId != null && userHash == null)
+        {
+            try
+            {
                 MessageDigest md = MessageDigest.getInstance("MD5");
                 byte[] digest = md.digest(userId.getBytes("UTF-8"));
 
                 userHash = (new BigInteger(1, digest)).toString(16);
 
-                while (userHash.length() < 32) {
+                while (userHash.length() < 32)
+                {
                     userHash = "0" + userHash;
                 }
-            } catch (NoSuchAlgorithmException e) {
+            }
+            catch (NoSuchAlgorithmException e)
+            {
                 LogManager.getInstance(context).logException(e);
-            } catch (UnsupportedEncodingException e) {
+            }
+            catch (UnsupportedEncodingException e)
+            {
                 LogManager.getInstance(context).logException(e);
             }
         }
@@ -542,18 +586,19 @@ public class LegacyJSONConfigFile {
         if (userHash != null)
             editor.putString("config_user_hash", userHash);
 
-        if (this.parameters.has(LegacyJSONConfigFile.FEATURES)) {
+        if (this.parameters.has(LegacyJSONConfigFile.FEATURES))
+        {
             ProbeManager.clearFeatures();
 
-            try {
-                JSONArray features = this.parameters
-                        .getJSONArray(LegacyJSONConfigFile.FEATURES);
+            try
+            {
+                JSONArray features = this.parameters.getJSONArray(LegacyJSONConfigFile.FEATURES);
 
-                for (int i = 0; i < features.length(); i++) {
+                for (int i = 0; i < features.length(); i++)
+                {
                     JSONObject feature = features.getJSONObject(i);
 
-                    String name = context
-                            .getString(R.string.label_unknown_feature);
+                    String name = context.getString(R.string.label_unknown_feature);
                     String script = "";
                     String formatter = "";
 
@@ -568,21 +613,23 @@ public class LegacyJSONConfigFile {
 
                     ArrayList<String> sources = new ArrayList<String>();
 
-                    if (feature.has("sources")) {
+                    if (feature.has("sources"))
+                    {
                         JSONArray sourceArray = feature.getJSONArray("sources");
 
-                        for (int j = 0; j < sourceArray.length(); j++) {
+                        for (int j = 0; j < sourceArray.length(); j++)
+                        {
                             String source = sourceArray.getString(j);
 
                             sources.add(source);
                         }
                     }
 
-                    ProbeManager.addFeature(name,
-                            LegacyJSONConfigFile.toSlug(name), script,
-                            formatter, sources, false);
+                    ProbeManager.addFeature(name, LegacyJSONConfigFile.toSlug(name), script, formatter, sources, false);
                 }
-            } catch (JSONException e) {
+            }
+            catch (JSONException e)
+            {
                 LogManager.getInstance(context).logException(e);
             }
         }
@@ -590,7 +637,8 @@ public class LegacyJSONConfigFile {
         editor.commit();
     }
 
-    public static String toSlug(String input) {
+    public static String toSlug(String input)
+    {
         Pattern NONLATIN = Pattern.compile("[^\\w-]");
         Pattern WHITESPACE = Pattern.compile("[\\s]");
 
@@ -601,22 +649,22 @@ public class LegacyJSONConfigFile {
         return slug.toLowerCase(Locale.ENGLISH);
     }
 
-    public static void update(final Context context, final boolean force) {
-        Runnable r = new Runnable() {
-            public void run() {
-                SharedPreferences prefs = LegacyJSONConfigFile
-                        .getPreferences(context);
+    public static void update(final Context context, final boolean force)
+    {
+        Runnable r = new Runnable()
+        {
+            public void run()
+            {
+                SharedPreferences prefs = LegacyJSONConfigFile.getPreferences(context);
 
-                long lastUpdate = prefs.getLong(
-                        LegacyJSONConfigFile.JSON_LAST_UPDATE, 0);
+                long lastUpdate = prefs.getLong(LegacyJSONConfigFile.JSON_LAST_UPDATE, 0);
 
                 long now = System.currentTimeMillis();
 
-                int interval = Integer.parseInt(prefs.getString(
-                        "config_json_refresh_interval", "3600"));
+                int interval = Integer.parseInt(prefs.getString("config_json_refresh_interval", "3600"));
 
-                if (force
-                        || (interval > 0 && now - lastUpdate > 1000 * interval)) {
+                if (force || (interval > 0 && now - lastUpdate > 1000 * interval))
+                {
                     Editor edit = prefs.edit();
 
                     LegacyJSONConfigFile.updateFromOnline(context);
@@ -625,25 +673,29 @@ public class LegacyJSONConfigFile {
                     edit.commit();
 
                     if (LegacyJSONConfigFile._sharedFile != null)
-                        LegacyJSONConfigFile._sharedFile
-                                .updateTriggers(context);
+                        LegacyJSONConfigFile._sharedFile.updateTriggers(context);
                 }
             }
         };
 
-        try {
+        try
+        {
             Thread t = new Thread(r);
             t.start();
-        } catch (OutOfMemoryError e) {
+        }
+        catch (OutOfMemoryError e)
+        {
             LogManager.getInstance(context).logException(e);
         }
     }
 
-    protected String content() {
+    protected String content()
+    {
         return this.parameters.toString();
     }
 
-    protected boolean isValid() {
+    protected boolean isValid()
+    {
         if (this.content().length() > Preferences.MAX_VALUE_LENGTH)
             return false;
 

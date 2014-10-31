@@ -15,12 +15,15 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RobotHealthProbe;
 
-public class PurpleRobotHealthProbeTestCase extends RobotTestCase {
-    public PurpleRobotHealthProbeTestCase(Context context, int priority) {
+public class PurpleRobotHealthProbeTestCase extends RobotTestCase
+{
+    public PurpleRobotHealthProbeTestCase(Context context, int priority)
+    {
         super(context, priority);
     }
 
-    public void test() {
+    public void test()
+    {
         if (this.isSelected(this._context) == false)
             return;
 
@@ -29,11 +32,14 @@ public class PurpleRobotHealthProbeTestCase extends RobotTestCase {
         values.put("start", Long.MAX_VALUE);
         values.put("end", 0L);
 
-        BroadcastReceiver receiver = new BroadcastReceiver() {
-            public void onReceive(Context context, Intent intent) {
+        BroadcastReceiver receiver = new BroadcastReceiver()
+        {
+            public void onReceive(Context context, Intent intent)
+            {
                 String name = intent.getStringExtra("PROBE");
 
-                if (RobotHealthProbe.NAME.equals(name)) {
+                if (RobotHealthProbe.NAME.equals(name))
+                {
                     long count = values.getAsLong("count");
                     double start = values.getAsDouble("start");
                     double end = values.getAsDouble("end");
@@ -56,17 +62,18 @@ public class PurpleRobotHealthProbeTestCase extends RobotTestCase {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Probe.PROBE_READING);
 
-        LocalBroadcastManager localManager = LocalBroadcastManager
-                .getInstance(this._context);
+        LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(this._context);
         localManager.registerReceiver(receiver, intentFilter);
 
-        try {
+        try
+        {
             this.broadcastUpdate("Enabling probe...");
 
-            for (Probe probe : ProbeManager.allProbes(this._context)) {
-                if (probe instanceof RobotHealthProbe) {
-                    SharedPreferences prefs = PreferenceManager
-                            .getDefaultSharedPreferences(this._context);
+            for (Probe probe : ProbeManager.allProbes(this._context))
+            {
+                if (probe instanceof RobotHealthProbe)
+                {
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
                     Editor e = prefs.edit();
                     e.putString("config_probe_robot_frequency", "60000");
                     e.commit();
@@ -77,8 +84,10 @@ public class PurpleRobotHealthProbeTestCase extends RobotTestCase {
 
             Thread.sleep(2000);
 
-            for (Probe probe : ProbeManager.allProbes(this._context)) {
-                if (probe instanceof RobotHealthProbe) {
+            for (Probe probe : ProbeManager.allProbes(this._context))
+            {
+                if (probe instanceof RobotHealthProbe)
+                {
                     Assert.assertTrue("ATP0", probe.isEnabled(this._context));
                 }
             }
@@ -107,7 +116,9 @@ public class PurpleRobotHealthProbeTestCase extends RobotTestCase {
             this.broadcastUpdate("Halting data collection...", 0);
             localManager.unregisterReceiver(receiver);
             Thread.sleep(2000);
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e)
+        {
             Assert.fail("PRHP1");
         }
 
@@ -120,10 +131,11 @@ public class PurpleRobotHealthProbeTestCase extends RobotTestCase {
         Assert.assertTrue("PRHP3", end < System.currentTimeMillis());
         Assert.assertTrue("PRHP4", (end - start) > 240);
 
-        for (Probe probe : ProbeManager.allProbes(this._context)) {
-            if (probe instanceof RobotHealthProbe) {
-                SharedPreferences prefs = PreferenceManager
-                        .getDefaultSharedPreferences(this._context);
+        for (Probe probe : ProbeManager.allProbes(this._context))
+        {
+            if (probe instanceof RobotHealthProbe)
+            {
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
                 Editor e = prefs.edit();
                 e.putString("config_probe_robot_frequency", "300000");
                 e.commit();
@@ -131,11 +143,13 @@ public class PurpleRobotHealthProbeTestCase extends RobotTestCase {
         }
     }
 
-    public int estimatedMinutes() {
+    public int estimatedMinutes()
+    {
         return 1;
     }
 
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return context.getString(R.string.name_health_probe_test);
     }
 }

@@ -54,8 +54,10 @@ import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
 @SuppressLint("SimpleDateFormat")
-public class DiagnosticActivity extends ActionBarActivity {
-    protected void onCreate(Bundle savedInstanceState) {
+public class DiagnosticActivity extends ActionBarActivity
+{
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
         this.getSupportActionBar().setTitle(R.string.activity_diagnostic_title);
@@ -64,26 +66,21 @@ public class DiagnosticActivity extends ActionBarActivity {
     }
 
     @SuppressWarnings("deprecation")
-    protected void onResume() {
+    protected void onResume()
+    {
         super.onResume();
 
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         TextView userId = (TextView) this.findViewById(R.id.user_id_value);
-        TextView probeStatus = (TextView) this
-                .findViewById(R.id.probe_status_value);
-        TextView uploadStatus = (TextView) this
-                .findViewById(R.id.upload_status_value);
-        TextView lastUpload = (TextView) this
-                .findViewById(R.id.last_upload_value);
-        TextView prVersion = (TextView) this
-                .findViewById(R.id.pr_version_value);
+        TextView probeStatus = (TextView) this.findViewById(R.id.probe_status_value);
+        TextView uploadStatus = (TextView) this.findViewById(R.id.upload_status_value);
+        TextView lastUpload = (TextView) this.findViewById(R.id.last_upload_value);
+        TextView prVersion = (TextView) this.findViewById(R.id.pr_version_value);
 
-        userId.setText("\"" + EncryptionManager.getInstance().getUserId(this)
-                + "\"");
+        userId.setText("\"" + EncryptionManager.getInstance().getUserId(this) + "\"");
 
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(this);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         boolean probeEnabled = prefs.getBoolean("config_probes_enabled", false);
 
@@ -94,22 +91,22 @@ public class DiagnosticActivity extends ActionBarActivity {
 
         PurpleRobotApplication.fixPreferences(this, true);
 
-        boolean uploadEnabled = prefs.getBoolean("config_enable_data_server",
-                false);
+        boolean uploadEnabled = prefs.getBoolean("config_enable_data_server", false);
 
-        if (uploadEnabled) {
-            boolean wifiOnly = prefs.getBoolean("config_restrict_data_wifi",
-                    true);
+        if (uploadEnabled)
+        {
+            boolean wifiOnly = prefs.getBoolean("config_restrict_data_wifi", true);
 
             if (wifiOnly)
                 uploadStatus.setText(R.string.upload_status_enabled_wifi_only);
             else
                 uploadStatus.setText(R.string.upload_status_enabled);
-        } else
+        }
+        else
             uploadStatus.setText(R.string.upload_status_disabled);
 
-        if (prefs.contains("http_last_upload")
-                && prefs.contains("http_last_payload_size")) {
+        if (prefs.contains("http_last_upload") && prefs.contains("http_last_payload_size"))
+        {
             long lastUploadTime = prefs.getLong("http_last_upload", 0);
             long lastPayloadSize = prefs.getLong("http_last_payload_size", 0) / 1024;
 
@@ -117,78 +114,80 @@ public class DiagnosticActivity extends ActionBarActivity {
 
             String dateString = sdf.format(new Date(lastUploadTime));
 
-            lastUpload.setText(String.format(
-                    this.getString(R.string.last_upload_format), dateString,
-                    lastPayloadSize));
+            lastUpload.setText(String.format(this.getString(R.string.last_upload_format), dateString, lastPayloadSize));
         }
 
-        if (prefs.getBoolean("config_enable_data_server", false)) {
-            OutputPlugin plugin = OutputPluginManager.sharedInstance
-                    .pluginForClass(this, HttpUploadPlugin.class);
+        if (prefs.getBoolean("config_enable_data_server", false))
+        {
+            OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(this, HttpUploadPlugin.class);
 
-            if (plugin instanceof HttpUploadPlugin) {
+            if (plugin instanceof HttpUploadPlugin)
+            {
                 HttpUploadPlugin http = (HttpUploadPlugin) plugin;
 
-                TextView uploadCount = (TextView) this
-                        .findViewById(R.id.pending_files_value);
-                uploadCount.setText(this.getString(R.string.pending_files_file,
-                        http.pendingFilesCount()));
+                TextView uploadCount = (TextView) this.findViewById(R.id.pending_files_value);
+                uploadCount.setText(this.getString(R.string.pending_files_file, http.pendingFilesCount()));
             }
-        } else {
-            OutputPlugin plugin = OutputPluginManager.sharedInstance
-                    .pluginForClass(this, StreamingJacksonUploadPlugin.class);
+        }
+        else
+        {
+            OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(this,
+                    StreamingJacksonUploadPlugin.class);
 
-            if (plugin instanceof StreamingJacksonUploadPlugin) {
+            if (plugin instanceof StreamingJacksonUploadPlugin)
+            {
                 StreamingJacksonUploadPlugin http = (StreamingJacksonUploadPlugin) plugin;
 
-                TextView uploadCount = (TextView) this
-                        .findViewById(R.id.pending_files_value);
-                uploadCount.setText(this.getString(R.string.pending_files_file,
-                        http.pendingFilesCount()));
+                TextView uploadCount = (TextView) this.findViewById(R.id.pending_files_value);
+                uploadCount.setText(this.getString(R.string.pending_files_file, http.pendingFilesCount()));
             }
         }
 
-        try {
-            PackageInfo pInfo = this.getPackageManager().getPackageInfo(
-                    this.getPackageName(), 0);
+        try
+        {
+            PackageInfo pInfo = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
             prVersion.setText(pInfo.versionName);
-        } catch (NameNotFoundException e) {
+        }
+        catch (NameNotFoundException e)
+        {
             LogManager.getInstance(this).logException(e);
         }
 
-        TextView okText = (TextView) this
-                .findViewById(R.id.pr_error_none_value);
-        LinearLayout errorList = (LinearLayout) this
-                .findViewById(R.id.pr_error_list);
+        TextView okText = (TextView) this.findViewById(R.id.pr_error_none_value);
+        LinearLayout errorList = (LinearLayout) this.findViewById(R.id.pr_error_list);
         errorList.removeAllViews();
 
         final SanityManager sanity = SanityManager.getInstance(this);
 
-        if (sanity.getErrorLevel() != SanityCheck.OK) {
+        if (sanity.getErrorLevel() != SanityCheck.OK)
+        {
             errorList.setVisibility(View.VISIBLE);
             okText.setVisibility(View.GONE);
 
             Map<String, String> errors = sanity.errors();
 
-            if (errors.size() > 0) {
+            if (errors.size() > 0)
+            {
                 errorList.setVisibility(View.VISIBLE);
 
-                for (String error : errors.keySet()) {
+                for (String error : errors.keySet())
+                {
                     TextView errorLine = new TextView(this);
                     errorLine.setText(errors.get(error));
                     errorLine.setTextColor(0xffff4444);
                     errorLine.setTextSize(18);
 
-                    LinearLayout.LayoutParams layout = new LinearLayout.LayoutParams(
-                            LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams layout = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
                             LayoutParams.WRAP_CONTENT);
                     layout.setMargins(0, 0, 0, 10);
                     errorLine.setLayoutParams(layout);
 
                     final String errorKey = error;
 
-                    errorLine.setOnClickListener(new OnClickListener() {
-                        public void onClick(View view) {
+                    errorLine.setOnClickListener(new OnClickListener()
+                    {
+                        public void onClick(View view)
+                        {
                             sanity.runActionForAlert(errorKey);
                         }
 
@@ -200,23 +199,26 @@ public class DiagnosticActivity extends ActionBarActivity {
 
             Map<String, String> warnings = sanity.warnings();
 
-            if (warnings.size() > 0) {
-                for (String error : warnings.keySet()) {
+            if (warnings.size() > 0)
+            {
+                for (String error : warnings.keySet())
+                {
                     TextView errorLine = new TextView(this);
                     errorLine.setText(warnings.get(error));
                     errorLine.setTextColor(0xffffbb33);
                     errorLine.setTextSize(18);
 
-                    LinearLayout.LayoutParams layout = new LinearLayout.LayoutParams(
-                            LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams layout = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
                             LayoutParams.WRAP_CONTENT);
                     layout.setMargins(0, 0, 0, 10);
                     errorLine.setLayoutParams(layout);
 
                     final String errorKey = error;
 
-                    errorLine.setOnClickListener(new OnClickListener() {
-                        public void onClick(View view) {
+                    errorLine.setOnClickListener(new OnClickListener()
+                    {
+                        public void onClick(View view)
+                        {
                             sanity.runActionForAlert(errorKey);
                         }
 
@@ -225,20 +227,23 @@ public class DiagnosticActivity extends ActionBarActivity {
                     errorList.addView(errorLine);
                 }
             }
-        } else {
+        }
+        else
+        {
             errorList.setVisibility(View.GONE);
             okText.setVisibility(View.VISIBLE);
         }
 
-        TextView triggerList = (TextView) this
-                .findViewById(R.id.installed_triggers_value);
+        TextView triggerList = (TextView) this.findViewById(R.id.installed_triggers_value);
 
         StringBuffer triggerSb = new StringBuffer();
 
         List<Trigger> triggers = TriggerManager.getInstance(this).allTriggers();
 
-        if (triggers.size() > 0) {
-            for (Trigger trigger : triggers) {
+        if (triggers.size() > 0)
+        {
+            for (Trigger trigger : triggers)
+            {
                 if (triggerSb.length() > 0)
                     triggerSb.append("\n");
 
@@ -246,17 +251,17 @@ public class DiagnosticActivity extends ActionBarActivity {
             }
 
             triggerList.setText(triggerSb.toString());
-        } else
+        }
+        else
             triggerList.setText(R.string.no_installed_triggers_label);
 
-        TextView sensorsList = (TextView) this
-                .findViewById(R.id.available_sensors_value);
+        TextView sensorsList = (TextView) this.findViewById(R.id.available_sensors_value);
         StringBuffer sb = new StringBuffer();
 
-        SensorManager sensorManager = (SensorManager) this
-                .getSystemService(Context.SENSOR_SERVICE);
+        SensorManager sensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
 
-        for (Sensor s : sensorManager.getSensorList(Sensor.TYPE_ALL)) {
+        for (Sensor s : sensorManager.getSensorList(Sensor.TYPE_ALL))
+        {
             if (sb.length() > 0)
                 sb.append("\n");
 
@@ -267,55 +272,62 @@ public class DiagnosticActivity extends ActionBarActivity {
 
         String ipAddress = null;
 
-        WifiManager wifiManager = (WifiManager) this
-                .getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 
-        if (wifiInfo != null) {
+        if (wifiInfo != null)
+        {
             int ip = wifiInfo.getIpAddress();
 
             ipAddress = Formatter.formatIpAddress(ip);
-        } else {
-            try {
-                Enumeration<NetworkInterface> ifaces = NetworkInterface
-                        .getNetworkInterfaces();
+        }
+        else
+        {
+            try
+            {
+                Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
 
                 NetworkInterface iface = null;
 
-                while (ifaces.hasMoreElements()
-                        && (iface = ifaces.nextElement()) != null
-                        && ipAddress == null) {
-                    if (iface.getName().equals("lo") == false) {
+                while (ifaces.hasMoreElements() && (iface = ifaces.nextElement()) != null && ipAddress == null)
+                {
+                    if (iface.getName().equals("lo") == false)
+                    {
                         Enumeration<InetAddress> ips = iface.getInetAddresses();
                         InetAddress ipAddr = null;
 
-                        while (ips.hasMoreElements()
-                                && (ipAddr = ips.nextElement()) != null) {
+                        while (ips.hasMoreElements() && (ipAddr = ips.nextElement()) != null)
+                        {
                             ipAddress = ipAddr.getHostAddress();
                         }
                     }
                 }
-            } catch (SocketException e) {
+            }
+            catch (SocketException e)
+            {
                 LogManager.getInstance(this).logException(e);
             }
         }
 
-        if (ipAddress != null) {
-            TextView ipAddressView = (TextView) this
-                    .findViewById(R.id.ip_address_value);
+        if (ipAddress != null)
+        {
+            TextView ipAddressView = (TextView) this.findViewById(R.id.ip_address_value);
             ipAddressView.setText(ipAddress);
         }
     }
 
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
         MenuInflater inflater = this.getMenuInflater();
         inflater.inflate(R.menu.menu_diagnostics, menu);
 
         return true;
     }
 
-    public void onBackPressed() {
-        if (this.isTaskRoot()) {
+    public void onBackPressed()
+    {
+        if (this.isTaskRoot())
+        {
             Intent intent = new Intent(this, StartActivity.class);
             this.startActivity(intent);
         }
@@ -323,25 +335,26 @@ public class DiagnosticActivity extends ActionBarActivity {
         this.finish();
     }
 
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
         final int itemId = item.getItemId();
 
-        if (itemId == android.R.id.home) {
+        if (itemId == android.R.id.home)
+        {
             this.onBackPressed();
 
         }
-        if (itemId == R.id.menu_email_item) {
+        if (itemId == R.id.menu_email_item)
+        {
             StringBuffer message = new StringBuffer();
 
-            SharedPreferences prefs = PreferenceManager
-                    .getDefaultSharedPreferences(this);
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
             String newline = System.getProperty("line.separator");
 
             message.append(this.getString(R.string.user_id_label));
             message.append(newline);
-            message.append("\""
-                    + EncryptionManager.getInstance().getUserId(this) + "\"");
+            message.append("\"" + EncryptionManager.getInstance().getUserId(this) + "\"");
 
             message.append(newline);
             message.append(newline);
@@ -349,8 +362,7 @@ public class DiagnosticActivity extends ActionBarActivity {
             message.append(this.getString(R.string.probe_status_label));
             message.append(newline);
 
-            boolean probeEnabled = prefs.getBoolean("config_probes_enabled",
-                    false);
+            boolean probeEnabled = prefs.getBoolean("config_probes_enabled", false);
 
             if (probeEnabled)
                 message.append(this.getString(R.string.probe_status_enabled));
@@ -365,20 +377,18 @@ public class DiagnosticActivity extends ActionBarActivity {
 
             PurpleRobotApplication.fixPreferences(this, true);
 
-            boolean uploadEnabled = prefs.getBoolean(
-                    "config_enable_data_server", false);
+            boolean uploadEnabled = prefs.getBoolean("config_enable_data_server", false);
 
-            if (uploadEnabled) {
-                boolean wifiOnly = prefs.getBoolean(
-                        "config_restrict_data_wifi", true);
+            if (uploadEnabled)
+            {
+                boolean wifiOnly = prefs.getBoolean("config_restrict_data_wifi", true);
 
                 if (wifiOnly)
-                    message.append(this
-                            .getString(R.string.upload_status_enabled_wifi_only));
+                    message.append(this.getString(R.string.upload_status_enabled_wifi_only));
                 else
-                    message.append(this
-                            .getString(R.string.upload_status_enabled));
-            } else
+                    message.append(this.getString(R.string.upload_status_enabled));
+            }
+            else
                 message.append(this.getString(R.string.upload_status_disabled));
 
             message.append(newline);
@@ -387,36 +397,32 @@ public class DiagnosticActivity extends ActionBarActivity {
             message.append(this.getString(R.string.last_upload_label));
             message.append(newline);
 
-            if (prefs.contains("http_last_upload")
-                    && prefs.contains("http_last_payload_size")) {
+            if (prefs.contains("http_last_upload") && prefs.contains("http_last_payload_size"))
+            {
                 long lastUploadTime = prefs.getLong("http_last_upload", 0);
-                long lastPayloadSize = prefs.getLong("http_last_payload_size",
-                        0) / 1024;
+                long lastPayloadSize = prefs.getLong("http_last_payload_size", 0) / 1024;
 
                 SimpleDateFormat sdf = new SimpleDateFormat("MMM d - HH:mm:ss");
 
                 String dateString = sdf.format(new Date(lastUploadTime));
 
-                message.append(String.format(
-                        this.getString(R.string.last_upload_format),
-                        dateString, lastPayloadSize));
-            } else
+                message.append(String.format(this.getString(R.string.last_upload_format), dateString, lastPayloadSize));
+            }
+            else
                 message.append(this.getString(R.string.last_upload_placeholder));
 
             message.append(newline);
             message.append(newline);
 
-            OutputPlugin plugin = OutputPluginManager.sharedInstance
-                    .pluginForClass(this, HttpUploadPlugin.class);
+            OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(this, HttpUploadPlugin.class);
 
-            if (plugin instanceof HttpUploadPlugin) {
+            if (plugin instanceof HttpUploadPlugin)
+            {
                 HttpUploadPlugin http = (HttpUploadPlugin) plugin;
 
-                message.append(this
-                        .getString(R.string.robot_pending_count_label));
+                message.append(this.getString(R.string.robot_pending_count_label));
                 message.append(newline);
-                message.append(this.getString(R.string.pending_files_file,
-                        http.pendingFilesCount()));
+                message.append(this.getString(R.string.pending_files_file, http.pendingFilesCount()));
 
                 message.append(newline);
                 message.append(newline);
@@ -427,11 +433,14 @@ public class DiagnosticActivity extends ActionBarActivity {
 
             final SanityManager sanity = SanityManager.getInstance(this);
 
-            if (sanity.getErrorLevel() != SanityCheck.OK) {
+            if (sanity.getErrorLevel() != SanityCheck.OK)
+            {
                 Map<String, String> errors = sanity.errors();
 
-                if (errors.size() > 0) {
-                    for (String error : errors.keySet()) {
+                if (errors.size() > 0)
+                {
+                    for (String error : errors.keySet())
+                    {
                         message.append(errors.get(error));
                         message.append(newline);
                     }
@@ -441,15 +450,19 @@ public class DiagnosticActivity extends ActionBarActivity {
 
                 Map<String, String> warnings = sanity.warnings();
 
-                if (warnings.size() > 0) {
-                    for (String error : warnings.keySet()) {
+                if (warnings.size() > 0)
+                {
+                    for (String error : warnings.keySet())
+                    {
                         message.append(warnings.get(error));
                         message.append(newline);
                     }
 
                     message.append(newline);
                 }
-            } else {
+            }
+            else
+            {
                 message.append(this.getString(R.string.pr_errors_none_label));
                 message.append(newline);
             }
@@ -457,11 +470,13 @@ public class DiagnosticActivity extends ActionBarActivity {
             message.append(this.getString(R.string.pr_version_label));
             message.append(newline);
 
-            try {
-                PackageInfo pInfo = this.getPackageManager().getPackageInfo(
-                        this.getPackageName(), 0);
+            try
+            {
+                PackageInfo pInfo = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
                 message.append(pInfo.versionName);
-            } catch (NameNotFoundException e) {
+            }
+            catch (NameNotFoundException e)
+            {
                 LogManager.getInstance(this).logException(e);
             }
 
@@ -473,10 +488,10 @@ public class DiagnosticActivity extends ActionBarActivity {
 
             StringBuffer sb = new StringBuffer();
 
-            SensorManager sensorManager = (SensorManager) this
-                    .getSystemService(Context.SENSOR_SERVICE);
+            SensorManager sensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
 
-            for (Sensor s : sensorManager.getSensorList(Sensor.TYPE_ALL)) {
+            for (Sensor s : sensorManager.getSensorList(Sensor.TYPE_ALL))
+            {
                 if (sb.length() > 0)
                     sb.append("\n");
 
@@ -485,12 +500,12 @@ public class DiagnosticActivity extends ActionBarActivity {
 
             message.append(sb.toString());
 
-            try {
+            try
+            {
                 Intent intent = new Intent(Intent.ACTION_SEND);
 
                 intent.setType("message/rfc822");
-                intent.putExtra(Intent.EXTRA_SUBJECT,
-                        this.getString(R.string.email_diagnostic_subject));
+                intent.putExtra(Intent.EXTRA_SUBJECT, this.getString(R.string.email_diagnostic_subject));
                 intent.putExtra(Intent.EXTRA_TEXT, message.toString());
 
                 SchemeConfigFile scheme = new SchemeConfigFile(this);
@@ -500,8 +515,7 @@ public class DiagnosticActivity extends ActionBarActivity {
 
                 FileOutputStream fout = new FileOutputStream(configFile);
 
-                fout.write(scheme.toString().getBytes(
-                        Charset.defaultCharset().name()));
+                fout.write(scheme.toString().getBytes(Charset.defaultCharset().name()));
 
                 fout.flush();
                 fout.close();
@@ -509,22 +523,28 @@ public class DiagnosticActivity extends ActionBarActivity {
                 intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(configFile));
 
                 this.startActivity(intent);
-            } catch (ActivityNotFoundException e) {
-                try {
-                    Intent mailIntent = new Intent(Intent.ACTION_VIEW,
-                            Uri.parse("mailto:c-karr@northwestern.edu"));
-                    mailIntent.putExtra(Intent.EXTRA_SUBJECT,
-                            this.getString(R.string.email_diagnostic_subject));
+            }
+            catch (ActivityNotFoundException e)
+            {
+                try
+                {
+                    Intent mailIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("mailto:c-karr@northwestern.edu"));
+                    mailIntent.putExtra(Intent.EXTRA_SUBJECT, this.getString(R.string.email_diagnostic_subject));
                     mailIntent.putExtra(Intent.EXTRA_TEXT, message.toString());
 
                     this.startActivity(mailIntent);
-                } catch (ActivityNotFoundException ex) {
-                    Toast.makeText(this, R.string.toast_mail_not_found,
-                            Toast.LENGTH_LONG).show();
                 }
-            } catch (FileNotFoundException e) {
+                catch (ActivityNotFoundException ex)
+                {
+                    Toast.makeText(this, R.string.toast_mail_not_found, Toast.LENGTH_LONG).show();
+                }
+            }
+            catch (FileNotFoundException e)
+            {
                 LogManager.getInstance(this).logException(e);
-            } catch (IOException e) {
+            }
+            catch (IOException e)
+            {
                 LogManager.getInstance(this).logException(e);
             }
 

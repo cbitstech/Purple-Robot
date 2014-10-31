@@ -13,41 +13,53 @@ import android.content.Context;
 
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
-public class JSONHelper {
-    public boolean isJson(Object o) {
+public class JSONHelper
+{
+    public boolean isJson(Object o)
+    {
         return (o instanceof JSONObject);
     }
 
-    public boolean isJsonArray(Object o) {
+    public boolean isJsonArray(Object o)
+    {
         return (o instanceof JSONArray);
     }
 
-    public int jsonArrayLength(JSONArray array) {
+    public int jsonArrayLength(JSONArray array)
+    {
         return array.length();
     }
 
-    public Object parse(String jsonString) throws JSONException {
+    public Object parse(String jsonString) throws JSONException
+    {
         if (jsonString.trim().startsWith("{"))
             return new JSONObject(jsonString);
         else if (jsonString.trim().startsWith("["))
             return new JSONArray(jsonString);
 
-        try {
+        try
+        {
             return Integer.parseInt(jsonString);
-        } catch (NumberFormatException e) {
+        }
+        catch (NumberFormatException e)
+        {
 
         }
 
-        try {
+        try
+        {
             return Double.parseDouble(jsonString);
-        } catch (NumberFormatException e) {
+        }
+        catch (NumberFormatException e)
+        {
 
         }
 
         return jsonString;
     }
 
-    public Object jsonArrayGet(JSONArray array, int index) throws JSONException {
+    public Object jsonArrayGet(JSONArray array, int index) throws JSONException
+    {
         Object value = array.get(index);
 
         if (value instanceof JSONArray)
@@ -58,23 +70,27 @@ public class JSONHelper {
         return value;
     }
 
-    private static JSONObject fromPairs(Pair pair) throws JSONException {
+    private static JSONObject fromPairs(Pair pair) throws JSONException
+    {
         JSONObject json = new JSONObject();
 
         if (pair.isEmpty())
             return json;
 
-        if (pair.isEmpty() == false) {
+        if (pair.isEmpty() == false)
+        {
             Object first = pair.getFirst();
 
-            if (first instanceof Pair) {
+            if (first instanceof Pair)
+            {
                 Pair firstPair = (Pair) first;
 
                 String key = firstPair.first.toString();
 
                 Object value = firstPair.rest();
 
-                if (value instanceof Pair) {
+                if (value instanceof Pair)
+                {
                     Pair valuePair = (Pair) value;
 
                     if (valuePair.first instanceof Pair)
@@ -90,14 +106,16 @@ public class JSONHelper {
 
             Object rest = pair.getRest();
 
-            if (rest instanceof Pair) {
+            if (rest instanceof Pair)
+            {
                 Pair restPair = (Pair) rest;
 
                 JSONObject restJson = JSONHelper.fromPairs(restPair);
 
                 Iterator<String> keys = restJson.keys();
 
-                while (keys.hasNext()) {
+                while (keys.hasNext())
+                {
                     String key = keys.next();
 
                     json.put(key, restJson.get(key));
@@ -108,13 +126,15 @@ public class JSONHelper {
         return json;
     }
 
-    private static JSONArray listFromPairs(Pair pairs) throws JSONException {
+    private static JSONArray listFromPairs(Pair pairs) throws JSONException
+    {
         if (pairs.isEmpty())
             return new JSONArray();
 
         Object value = pairs.first;
 
-        if (value instanceof Pair) {
+        if (value instanceof Pair)
+        {
             Pair valuePair = (Pair) value;
 
             if (valuePair.first instanceof Pair)
@@ -128,7 +148,8 @@ public class JSONHelper {
 
         Object rest = pairs.rest();
 
-        if (rest instanceof Pair) {
+        if (rest instanceof Pair)
+        {
             JSONArray restArray = JSONHelper.listFromPairs((Pair) rest);
 
             for (int i = 0; i < restArray.length(); i++)
@@ -138,9 +159,10 @@ public class JSONHelper {
         return array;
     }
 
-    public boolean jsonArrayInsert(JSONArray array, Object value, int index)
-            throws JSONException {
-        if (value instanceof Pair) {
+    public boolean jsonArrayInsert(JSONArray array, Object value, int index) throws JSONException
+    {
+        if (value instanceof Pair)
+        {
             Pair valuePair = (Pair) value;
 
             if (valuePair.first instanceof Pair)
@@ -156,9 +178,10 @@ public class JSONHelper {
         return false;
     }
 
-    public boolean jsonArrayAppend(JSONArray array, Object value)
-            throws JSONException {
-        if (value instanceof Pair) {
+    public boolean jsonArrayAppend(JSONArray array, Object value) throws JSONException
+    {
+        if (value instanceof Pair)
+        {
             Pair valuePair = (Pair) value;
 
             if (valuePair.first instanceof Pair)
@@ -174,11 +197,12 @@ public class JSONHelper {
         return false;
     }
 
-    public JSONArray jsonArrayRemove(JSONArray array, int index)
-            throws JSONException {
+    public JSONArray jsonArrayRemove(JSONArray array, int index) throws JSONException
+    {
         JSONArray newArray = new JSONArray();
 
-        for (int i = 0; i < array.length(); i++) {
+        for (int i = 0; i < array.length(); i++)
+        {
             if (i != index)
                 newArray.put(array.get(i));
         }
@@ -186,9 +210,10 @@ public class JSONHelper {
         return newArray;
     }
 
-    public JSONArray jsonArrayReplace(JSONArray array, Object value, int index)
-            throws JSONException {
-        if (value instanceof Pair) {
+    public JSONArray jsonArrayReplace(JSONArray array, Object value, int index) throws JSONException
+    {
+        if (value instanceof Pair)
+        {
             Pair valuePair = (Pair) value;
 
             if (valuePair.first instanceof Pair)
@@ -199,7 +224,8 @@ public class JSONHelper {
 
         JSONArray newArray = new JSONArray();
 
-        for (int i = 0; i < array.length(); i++) {
+        for (int i = 0; i < array.length(); i++)
+        {
             if (i != index)
                 newArray.put(array.get(i));
             else
@@ -209,7 +235,8 @@ public class JSONHelper {
         return newArray;
     }
 
-    public String toString(Object o, int indent) throws JSONException {
+    public String toString(Object o, int indent) throws JSONException
+    {
         if (o instanceof JSONObject && indent > 0)
             return ((JSONObject) o).toString(indent);
         else if (o instanceof JSONArray && indent > 0)
@@ -218,8 +245,10 @@ public class JSONHelper {
         return o.toString();
     }
 
-    public Object get(Context context, JSONObject obj, String key) {
-        try {
+    public Object get(Context context, JSONObject obj, String key)
+    {
+        try
+        {
             Object value = obj.get(key);
 
             if (value instanceof JSONArray)
@@ -228,17 +257,21 @@ public class JSONHelper {
                 value = JSONHelper.toPairs((JSONObject) value);
 
             return value;
-        } catch (JSONException e) {
+        }
+        catch (JSONException e)
+        {
             LogManager.getInstance(context).logException(e);
         }
 
         return null;
     }
 
-    private static Pair toList(JSONArray array) throws JSONException {
+    private static Pair toList(JSONArray array) throws JSONException
+    {
         Pair pair = Pair.EMPTY;
 
-        for (int i = array.length() - 1; i >= 0; i--) {
+        for (int i = array.length() - 1; i >= 0; i--)
+        {
             Object item = array.get(i);
 
             if (item instanceof JSONArray)
@@ -252,16 +285,19 @@ public class JSONHelper {
         return pair;
     }
 
-    public Pair keys(JSONObject json) throws JSONException {
+    public Pair keys(JSONObject json) throws JSONException
+    {
         return JSONHelper.toList(json.names());
     }
 
-    private static Pair toPairs(JSONObject json) throws JSONException {
+    private static Pair toPairs(JSONObject json) throws JSONException
+    {
         Pair list = Pair.EMPTY;
 
         JSONArray names = json.names();
 
-        for (int i = 0; i < names.length(); i++) {
+        for (int i = 0; i < names.length(); i++)
+        {
             String name = names.getString(i);
             Object item = json.get(name);
 
@@ -273,16 +309,19 @@ public class JSONHelper {
             list = new Pair(new Pair(name, item), list);
         }
 
-        return new Pair(new Pair(Symbol.QUOTE, new Pair(list, Pair.EMPTY)),
-                Pair.EMPTY);
+        return new Pair(new Pair(Symbol.QUOTE, new Pair(list, Pair.EMPTY)), Pair.EMPTY);
     }
 
-    public boolean put(Context context, JSONObject obj, String key, Object value) {
-        try {
+    public boolean put(Context context, JSONObject obj, String key, Object value)
+    {
+        try
+        {
             obj.put(key, value);
 
             return true;
-        } catch (JSONException e) {
+        }
+        catch (JSONException e)
+        {
             LogManager.getInstance(context).logException(e);
         }
 

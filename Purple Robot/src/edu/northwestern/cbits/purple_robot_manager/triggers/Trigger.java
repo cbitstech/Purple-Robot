@@ -19,7 +19,8 @@ import edu.northwestern.cbits.purple_robot_manager.activities.CodeViewerActivity
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 
-public abstract class Trigger {
+public abstract class Trigger
+{
     public static final String NAME = "name";
     public static final String ACTION = "action";
     public static final String IDENTIFIER = "identifier";
@@ -31,7 +32,8 @@ public abstract class Trigger {
     private String _action = null;
     private String _identifier = "unidentified-trigger";
 
-    public Trigger(Context context, Map<String, Object> map) {
+    public Trigger(Context context, Map<String, Object> map)
+    {
         this.updateFromMap(context, map);
     }
 
@@ -39,43 +41,48 @@ public abstract class Trigger {
 
     public abstract void refresh(Context context);
 
-    public boolean enabled(Context context) {
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(context);
+    public boolean enabled(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         return prefs.getBoolean(this.enabledKey(), true);
     }
 
-    public void setEnabled(Context context, boolean enabled) {
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(context);
+    public void setEnabled(Context context, boolean enabled)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         Editor e = prefs.edit();
         e.putBoolean(this.enabledKey(), enabled);
         e.commit();
     }
 
-    public void execute(final Context context, boolean force) {
-        if (this.enabled(context) && this._action != null) {
+    public void execute(final Context context, boolean force)
+    {
+        if (this.enabled(context) && this._action != null)
+        {
             final Trigger me = this;
 
-            Runnable r = new Runnable() {
-                public void run() {
-                    try {
+            Runnable r = new Runnable()
+            {
+                public void run()
+                {
+                    try
+                    {
                         BaseScriptEngine.runScript(context, me._action);
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         LogManager.getInstance(context).logException(e);
 
                         HashMap<String, Object> payload = new HashMap<String, Object>();
                         payload.put("script", me._action);
 
-                        LogManager.getInstance(context).log(
-                                "failed_trigger_script", payload);
+                        LogManager.getInstance(context).log("failed_trigger_script", payload);
                     }
                 }
             };
 
-            Thread t = new Thread(new ThreadGroup("Triggers"), r, this.name(),
-                    32768);
+            Thread t = new Thread(new ThreadGroup("Triggers"), r, this.name(), 32768);
             t.start();
 
             HashMap<String, Object> payload = new HashMap<String, Object>();
@@ -87,44 +94,50 @@ public abstract class Trigger {
         }
     }
 
-    public String toString() {
+    public String toString()
+    {
         return this.name();
     }
 
-    public String name() {
+    public String name()
+    {
         return this._name;
     }
 
-    public boolean equals(Object obj) {
-        if (obj != null && obj instanceof Trigger) {
+    public boolean equals(Object obj)
+    {
+        if (obj != null && obj instanceof Trigger)
+        {
             Trigger t = (Trigger) obj;
 
-            if ((t._identifier == null || this._identifier == null)
-                    && (t._name != null && t._name.equals(this._name)))
+            if ((t._identifier == null || this._identifier == null) && (t._name != null && t._name.equals(this._name)))
                 return true;
-            else if (t._identifier != null
-                    && t._identifier.equals(this._identifier))
+            else if (t._identifier != null && t._identifier.equals(this._identifier))
                 return true;
         }
 
         return false;
     }
 
-    public void merge(Trigger trigger) {
+    public void merge(Trigger trigger)
+    {
         this._name = trigger._name;
         this._action = trigger._action;
     }
 
-    public String identifier() {
+    public String identifier()
+    {
         return this._identifier;
     }
 
-    public void reset(Context context) {
+    public void reset(Context context)
+    {
         // Default implementation does nothing...
     }
 
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(final PreferenceActivity activity) {
+    public PreferenceScreen preferenceScreen(final PreferenceActivity activity)
+    {
         PreferenceManager manager = activity.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(activity);
@@ -146,20 +159,19 @@ public abstract class Trigger {
         viewAction.setSummary(R.string.label_trigger_show_action_desc);
         viewAction.setOrder(Integer.MAX_VALUE);
 
-        viewAction
-                .setOnPreferenceClickListener(new OnPreferenceClickListener() {
-                    public boolean onPreferenceClick(Preference preference) {
-                        Intent intent = new Intent(activity,
-                                CodeViewerActivity.class);
-                        intent.putExtra(CodeViewerActivity.SOURCE_CODE,
-                                me._action);
-                        intent.putExtra(CodeViewerActivity.TITLE, me.name());
+        viewAction.setOnPreferenceClickListener(new OnPreferenceClickListener()
+        {
+            public boolean onPreferenceClick(Preference preference)
+            {
+                Intent intent = new Intent(activity, CodeViewerActivity.class);
+                intent.putExtra(CodeViewerActivity.SOURCE_CODE, me._action);
+                intent.putExtra(CodeViewerActivity.TITLE, me.name());
 
-                        activity.startActivity(intent);
+                activity.startActivity(intent);
 
-                        return true;
-                    }
-                });
+                return true;
+            }
+        });
 
         screen.addPreference(viewAction);
 
@@ -171,9 +183,10 @@ public abstract class Trigger {
 
         enabled.setOrder(Integer.MAX_VALUE);
 
-        enabled.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            public boolean onPreferenceChange(Preference preference,
-                    Object newValue) {
+        enabled.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
+        {
+            public boolean onPreferenceChange(Preference preference, Object newValue)
+            {
                 return true;
             }
         });
@@ -185,8 +198,10 @@ public abstract class Trigger {
         fireNow.setSummary(R.string.label_trigger_fire_now_desc);
         fireNow.setOrder(Integer.MAX_VALUE / 2);
 
-        fireNow.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-            public boolean onPreferenceClick(Preference preference) {
+        fireNow.setOnPreferenceClickListener(new OnPreferenceClickListener()
+        {
+            public boolean onPreferenceClick(Preference preference)
+            {
                 me.execute(activity, true);
 
                 return true;
@@ -198,11 +213,13 @@ public abstract class Trigger {
         return screen;
     }
 
-    private String enabledKey() {
+    private String enabledKey()
+    {
         return "trigger_enabled_" + this._identifier;
     }
 
-    public static Trigger parse(Context context, Map<String, Object> params) {
+    public static Trigger parse(Context context, Map<String, Object> params)
+    {
         String type = params.get("type").toString();
 
         if (DateTrigger.TYPE_NAME.equals(type))
@@ -213,7 +230,8 @@ public abstract class Trigger {
         return null;
     }
 
-    public Map<String, Object> configuration(Context context) {
+    public Map<String, Object> configuration(Context context)
+    {
         Map<String, Object> config = new HashMap<String, Object>();
 
         config.put("name", this._name);
@@ -231,23 +249,27 @@ public abstract class Trigger {
         if (this._name != null)
             config.put("name", this._name);
         else
-            config.put("name",
-                    context.getString(R.string.name_anonymous_trigger));
+            config.put("name", context.getString(R.string.name_anonymous_trigger));
 
         return config;
     }
 
-    public boolean updateFromMap(Context context, Map<String, Object> params) {
+    public boolean updateFromMap(Context context, Map<String, Object> params)
+    {
         if (params.containsKey("name"))
             this._name = params.get("name").toString();
 
         if (params.containsKey("action"))
             this._action = params.get("action").toString();
 
-        if (params.containsKey("identifier")) {
-            try {
+        if (params.containsKey("identifier"))
+        {
+            try
+            {
                 this._identifier = params.get("identifier").toString();
-            } catch (NullPointerException e) {
+            }
+            catch (NullPointerException e)
+            {
                 this._identifier = "unspecified-identifier";
             }
         }
@@ -259,7 +281,8 @@ public abstract class Trigger {
 
     public abstract String getDiagnosticString(Context context);
 
-    public Bundle bundle(Context context) {
+    public Bundle bundle(Context context)
+    {
         Bundle bundle = new Bundle();
 
         bundle.putString(Trigger.NAME, this._name);
@@ -271,8 +294,7 @@ public abstract class Trigger {
 
         bundle.putBoolean(Trigger.ENABLED, this.enabled(context));
 
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(context);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         String key = "last_fired_" + this._identifier;
 
@@ -281,9 +303,9 @@ public abstract class Trigger {
         return bundle;
     }
 
-    public long lastFireTime(Context context) {
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(context);
+    public long lastFireTime(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         String key = "last_fired_" + this.identifier();
 

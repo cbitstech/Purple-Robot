@@ -19,7 +19,8 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
-public class HardwareInformationProbe extends Probe {
+public class HardwareInformationProbe extends Probe
+{
     private static final String BOARD = "BOARD";
     private static final String BOOTLOADER = "BOOTLOADER";
     private static final String BRAND = "BRAND";
@@ -40,20 +41,23 @@ public class HardwareInformationProbe extends Probe {
 
     private long _lastCheck = 0;
 
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.HardwareInformationProbe";
     }
 
-    public String title(Context context) {
+    public String title(Context context)
+    {
         return context.getString(R.string.title_hardware_info_probe);
     }
 
-    public String probeCategory(Context context) {
-        return context.getResources().getString(
-                R.string.probe_device_info_category);
+    public String probeCategory(Context context)
+    {
+        return context.getResources().getString(R.string.probe_device_info_category);
     }
 
-    public void enable(Context context) {
+    public void enable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -62,7 +66,8 @@ public class HardwareInformationProbe extends Probe {
         e.commit();
     }
 
-    public void disable(Context context) {
+    public void disable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -71,73 +76,60 @@ public class HardwareInformationProbe extends Probe {
         e.commit();
     }
 
-    public boolean isEnabled(Context context) {
+    public boolean isEnabled(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         long now = System.currentTimeMillis();
 
-        if (super.isEnabled(context)) {
-            if (prefs.getBoolean("config_probe_hardware_enabled",
-                    HardwareInformationProbe.DEFAULT_ENABLED)) {
-                synchronized (this) {
-                    long freq = Long.parseLong(prefs.getString(
-                            "config_probe_hardware_frequency",
+        if (super.isEnabled(context))
+        {
+            if (prefs.getBoolean("config_probe_hardware_enabled", HardwareInformationProbe.DEFAULT_ENABLED))
+            {
+                synchronized (this)
+                {
+                    long freq = Long.parseLong(prefs.getString("config_probe_hardware_frequency",
                             Probe.DEFAULT_FREQUENCY));
 
-                    if (now - this._lastCheck > freq) {
+                    if (now - this._lastCheck > freq)
+                    {
                         Bundle bundle = new Bundle();
                         bundle.putString("PROBE", this.name(context));
-                        bundle.putLong("TIMESTAMP",
-                                System.currentTimeMillis() / 1000);
+                        bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
 
-                        bundle.putString(HardwareInformationProbe.BOARD,
-                                Build.BOARD);
-                        bundle.putString(HardwareInformationProbe.BOOTLOADER,
-                                Build.BOOTLOADER);
-                        bundle.putString(HardwareInformationProbe.BRAND,
-                                Build.BRAND);
-                        bundle.putString(HardwareInformationProbe.DEVICE,
-                                Build.DEVICE);
-                        bundle.putString(HardwareInformationProbe.DISPLAY,
-                                Build.DISPLAY);
-                        bundle.putString(HardwareInformationProbe.FINGERPRINT,
-                                Build.FINGERPRINT);
-                        bundle.putString(HardwareInformationProbe.HARDWARE,
-                                Build.HARDWARE);
-                        bundle.putString(HardwareInformationProbe.HOST,
-                                Build.HOST);
+                        bundle.putString(HardwareInformationProbe.BOARD, Build.BOARD);
+                        bundle.putString(HardwareInformationProbe.BOOTLOADER, Build.BOOTLOADER);
+                        bundle.putString(HardwareInformationProbe.BRAND, Build.BRAND);
+                        bundle.putString(HardwareInformationProbe.DEVICE, Build.DEVICE);
+                        bundle.putString(HardwareInformationProbe.DISPLAY, Build.DISPLAY);
+                        bundle.putString(HardwareInformationProbe.FINGERPRINT, Build.FINGERPRINT);
+                        bundle.putString(HardwareInformationProbe.HARDWARE, Build.HARDWARE);
+                        bundle.putString(HardwareInformationProbe.HOST, Build.HOST);
                         bundle.putString(HardwareInformationProbe.ID, Build.ID);
-                        bundle.putString(HardwareInformationProbe.MANUFACTURER,
-                                Build.MANUFACTURER);
-                        bundle.putString(HardwareInformationProbe.MODEL,
-                                Build.MODEL);
-                        bundle.putString(HardwareInformationProbe.PRODUCT,
-                                Build.PRODUCT);
+                        bundle.putString(HardwareInformationProbe.MANUFACTURER, Build.MANUFACTURER);
+                        bundle.putString(HardwareInformationProbe.MODEL, Build.MODEL);
+                        bundle.putString(HardwareInformationProbe.PRODUCT, Build.PRODUCT);
 
-                        try {
-                            WifiManager wifi = (WifiManager) context
-                                    .getSystemService(Context.WIFI_SERVICE);
-                            bundle.putString(HardwareInformationProbe.WIFI_MAC,
-                                    wifi.getConnectionInfo().getMacAddress());
-                        } catch (NullPointerException e) {
+                        try
+                        {
+                            WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+                            bundle.putString(HardwareInformationProbe.WIFI_MAC, wifi.getConnectionInfo()
+                                    .getMacAddress());
+                        }
+                        catch (NullPointerException e)
+                        {
                             LogManager.getInstance(context).logException(e);
                         }
 
-                        TelephonyManager tm = (TelephonyManager) context
-                                .getSystemService(Context.TELEPHONY_SERVICE);
-                        bundle.putString(HardwareInformationProbe.MOBILE_ID,
-                                tm.getDeviceId());
+                        TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+                        bundle.putString(HardwareInformationProbe.MOBILE_ID, tm.getDeviceId());
 
-                        BluetoothAdapter adapter = BluetoothAdapter
-                                .getDefaultAdapter();
+                        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 
                         if (adapter != null)
-                            bundle.putString(
-                                    HardwareInformationProbe.BLUETOOTH_MAC,
-                                    adapter.getAddress());
+                            bundle.putString(HardwareInformationProbe.BLUETOOTH_MAC, adapter.getAddress());
                         else
-                            bundle.putString(
-                                    HardwareInformationProbe.BLUETOOTH_MAC, "");
+                            bundle.putString(HardwareInformationProbe.BLUETOOTH_MAC, "");
 
                         this.transmitData(context, bundle);
 
@@ -152,15 +144,15 @@ public class HardwareInformationProbe extends Probe {
         return false;
     }
 
-    public Bundle formattedBundle(Context context, Bundle bundle) {
+    public Bundle formattedBundle(Context context, Bundle bundle)
+    {
         Bundle formatted = super.formattedBundle(context, bundle);
 
         formatted.putString(context.getString(R.string.hardware_model_label),
                 bundle.getString(HardwareInformationProbe.MODEL));
         formatted.putString(context.getString(R.string.hardware_mfr_label),
                 bundle.getString(HardwareInformationProbe.MANUFACTURER));
-        formatted.putString(
-                context.getString(R.string.hardware_bluetooth_label),
+        formatted.putString(context.getString(R.string.hardware_bluetooth_label),
                 bundle.getString(HardwareInformationProbe.BLUETOOTH_MAC));
         formatted.putString(context.getString(R.string.hardware_wifi_label),
                 bundle.getString(HardwareInformationProbe.WIFI_MAC));
@@ -168,13 +160,12 @@ public class HardwareInformationProbe extends Probe {
         return formatted;
     };
 
-    public String summarizeValue(Context context, Bundle bundle) {
+    public String summarizeValue(Context context, Bundle bundle)
+    {
         String model = bundle.getString(HardwareInformationProbe.MODEL);
         String wifi = bundle.getString(HardwareInformationProbe.WIFI_MAC);
 
-        return String.format(
-                context.getResources().getString(
-                        R.string.summary_hardware_info_probe), model, wifi);
+        return String.format(context.getResources().getString(R.string.summary_hardware_info_probe), model, wifi);
     }
 
     /*
@@ -193,42 +184,46 @@ public class HardwareInformationProbe extends Probe {
      * return formatted; };
      */
 
-    public Map<String, Object> configuration(Context context) {
+    public Map<String, Object> configuration(Context context)
+    {
         Map<String, Object> map = super.configuration(context);
 
         SharedPreferences prefs = Probe.getPreferences(context);
 
-        long freq = Long.parseLong(prefs.getString(
-                "config_probe_hardware_frequency", Probe.DEFAULT_FREQUENCY));
+        long freq = Long.parseLong(prefs.getString("config_probe_hardware_frequency", Probe.DEFAULT_FREQUENCY));
 
         map.put(Probe.PROBE_FREQUENCY, freq);
 
         return map;
     }
 
-    public void updateFromMap(Context context, Map<String, Object> params) {
+    public void updateFromMap(Context context, Map<String, Object> params)
+    {
         super.updateFromMap(context, params);
 
-        if (params.containsKey(Probe.PROBE_FREQUENCY)) {
+        if (params.containsKey(Probe.PROBE_FREQUENCY))
+        {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
 
-            if (frequency instanceof Long) {
+            if (frequency instanceof Long)
+            {
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putString("config_probe_hardware_frequency",
-                        frequency.toString());
+                e.putString("config_probe_hardware_frequency", frequency.toString());
                 e.commit();
             }
         }
     }
 
-    public String summary(Context context) {
+    public String summary(Context context)
+    {
         return context.getString(R.string.summary_hardware_info_probe_desc);
     }
 
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    {
         PreferenceManager manager = activity.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(activity);

@@ -23,7 +23,8 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
-public class NetworkProbe extends Probe {
+public class NetworkProbe extends Probe
+{
     private static final String HOSTNAME = "HOSTNAME";
     private static final String IP_ADDRESS = "IP_ADDRESS";
     private static final String IFACE_NAME = "INTERFACE_NAME";
@@ -33,20 +34,23 @@ public class NetworkProbe extends Probe {
 
     private long _lastCheck = 0;
 
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.NetworkProbe";
     }
 
-    public String title(Context context) {
+    public String title(Context context)
+    {
         return context.getString(R.string.title_network_probe);
     }
 
-    public String probeCategory(Context context) {
-        return context.getResources().getString(
-                R.string.probe_device_info_category);
+    public String probeCategory(Context context)
+    {
+        return context.getResources().getString(R.string.probe_device_info_category);
     }
 
-    public void enable(Context context) {
+    public void enable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -55,7 +59,8 @@ public class NetworkProbe extends Probe {
         e.commit();
     }
 
-    public void disable(Context context) {
+    public void disable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -64,110 +69,106 @@ public class NetworkProbe extends Probe {
         e.commit();
     }
 
-    public boolean isEnabled(final Context context) {
+    public boolean isEnabled(final Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
-        if (super.isEnabled(context)) {
+        if (super.isEnabled(context))
+        {
             final long now = System.currentTimeMillis();
 
-            if (prefs.getBoolean("config_probe_network_enabled",
-                    NetworkProbe.DEFAULT_ENABLED)) {
-                synchronized (this) {
-                    long freq = Long.parseLong(prefs.getString(
-                            "config_probe_network_frequency",
+            if (prefs.getBoolean("config_probe_network_enabled", NetworkProbe.DEFAULT_ENABLED))
+            {
+                synchronized (this)
+                {
+                    long freq = Long.parseLong(prefs.getString("config_probe_network_frequency",
                             Probe.DEFAULT_FREQUENCY));
 
-                    if (now - this._lastCheck > freq) {
+                    if (now - this._lastCheck > freq)
+                    {
                         final NetworkProbe me = this;
 
-                        Runnable r = new Runnable() {
+                        Runnable r = new Runnable()
+                        {
                             @SuppressWarnings("deprecation")
-                            public void run() {
+                            public void run()
+                            {
                                 Bundle bundle = new Bundle();
                                 bundle.putString("PROBE", me.name(context));
-                                bundle.putLong("TIMESTAMP",
-                                        System.currentTimeMillis() / 1000);
+                                bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
 
-                                WifiManager wifiManager = (WifiManager) context
-                                        .getSystemService(Context.WIFI_SERVICE);
-                                WifiInfo wifiInfo = wifiManager
-                                        .getConnectionInfo();
+                                WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+                                WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 
-                                if (wifiInfo != null) {
+                                if (wifiInfo != null)
+                                {
                                     int ip = wifiInfo.getIpAddress();
 
-                                    String ipString = Formatter
-                                            .formatIpAddress(ip);
+                                    String ipString = Formatter.formatIpAddress(ip);
 
-                                    bundle.putString(NetworkProbe.IP_ADDRESS,
-                                            ipString);
+                                    bundle.putString(NetworkProbe.IP_ADDRESS, ipString);
 
-                                    try {
-                                        bundle.putString(NetworkProbe.HOSTNAME,
-                                                InetAddress.getByName(ipString)
-                                                        .getHostName());
-                                    } catch (UnknownHostException e) {
-                                        bundle.putString(NetworkProbe.HOSTNAME,
-                                                ipString);
+                                    try
+                                    {
+                                        bundle.putString(NetworkProbe.HOSTNAME, InetAddress.getByName(ipString)
+                                                .getHostName());
                                     }
-                                } else {
-                                    try {
-                                        Enumeration<NetworkInterface> ifaces = NetworkInterface
-                                                .getNetworkInterfaces();
+                                    catch (UnknownHostException e)
+                                    {
+                                        bundle.putString(NetworkProbe.HOSTNAME, ipString);
+                                    }
+                                }
+                                else
+                                {
+                                    try
+                                    {
+                                        Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
 
                                         NetworkInterface iface = null;
 
-                                        while (ifaces.hasMoreElements()
-                                                && (iface = ifaces
-                                                        .nextElement()) != null
-                                                && bundle
-                                                        .containsKey(NetworkProbe.IP_ADDRESS) == false) {
-                                            if (iface.getName().equals("lo") == false) {
-                                                Enumeration<InetAddress> ips = iface
-                                                        .getInetAddresses();
+                                        while (ifaces.hasMoreElements() && (iface = ifaces.nextElement()) != null
+                                                && bundle.containsKey(NetworkProbe.IP_ADDRESS) == false)
+                                        {
+                                            if (iface.getName().equals("lo") == false)
+                                            {
+                                                Enumeration<InetAddress> ips = iface.getInetAddresses();
                                                 InetAddress ipAddr = null;
 
-                                                while (ips.hasMoreElements()
-                                                        && (ipAddr = ips
-                                                                .nextElement()) != null) {
-                                                    bundle.putString(
-                                                            NetworkProbe.IP_ADDRESS,
-                                                            ipAddr.getHostAddress());
-                                                    bundle.putString(
-                                                            NetworkProbe.HOSTNAME,
-                                                            ipAddr.getHostName());
+                                                while (ips.hasMoreElements() && (ipAddr = ips.nextElement()) != null)
+                                                {
+                                                    bundle.putString(NetworkProbe.IP_ADDRESS, ipAddr.getHostAddress());
+                                                    bundle.putString(NetworkProbe.HOSTNAME, ipAddr.getHostName());
                                                 }
                                             }
                                         }
-                                    } catch (SocketException e) {
-                                        LogManager.getInstance(context)
-                                                .logException(e);
+                                    }
+                                    catch (SocketException e)
+                                    {
+                                        LogManager.getInstance(context).logException(e);
                                     }
                                 }
 
-                                if (bundle.containsKey(NetworkProbe.IP_ADDRESS) == false) {
-                                    bundle.putString(NetworkProbe.IP_ADDRESS,
-                                            "127.0.0.1");
-                                    bundle.putString(NetworkProbe.HOSTNAME,
-                                            "localhost");
+                                if (bundle.containsKey(NetworkProbe.IP_ADDRESS) == false)
+                                {
+                                    bundle.putString(NetworkProbe.IP_ADDRESS, "127.0.0.1");
+                                    bundle.putString(NetworkProbe.HOSTNAME, "localhost");
                                 }
 
-                                try {
-                                    NetworkInterface iface = NetworkInterface
-                                            .getByInetAddress(InetAddress
-                                                    .getByName("127.0.0.1"));
+                                try
+                                {
+                                    NetworkInterface iface = NetworkInterface.getByInetAddress(InetAddress
+                                            .getByName("127.0.0.1"));
 
-                                    bundle.putString(NetworkProbe.IFACE_NAME,
-                                            iface.getName());
-                                    bundle.putString(
-                                            NetworkProbe.IFACE_DISPLAY_NAME,
-                                            iface.getDisplayName());
-                                } catch (SocketException e) {
-                                    LogManager.getInstance(context)
-                                            .logException(e);
-                                } catch (UnknownHostException e) {
-                                    LogManager.getInstance(context)
-                                            .logException(e);
+                                    bundle.putString(NetworkProbe.IFACE_NAME, iface.getName());
+                                    bundle.putString(NetworkProbe.IFACE_DISPLAY_NAME, iface.getDisplayName());
+                                }
+                                catch (SocketException e)
+                                {
+                                    LogManager.getInstance(context).logException(e);
+                                }
+                                catch (UnknownHostException e)
+                                {
+                                    LogManager.getInstance(context).logException(e);
                                 }
 
                                 me.transmitData(context, bundle);
@@ -188,50 +189,53 @@ public class NetworkProbe extends Probe {
         return false;
     }
 
-    public String summarizeValue(Context context, Bundle bundle) {
+    public String summarizeValue(Context context, Bundle bundle)
+    {
         String ipAddress = bundle.getString(NetworkProbe.IP_ADDRESS);
 
-        return String.format(
-                context.getResources()
-                        .getString(R.string.summary_network_probe), ipAddress);
+        return String.format(context.getResources().getString(R.string.summary_network_probe), ipAddress);
     }
 
-    public Map<String, Object> configuration(Context context) {
+    public Map<String, Object> configuration(Context context)
+    {
         Map<String, Object> map = super.configuration(context);
 
         SharedPreferences prefs = Probe.getPreferences(context);
 
-        long freq = Long.parseLong(prefs.getString(
-                "config_probe_network_frequency", Probe.DEFAULT_FREQUENCY));
+        long freq = Long.parseLong(prefs.getString("config_probe_network_frequency", Probe.DEFAULT_FREQUENCY));
 
         map.put(Probe.PROBE_FREQUENCY, freq);
 
         return map;
     }
 
-    public void updateFromMap(Context context, Map<String, Object> params) {
+    public void updateFromMap(Context context, Map<String, Object> params)
+    {
         super.updateFromMap(context, params);
 
-        if (params.containsKey(Probe.PROBE_FREQUENCY)) {
+        if (params.containsKey(Probe.PROBE_FREQUENCY))
+        {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
 
-            if (frequency instanceof Long) {
+            if (frequency instanceof Long)
+            {
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putString("config_probe_network_frequency",
-                        frequency.toString());
+                e.putString("config_probe_network_frequency", frequency.toString());
                 e.commit();
             }
         }
     }
 
-    public String summary(Context context) {
+    public String summary(Context context)
+    {
         return context.getString(R.string.summary_network_probe_desc);
     }
 
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    {
         PreferenceManager manager = activity.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(activity);

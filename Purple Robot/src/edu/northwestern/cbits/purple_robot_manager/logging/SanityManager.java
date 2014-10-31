@@ -22,7 +22,8 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.DiagnosticActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.StartActivity;
 
-public class SanityManager {
+public class SanityManager
+{
     public static final int NOTE_ID = 457284567;
 
     private static SanityManager _sharedInstance = null;
@@ -38,52 +39,60 @@ public class SanityManager {
     private String _lastTitle = null;
     private String _lastMessage = null;
 
-    public SanityManager(Context context) {
+    public SanityManager(Context context)
+    {
         this._context = context;
 
-        AlarmManager alarms = (AlarmManager) this._context
-                .getSystemService(Context.ALARM_SERVICE);
+        AlarmManager alarms = (AlarmManager) this._context.getSystemService(Context.ALARM_SERVICE);
 
         Intent intent = new Intent(ManagerService.REFRESH_ERROR_STATE_INTENT);
-        PendingIntent pending = PendingIntent.getService(this._context, 0,
-                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pending = PendingIntent.getService(this._context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         alarms.setInexactRepeating(AlarmManager.RTC, 0, 60000, pending);
     }
 
-    public static SanityManager getInstance(Context context) {
+    public static SanityManager getInstance(Context context)
+    {
         if (SanityManager._sharedInstance != null)
             return SanityManager._sharedInstance;
 
         if (context != null)
-            SanityManager._sharedInstance = new SanityManager(
-                    context.getApplicationContext());
+            SanityManager._sharedInstance = new SanityManager(context.getApplicationContext());
 
         return SanityManager._sharedInstance;
     }
 
     @SuppressWarnings("rawtypes")
     @SuppressLint("NewApi")
-    public void refreshState() {
+    public void refreshState()
+    {
         String packageName = this.getClass().getPackage().getName();
 
-        String[] checkClasses = this._context.getResources().getStringArray(
-                R.array.sanity_check_classes);
+        String[] checkClasses = this._context.getResources().getStringArray(R.array.sanity_check_classes);
 
-        for (String className : checkClasses) {
+        for (String className : checkClasses)
+        {
             Class checkClass = null;
 
-            try {
+            try
+            {
                 checkClass = Class.forName(packageName + "." + className);
-            } catch (ClassNotFoundException e) {
-                try {
+            }
+            catch (ClassNotFoundException e)
+            {
+                try
+                {
                     checkClass = Class.forName(className);
-                } catch (ClassNotFoundException ee) {
+                }
+                catch (ClassNotFoundException ee)
+                {
                     LogManager.getInstance(this._context).logException(ee);
                 }
             }
 
-            if (checkClass != null) {
-                try {
+            if (checkClass != null)
+            {
+                try
+                {
                     SanityCheck check = (SanityCheck) checkClass.newInstance();
 
                     check.runCheck(this._context);
@@ -91,70 +100,64 @@ public class SanityManager {
                     int error = check.getErrorLevel();
 
                     if (error == SanityCheck.ERROR)
-                        this.addAlert(SanityCheck.ERROR,
-                                check.name(this._context),
-                                check.getErrorMessage(),
+                        this.addAlert(SanityCheck.ERROR, check.name(this._context), check.getErrorMessage(),
                                 check.getAction(this._context));
                     else if (error == SanityCheck.WARNING)
-                        this.addAlert(SanityCheck.WARNING,
-                                check.name(this._context),
-                                check.getErrorMessage(),
+                        this.addAlert(SanityCheck.WARNING, check.name(this._context), check.getErrorMessage(),
                                 check.getAction(this._context));
                     else
                         this.clearAlert(check.name(this._context));
-                } catch (InstantiationException e) {
+                }
+                catch (InstantiationException e)
+                {
                     LogManager.getInstance(this._context).logException(e);
-                } catch (IllegalAccessException e) {
+                }
+                catch (IllegalAccessException e)
+                {
                     LogManager.getInstance(this._context).logException(e);
-                } catch (ClassCastException e) {
+                }
+                catch (ClassCastException e)
+                {
                     LogManager.getInstance(this._context).logException(e);
                 }
             }
         }
 
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(this._context);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
 
-        if (prefs.getBoolean("config_mute_warnings", false) == false) {
+        if (prefs.getBoolean("config_mute_warnings", false) == false)
+        {
             this._lastStatus = this.getErrorLevel();
             int issueCount = this._errors.size() + this._warnings.size();
 
-            PendingIntent contentIntent = PendingIntent.getActivity(
-                    this._context, SanityManager.NOTE_ID, new Intent(
-                            this._context, StartActivity.class),
-                    PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent contentIntent = PendingIntent.getActivity(this._context, SanityManager.NOTE_ID, new Intent(
+                    this._context, StartActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
             if (this._lastStatus != SanityCheck.OK)
-                contentIntent = PendingIntent.getActivity(this._context,
-                        SanityManager.NOTE_ID, new Intent(this._context,
-                                DiagnosticActivity.class),
-                        PendingIntent.FLAG_UPDATE_CURRENT);
+                contentIntent = PendingIntent.getActivity(this._context, SanityManager.NOTE_ID, new Intent(
+                        this._context, DiagnosticActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
             NotificationManager noteManager = (NotificationManager) this._context
                     .getSystemService(Context.NOTIFICATION_SERVICE);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH
-                    && this._lastStatus != SanityCheck.OK) {
-                Notification.Builder builder = new Notification.Builder(
-                        this._context);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH && this._lastStatus != SanityCheck.OK)
+            {
+                Notification.Builder builder = new Notification.Builder(this._context);
 
                 builder = builder.setContentIntent(contentIntent);
-                builder = builder.setContentTitle(this._context
-                        .getString(R.string.notify_running_title));
+                builder = builder.setContentTitle(this._context.getString(R.string.notify_running_title));
 
-                if (issueCount == 1) {
+                if (issueCount == 1)
+                {
                     builder = builder
-                            .setContentText(this._context
-                                    .getString(R.string.note_purple_robot_message_single));
-                    builder = builder
-                            .setTicker(this._context
-                                    .getString(R.string.note_purple_robot_message_single));
-                } else {
+                            .setContentText(this._context.getString(R.string.note_purple_robot_message_single));
+                    builder = builder.setTicker(this._context.getString(R.string.note_purple_robot_message_single));
+                }
+                else
+                {
                     builder = builder.setContentText(this._context.getString(
-                            R.string.note_purple_robot_message_multiple,
-                            issueCount));
-                    builder = builder.setTicker(this._context.getString(
-                            R.string.note_purple_robot_message_multiple,
+                            R.string.note_purple_robot_message_multiple, issueCount));
+                    builder = builder.setTicker(this._context.getString(R.string.note_purple_robot_message_multiple,
                             issueCount));
                 }
 
@@ -163,20 +166,18 @@ public class SanityManager {
                 else
                     builder = builder.setSmallIcon(R.drawable.ic_note_warning);
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
+                {
                     Notification.InboxStyle style = new Notification.InboxStyle();
 
-                    style = style.setBigContentTitle(this._context
-                            .getString(R.string.note_purple_robot_status));
+                    style = style.setBigContentTitle(this._context.getString(R.string.note_purple_robot_status));
 
                     if (issueCount == 1)
                         style = style
-                                .setSummaryText(this._context
-                                        .getString(R.string.note_purple_robot_message_single));
+                                .setSummaryText(this._context.getString(R.string.note_purple_robot_message_single));
                     else
                         style = style.setSummaryText(this._context.getString(
-                                R.string.note_purple_robot_message_multiple,
-                                issueCount));
+                                R.string.note_purple_robot_message_multiple, issueCount));
 
                     for (String key : this._errors.keySet())
                         style = style.addLine(this._errors.get(key));
@@ -191,46 +192,40 @@ public class SanityManager {
 
                     noteManager.notify(SanityManager.NOTE_ID, note);
                 }
-            } else {
-                NotificationCompat.Builder builder = new NotificationCompat.Builder(
-                        this._context);
+            }
+            else
+            {
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(this._context);
 
-                builder = builder.setContentTitle(this._context
-                        .getString(R.string.notify_running_title));
+                builder = builder.setContentTitle(this._context.getString(R.string.notify_running_title));
 
-                if (this._lastStatus != SanityCheck.OK) {
-                    contentIntent = PendingIntent
-                            .getActivity(this._context, 0, new Intent(
-                                    this._context, DiagnosticActivity.class),
-                                    Notification.FLAG_ONGOING_EVENT);
+                if (this._lastStatus != SanityCheck.OK)
+                {
+                    contentIntent = PendingIntent.getActivity(this._context, 0, new Intent(this._context,
+                            DiagnosticActivity.class), Notification.FLAG_ONGOING_EVENT);
 
-                    if (issueCount == 1) {
-                        builder = builder
-                                .setContentText(this._context
-                                        .getString(R.string.note_purple_robot_message_single));
-                        builder = builder
-                                .setTicker(this._context
-                                        .getString(R.string.note_purple_robot_message_single));
-                    } else {
-                        builder = builder
-                                .setContentText(this._context
-                                        .getString(
-                                                R.string.note_purple_robot_message_multiple,
-                                                issueCount));
+                    if (issueCount == 1)
+                    {
+                        builder = builder.setContentText(this._context
+                                .getString(R.string.note_purple_robot_message_single));
+                        builder = builder.setTicker(this._context.getString(R.string.note_purple_robot_message_single));
+                    }
+                    else
+                    {
+                        builder = builder.setContentText(this._context.getString(
+                                R.string.note_purple_robot_message_multiple, issueCount));
                         builder = builder.setTicker(this._context.getString(
-                                R.string.note_purple_robot_message_multiple,
-                                issueCount));
+                                R.string.note_purple_robot_message_multiple, issueCount));
                     }
 
                     if (this._lastStatus != SanityCheck.WARNING)
-                        builder = builder
-                                .setSmallIcon(R.drawable.ic_note_error);
+                        builder = builder.setSmallIcon(R.drawable.ic_note_error);
                     else
-                        builder = builder
-                                .setSmallIcon(R.drawable.ic_note_warning);
-                } else {
-                    builder = builder.setContentText(this._context
-                            .getString(R.string.pr_errors_none_label));
+                        builder = builder.setSmallIcon(R.drawable.ic_note_warning);
+                }
+                else
+                {
+                    builder = builder.setContentText(this._context.getString(R.string.pr_errors_none_label));
                     builder = builder.setSmallIcon(R.drawable.ic_note_normal);
                 }
 
@@ -244,7 +239,8 @@ public class SanityManager {
         }
     }
 
-    public int getErrorLevel() {
+    public int getErrorLevel()
+    {
         if (this._errors.size() > 0)
             return SanityCheck.ERROR;
         else if (this._warnings.size() > 0)
@@ -253,8 +249,10 @@ public class SanityManager {
         return SanityCheck.OK;
     }
 
-    public int getErrorIconResource() {
-        switch (this.getErrorLevel()) {
+    public int getErrorIconResource()
+    {
+        switch (this.getErrorLevel())
+        {
         case SanityCheck.ERROR:
             return R.drawable.action_error;
         case SanityCheck.WARNING:
@@ -264,14 +262,17 @@ public class SanityManager {
         return R.drawable.action_about;
     }
 
-    public void addAlert(int level, String name, String message, Runnable action) {
+    public void addAlert(int level, String name, String message, Runnable action)
+    {
         boolean alert = false;
 
-        if (level == SanityCheck.WARNING
-                && this._warnings.containsKey(name) == false) {
+        if (level == SanityCheck.WARNING && this._warnings.containsKey(name) == false)
+        {
             this._warnings.put(name, message);
             alert = true;
-        } else if (this._warnings.containsKey(name) == false) {
+        }
+        else if (this._warnings.containsKey(name) == false)
+        {
             this._errors.put(name, message);
             alert = true;
         }
@@ -279,25 +280,25 @@ public class SanityManager {
         if (action != null)
             this._actions.put(name, action);
 
-        if (alert) {
-            if (name.equals(this._lastTitle)
-                    && message.equals(this._lastMessage)) {
+        if (alert)
+        {
+            if (name.equals(this._lastTitle) && message.equals(this._lastMessage))
+            {
 
-            } else {
-                Intent pebbleIntent = new Intent(
-                        "com.getpebble.action.SEND_NOTIFICATION");
+            }
+            else
+            {
+                Intent pebbleIntent = new Intent("com.getpebble.action.SEND_NOTIFICATION");
 
                 HashMap<String, String> data = new HashMap<String, String>();
                 data.put("title", name);
                 data.put("body", message);
 
                 JSONObject jsonData = new JSONObject(data);
-                String notificationData = new JSONArray().put(jsonData)
-                        .toString();
+                String notificationData = new JSONArray().put(jsonData).toString();
 
                 pebbleIntent.putExtra("messageType", "PEBBLE_ALERT");
-                pebbleIntent.putExtra("sender",
-                        this._context.getString(R.string.app_name));
+                pebbleIntent.putExtra("sender", this._context.getString(R.string.app_name));
                 pebbleIntent.putExtra("notificationData", notificationData);
 
                 // this._context.sendBroadcast(pebbleIntent);
@@ -308,26 +309,31 @@ public class SanityManager {
         }
     }
 
-    public void runActionForAlert(String name) {
+    public void runActionForAlert(String name)
+    {
         Runnable r = this._actions.get(name);
 
-        if (r != null) {
+        if (r != null)
+        {
             Thread t = new Thread(r);
             t.start();
         }
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String, String> errors() {
+    public Map<String, String> errors()
+    {
         return (Map<String, String>) this._errors.clone();
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String, String> warnings() {
+    public Map<String, String> warnings()
+    {
         return (Map<String, String>) this._warnings.clone();
     }
 
-    public void clearAlert(String title) {
+    public void clearAlert(String title)
+    {
         this._warnings.remove(title);
         this._errors.remove(title);
         this._actions.remove(title);

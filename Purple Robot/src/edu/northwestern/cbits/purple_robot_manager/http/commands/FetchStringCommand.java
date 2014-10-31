@@ -7,22 +7,27 @@ import android.content.Context;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 
-public class FetchStringCommand extends JSONCommand {
+public class FetchStringCommand extends JSONCommand
+{
     public static final String KEY = "key";
     public static final String VALUE = "value";
     public static final String ENCRYPTED = "encrypted";
     public static final String COMMAND_NAME = "fetch_string";
     public static final String NOT_FOUND = "not_found";
 
-    public FetchStringCommand(JSONObject arguments, Context context) {
+    public FetchStringCommand(JSONObject arguments, Context context)
+    {
         super(arguments, context);
     }
 
-    public JSONObject execute(Context context) {
+    public JSONObject execute(Context context)
+    {
         JSONObject result = super.execute(context);
 
-        try {
-            if (JSONCommand.STATUS_OK.equals(result.get(JSONCommand.STATUS))) {
+        try
+        {
+            if (JSONCommand.STATUS_OK.equals(result.get(JSONCommand.STATUS)))
+            {
                 String key = this._arguments.getString(FetchStringCommand.KEY);
 
                 result.put(FetchStringCommand.KEY, key);
@@ -32,8 +37,7 @@ public class FetchStringCommand extends JSONCommand {
                 boolean doEncrypt = false;
 
                 if (this._arguments.has(FetchStringCommand.ENCRYPTED))
-                    doEncrypt = this._arguments
-                            .getBoolean(FetchStringCommand.ENCRYPTED);
+                    doEncrypt = this._arguments.getBoolean(FetchStringCommand.ENCRYPTED);
 
                 String resultString = null;
 
@@ -47,13 +51,18 @@ public class FetchStringCommand extends JSONCommand {
                 else
                     result.put(JSONCommand.STATUS, FetchStringCommand.NOT_FOUND);
             }
-        } catch (JSONException e) {
+        }
+        catch (JSONException e)
+        {
             LogManager.getInstance(context).logException(e);
 
-            try {
+            try
+            {
                 result.put(JSONCommand.STATUS, JSONCommand.STATUS_ERROR);
                 result.put(JSONCommand.MESSAGE, e.toString());
-            } catch (JSONException ee) {
+            }
+            catch (JSONException ee)
+            {
                 LogManager.getInstance(context).logException(ee);
             }
         }

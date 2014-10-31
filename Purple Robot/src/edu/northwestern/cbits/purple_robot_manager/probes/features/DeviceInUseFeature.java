@@ -13,7 +13,8 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CallStateProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ScreenProbe;
 
-public class DeviceInUseFeature extends Feature {
+public class DeviceInUseFeature extends Feature
+{
     protected static final String DEVICE_ACTIVE = "DEVICE_ACTIVE";
     private boolean _isInited = false;
     private boolean _isEnabled = true;
@@ -23,55 +24,63 @@ public class DeviceInUseFeature extends Feature {
     private boolean _callActive = false;
     private boolean _screenActive = false;
 
-    protected String featureKey() {
+    protected String featureKey()
+    {
         return "device_use";
     }
 
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return "edu.northwestern.cbits.purple_robot_manager.probes.features.DeviceInUseFeature";
     }
 
-    public String title(Context context) {
+    public String title(Context context)
+    {
         return context.getString(R.string.title_device_use_feature);
     }
 
-    public String summary(Context context) {
+    public String summary(Context context)
+    {
         return context.getString(R.string.summary_device_use_feature_desc);
     }
 
-    public String probeCategory(Context context) {
-        return context.getResources().getString(
-                R.string.probe_device_info_category);
+    public String probeCategory(Context context)
+    {
+        return context.getResources().getString(R.string.probe_device_info_category);
     }
 
-    public String summarizeValue(Context context, Bundle bundle) {
+    public String summarizeValue(Context context, Bundle bundle)
+    {
         boolean inUse = bundle.getBoolean(DeviceInUseFeature.DEVICE_ACTIVE);
 
         if (inUse)
-            return context.getResources().getString(
-                    R.string.summary_device_active);
+            return context.getResources().getString(R.string.summary_device_active);
         else
-            return context.getResources().getString(
-                    R.string.summary_device_inactive);
+            return context.getResources().getString(R.string.summary_device_inactive);
     }
 
-    public boolean isEnabled(Context context) {
+    public boolean isEnabled(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         this._isEnabled = false;
 
-        if (super.isEnabled(context)) {
+        if (super.isEnabled(context))
+        {
             if (prefs.getBoolean("config_probe_device_use_enabled", true))
                 this._isEnabled = true;
         }
 
-        if (!this._isInited) {
+        if (!this._isInited)
+        {
             IntentFilter intentFilter = new IntentFilter(Probe.PROBE_READING);
 
             final DeviceInUseFeature me = this;
 
-            BroadcastReceiver receiver = new BroadcastReceiver() {
-                public void onReceive(Context context, Intent intent) {
+            BroadcastReceiver receiver = new BroadcastReceiver()
+            {
+                public void onReceive(Context context, Intent intent)
+                {
                     if (me._isEnabled == false)
                         return;
 
@@ -80,32 +89,30 @@ public class DeviceInUseFeature extends Feature {
                     String probeName = extras.getString("PROBE");
 
                     if (probeName != null
-                            && (ScreenProbe.NAME.equals(probeName) || CallStateProbe.NAME
-                                    .equals(probeName))) {
+                            && (ScreenProbe.NAME.equals(probeName) || CallStateProbe.NAME.equals(probeName)))
+                    {
                         boolean xmit = false;
 
                         if (ScreenProbe.NAME.equals(probeName))
-                            me._screenActive = extras
-                                    .getBoolean(ScreenProbe.SCREEN_ACTIVE);
-                        else if (CallStateProbe.NAME.equals(probeName)) {
-                            String state = extras
-                                    .getString(CallStateProbe.CALL_STATE);
+                            me._screenActive = extras.getBoolean(ScreenProbe.SCREEN_ACTIVE);
+                        else if (CallStateProbe.NAME.equals(probeName))
+                        {
+                            String state = extras.getString(CallStateProbe.CALL_STATE);
 
-                            me._callActive = CallStateProbe.STATE_OFF_HOOK
-                                    .equals(state);
+                            me._callActive = CallStateProbe.STATE_OFF_HOOK.equals(state);
                         }
 
                         xmit = me._callActive || me._screenActive;
 
-                        if (me._lastXmit != xmit) {
-                            if (me._isEnabled) {
+                        if (me._lastXmit != xmit)
+                        {
+                            if (me._isEnabled)
+                            {
                                 Bundle bundle = new Bundle();
                                 bundle.putString("PROBE", me.name(context));
-                                bundle.putLong("TIMESTAMP",
-                                        System.currentTimeMillis() / 1000);
+                                bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
 
-                                bundle.putBoolean(
-                                        DeviceInUseFeature.DEVICE_ACTIVE, xmit);
+                                bundle.putBoolean(DeviceInUseFeature.DEVICE_ACTIVE, xmit);
 
                                 me.transmitData(context, bundle);
                             }
@@ -116,8 +123,7 @@ public class DeviceInUseFeature extends Feature {
                 }
             };
 
-            LocalBroadcastManager localManager = LocalBroadcastManager
-                    .getInstance(context);
+            LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(context);
             localManager.registerReceiver(receiver, intentFilter);
 
             this._isInited = true;
@@ -126,7 +132,8 @@ public class DeviceInUseFeature extends Feature {
         return this._isEnabled;
     }
 
-    public void enable(Context context) {
+    public void enable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -135,7 +142,8 @@ public class DeviceInUseFeature extends Feature {
         e.commit();
     }
 
-    public void disable(Context context) {
+    public void disable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();

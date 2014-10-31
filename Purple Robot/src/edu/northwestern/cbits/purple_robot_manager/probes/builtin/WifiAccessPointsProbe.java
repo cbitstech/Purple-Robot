@@ -23,7 +23,8 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
-public class WifiAccessPointsProbe extends Probe {
+public class WifiAccessPointsProbe extends Probe
+{
     private static final String ACCESS_POINT_COUNT = "ACCESS_POINT_COUNT";
     protected static final String ACCESS_POINTS = "ACCESS_POINTS";
     protected static final String BSSID = "BSSID";
@@ -44,102 +45,84 @@ public class WifiAccessPointsProbe extends Probe {
 
     private ArrayList<Bundle> _foundNetworks = new ArrayList<Bundle>();
 
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.WifiAccessPointsProbe";
     }
 
-    public String title(Context context) {
+    public String title(Context context)
+    {
         return context.getString(R.string.title_wifi_probe);
     }
 
-    public String probeCategory(Context context) {
-        return context.getResources().getString(
-                R.string.probe_other_devices_category);
+    public String probeCategory(Context context)
+    {
+        return context.getResources().getString(R.string.probe_other_devices_category);
     }
 
-    public boolean isEnabled(Context context) {
-        if (super.isEnabled(context)) {
+    public boolean isEnabled(Context context)
+    {
+        if (super.isEnabled(context))
+        {
             final SharedPreferences prefs = Probe.getPreferences(context);
 
-            if (prefs.getBoolean("config_probe_wifi_enabled",
-                    WifiAccessPointsProbe.DEFAULT_ENABLED)) {
+            if (prefs.getBoolean("config_probe_wifi_enabled", WifiAccessPointsProbe.DEFAULT_ENABLED))
+            {
                 final WifiAccessPointsProbe me = this;
 
-                if (this._receiver == null) {
-                    this._receiver = new BroadcastReceiver() {
-                        public void onReceive(Context context, Intent intent) {
-                            if (prefs.getBoolean("config_probe_wifi_enabled",
-                                    WifiAccessPointsProbe.DEFAULT_ENABLED) == false)
+                if (this._receiver == null)
+                {
+                    this._receiver = new BroadcastReceiver()
+                    {
+                        public void onReceive(Context context, Intent intent)
+                        {
+                            if (prefs.getBoolean("config_probe_wifi_enabled", WifiAccessPointsProbe.DEFAULT_ENABLED) == false)
                                 return;
 
-                            if (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION
-                                    .equals(intent.getAction())) {
-                                WifiManager wifi = (WifiManager) context
-                                        .getSystemService(Context.WIFI_SERVICE);
+                            if (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(intent.getAction()))
+                            {
+                                WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 
-                                List<ScanResult> results = wifi
-                                        .getScanResults();
+                                List<ScanResult> results = wifi.getScanResults();
 
                                 Bundle bundle = new Bundle();
 
                                 bundle.putString("PROBE", me.name(context));
-                                bundle.putLong("TIMESTAMP",
-                                        System.currentTimeMillis() / 1000);
+                                bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
 
                                 ArrayList<Bundle> accessPoints = new ArrayList<Bundle>();
 
-                                if (results != null) {
-                                    bundle.putInt(
-                                            WifiAccessPointsProbe.ACCESS_POINT_COUNT,
-                                            results.size());
+                                if (results != null)
+                                {
+                                    bundle.putInt(WifiAccessPointsProbe.ACCESS_POINT_COUNT, results.size());
 
-                                    for (ScanResult result : results) {
+                                    for (ScanResult result : results)
+                                    {
                                         Bundle pointBundle = new Bundle();
 
-                                        pointBundle.putString(
-                                                WifiAccessPointsProbe.BSSID,
-                                                result.BSSID);
-                                        pointBundle.putString(
-                                                WifiAccessPointsProbe.SSID,
-                                                result.SSID);
-                                        pointBundle
-                                                .putString(
-                                                        WifiAccessPointsProbe.CAPABILITIES,
-                                                        result.capabilities);
+                                        pointBundle.putString(WifiAccessPointsProbe.BSSID, result.BSSID);
+                                        pointBundle.putString(WifiAccessPointsProbe.SSID, result.SSID);
+                                        pointBundle.putString(WifiAccessPointsProbe.CAPABILITIES, result.capabilities);
 
-                                        pointBundle
-                                                .putInt(WifiAccessPointsProbe.FREQUENCY,
-                                                        result.frequency);
-                                        pointBundle.putInt(
-                                                WifiAccessPointsProbe.LEVEL,
-                                                result.level);
+                                        pointBundle.putInt(WifiAccessPointsProbe.FREQUENCY, result.frequency);
+                                        pointBundle.putInt(WifiAccessPointsProbe.LEVEL, result.level);
 
                                         accessPoints.add(pointBundle);
                                     }
-                                } else
-                                    bundle.putInt(
-                                            WifiAccessPointsProbe.ACCESS_POINT_COUNT,
-                                            0);
+                                }
+                                else
+                                    bundle.putInt(WifiAccessPointsProbe.ACCESS_POINT_COUNT, 0);
 
-                                bundle.putParcelableArrayList(
-                                        WifiAccessPointsProbe.ACCESS_POINTS,
-                                        accessPoints);
+                                bundle.putParcelableArrayList(WifiAccessPointsProbe.ACCESS_POINTS, accessPoints);
 
                                 WifiInfo wifiInfo = wifi.getConnectionInfo();
 
-                                if (wifiInfo != null) {
-                                    bundle.putString(
-                                            WifiAccessPointsProbe.CURRENT_BSSID,
-                                            wifiInfo.getBSSID());
-                                    bundle.putString(
-                                            WifiAccessPointsProbe.CURRENT_SSID,
-                                            wifiInfo.getSSID());
-                                    bundle.putInt(
-                                            WifiAccessPointsProbe.CURRENT_LINK_SPEED,
-                                            wifiInfo.getLinkSpeed());
-                                    bundle.putInt(
-                                            WifiAccessPointsProbe.CURRENT_RSSI,
-                                            wifiInfo.getRssi());
+                                if (wifiInfo != null)
+                                {
+                                    bundle.putString(WifiAccessPointsProbe.CURRENT_BSSID, wifiInfo.getBSSID());
+                                    bundle.putString(WifiAccessPointsProbe.CURRENT_SSID, wifiInfo.getSSID());
+                                    bundle.putInt(WifiAccessPointsProbe.CURRENT_LINK_SPEED, wifiInfo.getLinkSpeed());
+                                    bundle.putInt(WifiAccessPointsProbe.CURRENT_RSSI, wifiInfo.getRssi());
                                 }
 
                                 me.transmitData(context, bundle);
@@ -147,49 +130,41 @@ public class WifiAccessPointsProbe extends Probe {
                         }
                     };
 
-                    IntentFilter filter = new IntentFilter(
-                            WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+                    IntentFilter filter = new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
                     context.registerReceiver(this._receiver, filter);
                 }
 
                 long now = System.currentTimeMillis();
 
-                synchronized (this) {
-                    long freq = Long.parseLong(prefs.getString(
-                            "config_probe_wifi_frequency",
-                            Probe.DEFAULT_FREQUENCY));
+                synchronized (this)
+                {
+                    long freq = Long.parseLong(prefs.getString("config_probe_wifi_frequency", Probe.DEFAULT_FREQUENCY));
 
-                    if (now - this._lastCheck > freq) {
-                        WifiManager wifi = (WifiManager) context
-                                .getSystemService(Context.WIFI_SERVICE);
+                    if (now - this._lastCheck > freq)
+                    {
+                        WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 
-                        if (wifi.isWifiEnabled()) {
+                        if (wifi.isWifiEnabled())
+                        {
                             this._lastCheck = now;
                             this._foundNetworks.clear();
 
                             wifi.startScan();
-                        } else {
+                        }
+                        else
+                        {
                             Bundle bundle = new Bundle();
 
                             bundle.putString("PROBE", me.name(context));
-                            bundle.putLong("TIMESTAMP",
-                                    System.currentTimeMillis() / 1000);
-                            bundle.putInt(
-                                    WifiAccessPointsProbe.ACCESS_POINT_COUNT, 0);
+                            bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+                            bundle.putInt(WifiAccessPointsProbe.ACCESS_POINT_COUNT, 0);
 
-                            bundle.putParcelableArrayList(
-                                    WifiAccessPointsProbe.ACCESS_POINTS,
-                                    new ArrayList<Bundle>());
+                            bundle.putParcelableArrayList(WifiAccessPointsProbe.ACCESS_POINTS, new ArrayList<Bundle>());
 
-                            bundle.putString(
-                                    WifiAccessPointsProbe.CURRENT_BSSID, "");
-                            bundle.putString(
-                                    WifiAccessPointsProbe.CURRENT_SSID, "");
-                            bundle.putInt(
-                                    WifiAccessPointsProbe.CURRENT_LINK_SPEED,
-                                    -1);
-                            bundle.putInt(WifiAccessPointsProbe.CURRENT_RSSI,
-                                    -1);
+                            bundle.putString(WifiAccessPointsProbe.CURRENT_BSSID, "");
+                            bundle.putString(WifiAccessPointsProbe.CURRENT_SSID, "");
+                            bundle.putInt(WifiAccessPointsProbe.CURRENT_LINK_SPEED, -1);
+                            bundle.putInt(WifiAccessPointsProbe.CURRENT_RSSI, -1);
 
                             me.transmitData(context, bundle);
                         }
@@ -200,10 +175,14 @@ public class WifiAccessPointsProbe extends Probe {
             }
         }
 
-        if (this._receiver != null) {
-            try {
+        if (this._receiver != null)
+        {
+            try
+            {
                 context.unregisterReceiver(this._receiver);
-            } catch (RuntimeException e) {
+            }
+            catch (RuntimeException e)
+            {
                 LogManager.getInstance(context).logException(e);
             }
 
@@ -213,34 +192,29 @@ public class WifiAccessPointsProbe extends Probe {
         return false;
     }
 
-    private Bundle bundleForNetworksArray(Context context,
-            ArrayList<Bundle> objects) {
+    private Bundle bundleForNetworksArray(Context context, ArrayList<Bundle> objects)
+    {
         Bundle bundle = new Bundle();
 
         if (objects == null)
             objects = new ArrayList<Bundle>();
 
-        for (Bundle value : objects) {
+        for (Bundle value : objects)
+        {
             ArrayList<String> keys = new ArrayList<String>();
 
-            String key = String.format(
-                    context.getString(R.string.display_wifi_network_title),
-                    value.getString(WifiAccessPointsProbe.SSID),
-                    value.getString(WifiAccessPointsProbe.BSSID));
+            String key = String.format(context.getString(R.string.display_wifi_network_title),
+                    value.getString(WifiAccessPointsProbe.SSID), value.getString(WifiAccessPointsProbe.BSSID));
 
             Bundle wifiBundle = new Bundle();
 
-            wifiBundle.putString(
-                    context.getString(R.string.display_wifi_ssid_title),
+            wifiBundle.putString(context.getString(R.string.display_wifi_ssid_title),
                     value.getString(WifiAccessPointsProbe.SSID));
-            wifiBundle.putString(
-                    context.getString(R.string.display_wifi_bssid_title),
+            wifiBundle.putString(context.getString(R.string.display_wifi_bssid_title),
                     value.getString(WifiAccessPointsProbe.BSSID));
-            wifiBundle.putInt(
-                    context.getString(R.string.display_wifi_frequency_title),
+            wifiBundle.putInt(context.getString(R.string.display_wifi_frequency_title),
                     value.getInt(WifiAccessPointsProbe.FREQUENCY));
-            wifiBundle.putInt(
-                    context.getString(R.string.display_wifi_level_title),
+            wifiBundle.putInt(context.getString(R.string.display_wifi_level_title),
                     value.getInt(WifiAccessPointsProbe.LEVEL));
 
             keys.add(context.getString(R.string.display_wifi_ssid_title));
@@ -256,40 +230,33 @@ public class WifiAccessPointsProbe extends Probe {
         return bundle;
     }
 
-    public Bundle formattedBundle(Context context, Bundle bundle) {
+    public Bundle formattedBundle(Context context, Bundle bundle)
+    {
         Bundle formatted = super.formattedBundle(context, bundle);
 
         @SuppressWarnings("unchecked")
-        ArrayList<Bundle> array = (ArrayList<Bundle>) bundle
-                .get(WifiAccessPointsProbe.ACCESS_POINTS);
-        int count = (int) bundle
-                .getDouble(WifiAccessPointsProbe.ACCESS_POINT_COUNT);
+        ArrayList<Bundle> array = (ArrayList<Bundle>) bundle.get(WifiAccessPointsProbe.ACCESS_POINTS);
+        int count = (int) bundle.getDouble(WifiAccessPointsProbe.ACCESS_POINT_COUNT);
 
         Bundle devicesBundle = this.bundleForNetworksArray(context, array);
 
-        formatted
-                .putBundle(
-                        String.format(
-                                context.getString(R.string.display_wifi_networks_title),
-                                count), devicesBundle);
+        formatted.putBundle(String.format(context.getString(R.string.display_wifi_networks_title), count),
+                devicesBundle);
 
-        formatted.putString(
-                context.getString(R.string.display_current_ssid_title),
+        formatted.putString(context.getString(R.string.display_current_ssid_title),
                 bundle.getString(WifiAccessPointsProbe.CURRENT_SSID));
-        formatted.putString(
-                context.getString(R.string.display_current_bssid_title),
+        formatted.putString(context.getString(R.string.display_current_bssid_title),
                 bundle.getString(WifiAccessPointsProbe.CURRENT_BSSID));
-        formatted.putInt(context
-                .getString(R.string.display_current_speed_title), (int) bundle
-                .getDouble(WifiAccessPointsProbe.CURRENT_LINK_SPEED));
-        formatted.putInt(
-                context.getString(R.string.display_current_rssi_title),
+        formatted.putInt(context.getString(R.string.display_current_speed_title),
+                (int) bundle.getDouble(WifiAccessPointsProbe.CURRENT_LINK_SPEED));
+        formatted.putInt(context.getString(R.string.display_current_rssi_title),
                 (int) bundle.getDouble(WifiAccessPointsProbe.CURRENT_RSSI));
 
         return formatted;
     }
 
-    public void enable(Context context) {
+    public void enable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -298,7 +265,8 @@ public class WifiAccessPointsProbe extends Probe {
         e.commit();
     }
 
-    public void disable(Context context) {
+    public void disable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -307,35 +275,36 @@ public class WifiAccessPointsProbe extends Probe {
         e.commit();
     }
 
-    public String summarizeValue(Context context, Bundle bundle) {
-        int count = (int) bundle
-                .getDouble(WifiAccessPointsProbe.ACCESS_POINT_COUNT);
+    public String summarizeValue(Context context, Bundle bundle)
+    {
+        int count = (int) bundle.getDouble(WifiAccessPointsProbe.ACCESS_POINT_COUNT);
 
-        return String.format(
-                context.getResources().getString(R.string.summary_wifi_probe),
-                count);
+        return String.format(context.getResources().getString(R.string.summary_wifi_probe), count);
     }
 
-    public Map<String, Object> configuration(Context context) {
+    public Map<String, Object> configuration(Context context)
+    {
         Map<String, Object> map = super.configuration(context);
 
         SharedPreferences prefs = Probe.getPreferences(context);
 
-        long freq = Long.parseLong(prefs.getString(
-                "config_probe_wifi_frequency", Probe.DEFAULT_FREQUENCY));
+        long freq = Long.parseLong(prefs.getString("config_probe_wifi_frequency", Probe.DEFAULT_FREQUENCY));
 
         map.put(Probe.PROBE_FREQUENCY, freq);
 
         return map;
     }
 
-    public void updateFromMap(Context context, Map<String, Object> params) {
+    public void updateFromMap(Context context, Map<String, Object> params)
+    {
         super.updateFromMap(context, params);
 
-        if (params.containsKey(Probe.PROBE_FREQUENCY)) {
+        if (params.containsKey(Probe.PROBE_FREQUENCY))
+        {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
 
-            if (frequency instanceof Long) {
+            if (frequency instanceof Long)
+            {
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
@@ -346,7 +315,8 @@ public class WifiAccessPointsProbe extends Probe {
     }
 
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    {
         PreferenceManager manager = activity.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(activity);
@@ -372,7 +342,8 @@ public class WifiAccessPointsProbe extends Probe {
         return screen;
     }
 
-    public String summary(Context context) {
+    public String summary(Context context)
+    {
         return context.getString(R.string.summary_wifi_probe_desc);
     }
 }

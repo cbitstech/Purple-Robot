@@ -14,7 +14,8 @@ import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
-public class ScreenProbe extends Probe {
+public class ScreenProbe extends Probe
+{
     public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.ScreenProbe";
 
     public static final String SCREEN_ACTIVE = "SCREEN_ACTIVE";
@@ -26,33 +27,39 @@ public class ScreenProbe extends Probe {
 
     private BroadcastReceiver _receiver = null;
 
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return ScreenProbe.NAME;
     }
 
-    public String title(Context context) {
+    public String title(Context context)
+    {
         return context.getString(R.string.title_screen_probe);
     }
 
-    public String probeCategory(Context context) {
-        return context.getResources().getString(
-                R.string.probe_device_info_category);
+    public String probeCategory(Context context)
+    {
+        return context.getResources().getString(R.string.probe_device_info_category);
     }
 
-    public boolean isEnabled(Context context) {
-        if (!this._isInited) {
+    public boolean isEnabled(Context context)
+    {
+        if (!this._isInited)
+        {
             IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
             filter.addAction(Intent.ACTION_SCREEN_OFF);
 
             final ScreenProbe me = this;
 
-            this._receiver = new BroadcastReceiver() {
-                public void onReceive(Context context, Intent intent) {
-                    if (me._isEnabled) {
+            this._receiver = new BroadcastReceiver()
+            {
+                public void onReceive(Context context, Intent intent)
+                {
+                    if (me._isEnabled)
+                    {
                         Bundle bundle = new Bundle();
                         bundle.putString("PROBE", me.name(context));
-                        bundle.putLong("TIMESTAMP",
-                                System.currentTimeMillis() / 1000);
+                        bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
 
                         final String action = intent.getAction();
 
@@ -73,19 +80,21 @@ public class ScreenProbe extends Probe {
 
         SharedPreferences prefs = Probe.getPreferences(context);
 
-        if (super.isEnabled(context)) {
-            if (prefs.getBoolean("config_probe_screen_enabled",
-                    ScreenProbe.DEFAULT_ENABLED))
+        if (super.isEnabled(context))
+        {
+            if (prefs.getBoolean("config_probe_screen_enabled", ScreenProbe.DEFAULT_ENABLED))
                 this._isEnabled = true;
             else
                 this._isEnabled = false;
-        } else
+        }
+        else
             this._isEnabled = false;
 
         return this._isEnabled;
     }
 
-    public void enable(Context context) {
+    public void enable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -94,7 +103,8 @@ public class ScreenProbe extends Probe {
         e.commit();
     }
 
-    public void disable(Context context) {
+    public void disable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -103,40 +113,40 @@ public class ScreenProbe extends Probe {
         e.commit();
     }
 
-    public String summarizeValue(Context context, Bundle bundle) {
+    public String summarizeValue(Context context, Bundle bundle)
+    {
         boolean active = bundle.getBoolean(ScreenProbe.SCREEN_ACTIVE, false);
 
         if (active)
-            return context.getResources().getString(
-                    R.string.summary_screen_probe_active);
+            return context.getResources().getString(R.string.summary_screen_probe_active);
 
-        return context.getResources().getString(
-                R.string.summary_screen_probe_inactive);
+        return context.getResources().getString(R.string.summary_screen_probe_inactive);
     }
 
-    public Bundle formattedBundle(Context context, Bundle bundle) {
+    public Bundle formattedBundle(Context context, Bundle bundle)
+    {
         Bundle formatted = super.formattedBundle(context, bundle);
 
         boolean active = bundle.getBoolean(ScreenProbe.SCREEN_ACTIVE, false);
 
         if (active)
-            formatted.putString(
-                    context.getString(R.string.display_screen_label),
+            formatted.putString(context.getString(R.string.display_screen_label),
                     context.getString(R.string.display_screen_active_label));
         else
-            formatted.putString(
-                    context.getString(R.string.display_screen_label),
+            formatted.putString(context.getString(R.string.display_screen_label),
                     context.getString(R.string.display_screen_inactive_label));
 
         return formatted;
     };
 
-    public String summary(Context context) {
+    public String summary(Context context)
+    {
         return context.getString(R.string.summary_screen_probe_desc);
     }
 
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    {
         PreferenceManager manager = activity.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(activity);

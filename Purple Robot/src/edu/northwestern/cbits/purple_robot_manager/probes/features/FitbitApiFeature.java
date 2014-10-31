@@ -33,7 +33,8 @@ import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.oauth.FitbitApi;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
-public class FitbitApiFeature extends Feature {
+public class FitbitApiFeature extends Feature
+{
     protected static final String VERY_ACTIVE_MINUTES = "VERY_ACTIVE_MINUTES";
     protected static final String LIGHTLY_ACTIVE_MINUTES = "LIGHTLY_ACTIVE_MINUTES";
     protected static final String STEPS = "STEPS";
@@ -105,28 +106,33 @@ public class FitbitApiFeature extends Feature {
     private String _token = null;
     private String _secret = null;
 
-    protected String featureKey() {
+    protected String featureKey()
+    {
         return "fitbit_api";
     }
 
-    public String summary(Context context) {
+    public String summary(Context context)
+    {
         return context.getString(R.string.summary_fitbit_api_feature_desc);
     }
 
-    public String probeCategory(Context context) {
-        return context.getResources().getString(
-                R.string.probe_external_services_category);
+    public String probeCategory(Context context)
+    {
+        return context.getResources().getString(R.string.probe_external_services_category);
     }
 
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return "edu.northwestern.cbits.purple_robot_manager.probes.features.FitBitApiFeature";
     }
 
-    public String title(Context context) {
+    public String title(Context context)
+    {
         return context.getString(R.string.title_fitbit_api_feature);
     }
 
-    public void enable(Context context) {
+    public void enable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -134,7 +140,8 @@ public class FitbitApiFeature extends Feature {
         e.commit();
     }
 
-    public void disable(Context context) {
+    public void disable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -142,14 +149,18 @@ public class FitbitApiFeature extends Feature {
         e.commit();
     }
 
-    public boolean isEnabled(final Context context) {
+    public boolean isEnabled(final Context context)
+    {
         final SharedPreferences prefs = Probe.getPreferences(context);
 
-        if (super.isEnabled(context)) {
-            if (prefs.getBoolean("config_feature_fitbit_api_enabled", false)) {
+        if (super.isEnabled(context))
+        {
+            if (prefs.getBoolean("config_feature_fitbit_api_enabled", false))
+            {
                 long now = System.currentTimeMillis();
 
-                if (now - this._lastUpdate > 1000 * 60) {
+                if (now - this._lastUpdate > 1000 * 60)
+                {
                     this._lastUpdate = now;
 
                     final FitbitApiFeature me = this;
@@ -157,213 +168,144 @@ public class FitbitApiFeature extends Feature {
                     this._token = prefs.getString("oauth_fitbit_token", null);
                     this._secret = prefs.getString("oauth_fitbit_secret", null);
 
-                    final String title = context
-                            .getString(R.string.title_fitbit_check);
-                    final SanityManager sanity = SanityManager
-                            .getInstance(context);
+                    final String title = context.getString(R.string.title_fitbit_check);
+                    final SanityManager sanity = SanityManager.getInstance(context);
 
-                    if (this._token == null || this._secret == null) {
-                        String message = context
-                                .getString(R.string.message_fitbit_check);
+                    if (this._token == null || this._secret == null)
+                    {
+                        String message = context.getString(R.string.message_fitbit_check);
 
-                        Runnable action = new Runnable() {
-                            public void run() {
+                        Runnable action = new Runnable()
+                        {
+                            public void run()
+                            {
                                 me.fetchAuth(context);
                             }
                         };
 
-                        sanity.addAlert(SanityCheck.WARNING, title, message,
-                                action);
-                    } else {
+                        sanity.addAlert(SanityCheck.WARNING, title, message, action);
+                    }
+                    else
+                    {
                         sanity.clearAlert(title);
 
-                        if (now - this._lastFetch > 1000 * 60 * 5) {
+                        if (now - this._lastFetch > 1000 * 60 * 5)
+                        {
                             this._lastFetch = now;
 
-                            Runnable r = new Runnable() {
-                                public void run() {
-                                    try {
-                                        Token accessToken = new Token(
-                                                me._token, me._secret);
+                            Runnable r = new Runnable()
+                            {
+                                public void run()
+                                {
+                                    try
+                                    {
+                                        Token accessToken = new Token(me._token, me._secret);
 
                                         ServiceBuilder builder = new ServiceBuilder();
-                                        builder = builder
-                                                .provider(FitbitApi.class);
-                                        builder = builder
-                                                .apiKey(context
-                                                        .getString(R.string.fitbit_consumer_key));
-                                        builder = builder
-                                                .apiSecret(context
-                                                        .getString(R.string.fitbit_consumer_secret));
+                                        builder = builder.provider(FitbitApi.class);
+                                        builder = builder.apiKey(context.getString(R.string.fitbit_consumer_key));
+                                        builder = builder.apiSecret(context.getString(R.string.fitbit_consumer_secret));
 
-                                        final OAuthService service = builder
-                                                .build();
+                                        final OAuthService service = builder.build();
 
-                                        SimpleDateFormat sdf = new SimpleDateFormat(
-                                                "yyyy-MM-dd");
+                                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-                                        String dateString = sdf
-                                                .format(new Date());
+                                        String dateString = sdf.format(new Date());
 
-                                        OAuthRequest request = new OAuthRequest(
-                                                Verb.GET,
-                                                "https://api.fitbit.com/1/user/-/activities/date/"
-                                                        + dateString + ".json");
-                                        service.signRequest(accessToken,
-                                                request);
+                                        OAuthRequest request = new OAuthRequest(Verb.GET,
+                                                "https://api.fitbit.com/1/user/-/activities/date/" + dateString
+                                                        + ".json");
+                                        service.signRequest(accessToken, request);
 
                                         Response response = request.send();
 
-                                        JSONObject body = new JSONObject(
-                                                response.getBody());
+                                        JSONObject body = new JSONObject(response.getBody());
 
-                                        JSONObject summary = body
-                                                .getJSONObject("summary");
+                                        JSONObject summary = body.getJSONObject("summary");
 
                                         Bundle bundle = new Bundle();
-                                        bundle.putString("PROBE",
-                                                me.name(context));
-                                        bundle.putLong(
-                                                "TIMESTAMP",
-                                                System.currentTimeMillis() / 1000);
+                                        bundle.putString("PROBE", me.name(context));
+                                        bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
 
-                                        long veryActive = summary
-                                                .getLong("veryActiveMinutes");
-                                        long fairlyActive = summary
-                                                .getLong("fairlyActiveMinutes");
-                                        long lightlyActive = summary
-                                                .getLong("lightlyActiveMinutes");
-                                        long sedentary = summary
-                                                .getLong("sedentaryMinutes");
+                                        long veryActive = summary.getLong("veryActiveMinutes");
+                                        long fairlyActive = summary.getLong("fairlyActiveMinutes");
+                                        long lightlyActive = summary.getLong("lightlyActiveMinutes");
+                                        long sedentary = summary.getLong("sedentaryMinutes");
 
-                                        long total = veryActive + fairlyActive
-                                                + lightlyActive + sedentary;
+                                        long total = veryActive + fairlyActive + lightlyActive + sedentary;
 
-                                        bundle.putLong(
-                                                FitbitApiFeature.VERY_ACTIVE_MINUTES,
-                                                veryActive);
-                                        bundle.putLong(
-                                                FitbitApiFeature.FAIRLY_ACTIVE_MINUTES,
-                                                fairlyActive);
-                                        bundle.putLong(
-                                                FitbitApiFeature.LIGHTLY_ACTIVE_MINUTES,
-                                                lightlyActive);
-                                        bundle.putLong(
-                                                FitbitApiFeature.SEDENTARY_MINUTES,
-                                                sedentary);
+                                        bundle.putLong(FitbitApiFeature.VERY_ACTIVE_MINUTES, veryActive);
+                                        bundle.putLong(FitbitApiFeature.FAIRLY_ACTIVE_MINUTES, fairlyActive);
+                                        bundle.putLong(FitbitApiFeature.LIGHTLY_ACTIVE_MINUTES, lightlyActive);
+                                        bundle.putLong(FitbitApiFeature.SEDENTARY_MINUTES, sedentary);
 
-                                        bundle.putDouble(
-                                                FitbitApiFeature.VERY_ACTIVE_RATIO,
-                                                (double) veryActive
-                                                        / (double) total);
-                                        bundle.putDouble(
-                                                FitbitApiFeature.FAIRLY_ACTIVE_RATIO,
-                                                (double) fairlyActive
-                                                        / (double) total);
-                                        bundle.putDouble(
-                                                FitbitApiFeature.LIGHTLY_ACTIVE_RATIO,
-                                                (double) lightlyActive
-                                                        / (double) total);
-                                        bundle.putDouble(
-                                                FitbitApiFeature.SEDENTARY_RATIO,
-                                                (double) sedentary
-                                                        / (double) total);
+                                        bundle.putDouble(FitbitApiFeature.VERY_ACTIVE_RATIO, (double) veryActive
+                                                / (double) total);
+                                        bundle.putDouble(FitbitApiFeature.FAIRLY_ACTIVE_RATIO, (double) fairlyActive
+                                                / (double) total);
+                                        bundle.putDouble(FitbitApiFeature.LIGHTLY_ACTIVE_RATIO, (double) lightlyActive
+                                                / (double) total);
+                                        bundle.putDouble(FitbitApiFeature.SEDENTARY_RATIO, (double) sedentary
+                                                / (double) total);
 
                                         long steps = summary.getLong("steps");
-                                        bundle.putLong(FitbitApiFeature.STEPS,
-                                                steps);
+                                        bundle.putLong(FitbitApiFeature.STEPS, steps);
 
-                                        long caloriesOut = summary
-                                                .getLong("caloriesOut");
-                                        bundle.putLong(
-                                                FitbitApiFeature.CALORIES_OUT,
-                                                caloriesOut);
-                                        bundle.putLong(
-                                                FitbitApiFeature.CALORIES_BMR,
-                                                summary.getLong("caloriesBMR"));
-                                        bundle.putLong(
-                                                FitbitApiFeature.MARGINAL_CALORIES,
+                                        long caloriesOut = summary.getLong("caloriesOut");
+                                        bundle.putLong(FitbitApiFeature.CALORIES_OUT, caloriesOut);
+                                        bundle.putLong(FitbitApiFeature.CALORIES_BMR, summary.getLong("caloriesBMR"));
+                                        bundle.putLong(FitbitApiFeature.MARGINAL_CALORIES,
                                                 summary.getLong("marginalCalories"));
-                                        bundle.putLong(
-                                                FitbitApiFeature.ACTIVITY_CALORIES,
+                                        bundle.putLong(FitbitApiFeature.ACTIVITY_CALORIES,
                                                 summary.getLong("activityCalories"));
 
-                                        long score = summary
-                                                .getLong("activeScore");
-                                        bundle.putLong(
-                                                FitbitApiFeature.ACTIVE_SCORE,
-                                                score);
+                                        long score = summary.getLong("activeScore");
+                                        bundle.putLong(FitbitApiFeature.ACTIVE_SCORE, score);
 
-                                        JSONArray activities = summary
-                                                .getJSONArray("distances");
+                                        JSONArray activities = summary.getJSONArray("distances");
 
                                         long distance = 0;
 
-                                        for (int i = 0; i < activities.length(); i++) {
-                                            JSONObject activity = activities
-                                                    .getJSONObject(i);
+                                        for (int i = 0; i < activities.length(); i++)
+                                        {
+                                            JSONObject activity = activities.getJSONObject(i);
 
-                                            if ("total".equals(activity
-                                                    .getString("activity")))
-                                                distance = activity
-                                                        .getLong("distance");
+                                            if ("total".equals(activity.getString("activity")))
+                                                distance = activity.getLong("distance");
                                         }
 
-                                        bundle.putLong(
-                                                FitbitApiFeature.TOTAL_DISTANCE,
-                                                distance);
+                                        bundle.putLong(FitbitApiFeature.TOTAL_DISTANCE, distance);
 
-                                        JSONObject goals = body
-                                                .getJSONObject("goals");
+                                        JSONObject goals = body.getJSONObject("goals");
 
-                                        long goalDistance = goals
-                                                .getLong("distance");
+                                        long goalDistance = goals.getLong("distance");
                                         long goalSteps = goals.getLong("steps");
-                                        long goalCalories = goals
-                                                .getLong("caloriesOut");
+                                        long goalCalories = goals.getLong("caloriesOut");
 
-                                        bundle.putLong(
-                                                FitbitApiFeature.GOAL_DISTANCE,
-                                                goalDistance);
-                                        bundle.putLong(
-                                                FitbitApiFeature.GOAL_STEPS,
-                                                goalSteps);
-                                        bundle.putLong(
-                                                FitbitApiFeature.GOAL_CALORIES,
-                                                goalCalories);
+                                        bundle.putLong(FitbitApiFeature.GOAL_DISTANCE, goalDistance);
+                                        bundle.putLong(FitbitApiFeature.GOAL_STEPS, goalSteps);
+                                        bundle.putLong(FitbitApiFeature.GOAL_CALORIES, goalCalories);
 
-                                        bundle.putDouble(
-                                                FitbitApiFeature.GOAL_DISTANCE_RATIO,
-                                                (double) distance
-                                                        / (double) goalDistance);
-                                        bundle.putDouble(
-                                                FitbitApiFeature.GOAL_STEPS_RATIO,
-                                                (double) steps
-                                                        / (double) goalSteps);
-                                        bundle.putDouble(
-                                                FitbitApiFeature.GOAL_CALORIES_RATIO,
-                                                (double) caloriesOut
-                                                        / (double) goalCalories);
+                                        bundle.putDouble(FitbitApiFeature.GOAL_DISTANCE_RATIO, (double) distance
+                                                / (double) goalDistance);
+                                        bundle.putDouble(FitbitApiFeature.GOAL_STEPS_RATIO, (double) steps
+                                                / (double) goalSteps);
+                                        bundle.putDouble(FitbitApiFeature.GOAL_CALORIES_RATIO, (double) caloriesOut
+                                                / (double) goalCalories);
 
-                                        if (prefs
-                                                .getBoolean(
-                                                        "config_feature_fitbit_api_sleep_enabled",
-                                                        FitbitApiFeature.SLEEP_DEFAULT)) {
-                                            request = new OAuthRequest(
-                                                    Verb.GET,
-                                                    "https://api.fitbit.com/1/user/-/sleep/date/"
-                                                            + dateString
+                                        if (prefs.getBoolean("config_feature_fitbit_api_sleep_enabled",
+                                                FitbitApiFeature.SLEEP_DEFAULT))
+                                        {
+                                            request = new OAuthRequest(Verb.GET,
+                                                    "https://api.fitbit.com/1/user/-/sleep/date/" + dateString
                                                             + ".json");
-                                            service.signRequest(accessToken,
-                                                    request);
+                                            service.signRequest(accessToken, request);
 
                                             response = request.send();
 
-                                            body = new JSONObject(
-                                                    response.getBody());
+                                            body = new JSONObject(response.getBody());
 
-                                            JSONArray sleeps = body
-                                                    .getJSONArray("sleep");
+                                            JSONArray sleeps = body.getJSONArray("sleep");
 
                                             int restlessCount = 0;
                                             int restlessDuration = 0;
@@ -380,242 +322,137 @@ public class FitbitApiFeature extends Feature {
                                             int timeInBed = 0;
                                             int duration = 0;
 
-                                            for (int j = 0; j < sleeps.length(); j++) {
-                                                JSONObject sleep = sleeps
-                                                        .getJSONObject(j);
+                                            for (int j = 0; j < sleeps.length(); j++)
+                                            {
+                                                JSONObject sleep = sleeps.getJSONObject(j);
 
-                                                restlessCount += sleep
-                                                        .getInt("restlessCount");
-                                                restlessDuration += sleep
-                                                        .getInt("restlessDuration");
+                                                restlessCount += sleep.getInt("restlessCount");
+                                                restlessDuration += sleep.getInt("restlessDuration");
 
-                                                awakeCount += sleep
-                                                        .getInt("awakeCount");
-                                                awakeDuration += sleep
-                                                        .getInt("awakeDuration");
-                                                awakeningsCount += sleep
-                                                        .getInt("awakeningsCount");
+                                                awakeCount += sleep.getInt("awakeCount");
+                                                awakeDuration += sleep.getInt("awakeDuration");
+                                                awakeningsCount += sleep.getInt("awakeningsCount");
 
-                                                minutesInBedBefore += sleep
-                                                        .getInt("minutesToFallAsleep");
-                                                minutesAsleep += sleep
-                                                        .getInt("minutesAsleep");
-                                                minutesAwake += sleep
-                                                        .getInt("minutesAwake");
-                                                minutesInBedAfter += sleep
-                                                        .getInt("minutesAfterWakeup");
+                                                minutesInBedBefore += sleep.getInt("minutesToFallAsleep");
+                                                minutesAsleep += sleep.getInt("minutesAsleep");
+                                                minutesAwake += sleep.getInt("minutesAwake");
+                                                minutesInBedAfter += sleep.getInt("minutesAfterWakeup");
 
-                                                timeInBed += sleep
-                                                        .getInt("timeInBed");
-                                                duration += sleep
-                                                        .getInt("duration");
+                                                timeInBed += sleep.getInt("timeInBed");
+                                                duration += sleep.getInt("duration");
                                             }
 
                                             Bundle sleepBundle = new Bundle();
 
-                                            sleepBundle
-                                                    .putDouble(
-                                                            FitbitApiFeature.MEASUREMENT_RESTLESS_COUNT,
-                                                            restlessCount);
-                                            sleepBundle
-                                                    .putDouble(
-                                                            FitbitApiFeature.MEASUREMENT_RESTLESS_DURATION,
-                                                            restlessDuration);
-                                            sleepBundle
-                                                    .putDouble(
-                                                            FitbitApiFeature.MEASUREMENT_AWAKE_COUNT,
-                                                            awakeCount);
-                                            sleepBundle
-                                                    .putDouble(
-                                                            FitbitApiFeature.MEASUREMENT_AWAKE_DURATION,
-                                                            awakeDuration);
-                                            sleepBundle
-                                                    .putDouble(
-                                                            FitbitApiFeature.MEASUREMENT_AWAKENINGS_COUNT,
-                                                            awakeningsCount);
-                                            sleepBundle
-                                                    .putDouble(
-                                                            FitbitApiFeature.MEASUREMENT_MINUTES_IN_BED_BEFORE,
-                                                            minutesInBedBefore);
-                                            sleepBundle
-                                                    .putDouble(
-                                                            FitbitApiFeature.MEASUREMENT_MINUTES_ASLEEP,
-                                                            minutesAsleep);
-                                            sleepBundle
-                                                    .putDouble(
-                                                            FitbitApiFeature.MEASUREMENT_MINUTES_AWAKE,
-                                                            minutesAwake);
-                                            sleepBundle
-                                                    .putDouble(
-                                                            FitbitApiFeature.MEASUREMENT_MINUTES_IN_BED_AFTER,
-                                                            minutesInBedAfter);
-                                            sleepBundle
-                                                    .putDouble(
-                                                            FitbitApiFeature.MEASUREMENT_TIME_IN_BED,
-                                                            timeInBed);
-                                            sleepBundle
-                                                    .putDouble(
-                                                            FitbitApiFeature.MEASUREMENT_DURATION,
-                                                            duration);
+                                            sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_RESTLESS_COUNT,
+                                                    restlessCount);
+                                            sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_RESTLESS_DURATION,
+                                                    restlessDuration);
+                                            sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_AWAKE_COUNT, awakeCount);
+                                            sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_AWAKE_DURATION,
+                                                    awakeDuration);
+                                            sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_AWAKENINGS_COUNT,
+                                                    awakeningsCount);
+                                            sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_MINUTES_IN_BED_BEFORE,
+                                                    minutesInBedBefore);
+                                            sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_MINUTES_ASLEEP,
+                                                    minutesAsleep);
+                                            sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_MINUTES_AWAKE,
+                                                    minutesAwake);
+                                            sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_MINUTES_IN_BED_AFTER,
+                                                    minutesInBedAfter);
+                                            sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_TIME_IN_BED, timeInBed);
+                                            sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_DURATION, duration);
 
-                                            bundle.putBundle(
-                                                    FitbitApiFeature.MEASUREMENT_SLEEP,
-                                                    sleepBundle);
+                                            bundle.putBundle(FitbitApiFeature.MEASUREMENT_SLEEP, sleepBundle);
                                         }
 
-                                        if (prefs
-                                                .getBoolean(
-                                                        "config_feature_fitbit_api_food_enabled",
-                                                        FitbitApiFeature.FOOD_DEFAULT)) {
-                                            request = new OAuthRequest(
-                                                    Verb.GET,
-                                                    "https://api.fitbit.com/1/user/-/foods/log/date/"
-                                                            + dateString
+                                        if (prefs.getBoolean("config_feature_fitbit_api_food_enabled",
+                                                FitbitApiFeature.FOOD_DEFAULT))
+                                        {
+                                            request = new OAuthRequest(Verb.GET,
+                                                    "https://api.fitbit.com/1/user/-/foods/log/date/" + dateString
                                                             + ".json");
-                                            service.signRequest(accessToken,
-                                                    request);
+                                            service.signRequest(accessToken, request);
 
                                             response = request.send();
 
-                                            body = new JSONObject(
-                                                    response.getBody());
-                                            body = body
-                                                    .getJSONObject("summary");
+                                            body = new JSONObject(response.getBody());
+                                            body = body.getJSONObject("summary");
 
                                             Bundle foodBundle = new Bundle();
 
-                                            foodBundle
-                                                    .putDouble(
-                                                            FitbitApiFeature.MEASUREMENT_WATER,
-                                                            (double) body
-                                                                    .getInt("water"));
-                                            foodBundle
-                                                    .putDouble(
-                                                            FitbitApiFeature.MEASUREMENT_CALORIES,
-                                                            (double) body
-                                                                    .getInt("calories"));
-                                            foodBundle
-                                                    .putDouble(
-                                                            FitbitApiFeature.MEASUREMENT_SODIUM,
-                                                            (double) body
-                                                                    .getInt("sodium"));
-                                            foodBundle
-                                                    .putDouble(
-                                                            FitbitApiFeature.MEASUREMENT_FIBER,
-                                                            (double) body
-                                                                    .getInt("fiber"));
-                                            foodBundle
-                                                    .putDouble(
-                                                            FitbitApiFeature.MEASUREMENT_CARBS,
-                                                            (double) body
-                                                                    .getInt("carbs"));
-                                            foodBundle
-                                                    .putDouble(
-                                                            FitbitApiFeature.MEASUREMENT_PROTEIN,
-                                                            (double) body
-                                                                    .getInt("protein"));
-                                            foodBundle
-                                                    .putDouble(
-                                                            FitbitApiFeature.MEASUREMENT_FAT_FOOD,
-                                                            (double) body
-                                                                    .getInt("fat"));
+                                            foodBundle.putDouble(FitbitApiFeature.MEASUREMENT_WATER,
+                                                    (double) body.getInt("water"));
+                                            foodBundle.putDouble(FitbitApiFeature.MEASUREMENT_CALORIES,
+                                                    (double) body.getInt("calories"));
+                                            foodBundle.putDouble(FitbitApiFeature.MEASUREMENT_SODIUM,
+                                                    (double) body.getInt("sodium"));
+                                            foodBundle.putDouble(FitbitApiFeature.MEASUREMENT_FIBER,
+                                                    (double) body.getInt("fiber"));
+                                            foodBundle.putDouble(FitbitApiFeature.MEASUREMENT_CARBS,
+                                                    (double) body.getInt("carbs"));
+                                            foodBundle.putDouble(FitbitApiFeature.MEASUREMENT_PROTEIN,
+                                                    (double) body.getInt("protein"));
+                                            foodBundle.putDouble(FitbitApiFeature.MEASUREMENT_FAT_FOOD,
+                                                    (double) body.getInt("fat"));
 
-                                            bundle.putBundle(
-                                                    FitbitApiFeature.MEASUREMENT_FOOD,
-                                                    foodBundle);
+                                            bundle.putBundle(FitbitApiFeature.MEASUREMENT_FOOD, foodBundle);
                                         }
 
-                                        if (prefs
-                                                .getBoolean(
-                                                        "config_feature_fitbit_api_body_enabled",
-                                                        FitbitApiFeature.BODY_DEFAULT)) {
-                                            request = new OAuthRequest(
-                                                    Verb.GET,
-                                                    "https://api.fitbit.com/1/user/-/body/date/"
-                                                            + dateString
-                                                            + ".json");
-                                            service.signRequest(accessToken,
-                                                    request);
+                                        if (prefs.getBoolean("config_feature_fitbit_api_body_enabled",
+                                                FitbitApiFeature.BODY_DEFAULT))
+                                        {
+                                            request = new OAuthRequest(Verb.GET,
+                                                    "https://api.fitbit.com/1/user/-/body/date/" + dateString + ".json");
+                                            service.signRequest(accessToken, request);
 
                                             response = request.send();
 
-                                            body = new JSONObject(
-                                                    response.getBody());
+                                            body = new JSONObject(response.getBody());
                                             body = body.getJSONObject("body");
 
                                             Bundle bodyBundle = new Bundle();
 
-                                            bodyBundle
-                                                    .putDouble(
-                                                            FitbitApiFeature.MEASUREMENT_BICEP,
-                                                            (double) body
-                                                                    .getInt("bicep"));
-                                            bodyBundle
-                                                    .putDouble(
-                                                            FitbitApiFeature.MEASUREMENT_BMI,
-                                                            (double) body
-                                                                    .getInt("bmi"));
-                                            bodyBundle
-                                                    .putDouble(
-                                                            FitbitApiFeature.MEASUREMENT_CALF,
-                                                            (double) body
-                                                                    .getInt("calf"));
-                                            bodyBundle
-                                                    .putDouble(
-                                                            FitbitApiFeature.MEASUREMENT_CHEST,
-                                                            (double) body
-                                                                    .getInt("chest"));
-                                            bodyBundle
-                                                    .putDouble(
-                                                            FitbitApiFeature.MEASUREMENT_FAT,
-                                                            (double) body
-                                                                    .getInt("fat"));
-                                            bodyBundle
-                                                    .putDouble(
-                                                            FitbitApiFeature.MEASUREMENT_FOREARM,
-                                                            (double) body
-                                                                    .getInt("forearm"));
-                                            bodyBundle
-                                                    .putDouble(
-                                                            FitbitApiFeature.MEASUREMENT_HIPS,
-                                                            (double) body
-                                                                    .getInt("hips"));
-                                            bodyBundle
-                                                    .putDouble(
-                                                            FitbitApiFeature.MEASUREMENT_NECK,
-                                                            (double) body
-                                                                    .getInt("neck"));
-                                            bodyBundle
-                                                    .putDouble(
-                                                            FitbitApiFeature.MEASUREMENT_THIGH,
-                                                            (double) body
-                                                                    .getInt("thigh"));
-                                            bodyBundle
-                                                    .putDouble(
-                                                            FitbitApiFeature.MEASUREMENT_WAIST,
-                                                            (double) body
-                                                                    .getInt("waist"));
-                                            bodyBundle
-                                                    .putDouble(
-                                                            FitbitApiFeature.MEASUREMENT_WEIGHT,
-                                                            (double) body
-                                                                    .getInt("weight"));
+                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_BICEP,
+                                                    (double) body.getInt("bicep"));
+                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_BMI,
+                                                    (double) body.getInt("bmi"));
+                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_CALF,
+                                                    (double) body.getInt("calf"));
+                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_CHEST,
+                                                    (double) body.getInt("chest"));
+                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_FAT,
+                                                    (double) body.getInt("fat"));
+                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_FOREARM,
+                                                    (double) body.getInt("forearm"));
+                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_HIPS,
+                                                    (double) body.getInt("hips"));
+                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_NECK,
+                                                    (double) body.getInt("neck"));
+                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_THIGH,
+                                                    (double) body.getInt("thigh"));
+                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_WAIST,
+                                                    (double) body.getInt("waist"));
+                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_WEIGHT,
+                                                    (double) body.getInt("weight"));
 
-                                            bundle.putBundle(
-                                                    FitbitApiFeature.MEASUREMENT_BODY,
-                                                    bodyBundle);
+                                            bundle.putBundle(FitbitApiFeature.MEASUREMENT_BODY, bodyBundle);
                                         }
 
                                         me.transmitData(context, bundle);
-                                    } catch (JSONException e) {
-                                        LogManager.getInstance(context)
-                                                .logException(e);
-                                    } catch (OAuthException e) {
-                                        LogManager.getInstance(context)
-                                                .logException(e);
-                                    } catch (IllegalArgumentException e) {
-                                        LogManager.getInstance(context)
-                                                .logException(e);
+                                    }
+                                    catch (JSONException e)
+                                    {
+                                        LogManager.getInstance(context).logException(e);
+                                    }
+                                    catch (OAuthException e)
+                                    {
+                                        LogManager.getInstance(context).logException(e);
+                                    }
+                                    catch (IllegalArgumentException e)
+                                    {
+                                        LogManager.getInstance(context).logException(e);
                                     }
                                 }
                             };
@@ -633,26 +470,26 @@ public class FitbitApiFeature extends Feature {
         return false;
     }
 
-    protected boolean defaultEnabled() {
+    protected boolean defaultEnabled()
+    {
         return false;
     }
 
-    private void fetchAuth(Context context) {
+    private void fetchAuth(Context context)
+    {
         Intent intent = new Intent(context, OAuthActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-        intent.putExtra(OAuthActivity.CONSUMER_KEY,
-                context.getString(R.string.fitbit_consumer_key));
-        intent.putExtra(OAuthActivity.CONSUMER_SECRET,
-                context.getString(R.string.fitbit_consumer_secret));
+        intent.putExtra(OAuthActivity.CONSUMER_KEY, context.getString(R.string.fitbit_consumer_key));
+        intent.putExtra(OAuthActivity.CONSUMER_SECRET, context.getString(R.string.fitbit_consumer_secret));
         intent.putExtra(OAuthActivity.REQUESTER, "fitbit");
-        intent.putExtra(OAuthActivity.CALLBACK_URL,
-                "http://pr-oauth/oauth/fitbit");
+        intent.putExtra(OAuthActivity.CALLBACK_URL, "http://pr-oauth/oauth/fitbit");
 
         context.startActivity(intent);
     }
 
-    public PreferenceScreen preferenceScreen(final PreferenceActivity activity) {
+    public PreferenceScreen preferenceScreen(final PreferenceActivity activity)
+    {
         final PreferenceScreen screen = super.preferenceScreen(activity);
 
         CheckBoxPreference sleepPref = new CheckBoxPreference(activity);
@@ -688,43 +525,45 @@ public class FitbitApiFeature extends Feature {
 
         final FitbitApiFeature me = this;
 
-        authPreference
-                .setOnPreferenceClickListener(new OnPreferenceClickListener() {
-                    public boolean onPreferenceClick(Preference preference) {
-                        me.fetchAuth(activity);
+        authPreference.setOnPreferenceClickListener(new OnPreferenceClickListener()
+        {
+            public boolean onPreferenceClick(Preference preference)
+            {
+                me.fetchAuth(activity);
 
-                        screen.addPreference(logoutPreference);
-                        screen.removePreference(authPreference);
+                screen.addPreference(logoutPreference);
+                screen.removePreference(authPreference);
 
-                        return true;
+                return true;
+            }
+        });
+
+        logoutPreference.setOnPreferenceClickListener(new OnPreferenceClickListener()
+        {
+            public boolean onPreferenceClick(Preference preference)
+            {
+                Editor e = prefs.edit();
+                e.remove("oauth_fitbit_token");
+                e.remove("oauth_fitbit_secret");
+                e.commit();
+
+                me._lastUpdate = 0;
+
+                screen.addPreference(authPreference);
+                screen.removePreference(logoutPreference);
+
+                activity.runOnUiThread(new Runnable()
+                {
+                    public void run()
+                    {
+                        Toast.makeText(activity, activity.getString(R.string.toast_fitbit_logout), Toast.LENGTH_LONG)
+                                .show();
                     }
                 });
 
-        logoutPreference
-                .setOnPreferenceClickListener(new OnPreferenceClickListener() {
-                    public boolean onPreferenceClick(Preference preference) {
-                        Editor e = prefs.edit();
-                        e.remove("oauth_fitbit_token");
-                        e.remove("oauth_fitbit_secret");
-                        e.commit();
-
-                        me._lastUpdate = 0;
-
-                        screen.addPreference(authPreference);
-                        screen.removePreference(logoutPreference);
-
-                        activity.runOnUiThread(new Runnable() {
-                            public void run() {
-                                Toast.makeText(
-                                        activity,
-                                        activity.getString(R.string.toast_fitbit_logout),
-                                        Toast.LENGTH_LONG).show();
-                            }
-                        });
-
-                        return true;
-                    }
-                });
+                return true;
+            }
+        });
 
         if (token == null || secret == null)
             screen.addPreference(authPreference);
@@ -734,12 +573,11 @@ public class FitbitApiFeature extends Feature {
         return screen;
     }
 
-    public String summarizeValue(Context context, Bundle bundle) {
+    public String summarizeValue(Context context, Bundle bundle)
+    {
         double steps = bundle.getDouble(FitbitApiFeature.STEPS);
         double progress = bundle.getDouble(FitbitApiFeature.GOAL_STEPS_RATIO) * 100;
 
-        return String.format(
-                context.getResources().getString(R.string.summary_fitbit),
-                steps, progress);
+        return String.format(context.getResources().getString(R.string.summary_fitbit), steps, progress);
     }
 }

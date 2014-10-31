@@ -35,30 +35,30 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.FoursquareProb
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.InstagramProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LinkedInProbe;
 
-public class OAuthActivity extends Activity {
+public class OAuthActivity extends Activity
+{
     public static final String CONSUMER_KEY = "CONSUMER_KEY";
     public static final String CONSUMER_SECRET = "CONSUMER_SECRET";
     public static final String CALLBACK_URL = "CALLBACK_URL";
     public static final String REQUESTER = "REQUESTER";
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public void onResume() {
+    @SuppressWarnings(
+    { "unchecked", "rawtypes" })
+    public void onResume()
+    {
         super.onResume();
 
-        final SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(this);
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         final OAuthActivity me = this;
 
         Bundle extras = this.getIntent().getExtras();
 
-        if (extras.containsKey(OAuthActivity.CONSUMER_KEY)) {
-            final String consumerKey = extras
-                    .getString(OAuthActivity.CONSUMER_KEY);
-            final String consumerSecret = extras
-                    .getString(OAuthActivity.CONSUMER_SECRET);
-            final String callbackUrl = extras
-                    .getString(OAuthActivity.CALLBACK_URL);
+        if (extras.containsKey(OAuthActivity.CONSUMER_KEY))
+        {
+            final String consumerKey = extras.getString(OAuthActivity.CONSUMER_KEY);
+            final String consumerSecret = extras.getString(OAuthActivity.CONSUMER_SECRET);
+            final String callbackUrl = extras.getString(OAuthActivity.CALLBACK_URL);
             final String requester = extras.getString(OAuthActivity.REQUESTER);
 
             Class api = null;
@@ -76,7 +76,8 @@ public class OAuthActivity extends Activity {
 
             final Class apiClass = api;
 
-            if (apiClass != null) {
+            if (apiClass != null)
+            {
                 ServiceBuilder builder = new ServiceBuilder();
                 builder = builder.provider(apiClass);
                 builder = builder.apiKey(consumerKey);
@@ -85,58 +86,66 @@ public class OAuthActivity extends Activity {
 
                 final OAuthService service = builder.build();
 
-                final OAuthConfig config = new OAuthConfig(consumerKey,
-                        consumerSecret, callbackUrl, null, null, null);
+                final OAuthConfig config = new OAuthConfig(consumerKey, consumerSecret, callbackUrl, null, null, null);
 
-                Runnable r = new Runnable() {
-                    public void run() {
-                        try {
-                            if (DefaultApi20.class.isAssignableFrom(apiClass)) {
-                                Constructor constructor = apiClass
-                                        .getConstructors()[0];
+                Runnable r = new Runnable()
+                {
+                    public void run()
+                    {
+                        try
+                        {
+                            if (DefaultApi20.class.isAssignableFrom(apiClass))
+                            {
+                                Constructor constructor = apiClass.getConstructors()[0];
 
-                                try {
-                                    DefaultApi20 api = (DefaultApi20) constructor
-                                            .newInstance();
+                                try
+                                {
+                                    DefaultApi20 api = (DefaultApi20) constructor.newInstance();
 
-                                    String url = api
-                                            .getAuthorizationUrl(config);
+                                    String url = api.getAuthorizationUrl(config);
 
-                                    Intent intent = new Intent(me,
-                                            OAuthWebActivity.class);
+                                    Intent intent = new Intent(me, OAuthWebActivity.class);
                                     intent.setData(Uri.parse(url));
 
                                     me.startActivity(intent);
-                                } catch (InstantiationException e) {
-                                    LogManager.getInstance(me).logException(e);
-                                } catch (IllegalAccessException e) {
-                                    LogManager.getInstance(me).logException(e);
-                                } catch (IllegalArgumentException e) {
-                                    LogManager.getInstance(me).logException(e);
-                                } catch (InvocationTargetException e) {
+                                }
+                                catch (InstantiationException e)
+                                {
                                     LogManager.getInstance(me).logException(e);
                                 }
-                            } else if (DefaultApi10a.class
-                                    .isAssignableFrom(apiClass)) {
+                                catch (IllegalAccessException e)
+                                {
+                                    LogManager.getInstance(me).logException(e);
+                                }
+                                catch (IllegalArgumentException e)
+                                {
+                                    LogManager.getInstance(me).logException(e);
+                                }
+                                catch (InvocationTargetException e)
+                                {
+                                    LogManager.getInstance(me).logException(e);
+                                }
+                            }
+                            else if (DefaultApi10a.class.isAssignableFrom(apiClass))
+                            {
                                 Token token = service.getRequestToken();
 
                                 Editor e = prefs.edit();
-                                e.putString("request_token_" + requester,
-                                        token.getToken());
-                                e.putString("request_secret_" + requester,
-                                        token.getSecret());
+                                e.putString("request_token_" + requester, token.getToken());
+                                e.putString("request_secret_" + requester, token.getSecret());
                                 e.commit();
 
                                 String url = service.getAuthorizationUrl(token);
 
-                                Intent intent = new Intent(me,
-                                        OAuthWebActivity.class);
+                                Intent intent = new Intent(me, OAuthWebActivity.class);
                                 intent.setData(Uri.parse(url));
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
                                 me.startActivity(intent);
                             }
-                        } catch (OAuthException e) {
+                        }
+                        catch (OAuthException e)
+                        {
                             LogManager.getInstance(me).logException(e);
                         }
                     }
@@ -147,26 +156,28 @@ public class OAuthActivity extends Activity {
             }
 
             this.finish();
-        } else {
+        }
+        else
+        {
             Uri incomingUri = this.getIntent().getData();
 
-            if ("http".equals(incomingUri.getScheme())) {
+            if ("http".equals(incomingUri.getScheme()))
+            {
                 List<String> segments = incomingUri.getPathSegments();
 
-                if (segments.get(0).equals("oauth")) {
+                if (segments.get(0).equals("oauth"))
+                {
                     final String requester = segments.get(1);
 
-                    String verifier = incomingUri
-                            .getQueryParameter("oauth_verifier");
+                    String verifier = incomingUri.getQueryParameter("oauth_verifier");
 
                     if (verifier == null)
                         verifier = incomingUri.getQueryParameter("code");
 
-                    if (verifier != null) {
-                        final Token requestToken = new Token(prefs.getString(
-                                "request_token_" + requester, ""),
-                                prefs.getString("request_secret_" + requester,
-                                        ""));
+                    if (verifier != null)
+                    {
+                        final Token requestToken = new Token(prefs.getString("request_token_" + requester, ""),
+                                prefs.getString("request_secret_" + requester, ""));
 
                         final Verifier v = new Verifier(verifier);
 
@@ -175,43 +186,42 @@ public class OAuthActivity extends Activity {
                         String consumerSecret = null;
                         String callback = null;
 
-                        if ("fitbit".equals(requester)) {
+                        if ("fitbit".equals(requester))
+                        {
                             apiClass = FitbitApi.class;
-                            consumerKey = this
-                                    .getString(R.string.fitbit_consumer_key);
-                            consumerSecret = this
-                                    .getString(R.string.fitbit_consumer_secret);
-                        } else if ("twitter".equals(requester)) {
+                            consumerKey = this.getString(R.string.fitbit_consumer_key);
+                            consumerSecret = this.getString(R.string.fitbit_consumer_secret);
+                        }
+                        else if ("twitter".equals(requester))
+                        {
                             apiClass = TwitterApi.SSL.class;
-                            consumerKey = this
-                                    .getString(R.string.twitter_consumer_key);
-                            consumerSecret = this
-                                    .getString(R.string.twitter_consumer_secret);
-                        } else if ("instagram".equals(requester)) {
+                            consumerKey = this.getString(R.string.twitter_consumer_key);
+                            consumerSecret = this.getString(R.string.twitter_consumer_secret);
+                        }
+                        else if ("instagram".equals(requester))
+                        {
                             apiClass = InstagramApi.class;
-                            consumerKey = this
-                                    .getString(R.string.instagram_consumer_key);
-                            consumerSecret = this
-                                    .getString(R.string.instagram_consumer_secret);
+                            consumerKey = this.getString(R.string.instagram_consumer_key);
+                            consumerSecret = this.getString(R.string.instagram_consumer_secret);
                             callback = InstagramProbe.CALLBACK;
-                        } else if ("linkedin".equalsIgnoreCase(requester)) {
+                        }
+                        else if ("linkedin".equalsIgnoreCase(requester))
+                        {
                             apiClass = LinkedInApi.class;
-                            consumerKey = this
-                                    .getString(R.string.linkedin_consumer_key);
-                            consumerSecret = this
-                                    .getString(R.string.linkedin_consumer_secret);
+                            consumerKey = this.getString(R.string.linkedin_consumer_key);
+                            consumerSecret = this.getString(R.string.linkedin_consumer_secret);
                             callback = LinkedInProbe.CALLBACK;
-                        } else if ("foursquare".equalsIgnoreCase(requester)) {
+                        }
+                        else if ("foursquare".equalsIgnoreCase(requester))
+                        {
                             apiClass = Foursquare2Api.class;
-                            consumerKey = this
-                                    .getString(R.string.foursquare_consumer_key);
-                            consumerSecret = this
-                                    .getString(R.string.foursquare_consumer_secret);
+                            consumerKey = this.getString(R.string.foursquare_consumer_key);
+                            consumerSecret = this.getString(R.string.foursquare_consumer_secret);
                             callback = FoursquareProbe.CALLBACK;
                         }
 
-                        if (apiClass != null && consumerKey != null
-                                && consumerSecret != null) {
+                        if (apiClass != null && consumerKey != null && consumerSecret != null)
+                        {
                             ServiceBuilder builder = new ServiceBuilder();
                             builder = builder.provider(apiClass);
                             builder = builder.apiKey(consumerKey);
@@ -224,62 +234,61 @@ public class OAuthActivity extends Activity {
 
                             Runnable r = null;
 
-                            if (DefaultApi20.class.isAssignableFrom(apiClass)) {
-                                r = new Runnable() {
-                                    public void run() {
-                                        Token accessToken = service
-                                                .getAccessToken(null, v);
+                            if (DefaultApi20.class.isAssignableFrom(apiClass))
+                            {
+                                r = new Runnable()
+                                {
+                                    public void run()
+                                    {
+                                        Token accessToken = service.getAccessToken(null, v);
 
                                         Editor e = prefs.edit();
-                                        e.putString("oauth_" + requester
-                                                + "_secret",
-                                                accessToken.getSecret());
-                                        e.putString("oauth_" + requester
-                                                + "_token",
-                                                accessToken.getToken());
+                                        e.putString("oauth_" + requester + "_secret", accessToken.getSecret());
+                                        e.putString("oauth_" + requester + "_token", accessToken.getToken());
 
                                         e.commit();
 
-                                        SanityManager.getInstance(me)
-                                                .refreshState();
+                                        SanityManager.getInstance(me).refreshState();
 
-                                        me.runOnUiThread(new Runnable() {
-                                            public void run() {
+                                        me.runOnUiThread(new Runnable()
+                                        {
+                                            public void run()
+                                            {
                                                 me.authSuccess();
                                             }
                                         });
                                     }
                                 };
-                            } else if (DefaultApi10a.class
-                                    .isAssignableFrom(apiClass)) {
-                                r = new Runnable() {
-                                    public void run() {
-                                        try {
-                                            Token accessToken = service
-                                                    .getAccessToken(
-                                                            requestToken, v);
+                            }
+                            else if (DefaultApi10a.class.isAssignableFrom(apiClass))
+                            {
+                                r = new Runnable()
+                                {
+                                    public void run()
+                                    {
+                                        try
+                                        {
+                                            Token accessToken = service.getAccessToken(requestToken, v);
 
                                             Editor e = prefs.edit();
-                                            e.putString("oauth_" + requester
-                                                    + "_secret",
-                                                    accessToken.getSecret());
-                                            e.putString("oauth_" + requester
-                                                    + "_token",
-                                                    accessToken.getToken());
+                                            e.putString("oauth_" + requester + "_secret", accessToken.getSecret());
+                                            e.putString("oauth_" + requester + "_token", accessToken.getToken());
 
                                             e.commit();
 
-                                            SanityManager.getInstance(me)
-                                                    .refreshState();
+                                            SanityManager.getInstance(me).refreshState();
 
-                                            me.runOnUiThread(new Runnable() {
-                                                public void run() {
+                                            me.runOnUiThread(new Runnable()
+                                            {
+                                                public void run()
+                                                {
                                                     me.authSuccess();
                                                 }
                                             });
-                                        } catch (OAuthConnectionException e) {
-                                            LogManager.getInstance(me)
-                                                    .logException(e);
+                                        }
+                                        catch (OAuthConnectionException e)
+                                        {
+                                            LogManager.getInstance(me).logException(e);
                                         }
                                     }
                                 };
@@ -294,7 +303,8 @@ public class OAuthActivity extends Activity {
         }
     }
 
-    protected void authSuccess() {
+    protected void authSuccess()
+    {
         final OAuthActivity me = this;
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -303,12 +313,13 @@ public class OAuthActivity extends Activity {
         builder = builder.setMessage(R.string.auth_success_message);
 
         builder = builder.setCancelable(false);
-        builder = builder.setPositiveButton(R.string.auth_success_close,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        me.finish();
-                    }
-                });
+        builder = builder.setPositiveButton(R.string.auth_success_close, new DialogInterface.OnClickListener()
+        {
+            public void onClick(DialogInterface dialog, int which)
+            {
+                me.finish();
+            }
+        });
 
         builder.create().show();
     }

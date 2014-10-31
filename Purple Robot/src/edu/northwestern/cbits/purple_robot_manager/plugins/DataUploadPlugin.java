@@ -56,7 +56,8 @@ import edu.northwestern.cbits.purple_robot_manager.logging.LiberalSSLSocketFacto
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
 @SuppressLint("NewApi")
-public abstract class DataUploadPlugin extends OutputPlugin {
+public abstract class DataUploadPlugin extends OutputPlugin
+{
     public final static String USER_HASH_KEY = "UserHash";
     public final static String OPERATION_KEY = "Operation";
     public final static String PAYLOAD_KEY = "Payload";
@@ -78,9 +79,9 @@ public abstract class DataUploadPlugin extends OutputPlugin {
     protected static final int RESULT_NO_CONNECTION = 1;
     protected static final int RESULT_ERROR = 2;
 
-    public File getPendingFolder() {
-        SharedPreferences prefs = HttpUploadPlugin.getPreferences(this
-                .getContext());
+    public File getPendingFolder()
+    {
+        SharedPreferences prefs = HttpUploadPlugin.getPreferences(this.getContext());
 
         File internalStorage = this.getContext().getFilesDir();
 
@@ -90,8 +91,7 @@ public abstract class DataUploadPlugin extends OutputPlugin {
         if (internalStorage != null && !internalStorage.exists())
             internalStorage.mkdirs();
 
-        File pendingFolder = new File(internalStorage,
-                DataUploadPlugin.CACHE_DIR);
+        File pendingFolder = new File(internalStorage, DataUploadPlugin.CACHE_DIR);
 
         if (pendingFolder != null && !pendingFolder.exists())
             pendingFolder.mkdirs();
@@ -99,14 +99,16 @@ public abstract class DataUploadPlugin extends OutputPlugin {
         return pendingFolder;
     }
 
-    private boolean restrictToWifi(SharedPreferences prefs) {
-        try {
-            return prefs.getBoolean(DataUploadPlugin.RESTRICT_TO_WIFI,
-                    DataUploadPlugin.RESTRICT_TO_WIFI_DEFAULT);
-        } catch (ClassCastException e) {
+    private boolean restrictToWifi(SharedPreferences prefs)
+    {
+        try
+        {
+            return prefs.getBoolean(DataUploadPlugin.RESTRICT_TO_WIFI, DataUploadPlugin.RESTRICT_TO_WIFI_DEFAULT);
+        }
+        catch (ClassCastException e)
+        {
             String enabled = prefs.getString(DataUploadPlugin.RESTRICT_TO_WIFI,
-                    "" + DataUploadPlugin.RESTRICT_TO_WIFI_DEFAULT)
-                    .toLowerCase(Locale.ENGLISH);
+                    "" + DataUploadPlugin.RESTRICT_TO_WIFI_DEFAULT).toLowerCase(Locale.ENGLISH);
 
             boolean isRestricted = ("false".equals(enabled) == false);
 
@@ -119,7 +121,8 @@ public abstract class DataUploadPlugin extends OutputPlugin {
     }
 
     @SuppressWarnings("deprecation")
-    protected int transmitPayload(SharedPreferences prefs, String payload) {
+    protected int transmitPayload(SharedPreferences prefs, String payload)
+    {
         Context context = this.getContext();
 
         if (prefs == null)
@@ -130,15 +133,17 @@ public abstract class DataUploadPlugin extends OutputPlugin {
 
         final DataUploadPlugin me = this;
 
-        try {
-            AndroidHttpClient androidClient = AndroidHttpClient.newInstance(
-                    "Purple Robot", context);
+        try
+        {
+            AndroidHttpClient androidClient = AndroidHttpClient.newInstance("Purple Robot", context);
 
-            try {
-                if (this.restrictToWifi(prefs)) {
-                    if (WiFiHelper.wifiAvailable(context) == false) {
-                        me.broadcastMessage(context
-                                .getString(R.string.message_wifi_pending));
+            try
+            {
+                if (this.restrictToWifi(prefs))
+                {
+                    if (WiFiHelper.wifiAvailable(context) == false)
+                    {
+                        me.broadcastMessage(context.getString(R.string.message_wifi_pending));
 
                         return DataUploadPlugin.RESULT_NO_CONNECTION;
                     }
@@ -157,16 +162,15 @@ public abstract class DataUploadPlugin extends OutputPlugin {
 
                 jsonMessage.put(PAYLOAD_KEY, payload);
 
-                String userHash = EncryptionManager.getInstance().getUserHash(
-                        me.getContext());
+                String userHash = EncryptionManager.getInstance().getUserHash(me.getContext());
 
                 jsonMessage.put(USER_HASH_KEY, userHash);
 
                 MessageDigest md = MessageDigest.getInstance("MD5");
 
                 byte[] checksummed = (jsonMessage.get(USER_HASH_KEY).toString()
-                        + jsonMessage.get(OPERATION_KEY).toString() + jsonMessage
-                        .get(PAYLOAD_KEY).toString()).getBytes("UTF-8"); // .getBytes("US-ASCII");
+                        + jsonMessage.get(OPERATION_KEY).toString() + jsonMessage.get(PAYLOAD_KEY).toString())
+                        .getBytes("UTF-8"); // .getBytes("US-ASCII");
 
                 byte[] digest = md.digest(checksummed);
 
@@ -184,17 +188,14 @@ public abstract class DataUploadPlugin extends OutputPlugin {
                 HostnameVerifier hostnameVerifier = org.apache.http.conn.ssl.SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
 
                 SchemeRegistry registry = new SchemeRegistry();
-                registry.register(new Scheme("http", PlainSocketFactory
-                        .getSocketFactory(), 80));
+                registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
 
-                SSLSocketFactory socketFactory = SSLSocketFactory
-                        .getSocketFactory();
+                SSLSocketFactory socketFactory = SSLSocketFactory.getSocketFactory();
 
-                if (prefs.getBoolean(
-                        DataUploadPlugin.ALLOW_ALL_SSL_CERTIFICATES,
-                        DataUploadPlugin.ALLOW_ALL_SSL_CERTIFICATES_DEFAULT)) {
-                    KeyStore trustStore = KeyStore.getInstance(KeyStore
-                            .getDefaultType());
+                if (prefs.getBoolean(DataUploadPlugin.ALLOW_ALL_SSL_CERTIFICATES,
+                        DataUploadPlugin.ALLOW_ALL_SSL_CERTIFICATES_DEFAULT))
+                {
+                    KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
                     trustStore.load(null, null);
 
                     socketFactory = new LiberalSSLSocketFactory(trustStore);
@@ -206,23 +207,18 @@ public abstract class DataUploadPlugin extends OutputPlugin {
                 HttpConnectionParams.setConnectionTimeout(params, 180000);
                 HttpConnectionParams.setSoTimeout(params, 180000);
 
-                SingleClientConnManager mgr = new SingleClientConnManager(
-                        params, registry);
+                SingleClientConnManager mgr = new SingleClientConnManager(params, registry);
                 HttpClient httpClient = new DefaultHttpClient(mgr, params);
 
                 HttpsURLConnection.setDefaultHostnameVerifier(hostnameVerifier);
 
-                String title = me.getContext().getString(
-                        R.string.notify_upload_data);
+                String title = me.getContext().getString(R.string.notify_upload_data);
 
-                Notification note = new Notification(R.drawable.ic_note_normal,
-                        title, System.currentTimeMillis());
-                PendingIntent contentIntent = PendingIntent.getActivity(me
-                        .getContext(), 0, new Intent(me.getContext(),
+                Notification note = new Notification(R.drawable.ic_note_normal, title, System.currentTimeMillis());
+                PendingIntent contentIntent = PendingIntent.getActivity(me.getContext(), 0, new Intent(me.getContext(),
                         StartActivity.class), Notification.FLAG_ONGOING_EVENT);
 
-                note.setLatestEventInfo(me.getContext(), title, title,
-                        contentIntent);
+                note.setLatestEventInfo(me.getContext(), title, title, contentIntent);
 
                 note.flags = Notification.FLAG_ONGOING_EVENT;
 
@@ -234,21 +230,18 @@ public abstract class DataUploadPlugin extends OutputPlugin {
                 URI siteUri = new URI(uriString);
 
                 HttpPost httpPost = new HttpPost(siteUri);
-                httpPost.setHeader("Content-Type",
-                        "application/x-www-form-urlencoded;charset=UTF-8");
+                httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
 
                 String jsonString = jsonMessage.toString();
 
                 List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
                 nameValuePairs.add(new BasicNameValuePair("json", jsonString));
-                HttpEntity entity = new UrlEncodedFormEntity(nameValuePairs,
-                        HTTP.UTF_8);
+                HttpEntity entity = new UrlEncodedFormEntity(nameValuePairs, HTTP.UTF_8);
 
                 httpPost.setEntity(entity);
 
-                String uploadMessage = String.format(
-                        context.getString(R.string.message_transmit_bytes),
-                        (httpPost.getEntity().getContentLength() / 1024));
+                String uploadMessage = String.format(context.getString(R.string.message_transmit_bytes), (httpPost
+                        .getEntity().getContentLength() / 1024));
                 me.broadcastMessage(uploadMessage);
 
                 HttpResponse response = httpClient.execute(httpPost);
@@ -258,12 +251,11 @@ public abstract class DataUploadPlugin extends OutputPlugin {
                 String contentHeader = null;
 
                 if (response.containsHeader("Content-Encoding"))
-                    contentHeader = response.getFirstHeader("Content-Encoding")
-                            .getValue();
+                    contentHeader = response.getFirstHeader("Content-Encoding").getValue();
 
-                if (contentHeader != null && contentHeader.endsWith("gzip")) {
-                    BufferedInputStream in = new BufferedInputStream(
-                            AndroidHttpClient.getUngzippedContent(httpEntity));
+                if (contentHeader != null && contentHeader.endsWith("gzip"))
+                {
+                    BufferedInputStream in = new BufferedInputStream(AndroidHttpClient.getUngzippedContent(httpEntity));
 
                     ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -276,7 +268,8 @@ public abstract class DataUploadPlugin extends OutputPlugin {
                     in.close();
 
                     body = out.toString("UTF-8");
-                } else
+                }
+                else
                     body = EntityUtils.toString(httpEntity);
 
                 JSONObject json = new JSONObject(body);
@@ -293,78 +286,82 @@ public abstract class DataUploadPlugin extends OutputPlugin {
                 if (json.has(PAYLOAD_KEY))
                     responsePayload = json.getString(PAYLOAD_KEY);
 
-                if (status.equals("error") == false) {
-                    byte[] responseDigest = md
-                            .digest((status + responsePayload)
-                                    .getBytes("UTF-8"));
-                    String responseChecksum = (new BigInteger(1, responseDigest))
-                            .toString(16);
+                if (status.equals("error") == false)
+                {
+                    byte[] responseDigest = md.digest((status + responsePayload).getBytes("UTF-8"));
+                    String responseChecksum = (new BigInteger(1, responseDigest)).toString(16);
 
                     while (responseChecksum.length() < 32)
                         responseChecksum = "0" + responseChecksum;
 
-                    if (responseChecksum.equals(json.getString(CHECKSUM_KEY))) {
-                        String uploadedMessage = String
-                                .format(context
-                                        .getString(R.string.message_upload_successful),
-                                        (httpPost.getEntity()
-                                                .getContentLength() / 1024));
+                    if (responseChecksum.equals(json.getString(CHECKSUM_KEY)))
+                    {
+                        String uploadedMessage = String.format(context.getString(R.string.message_upload_successful),
+                                (httpPost.getEntity().getContentLength() / 1024));
 
                         me.broadcastMessage(uploadedMessage);
-                    } else
-                        me.broadcastMessage(context
-                                .getString(R.string.message_checksum_failed));
+                    }
+                    else
+                        me.broadcastMessage(context.getString(R.string.message_checksum_failed));
 
                     return DataUploadPlugin.RESULT_SUCCESS;
-                } else {
-                    String errorMessage = String.format(
-                            context.getString(R.string.message_server_error),
-                            status);
+                }
+                else
+                {
+                    String errorMessage = String.format(context.getString(R.string.message_server_error), status);
                     me.broadcastMessage(errorMessage);
 
                     String payloadString = json.getString("Payload");
 
                     if (payloadString.length() > 512)
-                        payloadString = payloadString.substring(payloadString
-                                .length() - 512);
+                        payloadString = payloadString.substring(payloadString.length() - 512);
                 }
-            } catch (HttpHostConnectException e) {
-                me.broadcastMessage(context
-                        .getString(R.string.message_http_connection_error));
+            }
+            catch (HttpHostConnectException e)
+            {
+                me.broadcastMessage(context.getString(R.string.message_http_connection_error));
                 LogManager.getInstance(context).logException(e);
-            } catch (SocketTimeoutException e) {
-                me.broadcastMessage(context
-                        .getString(R.string.message_socket_timeout_error));
+            }
+            catch (SocketTimeoutException e)
+            {
+                me.broadcastMessage(context.getString(R.string.message_socket_timeout_error));
                 LogManager.getInstance(me.getContext()).logException(e);
-            } catch (SocketException e) {
-                String errorMessage = String.format(
-                        context.getString(R.string.message_socket_error),
-                        e.getMessage());
+            }
+            catch (SocketException e)
+            {
+                String errorMessage = String.format(context.getString(R.string.message_socket_error), e.getMessage());
                 me.broadcastMessage(errorMessage);
                 LogManager.getInstance(me.getContext()).logException(e);
-            } catch (UnknownHostException e) {
-                me.broadcastMessage(context
-                        .getString(R.string.message_unreachable_error));
+            }
+            catch (UnknownHostException e)
+            {
+                me.broadcastMessage(context.getString(R.string.message_unreachable_error));
                 LogManager.getInstance(me.getContext()).logException(e);
-            } catch (JSONException e) {
-                me.broadcastMessage(context
-                        .getString(R.string.message_response_error));
+            }
+            catch (JSONException e)
+            {
+                me.broadcastMessage(context.getString(R.string.message_response_error));
                 LogManager.getInstance(me.getContext()).logException(e);
-            } catch (SSLPeerUnverifiedException e) {
+            }
+            catch (SSLPeerUnverifiedException e)
+            {
                 LogManager.getInstance(me.getContext()).logException(e);
-                me.broadcastMessage(context
-                        .getString(R.string.message_unverified_server));
-            } catch (Exception e) {
+                me.broadcastMessage(context.getString(R.string.message_unverified_server));
+            }
+            catch (Exception e)
+            {
                 LogManager.getInstance(me.getContext()).logException(e);
-                me.broadcastMessage(context.getString(
-                        R.string.message_general_error, e.getMessage()));
-            } finally {
+                me.broadcastMessage(context.getString(R.string.message_general_error, e.getMessage()));
+            }
+            finally
+            {
                 androidClient.close();
             }
-        } catch (OutOfMemoryError e) {
+        }
+        catch (OutOfMemoryError e)
+        {
             LogManager.getInstance(me.getContext()).logException(e);
-            me.broadcastMessage(context.getString(
-                    R.string.message_general_error, e.getMessage()));
+            me.broadcastMessage(context.getString(R.string.message_general_error, e.getMessage()));
         }
 
         return DataUploadPlugin.RESULT_ERROR;

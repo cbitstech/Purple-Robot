@@ -28,38 +28,43 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 
 @SuppressLint("SimpleDateFormat")
-public class WebkitActivity extends ActionBarActivity {
+public class WebkitActivity extends ActionBarActivity
+{
     private double _selectedTimestamp = 0;
     private boolean _inited = false;
 
-    public static String stringForAsset(Activity activity, String assetName)
-            throws IOException {
+    public static String stringForAsset(Activity activity, String assetName) throws IOException
+    {
         InputStream is = activity.getAssets().open(assetName);
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(is,
-                Charset.forName("UTF-8")));
+        BufferedReader br = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
 
         StringBuffer sb = new StringBuffer();
         String line = null;
 
-        while ((line = br.readLine()) != null) {
+        while ((line = br.readLine()) != null)
+        {
             sb.append(line + "\n");
         }
 
         return sb.toString();
     }
 
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
         this.setContentView(R.layout.layout_webkit_activity);
     }
 
-    protected String contentString() {
-        try {
+    protected String contentString()
+    {
+        try
+        {
             String name = this.getIntent().getStringExtra("probe_name");
 
-            if (name != null) {
+            if (name != null)
+            {
                 Probe p = ProbeManager.probeForName(name, this);
 
                 String content = p.getDisplayContent(this);
@@ -69,7 +74,9 @@ public class WebkitActivity extends ActionBarActivity {
             }
 
             return WebkitActivity.stringForAsset(this, "webkit/webview.html");
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             LogManager.getInstance(this).logException(e);
         }
 
@@ -77,8 +84,10 @@ public class WebkitActivity extends ActionBarActivity {
     }
 
     @JavascriptInterface
-    public void setValue(String key, String value) {
-        if (key.equals("timestamp")) {
+    public void setValue(String key, String value)
+    {
+        if (key.equals("timestamp"))
+        {
             this._selectedTimestamp = Double.parseDouble(value);
 
             final Date d = new Date((long) this._selectedTimestamp);
@@ -87,37 +96,42 @@ public class WebkitActivity extends ActionBarActivity {
 
             final WebkitActivity me = this;
 
-            this.runOnUiThread(new Runnable() {
-                public void run() {
+            this.runOnUiThread(new Runnable()
+            {
+                public void run()
+                {
                     ActionBar actionBar = me.getSupportActionBar();
 
-                    actionBar.setSubtitle(String.format(
-                            me.getString(R.string.display_date_item_count),
-                            sdf.format(d), me.contentSubtitle()));
+                    actionBar.setSubtitle(String.format(me.getString(R.string.display_date_item_count), sdf.format(d),
+                            me.contentSubtitle()));
                 }
             });
         }
     }
 
-    protected void onResume() {
+    protected void onResume()
+    {
         super.onResume();
 
         this.refresh();
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    private void refresh() {
+    private void refresh()
+    {
         WebView webview = (WebView) this.findViewById(R.id.webview);
 
-        webview.setWebChromeClient(new WebChromeClient() {
-            public boolean onConsoleMessage(ConsoleMessage cm) {
-                Log.e("PRM", cm.message() + " -- From line " + cm.lineNumber()
-                        + " of " + cm.sourceId());
+        webview.setWebChromeClient(new WebChromeClient()
+        {
+            public boolean onConsoleMessage(ConsoleMessage cm)
+            {
+                Log.e("PRM", cm.message() + " -- From line " + cm.lineNumber() + " of " + cm.sourceId());
                 return true;
             }
         });
 
-        if (this._inited == false) {
+        if (this._inited == false)
+        {
             webview.addJavascriptInterface(this, "PurpleRobot");
 
             this._inited = true;
@@ -125,10 +139,10 @@ public class WebkitActivity extends ActionBarActivity {
 
         String contentString = this.contentString();
 
-        if (contentString != null) {
+        if (contentString != null)
+        {
             webview.getSettings().setJavaScriptEnabled(true);
-            webview.loadDataWithBaseURL("file:///android_asset/webkit/",
-                    contentString, "text/html", "UTF-8", null);
+            webview.loadDataWithBaseURL("file:///android_asset/webkit/", contentString, "text/html", "UTF-8", null);
 
             String title = this.contentTitle();
             String subtitle = this.contentSubtitle();
@@ -137,13 +151,13 @@ public class WebkitActivity extends ActionBarActivity {
 
             actionBar.setTitle(title);
             actionBar.setSubtitle(subtitle);
-        } else {
+        }
+        else
+        {
             Intent dataIntent = new Intent(this, ProbeViewerActivity.class);
 
-            dataIntent.putExtra("probe_name",
-                    this.getIntent().getStringExtra("probe_name"));
-            dataIntent.putExtra("probe_bundle", this.getIntent()
-                    .getParcelableExtra("probe_bundle"));
+            dataIntent.putExtra("probe_name", this.getIntent().getStringExtra("probe_name"));
+            dataIntent.putExtra("probe_bundle", this.getIntent().getParcelableExtra("probe_bundle"));
 
             this.startActivity(dataIntent);
 
@@ -151,10 +165,12 @@ public class WebkitActivity extends ActionBarActivity {
         }
     }
 
-    protected String contentSubtitle() {
+    protected String contentSubtitle()
+    {
         String name = this.getIntent().getStringExtra("probe_name");
 
-        if (name != null) {
+        if (name != null)
+        {
             Probe p = ProbeManager.probeForName(name, this);
 
             return p.contentSubtitle(this);
@@ -163,10 +179,12 @@ public class WebkitActivity extends ActionBarActivity {
         return null;
     }
 
-    protected String contentTitle() {
+    protected String contentTitle()
+    {
         String name = this.getIntent().getStringExtra("probe_name");
 
-        if (name != null) {
+        if (name != null)
+        {
             Probe p = ProbeManager.probeForName(name, this);
 
             return p.title(this);
@@ -175,21 +193,22 @@ public class WebkitActivity extends ActionBarActivity {
         return this.getString(R.string.app_name);
     }
 
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
         MenuInflater inflater = this.getMenuInflater();
         inflater.inflate(R.menu.menu_probe_activity, menu);
 
         return true;
     }
 
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.menu_data_item) {
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        if (item.getItemId() == R.id.menu_data_item)
+        {
             Intent dataIntent = new Intent(this, ProbeViewerActivity.class);
 
-            dataIntent.putExtra("probe_name",
-                    this.getIntent().getStringExtra("probe_name"));
-            dataIntent.putExtra("probe_bundle", this.getIntent()
-                    .getParcelableExtra("probe_bundle"));
+            dataIntent.putExtra("probe_name", this.getIntent().getStringExtra("probe_name"));
+            dataIntent.putExtra("probe_bundle", this.getIntent().getParcelableExtra("probe_bundle"));
 
             this.startActivity(dataIntent);
 

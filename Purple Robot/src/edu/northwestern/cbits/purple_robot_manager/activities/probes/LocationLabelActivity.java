@@ -40,33 +40,36 @@ import edu.northwestern.cbits.purple_robot_manager.util.DBSCAN;
 import edu.northwestern.cbits.purple_robot_manager.util.DBSCAN.Cluster;
 import edu.northwestern.cbits.purple_robot_manager.util.DBSCAN.Point;
 
-public class LocationLabelActivity extends ActionBarActivity {
+public class LocationLabelActivity extends ActionBarActivity
+{
     private ArrayList<Cluster> _clusters = new ArrayList<Cluster>();
     private int _selectedCluster = -1;
 
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
         this.setContentView(R.layout.layout_location_label_activity);
 
         DBSCAN dbscan = new DBSCAN(this, DBSCAN.DISTANCE, DBSCAN.POPULATION);
 
-        Cursor cursor = ProbeValuesProvider.getProvider(this).retrieveValues(
-                this, LocationProbe.DB_TABLE, LocationProbe.databaseSchema());
+        Cursor cursor = ProbeValuesProvider.getProvider(this).retrieveValues(this, LocationProbe.DB_TABLE,
+                LocationProbe.databaseSchema());
 
-        while (cursor.moveToNext()) {
-            dbscan.addPoint(new Point(cursor.getDouble(cursor
-                    .getColumnIndex(LocationProbe.LATITUDE_KEY)), cursor
-                    .getDouble(cursor
-                            .getColumnIndex(LocationProbe.LONGITUDE_KEY))));
+        while (cursor.moveToNext())
+        {
+            dbscan.addPoint(new Point(cursor.getDouble(cursor.getColumnIndex(LocationProbe.LATITUDE_KEY)), cursor
+                    .getDouble(cursor.getColumnIndex(LocationProbe.LONGITUDE_KEY))));
         }
 
         cursor.close();
 
         this._clusters.addAll(dbscan.calculate(this));
 
-        Collections.sort(this._clusters, new Comparator<Cluster>() {
-            public int compare(Cluster one, Cluster two) {
+        Collections.sort(this._clusters, new Comparator<Cluster>()
+        {
+            public int compare(Cluster one, Cluster two)
+            {
                 if (one.population() > two.population())
                     return -1;
                 else if (one.population() < two.population())
@@ -86,21 +89,23 @@ public class LocationLabelActivity extends ActionBarActivity {
         e.commit();
     }
 
-    protected void onResume() {
+    protected void onResume()
+    {
         super.onResume();
 
-        SupportMapFragment fragment = (SupportMapFragment) this
-                .getSupportFragmentManager()
-                .findFragmentById(R.id.map_fragment);
+        SupportMapFragment fragment = (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(
+                R.id.map_fragment);
 
         final GoogleMap map = fragment.getMap();
 
-        for (int i = 0; i < this._clusters.size(); i++) {
+        for (int i = 0; i < this._clusters.size(); i++)
+        {
             Cluster cluster = this._clusters.get(i);
 
             int color = Color.BLACK;
 
-            switch (i % 5) {
+            switch (i % 5)
+            {
             case 0:
                 color = Color.parseColor("#33B5E5");
                 break;
@@ -118,7 +123,8 @@ public class LocationLabelActivity extends ActionBarActivity {
                 break;
             }
 
-            for (Point p : cluster.getPoints(20)) {
+            for (Point p : cluster.getPoints(20))
+            {
                 CircleOptions options = new CircleOptions();
                 options.center(new LatLng(p.x(), p.y()));
                 options.fillColor(color);
@@ -135,21 +141,21 @@ public class LocationLabelActivity extends ActionBarActivity {
 
         final LocationLabelActivity me = this;
 
-        ArrayAdapter<Cluster> adapter = new ArrayAdapter<Cluster>(this,
-                R.layout.layout_cluster_row, this._clusters) {
-            public View getView(final int position, View convertView,
-                    final ViewGroup parent) {
-                if (convertView == null) {
-                    LayoutInflater inflater = (LayoutInflater) me
-                            .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        ArrayAdapter<Cluster> adapter = new ArrayAdapter<Cluster>(this, R.layout.layout_cluster_row, this._clusters)
+        {
+            public View getView(final int position, View convertView, final ViewGroup parent)
+            {
+                if (convertView == null)
+                {
+                    LayoutInflater inflater = (LayoutInflater) me.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-                    convertView = inflater.inflate(R.layout.layout_cluster_row,
-                            null);
+                    convertView = inflater.inflate(R.layout.layout_cluster_row, null);
                 }
 
                 int color = Color.BLACK;
 
-                switch (position % 5) {
+                switch (position % 5)
+                {
                 case 0:
                     color = Color.parseColor("#33B5E5");
                     break;
@@ -172,10 +178,8 @@ public class LocationLabelActivity extends ActionBarActivity {
                 View v = convertView.findViewById(R.id.color_indicator);
                 v.setBackgroundColor(color);
 
-                TextView clusterName = (TextView) convertView
-                        .findViewById(R.id.text_cluster_name);
-                TextView clusterDetails = (TextView) convertView
-                        .findViewById(R.id.text_cluster_details);
+                TextView clusterName = (TextView) convertView.findViewById(R.id.text_cluster_name);
+                TextView clusterDetails = (TextView) convertView.findViewById(R.id.text_cluster_details);
 
                 String name = c.getName();
 
@@ -183,11 +187,12 @@ public class LocationLabelActivity extends ActionBarActivity {
                     name = me.getString(R.string.title_place_unknown);
 
                 clusterName.setText(name);
-                clusterDetails.setText(me.getString(R.string.title_place_count,
-                        c.population()));
+                clusterDetails.setText(me.getString(R.string.title_place_count, c.population()));
 
-                v.setOnClickListener(new OnClickListener() {
-                    public void onClick(View arg0) {
+                v.setOnClickListener(new OnClickListener()
+                {
+                    public void onClick(View arg0)
+                    {
                         Cluster cluster = me._clusters.get(position);
 
                         double minX = Double.MAX_VALUE;
@@ -195,7 +200,8 @@ public class LocationLabelActivity extends ActionBarActivity {
                         double maxX = 0 - Double.MAX_VALUE;
                         double maxY = 0 - Double.MAX_VALUE;
 
-                        for (Point p : cluster.getPoints()) {
+                        for (Point p : cluster.getPoints())
+                        {
                             double x = p.x();
                             double y = p.y();
 
@@ -212,11 +218,9 @@ public class LocationLabelActivity extends ActionBarActivity {
                                 maxY = y;
                         }
 
-                        LatLngBounds bounds = new LatLngBounds(new LatLng(minX,
-                                minY), new LatLng(maxX, maxY));
+                        LatLngBounds bounds = new LatLngBounds(new LatLng(minX, minY), new LatLng(maxX, maxY));
 
-                        map.animateCamera(CameraUpdateFactory.newLatLngBounds(
-                                bounds, parent.getWidth() / 2,
+                        map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, parent.getWidth() / 2,
                                 parent.getHeight() / 2, 20));
                     }
                 });
@@ -225,7 +229,8 @@ public class LocationLabelActivity extends ActionBarActivity {
             }
         };
 
-        if (this._clusters.size() > 0) {
+        if (this._clusters.size() > 0)
+        {
             Cluster cluster = this._clusters.get(0);
 
             double minX = Double.MAX_VALUE;
@@ -233,7 +238,8 @@ public class LocationLabelActivity extends ActionBarActivity {
             double maxX = 0 - Double.MAX_VALUE;
             double maxY = 0 - Double.MAX_VALUE;
 
-            for (Point p : cluster.getPoints()) {
+            for (Point p : cluster.getPoints())
+            {
                 double x = p.x();
                 double y = p.y();
 
@@ -250,17 +256,16 @@ public class LocationLabelActivity extends ActionBarActivity {
                     maxY = y;
             }
 
-            LatLngBounds bounds = new LatLngBounds(new LatLng(minX, minY),
-                    new LatLng(maxX, maxY));
-            map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 200,
-                    200, 20));
+            LatLngBounds bounds = new LatLngBounds(new LatLng(minX, minY), new LatLng(maxX, maxY));
+            map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 200, 200, 20));
         }
 
         list.setAdapter(adapter);
 
-        list.setOnItemClickListener(new OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view,
-                    int position, long id) {
+        list.setOnItemClickListener(new OnItemClickListener()
+        {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
                 me._selectedCluster = position;
 
                 parent.showContextMenu();
@@ -268,23 +273,24 @@ public class LocationLabelActivity extends ActionBarActivity {
         });
     }
 
-    public void onCreateContextMenu(ContextMenu menu, View v,
-            ContextMenuInfo menuInfo) {
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
+    {
         super.onCreateContextMenu(menu, v, menuInfo);
 
         menu.setHeaderTitle(R.string.menu_label_cluster);
 
-        String[] groups = this.getResources().getStringArray(
-                R.array.place_groups);
+        String[] groups = this.getResources().getStringArray(R.array.place_groups);
 
-        for (int i = 0; i < groups.length; i++) {
+        for (int i = 0; i < groups.length; i++)
+        {
             String group = groups[i];
 
             menu.add(Menu.NONE, i, i, group);
         }
     }
 
-    public boolean onContextItemSelected(MenuItem item) {
+    public boolean onContextItemSelected(MenuItem item)
+    {
         Cluster selected = this._clusters.get(this._selectedCluster);
 
         selected.setName(item.getTitle().toString());
@@ -292,13 +298,13 @@ public class LocationLabelActivity extends ActionBarActivity {
         ListView list = (ListView) this.findViewById(R.id.list_view);
         list.setAdapter(list.getAdapter());
 
-        DBSCAN.persistClusters(this, this._clusters, DBSCAN.DISTANCE,
-                DBSCAN.POPULATION);
+        DBSCAN.persistClusters(this, this._clusters, DBSCAN.DISTANCE, DBSCAN.POPULATION);
 
         return true;
     }
 
-    protected boolean isRouteDisplayed() {
+    protected boolean isRouteDisplayed()
+    {
         return false;
     }
 }

@@ -19,8 +19,10 @@ import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 
-public class WebActivity extends ActionBarActivity {
-    protected void onCreate(Bundle savedInstanceState) {
+public class WebActivity extends ActionBarActivity
+{
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
         this.getWindow().requestFeature(Window.FEATURE_PROGRESS);
@@ -28,8 +30,10 @@ public class WebActivity extends ActionBarActivity {
         this.setContentView(R.layout.layout_web_activity);
     }
 
-    @SuppressLint({ "SetJavaScriptEnabled", "DefaultLocale" })
-    protected void onResume() {
+    @SuppressLint(
+    { "SetJavaScriptEnabled", "DefaultLocale" })
+    protected void onResume()
+    {
         super.onResume();
 
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -38,10 +42,8 @@ public class WebActivity extends ActionBarActivity {
 
         Uri uri = this.getIntent().getData();
 
-        if (uri != null
-                && uri.getScheme() != null
-                && uri.getScheme().toLowerCase(Locale.ENGLISH)
-                        .startsWith("http")) {
+        if (uri != null && uri.getScheme() != null && uri.getScheme().toLowerCase(Locale.ENGLISH).startsWith("http"))
+        {
             final WebActivity me = this;
 
             WebSettings settings = webView.getSettings();
@@ -49,34 +51,40 @@ public class WebActivity extends ActionBarActivity {
             settings.setJavaScriptEnabled(true);
             settings.setBuiltInZoomControls(true);
 
-            webView.setWebChromeClient(new WebChromeClient() {
-                public void onProgressChanged(WebView view, int progress) {
+            webView.setWebChromeClient(new WebChromeClient()
+            {
+                public void onProgressChanged(WebView view, int progress)
+                {
                     me.setProgress(progress * 1000);
                 }
 
-                public void onCloseWindow(WebView window) {
+                public void onCloseWindow(WebView window)
+                {
                     me.finish();
                 }
 
-                public void onReceivedTitle(WebView view, String title) {
+                public void onReceivedTitle(WebView view, String title)
+                {
                     me.getSupportActionBar().setTitle(title);
                 }
             });
 
-            webView.setWebViewClient(new WebViewClient() {
-                public void onReceivedError(WebView view, int errorCode,
-                        String description, String failingUrl) {
+            webView.setWebViewClient(new WebViewClient()
+            {
+                public void onReceivedError(WebView view, int errorCode, String description, String failingUrl)
+                {
                     Toast.makeText(me, description, Toast.LENGTH_LONG).show();
                 }
             });
 
             webView.loadUrl(uri.toString());
-        } else
-            Toast.makeText(this, R.string.error_missing_uri, Toast.LENGTH_LONG)
-                    .show();
+        }
+        else
+            Toast.makeText(this, R.string.error_missing_uri, Toast.LENGTH_LONG).show();
     }
 
-    public void onBackPressed() {
+    public void onBackPressed()
+    {
         WebView webView = (WebView) this.findViewById(R.id.webview);
 
         if (webView.canGoBack())
@@ -85,23 +93,28 @@ public class WebActivity extends ActionBarActivity {
             super.onBackPressed();
     }
 
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
         MenuInflater inflater = this.getMenuInflater();
         inflater.inflate(R.menu.menu_web_activity, menu);
 
         return true;
     }
 
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
         final int itemId = item.getItemId();
 
-        if (itemId == android.R.id.home) {
+        if (itemId == android.R.id.home)
+        {
             this.onUpPressed();
         }
-        if (itemId == R.id.menu_close) {
+        if (itemId == R.id.menu_close)
+        {
             this.finish();
         }
-        if (itemId == R.id.menu_open) {
+        if (itemId == R.id.menu_open)
+        {
             JavaScriptEngine engine = new JavaScriptEngine(this);
 
             Uri data = this.getIntent().getData();
@@ -113,8 +126,10 @@ public class WebActivity extends ActionBarActivity {
         return true;
     }
 
-    private void onUpPressed() {
-        if (this.isTaskRoot()) {
+    private void onUpPressed()
+    {
+        if (this.isTaskRoot())
+        {
             Intent intent = new Intent(this, StartActivity.class);
             this.startActivity(intent);
         }

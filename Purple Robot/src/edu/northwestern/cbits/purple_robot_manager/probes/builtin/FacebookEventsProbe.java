@@ -9,24 +9,28 @@ import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
-public class FacebookEventsProbe extends Probe {
+public class FacebookEventsProbe extends Probe
+{
     public static final String PROBE_NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.FacebookEventsProbe";
 
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return FacebookEventsProbe.PROBE_NAME;
     }
 
     @Override
-    public String title(Context context) {
+    public String title(Context context)
+    {
         return context.getString(R.string.title_facebook_events_probe);
     }
 
-    public String probeCategory(Context context) {
-        return context.getResources().getString(
-                R.string.probe_external_services_category);
+    public String probeCategory(Context context)
+    {
+        return context.getResources().getString(R.string.probe_external_services_category);
     }
 
-    public PreferenceScreen preferenceScreen(PreferenceActivity settingsActivity) {
+    public PreferenceScreen preferenceScreen(PreferenceActivity settingsActivity)
+    {
         return null;
     }
 
@@ -34,19 +38,23 @@ public class FacebookEventsProbe extends Probe {
 
     }
 
-    public void enable(Context context) {
+    public void enable(Context context)
+    {
 
     }
 
-    public void disable(Context context) {
+    public void disable(Context context)
+    {
 
     }
 
-    public String summary(Context context) {
+    public String summary(Context context)
+    {
         return context.getString(R.string.title_facebook_events_probe);
     }
 
-    public String summarizeValue(Context context, Bundle bundle) {
+    public String summarizeValue(Context context, Bundle bundle)
+    {
         String message = bundle.getString("MESSAGE");
         String type = bundle.getString("TYPE");
 
@@ -56,14 +64,10 @@ public class FacebookEventsProbe extends Probe {
             message = StringUtils.abbreviate(message, 512);
 
         if (obfuscated)
-            return String.format(
-                    context.getResources().getString(
-                            R.string.facebook_event_obfuscated_desc), message,
+            return String.format(context.getResources().getString(R.string.facebook_event_obfuscated_desc), message,
                     type);
 
-        return String.format(
-                context.getResources().getString(
-                        R.string.facebook_event_clear_desc), message, type);
+        return String.format(context.getResources().getString(R.string.facebook_event_clear_desc), message, type);
 
     }
 }

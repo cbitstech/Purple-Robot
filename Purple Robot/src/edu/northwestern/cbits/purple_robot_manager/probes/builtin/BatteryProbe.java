@@ -30,7 +30,8 @@ import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
-public class BatteryProbe extends Probe {
+public class BatteryProbe extends Probe
+{
     private static final String DB_TABLE = "battery_probe";
 
     private static final String BATTERY_KEY = "BATTERY_LEVEL";
@@ -42,33 +43,36 @@ public class BatteryProbe extends Probe {
 
     private BroadcastReceiver _receiver = null;;
 
-    public Intent viewIntent(Context context) {
+    public Intent viewIntent(Context context)
+    {
         Intent i = new Intent(context, WebkitLandscapeActivity.class);
 
         return i;
     }
 
-    public String probeCategory(Context context) {
-        return context.getResources().getString(
-                R.string.probe_device_info_category);
+    public String probeCategory(Context context)
+    {
+        return context.getResources().getString(R.string.probe_device_info_category);
     }
 
-    public String contentSubtitle(Context context) {
-        Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(
-                context, BatteryProbe.DB_TABLE, this.databaseSchema());
+    public String contentSubtitle(Context context)
+    {
+        Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(context, BatteryProbe.DB_TABLE,
+                this.databaseSchema());
 
         int count = -1;
 
-        if (c != null) {
+        if (c != null)
+        {
             count = c.getCount();
             c.close();
         }
 
-        return String.format(context.getString(R.string.display_item_count),
-                count);
+        return String.format(context.getString(R.string.display_item_count), count);
     }
 
-    public Map<String, String> databaseSchema() {
+    public Map<String, String> databaseSchema()
+    {
         HashMap<String, String> schema = new HashMap<String, String>();
 
         schema.put(BatteryProbe.BATTERY_KEY, ProbeValuesProvider.REAL_TYPE);
@@ -76,30 +80,30 @@ public class BatteryProbe extends Probe {
         return schema;
     }
 
-    public String getDisplayContent(Activity activity) {
-        try {
-            String template = WebkitActivity.stringForAsset(activity,
-                    "webkit/chart_spline_full.html");
+    public String getDisplayContent(Activity activity)
+    {
+        try
+        {
+            String template = WebkitActivity.stringForAsset(activity, "webkit/chart_spline_full.html");
 
             SplineChart c = new SplineChart();
 
             ArrayList<Double> battery = new ArrayList<Double>();
             ArrayList<Double> time = new ArrayList<Double>();
 
-            Cursor cursor = ProbeValuesProvider.getProvider(activity)
-                    .retrieveValues(activity, BatteryProbe.DB_TABLE,
-                            this.databaseSchema());
+            Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(activity, BatteryProbe.DB_TABLE,
+                    this.databaseSchema());
 
             int count = -1;
 
-            if (cursor != null) {
+            if (cursor != null)
+            {
                 count = cursor.getCount();
 
-                while (cursor.moveToNext()) {
-                    double d = cursor.getDouble(cursor
-                            .getColumnIndex(BatteryProbe.BATTERY_KEY));
-                    double t = cursor.getDouble(cursor
-                            .getColumnIndex(ProbeValuesProvider.TIMESTAMP));
+                while (cursor.moveToNext())
+                {
+                    double d = cursor.getDouble(cursor.getColumnIndex(BatteryProbe.BATTERY_KEY));
+                    double t = cursor.getDouble(cursor.getColumnIndex(ProbeValuesProvider.TIMESTAMP));
 
                     battery.add(d);
                     time.add(t);
@@ -108,35 +112,40 @@ public class BatteryProbe extends Probe {
                 cursor.close();
             }
 
-            c.addSeries(activity.getString(R.string.battery_level_label),
-                    battery);
+            c.addSeries(activity.getString(R.string.battery_level_label), battery);
             c.addTime(activity.getString(R.string.battery_time_label), time);
 
             JSONObject json = c.dataJson(activity);
 
-            template = template.replace("{{{ highchart_json }}}",
-                    json.toString());
+            template = template.replace("{{{ highchart_json }}}", json.toString());
             template = template.replace("{{{ highchart_count }}}", "" + count);
 
             return template;
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             LogManager.getInstance(activity).logException(e);
-        } catch (JSONException e) {
+        }
+        catch (JSONException e)
+        {
             LogManager.getInstance(activity).logException(e);
         }
 
         return null;
     }
 
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.BatteryProbe";
     }
 
-    public String title(Context context) {
+    public String title(Context context)
+    {
         return context.getString(R.string.title_battery_probe);
     }
 
-    public Bundle formattedBundle(Context context, Bundle bundle) {
+    public Bundle formattedBundle(Context context, Bundle bundle)
+    {
         Bundle formatted = super.formattedBundle(context, bundle);
 
         formatted.putString(context.getString(R.string.battery_tech_label),
@@ -146,117 +155,105 @@ public class BatteryProbe extends Probe {
         formatted.putInt(context.getString(R.string.battery_volt_label),
                 (int) bundle.getDouble(BatteryManager.EXTRA_VOLTAGE, -1));
 
-        int status = (int) bundle.getDouble(BatteryManager.EXTRA_STATUS,
-                BatteryManager.BATTERY_STATUS_UNKNOWN);
+        int status = (int) bundle.getDouble(BatteryManager.EXTRA_STATUS, BatteryManager.BATTERY_STATUS_UNKNOWN);
 
-        switch (status) {
+        switch (status)
+        {
         case BatteryManager.BATTERY_STATUS_CHARGING:
-            formatted.putString(
-                    context.getString(R.string.battery_status_label),
+            formatted.putString(context.getString(R.string.battery_status_label),
                     context.getString(R.string.battery_status_charging));
             break;
         case BatteryManager.BATTERY_STATUS_DISCHARGING:
-            formatted.putString(
-                    context.getString(R.string.battery_status_label),
+            formatted.putString(context.getString(R.string.battery_status_label),
                     context.getString(R.string.battery_status_discharging));
             break;
         case BatteryManager.BATTERY_STATUS_FULL:
-            formatted.putString(
-                    context.getString(R.string.battery_status_label),
+            formatted.putString(context.getString(R.string.battery_status_label),
                     context.getString(R.string.battery_status_full));
             break;
         case BatteryManager.BATTERY_STATUS_NOT_CHARGING:
-            formatted.putString(
-                    context.getString(R.string.battery_status_label),
+            formatted.putString(context.getString(R.string.battery_status_label),
                     context.getString(R.string.battery_status_not_charging));
             break;
         default:
-            formatted.putString(
-                    context.getString(R.string.battery_status_label),
+            formatted.putString(context.getString(R.string.battery_status_label),
                     context.getString(R.string.battery_status_unknown));
         }
 
-        int health = (int) bundle.getDouble(BatteryManager.EXTRA_HEALTH,
-                BatteryManager.BATTERY_HEALTH_UNKNOWN);
+        int health = (int) bundle.getDouble(BatteryManager.EXTRA_HEALTH, BatteryManager.BATTERY_HEALTH_UNKNOWN);
 
-        switch (health) {
+        switch (health)
+        {
         case BatteryManager.BATTERY_HEALTH_COLD:
-            formatted.putString(
-                    context.getString(R.string.battery_health_label),
+            formatted.putString(context.getString(R.string.battery_health_label),
                     context.getString(R.string.battery_health_cold));
             break;
         case BatteryManager.BATTERY_HEALTH_DEAD:
-            formatted.putString(
-                    context.getString(R.string.battery_health_label),
+            formatted.putString(context.getString(R.string.battery_health_label),
                     context.getString(R.string.battery_health_dead));
             break;
         case BatteryManager.BATTERY_HEALTH_GOOD:
-            formatted.putString(
-                    context.getString(R.string.battery_health_label),
+            formatted.putString(context.getString(R.string.battery_health_label),
                     context.getString(R.string.battery_health_good));
             break;
         case BatteryManager.BATTERY_HEALTH_OVERHEAT:
-            formatted.putString(
-                    context.getString(R.string.battery_health_label),
+            formatted.putString(context.getString(R.string.battery_health_label),
                     context.getString(R.string.battery_health_overheat));
             break;
         case BatteryManager.BATTERY_HEALTH_OVER_VOLTAGE:
-            formatted.putString(
-                    context.getString(R.string.battery_health_label),
+            formatted.putString(context.getString(R.string.battery_health_label),
                     context.getString(R.string.battery_health_over_voltage));
             break;
         case BatteryManager.BATTERY_HEALTH_UNSPECIFIED_FAILURE:
-            formatted.putString(
-                    context.getString(R.string.battery_health_label),
+            formatted.putString(context.getString(R.string.battery_health_label),
                     context.getString(R.string.battery_health_failure));
             break;
         default:
-            formatted.putString(
-                    context.getString(R.string.battery_health_label),
+            formatted.putString(context.getString(R.string.battery_health_label),
                     context.getString(R.string.battery_health_unknown));
         }
 
         int source = (int) bundle.getDouble(BatteryManager.EXTRA_PLUGGED, 0);
 
-        switch (source) {
+        switch (source)
+        {
         case 0:
-            formatted.putString(
-                    context.getString(R.string.battery_plugged_label),
+            formatted.putString(context.getString(R.string.battery_plugged_label),
                     context.getString(R.string.battery_source_none));
             break;
         case BatteryManager.BATTERY_PLUGGED_AC:
-            formatted.putString(
-                    context.getString(R.string.battery_plugged_label),
+            formatted.putString(context.getString(R.string.battery_plugged_label),
                     context.getString(R.string.battery_source_ac));
             break;
         case BatteryManager.BATTERY_PLUGGED_USB:
-            formatted.putString(
-                    context.getString(R.string.battery_plugged_label),
+            formatted.putString(context.getString(R.string.battery_plugged_label),
                     context.getString(R.string.battery_source_usb));
             break;
         default:
-            formatted.putString(
-                    context.getString(R.string.battery_plugged_label),
+            formatted.putString(context.getString(R.string.battery_plugged_label),
                     context.getString(R.string.battery_source_other));
         }
 
         return formatted;
     };
 
-    public boolean isEnabled(Context context) {
-        if (!this._isInited) {
-            IntentFilter filter = new IntentFilter(
-                    Intent.ACTION_BATTERY_CHANGED);
+    public boolean isEnabled(Context context)
+    {
+        if (!this._isInited)
+        {
+            IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
 
             final BatteryProbe me = this;
 
-            this._receiver = new BroadcastReceiver() {
-                public void onReceive(Context context, Intent intent) {
-                    if (me._isEnabled) {
+            this._receiver = new BroadcastReceiver()
+            {
+                public void onReceive(Context context, Intent intent)
+                {
+                    if (me._isEnabled)
+                    {
                         Bundle bundle = new Bundle();
                         bundle.putString("PROBE", me.name(context));
-                        bundle.putLong("TIMESTAMP",
-                                System.currentTimeMillis() / 1000);
+                        bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
 
                         bundle.putAll(intent.getExtras());
 
@@ -264,13 +261,10 @@ public class BatteryProbe extends Probe {
 
                         Map<String, Object> values = new HashMap<String, Object>();
 
-                        values.put(BatteryProbe.BATTERY_KEY,
-                                bundle.getInt(BatteryManager.EXTRA_LEVEL));
-                        values.put(ProbeValuesProvider.TIMESTAMP,
-                                Double.valueOf(bundle.getLong("TIMESTAMP")));
+                        values.put(BatteryProbe.BATTERY_KEY, bundle.getInt(BatteryManager.EXTRA_LEVEL));
+                        values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(bundle.getLong("TIMESTAMP")));
 
-                        ProbeValuesProvider.getProvider(context).insertValue(
-                                context, BatteryProbe.DB_TABLE,
+                        ProbeValuesProvider.getProvider(context).insertValue(context, BatteryProbe.DB_TABLE,
                                 me.databaseSchema(), values);
                     }
                 }
@@ -285,16 +279,17 @@ public class BatteryProbe extends Probe {
 
         this._isEnabled = false;
 
-        if (super.isEnabled(context)) {
-            if (prefs.getBoolean("config_probe_battery_enabled",
-                    BatteryProbe.DEFAULT_ENABLED))
+        if (super.isEnabled(context))
+        {
+            if (prefs.getBoolean("config_probe_battery_enabled", BatteryProbe.DEFAULT_ENABLED))
                 this._isEnabled = true;
         }
 
         return this._isEnabled;
     }
 
-    public void enable(Context context) {
+    public void enable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -303,7 +298,8 @@ public class BatteryProbe extends Probe {
         e.commit();
     }
 
-    public void disable(Context context) {
+    public void disable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -312,20 +308,19 @@ public class BatteryProbe extends Probe {
         e.commit();
     }
 
-    public String summarizeValue(Context context, Bundle bundle) {
-        String status = this.getStatus(context,
-                (int) bundle.getDouble(BatteryManager.EXTRA_STATUS));
+    public String summarizeValue(Context context, Bundle bundle)
+    {
+        String status = this.getStatus(context, (int) bundle.getDouble(BatteryManager.EXTRA_STATUS));
 
         int level = (int) bundle.getDouble(BatteryManager.EXTRA_LEVEL);
 
-        return String.format(
-                context.getResources()
-                        .getString(R.string.summary_battery_probe), level,
-                status);
+        return String.format(context.getResources().getString(R.string.summary_battery_probe), level, status);
     }
 
-    private String getStatus(Context context, int statusInt) {
-        switch (statusInt) {
+    private String getStatus(Context context, int statusInt)
+    {
+        switch (statusInt)
+        {
         case BatteryManager.BATTERY_STATUS_CHARGING:
             return context.getString(R.string.label_battery_charging);
         case BatteryManager.BATTERY_STATUS_DISCHARGING:
@@ -356,12 +351,14 @@ public class BatteryProbe extends Probe {
      * return formatted; };
      */
 
-    public String summary(Context context) {
+    public String summary(Context context)
+    {
         return context.getString(R.string.summary_battery_probe_desc);
     }
 
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    {
         PreferenceManager manager = activity.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(activity);
