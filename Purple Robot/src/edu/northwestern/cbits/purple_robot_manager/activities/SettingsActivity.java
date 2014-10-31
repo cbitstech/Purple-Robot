@@ -52,8 +52,9 @@ import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
-public class SettingsActivity extends PreferenceActivity implements
-        OnPreferenceClickListener, OnPreferenceChangeListener {
+public class SettingsActivity extends PreferenceActivity implements OnPreferenceClickListener,
+        OnPreferenceChangeListener
+{
     public static final String PROBES_SCREEN_KEY = "config_probes_screen";
     private static final String MANUAL_REFRESH_KEY = "config_json_refresh_manually";
     private static final String LOG_REFRESH_KEY = "config_log_refresh_manually";
@@ -72,7 +73,8 @@ public class SettingsActivity extends PreferenceActivity implements
     private static final String RUN_TESTS_KEY = "config_run_tests";
 
     @SuppressWarnings("deprecation")
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
         PurpleRobotApplication.fixPreferences(this, true);
@@ -89,11 +91,11 @@ public class SettingsActivity extends PreferenceActivity implements
 
         final SettingsActivity me = this;
 
-        ListPreference haptic = (ListPreference) prefs
-                .findPreference(HAPTIC_PATTERN_KEY);
-        haptic.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
-            public boolean onPreferenceChange(Preference preference,
-                    Object newValue) {
+        ListPreference haptic = (ListPreference) prefs.findPreference(HAPTIC_PATTERN_KEY);
+        haptic.setOnPreferenceChangeListener(new OnPreferenceChangeListener()
+        {
+            public boolean onPreferenceChange(Preference preference, Object newValue)
+            {
                 String pattern = (String) newValue;
 
                 Intent intent = new Intent(ManagerService.HAPTIC_PATTERN_INTENT);
@@ -106,25 +108,20 @@ public class SettingsActivity extends PreferenceActivity implements
             }
         });
 
-        PreferenceScreen probesScreen = ProbeManager
-                .buildPreferenceScreen(this);
+        PreferenceScreen probesScreen = ProbeManager.buildPreferenceScreen(this);
 
-        PreferenceCategory category = (PreferenceCategory) prefs
-                .findPreference("config_settings_probe_category");
+        PreferenceCategory category = (PreferenceCategory) prefs.findPreference("config_settings_probe_category");
         category.addPreference(probesScreen);
 
-        PreferenceScreen triggersScreen = TriggerManager.getInstance(this)
-                .buildPreferenceScreen(this);
+        PreferenceScreen triggersScreen = TriggerManager.getInstance(this).buildPreferenceScreen(this);
 
         PreferenceCategory triggerCategory = (PreferenceCategory) prefs
                 .findPreference("config_settings_trigger_category");
         triggerCategory.addPreference(triggersScreen);
 
-        PreferenceScreen modelsScreen = ModelManager.getInstance(this)
-                .buildPreferenceScreen(this);
+        PreferenceScreen modelsScreen = ModelManager.getInstance(this).buildPreferenceScreen(this);
 
-        PreferenceCategory modelCategory = (PreferenceCategory) prefs
-                .findPreference("config_settings_models_category");
+        PreferenceCategory modelCategory = (PreferenceCategory) prefs.findPreference("config_settings_models_category");
         modelCategory.addPreference(modelsScreen);
 
         Preference archive = prefs.findPreference(ZIP_ARCHIVES_KEY);
@@ -139,12 +136,10 @@ public class SettingsActivity extends PreferenceActivity implements
         Preference test = prefs.findPreference(RUN_TESTS_KEY);
         test.setOnPreferenceClickListener(this);
 
-        CheckBoxPreference update = (CheckBoxPreference) prefs
-                .findPreference(CHECK_UPDATES_KEY);
+        CheckBoxPreference update = (CheckBoxPreference) prefs.findPreference(CHECK_UPDATES_KEY);
         update.setOnPreferenceChangeListener(this);
 
-        ListPreference listUpdate = (ListPreference) prefs
-                .findPreference(RINGTONE_KEY);
+        ListPreference listUpdate = (ListPreference) prefs.findPreference(RINGTONE_KEY);
         listUpdate.setOnPreferenceChangeListener(this);
 
         Preference reset = prefs.findPreference(RESET_KEY);
@@ -153,17 +148,20 @@ public class SettingsActivity extends PreferenceActivity implements
         LogManager.getInstance(me).log("pr_settings_visited", null);
     }
 
-    protected void onDestroy() {
+    protected void onDestroy()
+    {
         super.onDestroy();
 
         LogManager.getInstance(this).log("pr_settings_exited", null);
     }
 
     @SuppressWarnings("deprecation")
-    public boolean onPreferenceClick(Preference preference) {
+    public boolean onPreferenceClick(Preference preference)
+    {
         final SettingsActivity me = this;
 
-        if (HAPTIC_PATTERN_KEY.equals(preference.getKey())) {
+        if (HAPTIC_PATTERN_KEY.equals(preference.getKey()))
+        {
             ListPreference listPref = (ListPreference) preference;
 
             String pattern = listPref.getValue();
@@ -175,11 +173,12 @@ public class SettingsActivity extends PreferenceActivity implements
             this.startService(intent);
 
             return true;
-        } else if (PROBES_SCREEN_KEY.equals(preference.getKey()))
+        }
+        else if (PROBES_SCREEN_KEY.equals(preference.getKey()))
             return true;
-        else if (MANUAL_REFRESH_KEY.equals(preference.getKey())) {
-            SharedPreferences prefs = PreferenceManager
-                    .getDefaultSharedPreferences(this.getApplicationContext());
+        else if (MANUAL_REFRESH_KEY.equals(preference.getKey()))
+        {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
             Editor editor = prefs.edit();
 
             editor.putLong(LegacyJSONConfigFile.JSON_LAST_UPDATE, 0);
@@ -192,52 +191,65 @@ public class SettingsActivity extends PreferenceActivity implements
             TriggerManager.getInstance(this).refreshTriggers(this);
 
             return true;
-        } else if (LOG_REFRESH_KEY.equals(preference.getKey())) {
-            try {
-                PackageInfo info = this.getPackageManager().getPackageInfo(
-                        this.getPackageName(), 0);
+        }
+        else if (LOG_REFRESH_KEY.equals(preference.getKey()))
+        {
+            try
+            {
+                PackageInfo info = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
 
-                Intent refreshIntent = new Intent(info.packageName
-                        + ".UPLOAD_LOGS_INTENT");
+                Intent refreshIntent = new Intent(info.packageName + ".UPLOAD_LOGS_INTENT");
                 refreshIntent.putExtra(LogService.LOG_FORCE_UPLOAD, true);
                 refreshIntent.setClass(me, ManagerService.class);
 
                 this.startService(refreshIntent);
-            } catch (NameNotFoundException e) {
+            }
+            catch (NameNotFoundException e)
+            {
                 LogManager.getInstance(this).logException(e);
             }
 
             return true;
-        } else if (ZIP_ARCHIVES_KEY.equals(preference.getKey())) {
-            HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance
-                    .pluginForClass(this, HttpUploadPlugin.class);
+        }
+        else if (ZIP_ARCHIVES_KEY.equals(preference.getKey()))
+        {
+            HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance.pluginForClass(this,
+                    HttpUploadPlugin.class);
 
-            if (plugin != null) {
+            if (plugin != null)
+            {
                 plugin.mailArchiveFiles(this);
 
                 return true;
             }
-        } else if (DELETE_ARCHIVES_KEY.equals(preference.getKey())) {
-            HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance
-                    .pluginForClass(this, HttpUploadPlugin.class);
+        }
+        else if (DELETE_ARCHIVES_KEY.equals(preference.getKey()))
+        {
+            HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance.pluginForClass(this,
+                    HttpUploadPlugin.class);
 
-            if (plugin != null) {
+            if (plugin != null)
+            {
                 plugin.deleteArchiveFiles(this);
 
                 return true;
             }
-        } else if (RUN_TESTS_KEY.equals(preference.getKey())) {
+        }
+        else if (RUN_TESTS_KEY.equals(preference.getKey()))
+        {
             Intent intent = new Intent(this, TestActivity.class);
             this.startActivity(intent);
-        } else if (DUMP_JSON_KEY.equals(preference.getKey())) {
-            try {
+        }
+        else if (DUMP_JSON_KEY.equals(preference.getKey()))
+        {
+            try
+            {
                 JSONObject root = new JSONObject();
 
                 ApplicationInfo info = this.getApplicationInfo();
                 root.put("name", this.getString(info.labelRes));
 
-                PackageInfo pkgInfo = this.getPackageManager().getPackageInfo(
-                        info.packageName, 0);
+                PackageInfo pkgInfo = this.getPackageManager().getPackageInfo(info.packageName, 0);
 
                 root.put("package_name", pkgInfo.packageName);
                 root.put("version", pkgInfo.versionCode);
@@ -251,14 +263,12 @@ public class SettingsActivity extends PreferenceActivity implements
 
                 FileOutputStream fout = new FileOutputStream(configJsonFile);
 
-                fout.write(root.toString(2).getBytes(
-                        Charset.defaultCharset().name()));
+                fout.write(root.toString(2).getBytes(Charset.defaultCharset().name()));
 
                 fout.flush();
                 fout.close();
 
-                Intent emailIntent = new Intent(
-                        android.content.Intent.ACTION_SEND);
+                Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
                 emailIntent.putExtra(android.content.Intent.EXTRA_TEXT,
                         this.getString(R.string.message_mail_app_schema));
                 emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
@@ -268,84 +278,91 @@ public class SettingsActivity extends PreferenceActivity implements
                 Uri uri = Uri.fromFile(configJsonFile);
                 emailIntent.putExtra(Intent.EXTRA_STREAM, uri);
                 this.startActivity(emailIntent);
-            } catch (JSONException e) {
-                LogManager.getInstance(this).logException(e);
-            } catch (NameNotFoundException e) {
-                LogManager.getInstance(this).logException(e);
-            } catch (FileNotFoundException e) {
-                LogManager.getInstance(this).logException(e);
-            } catch (IOException e) {
+            }
+            catch (JSONException e)
+            {
                 LogManager.getInstance(this).logException(e);
             }
-        } else if (RESET_KEY.equals(preference.getKey())) {
+            catch (NameNotFoundException e)
+            {
+                LogManager.getInstance(this).logException(e);
+            }
+            catch (FileNotFoundException e)
+            {
+                LogManager.getInstance(this).logException(e);
+            }
+            catch (IOException e)
+            {
+                LogManager.getInstance(this).logException(e);
+            }
+        }
+        else if (RESET_KEY.equals(preference.getKey()))
+        {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
             builder = builder.setTitle(R.string.title_clear_configuration);
             builder = builder.setMessage(R.string.message_clear_configuration);
 
-            builder = builder.setPositiveButton(R.string.button_clear_yes,
-                    new OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            SharedPreferences prefs = PreferenceManager
-                                    .getDefaultSharedPreferences(me);
-                            Editor e = prefs.edit();
+            builder = builder.setPositiveButton(R.string.button_clear_yes, new OnClickListener()
+            {
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(me);
+                    Editor e = prefs.edit();
 
-                            Map<String, ?> prefMap = prefs.getAll();
+                    Map<String, ?> prefMap = prefs.getAll();
 
-                            for (String key : prefMap.keySet()) {
-                                e.remove(key);
-                            }
+                    for (String key : prefMap.keySet())
+                    {
+                        e.remove(key);
+                    }
 
-                            e.commit();
+                    e.commit();
 
-                            Intent intent = new Intent(
-                                    PersistentService.NUDGE_PROBES);
-                            intent.setClass(me, PersistentService.class);
+                    Intent intent = new Intent(PersistentService.NUDGE_PROBES);
+                    intent.setClass(me, PersistentService.class);
 
-                            me.startService(intent);
+                    me.startService(intent);
 
-                            TriggerManager.getInstance(me).removeAllTriggers();
-                            TriggerManager.getInstance(me).refreshTriggers(me);
-                            HttpUploadPlugin.clearFiles(me);
+                    TriggerManager.getInstance(me).removeAllTriggers();
+                    TriggerManager.getInstance(me).refreshTriggers(me);
+                    HttpUploadPlugin.clearFiles(me);
 
-                            String where = "_id != -1";
+                    String where = "_id != -1";
 
-                            me.getContentResolver().delete(
-                                    RobotContentProvider.RECENT_PROBE_VALUES,
-                                    where, null);
-                            me.getContentResolver()
-                                    .delete(RobotContentProvider.SNAPSHOTS,
-                                            where, null);
-                            me.getContentResolver().delete(
-                                    DistancesProvider.CONTENT_URI, where, null);
+                    me.getContentResolver().delete(RobotContentProvider.RECENT_PROBE_VALUES, where, null);
+                    me.getContentResolver().delete(RobotContentProvider.SNAPSHOTS, where, null);
+                    me.getContentResolver().delete(DistancesProvider.CONTENT_URI, where, null);
 
-                            ProbeValuesProvider.getProvider(me).clear(me);
+                    ProbeValuesProvider.getProvider(me).clear(me);
 
-                            android.os.Process.killProcess(android.os.Process
-                                    .myPid());
-                        }
-                    });
+                    android.os.Process.killProcess(android.os.Process.myPid());
+                }
+            });
 
-            builder = builder.setNegativeButton(R.string.button_clear_no,
-                    new OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            // TODO Auto-generated method stub
+            builder = builder.setNegativeButton(R.string.button_clear_no, new OnClickListener()
+            {
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    // TODO Auto-generated method stub
 
-                        }
-                    });
+                }
+            });
 
             builder.create().show();
-        } else if (PROBES_DISABLE_EACH_KEY.equals(preference.getKey())) {
+        }
+        else if (PROBES_DISABLE_EACH_KEY.equals(preference.getKey()))
+        {
             ProbeManager.disableEachProbe(this);
 
-            Toast.makeText(this, R.string.message_disable_each_probe,
-                    Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.message_disable_each_probe, Toast.LENGTH_LONG).show();
         }
 
         return false;
     }
 
-    private JSONObject dumpJson(Preference preference) throws JSONException {
+    private JSONObject dumpJson(Preference preference) throws JSONException
+    {
         JSONObject prefJson = new JSONObject();
 
         if (preference.getKey() != null)
@@ -357,10 +374,12 @@ public class SettingsActivity extends PreferenceActivity implements
         if (preference.getSummary() != null)
             prefJson.put("summary", preference.getSummary());
 
-        if (preference instanceof PreferenceGroup) {
+        if (preference instanceof PreferenceGroup)
+        {
             if ("config_settings_trigger_category".equals(preference.getKey()))
                 return null;
-            else {
+            else
+            {
                 PreferenceGroup group = (PreferenceGroup) preference;
 
                 if (group.getPreferenceCount() == 0)
@@ -370,7 +389,8 @@ public class SettingsActivity extends PreferenceActivity implements
 
                 JSONArray children = new JSONArray();
 
-                for (int i = 0; i < group.getPreferenceCount(); i++) {
+                for (int i = 0; i < group.getPreferenceCount(); i++)
+                {
                     JSONObject child = this.dumpJson(group.getPreference(i));
 
                     if (child != null)
@@ -379,11 +399,13 @@ public class SettingsActivity extends PreferenceActivity implements
 
                 prefJson.put("children", children);
             }
-        } else if (preference instanceof CheckBoxPreference)
+        }
+        else if (preference instanceof CheckBoxPreference)
             prefJson.put("type", "boolean");
         else if (preference instanceof EditTextPreference)
             prefJson.put("type", "string");
-        else if (preference instanceof ListPreference) {
+        else if (preference instanceof ListPreference)
+        {
             ListPreference list = (ListPreference) preference;
             prefJson.put("type", "list");
 
@@ -400,21 +422,24 @@ public class SettingsActivity extends PreferenceActivity implements
                 values.put(cs);
 
             prefJson.put("values", values);
-        } else
+        }
+        else
             prefJson = null;
 
         return prefJson;
     }
 
-    public boolean onPreferenceChange(Preference pref, Object value) {
-        if (CHECK_UPDATES_KEY.equals(pref.getKey())) {
-            Toast.makeText(this, R.string.message_update_check,
-                    Toast.LENGTH_LONG).show();
+    public boolean onPreferenceChange(Preference pref, Object value)
+    {
+        if (CHECK_UPDATES_KEY.equals(pref.getKey()))
+        {
+            Toast.makeText(this, R.string.message_update_check, Toast.LENGTH_LONG).show();
 
             return true;
-        } else if (RINGTONE_KEY.equals(pref.getKey())) {
-            String name = ManagerService.soundNameForPath(this,
-                    value.toString());
+        }
+        else if (RINGTONE_KEY.equals(pref.getKey()))
+        {
+            String name = ManagerService.soundNameForPath(this, value.toString());
 
             Intent playIntent = new Intent(ManagerService.RINGTONE_INTENT);
 
@@ -426,9 +451,10 @@ public class SettingsActivity extends PreferenceActivity implements
             this.startService(playIntent);
 
             return true;
-        } else if (LogManager.ENABLED.equals(pref.getKey())) {
-            LogManager.getInstance(this).setEnabled(
-                    ((Boolean) value).booleanValue());
+        }
+        else if (LogManager.ENABLED.equals(pref.getKey()))
+        {
+            LogManager.getInstance(this).setEnabled(((Boolean) value).booleanValue());
 
             return true;
         }

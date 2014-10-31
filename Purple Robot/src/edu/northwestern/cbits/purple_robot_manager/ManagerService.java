@@ -33,7 +33,8 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ActivityDetect
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
-public class ManagerService extends IntentService {
+public class ManagerService extends IntentService
+{
     public static String RUN_SCRIPT_INTENT = "purple_robot_manager_run_script";
     public static String RUN_SCRIPT = "run_script";
 
@@ -74,141 +75,160 @@ public class ManagerService extends IntentService {
     private static boolean _looping = false;
     protected static MediaPlayer _player = null;
 
-    public ManagerService() {
+    public ManagerService()
+    {
         super("ManagerService");
     }
 
-    public ManagerService(String name) {
+    public ManagerService(String name)
+    {
         super(name);
     }
 
     @SuppressWarnings("deprecation")
-    protected void onHandleIntent(final Intent intent) {
+    protected void onHandleIntent(final Intent intent)
+    {
         String action = intent.getAction();
 
         final ManagerService me = this;
 
         if (GOOGLE_PLAY_ACTIVITY_DETECTED.equalsIgnoreCase(action))
             ActivityDetectionProbe.activityDetected(this, intent);
-        else if (REFRESH_ERROR_STATE_INTENT.equalsIgnoreCase(action)) {
-            Runnable r = new Runnable() {
-                public void run() {
+        else if (REFRESH_ERROR_STATE_INTENT.equalsIgnoreCase(action))
+        {
+            Runnable r = new Runnable()
+            {
+                public void run()
+                {
                     SanityManager.getInstance(me).refreshState();
                 }
             };
 
             Thread t = new Thread(r);
             t.start();
-        } else if (UPDATE_WIDGETS.equalsIgnoreCase(action)) {
-            Intent broadcast = new Intent(
-                    "edu.northwestern.cbits.purple.UPDATE_WIDGET");
+        }
+        else if (UPDATE_WIDGETS.equalsIgnoreCase(action))
+        {
+            Intent broadcast = new Intent("edu.northwestern.cbits.purple.UPDATE_WIDGET");
             broadcast.putExtras(intent.getExtras());
 
             this.startService(broadcast);
-        } else if (HAPTIC_PATTERN_INTENT.equalsIgnoreCase(action)) {
+        }
+        else if (HAPTIC_PATTERN_INTENT.equalsIgnoreCase(action))
+        {
             String pattern = intent.getStringExtra(HAPTIC_PATTERN_NAME);
 
             if (!pattern.startsWith("vibrator_"))
                 pattern = "vibrator_" + pattern;
 
-            int[] patternSpec = this.getResources().getIntArray(
-                    R.array.vibrator_buzz);
+            int[] patternSpec = this.getResources().getIntArray(R.array.vibrator_buzz);
 
             if ("vibrator_blip".equalsIgnoreCase(pattern))
-                patternSpec = this.getResources().getIntArray(
-                        R.array.vibrator_blip);
+                patternSpec = this.getResources().getIntArray(R.array.vibrator_blip);
             if ("vibrator_sos".equalsIgnoreCase(pattern))
-                patternSpec = this.getResources().getIntArray(
-                        R.array.vibrator_sos);
+                patternSpec = this.getResources().getIntArray(R.array.vibrator_sos);
 
             long[] longSpec = new long[patternSpec.length];
 
-            for (int i = 0; i < patternSpec.length; i++) {
+            for (int i = 0; i < patternSpec.length; i++)
+            {
                 longSpec[i] = (long) patternSpec[i];
             }
 
             // TODO: Implement looping...
 
-            Vibrator v = (Vibrator) this
-                    .getSystemService(Context.VIBRATOR_SERVICE);
+            Vibrator v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
             v.cancel();
             v.vibrate(longSpec, -1);
-        } else if (RINGTONE_STOP_INTENT.equalsIgnoreCase(action)) {
+        }
+        else if (RINGTONE_STOP_INTENT.equalsIgnoreCase(action))
+        {
             ManagerService._looping = false;
 
             if (ManagerService._player != null)
                 ManagerService._player.stop();
 
             ManagerService._player = null;
-        } else if (RINGTONE_INTENT.equalsIgnoreCase(action)) {
-            SharedPreferences prefs = PreferenceManager
-                    .getDefaultSharedPreferences(this);
+        }
+        else if (RINGTONE_INTENT.equalsIgnoreCase(action))
+        {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-            Uri toneUri = RingtoneManager
-                    .getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            Uri toneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-            String toneString = prefs.getString(SettingsActivity.RINGTONE_KEY,
-                    null);
+            String toneString = prefs.getString(SettingsActivity.RINGTONE_KEY, null);
 
             String name = null;
 
             if (intent.hasExtra(ManagerService.RINGTONE_NAME))
                 name = intent.getStringExtra(ManagerService.RINGTONE_NAME);
 
-            try {
-                if (toneString != null) {
+            try
+            {
+                if (toneString != null)
+                {
                     if (toneString.equals("0"))
-                        toneUri = RingtoneManager.getActualDefaultRingtoneUri(
-                                this, RingtoneManager.TYPE_NOTIFICATION);
+                        toneUri = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_NOTIFICATION);
                     else if (toneString.startsWith("sounds/") == false)
                         toneUri = Uri.parse(toneString);
                     else
                         toneUri = null;
-                } else {
-                    if (name != null) {
+                }
+                else
+                {
+                    if (name != null)
+                    {
                         RingtoneManager rm = new RingtoneManager(this);
                         rm.setType(RingtoneManager.TYPE_NOTIFICATION);
 
                         Cursor cursor = rm.getCursor();
 
-                        do {
-                            String title = cursor
-                                    .getString(RingtoneManager.TITLE_COLUMN_INDEX);
+                        do
+                        {
+                            String title = cursor.getString(RingtoneManager.TITLE_COLUMN_INDEX);
 
                             if (name.equalsIgnoreCase(title))
-                                toneUri = rm.getRingtoneUri(cursor
-                                        .getPosition());
-                        } while (cursor.moveToNext());
+                                toneUri = rm.getRingtoneUri(cursor.getPosition());
+                        }
+                        while (cursor.moveToNext());
 
                         cursor.deactivate();
                     }
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 LogManager.getInstance(this).logException(e);
             }
 
-            if (toneUri != null) {
-                final Ringtone r = RingtoneManager.getRingtone(
-                        getApplicationContext(), toneUri);
+            if (toneUri != null)
+            {
+                final Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), toneUri);
 
-                ManagerService._looping = intent.getBooleanExtra(
-                        ManagerService.RINGTONE_LOOPS, false);
+                ManagerService._looping = intent.getBooleanExtra(ManagerService.RINGTONE_LOOPS, false);
 
-                if (r != null) {
-                    Thread t = new Thread(new Runnable() {
-                        public void run() {
+                if (r != null)
+                {
+                    Thread t = new Thread(new Runnable()
+                    {
+                        public void run()
+                        {
                             r.play();
 
-                            try {
+                            try
+                            {
                                 while (r.isPlaying())
                                     Thread.sleep(100);
 
-                                if (ManagerService._looping) {
+                                if (ManagerService._looping)
+                                {
                                     Thread t = new Thread(this);
 
                                     t.start();
                                 }
-                            } catch (InterruptedException e) {
+                            }
+                            catch (InterruptedException e)
+                            {
                                 LogManager.getInstance(me).logException(e);
                             }
                         }
@@ -216,40 +236,49 @@ public class ManagerService extends IntentService {
 
                     t.start();
                 }
-            } else {
-                try {
+            }
+            else
+            {
+                try
+                {
                     final AssetFileDescriptor afd = this.getAssets().openFd(
                             ManagerService.pathForSound(this, toneString));
 
-                    Runnable r = new Runnable() {
-                        public void run() {
+                    Runnable r = new Runnable()
+                    {
+                        public void run()
+                        {
                             ManagerService._player = new MediaPlayer();
 
-                            try {
-                                ManagerService._player.setDataSource(
-                                        afd.getFileDescriptor(),
-                                        afd.getStartOffset(), afd.getLength());
-                                ManagerService._player.setLooping(intent
-                                        .getBooleanExtra(
-                                                ManagerService.RINGTONE_LOOPS,
-                                                false));
+                            try
+                            {
+                                ManagerService._player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(),
+                                        afd.getLength());
+                                ManagerService._player.setLooping(intent.getBooleanExtra(ManagerService.RINGTONE_LOOPS,
+                                        false));
 
                                 ManagerService._player.prepare();
 
-                                ManagerService._player
-                                        .setOnCompletionListener(new OnCompletionListener() {
-                                            public void onCompletion(
-                                                    MediaPlayer player) {
-                                                ManagerService._player = null;
-                                            }
-                                        });
+                                ManagerService._player.setOnCompletionListener(new OnCompletionListener()
+                                {
+                                    public void onCompletion(MediaPlayer player)
+                                    {
+                                        ManagerService._player = null;
+                                    }
+                                });
 
                                 ManagerService._player.start();
-                            } catch (IllegalArgumentException e) {
+                            }
+                            catch (IllegalArgumentException e)
+                            {
                                 LogManager.getInstance(me).logException(e);
-                            } catch (IllegalStateException e) {
+                            }
+                            catch (IllegalStateException e)
+                            {
                                 LogManager.getInstance(me).logException(e);
-                            } catch (IOException e) {
+                            }
+                            catch (IOException e)
+                            {
                                 LogManager.getInstance(me).logException(e);
                             }
                         }
@@ -257,37 +286,44 @@ public class ManagerService extends IntentService {
 
                     Thread t = new Thread(r);
                     t.start();
-                } catch (IOException e) {
+                }
+                catch (IOException e)
+                {
                     LogManager.getInstance(this).logException(e);
                 }
             }
-        } else if (APPLICATION_LAUNCH_INTENT.equalsIgnoreCase(action)) {
-            if (intent.hasExtra(APPLICATION_LAUNCH_INTENT_PACKAGE)) {
-                String packageName = intent
-                        .getStringExtra(APPLICATION_LAUNCH_INTENT_PACKAGE);
+        }
+        else if (APPLICATION_LAUNCH_INTENT.equalsIgnoreCase(action))
+        {
+            if (intent.hasExtra(APPLICATION_LAUNCH_INTENT_PACKAGE))
+            {
+                String packageName = intent.getStringExtra(APPLICATION_LAUNCH_INTENT_PACKAGE);
 
-                if (packageName != null) {
-                    Intent launchIntent = this.getPackageManager()
-                            .getLaunchIntentForPackage(packageName);
+                if (packageName != null)
+                {
+                    Intent launchIntent = this.getPackageManager().getLaunchIntentForPackage(packageName);
 
-                    if (launchIntent != null) {
-                        String launchParams = intent
-                                .getStringExtra(APPLICATION_LAUNCH_INTENT_PARAMETERS);
+                    if (launchIntent != null)
+                    {
+                        String launchParams = intent.getStringExtra(APPLICATION_LAUNCH_INTENT_PARAMETERS);
 
-                        if (launchParams != null) {
-                            try {
-                                JSONObject paramsObj = new JSONObject(
-                                        launchParams);
+                        if (launchParams != null)
+                        {
+                            try
+                            {
+                                JSONObject paramsObj = new JSONObject(launchParams);
 
                                 Iterator<String> keys = paramsObj.keys();
 
-                                while (keys.hasNext()) {
+                                while (keys.hasNext())
+                                {
                                     String key = keys.next();
 
-                                    launchIntent.putExtra(key,
-                                            paramsObj.getString(key));
+                                    launchIntent.putExtra(key, paramsObj.getString(key));
                                 }
-                            } catch (JSONException e) {
+                            }
+                            catch (JSONException e)
+                            {
                                 LogManager.getInstance(this).logException(e);
                             }
                         }
@@ -295,46 +331,54 @@ public class ManagerService extends IntentService {
                         this.startActivity(launchIntent);
                     }
 
-                    String script = intent
-                            .getStringExtra(APPLICATION_LAUNCH_INTENT_POSTSCRIPT);
-
-                    if (script != null)
-                        BaseScriptEngine.runScript(this, script);
-                }
-            } else if (intent.hasExtra(APPLICATION_LAUNCH_INTENT_URL)) {
-                String url = intent
-                        .getStringExtra(APPLICATION_LAUNCH_INTENT_URL);
-
-                if (url != null) {
-                    Intent launchIntent = new Intent(Intent.ACTION_VIEW,
-                            Uri.parse(url));
-                    launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                    this.startActivity(launchIntent);
-
-                    String script = intent
-                            .getStringExtra(APPLICATION_LAUNCH_INTENT_POSTSCRIPT);
+                    String script = intent.getStringExtra(APPLICATION_LAUNCH_INTENT_POSTSCRIPT);
 
                     if (script != null)
                         BaseScriptEngine.runScript(this, script);
                 }
             }
-        } else if (RUN_SCRIPT_INTENT.equalsIgnoreCase(action)) {
-            if (intent.hasExtra(RUN_SCRIPT)) {
+            else if (intent.hasExtra(APPLICATION_LAUNCH_INTENT_URL))
+            {
+                String url = intent.getStringExtra(APPLICATION_LAUNCH_INTENT_URL);
+
+                if (url != null)
+                {
+                    Intent launchIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                    this.startActivity(launchIntent);
+
+                    String script = intent.getStringExtra(APPLICATION_LAUNCH_INTENT_POSTSCRIPT);
+
+                    if (script != null)
+                        BaseScriptEngine.runScript(this, script);
+                }
+            }
+        }
+        else if (RUN_SCRIPT_INTENT.equalsIgnoreCase(action))
+        {
+            if (intent.hasExtra(RUN_SCRIPT))
+            {
                 String script = intent.getStringExtra(RUN_SCRIPT);
 
                 if (script != null)
                     BaseScriptEngine.runScript(this, script);
             }
-        } else if (FIRE_TRIGGERS_INTENT.equals(action)) {
+        }
+        else if (FIRE_TRIGGERS_INTENT.equals(action))
+        {
             TriggerManager.getInstance(this).nudgeTriggers(this);
 
-            this.startService(new Intent(
-                    ManagerService.UPDATE_TRIGGER_SCHEDULE_INTENT));
-        } else if (UPDATE_TRIGGER_SCHEDULE_INTENT.equals(action)) {
-            Runnable r = new Runnable() {
-                public void run() {
-                    if (ManagerService._updatingTriggerSchedule) {
+            this.startService(new Intent(ManagerService.UPDATE_TRIGGER_SCHEDULE_INTENT));
+        }
+        else if (UPDATE_TRIGGER_SCHEDULE_INTENT.equals(action))
+        {
+            Runnable r = new Runnable()
+            {
+                public void run()
+                {
+                    if (ManagerService._updatingTriggerSchedule)
+                    {
                         ManagerService._needsTriggerUpdate = true;
 
                         return;
@@ -343,38 +387,29 @@ public class ManagerService extends IntentService {
                     ManagerService._updatingTriggerSchedule = true;
                     ManagerService._needsTriggerUpdate = false;
 
-                    List<Long> times = TriggerManager.getInstance(me)
-                            .upcomingFireTimes(me);
+                    List<Long> times = TriggerManager.getInstance(me).upcomingFireTimes(me);
 
                     long now = System.currentTimeMillis();
 
-                    for (int index = 0; now > ManagerService._lastTriggerNudge
-                            && index < times.size(); index++) {
+                    for (int index = 0; now > ManagerService._lastTriggerNudge && index < times.size(); index++)
+                    {
                         Long fire = times.get(index);
 
-                        if (Math.abs(ManagerService._lastTriggerNudge
-                                - fire.longValue()) >= 60000) {
-                            AlarmManager alarmManager = (AlarmManager) me
-                                    .getSystemService(Context.ALARM_SERVICE);
+                        if (Math.abs(ManagerService._lastTriggerNudge - fire.longValue()) >= 60000)
+                        {
+                            AlarmManager alarmManager = (AlarmManager) me.getSystemService(Context.ALARM_SERVICE);
 
-                            PendingIntent pi = PendingIntent
-                                    .getService(
-                                            me,
-                                            0,
-                                            new Intent(
-                                                    ManagerService.FIRE_TRIGGERS_INTENT),
-                                            PendingIntent.FLAG_UPDATE_CURRENT);
+                            PendingIntent pi = PendingIntent.getService(me, 0, new Intent(
+                                    ManagerService.FIRE_TRIGGERS_INTENT), PendingIntent.FLAG_UPDATE_CURRENT);
 
                             alarmManager.cancel(pi);
 
                             ManagerService._lastTriggerNudge = fire.longValue();
 
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-                                alarmManager.setExact(AlarmManager.RTC_WAKEUP,
-                                        fire.longValue(), pi);
+                                alarmManager.setExact(AlarmManager.RTC_WAKEUP, fire.longValue(), pi);
                             else
-                                alarmManager.set(AlarmManager.RTC_WAKEUP,
-                                        fire.longValue(), pi);
+                                alarmManager.set(AlarmManager.RTC_WAKEUP, fire.longValue(), pi);
 
                             break;
                         }
@@ -389,41 +424,37 @@ public class ManagerService extends IntentService {
 
             Thread t = new Thread(r);
             t.start();
-        } else if (REFRESH_CONFIGURATION.equals(action))
+        }
+        else if (REFRESH_CONFIGURATION.equals(action))
             LegacyJSONConfigFile.update(this, false);
     }
 
-    public static void setupPeriodicCheck(final Context context) {
+    public static void setupPeriodicCheck(final Context context)
+    {
         if (ManagerService._checkSetup)
             return;
 
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(context);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         Editor editor = prefs.edit();
         editor.putString(LegacyJSONConfigFile.JSON_LAST_HASH, "");
         editor.commit();
 
-        AlarmManager alarmManager = (AlarmManager) context
-                .getSystemService(Context.ALARM_SERVICE);
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-        PendingIntent pi = PendingIntent.getService(context, 0, new Intent(
-                ManagerService.REFRESH_CONFIGURATION),
+        PendingIntent pi = PendingIntent.getService(context, 0, new Intent(ManagerService.REFRESH_CONFIGURATION),
                 PendingIntent.FLAG_UPDATE_CURRENT);
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,
-                System.currentTimeMillis(), 60000, pi);
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60000, pi);
 
-        pi = PendingIntent.getService(context, 0, new Intent(
-                ManagerService.UPDATE_TRIGGER_SCHEDULE_INTENT),
+        pi = PendingIntent.getService(context, 0, new Intent(ManagerService.UPDATE_TRIGGER_SCHEDULE_INTENT),
                 PendingIntent.FLAG_UPDATE_CURRENT);
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,
-                System.currentTimeMillis(), (15 * 60 * 1000), pi);
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), (15 * 60 * 1000), pi);
 
-        prefs.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
-            public void onSharedPreferenceChanged(SharedPreferences prefs,
-                    String key) {
-                Intent reloadIntent = new Intent(
-                        ManagerService.REFRESH_CONFIGURATION);
+        prefs.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener()
+        {
+            public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
+            {
+                Intent reloadIntent = new Intent(ManagerService.REFRESH_CONFIGURATION);
                 reloadIntent.setClass(context, ManagerService.class);
 
                 context.startService(reloadIntent);
@@ -440,37 +471,36 @@ public class ManagerService extends IntentService {
         ManagerService._checkSetup = true;
     }
 
-    public static String soundNameForPath(Context context, String path) {
-        String[] values = context.getResources().getStringArray(
-                R.array.sound_effect_values);
-        String[] labels = context.getResources().getStringArray(
-                R.array.sound_effect_labels);
+    public static String soundNameForPath(Context context, String path)
+    {
+        String[] values = context.getResources().getStringArray(R.array.sound_effect_values);
+        String[] labels = context.getResources().getStringArray(R.array.sound_effect_labels);
 
-        for (int i = 0; i < labels.length && i < values.length; i++) {
-            if (values[i].toLowerCase(Locale.ENGLISH).equals(
-                    path.toLowerCase(Locale.getDefault())))
+        for (int i = 0; i < labels.length && i < values.length; i++)
+        {
+            if (values[i].toLowerCase(Locale.ENGLISH).equals(path.toLowerCase(Locale.getDefault())))
                 return labels[i];
         }
 
         return path;
     }
 
-    private static String pathForSound(Context context, String name) {
-        String[] values = context.getResources().getStringArray(
-                R.array.sound_effect_values);
-        String[] labels = context.getResources().getStringArray(
-                R.array.sound_effect_labels);
+    private static String pathForSound(Context context, String name)
+    {
+        String[] values = context.getResources().getStringArray(R.array.sound_effect_values);
+        String[] labels = context.getResources().getStringArray(R.array.sound_effect_labels);
 
-        for (int i = 0; i < labels.length && i < values.length; i++) {
-            if (labels[i].toLowerCase(Locale.getDefault()).equals(
-                    name.toLowerCase(Locale.getDefault())))
+        for (int i = 0; i < labels.length && i < values.length; i++)
+        {
+            if (labels[i].toLowerCase(Locale.getDefault()).equals(name.toLowerCase(Locale.getDefault())))
                 return values[i];
         }
 
         return name;
     }
 
-    public static void resetTriggerNudgeDate() {
+    public static void resetTriggerNudgeDate()
+    {
         ManagerService._lastTriggerNudge = 0;
     }
 }

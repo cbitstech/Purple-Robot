@@ -17,8 +17,10 @@ import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
 
 @SuppressLint("SimpleDateFormat")
-public class LocationProbeActivity extends ActionBarActivity {
-    protected void onCreate(Bundle savedInstanceState) {
+public class LocationProbeActivity extends ActionBarActivity
+{
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
         this.setContentView(R.layout.layout_location_activity);
@@ -30,12 +32,12 @@ public class LocationProbeActivity extends ActionBarActivity {
         long minTime = Long.MAX_VALUE;
         long maxTime = Long.MIN_VALUE;
 
-        Cursor cursor = ProbeValuesProvider.getProvider(this).retrieveValues(
-                this, LocationProbe.DB_TABLE, LocationProbe.databaseSchema());
+        Cursor cursor = ProbeValuesProvider.getProvider(this).retrieveValues(this, LocationProbe.DB_TABLE,
+                LocationProbe.databaseSchema());
 
-        while (cursor.moveToNext()) {
-            long time = ((long) cursor.getDouble(cursor
-                    .getColumnIndex(ProbeValuesProvider.TIMESTAMP))) * 1000;
+        while (cursor.moveToNext())
+        {
+            long time = ((long) cursor.getDouble(cursor.getColumnIndex(ProbeValuesProvider.TIMESTAMP))) * 1000;
 
             if (time < minTime)
                 minTime = time;
@@ -50,15 +52,15 @@ public class LocationProbeActivity extends ActionBarActivity {
         String subtitle = startDate + " (" + cursor.getCount() + ")";
 
         if (!startDate.equals(endDate))
-            subtitle = startDate + " - " + endDate + " (" + cursor.getCount()
-                    + ")";
+            subtitle = startDate + " - " + endDate + " (" + cursor.getCount() + ")";
 
         this.getSupportActionBar().setSubtitle(subtitle);
 
         cursor.close();
     }
 
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
         MenuInflater inflater = this.getMenuInflater();
         inflater.inflate(R.menu.menu_probe_activity, menu);
 
@@ -71,16 +73,16 @@ public class LocationProbeActivity extends ActionBarActivity {
         return true;
     }
 
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
         final int itemId = item.getItemId();
 
-        if (itemId == R.id.menu_data_item) {
+        if (itemId == R.id.menu_data_item)
+        {
             Intent dataIntent = new Intent(this, ProbeViewerActivity.class);
 
-            dataIntent.putExtra("probe_name",
-                    this.getIntent().getStringExtra("probe_name"));
-            dataIntent.putExtra("probe_bundle", this.getIntent()
-                    .getParcelableExtra("probe_bundle"));
+            dataIntent.putExtra("probe_name", this.getIntent().getStringExtra("probe_name"));
+            dataIntent.putExtra("probe_bundle", this.getIntent().getParcelableExtra("probe_bundle"));
 
             this.startActivity(dataIntent);
         }

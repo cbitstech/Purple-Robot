@@ -59,7 +59,8 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
  * within this class file.
  */
 
-public class SampleProbe extends Probe {
+public class SampleProbe extends Probe
+{
     public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.sample.SampleProbe";
 
     private static final boolean DEFAULT_ENABLED = false;
@@ -78,7 +79,8 @@ public class SampleProbe extends Probe {
      * be unavailable.
      */
     @Override
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return SampleProbe.NAME;
     }
 
@@ -88,7 +90,8 @@ public class SampleProbe extends Probe {
      * mechanism.
      */
     @Override
-    public String title(Context context) {
+    public String title(Context context)
+    {
         return context.getString(R.string.title_sample_probe);
     }
 
@@ -98,7 +101,8 @@ public class SampleProbe extends Probe {
      * translations.
      */
     @Override
-    public String probeCategory(Context context) {
+    public String probeCategory(Context context)
+    {
         return context.getString(R.string.probe_misc_category);
     }
 
@@ -112,7 +116,8 @@ public class SampleProbe extends Probe {
      */
     @SuppressWarnings("deprecation")
     @Override
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    {
         PreferenceManager manager = activity.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(activity);
@@ -146,7 +151,8 @@ public class SampleProbe extends Probe {
      * it does.
      */
     @Override
-    public String summary(Context context) {
+    public String summary(Context context)
+    {
         return context.getString(R.string.summary_sample_probe_desc);
     }
 
@@ -155,9 +161,9 @@ public class SampleProbe extends Probe {
      * probe.
      */
     @Override
-    public void enable(Context context) {
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(context);
+    public void enable(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         Editor e = prefs.edit();
         e.putBoolean(SampleProbe.ENABLE, true);
@@ -169,9 +175,9 @@ public class SampleProbe extends Probe {
      * probe.
      */
     @Override
-    public void disable(Context context) {
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(context);
+    public void disable(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         Editor e = prefs.edit();
         e.putBoolean(SampleProbe.ENABLE, false);
@@ -191,11 +197,13 @@ public class SampleProbe extends Probe {
      * regularly-recorded audio samples.
      */
 
-    public boolean isEnabled(final Context context) {
+    public boolean isEnabled(final Context context)
+    {
         // First, check if probes are enabled across the app
         // (Settings->Probes->Enable Probes)
 
-        if (super.isEnabled(context)) {
+        if (super.isEnabled(context))
+        {
             // Probes are enabled system-wide, continue...
 
             // Fetch the SharedPreferences object of obtaining configuration
@@ -203,8 +211,8 @@ public class SampleProbe extends Probe {
 
             SharedPreferences prefs = Probe.getPreferences(context);
 
-            if (prefs.getBoolean(SampleProbe.ENABLE,
-                    SampleProbe.DEFAULT_ENABLED) == false) {
+            if (prefs.getBoolean(SampleProbe.ENABLE, SampleProbe.DEFAULT_ENABLED) == false)
+            {
                 // We're not enabled. Bailing out.
 
                 return false;
@@ -214,11 +222,11 @@ public class SampleProbe extends Probe {
             // has elapsed
             // since the last check...
 
-            long freq = Long.parseLong(prefs.getString(SampleProbe.FREQUENCY,
-                    Probe.DEFAULT_FREQUENCY));
+            long freq = Long.parseLong(prefs.getString(SampleProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
             long now = System.currentTimeMillis();
 
-            if (now - this._lastCheck < freq) {
+            if (now - this._lastCheck < freq)
+            {
                 // Not enough time has passed. Bailing out...
 
                 return true;
@@ -228,7 +236,8 @@ public class SampleProbe extends Probe {
 
             // If we're not recording, go ahead and get started...
 
-            if (this._recording == false) {
+            if (this._recording == false)
+            {
                 this._recording = true;
 
                 // Since we are going to collect and analyze data in separate
@@ -243,15 +252,16 @@ public class SampleProbe extends Probe {
 
                 // Define what the probe should do in its own thread...
 
-                Runnable r = new Runnable() {
+                Runnable r = new Runnable()
+                {
                     @SuppressWarnings("deprecation")
-                    public void run() {
+                    public void run()
+                    {
                         // Determine the size of the smallest buffer the probe
                         // will need
                         // to collect and store audio samples.
 
-                        int bufferSize = AudioRecord.getMinBufferSize(44100,
-                                AudioFormat.CHANNEL_CONFIGURATION_MONO,
+                        int bufferSize = AudioRecord.getMinBufferSize(44100, AudioFormat.CHANNEL_CONFIGURATION_MONO,
                                 AudioFormat.ENCODING_PCM_16BIT);
 
                         // Find the highest sample rate the device supports and
@@ -260,14 +270,15 @@ public class SampleProbe extends Probe {
 
                         AudioRecord recorder = null;
 
-                        int[] rates = new int[] { 44100, 22050, 11025, 8000 };
+                        int[] rates = new int[]
+                        { 44100, 22050, 11025, 8000 };
 
-                        for (int rate : rates) {
-                            if (recorder == null) {
-                                AudioRecord newRecorder = new AudioRecord(
-                                        MediaRecorder.AudioSource.MIC, rate,
-                                        AudioFormat.CHANNEL_CONFIGURATION_MONO,
-                                        AudioFormat.ENCODING_PCM_16BIT,
+                        for (int rate : rates)
+                        {
+                            if (recorder == null)
+                            {
+                                AudioRecord newRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC, rate,
+                                        AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT,
                                         bufferSize);
 
                                 if (newRecorder.getState() == AudioRecord.STATE_INITIALIZED)
@@ -281,7 +292,8 @@ public class SampleProbe extends Probe {
                         // AudioRecorder
                         // instance...
 
-                        if (recorder != null) {
+                        if (recorder != null)
+                        {
                             // Create a buffer for samples and start recording.
                             // Note that the recording duration
                             // is a function of the sample rate and master
@@ -308,17 +320,16 @@ public class SampleProbe extends Probe {
                             // While we have room in the master buffer and audio
                             // is available...
 
-                            while (index < me._samples.length
-                                    && 0 <= (read = recorder.read(buffer, 0,
-                                            bufferSize))) {
+                            while (index < me._samples.length && 0 <= (read = recorder.read(buffer, 0, bufferSize)))
+                            {
                                 // Calculate the power as we collect samples...
 
-                                for (int i = 0; i < read; i++) {
-                                    if (index < me._samples.length) {
+                                for (int i = 0; i < read; i++)
+                                {
+                                    if (index < me._samples.length)
+                                    {
                                         sampleSum += Math.abs(buffer[i]);
-                                        samplePower += Math.pow(
-                                                ((double) buffer[i])
-                                                        / Short.MAX_VALUE, 2);
+                                        samplePower += Math.pow(((double) buffer[i]) / Short.MAX_VALUE, 2);
 
                                         me._samples[index] = (double) buffer[i];
                                         index += 1;
@@ -336,15 +347,11 @@ public class SampleProbe extends Probe {
 
                             Bundle bundle = new Bundle();
                             bundle.putString("PROBE", me.name(context));
-                            bundle.putLong("TIMESTAMP",
-                                    System.currentTimeMillis() / 1000);
-                            bundle.putInt("SAMPLE_RATE",
-                                    recorder.getSampleRate());
-                            bundle.putDouble("POWER", samplePower
+                            bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+                            bundle.putInt("SAMPLE_RATE", recorder.getSampleRate());
+                            bundle.putDouble("POWER", samplePower / me._samples.length);
+                            bundle.putDouble("NORMALIZED_AVG_MAGNITUDE", (sampleSum / Short.MAX_VALUE)
                                     / me._samples.length);
-                            bundle.putDouble("NORMALIZED_AVG_MAGNITUDE",
-                                    (sampleSum / Short.MAX_VALUE)
-                                            / me._samples.length);
 
                             // The AudioRecord instance is no longer needed at
                             // the moment, free it...
@@ -362,11 +369,9 @@ public class SampleProbe extends Probe {
                             // with your own code for analyzing the collected
                             // samples.
 
-                            FastFourierTransformer fft = new FastFourierTransformer(
-                                    DftNormalization.STANDARD);
+                            FastFourierTransformer fft = new FastFourierTransformer(DftNormalization.STANDARD);
 
-                            Complex[] values = fft.transform(me._samples,
-                                    TransformType.FORWARD);
+                            Complex[] values = fft.transform(me._samples, TransformType.FORWARD);
 
                             double maxFrequency = 0;
                             double maxMagnitude = 0;
@@ -374,16 +379,16 @@ public class SampleProbe extends Probe {
                             // Look at the possible wavelengths and determine
                             // which one has the largest magnitude...
 
-                            for (int i = 0; i < values.length / 2; i++) {
+                            for (int i = 0; i < values.length / 2; i++)
+                            {
                                 Complex value = values[i];
 
                                 double magnitude = value.abs();
 
-                                if (magnitude > maxMagnitude) {
+                                if (magnitude > maxMagnitude)
+                                {
                                     maxMagnitude = magnitude;
-                                    maxFrequency = (i * recorder
-                                            .getSampleRate())
-                                            / (double) me._samples.length;
+                                    maxFrequency = (i * recorder.getSampleRate()) / (double) me._samples.length;
                                 }
                             }
 
@@ -403,9 +408,12 @@ public class SampleProbe extends Probe {
                         // before we allow recording to
                         // resume...
 
-                        try {
+                        try
+                        {
                             Thread.sleep(10000);
-                        } catch (InterruptedException e) {
+                        }
+                        catch (InterruptedException e)
+                        {
                             e.printStackTrace();
                         }
 
@@ -436,12 +444,11 @@ public class SampleProbe extends Probe {
      * returns a string formatting the most relevant details.
      */
 
-    public String summarizeValue(Context context, Bundle bundle) {
+    public String summarizeValue(Context context, Bundle bundle)
+    {
         double freq = bundle.getDouble("FREQUENCY");
 
-        return String.format(
-                context.getResources().getString(
-                        R.string.summary_audio_features_probe), freq);
+        return String.format(context.getResources().getString(R.string.summary_audio_features_probe), freq);
     }
 
 }

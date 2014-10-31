@@ -3,7 +3,8 @@ package edu.northwestern.cbits.purple_robot_manager.probes.features;
 import android.content.Context;
 import android.os.Bundle;
 
-public abstract class XYZContinuousProbeFeature extends ContinuousProbeFeature {
+public abstract class XYZContinuousProbeFeature extends ContinuousProbeFeature
+{
     protected static int BUFFER_SIZE = 512;
 
     protected float[] x = new float[BUFFER_SIZE];
@@ -16,19 +17,20 @@ public abstract class XYZContinuousProbeFeature extends ContinuousProbeFeature {
 
     protected abstract void analyzeBuffers(Context context);
 
-    protected void processData(Context context, Bundle dataBundle) {
-        if (this.isEnabled(context)) {
-            if (dataBundle.containsKey("EVENT_TIMESTAMP")
-                    && dataBundle.containsKey("X")
-                    && dataBundle.containsKey("Y")
-                    && dataBundle.containsKey("Z")) {
-                double[] incomingTimes = dataBundle
-                        .getDoubleArray("EVENT_TIMESTAMP");
+    protected void processData(Context context, Bundle dataBundle)
+    {
+        if (this.isEnabled(context))
+        {
+            if (dataBundle.containsKey("EVENT_TIMESTAMP") && dataBundle.containsKey("X") && dataBundle.containsKey("Y")
+                    && dataBundle.containsKey("Z"))
+            {
+                double[] incomingTimes = dataBundle.getDoubleArray("EVENT_TIMESTAMP");
                 float[] incomingX = dataBundle.getFloatArray("X");
                 float[] incomingY = dataBundle.getFloatArray("Y");
                 float[] incomingZ = dataBundle.getFloatArray("Z");
 
-                for (int i = 0; i < incomingTimes.length; i++) {
+                for (int i = 0; i < incomingTimes.length; i++)
+                {
                     if (index + i > BUFFER_SIZE)
                         this._filled = true;
 

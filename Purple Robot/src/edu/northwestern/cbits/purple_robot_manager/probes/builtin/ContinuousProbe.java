@@ -20,7 +20,8 @@ import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
-public abstract class ContinuousProbe extends Probe {
+public abstract class ContinuousProbe extends Probe
+{
     public static final String PROBE_THRESHOLD = "threshold";
 
     protected static final boolean DEFAULT_ENABLED = false;
@@ -34,7 +35,8 @@ public abstract class ContinuousProbe extends Probe {
     private boolean _lastEnableResult = false;
     private long _lastEnableCheck = 0;
 
-    public void enable(Context context) {
+    public void enable(Context context)
+    {
         String key = this.getPreferenceKey();
 
         SharedPreferences prefs = Probe.getPreferences(context);
@@ -45,7 +47,8 @@ public abstract class ContinuousProbe extends Probe {
         e.commit();
     }
 
-    public void disable(Context context) {
+    public void disable(Context context)
+    {
         String key = this.getPreferenceKey();
 
         SharedPreferences prefs = Probe.getPreferences(context);
@@ -56,20 +59,20 @@ public abstract class ContinuousProbe extends Probe {
         e.commit();
     }
 
-    protected boolean shouldProcessEvent(SensorEvent event) {
+    protected boolean shouldProcessEvent(SensorEvent event)
+    {
         long now = System.currentTimeMillis();
 
-        if (now - this._lastEnableCheck > 5000) {
-            SharedPreferences prefs = PreferenceManager
-                    .getDefaultSharedPreferences(this._context);
+        if (now - this._lastEnableCheck > 5000)
+        {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
 
             String key = this.getPreferenceKey();
-            this._lastEnableResult = prefs.getBoolean("config_probes_enabled",
-                    false);
+            this._lastEnableResult = prefs.getBoolean("config_probes_enabled", false);
 
             if (this._lastEnableResult)
-                this._lastEnableResult = prefs.getBoolean("config_probe_" + key
-                        + "_enabled", ContinuousProbe.DEFAULT_ENABLED);
+                this._lastEnableResult = prefs.getBoolean("config_probe_" + key + "_enabled",
+                        ContinuousProbe.DEFAULT_ENABLED);
 
             this._lastEnableCheck = now;
         }
@@ -78,7 +81,8 @@ public abstract class ContinuousProbe extends Probe {
     }
 
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    {
         PreferenceManager manager = activity.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(activity);
@@ -116,7 +120,8 @@ public abstract class ContinuousProbe extends Probe {
         return screen;
     }
 
-    public Map<String, Object> configuration(Context context) {
+    public Map<String, Object> configuration(Context context)
+    {
         Map<String, Object> map = super.configuration(context);
 
         map.put(Probe.PROBE_FREQUENCY, this.getFrequency());
@@ -124,15 +129,17 @@ public abstract class ContinuousProbe extends Probe {
         return map;
     }
 
-    public void updateFromMap(Context context, Map<String, Object> params) {
+    public void updateFromMap(Context context, Map<String, Object> params)
+    {
         super.updateFromMap(context, params);
 
-        if (params.containsKey(Probe.PROBE_FREQUENCY)) {
+        if (params.containsKey(Probe.PROBE_FREQUENCY))
+        {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
 
-            if (frequency instanceof Long || frequency instanceof Integer) {
-                String key = "config_probe_" + this.getPreferenceKey()
-                        + "_frequency";
+            if (frequency instanceof Long || frequency instanceof Integer)
+            {
+                String key = "config_probe_" + this.getPreferenceKey() + "_frequency";
 
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
@@ -140,18 +147,19 @@ public abstract class ContinuousProbe extends Probe {
                 e.putString(key, frequency.toString());
                 e.commit();
             }
-            if (frequency instanceof Double) {
-                String key = "config_probe_" + this.getPreferenceKey()
-                        + "_frequency";
+            if (frequency instanceof Double)
+            {
+                String key = "config_probe_" + this.getPreferenceKey() + "_frequency";
 
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
                 e.putString(key, "" + ((Double) frequency).intValue());
                 e.commit();
-            } else if (frequency instanceof String) {
-                String key = "config_probe_" + this.getPreferenceKey()
-                        + "_frequency";
+            }
+            else if (frequency instanceof String)
+            {
+                String key = "config_probe_" + this.getPreferenceKey() + "_frequency";
 
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
@@ -162,17 +170,20 @@ public abstract class ContinuousProbe extends Probe {
         }
     }
 
-    public Bundle formattedBundle(Context context, Bundle bundle) {
+    public Bundle formattedBundle(Context context, Bundle bundle)
+    {
         Bundle formatted = super.formattedBundle(context, bundle);
 
         return formatted;
     };
 
-    public int getResourceFrequencyLabels() {
+    public int getResourceFrequencyLabels()
+    {
         return R.array.probe_continuous_frequency_labels;
     }
 
-    public int getResourceFrequencyValues() {
+    public int getResourceFrequencyValues()
+    {
         return R.array.probe_continuous_frequency_values;
     }
 
@@ -186,33 +197,38 @@ public abstract class ContinuousProbe extends Probe {
 
     protected abstract boolean passesThreshold(SensorEvent event);
 
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    public void onAccuracyChanged(Sensor sensor, int accuracy)
+    {
 
     }
 
-    public String title(Context context) {
+    public String title(Context context)
+    {
         return context.getString(this.getTitleResource());
     }
 
-    public String summary(Context context) {
+    public String summary(Context context)
+    {
         return context.getString(this.getSummaryResource());
     }
 
     @SuppressLint("Wakelock")
-    public boolean isEnabled(Context context) {
+    public boolean isEnabled(Context context)
+    {
         boolean enabled = super.isEnabled(context);
 
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(context);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         String key = this.getPreferenceKey();
 
-        int wakeLevel = Integer.parseInt(prefs.getString("config_probe_" + key
-                + "_wakelock", "-1"));
+        int wakeLevel = Integer.parseInt(prefs.getString("config_probe_" + key + "_wakelock", "-1"));
 
-        if (enabled) {
-            if (wakeLevel != this._wakeLockLevel) {
-                if (this._wakeLock != null) {
+        if (enabled)
+        {
+            if (wakeLevel != this._wakeLockLevel)
+            {
+                if (this._wakeLock != null)
+                {
                     this._wakeLock.release();
 
                     this._wakeLock = null;
@@ -221,15 +237,18 @@ public abstract class ContinuousProbe extends Probe {
                 this._wakeLockLevel = wakeLevel;
             }
 
-            if (this._wakeLockLevel != -1 && this._wakeLock == null) {
-                PowerManager pm = (PowerManager) context
-                        .getSystemService(Context.POWER_SERVICE);
+            if (this._wakeLockLevel != -1 && this._wakeLock == null)
+            {
+                PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
 
                 this._wakeLock = pm.newWakeLock(this._wakeLockLevel, "key");
                 this._wakeLock.acquire();
             }
-        } else {
-            if (this._wakeLock != null) {
+        }
+        else
+        {
+            if (this._wakeLock != null)
+            {
                 this._wakeLock.release();
                 this._wakeLock = null;
             }

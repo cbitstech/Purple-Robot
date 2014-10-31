@@ -19,7 +19,7 @@
         android:title="@string/menu_label_label"
         robot:showAsAction="never" />
     <item android:id="@+id/menu_nfc_item"
-        android:title="@string/title_nfc_scanner"
+        android:title="@string/action_scan_nfc"
         robot:showAsAction="never" />
     <item android:id="@+id/menu_settings_item"
         android:title="@string/menu_settings_label" 

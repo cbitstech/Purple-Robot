@@ -6,21 +6,25 @@ import android.content.Context;
 import android.os.Bundle;
 import edu.northwestern.cbits.purple_robot_manager.R;
 
-public abstract class XYZBasicStatisticsFeature extends
-        XYZContinuousProbeFeature {
+public abstract class XYZBasicStatisticsFeature extends XYZContinuousProbeFeature
+{
     private long _lastCheck = 0;
     private boolean _running = false;
 
-    protected void analyzeBuffers(final Context context) {
+    protected void analyzeBuffers(final Context context)
+    {
         final long now = System.currentTimeMillis();
 
-        if (now - this._lastCheck > 10000 && this._running == false) {
+        if (now - this._lastCheck > 10000 && this._running == false)
+        {
             this._lastCheck = now;
 
             final XYZBasicStatisticsFeature me = this;
 
-            Runnable r = new Runnable() {
-                public void run() {
+            Runnable r = new Runnable()
+            {
+                public void run()
+                {
                     me._running = true;
 
                     Bundle data = new Bundle();
@@ -31,14 +35,12 @@ public abstract class XYZBasicStatisticsFeature extends
                     double maxTime = Double.MIN_VALUE;
                     double minTime = Double.MAX_VALUE;
 
-                    DescriptiveStatistics xStats = new DescriptiveStatistics(
-                            XYZContinuousProbeFeature.BUFFER_SIZE);
-                    DescriptiveStatistics yStats = new DescriptiveStatistics(
-                            XYZContinuousProbeFeature.BUFFER_SIZE);
-                    DescriptiveStatistics zStats = new DescriptiveStatistics(
-                            XYZContinuousProbeFeature.BUFFER_SIZE);
+                    DescriptiveStatistics xStats = new DescriptiveStatistics(XYZContinuousProbeFeature.BUFFER_SIZE);
+                    DescriptiveStatistics yStats = new DescriptiveStatistics(XYZContinuousProbeFeature.BUFFER_SIZE);
+                    DescriptiveStatistics zStats = new DescriptiveStatistics(XYZContinuousProbeFeature.BUFFER_SIZE);
 
-                    for (int i = 0; i < XYZContinuousProbeFeature.BUFFER_SIZE; i++) {
+                    for (int i = 0; i < XYZContinuousProbeFeature.BUFFER_SIZE; i++)
+                    {
                         xStats.addValue(me.x[i]);
                         yStats.addValue(me.y[i]);
                         zStats.addValue(me.z[i]);
@@ -54,36 +56,24 @@ public abstract class XYZBasicStatisticsFeature extends
                     data.putDouble("X_MAX", xStats.getMax());
                     data.putDouble("X_MEAN", xStats.getMean());
                     data.putDouble("X_STD_DEV", xStats.getStandardDeviation());
-                    data.putDouble(
-                            "X_RMS",
-                            Math.sqrt(xStats.getSumsq()
-                                    / XYZContinuousProbeFeature.BUFFER_SIZE));
+                    data.putDouble("X_RMS", Math.sqrt(xStats.getSumsq() / XYZContinuousProbeFeature.BUFFER_SIZE));
 
                     data.putDouble("Y_MIN", yStats.getMin());
                     data.putDouble("Y_MAX", yStats.getMax());
                     data.putDouble("Y_MEAN", yStats.getMean());
                     data.putDouble("Y_STD_DEV", yStats.getStandardDeviation());
-                    data.putDouble(
-                            "Y_RMS",
-                            Math.sqrt(yStats.getSumsq()
-                                    / XYZContinuousProbeFeature.BUFFER_SIZE));
+                    data.putDouble("Y_RMS", Math.sqrt(yStats.getSumsq() / XYZContinuousProbeFeature.BUFFER_SIZE));
 
                     data.putDouble("Z_MIN", zStats.getMin());
                     data.putDouble("Z_MAX", zStats.getMax());
                     data.putDouble("Z_MEAN", zStats.getMean());
                     data.putDouble("Z_STD_DEV", zStats.getStandardDeviation());
-                    data.putDouble(
-                            "Z_RMS",
-                            Math.sqrt(zStats.getSumsq()
-                                    / XYZContinuousProbeFeature.BUFFER_SIZE));
+                    data.putDouble("Z_RMS", Math.sqrt(zStats.getSumsq() / XYZContinuousProbeFeature.BUFFER_SIZE));
 
-                    data.putInt("BUFFER_SIZE",
-                            XYZContinuousProbeFeature.BUFFER_SIZE);
-                    data.putDouble("FREQUENCY",
-                            ((double) XYZContinuousProbeFeature.BUFFER_SIZE)
-                                    / ((maxTime - minTime) / 1000));
-                    data.putDouble("DURATION",
-                            ((double) ((maxTime - minTime) / 1000.0)));
+                    data.putInt("BUFFER_SIZE", XYZContinuousProbeFeature.BUFFER_SIZE);
+                    data.putDouble("FREQUENCY", ((double) XYZContinuousProbeFeature.BUFFER_SIZE)
+                            / ((maxTime - minTime) / 1000));
+                    data.putDouble("DURATION", ((double) ((maxTime - minTime) / 1000.0)));
 
                     me.transmitData(context, data);
 
@@ -97,15 +87,14 @@ public abstract class XYZBasicStatisticsFeature extends
         }
     }
 
-    public String summarizeValue(Context context, Bundle bundle) {
+    public String summarizeValue(Context context, Bundle bundle)
+    {
         double x = bundle.getDouble("X_STD_DEV");
         double y = bundle.getDouble("Y_STD_DEV");
         double z = bundle.getDouble("Z_STD_DEV");
 
-        return String.format(
-                context.getResources().getString(
-                        R.string.summary_accelerator_statistics_feature), x, y,
-                z);
+        return String
+                .format(context.getResources().getString(R.string.summary_accelerator_statistics_feature), x, y, z);
     }
 
     protected abstract String featureKey();

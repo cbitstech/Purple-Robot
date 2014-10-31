@@ -27,11 +27,13 @@ import edu.northwestern.cbits.purple_robot_manager.calibration.ContactCalibratio
 import edu.northwestern.cbits.purple_robot_manager.calibration.ContactRecord;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 
-public class AddressBookLabelActivity extends ActionBarActivity {
+public class AddressBookLabelActivity extends ActionBarActivity
+{
     private int _clickedIndex = -1;
     private List<ContactRecord> _contacts = null;
 
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
         this._contacts = ContactCalibrationHelper.fetchContactRecords(this);
@@ -40,7 +42,8 @@ public class AddressBookLabelActivity extends ActionBarActivity {
         this.getSupportActionBar().setTitle(R.string.title_address_book_label);
     }
 
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
         MenuInflater inflater = this.getMenuInflater();
         inflater.inflate(R.menu.menu_address_book_label_activity, menu);
 
@@ -48,21 +51,20 @@ public class AddressBookLabelActivity extends ActionBarActivity {
     }
 
     @SuppressLint("ValidFragment")
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.menu_accept_label) {
-            SharedPreferences prefs = PreferenceManager
-                    .getDefaultSharedPreferences(this.getApplicationContext());
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        if (item.getItemId() == R.id.menu_accept_label)
+        {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
 
             Editor e = prefs.edit();
-            e.putLong("last_address_book_calibration",
-                    System.currentTimeMillis());
+            e.putLong("last_address_book_calibration", System.currentTimeMillis());
             e.commit();
 
             this.finish();
 
             final SanityManager sanity = SanityManager.getInstance(this);
-            final String title = this
-                    .getString(R.string.title_address_book_label_check);
+            final String title = this.getString(R.string.title_address_book_label_check);
             sanity.clearAlert(title);
 
         }
@@ -70,8 +72,8 @@ public class AddressBookLabelActivity extends ActionBarActivity {
         return true;
     }
 
-    public void onCreateContextMenu(ContextMenu menu, View v,
-            ContextMenuInfo menuInfo) {
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
+    {
         super.onCreateContextMenu(menu, v, menuInfo);
 
         ContactRecord contact = this._contacts.get(this._clickedIndex);
@@ -81,38 +83,37 @@ public class AddressBookLabelActivity extends ActionBarActivity {
         else
             menu.setHeaderTitle(contact.number);
 
-        String[] groups = this.getResources().getStringArray(
-                R.array.contact_groups);
+        String[] groups = this.getResources().getStringArray(R.array.contact_groups);
 
-        for (int i = 0; i < groups.length; i++) {
+        for (int i = 0; i < groups.length; i++)
+        {
             String group = groups[i];
 
             menu.add(Menu.NONE, i, i, group);
         }
     }
 
-    public void refresh() {
+    public void refresh()
+    {
         ListView list = (ListView) this.findViewById(R.id.list_view);
 
         Parcelable state = list.onSaveInstanceState();
 
         final AddressBookLabelActivity me = this;
 
-        list.setAdapter(new ArrayAdapter<ContactRecord>(this,
-                R.layout.layout_contact_count_row, this._contacts) {
-            public View getView(int position, View convertView, ViewGroup parent) {
-                if (convertView == null) {
+        list.setAdapter(new ArrayAdapter<ContactRecord>(this, R.layout.layout_contact_count_row, this._contacts)
+        {
+            public View getView(int position, View convertView, ViewGroup parent)
+            {
+                if (convertView == null)
+                {
                     LayoutInflater inflater = LayoutInflater.from(me);
-                    convertView = inflater.inflate(
-                            R.layout.layout_contact_count_row, parent, false);
+                    convertView = inflater.inflate(R.layout.layout_contact_count_row, parent, false);
                 }
 
-                TextView contactName = (TextView) convertView
-                        .findViewById(R.id.label_contact_name);
-                TextView contactNumber = (TextView) convertView
-                        .findViewById(R.id.label_contact_number);
-                TextView contactType = (TextView) convertView
-                        .findViewById(R.id.label_contact_type);
+                TextView contactName = (TextView) convertView.findViewById(R.id.label_contact_name);
+                TextView contactNumber = (TextView) convertView.findViewById(R.id.label_contact_number);
+                TextView contactType = (TextView) convertView.findViewById(R.id.label_contact_type);
 
                 ContactRecord contact = me._contacts.get(position);
 
@@ -121,8 +122,7 @@ public class AddressBookLabelActivity extends ActionBarActivity {
                 else
                     contactName.setText(contact.number);
 
-                contactName.setText(contactName.getText() + " ("
-                        + contact.count + ")");
+                contactName.setText(contactName.getText() + " (" + contact.count + ")");
 
                 contactNumber.setText(contact.number);
 
@@ -138,7 +138,8 @@ public class AddressBookLabelActivity extends ActionBarActivity {
         list.onRestoreInstanceState(state);
     }
 
-    public void onResume() {
+    public void onResume()
+    {
         super.onResume();
 
         final AddressBookLabelActivity me = this;
@@ -148,9 +149,10 @@ public class AddressBookLabelActivity extends ActionBarActivity {
 
         this.refresh();
 
-        list.setOnItemClickListener(new OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view,
-                    int position, long id) {
+        list.setOnItemClickListener(new OnItemClickListener()
+        {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
                 me._clickedIndex = position;
 
                 parent.showContextMenu();
@@ -158,7 +160,8 @@ public class AddressBookLabelActivity extends ActionBarActivity {
         });
     }
 
-    public boolean onContextItemSelected(MenuItem item) {
+    public boolean onContextItemSelected(MenuItem item)
+    {
         ContactRecord contact = this._contacts.get(this._clickedIndex);
         contact.group = item.getTitle().toString();
 

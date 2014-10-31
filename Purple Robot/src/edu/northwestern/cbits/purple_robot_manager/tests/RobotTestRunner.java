@@ -18,13 +18,15 @@ import junit.framework.TestResult;
 import android.content.Context;
 import android.test.AndroidTestRunner;
 
-public class RobotTestRunner extends AndroidTestRunner {
+public class RobotTestRunner extends AndroidTestRunner
+{
     private List<TestCase> _cases = new ArrayList<TestCase>();
     private RobotTestSuite _suite = new RobotTestSuite();;
 
     private Thread _thread = null;
 
-    public RobotTestRunner(Context context) {
+    public RobotTestRunner(Context context)
+    {
         super();
 
         this._suite.addTest(new JUnitTestCase(context, 0));
@@ -45,14 +47,18 @@ public class RobotTestRunner extends AndroidTestRunner {
         this._suite.addTest(new HalfHourDateTriggerTestCase(context, 9));
     }
 
-    public List<TestCase> getTestCases(final Context context) {
-        if (this._cases.size() == 0) {
+    public List<TestCase> getTestCases(final Context context)
+    {
+        if (this._cases.size() == 0)
+        {
             Enumeration<Test> tests = this._suite.tests();
 
-            while (tests.hasMoreElements()) {
+            while (tests.hasMoreElements())
+            {
                 Test test = tests.nextElement();
 
-                if (test instanceof RobotTestCase) {
+                if (test instanceof RobotTestCase)
+                {
                     RobotTestCase robotTest = (RobotTestCase) test;
 
                     this._cases.add(robotTest);
@@ -60,15 +66,18 @@ public class RobotTestRunner extends AndroidTestRunner {
             }
         }
 
-        Collections.sort(this._cases, new Comparator<TestCase>() {
-            public int compare(TestCase one, TestCase two) {
-                if (one instanceof RobotTestCase
-                        && two instanceof RobotTestCase) {
+        Collections.sort(this._cases, new Comparator<TestCase>()
+        {
+            public int compare(TestCase one, TestCase two)
+            {
+                if (one instanceof RobotTestCase && two instanceof RobotTestCase)
+                {
                     RobotTestCase robotOne = (RobotTestCase) one;
                     RobotTestCase robotTwo = (RobotTestCase) two;
 
                     return robotOne.compareTo(context, robotTwo);
-                } else if (one instanceof RobotTestCase)
+                }
+                else if (one instanceof RobotTestCase)
                     return -1;
                 else if (two instanceof RobotTestCase)
                     return 1;
@@ -80,16 +89,19 @@ public class RobotTestRunner extends AndroidTestRunner {
         return this._cases;
     }
 
-    public boolean isRunning() {
+    public boolean isRunning()
+    {
         return this._thread != null;
     }
 
-    public void startTests(final Context context, final TestResult result,
-            final Runnable next) {
+    public void startTests(final Context context, final TestResult result, final Runnable next)
+    {
         final RobotTestRunner me = this;
 
-        this._thread = new Thread(new Runnable() {
-            public void run() {
+        this._thread = new Thread(new Runnable()
+        {
+            public void run()
+            {
                 for (TestCase testCase : me.getTestCases(context))
                     testCase.run(result);
 
@@ -103,8 +115,10 @@ public class RobotTestRunner extends AndroidTestRunner {
         this._thread.start();
     }
 
-    public void stopTests() {
-        if (this._thread != null) {
+    public void stopTests()
+    {
+        if (this._thread != null)
+        {
             this._thread.interrupt();
         }
     }

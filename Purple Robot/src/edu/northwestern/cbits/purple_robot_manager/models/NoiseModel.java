@@ -13,23 +13,28 @@ import edu.northwestern.cbits.purple_robot_manager.R;
  * pipelines.
  */
 
-public class NoiseModel extends Model {
+public class NoiseModel extends Model
+{
     protected static final String NOISE_VALUE = "NOISE_VALUE";
     public static final String TYPE = "noise";
 
-    public NoiseModel(Context context, Uri uri) {
+    public NoiseModel(Context context, Uri uri)
+    {
         // No initialization needed.
     }
 
-    public String getPreferenceKey() {
+    public String getPreferenceKey()
+    {
         return NoiseModel.TYPE;
     }
 
-    public String title(Context context) {
+    public String title(Context context)
+    {
         return context.getString(R.string.title_noise_model);
     }
 
-    public String summary(Context context) {
+    public String summary(Context context)
+    {
         return context.getString(R.string.summary_noise_model_desc);
     }
 
@@ -41,14 +46,16 @@ public class NoiseModel extends Model {
      *      java.util.Map)
      */
 
-    public void predict(final Context context, Map<String, Object> snapshot) {
+    public void predict(final Context context, Map<String, Object> snapshot)
+    {
         final NoiseModel me = this;
 
-        Runnable r = new Runnable() {
-            public void run() {
+        Runnable r = new Runnable()
+        {
+            public void run()
+            {
                 SecureRandom random = new SecureRandom();
-                me.transmitPrediction(context, random.nextDouble(),
-                        random.nextDouble());
+                me.transmitPrediction(context, random.nextDouble(), random.nextDouble());
             }
         };
 
@@ -56,11 +63,13 @@ public class NoiseModel extends Model {
         t.start();
     }
 
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return "edu.northwestern.cbits.purple_robot_manager.models.NoiseModel";
     }
 
-    public String modelType() {
+    public String modelType()
+    {
         return NoiseModel.TYPE;
     }
 }

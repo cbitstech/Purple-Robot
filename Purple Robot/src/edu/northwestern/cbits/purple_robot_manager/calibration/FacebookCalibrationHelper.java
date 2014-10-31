@@ -10,22 +10,24 @@ import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.FacebookProbe;
 
-public class FacebookCalibrationHelper {
-    public static void check(final Context context) {
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(context.getApplicationContext());
+public class FacebookCalibrationHelper
+{
+    public static void check(final Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
 
-        if (prefs.contains(FacebookProbe.TOKEN) == false) {
+        if (prefs.contains(FacebookProbe.TOKEN) == false)
+        {
             final SanityManager sanity = SanityManager.getInstance(context);
 
-            final String title = context
-                    .getString(R.string.title_facebook_check);
+            final String title = context.getString(R.string.title_facebook_check);
             String message = context.getString(R.string.message_facebook_check);
 
-            Runnable action = new Runnable() {
-                public void run() {
-                    Intent intent = new Intent(context,
-                            FacebookLoginActivity.class);
+            Runnable action = new Runnable()
+            {
+                public void run()
+                {
+                    Intent intent = new Intent(context, FacebookLoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
                     context.startActivity(intent);

@@ -13,31 +13,39 @@ import edu.northwestern.cbits.purple_robot_manager.triggers.ProbeTrigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
-public class TriggerOutputPlugin extends OutputPlugin {
-    public String[] respondsTo() {
-        String[] activeActions = { Probe.PROBE_READING };
+public class TriggerOutputPlugin extends OutputPlugin
+{
+    public String[] respondsTo()
+    {
+        String[] activeActions =
+        { Probe.PROBE_READING };
 
         return activeActions;
     }
 
-    public void processIntent(Intent intent) {
+    public void processIntent(Intent intent)
+    {
         Context context = this.getContext();
 
-        synchronized (this) {
+        synchronized (this)
+        {
             List<Trigger> triggers = new ArrayList<Trigger>();
             triggers.addAll(TriggerManager.getInstance(context).allTriggers());
 
-            for (Trigger trigger : triggers) {
-                if (trigger instanceof ProbeTrigger) {
+            for (Trigger trigger : triggers)
+            {
+                if (trigger instanceof ProbeTrigger)
+                {
                     ProbeTrigger probeTrigger = (ProbeTrigger) trigger;
 
-                    try {
-                        if (probeTrigger.matchesProbe(intent.getExtras()
-                                .getString("PROBE"))
-                                && probeTrigger.matches(context, OutputPlugin
-                                        .jsonForBundle(intent.getExtras())))
+                    try
+                    {
+                        if (probeTrigger.matchesProbe(intent.getExtras().getString("PROBE"))
+                                && probeTrigger.matches(context, OutputPlugin.jsonForBundle(intent.getExtras())))
                             trigger.execute(context, false);
-                    } catch (JSONException e) {
+                    }
+                    catch (JSONException e)
+                    {
                         LogManager.getInstance(context).logException(e);
                     }
                 }

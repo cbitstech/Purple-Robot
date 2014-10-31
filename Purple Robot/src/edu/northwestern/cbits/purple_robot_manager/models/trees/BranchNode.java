@@ -5,13 +5,16 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map;
 
-public class BranchNode extends TreeNode {
+public class BranchNode extends TreeNode
+{
     /**
      * Thrown when a tree is evaluated and a value is not available to match any
      * of the associated conditions.
      */
-    public static class MissingValueException extends TreeNodeException {
-        public MissingValueException(String message) {
+    public static class MissingValueException extends TreeNodeException
+    {
+        public MissingValueException(String message)
+        {
             super(message);
         }
 
@@ -25,7 +28,8 @@ public class BranchNode extends TreeNode {
      * implemented.
      */
 
-    public static enum Operation {
+    public static enum Operation
+    {
         LESS_THAN, LESS_THAN_OR_EQUAL_TO, MORE_THAN, MORE_THAN_OR_EQUAL_TO, EQUALS, EQUALS_CASE_INSENSITIVE, CONTAINS, CONTAINED_BY, STARTS_WITH, ENDS_WITH, DEFAULT // Always
                                                                                                                                                                      // passes.
                                                                                                                                                                      // Typically
@@ -46,7 +50,8 @@ public class BranchNode extends TreeNode {
      * world passes the condition.
      */
 
-    public static class Condition {
+    public static class Condition
+    {
         public static final int DEFAULT_PRIORITY = 0;
         public static final int LOWEST_PRIORITY = Integer.MIN_VALUE;
         public static final int HIGHEST_PRIORITY = Integer.MAX_VALUE;
@@ -76,8 +81,8 @@ public class BranchNode extends TreeNode {
          *            TreeNode associated with fulfilling this condition.
          */
 
-        public Condition(Operation op, String feature, Object value,
-                int priority, TreeNode node) {
+        public Condition(Operation op, String feature, Object value, int priority, TreeNode node)
+        {
             this._operation = op;
             this._feature = feature;
             this._value = value;
@@ -91,7 +96,8 @@ public class BranchNode extends TreeNode {
          * @see java.lang.Object#toString()
          */
 
-        public String toString() {
+        public String toString()
+        {
             StringBuffer sb = new StringBuffer();
 
             sb.append(this._feature);
@@ -118,17 +124,19 @@ public class BranchNode extends TreeNode {
          *             Thrown on error evaluating the coditions.
          */
 
-        public boolean evaluate(Map<String, Object> features)
-                throws TreeNodeException {
+        public boolean evaluate(Map<String, Object> features) throws TreeNodeException
+        {
             Object value = features.get(this._feature);
 
-            if (value == null && this._operation != Operation.DEFAULT) {
+            if (value == null && this._operation != Operation.DEFAULT)
+            {
                 // We're missing a value to test and this isn't a DEFAULT node.
 
                 return false;
             }
 
-            switch (this._operation) {
+            switch (this._operation)
+            {
             case LESS_THAN:
                 return Condition.testLessThan(this._value, value);
             case LESS_THAN_OR_EQUAL_TO:
@@ -165,15 +173,14 @@ public class BranchNode extends TreeNode {
          * @throws TreeNodeException
          */
 
-        @SuppressWarnings({ "rawtypes", "unchecked" })
-        private static boolean testMoreThanOrEqualTo(Object test, Object value)
-                throws TreeNodeException {
+        @SuppressWarnings(
+        { "rawtypes", "unchecked" })
+        private static boolean testMoreThanOrEqualTo(Object test, Object value) throws TreeNodeException
+        {
             if (test instanceof Comparable<?> == false)
-                throw new TreeNode.TreeNodeException(
-                        "Test does not implement Comparable.");
+                throw new TreeNode.TreeNodeException("Test does not implement Comparable.");
             if (value instanceof Comparable<?> == false)
-                throw new TreeNode.TreeNodeException(
-                        "Value does not implement Comparable.");
+                throw new TreeNode.TreeNodeException("Value does not implement Comparable.");
 
             Comparable testComparable = (Comparable) test;
             Comparable valueComparable = (Comparable) value;
@@ -192,15 +199,14 @@ public class BranchNode extends TreeNode {
          * @throws TreeNodeException
          */
 
-        @SuppressWarnings({ "rawtypes", "unchecked" })
-        private static boolean testLessThanOrEqualTo(Object test, Object value)
-                throws TreeNodeException {
+        @SuppressWarnings(
+        { "rawtypes", "unchecked" })
+        private static boolean testLessThanOrEqualTo(Object test, Object value) throws TreeNodeException
+        {
             if (test instanceof Comparable<?> == false)
-                throw new TreeNode.TreeNodeException(
-                        "Test does not implement Comparable: " + test);
+                throw new TreeNode.TreeNodeException("Test does not implement Comparable: " + test);
             if (value instanceof Comparable<?> == false)
-                throw new TreeNode.TreeNodeException(
-                        "Value does not implement Comparable: " + value);
+                throw new TreeNode.TreeNodeException("Value does not implement Comparable: " + value);
 
             Comparable testComparable = (Comparable) test;
             Comparable valueComparable = (Comparable) value;
@@ -219,15 +225,14 @@ public class BranchNode extends TreeNode {
          * @throws TreeNodeException
          */
 
-        @SuppressWarnings({ "rawtypes", "unchecked" })
-        private static boolean testMoreThan(Object test, Object value)
-                throws TreeNodeException {
+        @SuppressWarnings(
+        { "rawtypes", "unchecked" })
+        private static boolean testMoreThan(Object test, Object value) throws TreeNodeException
+        {
             if (test instanceof Comparable<?> == false)
-                throw new TreeNode.TreeNodeException(
-                        "Test does not implement Comparable.");
+                throw new TreeNode.TreeNodeException("Test does not implement Comparable.");
             if (value instanceof Comparable<?> == false)
-                throw new TreeNode.TreeNodeException(
-                        "Value does not implement Comparable.");
+                throw new TreeNode.TreeNodeException("Value does not implement Comparable.");
 
             Comparable testComparable = (Comparable) test;
             Comparable valueComparable = (Comparable) value;
@@ -246,15 +251,14 @@ public class BranchNode extends TreeNode {
          * @throws TreeNodeException
          */
 
-        @SuppressWarnings({ "rawtypes", "unchecked" })
-        private static boolean testLessThan(Object test, Object value)
-                throws TreeNodeException {
+        @SuppressWarnings(
+        { "rawtypes", "unchecked" })
+        private static boolean testLessThan(Object test, Object value) throws TreeNodeException
+        {
             if (test instanceof Comparable<?> == false)
-                throw new TreeNode.TreeNodeException(
-                        "Test does not implement Comparable.");
+                throw new TreeNode.TreeNodeException("Test does not implement Comparable.");
             if (value instanceof Comparable<?> == false)
-                throw new TreeNode.TreeNodeException(
-                        "Value does not implement Comparable.");
+                throw new TreeNode.TreeNodeException("Value does not implement Comparable.");
 
             Comparable testComparable = (Comparable) test;
             Comparable valueComparable = (Comparable) value;
@@ -273,33 +277,33 @@ public class BranchNode extends TreeNode {
          * @throws TreeNodeException
          */
 
-        private static boolean testEquals(Object test, Object value)
-                throws TreeNodeException {
+        private static boolean testEquals(Object test, Object value) throws TreeNodeException
+        {
             return test.equals(value);
         }
 
-        private static boolean testEndsWith(Object test, Object value)
-                throws TreeNodeException {
+        private static boolean testEndsWith(Object test, Object value) throws TreeNodeException
+        {
             throw new TreeNode.TreeNodeException("Unimplemented comparison.");
         }
 
-        private static boolean testEqualsCaseInsensitive(Object test,
-                Object value) throws TreeNodeException {
+        private static boolean testEqualsCaseInsensitive(Object test, Object value) throws TreeNodeException
+        {
             throw new TreeNode.TreeNodeException("Unimplemented comparison.");
         }
 
-        private static boolean testStartsWith(Object test, Object value)
-                throws TreeNodeException {
+        private static boolean testStartsWith(Object test, Object value) throws TreeNodeException
+        {
             throw new TreeNode.TreeNodeException("Unimplemented comparison.");
         }
 
-        private static boolean testContains(Object test, Object value)
-                throws TreeNodeException {
+        private static boolean testContains(Object test, Object value) throws TreeNodeException
+        {
             throw new TreeNode.TreeNodeException("Unimplemented comparison.");
         }
 
-        private static boolean testEqualsContainedBy(Object test, Object value)
-                throws TreeNodeException {
+        private static boolean testEqualsContainedBy(Object test, Object value) throws TreeNodeException
+        {
             throw new TreeNode.TreeNodeException("Unimplemented comparison.");
         }
 
@@ -311,20 +315,22 @@ public class BranchNode extends TreeNode {
          *             Thrown if no node is associated with this condition.
          */
 
-        public TreeNode getNode() throws TreeNode.TreeNodeException {
+        public TreeNode getNode() throws TreeNode.TreeNodeException
+        {
             if (this._node == null)
-                throw new TreeNode.TreeNodeException(
-                        "Null tree node encountered.");
+                throw new TreeNode.TreeNodeException("Null tree node encountered.");
 
             return this._node;
         }
     }
 
-    public BranchNode(String name) {
+    public BranchNode(String name)
+    {
         super(name);
     }
 
-    public BranchNode() {
+    public BranchNode()
+    {
         super(null);
     }
 
@@ -343,12 +349,14 @@ public class BranchNode extends TreeNode {
      *            Associated TreeNode on passing of test.
      */
 
-    public void addCondition(Operation op, String feature, Object value,
-            int priority, TreeNode node) {
+    public void addCondition(Operation op, String feature, Object value, int priority, TreeNode node)
+    {
         this._conditions.add(new Condition(op, feature, value, priority, node));
 
-        Collections.sort(this._conditions, new Comparator<Condition>() {
-            public int compare(Condition one, Condition two) {
+        Collections.sort(this._conditions, new Comparator<Condition>()
+        {
+            public int compare(Condition one, Condition two)
+            {
                 if (one._priority > two._priority)
                     return -1;
                 else if (one._priority < two._priority)
@@ -366,10 +374,12 @@ public class BranchNode extends TreeNode {
      * @see edu.northwestern.cbits.purple_robot_manager.models.trees.TreeNode#fetchPrediction(java.util.Map)
      */
 
-    public Map<String, Object> fetchPrediction(Map<String, Object> features)
-            throws TreeNode.TreeNodeException {
-        for (Condition condition : this._conditions) {
-            if (condition.evaluate(features)) {
+    public Map<String, Object> fetchPrediction(Map<String, Object> features) throws TreeNode.TreeNodeException
+    {
+        for (Condition condition : this._conditions)
+        {
+            if (condition.evaluate(features))
+            {
                 // Test passed - recurse down the test's associated node and
                 // continue...
 
@@ -389,12 +399,14 @@ public class BranchNode extends TreeNode {
      * (int)
      */
 
-    public String toString(int indent) throws TreeNodeException {
+    public String toString(int indent) throws TreeNodeException
+    {
         StringBuffer sb = new StringBuffer();
 
         String newline = System.getProperty("line.separator");
 
-        for (Condition condition : this._conditions) {
+        for (Condition condition : this._conditions)
+        {
             if (sb.length() > 0)
                 sb.append(newline);
 
@@ -410,12 +422,14 @@ public class BranchNode extends TreeNode {
         return sb.toString();
     }
 
-    public void addDefaultCondition(TreeNode node) {
-        this._conditions.add(new Condition(Operation.DEFAULT, "foo", "bar",
-                Condition.LOWEST_PRIORITY, node));
+    public void addDefaultCondition(TreeNode node)
+    {
+        this._conditions.add(new Condition(Operation.DEFAULT, "foo", "bar", Condition.LOWEST_PRIORITY, node));
 
-        Collections.sort(this._conditions, new Comparator<Condition>() {
-            public int compare(Condition one, Condition two) {
+        Collections.sort(this._conditions, new Comparator<Condition>()
+        {
+            public int compare(Condition one, Condition two)
+            {
                 if (one._priority > two._priority)
                     return -1;
                 else if (one._priority < two._priority)

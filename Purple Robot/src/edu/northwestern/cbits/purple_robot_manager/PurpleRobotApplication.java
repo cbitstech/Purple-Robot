@@ -17,36 +17,40 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
-public class PurpleRobotApplication extends Application {
+public class PurpleRobotApplication extends Application
+{
     private static Context _context;
     private static long _lastFix = 0;
 
-    public void onCreate() {
+    public void onCreate()
+    {
         super.onCreate();
 
         PurpleRobotApplication._context = this.getApplicationContext();
     }
 
-    public static Context getAppContext() {
+    public static Context getAppContext()
+    {
         return PurpleRobotApplication._context;
     }
 
-    public static boolean updateFromMap(Context context,
-            Map<String, Object> config) {
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(context.getApplicationContext());
+    public static boolean updateFromMap(Context context, Map<String, Object> config)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
         Editor e = prefs.edit();
 
-        for (String key : config.keySet()) {
+        for (String key : config.keySet())
+        {
             Object value = config.get(key);
 
-            if (value instanceof String) {
+            if (value instanceof String)
+            {
                 if ("config_json_url".equals(key))
-                    EncryptionManager.getInstance().setConfigUri(context,
-                            Uri.parse(value.toString()));
+                    EncryptionManager.getInstance().setConfigUri(context, Uri.parse(value.toString()));
                 else
                     e.putString(key, value.toString());
-            } else if (value instanceof Boolean)
+            }
+            else if (value instanceof Boolean)
                 e.putBoolean(key, ((Boolean) value).booleanValue());
         }
 
@@ -55,84 +59,92 @@ public class PurpleRobotApplication extends Application {
         return success;
     }
 
-    public static Map<String, Object> configuration(Context context) {
+    public static Map<String, Object> configuration(Context context)
+    {
         Map<String, Object> map = new HashMap<String, Object>();
 
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(context);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        try {
+        try
+        {
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
 
             factory.setNamespaceAware(false);
 
-            XmlPullParser xpp = context.getResources().getXml(
-                    R.layout.layout_settings_activity);
+            XmlPullParser xpp = context.getResources().getXml(R.layout.layout_settings_activity);
             int eventType = xpp.getEventType();
 
-            while (eventType != XmlPullParser.END_DOCUMENT) {
-                if (eventType == XmlPullParser.START_TAG) {
+            while (eventType != XmlPullParser.END_DOCUMENT)
+            {
+                if (eventType == XmlPullParser.START_TAG)
+                {
                     String name = xpp.getName();
-                    String key = xpp
-                            .getAttributeValue(
-                                    "http://schemas.android.com/apk/res/android",
-                                    "key");
+                    String key = xpp.getAttributeValue("http://schemas.android.com/apk/res/android", "key");
 
-                    if (prefs.contains(key)) {
+                    if (prefs.contains(key))
+                    {
                         if ("EditTextPreference".equals(name))
                             map.put(key, prefs.getString(key, null));
                         else if ("ListPreference".equals(name))
                             map.put(key, prefs.getString(key, null));
-                        else if ("CheckBoxPreference".equals(name)) {
-                            try {
+                        else if ("CheckBoxPreference".equals(name))
+                        {
+                            try
+                            {
                                 map.put(key, prefs.getBoolean(key, false));
-                            } catch (ClassCastException e) {
+                            }
+                            catch (ClassCastException e)
+                            {
                                 String value = prefs.getString(key, null);
 
-                                if (value != null
-                                        && "true".equals(value
-                                                .toLowerCase(Locale.ENGLISH)))
+                                if (value != null && "true".equals(value.toLowerCase(Locale.ENGLISH)))
                                     map.put(key, Boolean.valueOf(true));
                                 else
                                     map.put(key, Boolean.valueOf(false));
                             }
-                        } else if ("Preference".equals(name))
+                        }
+                        else if ("Preference".equals(name))
                             map.put(key, prefs.getString(key, null));
                     }
                 }
 
                 eventType = xpp.next();
             }
-        } catch (XmlPullParserException e) {
+        }
+        catch (XmlPullParserException e)
+        {
             LogManager.getInstance(context).logException(e);
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             LogManager.getInstance(context).logException(e);
         }
 
-        map.put("config_probes_enabled", Boolean.valueOf(prefs.getBoolean(
-                "config_probes_enabled", false)));
+        map.put("config_probes_enabled", Boolean.valueOf(prefs.getBoolean("config_probes_enabled", false)));
 
         return map;
     }
 
-    public static void fixPreferences(Context context, boolean force) {
+    public static void fixPreferences(Context context, boolean force)
+    {
         if (force)
             PurpleRobotApplication._lastFix = 0;
 
         long now = System.currentTimeMillis();
 
-        if (now - PurpleRobotApplication._lastFix > 60000) {
-            Map<String, Object> values = PurpleRobotApplication
-                    .configuration(context);
+        if (now - PurpleRobotApplication._lastFix > 60000)
+        {
+            Map<String, Object> values = PurpleRobotApplication.configuration(context);
 
-            SharedPreferences prefs = PreferenceManager
-                    .getDefaultSharedPreferences(context);
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             Editor e = prefs.edit();
 
-            for (String key : values.keySet()) {
+            for (String key : values.keySet())
+            {
                 Object value = values.get(key);
 
-                if (value instanceof Boolean) {
+                if (value instanceof Boolean)
+                {
                     Boolean boolValue = (Boolean) value;
 
                     e.putBoolean(key, boolValue.booleanValue());

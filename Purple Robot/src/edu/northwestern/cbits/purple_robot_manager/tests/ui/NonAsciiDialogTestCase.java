@@ -9,24 +9,26 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 import edu.northwestern.cbits.purple_robot_manager.tests.RobotTestCase;
 
-public class NonAsciiDialogTestCase extends RobotTestCase {
-    public NonAsciiDialogTestCase(Context context, int priority) {
+public class NonAsciiDialogTestCase extends RobotTestCase
+{
+    public NonAsciiDialogTestCase(Context context, int priority)
+    {
         super(context, priority);
     }
 
-    public void test() {
+    public void test()
+    {
         if (this.isSelected(this._context) == false)
             return;
 
-        try {
-            BaseScriptEngine.runScript(this._context,
-                    "PurpleRobot.persistString('ASCII', '?');");
+        try
+        {
+            BaseScriptEngine.runScript(this._context, "PurpleRobot.persistString('ASCII', '?');");
 
             Thread.sleep(1000);
 
-            NativeJavaObject value = (NativeJavaObject) BaseScriptEngine
-                    .runScript(this._context,
-                            "PurpleRobot.fetchString('ASCII')");
+            NativeJavaObject value = (NativeJavaObject) BaseScriptEngine.runScript(this._context,
+                    "PurpleRobot.fetchString('ASCII')");
 
             Assert.assertEquals("NAD002", "?", value.unwrap());
 
@@ -40,16 +42,18 @@ public class NonAsciiDialogTestCase extends RobotTestCase {
 
             Thread.sleep(5000);
 
-            value = (NativeJavaObject) BaseScriptEngine.runScript(
-                    this._context, "PurpleRobot.fetchString('ASCII')");
+            value = (NativeJavaObject) BaseScriptEngine.runScript(this._context, "PurpleRobot.fetchString('ASCII')");
 
             Assert.assertEquals("NAD003", "Y", value.unwrap());
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e)
+        {
             Assert.fail("NAD001");
         }
     }
 
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return context.getString(R.string.name_non_ascii_dialog_test);
     }
 }

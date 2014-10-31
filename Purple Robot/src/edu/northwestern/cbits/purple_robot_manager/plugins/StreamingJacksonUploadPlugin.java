@@ -33,7 +33,8 @@ import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("NewApi")
-public class StreamingJacksonUploadPlugin extends DataUploadPlugin {
+public class StreamingJacksonUploadPlugin extends DataUploadPlugin
+{
     private final static String FILE_EXTENSION = ".jackson";
     private static final String TEMP_FILE_EXTENSION = ".jackson-temp";
 
@@ -49,18 +50,18 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin {
     private long _lastAttempt = 0;
     private File _currentFile = null;
 
-    public String[] respondsTo() {
-        String[] activeActions = { Probe.PROBE_READING,
-                OutputPlugin.FORCE_UPLOAD };
+    public String[] respondsTo()
+    {
+        String[] activeActions =
+        { Probe.PROBE_READING, OutputPlugin.FORCE_UPLOAD };
         return activeActions;
     }
 
-    private void uploadFiles(final Context context,
-            final SharedPreferences prefs) {
+    private void uploadFiles(final Context context, final SharedPreferences prefs)
+    {
         long now = System.currentTimeMillis();
 
-        long duration = Long.parseLong(prefs.getString(
-                StreamingJacksonUploadPlugin.UPLOAD_INTERVAL,
+        long duration = Long.parseLong(prefs.getString(StreamingJacksonUploadPlugin.UPLOAD_INTERVAL,
                 StreamingJacksonUploadPlugin.UPLOAD_INTERVAL_DEFAULT)) * 1000;
 
         if (now - this._lastAttempt < duration)
@@ -70,23 +71,26 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin {
 
         final StreamingJacksonUploadPlugin me = this;
 
-        Runnable r = new Runnable() {
+        Runnable r = new Runnable()
+        {
             @SuppressLint("TrulyRandom")
-            public void run() {
-                synchronized (me) {
-                    try {
+            public void run()
+            {
+                synchronized (me)
+                {
+                    try
+                    {
                         me.closeOpenSession();
 
                         File pendingFolder = me.getPendingFolder();
 
-                        String[] filenames = pendingFolder
-                                .list(new FilenameFilter() {
-                                    public boolean accept(File dir,
-                                            String filename) {
-                                        return filename
-                                                .endsWith(StreamingJacksonUploadPlugin.FILE_EXTENSION);
-                                    }
-                                });
+                        String[] filenames = pendingFolder.list(new FilenameFilter()
+                        {
+                            public boolean accept(File dir, String filename)
+                            {
+                                return filename.endsWith(StreamingJacksonUploadPlugin.FILE_EXTENSION);
+                            }
+                        });
 
                         if (filenames == null)
                             filenames = new String[0];
@@ -101,22 +105,22 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin {
                         if (filenames.length > 1)
                             index = random.nextInt(filenames.length);
 
-                        File payloadFile = new File(pendingFolder,
-                                filenames[index]);
+                        File payloadFile = new File(pendingFolder, filenames[index]);
 
-                        String payload = FileUtils.readFileToString(
-                                payloadFile, "UTF-8");
+                        String payload = FileUtils.readFileToString(payloadFile, "UTF-8");
 
-                        if (me.transmitPayload(prefs, payload) == DataUploadPlugin.RESULT_SUCCESS) {
+                        if (me.transmitPayload(prefs, payload) == DataUploadPlugin.RESULT_SUCCESS)
+                        {
                             payloadFile.delete();
 
                             me._lastAttempt = 0;
                             me.uploadFiles(context, prefs);
                         }
-                    } catch (IOException e) {
+                    }
+                    catch (IOException e)
+                    {
                         LogManager.getInstance(context).logException(e);
-                        me.broadcastMessage(context
-                                .getString(R.string.message_general_error));
+                        me.broadcastMessage(context.getString(R.string.message_general_error));
                     }
                 }
             }
@@ -126,77 +130,82 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin {
         t.start();
     }
 
-    public void processIntent(final Intent intent) {
+    public void processIntent(final Intent intent)
+    {
         final Context context = this.getContext().getApplicationContext();
-        final SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(context);
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         if (prefs.getBoolean(StreamingJacksonUploadPlugin.ENABLED, false) == false)
             return;
 
-        synchronized (this) {
+        synchronized (this)
+        {
             String action = intent.getAction();
 
-            if (OutputPlugin.FORCE_UPLOAD.equals(action)) {
+            if (OutputPlugin.FORCE_UPLOAD.equals(action))
+            {
                 this._lastAttempt = 0;
 
                 this.uploadFiles(context, prefs);
-            } else if (Probe.PROBE_READING.equals(action)) {
+            }
+            else if (Probe.PROBE_READING.equals(action))
+            {
                 Bundle extras = intent.getExtras();
 
                 if (extras.containsKey(DataUploadPlugin.TRANSMIT_KEY)
-                        && extras.getBoolean(DataUploadPlugin.TRANSMIT_KEY) == false) {
+                        && extras.getBoolean(DataUploadPlugin.TRANSMIT_KEY) == false)
+                {
 
-                } else {
+                }
+                else
+                {
                     long now = System.currentTimeMillis();
 
-                    try {
+                    try
+                    {
                         File pendingFolder = this.getPendingFolder();
 
-                        if (this._currentFile != null) {
+                        if (this._currentFile != null)
+                        {
                             File f = this._currentFile.getAbsoluteFile();
 
                             long length = f.length();
                             long modDelta = now - f.lastModified();
 
-                            long size = Long
-                                    .parseLong(prefs
-                                            .getString(
-                                                    StreamingJacksonUploadPlugin.UPLOAD_SIZE,
-                                                    StreamingJacksonUploadPlugin.UPLOAD_SIZE_DEFAULT));
+                            long size = Long.parseLong(prefs.getString(StreamingJacksonUploadPlugin.UPLOAD_SIZE,
+                                    StreamingJacksonUploadPlugin.UPLOAD_SIZE_DEFAULT));
 
-                            if (this._generator != null
-                                    && (length > size || modDelta > 60000))
+                            if (this._generator != null && (length > size || modDelta > 60000))
                                 this.closeOpenSession();
                         }
 
                         this.uploadFiles(context, prefs);
 
-                        if (this._generator == null) {
-                            this._currentFile = new File(pendingFolder, now
-                                    + TEMP_FILE_EXTENSION);
+                        if (this._generator == null)
+                        {
+                            this._currentFile = new File(pendingFolder, now + TEMP_FILE_EXTENSION);
 
                             JsonFactory factory = new JsonFactory();
 
-                            this._generator = factory.createGenerator(
-                                    this._currentFile, JsonEncoding.UTF8);
+                            this._generator = factory.createGenerator(this._currentFile, JsonEncoding.UTF8);
 
                             this._generator.writeStartArray();
                         }
 
-                        StreamingJacksonUploadPlugin.writeBundle(
-                                this.getContext(), this._generator, extras);
+                        StreamingJacksonUploadPlugin.writeBundle(this.getContext(), this._generator, extras);
                         this._generator.flush();
-                    } catch (IOException e) {
-                        LogManager.getInstance(this.getContext()).logException(
-                                e);
+                    }
+                    catch (IOException e)
+                    {
+                        LogManager.getInstance(this.getContext()).logException(e);
                     }
                 }
             }
         }
     }
 
-    private void closeOpenSession() throws JsonGenerationException, IOException {
+    private void closeOpenSession() throws JsonGenerationException, IOException
+    {
         if (this._generator == null || this._currentFile == null)
             return;
 
@@ -209,24 +218,25 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin {
         this._generator = null;
 
         String tempFile = this._currentFile.getAbsolutePath();
-        String finalFile = tempFile
-                .replace(TEMP_FILE_EXTENSION, FILE_EXTENSION);
+        String finalFile = tempFile.replace(TEMP_FILE_EXTENSION, FILE_EXTENSION);
 
         this._currentFile = null;
 
         FileUtils.moveFile(new File(tempFile), new File(finalFile));
 
-        String[] filenames = pendingFolder.list(new FilenameFilter() {
-            public boolean accept(File dir, String filename) {
-                return filename
-                        .endsWith(StreamingJacksonUploadPlugin.TEMP_FILE_EXTENSION);
+        String[] filenames = pendingFolder.list(new FilenameFilter()
+        {
+            public boolean accept(File dir, String filename)
+            {
+                return filename.endsWith(StreamingJacksonUploadPlugin.TEMP_FILE_EXTENSION);
             }
         });
 
         if (filenames == null)
             filenames = new String[0];
 
-        for (String filename : filenames) {
+        for (String filename : filenames)
+        {
             File toDelete = new File(pendingFolder, filename);
 
             toDelete.delete();
@@ -234,22 +244,28 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin {
     }
 
     @SuppressWarnings("unchecked")
-    public static void writeBundle(Context context, JsonGenerator generator,
-            Bundle bundle) {
-        try {
+    public static void writeBundle(Context context, JsonGenerator generator, Bundle bundle)
+    {
+        try
+        {
             generator.writeStartObject();
 
             Map<String, Object> values = OutputPlugin.getValues(bundle);
 
-            for (String key : values.keySet()) {
+            for (String key : values.keySet())
+            {
                 Object value = values.get(key);
 
-                if (value == null || key == null) {
+                if (value == null || key == null)
+                {
                     // Skip
-                } else {
+                }
+                else
+                {
                     if (value instanceof String)
                         generator.writeStringField(key, (String) value);
-                    else if (value instanceof float[]) {
+                    else if (value instanceof float[])
+                    {
                         float[] floats = (float[]) value;
 
                         generator.writeArrayFieldStart(key);
@@ -258,7 +274,9 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin {
                             generator.writeNumber(f);
 
                         generator.writeEndArray();
-                    } else if (value instanceof int[]) {
+                    }
+                    else if (value instanceof int[])
+                    {
                         int[] ints = (int[]) value;
 
                         generator.writeArrayFieldStart(key);
@@ -267,7 +285,9 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin {
                             generator.writeNumber(i);
 
                         generator.writeEndArray();
-                    } else if (value instanceof long[]) {
+                    }
+                    else if (value instanceof long[])
+                    {
                         long[] longs = (long[]) value;
 
                         generator.writeArrayFieldStart(key);
@@ -276,7 +296,9 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin {
                             generator.writeNumber(l);
 
                         generator.writeEndArray();
-                    } else if (value instanceof double[]) {
+                    }
+                    else if (value instanceof double[])
+                    {
                         double[] doubles = (double[]) value;
 
                         generator.writeArrayFieldStart(key);
@@ -285,125 +307,130 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin {
                             generator.writeNumber(d);
 
                         generator.writeEndArray();
-                    } else if (value instanceof Float) {
+                    }
+                    else if (value instanceof Float)
+                    {
                         Float f = (Float) value;
 
                         generator.writeNumberField(key, f);
-                    } else if (value instanceof Integer) {
+                    }
+                    else if (value instanceof Integer)
+                    {
                         Integer i = (Integer) value;
 
                         generator.writeNumberField(key, i);
-                    } else if (value instanceof Long) {
+                    }
+                    else if (value instanceof Long)
+                    {
                         Long l = (Long) value;
 
                         generator.writeNumberField(key, l);
-                    } else if (value instanceof Boolean) {
+                    }
+                    else if (value instanceof Boolean)
+                    {
                         Boolean b = (Boolean) value;
 
                         generator.writeBooleanField(key, b);
-                    } else if (value instanceof Short) {
+                    }
+                    else if (value instanceof Short)
+                    {
                         Short s = (Short) value;
 
                         generator.writeNumberField(key, s);
-                    } else if (value instanceof Double) {
+                    }
+                    else if (value instanceof Double)
+                    {
                         Double d = (Double) value;
 
                         if (d.isInfinite())
                             generator.writeNumberField(key, Double.MAX_VALUE);
                         else
                             generator.writeNumberField(key, d);
-                    } else if (value instanceof List) {
+                    }
+                    else if (value instanceof List)
+                    {
                         List<Object> list = (List<Object>) value;
 
                         generator.writeArrayFieldStart(key);
 
-                        for (Object o : list) {
+                        for (Object o : list)
+                        {
                             if (o instanceof String)
                                 generator.writeString(o.toString());
                             else if (o instanceof Bundle)
-                                StreamingJacksonUploadPlugin.writeBundle(
-                                        context, generator, (Bundle) o);
-                            else if (o instanceof ScanResult) {
+                                StreamingJacksonUploadPlugin.writeBundle(context, generator, (Bundle) o);
+                            else if (o instanceof ScanResult)
+                            {
                                 ScanResult s = (ScanResult) o;
 
                                 generator.writeStartObject();
 
                                 if (s.BSSID != null)
-                                    generator
-                                            .writeStringField("BSSID", s.BSSID);
+                                    generator.writeStringField("BSSID", s.BSSID);
 
                                 if (s.SSID != null)
                                     generator.writeStringField("SSID", s.SSID);
 
                                 if (s.capabilities != null)
-                                    generator.writeStringField("Capabilities",
-                                            s.capabilities);
+                                    generator.writeStringField("Capabilities", s.capabilities);
 
-                                generator.writeNumberField("Frequency",
-                                        s.frequency);
-                                generator
-                                        .writeNumberField("Level dBm", s.level);
+                                generator.writeNumberField("Frequency", s.frequency);
+                                generator.writeNumberField("Level dBm", s.level);
 
                                 generator.writeEndObject();
-                            } else if (o instanceof RunningTaskInfo) {
+                            }
+                            else if (o instanceof RunningTaskInfo)
+                            {
                                 RunningTaskInfo r = (RunningTaskInfo) o;
 
                                 generator.writeStartObject();
 
                                 if (r.baseActivity != null)
-                                    generator.writeStringField("Base Activity",
-                                            r.baseActivity.getPackageName());
+                                    generator.writeStringField("Base Activity", r.baseActivity.getPackageName());
 
                                 if (r.description != null)
-                                    generator.writeStringField("Description",
-                                            r.description.toString());
+                                    generator.writeStringField("Description", r.description.toString());
 
-                                generator.writeNumberField("Activity Count",
-                                        r.numActivities);
-                                generator.writeNumberField(
-                                        "Running Activity Count", r.numRunning);
+                                generator.writeNumberField("Activity Count", r.numActivities);
+                                generator.writeNumberField("Running Activity Count", r.numRunning);
 
                                 generator.writeEndObject();
-                            } else if (o instanceof ApplicationInfo) {
+                            }
+                            else if (o instanceof ApplicationInfo)
+                            {
                                 ApplicationInfo a = (ApplicationInfo) o;
 
                                 generator.writeString(a.packageName);
-                            } else if (o instanceof Location) {
+                            }
+                            else if (o instanceof Location)
+                            {
                                 Location l = (Location) o;
 
                                 generator.writeStartObject();
 
-                                generator.writeNumberField("Accuracy",
-                                        l.getAccuracy());
-                                generator.writeNumberField("Altitude",
-                                        l.getAltitude());
-                                generator.writeNumberField("Bearing",
-                                        l.getBearing());
-                                generator.writeNumberField("Latitude",
-                                        l.getLatitude());
-                                generator.writeNumberField("Longitude",
-                                        l.getLongitude());
-                                generator.writeNumberField("Speed",
-                                        l.getSpeed());
-                                generator.writeNumberField("Timestamp",
-                                        l.getTime());
+                                generator.writeNumberField("Accuracy", l.getAccuracy());
+                                generator.writeNumberField("Altitude", l.getAltitude());
+                                generator.writeNumberField("Bearing", l.getBearing());
+                                generator.writeNumberField("Latitude", l.getLatitude());
+                                generator.writeNumberField("Longitude", l.getLongitude());
+                                generator.writeNumberField("Speed", l.getSpeed());
+                                generator.writeNumberField("Timestamp", l.getTime());
 
                                 if (l.getProvider() != null)
-                                    generator.writeStringField("Provider",
-                                            l.getProvider());
+                                    generator.writeStringField("Provider", l.getProvider());
                                 else
-                                    generator.writeStringField("Provider",
-                                            "Unknown");
+                                    generator.writeStringField("Provider", "Unknown");
 
                                 generator.writeEndObject();
-                            } else
-                                Log.e("PRM", "LIST OBJ: "
-                                        + o.getClass().getCanonicalName()
-                                        + " IN " + key);
+                            }
+                            else
+                                Log.e("PRM", "LIST OBJ: " + o.getClass().getCanonicalName() + " IN " + key);
                         }
 
                         generator.writeEndArray();
-                    } else if (value instanceof Location) {
+                    }
+                    else if (value instanceof Location)
+                    {
                         Location l = (Location) value;
 
                         generator.writeStartObject();
@@ -412,23 +439,25 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin {
                         generator.writeNumberField("Altitude", l.getAltitude());
                         generator.writeNumberField("Bearing", l.getBearing());
                         generator.writeNumberField("Latitude", l.getLatitude());
-                        generator.writeNumberField("Longitude",
-                                l.getLongitude());
+                        generator.writeNumberField("Longitude", l.getLongitude());
                         generator.writeNumberField("Speed", l.getSpeed());
                         generator.writeNumberField("Timestamp", l.getTime());
 
                         if (l.getProvider() != null)
-                            generator.writeStringField("Provider",
-                                    l.getProvider());
+                            generator.writeStringField("Provider", l.getProvider());
                         else
                             generator.writeStringField("Provider", "Unknown");
 
                         generator.writeEndObject();
-                    } else if (value instanceof BluetoothClass) {
+                    }
+                    else if (value instanceof BluetoothClass)
+                    {
                         BluetoothClass btClass = (BluetoothClass) value;
 
                         generator.writeStringField(key, btClass.toString());
-                    } else if (value instanceof BluetoothDevice) {
+                    }
+                    else if (value instanceof BluetoothDevice)
+                    {
                         BluetoothDevice device = (BluetoothDevice) value;
 
                         generator.writeStartObject();
@@ -440,36 +469,38 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin {
                         else
                             generator.writeStringField("Bond State", "None");
 
-                        generator.writeStringField("Device Address",
-                                device.getAddress());
-                        generator.writeStringField("Device Class", device
-                                .getBluetoothClass().toString());
+                        generator.writeStringField("Device Address", device.getAddress());
+                        generator.writeStringField("Device Class", device.getBluetoothClass().toString());
 
                         generator.writeEndObject();
-                    } else if (value instanceof Bundle) {
+                    }
+                    else if (value instanceof Bundle)
+                    {
                         generator.writeFieldName(key);
-                        StreamingJacksonUploadPlugin.writeBundle(context,
-                                generator, (Bundle) value);
-                    } else
-                        Log.e("PRM", "GOT TYPE "
-                                + value.getClass().getCanonicalName() + " FOR "
-                                + key);
+                        StreamingJacksonUploadPlugin.writeBundle(context, generator, (Bundle) value);
+                    }
+                    else
+                        Log.e("PRM", "GOT TYPE " + value.getClass().getCanonicalName() + " FOR " + key);
                 }
             }
 
             generator.writeEndObject();
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             LogManager.getInstance(context).logException(e);
         }
     }
 
-    public int pendingFilesCount() {
+    public int pendingFilesCount()
+    {
         File pendingFolder = this.getPendingFolder();
 
-        String[] filenames = pendingFolder.list(new FilenameFilter() {
-            public boolean accept(File dir, String filename) {
-                return (filename
-                        .endsWith(StreamingJacksonUploadPlugin.FILE_EXTENSION) || filename
+        String[] filenames = pendingFolder.list(new FilenameFilter()
+        {
+            public boolean accept(File dir, String filename)
+            {
+                return (filename.endsWith(StreamingJacksonUploadPlugin.FILE_EXTENSION) || filename
                         .endsWith(StreamingJacksonUploadPlugin.TEMP_FILE_EXTENSION));
             }
         });
@@ -480,13 +511,15 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin {
         return filenames.length;
     }
 
-    public long pendingFilesSize() {
+    public long pendingFilesSize()
+    {
         File pendingFolder = this.getPendingFolder();
 
-        String[] filenames = pendingFolder.list(new FilenameFilter() {
-            public boolean accept(File dir, String filename) {
-                return (filename
-                        .endsWith(StreamingJacksonUploadPlugin.FILE_EXTENSION) || filename
+        String[] filenames = pendingFolder.list(new FilenameFilter()
+        {
+            public boolean accept(File dir, String filename)
+            {
+                return (filename.endsWith(StreamingJacksonUploadPlugin.FILE_EXTENSION) || filename
                         .endsWith(StreamingJacksonUploadPlugin.TEMP_FILE_EXTENSION));
             }
         });
@@ -494,10 +527,14 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin {
         if (filenames == null)
             filenames = new String[0];
 
-        if (filenames.length < 1024) {
-            try {
+        if (filenames.length < 1024)
+        {
+            try
+            {
                 return FileUtils.sizeOf(pendingFolder);
-            } catch (IllegalArgumentException e) {
+            }
+            catch (IllegalArgumentException e)
+            {
                 // File went away - try again...
 
                 return this.pendingFilesSize();

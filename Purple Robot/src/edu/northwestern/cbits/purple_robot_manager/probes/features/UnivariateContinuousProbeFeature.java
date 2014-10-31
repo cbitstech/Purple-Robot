@@ -6,8 +6,8 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import android.content.Context;
 import android.os.Bundle;
 
-public abstract class UnivariateContinuousProbeFeature extends
-        ContinuousProbeFeature {
+public abstract class UnivariateContinuousProbeFeature extends ContinuousProbeFeature
+{
     protected static int BUFFER_SIZE = 1024;
 
     protected float[] value = new float[BUFFER_SIZE];
@@ -21,16 +21,20 @@ public abstract class UnivariateContinuousProbeFeature extends
 
     protected abstract String valueKey();
 
-    protected void analyzeBuffers(final Context context) {
+    protected void analyzeBuffers(final Context context)
+    {
         final long now = System.currentTimeMillis();
 
-        if (now - this._lastCheck > 10000 && this._running == false) {
+        if (now - this._lastCheck > 10000 && this._running == false)
+        {
             this._lastCheck = now;
 
             final UnivariateContinuousProbeFeature me = this;
 
-            Runnable r = new Runnable() {
-                public void run() {
+            Runnable r = new Runnable()
+            {
+                public void run()
+                {
                     me._running = true;
 
                     Bundle data = new Bundle();
@@ -41,10 +45,10 @@ public abstract class UnivariateContinuousProbeFeature extends
                     double maxTime = Double.MIN_VALUE;
                     double minTime = Double.MAX_VALUE;
 
-                    DescriptiveStatistics stats = new DescriptiveStatistics(
-                            XYZContinuousProbeFeature.BUFFER_SIZE);
+                    DescriptiveStatistics stats = new DescriptiveStatistics(XYZContinuousProbeFeature.BUFFER_SIZE);
 
-                    for (int i = 0; i < UnivariateContinuousProbeFeature.BUFFER_SIZE; i++) {
+                    for (int i = 0; i < UnivariateContinuousProbeFeature.BUFFER_SIZE; i++)
+                    {
                         stats.addValue(me.value[i]);
 
                         if (me.timestamp[i] > maxTime)
@@ -58,17 +62,12 @@ public abstract class UnivariateContinuousProbeFeature extends
                     data.putDouble("MAX", stats.getMax());
                     data.putDouble("MEAN", stats.getMean());
                     data.putDouble("STD_DEV", stats.getStandardDeviation());
-                    data.putDouble("RMS", Math.sqrt(stats.getSumsq()
-                            / UnivariateContinuousProbeFeature.BUFFER_SIZE));
+                    data.putDouble("RMS", Math.sqrt(stats.getSumsq() / UnivariateContinuousProbeFeature.BUFFER_SIZE));
 
-                    data.putInt("BUFFER_SIZE",
-                            UnivariateContinuousProbeFeature.BUFFER_SIZE);
-                    data.putDouble(
-                            "FREQUENCY",
-                            ((double) UnivariateContinuousProbeFeature.BUFFER_SIZE)
-                                    / ((maxTime - minTime) / 1000));
-                    data.putDouble("DURATION",
-                            ((double) ((maxTime - minTime) / 1000.0)));
+                    data.putInt("BUFFER_SIZE", UnivariateContinuousProbeFeature.BUFFER_SIZE);
+                    data.putDouble("FREQUENCY", ((double) UnivariateContinuousProbeFeature.BUFFER_SIZE)
+                            / ((maxTime - minTime) / 1000));
+                    data.putDouble("DURATION", ((double) ((maxTime - minTime) / 1000.0)));
 
                     me.transmitData(context, data);
 
@@ -81,17 +80,19 @@ public abstract class UnivariateContinuousProbeFeature extends
         }
     }
 
-    protected void processData(Context context, Bundle dataBundle) {
+    protected void processData(Context context, Bundle dataBundle)
+    {
         String key = this.valueKey();
 
-        if (dataBundle.containsKey(key)
-                && dataBundle.containsKey("EVENT_TIMESTAMP")) {
-            double[] incomingTimes = dataBundle
-                    .getDoubleArray("EVENT_TIMESTAMP");
+        if (dataBundle.containsKey(key) && dataBundle.containsKey("EVENT_TIMESTAMP"))
+        {
+            double[] incomingTimes = dataBundle.getDoubleArray("EVENT_TIMESTAMP");
             float[] values = dataBundle.getFloatArray(key);
 
-            if (values != null) {
-                for (int i = 0; i < incomingTimes.length; i++) {
+            if (values != null)
+            {
+                for (int i = 0; i < incomingTimes.length; i++)
+                {
                     if (index + i > BUFFER_SIZE)
                         this._filled = true;
 
@@ -109,14 +110,13 @@ public abstract class UnivariateContinuousProbeFeature extends
         }
     }
 
-    public String summarizeValue(Context context, Bundle bundle) {
+    public String summarizeValue(Context context, Bundle bundle)
+    {
         double mean = bundle.getDouble("MEAN");
         double stdDev = bundle.getDouble("STD_DEV");
         double rootMeanSquare = bundle.getDouble("RMS");
 
-        return String.format(
-                context.getResources().getString(
-                        R.string.summary_univariate_statistics_feature), mean,
+        return String.format(context.getResources().getString(R.string.summary_univariate_statistics_feature), mean,
                 stdDev, rootMeanSquare);
     }
 

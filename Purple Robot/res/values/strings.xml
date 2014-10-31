@@ -1306,4 +1306,5 @@
     <string name="summary_nfc_probe_desc">Generates readings when NFC tags are scanned.</string>
     
     <string name="summary_nfc_probe">Scanned Tag: %1$s</string>
+    <string name="action_scan_nfc">Scan NFC tag</string>
 </resources>

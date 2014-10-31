@@ -17,36 +17,47 @@ import android.content.Context;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.scripting.SchemeEngine;
 
-public class JsonVariablesRequestHandler implements HttpRequestHandler {
+public class JsonVariablesRequestHandler implements HttpRequestHandler
+{
     private Context _context = null;
 
-    public JsonVariablesRequestHandler(Context context) {
+    public JsonVariablesRequestHandler(Context context)
+    {
         super();
 
         this._context = context;
     }
 
-    public static JSONObject fetchStoredValues(Context context) {
+    public static JSONObject fetchStoredValues(Context context)
+    {
         JSONObject obj = new JSONObject();
 
         SchemeEngine engine = new SchemeEngine(context, null);
 
-        for (String ns : engine.fetchNamespaces()) {
+        for (String ns : engine.fetchNamespaces())
+        {
             JSONObject nsObject = new JSONObject();
 
             Map<String, Object> nsMap = engine.fetchNamespaceMap(ns);
 
-            for (String key : nsMap.keySet()) {
-                try {
+            for (String key : nsMap.keySet())
+            {
+                try
+                {
                     nsObject.put(key, nsMap.get(key));
-                } catch (JSONException e) {
+                }
+                catch (JSONException e)
+                {
                     e.printStackTrace();
                 }
             }
 
-            try {
+            try
+            {
                 obj.put(ns, nsObject);
-            } catch (JSONException e) {
+            }
+            catch (JSONException e)
+            {
                 e.printStackTrace();
             }
         }
@@ -54,25 +65,27 @@ public class JsonVariablesRequestHandler implements HttpRequestHandler {
         return obj;
     }
 
-    public void handle(HttpRequest request, HttpResponse response,
-            HttpContext argument) throws HttpException, IOException {
+    public void handle(HttpRequest request, HttpResponse response, HttpContext argument) throws HttpException,
+            IOException
+    {
         response.setStatusCode(HttpStatus.SC_OK);
 
-        JSONObject obj = JsonVariablesRequestHandler
-                .fetchStoredValues(this._context);
+        JSONObject obj = JsonVariablesRequestHandler.fetchStoredValues(this._context);
 
-        try {
+        try
+        {
             StringEntity body = new StringEntity(obj.toString(2));
             body.setContentType("application/json");
 
             response.setEntity(body);
-        } catch (JSONException e) {
+        }
+        catch (JSONException e)
+        {
             e.printStackTrace();
 
             response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
 
-            StringEntity body = new StringEntity(
-                    this._context.getString(R.string.error_malformed_request));
+            StringEntity body = new StringEntity(this._context.getString(R.string.error_malformed_request));
             body.setContentType("text/plain");
 
             response.setEntity(body);

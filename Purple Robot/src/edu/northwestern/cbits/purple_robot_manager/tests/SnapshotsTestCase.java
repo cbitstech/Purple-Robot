@@ -16,39 +16,46 @@ import edu.northwestern.cbits.purple_robot_manager.probes.features.Feature;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 
-public class SnapshotsTestCase extends RobotTestCase {
-    public SnapshotsTestCase(Context context, int priority) {
+public class SnapshotsTestCase extends RobotTestCase
+{
+    public SnapshotsTestCase(Context context, int priority)
+    {
         super(context, priority);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public void test() {
+    @SuppressWarnings(
+    { "unchecked", "rawtypes" })
+    public void test()
+    {
         if (this.isSelected(this._context) == false)
             return;
 
         long now = System.currentTimeMillis();
 
-        BaseScriptEngine.runScript(this._context,
-                "PurpleRobot.emitReading('SnapshotTest', '" + now + "');");
+        BaseScriptEngine.runScript(this._context, "PurpleRobot.emitReading('SnapshotTest', '" + now + "');");
 
-        try {
+        try
+        {
             Thread.sleep(5000);
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e)
+        {
 
         }
 
-        NativeJavaObject snapId = (NativeJavaObject) BaseScriptEngine
-                .runScript(this._context,
-                        "PurpleRobot.takeSnapshot('Snapshot Test');");
+        NativeJavaObject snapId = (NativeJavaObject) BaseScriptEngine.runScript(this._context,
+                "PurpleRobot.takeSnapshot('Snapshot Test');");
 
-        try {
+        try
+        {
             Thread.sleep(1000);
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e)
+        {
 
         }
 
-        NativeArray value = (NativeArray) BaseScriptEngine.runScript(
-                this._context, "PurpleRobot.fetchSnapshotIds();");
+        NativeArray value = (NativeArray) BaseScriptEngine.runScript(this._context, "PurpleRobot.fetchSnapshotIds();");
 
         Assert.assertNotNull("SNAP001", value);
 
@@ -58,7 +65,8 @@ public class SnapshotsTestCase extends RobotTestCase {
 
         long testId = 0;
 
-        while (iter.hasNext()) {
+        while (iter.hasNext())
+        {
             String id = iter.next().toString();
 
             long idTimestamp = Long.parseLong(id);
@@ -69,11 +77,10 @@ public class SnapshotsTestCase extends RobotTestCase {
 
         Assert.assertTrue("SNAP003", testId > now);
 
-        Assert.assertTrue("SNAP004",
-                snapId.unwrap().toString().equals("" + testId));
+        Assert.assertTrue("SNAP004", snapId.unwrap().toString().equals("" + testId));
 
-        NativeObject snapshot = (NativeObject) BaseScriptEngine.runScript(
-                this._context, "PurpleRobot.fetchSnapshot('" + testId + "');");
+        NativeObject snapshot = (NativeObject) BaseScriptEngine.runScript(this._context, "PurpleRobot.fetchSnapshot('"
+                + testId + "');");
 
         Assert.assertNotNull("SNAP005", snapshot);
 
@@ -81,15 +88,15 @@ public class SnapshotsTestCase extends RobotTestCase {
 
         Assert.assertNotNull("SNAP006", snapValue);
 
-        ArrayList<Map<String, Object>> valuesList = (ArrayList<Map<String, Object>>) snapValue
-                .get("values");
+        ArrayList<Map<String, Object>> valuesList = (ArrayList<Map<String, Object>>) snapValue.get("values");
 
         Object savedValue = null;
 
-        for (Map<String, Object> values : valuesList) {
-            if (values.get("probe").equals("SnapshotTest")) {
-                Map<String, Object> probeValue = (Map<String, Object>) values
-                        .get("value");
+        for (Map<String, Object> values : valuesList)
+        {
+            if (values.get("probe").equals("SnapshotTest"))
+            {
+                Map<String, Object> probeValue = (Map<String, Object>) values.get("value");
 
                 savedValue = probeValue.get(Feature.FEATURE_VALUE);
             }
@@ -98,20 +105,21 @@ public class SnapshotsTestCase extends RobotTestCase {
         Assert.assertNotNull("SNAP007", savedValue);
         Assert.assertEquals("SNAP008", savedValue.toString(), "" + now);
 
-        BaseScriptEngine.runScript(this._context,
-                "PurpleRobot.deleteSnapshot('" + testId + "');");
+        BaseScriptEngine.runScript(this._context, "PurpleRobot.deleteSnapshot('" + testId + "');");
 
-        snapshot = (NativeObject) BaseScriptEngine.runScript(this._context,
-                "PurpleRobot.fetchSnapshot('" + testId + "');");
+        snapshot = (NativeObject) BaseScriptEngine.runScript(this._context, "PurpleRobot.fetchSnapshot('" + testId
+                + "');");
 
         Assert.assertTrue("SNAP009", snapshot == null);
     }
 
-    public int estimatedMinutes() {
+    public int estimatedMinutes()
+    {
         return 1;
     }
 
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return context.getString(R.string.name_snapshot_test);
     }
 }

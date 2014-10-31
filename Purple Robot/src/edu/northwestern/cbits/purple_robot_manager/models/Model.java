@@ -52,7 +52,8 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
  * @author Administrator
  * 
  */
-public abstract class Model {
+public abstract class Model
+{
     public static final boolean DEFAULT_ENABLED = true;
     private static long _lastEnabledCheck = 0;
     private static boolean _lastEnabled = false;
@@ -113,9 +114,9 @@ public abstract class Model {
      *         appropriate {@link Model} class can be determined.
      */
 
-    public final static Model modelForUrl(Context context, String jsonUrl) {
-        String hash = EncryptionManager.getInstance().createHash(context,
-                jsonUrl);
+    public final static Model modelForUrl(Context context, String jsonUrl)
+    {
+        String hash = EncryptionManager.getInstance().createHash(context, jsonUrl);
 
         SharedPreferences prefs = Probe.getPreferences(context);
 
@@ -139,25 +140,31 @@ public abstract class Model {
 
         // Load any cached model definitions...
 
-        try {
+        try
+        {
             contents = FileUtils.readFileToString(cachedModel);
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
 
         }
 
         // Fetch the contents of the URL & replace the cached version if
         // successful retrieving the definition online...
 
-        try {
+        try
+        {
             BufferedReader in = null;
 
-            if (jsonUrl.startsWith("file:///android_asset/")) {
+            if (jsonUrl.startsWith("file:///android_asset/"))
+            {
                 AssetManager assets = context.getAssets();
 
                 in = new BufferedReader(new InputStreamReader(
-                        assets.open(jsonUrl.replace("file:///android_asset/",
-                                ""))));
-            } else {
+                        assets.open(jsonUrl.replace("file:///android_asset/", ""))));
+            }
+            else
+            {
                 URL u = new URL(jsonUrl);
 
                 in = new BufferedReader(new InputStreamReader(u.openStream()));
@@ -173,17 +180,23 @@ public abstract class Model {
             in.close();
 
             contents = sb.toString();
-        } catch (MalformedURLException e) {
+        }
+        catch (MalformedURLException e)
+        {
             LogManager.getInstance(context).logException(e);
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             LogManager.getInstance(context).logException(e);
         }
 
         // Determine which subclass to use to instantiate an instance. Return
         // the new instance if successful...
 
-        if (contents != null) {
-            try {
+        if (contents != null)
+        {
+            try
+            {
                 JSONObject json = new JSONObject(contents);
 
                 String type = json.getString("model_type");
@@ -202,7 +215,9 @@ public abstract class Model {
                 else if (NoiseModel.TYPE.equals(type))
                     return new NoiseModel(context, Uri.parse(jsonUrl));
 
-            } catch (JSONException e) {
+            }
+            catch (JSONException e)
+            {
                 LogManager.getInstance(context).logException(e);
             }
         }
@@ -219,7 +234,8 @@ public abstract class Model {
      *         implement alternative behaviors.
      */
 
-    public Uri uri() {
+    public Uri uri()
+    {
         return null;
     }
 
@@ -232,7 +248,8 @@ public abstract class Model {
      *            instances.
      */
 
-    public void enable(Context context) {
+    public void enable(Context context)
+    {
         String key = this.getPreferenceKey();
 
         SharedPreferences prefs = Probe.getPreferences(context);
@@ -252,7 +269,8 @@ public abstract class Model {
      *            instances.
      */
 
-    public void disable(Context context) {
+    public void disable(Context context)
+    {
         String key = this.getPreferenceKey();
 
         SharedPreferences prefs = Probe.getPreferences(context);
@@ -275,14 +293,15 @@ public abstract class Model {
      * @return Status of the model.
      */
 
-    public boolean enabled(Context context) {
-        if (ModelManager.getInstance(context).enabled(context)) {
+    public boolean enabled(Context context)
+    {
+        if (ModelManager.getInstance(context).enabled(context))
+        {
             String key = this.getPreferenceKey();
 
             SharedPreferences prefs = Probe.getPreferences(context);
 
-            return prefs.getBoolean("config_model_" + key + "_enabled",
-                    Model.DEFAULT_ENABLED);
+            return prefs.getBoolean("config_model_" + key + "_enabled", Model.DEFAULT_ENABLED);
         }
 
         return false;
@@ -299,7 +318,8 @@ public abstract class Model {
      */
 
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    {
         PreferenceManager manager = activity.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(activity);
@@ -331,18 +351,20 @@ public abstract class Model {
      * @return Status of the model.
      */
 
-    public boolean isEnabled(Context context) {
+    public boolean isEnabled(Context context)
+    {
         long now = System.currentTimeMillis();
         SharedPreferences prefs = Probe.getPreferences(context);
 
-        if (now - Model._lastEnabledCheck > 10000) {
+        if (now - Model._lastEnabledCheck > 10000)
+        {
             Model._lastEnabledCheck = now;
 
-            Model._lastEnabled = prefs.getBoolean("config_models_enabled",
-                    Model.DEFAULT_ENABLED);
+            Model._lastEnabled = prefs.getBoolean("config_models_enabled", Model.DEFAULT_ENABLED);
         }
 
-        if (Model._lastEnabled) {
+        if (Model._lastEnabled)
+        {
             String key = this.getPreferenceKey();
 
             return prefs.getBoolean("config_model_" + key + "_enabled", true);
@@ -362,12 +384,11 @@ public abstract class Model {
      *            Estimated accuracy of the prediction.
      */
 
-    protected void transmitPrediction(Context context, double prediction,
-            double accuracy) {
+    protected void transmitPrediction(Context context, double prediction, double accuracy)
+    {
         Bundle bundle = new Bundle();
         bundle.putString("PROBE", this.title(context));
-        bundle.putDouble("TIMESTAMP",
-                ((double) System.currentTimeMillis()) / 1000);
+        bundle.putDouble("TIMESTAMP", ((double) System.currentTimeMillis()) / 1000);
         bundle.putDouble("PREDICTION", prediction);
         bundle.putBoolean("FROM_MODEL", true);
 
@@ -384,7 +405,8 @@ public abstract class Model {
      * @return Map containing the prediction and any relevant metadata.
      */
 
-    public Map<String, Object> latestPrediction(Context context) {
+    public Map<String, Object> latestPrediction(Context context)
+    {
         HashMap<String, Object> prediction = new HashMap<String, Object>();
 
         prediction.put("prediction", this._latestPrediction);
@@ -408,18 +430,19 @@ public abstract class Model {
      * @param map
      */
 
-    protected void transmitPrediction(Context context, String prediction,
-            double accuracy, Map<String, Object> map) {
+    protected void transmitPrediction(Context context, String prediction, double accuracy, Map<String, Object> map)
+    {
         Bundle bundle = new Bundle();
         bundle.putString("PROBE", this.title(context));
-        bundle.putDouble("TIMESTAMP",
-                ((double) System.currentTimeMillis()) / 1000);
+        bundle.putDouble("TIMESTAMP", ((double) System.currentTimeMillis()) / 1000);
         bundle.putString("PREDICTION", prediction);
         bundle.putBoolean("FROM_MODEL", true);
         bundle.putDouble("ACCURACY", accuracy);
 
-        if (map != null) {
-            for (String key : map.keySet()) {
+        if (map != null)
+        {
+            for (String key : map.keySet())
+            {
                 Object value = map.get(key);
 
                 if (value instanceof Double)
@@ -437,8 +460,8 @@ public abstract class Model {
         this._latestAccuracy = accuracy;
     }
 
-    protected void transmitPrediction(Context context, String prediction,
-            double accuracy) {
+    protected void transmitPrediction(Context context, String prediction, double accuracy)
+    {
         this.transmitPrediction(context, prediction, accuracy, null);
     }
 
@@ -451,16 +474,16 @@ public abstract class Model {
      *            Bundle containing the prediction and any relevant metadata.
      */
 
-    protected void transmitData(Context context, Bundle data) {
-        if (context != null) {
+    protected void transmitData(Context context, Bundle data)
+    {
+        if (context != null)
+        {
             UUID uuid = UUID.randomUUID();
             data.putString("GUID", uuid.toString());
             data.putString("MODEL_NAME", this.title(context));
 
-            LocalBroadcastManager localManager = LocalBroadcastManager
-                    .getInstance(context);
-            Intent intent = new Intent(
-                    edu.northwestern.cbits.purple_robot_manager.probes.Probe.PROBE_READING);
+            LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(context);
+            Intent intent = new Intent(edu.northwestern.cbits.purple_robot_manager.probes.Probe.PROBE_READING);
             intent.putExtras(data);
 
             localManager.sendBroadcast(intent);
@@ -498,7 +521,8 @@ public abstract class Model {
 
     public abstract String modelType();
 
-    public String mappedFeatureName(String key) {
+    public String mappedFeatureName(String key)
+    {
         return this._featureMap.get(key);
     }
 }

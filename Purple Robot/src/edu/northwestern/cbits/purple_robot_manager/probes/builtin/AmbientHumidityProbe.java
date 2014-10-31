@@ -24,15 +24,16 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("SimpleDateFormat")
-public class AmbientHumidityProbe extends ContinuousProbe implements
-        SensorEventListener {
+public class AmbientHumidityProbe extends ContinuousProbe implements SensorEventListener
+{
     private static final String DEFAULT_THRESHOLD = "5.0";
 
     public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.AmbientHumidityProbe";
 
     private static int BUFFER_SIZE = 32;
 
-    private static String[] fieldNames = { "HUMIDITY" };
+    private static String[] fieldNames =
+    { "HUMIDITY" };
 
     private double _lastValue = Double.MAX_VALUE;
 
@@ -46,11 +47,13 @@ public class AmbientHumidityProbe extends ContinuousProbe implements
 
     private int _lastFrequency = -1;
 
-    public String probeCategory(Context context) {
+    public String probeCategory(Context context)
+    {
         return context.getString(R.string.probe_sensor_category);
     }
 
-    public Bundle formattedBundle(Context context, Bundle bundle) {
+    public Bundle formattedBundle(Context context, Bundle bundle)
+    {
         Bundle formatted = super.formattedBundle(context, bundle);
 
         double[] eventTimes = bundle.getDoubleArray("EVENT_TIMESTAMP");
@@ -58,16 +61,17 @@ public class AmbientHumidityProbe extends ContinuousProbe implements
 
         ArrayList<String> keys = new ArrayList<String>();
 
-        if (humidity != null && eventTimes != null) {
-            SimpleDateFormat sdf = new SimpleDateFormat(
-                    context.getString(R.string.display_date_format));
+        if (humidity != null && eventTimes != null)
+        {
+            SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.display_date_format));
 
-            if (eventTimes.length > 1) {
+            if (eventTimes.length > 1)
+            {
                 Bundle readings = new Bundle();
 
-                for (int i = 0; i < eventTimes.length; i++) {
-                    String formatString = String.format(context
-                            .getString(R.string.display_humidity_reading),
+                for (int i = 0; i < eventTimes.length; i++)
+                {
+                    String formatString = String.format(context.getString(R.string.display_humidity_reading),
                             humidity[i]);
 
                     double time = eventTimes[i];
@@ -84,13 +88,11 @@ public class AmbientHumidityProbe extends ContinuousProbe implements
                 if (keys.size() > 0)
                     readings.putStringArrayList("KEY_ORDER", keys);
 
-                formatted.putBundle(
-                        context.getString(R.string.display_humidity_readings),
-                        readings);
-            } else if (eventTimes.length > 0) {
-                String formatString = String.format(
-                        context.getString(R.string.display_humidity_reading),
-                        humidity[0]);
+                formatted.putBundle(context.getString(R.string.display_humidity_readings), readings);
+            }
+            else if (eventTimes.length > 0)
+            {
+                String formatString = String.format(context.getString(R.string.display_humidity_reading), humidity[0]);
 
                 double time = eventTimes[0];
 
@@ -103,24 +105,27 @@ public class AmbientHumidityProbe extends ContinuousProbe implements
         return formatted;
     };
 
-    public long getFrequency() {
+    public long getFrequency()
+    {
         SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
 
-        return Long.parseLong(prefs.getString(
-                "config_probe_humidity_built_in_frequency",
+        return Long.parseLong(prefs.getString("config_probe_humidity_built_in_frequency",
                 ContinuousProbe.DEFAULT_FREQUENCY));
     }
 
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return AmbientHumidityProbe.NAME;
     }
 
-    public int getTitleResource() {
+    public int getTitleResource()
+    {
         return R.string.title_humidity_probe;
     }
 
     @SuppressLint("InlinedApi")
-    public boolean isEnabled(Context context) {
+    public boolean isEnabled(Context context)
+    {
         if (Build.VERSION.SDK_INT < 14)
             return false;
 
@@ -128,40 +133,36 @@ public class AmbientHumidityProbe extends ContinuousProbe implements
 
         this._context = context.getApplicationContext();
 
-        SensorManager sensors = (SensorManager) context
-                .getSystemService(Context.SENSOR_SERVICE);
+        SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY);
 
-        if (super.isEnabled(context)) {
-            if (prefs.getBoolean("config_probe_humidity_built_in_enabled",
-                    ContinuousProbe.DEFAULT_ENABLED)) {
-                int frequency = Integer.parseInt(prefs.getString(
-                        "config_probe_humidity_built_in_frequency",
+        if (super.isEnabled(context))
+        {
+            if (prefs.getBoolean("config_probe_humidity_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
+            {
+                int frequency = Integer.parseInt(prefs.getString("config_probe_humidity_built_in_frequency",
                         ContinuousProbe.DEFAULT_FREQUENCY));
 
-                if (this._lastFrequency != frequency) {
+                if (this._lastFrequency != frequency)
+                {
                     sensors.unregisterListener(this, sensor);
 
-                    switch (frequency) {
+                    switch (frequency)
+                    {
                     case SensorManager.SENSOR_DELAY_FASTEST:
-                        sensors.registerListener(this, sensor,
-                                SensorManager.SENSOR_DELAY_FASTEST, null);
+                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST, null);
                         break;
                     case SensorManager.SENSOR_DELAY_GAME:
-                        sensors.registerListener(this, sensor,
-                                SensorManager.SENSOR_DELAY_GAME, null);
+                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME, null);
                         break;
                     case SensorManager.SENSOR_DELAY_UI:
-                        sensors.registerListener(this, sensor,
-                                SensorManager.SENSOR_DELAY_UI, null);
+                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI, null);
                         break;
                     case SensorManager.SENSOR_DELAY_NORMAL:
-                        sensors.registerListener(this, sensor,
-                                SensorManager.SENSOR_DELAY_NORMAL, null);
+                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL, null);
                         break;
                     default:
-                        sensors.registerListener(this, sensor,
-                                SensorManager.SENSOR_DELAY_GAME, null);
+                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME, null);
                         break;
 
                     }
@@ -170,11 +171,15 @@ public class AmbientHumidityProbe extends ContinuousProbe implements
                 }
 
                 return true;
-            } else {
+            }
+            else
+            {
                 sensors.unregisterListener(this, sensor);
                 this._lastFrequency = -1;
             }
-        } else {
+        }
+        else
+        {
             sensors.unregisterListener(this, sensor);
             this._lastFrequency = -1;
         }
@@ -182,13 +187,14 @@ public class AmbientHumidityProbe extends ContinuousProbe implements
         return false;
     }
 
-    protected boolean passesThreshold(SensorEvent event) {
+    protected boolean passesThreshold(SensorEvent event)
+    {
         long now = System.currentTimeMillis();
 
-        if (now - this.lastThresholdLookup > 5000) {
+        if (now - this.lastThresholdLookup > 5000)
+        {
             SharedPreferences prefs = Probe.getPreferences(this._context);
-            this.lastThreshold = Double.parseDouble(prefs.getString(
-                    "config_probe_humidity_threshold",
+            this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_humidity_threshold",
                     AmbientHumidityProbe.DEFAULT_THRESHOLD));
 
             this.lastThresholdLookup = now;
@@ -207,7 +213,8 @@ public class AmbientHumidityProbe extends ContinuousProbe implements
         return passes;
     }
 
-    public Map<String, Object> configuration(Context context) {
+    public Map<String, Object> configuration(Context context)
+    {
         Map<String, Object> map = super.configuration(context);
 
         map.put(ContinuousProbe.PROBE_THRESHOLD, this.lastThreshold);
@@ -215,24 +222,27 @@ public class AmbientHumidityProbe extends ContinuousProbe implements
         return map;
     }
 
-    public void updateFromMap(Context context, Map<String, Object> params) {
+    public void updateFromMap(Context context, Map<String, Object> params)
+    {
         super.updateFromMap(context, params);
 
-        if (params.containsKey(ContinuousProbe.PROBE_THRESHOLD)) {
+        if (params.containsKey(ContinuousProbe.PROBE_THRESHOLD))
+        {
             Object threshold = params.get(ContinuousProbe.PROBE_THRESHOLD);
 
-            if (threshold instanceof Double) {
+            if (threshold instanceof Double)
+            {
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putString("config_probe_humidity_threshold",
-                        threshold.toString());
+                e.putString("config_probe_humidity_threshold", threshold.toString());
                 e.commit();
             }
         }
     }
 
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    {
         PreferenceScreen screen = super.preferenceScreen(activity);
 
         ListPreference threshold = new ListPreference(activity);
@@ -249,14 +259,17 @@ public class AmbientHumidityProbe extends ContinuousProbe implements
     }
 
     @SuppressLint("NewApi")
-    public void onSensorChanged(SensorEvent event) {
+    public void onSensorChanged(SensorEvent event)
+    {
         if (this.shouldProcessEvent(event) == false)
             return;
 
         double now = System.currentTimeMillis();
 
-        if (this.passesThreshold(event)) {
-            synchronized (this) {
+        if (this.passesThreshold(event))
+        {
+            synchronized (this)
+            {
                 double elapsed = SystemClock.uptimeMillis();
                 double boot = (now - elapsed) * 1000 * 1000;
 
@@ -273,14 +286,14 @@ public class AmbientHumidityProbe extends ContinuousProbe implements
 
                 bufferIndex += 1;
 
-                if (bufferIndex >= timeBuffer.length) {
+                if (bufferIndex >= timeBuffer.length)
+                {
                     Sensor sensor = event.sensor;
 
                     Bundle data = new Bundle();
 
                     Bundle sensorBundle = new Bundle();
-                    sensorBundle.putFloat("MAXIMUM_RANGE",
-                            sensor.getMaximumRange());
+                    sensorBundle.putFloat("MAXIMUM_RANGE", sensor.getMaximumRange());
                     sensorBundle.putString("NAME", sensor.getName());
                     sensorBundle.putFloat("POWER", sensor.getPower());
                     sensorBundle.putFloat("RESOLUTION", sensor.getResolution());
@@ -295,7 +308,8 @@ public class AmbientHumidityProbe extends ContinuousProbe implements
 
                     data.putDoubleArray("EVENT_TIMESTAMP", timeBuffer);
 
-                    for (int i = 0; i < fieldNames.length; i++) {
+                    for (int i = 0; i < fieldNames.length; i++)
+                    {
                         data.putFloatArray(fieldNames[i], valueBuffer[i]);
                     }
 
@@ -307,19 +321,20 @@ public class AmbientHumidityProbe extends ContinuousProbe implements
         }
     }
 
-    public String getPreferenceKey() {
+    public String getPreferenceKey()
+    {
         return "humidity_built_in";
     }
 
-    public String summarizeValue(Context context, Bundle bundle) {
+    public String summarizeValue(Context context, Bundle bundle)
+    {
         double humidity = bundle.getDoubleArray("HUMIDITY")[0];
 
-        return String.format(
-                context.getResources().getString(
-                        R.string.summary_humidity_probe), humidity);
+        return String.format(context.getResources().getString(R.string.summary_humidity_probe), humidity);
     }
 
-    public int getSummaryResource() {
+    public int getSummaryResource()
+    {
         return R.string.summary_humidity_probe_desc;
     }
 }

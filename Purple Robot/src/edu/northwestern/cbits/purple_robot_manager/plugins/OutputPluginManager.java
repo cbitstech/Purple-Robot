@@ -9,12 +9,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-public class OutputPluginManager extends BroadcastReceiver {
+public class OutputPluginManager extends BroadcastReceiver
+{
     public static OutputPluginManager sharedInstance = new OutputPluginManager();
 
     private Map<Class<OutputPlugin>, OutputPlugin> _plugins = new HashMap<Class<OutputPlugin>, OutputPlugin>();
 
-    public OutputPlugin pluginForClass(Context context, Class<?> c) {
+    public OutputPlugin pluginForClass(Context context, Class<?> c)
+    {
         OutputPlugin plugin = this._plugins.get(c);
 
         if (plugin != null)
@@ -25,13 +27,16 @@ public class OutputPluginManager extends BroadcastReceiver {
         return this._plugins.get(c);
     }
 
-    public void onReceive(Context context, Intent intent) {
-        for (Class<OutputPlugin> pluginClass : OutputPlugin
-                .availablePluginClasses()) {
-            try {
+    public void onReceive(Context context, Intent intent)
+    {
+        for (Class<OutputPlugin> pluginClass : OutputPlugin.availablePluginClasses())
+        {
+            try
+            {
                 OutputPlugin plugin = this._plugins.get(pluginClass);
 
-                if (plugin == null) {
+                if (plugin == null)
+                {
                     plugin = pluginClass.newInstance();
                     this._plugins.put(pluginClass, plugin);
                 }
@@ -40,9 +45,13 @@ public class OutputPluginManager extends BroadcastReceiver {
 
                 if (intent != null)
                     plugin.process(intent);
-            } catch (InstantiationException e) {
+            }
+            catch (InstantiationException e)
+            {
                 LogManager.getInstance(context).logException(e);
-            } catch (IllegalAccessException e) {
+            }
+            catch (IllegalAccessException e)
+            {
                 LogManager.getInstance(context).logException(e);
             }
         }

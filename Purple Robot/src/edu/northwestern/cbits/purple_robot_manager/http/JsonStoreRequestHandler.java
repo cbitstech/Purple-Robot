@@ -23,20 +23,24 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 
-public class JsonStoreRequestHandler implements HttpRequestHandler {
+public class JsonStoreRequestHandler implements HttpRequestHandler
+{
     private Context _context = null;
 
-    public JsonStoreRequestHandler(Context context) {
+    public JsonStoreRequestHandler(Context context)
+    {
         super();
 
         this._context = context;
     }
 
-    public void handle(HttpRequest request, HttpResponse response,
-            HttpContext argument) throws HttpException, IOException {
+    public void handle(HttpRequest request, HttpResponse response, HttpContext argument) throws HttpException,
+            IOException
+    {
         response.setStatusCode(HttpStatus.SC_OK);
 
-        if (request instanceof HttpEntityEnclosingRequest) {
+        if (request instanceof HttpEntityEnclosingRequest)
+        {
             HttpEntityEnclosingRequest enclosingRequest = (HttpEntityEnclosingRequest) request;
 
             HttpEntity entity = enclosingRequest.getEntity();
@@ -47,10 +51,12 @@ public class JsonStoreRequestHandler implements HttpRequestHandler {
 
             JSONObject arguments = null;
 
-            try {
-                arguments = new JSONObject(URLDecoder.decode(
-                        u.getQueryParameter("json"), "UTF-8"));
-            } catch (JSONException e) {
+            try
+            {
+                arguments = new JSONObject(URLDecoder.decode(u.getQueryParameter("json"), "UTF-8"));
+            }
+            catch (JSONException e)
+            {
                 LogManager.getInstance(this._context).logException(e);
 
                 response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
@@ -63,15 +69,18 @@ public class JsonStoreRequestHandler implements HttpRequestHandler {
                 return;
             }
 
-            if (arguments != null) {
-                try {
-                    JavaScriptEngine engine = new JavaScriptEngine(
-                            this._context);
+            if (arguments != null)
+            {
+                try
+                {
+                    JavaScriptEngine engine = new JavaScriptEngine(this._context);
 
                     String action = arguments.getString("action");
 
-                    if ("fetch".equals(action)) {
-                        if (arguments.has("keys")) {
+                    if ("fetch".equals(action))
+                    {
+                        if (arguments.has("keys"))
+                        {
                             JSONObject result = new JSONObject();
                             result.put("status", "success");
 
@@ -79,7 +88,8 @@ public class JsonStoreRequestHandler implements HttpRequestHandler {
 
                             JSONObject values = new JSONObject();
 
-                            for (int i = 0; i < keys.length(); i++) {
+                            for (int i = 0; i < keys.length(); i++)
+                            {
                                 String key = keys.getString(i);
 
                                 String value = engine.fetchString(key);
@@ -89,21 +99,24 @@ public class JsonStoreRequestHandler implements HttpRequestHandler {
 
                             result.put("values", values);
 
-                            StringEntity body = new StringEntity(
-                                    result.toString(2));
+                            StringEntity body = new StringEntity(result.toString(2));
                             body.setContentType("application/json");
 
                             response.setEntity(body);
 
                             return;
                         }
-                    } else if ("put".equals(action)) {
+                    }
+                    else if ("put".equals(action))
+                    {
                         JSONArray names = arguments.names();
 
-                        for (int i = 0; i < names.length(); i++) {
+                        for (int i = 0; i < names.length(); i++)
+                        {
                             String name = names.getString(i);
 
-                            if ("action".equals(name) == false) {
+                            if ("action".equals(name) == false)
+                            {
                                 String value = arguments.getString(name);
 
                                 if (value != null)
@@ -121,7 +134,9 @@ public class JsonStoreRequestHandler implements HttpRequestHandler {
 
                         return;
                     }
-                } catch (JSONException e) {
+                }
+                catch (JSONException e)
+                {
                     LogManager.getInstance(this._context).logException(e);
 
                     response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
@@ -138,8 +153,7 @@ public class JsonStoreRequestHandler implements HttpRequestHandler {
 
         response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
 
-        StringEntity body = new StringEntity(
-                this._context.getString(R.string.error_malformed_request));
+        StringEntity body = new StringEntity(this._context.getString(R.string.error_malformed_request));
         body.setContentType("text/plain");
 
         response.setEntity(body);

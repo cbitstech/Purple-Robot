@@ -20,7 +20,8 @@ import android.widget.LinearLayout;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
-public class TouchEventsProbe extends Probe {
+public class TouchEventsProbe extends Probe
+{
     private static final boolean DEFAULT_ENABLED = false;
 
     private static final String ENABLED_KEY = "config_probe_activity_detection_enabled";
@@ -30,19 +31,23 @@ public class TouchEventsProbe extends Probe {
     private ArrayList<Long> _timestamps = new ArrayList<Long>();
     private long _lastTouch = 0;
 
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.TouchEventsProbe";
     }
 
-    public String title(Context context) {
+    public String title(Context context)
+    {
         return context.getString(R.string.title_touch_events_probe);
     }
 
-    public String probeCategory(Context context) {
+    public String probeCategory(Context context)
+    {
         return context.getResources().getString(R.string.probe_misc_category);
     }
 
-    public void enable(Context context) {
+    public void enable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -51,7 +56,8 @@ public class TouchEventsProbe extends Probe {
         e.commit();
     }
 
-    public void disable(Context context) {
+    public void disable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -60,7 +66,8 @@ public class TouchEventsProbe extends Probe {
         e.commit();
     }
 
-    public boolean isEnabled(Context context) {
+    public boolean isEnabled(Context context)
+    {
         final SharedPreferences prefs = Probe.getPreferences(context);
 
         boolean enabled = super.isEnabled(context);
@@ -69,16 +76,17 @@ public class TouchEventsProbe extends Probe {
             this._context = context.getApplicationContext();
 
         if (enabled)
-            enabled = prefs.getBoolean(TouchEventsProbe.ENABLED_KEY,
-                    TouchEventsProbe.DEFAULT_ENABLED);
+            enabled = prefs.getBoolean(TouchEventsProbe.ENABLED_KEY, TouchEventsProbe.DEFAULT_ENABLED);
 
-        if (enabled) {
-            WindowManager wm = (WindowManager) this._context
-                    .getApplicationContext().getSystemService(
-                            Context.WINDOW_SERVICE);
+        if (enabled)
+        {
+            WindowManager wm = (WindowManager) this._context.getApplicationContext().getSystemService(
+                    Context.WINDOW_SERVICE);
 
-            synchronized (wm) {
-                if (this._overlay == null) {
+            synchronized (wm)
+            {
+                if (this._overlay == null)
+                {
 
                     WindowManager.LayoutParams params = new WindowManager.LayoutParams();
 
@@ -93,13 +101,13 @@ public class TouchEventsProbe extends Probe {
 
                     final TouchEventsProbe me = this;
 
-                    this._overlay = new LinearLayout(
-                            this._context.getApplicationContext());
-                    this._overlay.setBackgroundColor(android.graphics.Color
-                            .argb(0, 255, 255, 255));
+                    this._overlay = new LinearLayout(this._context.getApplicationContext());
+                    this._overlay.setBackgroundColor(android.graphics.Color.argb(0, 255, 255, 255));
                     this._overlay.setHapticFeedbackEnabled(true);
-                    this._overlay.setOnTouchListener(new OnTouchListener() {
-                        public boolean onTouch(View arg0, MotionEvent event) {
+                    this._overlay.setOnTouchListener(new OnTouchListener()
+                    {
+                        public boolean onTouch(View arg0, MotionEvent event)
+                        {
                             me._lastTouch = System.currentTimeMillis();
                             me._timestamps.add(me._lastTouch);
 
@@ -111,7 +119,8 @@ public class TouchEventsProbe extends Probe {
                 }
             }
 
-            if (this._lastTouch != 0) {
+            if (this._lastTouch != 0)
+            {
                 long now = System.currentTimeMillis();
 
                 Bundle bundle = new Bundle();
@@ -128,9 +137,10 @@ public class TouchEventsProbe extends Probe {
             }
 
             return true;
-        } else if (this._overlay != null) {
-            WindowManager wm = (WindowManager) this._context
-                    .getSystemService(Context.WINDOW_SERVICE);
+        }
+        else if (this._overlay != null)
+        {
+            WindowManager wm = (WindowManager) this._context.getSystemService(Context.WINDOW_SERVICE);
 
             if (this._overlay.isAttachedToWindow())
                 wm.removeView(this._overlay);
@@ -141,20 +151,20 @@ public class TouchEventsProbe extends Probe {
         return false;
     }
 
-    public String summarizeValue(Context context, Bundle bundle) {
+    public String summarizeValue(Context context, Bundle bundle)
+    {
         int count = (int) bundle.getDouble("TOUCH_COUNT");
         long delay = (long) bundle.getDouble("LAST_TOUCH_DELAY");
 
         if (count == 1)
-            return context.getResources().getString(
-                    R.string.summary_touch_events_probe_single, delay);
+            return context.getResources().getString(R.string.summary_touch_events_probe_single, delay);
 
-        return context.getResources().getString(
-                R.string.summary_touch_events_probe, count, delay);
+        return context.getResources().getString(R.string.summary_touch_events_probe, count, delay);
     }
 
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    {
         PreferenceManager manager = activity.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(activity);
@@ -171,7 +181,8 @@ public class TouchEventsProbe extends Probe {
         return screen;
     }
 
-    public String summary(Context context) {
+    public String summary(Context context)
+    {
         return context.getString(R.string.summary_touch_events_probe_desc);
     }
 }

@@ -32,7 +32,8 @@ import edu.northwestern.cbits.purple_robot_manager.db.DistancesProvider;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
-public class AddressBookDistancesProbe extends Probe {
+public class AddressBookDistancesProbe extends Probe
+{
     private static final boolean DEFAULT_ENABLED = false;
     private static final String DEFAULT_FREQUENCY = "3600000";
 
@@ -44,20 +45,23 @@ public class AddressBookDistancesProbe extends Probe {
 
     private LocationListener _listener = null;
 
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.AddressBookDistancesProbe";
     }
 
-    public String title(Context context) {
+    public String title(Context context)
+    {
         return context.getString(R.string.title_distances_probe);
     }
 
-    public String probeCategory(Context context) {
-        return context.getResources().getString(
-                R.string.probe_personal_info_category);
+    public String probeCategory(Context context)
+    {
+        return context.getResources().getString(R.string.probe_personal_info_category);
     }
 
-    public void enable(Context context) {
+    public void enable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -66,7 +70,8 @@ public class AddressBookDistancesProbe extends Probe {
         e.commit();
     }
 
-    public void disable(Context context) {
+    public void disable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -75,136 +80,122 @@ public class AddressBookDistancesProbe extends Probe {
         e.commit();
     }
 
-    public boolean isEnabled(Context context) {
+    public boolean isEnabled(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
-        LocationManager locationManager = (LocationManager) context
-                .getSystemService(Context.LOCATION_SERVICE);
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
-        if (super.isEnabled(context)) {
+        if (super.isEnabled(context))
+        {
             long now = System.currentTimeMillis();
 
-            if (prefs.getBoolean("config_probe_distances_enabled",
-                    AddressBookDistancesProbe.DEFAULT_ENABLED)) {
+            if (prefs.getBoolean("config_probe_distances_enabled", AddressBookDistancesProbe.DEFAULT_ENABLED))
+            {
 
                 HashMap<String, String> addresses = new HashMap<String, String>();
 
-                long freq = Long.parseLong(prefs.getString(
-                        "config_probe_distances_frequency",
+                long freq = Long.parseLong(prefs.getString("config_probe_distances_frequency",
                         AddressBookDistancesProbe.DEFAULT_FREQUENCY));
-                boolean doHash = prefs.getBoolean(
-                        "config_probe_distances_hash_data",
-                        Probe.DEFAULT_HASH_DATA);
+                boolean doHash = prefs.getBoolean("config_probe_distances_hash_data", Probe.DEFAULT_HASH_DATA);
 
-                synchronized (this) {
+                synchronized (this)
+                {
                     final AddressBookDistancesProbe me = this;
 
-                    if (this._listener == null) {
-                        this._listener = new LocationListener() {
-                            public void onLocationChanged(Location location) {
+                    if (this._listener == null)
+                    {
+                        this._listener = new LocationListener()
+                        {
+                            public void onLocationChanged(Location location)
+                            {
                                 me._lastLatitude = location.getLatitude();
                                 me._lastLongitude = location.getLongitude();
                             }
 
-                            public void onProviderDisabled(String provider) {
+                            public void onProviderDisabled(String provider)
+                            {
 
                             }
 
-                            public void onProviderEnabled(String provider) {
+                            public void onProviderEnabled(String provider)
+                            {
 
                             }
 
-                            public void onStatusChanged(String provider,
-                                    int status, Bundle extras) {
+                            public void onStatusChanged(String provider, int status, Bundle extras)
+                            {
 
                             }
                         };
 
-                        locationManager.requestLocationUpdates(
-                                LocationManager.PASSIVE_PROVIDER, 0, 0,
-                                this._listener);
-                    } else if (now - this._lastCheck > freq
-                            && this._lastLatitude < 90
-                            && this._lastLongitude < 180) {
+                        locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 0, 0, this._listener);
+                    }
+                    else if (now - this._lastCheck > freq && this._lastLatitude < 90 && this._lastLongitude < 180)
+                    {
                         Bundle bundle = new Bundle();
                         bundle.putString("PROBE", this.name(context));
-                        bundle.putLong("TIMESTAMP",
-                                System.currentTimeMillis() / 1000);
+                        bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
 
                         this._lastCheck = now;
 
-                        String selection = ContactsContract.Groups.TITLE
-                                + " LIKE ?";
-                        String[] args = { "Purple Robot%" };
+                        String selection = ContactsContract.Groups.TITLE + " LIKE ?";
+                        String[] args =
+                        { "Purple Robot%" };
 
-                        Cursor cursor = context.getContentResolver().query(
-                                ContactsContract.Groups.CONTENT_URI, null,
+                        Cursor cursor = context.getContentResolver().query(ContactsContract.Groups.CONTENT_URI, null,
                                 selection, args, null);
 
-                        while (cursor.moveToNext()) {
+                        while (cursor.moveToNext())
+                        {
                             String membersSelection = ContactsContract.CommonDataKinds.GroupMembership.GROUP_ROW_ID
                                     + " = ?";
-                            String[] membersArgs = { cursor
-                                    .getString(cursor
-                                            .getColumnIndex(ContactsContract.Groups._ID)) };
-                            String[] membersProjection = {
-                                    ContactsContract.CommonDataKinds.GroupMembership.CONTACT_ID,
+                            String[] membersArgs =
+                            { cursor.getString(cursor.getColumnIndex(ContactsContract.Groups._ID)) };
+                            String[] membersProjection =
+                            { ContactsContract.CommonDataKinds.GroupMembership.CONTACT_ID,
                                     ContactsContract.Contacts.DISPLAY_NAME };
 
-                            Cursor membersCursor = context
-                                    .getContentResolver()
-                                    .query(ContactsContract.Data.CONTENT_URI,
-                                            membersProjection,
-                                            membersSelection, membersArgs, null);
+                            Cursor membersCursor = context.getContentResolver().query(
+                                    ContactsContract.Data.CONTENT_URI, membersProjection, membersSelection,
+                                    membersArgs, null);
 
-                            while (membersCursor.moveToNext()) {
-                                int contactId = membersCursor
-                                        .getInt(membersCursor
-                                                .getColumnIndex(ContactsContract.CommonDataKinds.GroupMembership.CONTACT_ID));
-                                String contactName = membersCursor
-                                        .getString(membersCursor
-                                                .getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                            while (membersCursor.moveToNext())
+                            {
+                                int contactId = membersCursor.getInt(membersCursor
+                                        .getColumnIndex(ContactsContract.CommonDataKinds.GroupMembership.CONTACT_ID));
+                                String contactName = membersCursor.getString(membersCursor
+                                        .getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
 
-                                String addressSelection = ContactsContract.Data.CONTACT_ID
-                                        + " = ? AND "
-                                        + ContactsContract.Data.MIMETYPE
-                                        + " = ?";
-                                String[] addressArgs = {
-                                        "" + contactId,
-                                        ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE };
+                                String addressSelection = ContactsContract.Data.CONTACT_ID + " = ? AND "
+                                        + ContactsContract.Data.MIMETYPE + " = ?";
+                                String[] addressArgs =
+                                { "" + contactId, ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE };
 
-                                String[] projection = new String[] {
-                                        StructuredPostal.FORMATTED_ADDRESS,
-                                        StructuredPostal.TYPE }; // ,
+                                String[] projection = new String[]
+                                { StructuredPostal.FORMATTED_ADDRESS, StructuredPostal.TYPE }; // ,
 
-                                Cursor addressCursor = context
-                                        .getContentResolver()
-                                        .query(ContactsContract.Data.CONTENT_URI,
-                                                projection, addressSelection,
-                                                addressArgs, null);
+                                Cursor addressCursor = context.getContentResolver().query(
+                                        ContactsContract.Data.CONTENT_URI, projection, addressSelection, addressArgs,
+                                        null);
 
-                                while (addressCursor.moveToNext()) {
-                                    String address = addressCursor
-                                            .getString(addressCursor
-                                                    .getColumnIndex(StructuredPostal.FORMATTED_ADDRESS));
+                                while (addressCursor.moveToNext())
+                                {
+                                    String address = addressCursor.getString(addressCursor
+                                            .getColumnIndex(StructuredPostal.FORMATTED_ADDRESS));
                                     int type = addressCursor
-                                            .getInt(addressCursor
-                                                    .getColumnIndex(StructuredPostal.TYPE));
+                                            .getInt(addressCursor.getColumnIndex(StructuredPostal.TYPE));
 
-                                    String label = context
-                                            .getString(R.string.config_probe_distances_label_other);
+                                    String label = context.getString(R.string.config_probe_distances_label_other);
 
                                     if (type == StructuredPostal.TYPE_HOME)
-                                        label = context
-                                                .getString(R.string.config_probe_distances_label_home);
+                                        label = context.getString(R.string.config_probe_distances_label_home);
                                     else if (type == StructuredPostal.TYPE_WORK)
-                                        label = context
-                                                .getString(R.string.config_probe_distances_label_work);
+                                        label = context.getString(R.string.config_probe_distances_label_work);
 
                                     label = contactName + ": " + label;
 
                                     if (doHash)
-                                        label = EncryptionManager.getInstance()
-                                                .createHash(context, label);
+                                        label = EncryptionManager.getInstance().createHash(context, label);
 
                                     addresses.put(label, address);
                                 }
@@ -221,27 +212,22 @@ public class AddressBookDistancesProbe extends Probe {
                         here.setLatitude(this._lastLatitude);
                         here.setLongitude(this._lastLongitude);
 
-                        Bundle nowDistances = this.distancesForDays(context,
-                                here, addresses, 0, now, false);
+                        Bundle nowDistances = this.distancesForDays(context, here, addresses, 0, now, false);
 
                         if (nowDistances != null)
-                            bundle.putBundle(AddressBookDistancesProbe.NOW,
-                                    nowDistances);
+                            bundle.putBundle(AddressBookDistancesProbe.NOW, nowDistances);
 
-                        Bundle todayDistances = this.distancesForDays(context,
-                                here, addresses, 1, now, false);
+                        Bundle todayDistances = this.distancesForDays(context, here, addresses, 1, now, false);
 
                         if (todayDistances != null)
                             bundle.putBundle("TODAY_AVERAGE", todayDistances);
 
-                        Bundle weekDistances = this.distancesForDays(context,
-                                here, addresses, 7, now, false);
+                        Bundle weekDistances = this.distancesForDays(context, here, addresses, 7, now, false);
 
                         if (weekDistances != null)
                             bundle.putBundle("WEEK_AVERAGE", weekDistances);
 
-                        Bundle monthDistances = this.distancesForDays(context,
-                                here, addresses, 28, now, true);
+                        Bundle monthDistances = this.distancesForDays(context, here, addresses, 28, now, true);
 
                         if (monthDistances != null)
                             bundle.putBundle("MONTH_AVERAGE", monthDistances);
@@ -254,7 +240,8 @@ public class AddressBookDistancesProbe extends Probe {
             }
         }
 
-        if (this._listener != null) {
+        if (this._listener != null)
+        {
             locationManager.removeUpdates(this._listener);
             this._listener = null;
         }
@@ -263,19 +250,20 @@ public class AddressBookDistancesProbe extends Probe {
     }
 
     @SuppressLint("DefaultLocale")
-    private Bundle distancesForDays(Context context, Location here,
-            HashMap<String, String> addresses, long days, long now,
-            boolean clear) {
+    private Bundle distancesForDays(Context context, Location here, HashMap<String, String> addresses, long days,
+            long now, boolean clear)
+    {
         long start = now - (days * 24 * 60 * 60 * 1000);
 
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Bundle bundle = new Bundle();
 
-        if (days == 0) {
-            for (String label : addresses.keySet()) {
-                String address = addresses.get(label).trim().toLowerCase()
-                        .replace("\n", " ").replace("\r", " ");
+        if (days == 0)
+        {
+            for (String label : addresses.keySet())
+            {
+                String address = addresses.get(label).trim().toLowerCase().replace("\n", " ").replace("\r", " ");
 
                 while (address.indexOf("  ") != -1)
                     address = address.replace("  ", " ");
@@ -285,14 +273,16 @@ public class AddressBookDistancesProbe extends Probe {
                 String locationJson = prefs.getString(key, null);
                 Location there = null;
 
-                try {
-                    if (locationJson == null) {
+                try
+                {
+                    if (locationJson == null)
+                    {
                         Geocoder geo = new Geocoder(context);
 
-                        List<Address> matches = geo.getFromLocationName(
-                                address, 1);
+                        List<Address> matches = geo.getFromLocationName(address, 1);
 
-                        if (matches.size() > 0) {
+                        if (matches.size() > 0)
+                        {
                             Address match = matches.get(0);
 
                             JSONObject json = new JSONObject();
@@ -308,22 +298,28 @@ public class AddressBookDistancesProbe extends Probe {
                             there = new Location("Purple Robot");
                             there.setLatitude(match.getLatitude());
                             there.setLongitude(match.getLongitude());
-                        } else {
-                            throw new Exception("Unable to find location for '"
-                                    + address + "'.");
                         }
-                    } else {
+                        else
+                        {
+                            throw new Exception("Unable to find location for '" + address + "'.");
+                        }
+                    }
+                    else
+                    {
                         JSONObject json = new JSONObject(locationJson);
 
                         there = new Location("Purple Robot");
                         there.setLatitude(json.getDouble("latitude"));
                         there.setLongitude(json.getDouble("longitude"));
                     }
-                } catch (Throwable e) {
+                }
+                catch (Throwable e)
+                {
                     LogManager.getInstance(context).logException(e);
                 }
 
-                if (there != null) {
+                if (there != null)
+                {
                     float distance = here.distanceTo(there);
 
                     bundle.putFloat(label, distance);
@@ -333,57 +329,58 @@ public class AddressBookDistancesProbe extends Probe {
                     value.put(DistancesProvider.DISTANCE, distance);
                     value.put(DistancesProvider.TIMESTAMP, now);
 
-                    context.getContentResolver().insert(
-                            DistancesProvider.CONTENT_URI, value);
+                    context.getContentResolver().insert(DistancesProvider.CONTENT_URI, value);
                 }
             }
-        } else {
-            for (String label : addresses.keySet()) {
-                String testSelection = DistancesProvider.NAME + " = ? AND "
-                        + DistancesProvider.TIMESTAMP + " < ?";
-                String[] testSelectionArgs = { label, "" + start };
-                String[] testProjection = { DistancesProvider.DISTANCE,
-                        DistancesProvider.TIMESTAMP };
+        }
+        else
+        {
+            for (String label : addresses.keySet())
+            {
+                String testSelection = DistancesProvider.NAME + " = ? AND " + DistancesProvider.TIMESTAMP + " < ?";
+                String[] testSelectionArgs =
+                { label, "" + start };
+                String[] testProjection =
+                { DistancesProvider.DISTANCE, DistancesProvider.TIMESTAMP };
 
-                Cursor testCursor = context.getContentResolver().query(
-                        DistancesProvider.CONTENT_URI, testProjection,
+                Cursor testCursor = context.getContentResolver().query(DistancesProvider.CONTENT_URI, testProjection,
                         testSelection, testSelectionArgs, null);
 
                 boolean goOn = (testCursor.getCount() > 0);
 
                 testCursor.close();
 
-                if (goOn) {
-                    String selection = DistancesProvider.NAME + " = ? AND "
-                            + DistancesProvider.TIMESTAMP + " >= ? AND "
-                            + DistancesProvider.TIMESTAMP + " <= ?";
-                    String[] selectionArgs = { label, "" + start, "" + now };
-                    String[] projection = { DistancesProvider.DISTANCE,
-                            DistancesProvider.TIMESTAMP };
+                if (goOn)
+                {
+                    String selection = DistancesProvider.NAME + " = ? AND " + DistancesProvider.TIMESTAMP
+                            + " >= ? AND " + DistancesProvider.TIMESTAMP + " <= ?";
+                    String[] selectionArgs =
+                    { label, "" + start, "" + now };
+                    String[] projection =
+                    { DistancesProvider.DISTANCE, DistancesProvider.TIMESTAMP };
 
-                    Cursor cursor = context.getContentResolver().query(
-                            DistancesProvider.CONTENT_URI, projection,
+                    Cursor cursor = context.getContentResolver().query(DistancesProvider.CONTENT_URI, projection,
                             selection, selectionArgs, null);
 
                     DescriptiveStatistics stats = new DescriptiveStatistics();
 
-                    while (cursor.moveToNext()) {
-                        double distance = cursor.getDouble(cursor
-                                .getColumnIndex(DistancesProvider.DISTANCE));
+                    while (cursor.moveToNext())
+                    {
+                        double distance = cursor.getDouble(cursor.getColumnIndex(DistancesProvider.DISTANCE));
 
                         stats.addValue(distance);
                     }
 
                     cursor.close();
 
-                    if (stats.getN() > 0) {
+                    if (stats.getN() > 0)
+                    {
                         Bundle placeStats = new Bundle();
 
                         placeStats.putDouble("MEAN", stats.getMean());
                         placeStats.putDouble("MIN", stats.getMin());
                         placeStats.putDouble("MAX", stats.getMax());
-                        placeStats.putDouble("STD_DEV",
-                                stats.getStandardDeviation());
+                        placeStats.putDouble("STD_DEV", stats.getStandardDeviation());
                         placeStats.putDouble("COUNT", stats.getN());
 
                         bundle.putBundle(label, placeStats);
@@ -391,13 +388,13 @@ public class AddressBookDistancesProbe extends Probe {
                 }
             }
 
-            if (clear) {
+            if (clear)
+            {
                 String deleteSelection = DistancesProvider.TIMESTAMP + " < ?";
-                String[] deleteArgs = { "" + start };
+                String[] deleteArgs =
+                { "" + start };
 
-                context.getContentResolver().delete(
-                        DistancesProvider.CONTENT_URI, deleteSelection,
-                        deleteArgs);
+                context.getContentResolver().delete(DistancesProvider.CONTENT_URI, deleteSelection, deleteArgs);
             }
         }
 
@@ -407,74 +404,79 @@ public class AddressBookDistancesProbe extends Probe {
         return bundle;
     }
 
-    public String summarizeValue(Context context, Bundle bundle) {
+    public String summarizeValue(Context context, Bundle bundle)
+    {
         float minDistance = Float.MAX_VALUE;
         String minLabel = "";
 
         Bundle now = bundle.getBundle(AddressBookDistancesProbe.NOW);
 
-        for (String key : now.keySet()) {
+        for (String key : now.keySet())
+        {
             float distance = now.getFloat(key);
 
-            if (distance < minDistance) {
+            if (distance < minDistance)
+            {
                 minDistance = distance;
                 minLabel = key;
             }
         }
 
-        return context.getResources().getString(
-                R.string.summary_distances_probe, minLabel, minDistance);
+        return context.getResources().getString(R.string.summary_distances_probe, minLabel, minDistance);
     }
 
-    public Map<String, Object> configuration(Context context) {
+    public Map<String, Object> configuration(Context context)
+    {
         Map<String, Object> map = super.configuration(context);
 
         SharedPreferences prefs = Probe.getPreferences(context);
 
-        long freq = Long.parseLong(prefs.getString(
-                "config_probe_distance_frequency",
+        long freq = Long.parseLong(prefs.getString("config_probe_distance_frequency",
                 AddressBookDistancesProbe.DEFAULT_FREQUENCY));
         map.put(Probe.PROBE_FREQUENCY, freq);
 
-        boolean hash = prefs.getBoolean("config_probe_distances_hash_data",
-                Probe.DEFAULT_HASH_DATA);
+        boolean hash = prefs.getBoolean("config_probe_distances_hash_data", Probe.DEFAULT_HASH_DATA);
         map.put(Probe.HASH_DATA, hash);
 
         return map;
     }
 
-    public void updateFromMap(Context context, Map<String, Object> params) {
+    public void updateFromMap(Context context, Map<String, Object> params)
+    {
         super.updateFromMap(context, params);
 
-        if (params.containsKey(Probe.PROBE_FREQUENCY)) {
+        if (params.containsKey(Probe.PROBE_FREQUENCY))
+        {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
 
-            if (frequency instanceof Long) {
+            if (frequency instanceof Long)
+            {
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putString("config_probe_distances_frequency",
-                        frequency.toString());
+                e.putString("config_probe_distances_frequency", frequency.toString());
                 e.commit();
             }
         }
 
-        if (params.containsKey(Probe.HASH_DATA)) {
+        if (params.containsKey(Probe.HASH_DATA))
+        {
             Object hash = params.get(Probe.HASH_DATA);
 
-            if (hash instanceof Boolean) {
+            if (hash instanceof Boolean)
+            {
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putBoolean("config_probe_distances_hash_data",
-                        ((Boolean) hash).booleanValue());
+                e.putBoolean("config_probe_distances_hash_data", ((Boolean) hash).booleanValue());
                 e.commit();
             }
         }
     }
 
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    {
         PreferenceManager manager = activity.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(activity);
@@ -508,7 +510,8 @@ public class AddressBookDistancesProbe extends Probe {
         return screen;
     }
 
-    public String summary(Context context) {
+    public String summary(Context context)
+    {
         return context.getString(R.string.summary_distances_probe_desc);
     }
 

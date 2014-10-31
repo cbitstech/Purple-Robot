@@ -18,12 +18,15 @@ import edu.northwestern.cbits.purple_robot_manager.triggers.DateTrigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
-public class RepeatingTriggerTestCase extends RobotTestCase {
-    public RepeatingTriggerTestCase(Context context, int priority) {
+public class RepeatingTriggerTestCase extends RobotTestCase
+{
+    public RepeatingTriggerTestCase(Context context, int priority)
+    {
         super(context, priority);
     }
 
-    public void test() {
+    public void test()
+    {
         if (this.isSelected(this._context) == false)
             return;
 
@@ -35,11 +38,9 @@ public class RepeatingTriggerTestCase extends RobotTestCase {
         Assert.assertEquals("RDT0", 0, triggers.allTriggers().size());
 
         // TODO: Tests for these script calls elsewhere...
-        BaseScriptEngine.runScript(this._context,
-                "PurpleRobot.persistString('repeat-test-token', '');");
-        NativeJavaObject persisted = (NativeJavaObject) BaseScriptEngine
-                .runScript(this._context,
-                        "PurpleRobot.fetchString('repeat-test-token');");
+        BaseScriptEngine.runScript(this._context, "PurpleRobot.persistString('repeat-test-token', '');");
+        NativeJavaObject persisted = (NativeJavaObject) BaseScriptEngine.runScript(this._context,
+                "PurpleRobot.fetchString('repeat-test-token');");
 
         Assert.assertEquals("RDT1", "", persisted.unwrap()); // TODO: Unwrap at
                                                              // scripting
@@ -51,7 +52,8 @@ public class RepeatingTriggerTestCase extends RobotTestCase {
 
         long now = System.currentTimeMillis() + 60000;
 
-        try {
+        try
+        {
             JSONObject triggerDef = new JSONObject();
             triggerDef.put("type", "datetime");
 
@@ -60,25 +62,24 @@ public class RepeatingTriggerTestCase extends RobotTestCase {
             triggerDef
                     .put(Trigger.ACTION,
                             "PurpleRobot.playDefaultTone(); PurpleRobot.testLog('Date Test: Repeat Fired!'); PurpleRobot.persistString('repeat-test-token', PurpleRobot.fetchString('repeat-test-token') + 'a'); PurpleRobot.vibrate('SOS');");
-            triggerDef.put(DateTrigger.DATETIME_START,
-                    sdf.format(new Date(now)));
-            triggerDef.put(DateTrigger.DATETIME_REPEATS,
-                    "FREQ=MINUTELY;INTERVAL=2");
+            triggerDef.put(DateTrigger.DATETIME_START, sdf.format(new Date(now)));
+            triggerDef.put(DateTrigger.DATETIME_REPEATS, "FREQ=MINUTELY;INTERVAL=2");
 
-            String script = "PurpleRobot.updateTrigger('"
-                    + triggerId
-                    + "', "
-                    + triggerDef.toString().replace("'", "\\'")
-                            .replace("\"", "'") + ");";
+            String script = "PurpleRobot.updateTrigger('" + triggerId + "', "
+                    + triggerDef.toString().replace("'", "\\'").replace("\"", "'") + ");";
 
             BaseScriptEngine.runScript(this._context, script);
 
             this.broadcastUpdate("Created repeating trigger.");
 
             Thread.sleep(2000);
-        } catch (JSONException e) {
+        }
+        catch (JSONException e)
+        {
             Assert.fail("RDT2");
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e)
+        {
             Assert.fail("RDT3");
         }
 
@@ -98,36 +99,34 @@ public class RepeatingTriggerTestCase extends RobotTestCase {
 
         Assert.assertTrue("RDT7", upcomingTimes.size() > 0);
 
-        Assert.assertTrue(
-                "RDT8",
-                dateTrigger.matches(this._context, new Date(now
-                        + (2 * 60 * 1000) + 15000)));
+        Assert.assertTrue("RDT8", dateTrigger.matches(this._context, new Date(now + (2 * 60 * 1000) + 15000)));
 
-        try {
+        try
+        {
             long wait = (10 * 60 * 1000);
 
-            while (wait > 0) {
-                this.broadcastUpdate("Sleeping. " + (wait / (60 * 1000))
-                        + " minutes remaining...", 0);
+            while (wait > 0)
+            {
+                this.broadcastUpdate("Sleeping. " + (wait / (60 * 1000)) + " minutes remaining...", 0);
                 Thread.sleep(60 * 1000);
 
                 wait = wait - (60 * 1000);
             }
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e)
+        {
             Assert.fail();
         }
 
         this.broadcastUpdate("Verifying that repeating trigger fired...");
 
         Assert.assertTrue("RDT9", dateTrigger.lastFireTime(this._context) > 0);
-        Assert.assertTrue("RDTA",
-                dateTrigger.lastFireTime(this._context) < System
-                        .currentTimeMillis());
+        Assert.assertTrue("RDTA", dateTrigger.lastFireTime(this._context) < System.currentTimeMillis());
 
         this.broadcastUpdate("Checking trigger results...");
 
-        persisted = (NativeJavaObject) BaseScriptEngine.runScript(
-                this._context, "PurpleRobot.fetchString('repeat-test-token');");
+        persisted = (NativeJavaObject) BaseScriptEngine.runScript(this._context,
+                "PurpleRobot.fetchString('repeat-test-token');");
         Assert.assertEquals("RDTB", "aaaaa", persisted.unwrap());
 
         this.broadcastUpdate("Clearing triggers...");
@@ -135,11 +134,13 @@ public class RepeatingTriggerTestCase extends RobotTestCase {
         triggers.removeAllTriggers();
     }
 
-    public int estimatedMinutes() {
+    public int estimatedMinutes()
+    {
         return 11;
     }
 
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return context.getString(R.string.name_repeating_date_trigger_test);
     }
 }

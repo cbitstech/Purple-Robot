@@ -24,12 +24,14 @@ import android.preference.PreferenceManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
-public class LogServerEmulatorRequestHandler implements HttpRequestHandler {
+public class LogServerEmulatorRequestHandler implements HttpRequestHandler
+{
     public static final String LOG_COUNT = "edu.northwestern.cbits.purple_robot_manager.logging.LogManager.LOG_COUNT";
 
     private Context _context = null;
 
-    public LogServerEmulatorRequestHandler(Context context) {
+    public LogServerEmulatorRequestHandler(Context context)
+    {
         super();
 
         this._context = context;
@@ -37,11 +39,13 @@ public class LogServerEmulatorRequestHandler implements HttpRequestHandler {
 
     @Override
     @SuppressWarnings("deprecation")
-    public void handle(HttpRequest request, HttpResponse response,
-            HttpContext argument) throws HttpException, IOException {
+    public void handle(HttpRequest request, HttpResponse response, HttpContext argument) throws HttpException,
+            IOException
+    {
         response.setStatusCode(HttpStatus.SC_OK);
 
-        if (request instanceof HttpEntityEnclosingRequest) {
+        if (request instanceof HttpEntityEnclosingRequest)
+        {
             HttpEntityEnclosingRequest enclosingRequest = (HttpEntityEnclosingRequest) request;
 
             HttpEntity entity = enclosingRequest.getEntity();
@@ -54,19 +58,23 @@ public class LogServerEmulatorRequestHandler implements HttpRequestHandler {
 
             String jsonArg = URLDecoder.decode(entityString.substring(5));
 
-            try {
-                try {
-                    jsonArg = URLDecoder.decode(u.getQueryParameter("json"),
-                            "UTF-16");
-
-                    arguments = new JSONObject(jsonArg);
-                } catch (JSONException e) {
-                    jsonArg = URLDecoder.decode(u.getQueryParameter("json"),
-                            "UTF-16");
+            try
+            {
+                try
+                {
+                    jsonArg = URLDecoder.decode(u.getQueryParameter("json"), "UTF-16");
 
                     arguments = new JSONObject(jsonArg);
                 }
-            } catch (JSONException e) {
+                catch (JSONException e)
+                {
+                    jsonArg = URLDecoder.decode(u.getQueryParameter("json"), "UTF-16");
+
+                    arguments = new JSONObject(jsonArg);
+                }
+            }
+            catch (JSONException e)
+            {
                 LogManager.getInstance(this._context).logException(e);
 
                 response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
@@ -77,7 +85,9 @@ public class LogServerEmulatorRequestHandler implements HttpRequestHandler {
                 response.setEntity(body);
 
                 return;
-            } catch (NullPointerException e) {
+            }
+            catch (NullPointerException e)
+            {
                 LogManager.getInstance(this._context).logException(e);
 
                 response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
@@ -90,36 +100,37 @@ public class LogServerEmulatorRequestHandler implements HttpRequestHandler {
                 return;
             }
 
-            if (arguments != null) {
-                try {
-                    if ("test_event".equals(arguments.get("event_type"))) {
-                        SharedPreferences prefs = PreferenceManager
-                                .getDefaultSharedPreferences(this._context);
+            if (arguments != null)
+            {
+                try
+                {
+                    if ("test_event".equals(arguments.get("event_type")))
+                    {
+                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
 
-                        int count = prefs.getInt(
-                                LogServerEmulatorRequestHandler.LOG_COUNT, 0);
+                        int count = prefs.getInt(LogServerEmulatorRequestHandler.LOG_COUNT, 0);
 
                         Editor e = prefs.edit();
-                        e.putInt(LogServerEmulatorRequestHandler.LOG_COUNT,
-                                count + 1);
+                        e.putInt(LogServerEmulatorRequestHandler.LOG_COUNT, count + 1);
                         e.commit();
 
-                        StringEntity body = new StringEntity(
-                                arguments.toString(2));
+                        StringEntity body = new StringEntity(arguments.toString(2));
                         body.setContentType("application/json");
 
                         response.setEntity(body);
-                    } else {
+                    }
+                    else
+                    {
                         response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
 
-                        StringEntity body = new StringEntity(
-                                this._context
-                                        .getString(R.string.error_only_logs_test));
+                        StringEntity body = new StringEntity(this._context.getString(R.string.error_only_logs_test));
                         body.setContentType("text/plain");
 
                         response.setEntity(body);
                     }
-                } catch (JSONException e) {
+                }
+                catch (JSONException e)
+                {
                     response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
 
                     StringEntity body = new StringEntity(e.toString());

@@ -7,12 +7,13 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 
-public class ShutdownReceiver extends BroadcastReceiver {
+public class ShutdownReceiver extends BroadcastReceiver
+{
     public static final String SHUTDOWN_KEY = "system_last_halt";
 
-    public void onReceive(Context context, Intent intent) {
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(context);
+    public void onReceive(Context context, Intent intent)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         Editor e = prefs.edit();
 

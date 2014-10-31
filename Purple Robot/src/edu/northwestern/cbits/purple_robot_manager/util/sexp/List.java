@@ -2,25 +2,30 @@ package edu.northwestern.cbits.purple_robot_manager.util.sexp;
 
 import java.util.ArrayList;
 
-public class List extends SExpression {
+public class List extends SExpression
+{
     private ArrayList<SExpression> _elements = new ArrayList<SExpression>();
 
-    public List() {
+    public List()
+    {
 
     }
 
-    public List(java.util.List<SExpression> items) {
+    public List(java.util.List<SExpression> items)
+    {
         this._elements.addAll(items);
     }
 
-    public String toString(boolean pretty) {
+    public String toString(boolean pretty)
+    {
         // TODO: Obey pretty...
 
         StringBuffer sb = new StringBuffer();
 
         sb.append("(");
 
-        for (SExpression sexp : this._elements) {
+        for (SExpression sexp : this._elements)
+        {
             if (sb.length() > 1)
                 sb.append(" ");
 

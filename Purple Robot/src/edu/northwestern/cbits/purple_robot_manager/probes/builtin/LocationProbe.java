@@ -27,7 +27,8 @@ import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.util.DBSCAN;
 
-public class LocationProbe extends Probe implements LocationListener {
+public class LocationProbe extends Probe implements LocationListener
+{
     public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe";
 
     public static final String LATITUDE = "LATITUDE";
@@ -55,23 +56,29 @@ public class LocationProbe extends Probe implements LocationListener {
     private long _lastCache = 0;
     private Location _lastLocation = null;
 
-    public String probeCategory(Context context) {
+    public String probeCategory(Context context)
+    {
         return context.getString(R.string.probe_sensor_category);
     }
 
-    public Intent viewIntent(Context context) {
-        try {
+    public Intent viewIntent(Context context)
+    {
+        try
+        {
             Class.forName("com.google.android.maps.MapActivity");
 
             Intent i = new Intent(context, LocationProbeActivity.class);
 
             return i;
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             return super.viewIntent(context);
         }
     }
 
-    public void enable(Context context) {
+    public void enable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -80,7 +87,8 @@ public class LocationProbe extends Probe implements LocationListener {
         e.commit();
     }
 
-    public void disable(Context context) {
+    public void disable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -89,42 +97,46 @@ public class LocationProbe extends Probe implements LocationListener {
         e.commit();
     }
 
-    public Map<String, Object> configuration(Context context) {
+    public Map<String, Object> configuration(Context context)
+    {
         Map<String, Object> map = super.configuration(context);
 
         SharedPreferences prefs = Probe.getPreferences(context);
 
-        long freq = Long.parseLong(prefs.getString(
-                "config_probe_location_frequency", Probe.DEFAULT_FREQUENCY));
+        long freq = Long.parseLong(prefs.getString("config_probe_location_frequency", Probe.DEFAULT_FREQUENCY));
 
         map.put(Probe.PROBE_FREQUENCY, freq);
 
         return map;
     }
 
-    public void updateFromMap(Context context, Map<String, Object> params) {
+    public void updateFromMap(Context context, Map<String, Object> params)
+    {
         super.updateFromMap(context, params);
 
-        if (params.containsKey(Probe.PROBE_FREQUENCY)) {
+        if (params.containsKey(Probe.PROBE_FREQUENCY))
+        {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
 
-            if (frequency instanceof Long) {
+            if (frequency instanceof Long)
+            {
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putString("config_probe_location_frequency",
-                        frequency.toString());
+                e.putString("config_probe_location_frequency", frequency.toString());
                 e.commit();
             }
         }
     }
 
-    public String summary(Context context) {
+    public String summary(Context context)
+    {
         return context.getString(R.string.summary_location_probe_desc);
     }
 
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(final PreferenceActivity activity) {
+    public PreferenceScreen preferenceScreen(final PreferenceActivity activity)
+    {
         PreferenceManager manager = activity.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(activity);
@@ -151,10 +163,11 @@ public class LocationProbe extends Probe implements LocationListener {
 
         Preference calibrate = new Preference(activity);
         calibrate.setTitle(R.string.config_probe_calibrate_title);
-        calibrate.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-            public boolean onPreferenceClick(Preference pref) {
-                Intent intent = new Intent(activity,
-                        LocationLabelActivity.class);
+        calibrate.setOnPreferenceClickListener(new OnPreferenceClickListener()
+        {
+            public boolean onPreferenceClick(Preference pref)
+            {
+                Intent intent = new Intent(activity, LocationLabelActivity.class);
                 activity.startActivity(intent);
 
                 return true;
@@ -166,61 +179,54 @@ public class LocationProbe extends Probe implements LocationListener {
         return screen;
     }
 
-    public boolean isEnabled(Context context) {
-        LocationManager locationManager = (LocationManager) context
-                .getSystemService(Context.LOCATION_SERVICE);
+    public boolean isEnabled(Context context)
+    {
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
-        if (super.isEnabled(context)) {
+        if (super.isEnabled(context))
+        {
             this._context = context.getApplicationContext();
 
             SharedPreferences prefs = Probe.getPreferences(context);
 
-            if (prefs.getBoolean("config_probe_location_enabled",
-                    LocationProbe.DEFAULT_ENABLED)) {
+            if (prefs.getBoolean("config_probe_location_enabled", LocationProbe.DEFAULT_ENABLED))
+            {
                 long now = System.currentTimeMillis();
 
-                synchronized (this) {
+                synchronized (this)
+                {
                     Looper looper = Looper.myLooper();
 
                     if (looper == null)
                         Looper.prepare();
 
-                    long freq = Long.parseLong(prefs.getString(
-                            "config_probe_location_frequency",
+                    long freq = Long.parseLong(prefs.getString("config_probe_location_frequency",
                             Probe.DEFAULT_FREQUENCY));
 
-                    if (now - this._lastCheck > 30000
-                            && now - this._lastCheck < freq && this._listening) // Try
-                                                                                // to
-                                                                                // get
-                                                                                // position
-                                                                                // in
-                                                                                // 30
-                                                                                // seconds...
+                    if (now - this._lastCheck > 30000 && now - this._lastCheck < freq && this._listening) // Try
+                                                                                                          // to
+                                                                                                          // get
+                                                                                                          // position
+                                                                                                          // in
+                                                                                                          // 30
+                                                                                                          // seconds...
                     {
                         locationManager.removeUpdates(this);
                         this._listening = false;
-                    } else if (now - this._lastCheck > freq
-                            && this._listening == false) {
+                    }
+                    else if (now - this._lastCheck > freq && this._listening == false)
+                    {
                         LocationCalibrationHelper.check(context);
 
-                        if (locationManager
-                                .isProviderEnabled(LocationManager.GPS_PROVIDER))
-                            locationManager
-                                    .requestLocationUpdates(
-                                            LocationManager.GPS_PROVIDER, 1000,
-                                            1, this);
+                        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+                            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
 
-                        locationManager
-                                .requestLocationUpdates(
-                                        LocationManager.NETWORK_PROVIDER, 1000,
-                                        1, this);
+                        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, this);
 
                         this._lastCheck = now;
                         this._listening = true;
 
-                        this.onLocationChanged(locationManager
-                                .getLastKnownLocation(LocationManager.PASSIVE_PROVIDER));
+                        this.onLocationChanged(locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER));
                     }
                 }
 
@@ -234,15 +240,18 @@ public class LocationProbe extends Probe implements LocationListener {
         return false;
     }
 
-    public String title(Context context) {
+    public String title(Context context)
+    {
         return context.getString(R.string.title_location_probe);
     }
 
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return LocationProbe.NAME;
     }
 
-    public void onLocationChanged(Location location) {
+    public void onLocationChanged(Location location)
+    {
         if (location == null)
             return;
 
@@ -261,21 +270,18 @@ public class LocationProbe extends Probe implements LocationListener {
         bundle.putDouble(LocationProbe.LATITUDE, location.getLatitude());
         bundle.putDouble(LocationProbe.LONGITUDE, location.getLongitude());
 
-        String cluster = DBSCAN.inCluster(this._context,
-                location.getLatitude(), location.getLongitude());
+        String cluster = DBSCAN.inCluster(this._context, location.getLatitude(), location.getLongitude());
 
         if (cluster != null)
             bundle.putString(LocationProbe.CLUSTER, cluster);
 
         bundle.putString(LocationProbe.PROVIDER, location.getProvider());
 
-        LocationManager locationManager = (LocationManager) this._context
-                .getSystemService(Context.LOCATION_SERVICE);
+        LocationManager locationManager = (LocationManager) this._context.getSystemService(Context.LOCATION_SERVICE);
 
-        bundle.putBoolean(LocationProbe.GPS_AVAILABLE,
-                locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER));
-        bundle.putBoolean(LocationProbe.NETWORK_AVAILABLE, locationManager
-                .isProviderEnabled(LocationManager.NETWORK_PROVIDER));
+        bundle.putBoolean(LocationProbe.GPS_AVAILABLE, locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER));
+        bundle.putBoolean(LocationProbe.NETWORK_AVAILABLE,
+                locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER));
 
         if (location.hasAccuracy())
             bundle.putFloat(LocationProbe.ACCURACY, location.getAccuracy());
@@ -291,28 +297,26 @@ public class LocationProbe extends Probe implements LocationListener {
 
         bundle.putLong(LocationProbe.TIME_FIX, location.getTime());
 
-        synchronized (this) {
+        synchronized (this)
+        {
             long time = location.getTime();
 
-            if (time - this._lastCache > 30000 || this._lastLocation == null) {
+            if (time - this._lastCache > 30000 || this._lastLocation == null)
+            {
                 boolean include = true;
 
-                if (this._lastLocation != null
-                        && this._lastLocation.distanceTo(location) < 50.0)
+                if (this._lastLocation != null && this._lastLocation.distanceTo(location) < 50.0)
                     include = false;
 
-                if (include) {
+                if (include)
+                {
                     Map<String, Object> values = new HashMap<String, Object>();
 
-                    values.put(LocationProbe.LONGITUDE_KEY,
-                            Double.valueOf(location.getLongitude()));
-                    values.put(LocationProbe.LATITUDE_KEY,
-                            Double.valueOf(location.getLatitude()));
-                    values.put(ProbeValuesProvider.TIMESTAMP,
-                            Double.valueOf(location.getTime() / 1000));
+                    values.put(LocationProbe.LONGITUDE_KEY, Double.valueOf(location.getLongitude()));
+                    values.put(LocationProbe.LATITUDE_KEY, Double.valueOf(location.getLatitude()));
+                    values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(location.getTime() / 1000));
 
-                    ProbeValuesProvider.getProvider(this._context).insertValue(
-                            this._context, LocationProbe.DB_TABLE,
+                    ProbeValuesProvider.getProvider(this._context).insertValue(this._context, LocationProbe.DB_TABLE,
                             LocationProbe.databaseSchema(), values);
 
                     this._lastCache = time;
@@ -322,8 +326,10 @@ public class LocationProbe extends Probe implements LocationListener {
 
             final LocationProbe me = this;
 
-            Runnable r = new Runnable() {
-                public void run() {
+            Runnable r = new Runnable()
+            {
+                public void run()
+                {
                     FoursquareProbe.annotate(me._context, bundle);
 
                     me.transmitData(me._context, bundle);
@@ -335,35 +341,30 @@ public class LocationProbe extends Probe implements LocationListener {
         }
     }
 
-    public Bundle formattedBundle(Context context, Bundle bundle) {
+    public Bundle formattedBundle(Context context, Bundle bundle)
+    {
         Bundle formatted = super.formattedBundle(context, bundle);
 
-        formatted.putString(context
-                .getString(R.string.display_location_coordinates_label), String
-                .format(context
-                        .getString(R.string.display_location_coordinates),
-                        bundle.getDouble(LocationProbe.LATITUDE), bundle
-                                .getDouble(LocationProbe.LONGITUDE)));
         formatted.putString(
-                context.getString(R.string.display_location_provider_label),
+                context.getString(R.string.display_location_coordinates_label),
+                String.format(context.getString(R.string.display_location_coordinates),
+                        bundle.getDouble(LocationProbe.LATITUDE), bundle.getDouble(LocationProbe.LONGITUDE)));
+        formatted.putString(context.getString(R.string.display_location_provider_label),
                 bundle.getString(LocationProbe.PROVIDER));
-        formatted.putDouble(
-                context.getString(R.string.display_location_altitude_label),
+        formatted.putDouble(context.getString(R.string.display_location_altitude_label),
                 bundle.getFloat(LocationProbe.ALTITUDE));
-        formatted.putFloat(
-                context.getString(R.string.display_location_accuracy_label),
+        formatted.putFloat(context.getString(R.string.display_location_accuracy_label),
                 bundle.getFloat(LocationProbe.ACCURACY));
-        formatted.putFloat(
-                context.getString(R.string.display_location_bearing_label),
+        formatted.putFloat(context.getString(R.string.display_location_bearing_label),
                 bundle.getFloat(LocationProbe.BEARING));
-        formatted.putFloat(
-                context.getString(R.string.display_location_speed_label),
+        formatted.putFloat(context.getString(R.string.display_location_speed_label),
                 bundle.getFloat(LocationProbe.SPEED));
 
         return formatted;
     };
 
-    public static Map<String, String> databaseSchema() {
+    public static Map<String, String> databaseSchema()
+    {
         HashMap<String, String> schema = new HashMap<String, String>();
 
         schema.put(LocationProbe.LATITUDE_KEY, ProbeValuesProvider.REAL_TYPE);
@@ -372,27 +373,29 @@ public class LocationProbe extends Probe implements LocationListener {
         return schema;
     }
 
-    public void onProviderDisabled(String provider) {
+    public void onProviderDisabled(String provider)
+    {
         if (this._context != null)
             this.isEnabled(this._context);
     }
 
-    public void onProviderEnabled(String provider) {
+    public void onProviderEnabled(String provider)
+    {
         if (this._context != null)
             this.isEnabled(this._context);
     }
 
-    public void onStatusChanged(String provider, int status, Bundle extras) {
+    public void onStatusChanged(String provider, int status, Bundle extras)
+    {
         if (this._context != null)
             this.isEnabled(this._context);
     }
 
-    public String summarizeValue(Context context, Bundle bundle) {
+    public String summarizeValue(Context context, Bundle bundle)
+    {
         double latitude = bundle.getDouble(LocationProbe.LATITUDE);
         double longitude = bundle.getDouble(LocationProbe.LONGITUDE);
 
-        return String.format(
-                context.getResources().getString(
-                        R.string.summary_location_probe), latitude, longitude);
+        return String.format(context.getResources().getString(R.string.summary_location_probe), latitude, longitude);
     }
 }

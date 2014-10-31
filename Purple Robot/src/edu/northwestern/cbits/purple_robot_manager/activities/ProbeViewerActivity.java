@@ -15,12 +15,14 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 
 @SuppressWarnings("deprecation")
-public class ProbeViewerActivity extends PreferenceActivity {
+public class ProbeViewerActivity extends PreferenceActivity
+{
     private String _probeName = null;
     private Bundle _probeBundle = null;
     private Probe _probe = null;
 
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
         Bundle bundle = this.getIntent().getExtras();
@@ -28,30 +30,32 @@ public class ProbeViewerActivity extends PreferenceActivity {
         this._probeName = bundle.getString("probe_name");
         this._probeBundle = bundle.getBundle("probe_bundle");
 
-        if (bundle.getBoolean("is_model", false)) {
-            PreferenceScreen screen = this.screenForBundle(this._probeName,
-                    this._probeBundle);
+        if (bundle.getBoolean("is_model", false))
+        {
+            PreferenceScreen screen = this.screenForBundle(this._probeName, this._probeBundle);
 
             this.setPreferenceScreen(screen);
-        } else {
+        }
+        else
+        {
             this._probe = ProbeManager.probeForName(this._probeName, this);
 
-            if (this._probe != null) {
-                Bundle formattedBundle = this._probe.formattedBundle(this,
-                        this._probeBundle);
+            if (this._probe != null)
+            {
+                Bundle formattedBundle = this._probe.formattedBundle(this, this._probeBundle);
 
-                if (formattedBundle != null) {
-                    PreferenceScreen screen = this.screenForBundle(
-                            this._probe.title(this), formattedBundle);
+                if (formattedBundle != null)
+                {
+                    PreferenceScreen screen = this.screenForBundle(this._probe.title(this), formattedBundle);
 
-                    screen.addPreference(this.screenForBundle(
-                            this.getString(R.string.display_raw_data),
+                    screen.addPreference(this.screenForBundle(this.getString(R.string.display_raw_data),
                             this._probeBundle));
 
                     this.setPreferenceScreen(screen);
-                } else {
-                    PreferenceScreen screen = this.screenForBundle(
-                            this._probe.title(this), this._probeBundle);
+                }
+                else
+                {
+                    PreferenceScreen screen = this.screenForBundle(this._probe.title(this), this._probeBundle);
 
                     this.setPreferenceScreen(screen);
                 }
@@ -59,14 +63,16 @@ public class ProbeViewerActivity extends PreferenceActivity {
         }
     }
 
-    private PreferenceScreen screenForFloatArray(String title, float[] values) {
+    private PreferenceScreen screenForFloatArray(String title, float[] values)
+    {
         PreferenceManager manager = this.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(this);
 
         screen.setTitle(title);
 
-        for (float value : values) {
+        for (float value : values)
+        {
             Preference pref = new Preference(this);
             pref.setTitle("" + value);
 
@@ -76,14 +82,16 @@ public class ProbeViewerActivity extends PreferenceActivity {
         return screen;
     }
 
-    private PreferenceScreen screenForIntArray(String title, int[] values) {
+    private PreferenceScreen screenForIntArray(String title, int[] values)
+    {
         PreferenceManager manager = this.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(this);
 
         screen.setTitle(title);
 
-        for (int value : values) {
+        for (int value : values)
+        {
             Preference pref = new Preference(this);
             pref.setTitle("" + value);
 
@@ -93,14 +101,16 @@ public class ProbeViewerActivity extends PreferenceActivity {
         return screen;
     }
 
-    private PreferenceScreen screenForDoubleArray(String title, double[] values) {
+    private PreferenceScreen screenForDoubleArray(String title, double[] values)
+    {
         PreferenceManager manager = this.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(this);
 
         screen.setTitle(title);
 
-        for (double value : values) {
+        for (double value : values)
+        {
             Preference pref = new Preference(this);
             pref.setTitle("" + value);
 
@@ -110,14 +120,16 @@ public class ProbeViewerActivity extends PreferenceActivity {
         return screen;
     }
 
-    private PreferenceScreen screenForLongArray(String title, long[] values) {
+    private PreferenceScreen screenForLongArray(String title, long[] values)
+    {
         PreferenceManager manager = this.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(this);
 
         screen.setTitle(title);
 
-        for (long value : values) {
+        for (long value : values)
+        {
             Preference pref = new Preference(this);
             pref.setTitle("" + value);
 
@@ -127,14 +139,16 @@ public class ProbeViewerActivity extends PreferenceActivity {
         return screen;
     }
 
-    private PreferenceScreen screenForStringArray(String title, String[] values) {
+    private PreferenceScreen screenForStringArray(String title, String[] values)
+    {
         PreferenceManager manager = this.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(this);
 
         screen.setTitle(title);
 
-        for (String value : values) {
+        for (String value : values)
+        {
             Preference pref = new Preference(this);
             pref.setTitle(value);
 
@@ -144,8 +158,10 @@ public class ProbeViewerActivity extends PreferenceActivity {
         return screen;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    private PreferenceScreen screenForBundle(String title, Bundle bundle) {
+    @SuppressWarnings(
+    { "rawtypes", "unchecked" })
+    private PreferenceScreen screenForBundle(String title, Bundle bundle)
+    {
         PreferenceManager manager = this.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(this);
@@ -156,169 +172,189 @@ public class ProbeViewerActivity extends PreferenceActivity {
 
         if (bundle.containsKey("KEY_ORDER"))
             keys.addAll(bundle.getStringArrayList("KEY_ORDER"));
-        else {
+        else
+        {
             keys.addAll(bundle.keySet());
             Collections.sort(keys);
         }
 
-        for (String key : keys) {
+        for (String key : keys)
+        {
             Object o = bundle.get(key);
 
-            if (o == null) {
+            if (o == null)
+            {
                 Log.e("PRM", "NULL KEY (" + title + "): " + key);
-            } else if (o instanceof Bundle) {
+            }
+            else if (o instanceof Bundle)
+            {
                 Bundle b = (Bundle) o;
 
                 PreferenceScreen subscreen = this.screenForBundle(key, b);
 
                 screen.addPreference(subscreen);
-            } else if (o instanceof float[]) {
+            }
+            else if (o instanceof float[])
+            {
                 float[] array = (float[]) o;
 
-                if (array.length > 1) {
-                    PreferenceScreen subscreen = this.screenForFloatArray(key,
-                            array);
-                    subscreen.setSummary(String.format(
-                            this.getString(R.string.display_probe_values),
-                            array.length));
+                if (array.length > 1)
+                {
+                    PreferenceScreen subscreen = this.screenForFloatArray(key, array);
+                    subscreen.setSummary(String.format(this.getString(R.string.display_probe_values), array.length));
 
                     screen.addPreference(subscreen);
-                } else {
+                }
+                else
+                {
                     Preference pref = new Preference(this);
                     pref.setTitle("" + array[0]);
                     pref.setSummary(key);
 
                     screen.addPreference(pref);
                 }
-            } else if (o instanceof double[]) {
+            }
+            else if (o instanceof double[])
+            {
                 double[] array = (double[]) o;
 
-                if (array.length > 1) {
-                    PreferenceScreen subscreen = this.screenForDoubleArray(key,
-                            array);
-                    subscreen.setSummary(String.format(
-                            this.getString(R.string.display_probe_values),
-                            array.length));
+                if (array.length > 1)
+                {
+                    PreferenceScreen subscreen = this.screenForDoubleArray(key, array);
+                    subscreen.setSummary(String.format(this.getString(R.string.display_probe_values), array.length));
 
                     screen.addPreference(subscreen);
-                } else {
+                }
+                else
+                {
                     Preference pref = new Preference(this);
                     pref.setTitle("" + array[0]);
                     pref.setSummary(key);
 
                     screen.addPreference(pref);
                 }
-            } else if (o instanceof Location[]) {
+            }
+            else if (o instanceof Location[])
+            {
                 Location[] array = (Location[]) o;
 
-                if (array.length > 1) {
-                    PreferenceScreen subscreen = this.screenForLocationArray(
-                            key, array);
-                    subscreen.setSummary(String.format(
-                            this.getString(R.string.display_probe_values),
-                            array.length));
+                if (array.length > 1)
+                {
+                    PreferenceScreen subscreen = this.screenForLocationArray(key, array);
+                    subscreen.setSummary(String.format(this.getString(R.string.display_probe_values), array.length));
 
                     screen.addPreference(subscreen);
-                } else {
+                }
+                else
+                {
                     Preference pref = new Preference(this);
-                    pref.setTitle(array[0].getProvider() + ": "
-                            + array[0].getLatitude() + ","
+                    pref.setTitle(array[0].getProvider() + ": " + array[0].getLatitude() + ","
                             + array[0].getLongitude());
                     pref.setSummary(key);
 
                     screen.addPreference(pref);
                 }
-            } else if (o instanceof Location) {
+            }
+            else if (o instanceof Location)
+            {
                 Location location = (Location) o;
 
                 Preference pref = new Preference(this);
-                pref.setTitle(location.getProvider() + ": "
-                        + location.getLatitude() + ","
-                        + location.getLongitude());
+                pref.setTitle(location.getProvider() + ": " + location.getLatitude() + "," + location.getLongitude());
                 pref.setSummary(key);
 
                 screen.addPreference(pref);
-            } else if (o instanceof Bundle[]) {
+            }
+            else if (o instanceof Bundle[])
+            {
                 Bundle[] array = (Bundle[]) o;
 
-                PreferenceScreen subscreen = this.screenForBundleArray(key,
-                        array);
-                subscreen.setSummary(String.format(
-                        this.getString(R.string.display_probe_values),
-                        array.length));
+                PreferenceScreen subscreen = this.screenForBundleArray(key, array);
+                subscreen.setSummary(String.format(this.getString(R.string.display_probe_values), array.length));
 
                 screen.addPreference(subscreen);
-            } else if (o instanceof int[]) {
+            }
+            else if (o instanceof int[])
+            {
                 int[] array = (int[]) o;
 
-                if (array.length > 1) {
-                    PreferenceScreen subscreen = this.screenForIntArray(key,
-                            array);
-                    subscreen.setSummary(String.format(
-                            this.getString(R.string.display_probe_values),
-                            array.length));
+                if (array.length > 1)
+                {
+                    PreferenceScreen subscreen = this.screenForIntArray(key, array);
+                    subscreen.setSummary(String.format(this.getString(R.string.display_probe_values), array.length));
 
                     screen.addPreference(subscreen);
-                } else {
+                }
+                else
+                {
                     Preference pref = new Preference(this);
                     pref.setTitle("" + array[0]);
                     pref.setSummary(key);
 
                     screen.addPreference(pref);
                 }
-            } else if (o instanceof long[]) {
+            }
+            else if (o instanceof long[])
+            {
                 long[] array = (long[]) o;
 
-                if (array.length > 1) {
-                    PreferenceScreen subscreen = this.screenForLongArray(key,
-                            array);
-                    subscreen.setSummary(String.format(
-                            this.getString(R.string.display_probe_values),
-                            array.length));
+                if (array.length > 1)
+                {
+                    PreferenceScreen subscreen = this.screenForLongArray(key, array);
+                    subscreen.setSummary(String.format(this.getString(R.string.display_probe_values), array.length));
 
                     screen.addPreference(subscreen);
-                } else {
+                }
+                else
+                {
                     Preference pref = new Preference(this);
                     pref.setTitle("" + array[0]);
                     pref.setSummary(key);
 
                     screen.addPreference(pref);
                 }
-            } else if (o instanceof String[]) {
+            }
+            else if (o instanceof String[])
+            {
                 String[] array = (String[]) o;
 
-                if (array.length > 1) {
-                    PreferenceScreen subscreen = this.screenForStringArray(key,
-                            array);
-                    subscreen.setSummary(String.format(
-                            this.getString(R.string.display_probe_values),
-                            array.length));
+                if (array.length > 1)
+                {
+                    PreferenceScreen subscreen = this.screenForStringArray(key, array);
+                    subscreen.setSummary(String.format(this.getString(R.string.display_probe_values), array.length));
 
                     screen.addPreference(subscreen);
-                } else {
+                }
+                else
+                {
                     Preference pref = new Preference(this);
                     pref.setTitle("" + array[0]);
                     pref.setSummary(key);
 
                     screen.addPreference(pref);
                 }
-            } else if (o instanceof ArrayList) {
+            }
+            else if (o instanceof ArrayList)
+            {
                 ArrayList array = (ArrayList) o;
 
-                if (array.size() > 0) {
+                if (array.size() > 0)
+                {
                     Object oo = array.get(0);
 
-                    if (oo instanceof Bundle) {
-                        PreferenceScreen subscreen = this.screenForBundleArray(
-                                key, (Bundle[]) array.toArray(new Bundle[0]));
-                        subscreen.setSummary(String.format(
-                                this.getString(R.string.display_probe_values),
-                                array.size()));
+                    if (oo instanceof Bundle)
+                    {
+                        PreferenceScreen subscreen = this.screenForBundleArray(key,
+                                (Bundle[]) array.toArray(new Bundle[0]));
+                        subscreen
+                                .setSummary(String.format(this.getString(R.string.display_probe_values), array.size()));
 
                         screen.addPreference(subscreen);
                     }
                 }
-            } else {
+            }
+            else
+            {
                 String desc = o.toString();
 
                 Preference pref = new Preference(this);
@@ -332,19 +368,19 @@ public class ProbeViewerActivity extends PreferenceActivity {
         return screen;
     }
 
-    private PreferenceScreen screenForLocationArray(String title,
-            Location[] values) {
+    private PreferenceScreen screenForLocationArray(String title, Location[] values)
+    {
         PreferenceManager manager = this.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(this);
 
         screen.setTitle(title);
 
-        for (Location value : values) {
+        for (Location value : values)
+        {
             Preference pref = new Preference(this);
 
-            pref.setTitle(value.getProvider() + ": " + value.getLatitude()
-                    + "," + value.getLongitude());
+            pref.setTitle(value.getProvider() + ": " + value.getLatitude() + "," + value.getLongitude());
 
             screen.addPreference(pref);
         }
@@ -352,14 +388,16 @@ public class ProbeViewerActivity extends PreferenceActivity {
         return screen;
     }
 
-    private PreferenceScreen screenForBundleArray(String title, Bundle[] values) {
+    private PreferenceScreen screenForBundleArray(String title, Bundle[] values)
+    {
         PreferenceManager manager = this.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(this);
 
         screen.setTitle(title);
 
-        for (Bundle value : values) {
+        for (Bundle value : values)
+        {
             Preference pref = this.screenForBundle(title, value);
 
             pref.setTitle(this.getString(R.string.display_data_bundle));

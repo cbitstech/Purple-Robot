@@ -29,8 +29,8 @@ import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
-public class ActivityDetectionProbe extends Probe implements
-        ConnectionCallbacks, OnConnectionFailedListener {
+public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks, OnConnectionFailedListener
+{
     private static final boolean DEFAULT_ENABLED = false;
 
     private static final String ACTIVITY_TYPE = "ACTIVITY_TYPE";
@@ -41,19 +41,23 @@ public class ActivityDetectionProbe extends Probe implements
 
     private long _lastFreq = 0;
 
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.ActivityDetectionProbe";
     }
 
-    public String title(Context context) {
+    public String title(Context context)
+    {
         return context.getString(R.string.title_activity_detection_probe);
     }
 
-    public String probeCategory(Context context) {
+    public String probeCategory(Context context)
+    {
         return context.getResources().getString(R.string.probe_misc_category);
     }
 
-    public void enable(Context context) {
+    public void enable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -62,7 +66,8 @@ public class ActivityDetectionProbe extends Probe implements
         e.commit();
     }
 
-    public void disable(Context context) {
+    public void disable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -71,7 +76,8 @@ public class ActivityDetectionProbe extends Probe implements
         e.commit();
     }
 
-    public boolean isEnabled(Context context) {
+    public boolean isEnabled(Context context)
+    {
         final SharedPreferences prefs = Probe.getPreferences(context);
 
         boolean enabled = super.isEnabled(context);
@@ -80,37 +86,33 @@ public class ActivityDetectionProbe extends Probe implements
             this._context = context.getApplicationContext();
 
         if (enabled)
-            enabled = prefs.getBoolean(
-                    "config_probe_activity_detection_enabled",
+            enabled = prefs.getBoolean("config_probe_activity_detection_enabled",
                     ActivityDetectionProbe.DEFAULT_ENABLED);
 
-        if (enabled) {
-            long interval = Long.parseLong(prefs.getString(
-                    "config_probe_activity_detection_frequency",
+        if (enabled)
+        {
+            long interval = Long.parseLong(prefs.getString("config_probe_activity_detection_frequency",
                     Probe.DEFAULT_FREQUENCY));
 
-            if (interval != this._lastFreq
-                    && ActivityDetectionProbe._activityDetectionClient != null) {
+            if (interval != this._lastFreq && ActivityDetectionProbe._activityDetectionClient != null)
+            {
                 this._lastFreq = interval;
 
-                if (ActivityDetectionProbe._activityDetectionClient
-                        .isConnected())
-                    ActivityDetectionProbe._activityDetectionClient
-                            .disconnect();
+                if (ActivityDetectionProbe._activityDetectionClient.isConnected())
+                    ActivityDetectionProbe._activityDetectionClient.disconnect();
 
-                ActivityDetectionProbe._activityDetectionClient
-                        .unregisterConnectionCallbacks(this);
-                ActivityDetectionProbe._activityDetectionClient
-                        .unregisterConnectionFailedListener(this);
+                ActivityDetectionProbe._activityDetectionClient.unregisterConnectionCallbacks(this);
+                ActivityDetectionProbe._activityDetectionClient.unregisterConnectionFailedListener(this);
 
                 ActivityDetectionProbe._activityDetectionClient = null;
             }
 
-            if (ActivityDetectionProbe._activityDetectionClient == null) {
-                int resultCode = GooglePlayServicesUtil
-                        .isGooglePlayServicesAvailable(context);
+            if (ActivityDetectionProbe._activityDetectionClient == null)
+            {
+                int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(context);
 
-                if (ConnectionResult.SUCCESS == resultCode) {
+                if (ConnectionResult.SUCCESS == resultCode)
+                {
                     ActivityDetectionProbe._activityDetectionClient = new ActivityRecognitionClient(
                             context.getApplicationContext(), this, this);
 
@@ -119,11 +121,11 @@ public class ActivityDetectionProbe extends Probe implements
             }
 
             return true;
-        } else if (ActivityDetectionProbe._activityDetectionClient != null) {
-            ActivityDetectionProbe._activityDetectionClient
-                    .unregisterConnectionCallbacks(this);
-            ActivityDetectionProbe._activityDetectionClient
-                    .unregisterConnectionFailedListener(this);
+        }
+        else if (ActivityDetectionProbe._activityDetectionClient != null)
+        {
+            ActivityDetectionProbe._activityDetectionClient.unregisterConnectionCallbacks(this);
+            ActivityDetectionProbe._activityDetectionClient.unregisterConnectionFailedListener(this);
             ActivityDetectionProbe._activityDetectionClient.disconnect();
 
             ActivityDetectionProbe._activityDetectionClient = null;
@@ -132,19 +134,19 @@ public class ActivityDetectionProbe extends Probe implements
         return false;
     }
 
-    public static void activityDetected(Context context, Intent intent) {
+    public static void activityDetected(Context context, Intent intent)
+    {
         final SharedPreferences prefs = Probe.getPreferences(context);
 
         boolean enabled = prefs.getBoolean("config_probes_enabled", false);
 
         if (enabled)
-            enabled = prefs.getBoolean(
-                    "config_probe_activity_detection_enabled",
+            enabled = prefs.getBoolean("config_probe_activity_detection_enabled",
                     ActivityDetectionProbe.DEFAULT_ENABLED);
 
-        if (enabled && ActivityRecognitionResult.hasResult(intent)) {
-            ActivityRecognitionResult result = ActivityRecognitionResult
-                    .extractResult(intent);
+        if (enabled && ActivityRecognitionResult.hasResult(intent))
+        {
+            ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
 
             ActivityDetectionProbe probe = new ActivityDetectionProbe();
 
@@ -153,25 +155,24 @@ public class ActivityDetectionProbe extends Probe implements
             bundle.putString("PROBE", probe.name(context));
             bundle.putLong("TIMESTAMP", result.getTime() / 1000);
 
-            List<Bundle> activities = ActivityDetectionProbe
-                    .parseActivities(result.getProbableActivities());
+            List<Bundle> activities = ActivityDetectionProbe.parseActivities(result.getProbableActivities());
 
-            bundle.putParcelableArrayList("ACTIVITIES",
-                    (ArrayList<? extends Parcelable>) activities);
+            bundle.putParcelableArrayList("ACTIVITIES", (ArrayList<? extends Parcelable>) activities);
             bundle.putInt("ACTIVITY_COUNT", activities.size());
 
             DetectedActivity probable = result.getMostProbableActivity();
 
-            bundle.putString("MOST_PROBABLE_ACTIVITY",
-                    ActivityDetectionProbe.activityName(probable.getType()));
+            bundle.putString("MOST_PROBABLE_ACTIVITY", ActivityDetectionProbe.activityName(probable.getType()));
             bundle.putInt("MOST_PROBABLE_CONFIDENCE", probable.getConfidence());
 
             probe.transmitData(context, bundle);
         }
     }
 
-    public static String activityName(int activity) {
-        switch (activity) {
+    public static String activityName(int activity)
+    {
+        switch (activity)
+        {
         case DetectedActivity.IN_VEHICLE:
             return "IN_VEHICLE";
         case DetectedActivity.ON_BICYCLE:
@@ -191,15 +192,15 @@ public class ActivityDetectionProbe extends Probe implements
         return "UNKNOWN";
     }
 
-    public static List<Bundle> parseActivities(List<DetectedActivity> activities) {
+    public static List<Bundle> parseActivities(List<DetectedActivity> activities)
+    {
         ArrayList<Bundle> bundles = new ArrayList<Bundle>();
 
-        for (DetectedActivity activity : activities) {
+        for (DetectedActivity activity : activities)
+        {
             Bundle b = new Bundle();
-            b.putString(ActivityDetectionProbe.ACTIVITY_TYPE,
-                    ActivityDetectionProbe.activityName(activity.getType()));
-            b.putInt(ActivityDetectionProbe.ACTIVITY_CONFIDENCE,
-                    activity.getConfidence());
+            b.putString(ActivityDetectionProbe.ACTIVITY_TYPE, ActivityDetectionProbe.activityName(activity.getType()));
+            b.putInt(ActivityDetectionProbe.ACTIVITY_CONFIDENCE, activity.getConfidence());
 
             bundles.add(b);
         }
@@ -207,47 +208,49 @@ public class ActivityDetectionProbe extends Probe implements
         return bundles;
     }
 
-    public String summarizeValue(Context context, Bundle bundle) {
+    public String summarizeValue(Context context, Bundle bundle)
+    {
         double confidence = bundle.getDouble("MOST_PROBABLE_CONFIDENCE");
         String activity = bundle.getString("MOST_PROBABLE_ACTIVITY");
 
-        return context.getResources()
-                .getString(R.string.summary_activity_detection_probe, activity,
-                        confidence);
+        return context.getResources().getString(R.string.summary_activity_detection_probe, activity, confidence);
     }
 
-    public Map<String, Object> configuration(Context context) {
+    public Map<String, Object> configuration(Context context)
+    {
         Map<String, Object> map = super.configuration(context);
 
         SharedPreferences prefs = Probe.getPreferences(context);
 
-        long freq = Long.parseLong(prefs.getString(
-                "config_probe_activity_detection_frequency",
-                Probe.DEFAULT_FREQUENCY));
+        long freq = Long.parseLong(prefs
+                .getString("config_probe_activity_detection_frequency", Probe.DEFAULT_FREQUENCY));
         map.put(Probe.PROBE_FREQUENCY, freq);
 
         return map;
     }
 
-    public void updateFromMap(Context context, Map<String, Object> params) {
+    public void updateFromMap(Context context, Map<String, Object> params)
+    {
         super.updateFromMap(context, params);
 
-        if (params.containsKey(Probe.PROBE_FREQUENCY)) {
+        if (params.containsKey(Probe.PROBE_FREQUENCY))
+        {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
 
-            if (frequency instanceof Long) {
+            if (frequency instanceof Long)
+            {
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putString("config_probe_activity_detection_frequency",
-                        frequency.toString());
+                e.putString("config_probe_activity_detection_frequency", frequency.toString());
                 e.commit();
             }
         }
     }
 
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    {
         PreferenceManager manager = activity.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(activity);
@@ -273,34 +276,35 @@ public class ActivityDetectionProbe extends Probe implements
         return screen;
     }
 
-    public String summary(Context context) {
-        return context
-                .getString(R.string.summary_activity_detection_probe_desc);
+    public String summary(Context context)
+    {
+        return context.getString(R.string.summary_activity_detection_probe_desc);
     }
 
-    public void onConnected(Bundle bundle) {
+    public void onConnected(Bundle bundle)
+    {
         final SharedPreferences prefs = Probe.getPreferences(this._context);
 
-        long interval = Long.parseLong(prefs.getString(
-                "config_probe_activity_detection_frequency",
+        long interval = Long.parseLong(prefs.getString("config_probe_activity_detection_frequency",
                 Probe.DEFAULT_FREQUENCY));
 
         Intent intent = new Intent(ManagerService.GOOGLE_PLAY_ACTIVITY_DETECTED);
-        PendingIntent pendingIntent = PendingIntent.getService(this._context,
-                0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getService(this._context, 0, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
 
         if (ActivityDetectionProbe._activityDetectionClient.isConnected())
-            ActivityDetectionProbe._activityDetectionClient
-                    .requestActivityUpdates(interval, pendingIntent);
+            ActivityDetectionProbe._activityDetectionClient.requestActivityUpdates(interval, pendingIntent);
         else
             ActivityDetectionProbe._activityDetectionClient.connect();
     }
 
-    public void onDisconnected() {
+    public void onDisconnected()
+    {
 
     }
 
-    public void onConnectionFailed(ConnectionResult result) {
+    public void onConnectionFailed(ConnectionResult result)
+    {
 
     }
 }

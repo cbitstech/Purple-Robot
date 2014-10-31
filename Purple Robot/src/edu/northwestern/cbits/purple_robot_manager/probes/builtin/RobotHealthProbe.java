@@ -42,7 +42,8 @@ import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 // import org.apache.commons.net.ntp.NTPUDPClient;
 // import org.apache.commons.net.ntp.TimeInfo;
 
-public class RobotHealthProbe extends Probe {
+public class RobotHealthProbe extends Probe
+{
     private static final String PENDING_COUNT = "PENDING_COUNT";
     private static final String PENDING_SIZE = "PENDING_SIZE";
     // private static final String ARCHIVE_COUNT = "ARCHIVE_COUNT";
@@ -81,20 +82,23 @@ public class RobotHealthProbe extends Probe {
     private long _lastOffset = 0;
     private long _lastTimeCheck = 0;
 
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return RobotHealthProbe.NAME;
     }
 
-    public String title(Context context) {
+    public String title(Context context)
+    {
         return context.getString(R.string.title_robot_probe);
     }
 
-    public String probeCategory(Context context) {
-        return context.getResources().getString(
-                R.string.probe_device_info_category);
+    public String probeCategory(Context context)
+    {
+        return context.getResources().getString(R.string.probe_device_info_category);
     }
 
-    public void enable(Context context) {
+    public void enable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -103,7 +107,8 @@ public class RobotHealthProbe extends Probe {
         e.commit();
     }
 
-    public void disable(Context context) {
+    public void disable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -115,21 +120,25 @@ public class RobotHealthProbe extends Probe {
     // Source:
     // http://stackoverflow.com/questions/3118234/how-to-get-memory-usage-and-cpu-usage-in-android
 
-    private float readUsage(Context context) {
-        try {
+    private float readUsage(Context context)
+    {
+        try
+        {
             RandomAccessFile reader = new RandomAccessFile("/proc/stat", "r");
             String load = reader.readLine();
 
             String[] toks = load.split(" ");
 
             long idle1 = Long.parseLong(toks[5]);
-            long cpu1 = Long.parseLong(toks[2]) + Long.parseLong(toks[3])
-                    + Long.parseLong(toks[4]) + Long.parseLong(toks[6])
-                    + Long.parseLong(toks[7]) + Long.parseLong(toks[8]);
+            long cpu1 = Long.parseLong(toks[2]) + Long.parseLong(toks[3]) + Long.parseLong(toks[4])
+                    + Long.parseLong(toks[6]) + Long.parseLong(toks[7]) + Long.parseLong(toks[8]);
 
-            try {
+            try
+            {
                 Thread.sleep(360);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
 
             }
 
@@ -140,45 +149,51 @@ public class RobotHealthProbe extends Probe {
             toks = load.split(" ");
 
             long idle2 = Long.parseLong(toks[5]);
-            long cpu2 = Long.parseLong(toks[2]) + Long.parseLong(toks[3])
-                    + Long.parseLong(toks[4]) + Long.parseLong(toks[6])
-                    + Long.parseLong(toks[7]) + Long.parseLong(toks[8]);
+            long cpu2 = Long.parseLong(toks[2]) + Long.parseLong(toks[3]) + Long.parseLong(toks[4])
+                    + Long.parseLong(toks[6]) + Long.parseLong(toks[7]) + Long.parseLong(toks[8]);
 
             return (float) (cpu2 - cpu1) / ((cpu2 + idle2) - (cpu1 + idle1));
 
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             LogManager.getInstance(context).logException(e);
         }
 
         return 0;
     }
 
-    public boolean isEnabled(final Context context) {
+    public boolean isEnabled(final Context context)
+    {
         final SharedPreferences prefs = Probe.getPreferences(context);
 
         final long now = System.currentTimeMillis();
 
-        if (super.isEnabled(context)) {
-            if (prefs.getBoolean("config_probe_robot_enabled",
-                    RobotHealthProbe.DEFAULT_ENABLED)) {
-                synchronized (this) {
-                    long freq = Long.parseLong(prefs.getString(
-                            "config_probe_robot_frequency",
-                            Probe.DEFAULT_FREQUENCY));
+        if (super.isEnabled(context))
+        {
+            if (prefs.getBoolean("config_probe_robot_enabled", RobotHealthProbe.DEFAULT_ENABLED))
+            {
+                synchronized (this)
+                {
+                    long freq = Long
+                            .parseLong(prefs.getString("config_probe_robot_frequency", Probe.DEFAULT_FREQUENCY));
 
-                    if (now - this._lastCheck > freq) {
-                        OutputPlugin plugin = OutputPluginManager.sharedInstance
-                                .pluginForClass(context, HttpUploadPlugin.class);
+                    if (now - this._lastCheck > freq)
+                    {
+                        OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(context,
+                                HttpUploadPlugin.class);
 
-                        if (plugin != null
-                                && plugin instanceof HttpUploadPlugin) {
+                        if (plugin != null && plugin instanceof HttpUploadPlugin)
+                        {
                             final HttpUploadPlugin httpPlugin = (HttpUploadPlugin) plugin;
 
                             final RobotHealthProbe me = this;
 
-                            Runnable r = new Runnable() {
+                            Runnable r = new Runnable()
+                            {
                                 @SuppressWarnings("deprecation")
-                                public void run() {
+                                public void run()
+                                {
                                     if (me._checking)
                                         return;
 
@@ -189,257 +204,205 @@ public class RobotHealthProbe extends Probe {
 
                                     int pendingCount = 0;
 
-                                    if (prefs.getBoolean(
-                                            "config_enable_data_server", false)) {
-                                        OutputPlugin plugin = OutputPluginManager.sharedInstance
-                                                .pluginForClass(context,
-                                                        HttpUploadPlugin.class);
+                                    if (prefs.getBoolean("config_enable_data_server", false))
+                                    {
+                                        OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(
+                                                context, HttpUploadPlugin.class);
 
-                                        if (plugin instanceof HttpUploadPlugin) {
+                                        if (plugin instanceof HttpUploadPlugin)
+                                        {
                                             HttpUploadPlugin http = (HttpUploadPlugin) plugin;
-                                            pendingCount += http
-                                                    .pendingFilesCount();
+                                            pendingCount += http.pendingFilesCount();
                                         }
-                                    } else {
-                                        OutputPlugin plugin = OutputPluginManager.sharedInstance
-                                                .pluginForClass(
-                                                        context,
-                                                        StreamingJacksonUploadPlugin.class);
+                                    }
+                                    else
+                                    {
+                                        OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(
+                                                context, StreamingJacksonUploadPlugin.class);
 
-                                        if (plugin instanceof StreamingJacksonUploadPlugin) {
+                                        if (plugin instanceof StreamingJacksonUploadPlugin)
+                                        {
                                             StreamingJacksonUploadPlugin http = (StreamingJacksonUploadPlugin) plugin;
-                                            pendingCount += http
-                                                    .pendingFilesCount();
+                                            pendingCount += http.pendingFilesCount();
                                         }
                                     }
 
                                     long pendingSize = 0;
 
-                                    if (prefs.getBoolean(
-                                            "config_enable_data_server", false)) {
-                                        OutputPlugin plugin = OutputPluginManager.sharedInstance
-                                                .pluginForClass(context,
-                                                        HttpUploadPlugin.class);
+                                    if (prefs.getBoolean("config_enable_data_server", false))
+                                    {
+                                        OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(
+                                                context, HttpUploadPlugin.class);
 
-                                        if (plugin instanceof HttpUploadPlugin) {
+                                        if (plugin instanceof HttpUploadPlugin)
+                                        {
                                             HttpUploadPlugin http = (HttpUploadPlugin) plugin;
-                                            pendingSize += http
-                                                    .pendingFilesSize();
+                                            pendingSize += http.pendingFilesSize();
                                         }
-                                    } else {
-                                        OutputPlugin plugin = OutputPluginManager.sharedInstance
-                                                .pluginForClass(
-                                                        context,
-                                                        StreamingJacksonUploadPlugin.class);
+                                    }
+                                    else
+                                    {
+                                        OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(
+                                                context, StreamingJacksonUploadPlugin.class);
 
-                                        if (plugin instanceof StreamingJacksonUploadPlugin) {
+                                        if (plugin instanceof StreamingJacksonUploadPlugin)
+                                        {
                                             StreamingJacksonUploadPlugin http = (StreamingJacksonUploadPlugin) plugin;
-                                            pendingSize += http
-                                                    .pendingFilesSize();
+                                            pendingSize += http.pendingFilesSize();
                                         }
                                     }
 
                                     Bundle bundle = new Bundle();
                                     bundle.putString("PROBE", me.name(context));
-                                    bundle.putLong("TIMESTAMP",
-                                            System.currentTimeMillis() / 1000);
+                                    bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
 
-                                    bundle.putInt(
-                                            RobotHealthProbe.PENDING_COUNT,
-                                            pendingCount);
-                                    bundle.putLong(
-                                            RobotHealthProbe.PENDING_SIZE,
-                                            pendingSize);
+                                    bundle.putInt(RobotHealthProbe.PENDING_COUNT, pendingCount);
+                                    bundle.putLong(RobotHealthProbe.PENDING_SIZE, pendingSize);
 
-                                    double throughput = httpPlugin
-                                            .getRecentThroughput();
+                                    double throughput = httpPlugin.getRecentThroughput();
 
-                                    bundle.putDouble(
-                                            RobotHealthProbe.THROUGHPUT,
-                                            throughput);
+                                    bundle.putDouble(RobotHealthProbe.THROUGHPUT, throughput);
 
                                     long cleartime = -1;
 
                                     if (throughput > 0.0)
-                                        cleartime = pendingSize
-                                                / ((long) throughput);
+                                        cleartime = pendingSize / ((long) throughput);
 
-                                    bundle.putLong(RobotHealthProbe.CLEAR_TIME,
-                                            cleartime);
+                                    bundle.putLong(RobotHealthProbe.CLEAR_TIME, cleartime);
 
                                     // Version checks
 
-                                    try {
-                                        PackageInfo info = context
-                                                .getPackageManager()
-                                                .getPackageInfo(
-                                                        context.getPackageName(),
-                                                        0);
+                                    try
+                                    {
+                                        PackageInfo info = context.getPackageManager().getPackageInfo(
+                                                context.getPackageName(), 0);
 
-                                        bundle.putString(
-                                                RobotHealthProbe.APP_VERSION_NAME,
-                                                info.versionName);
-                                        bundle.putInt(
-                                                RobotHealthProbe.APP_VERSION_CODE,
-                                                info.versionCode);
-                                    } catch (NameNotFoundException e) {
-                                        LogManager.getInstance(context)
-                                                .logException(e);
-                                    } catch (RuntimeException e) {
-                                        LogManager.getInstance(context)
-                                                .logException(e);
+                                        bundle.putString(RobotHealthProbe.APP_VERSION_NAME, info.versionName);
+                                        bundle.putInt(RobotHealthProbe.APP_VERSION_CODE, info.versionCode);
+                                    }
+                                    catch (NameNotFoundException e)
+                                    {
+                                        LogManager.getInstance(context).logException(e);
+                                    }
+                                    catch (RuntimeException e)
+                                    {
+                                        LogManager.getInstance(context).logException(e);
                                     }
 
                                     // NTP checks
 
-                                    if ((now - me._lastTimeCheck) > NTP_CHECK_DURATION) {
-                                        try {
+                                    if ((now - me._lastTimeCheck) > NTP_CHECK_DURATION)
+                                    {
+                                        try
+                                        {
                                             NTPUDPClient client = new NTPUDPClient();
                                             client.setDefaultTimeout(10000);
 
-                                            TimeInfo info = client
-                                                    .getTime(InetAddress
-                                                            .getByName(NTP_HOST));
+                                            TimeInfo info = client.getTime(InetAddress.getByName(NTP_HOST));
 
-                                            if (info != null) {
+                                            if (info != null)
+                                            {
                                                 info.computeDetails();
 
                                                 if (info.getOffset() != null)
-                                                    me._lastOffset = info
-                                                            .getOffset()
-                                                            .longValue();
+                                                    me._lastOffset = info.getOffset().longValue();
 
                                             }
-                                        } catch (UnknownHostException e) {
-                                            LogManager.getInstance(context)
-                                                    .logException(e);
-                                        } catch (SocketTimeoutException e) {
-                                            LogManager.getInstance(context)
-                                                    .logException(e);
-                                        } catch (IOException e) {
-                                            LogManager.getInstance(context)
-                                                    .logException(e);
-                                        } finally {
+                                        }
+                                        catch (UnknownHostException e)
+                                        {
+                                            LogManager.getInstance(context).logException(e);
+                                        }
+                                        catch (SocketTimeoutException e)
+                                        {
+                                            LogManager.getInstance(context).logException(e);
+                                        }
+                                        catch (IOException e)
+                                        {
+                                            LogManager.getInstance(context).logException(e);
+                                        }
+                                        finally
+                                        {
                                             me._lastTimeCheck = now;
                                         }
                                     }
 
-                                    bundle.putLong(
-                                            RobotHealthProbe.TIME_OFFSET_MS,
-                                            me._lastOffset);
+                                    bundle.putLong(RobotHealthProbe.TIME_OFFSET_MS, me._lastOffset);
 
-                                    bundle.putLong(
-                                            RobotHealthProbe.ACTIVE_RUNTIME,
-                                            System.currentTimeMillis()
-                                                    - ManagerService.startTimestamp);
-                                    bundle.putFloat(RobotHealthProbe.CPU_USAGE,
-                                            me.readUsage(context));
+                                    bundle.putLong(RobotHealthProbe.ACTIVE_RUNTIME, System.currentTimeMillis()
+                                            - ManagerService.startTimestamp);
+                                    bundle.putFloat(RobotHealthProbe.CPU_USAGE, me.readUsage(context));
 
-                                    try {
-                                        StatFs root = new StatFs(Environment
-                                                .getRootDirectory()
+                                    try
+                                    {
+                                        StatFs root = new StatFs(Environment.getRootDirectory().getAbsolutePath());
+
+                                        int rootFree = root.getAvailableBlocks() * root.getBlockSize();
+                                        int rootTotal = root.getBlockCount() * root.getBlockSize();
+
+                                        bundle.putInt(RobotHealthProbe.ROOT_FREE, rootFree);
+                                        bundle.putInt(RobotHealthProbe.ROOT_TOTAL, rootTotal);
+                                    }
+                                    catch (IllegalArgumentException e)
+                                    {
+                                        LogManager.getInstance(context).logException(e);
+                                    }
+
+                                    try
+                                    {
+                                        StatFs external = new StatFs(Environment.getExternalStorageDirectory()
                                                 .getAbsolutePath());
 
-                                        int rootFree = root
-                                                .getAvailableBlocks()
-                                                * root.getBlockSize();
-                                        int rootTotal = root.getBlockCount()
-                                                * root.getBlockSize();
+                                        int externalFree = external.getAvailableBlocks() * external.getBlockSize();
+                                        int externalTotal = external.getBlockCount() * external.getBlockSize();
 
-                                        bundle.putInt(
-                                                RobotHealthProbe.ROOT_FREE,
-                                                rootFree);
-                                        bundle.putInt(
-                                                RobotHealthProbe.ROOT_TOTAL,
-                                                rootTotal);
-                                    } catch (IllegalArgumentException e) {
-                                        LogManager.getInstance(context)
-                                                .logException(e);
+                                        bundle.putInt(RobotHealthProbe.EXTERNAL_FREE, externalFree);
+                                        bundle.putInt(RobotHealthProbe.EXTERNAL_TOTAL, externalTotal);
+                                    }
+                                    catch (IllegalArgumentException e)
+                                    {
+                                        LogManager.getInstance(context).logException(e);
                                     }
 
-                                    try {
-                                        StatFs external = new StatFs(
-                                                Environment
-                                                        .getExternalStorageDirectory()
-                                                        .getAbsolutePath());
+                                    if (prefs.getBoolean("config_probe_robot_scheme_config",
+                                            RobotHealthProbe.DEFAULT_SCHEME))
+                                    {
+                                        SchemeConfigFile file = new SchemeConfigFile(context);
 
-                                        int externalFree = external
-                                                .getAvailableBlocks()
-                                                * external.getBlockSize();
-                                        int externalTotal = external
-                                                .getBlockCount()
-                                                * external.getBlockSize();
-
-                                        bundle.putInt(
-                                                RobotHealthProbe.EXTERNAL_FREE,
-                                                externalFree);
-                                        bundle.putInt(
-                                                RobotHealthProbe.EXTERNAL_TOTAL,
-                                                externalTotal);
-                                    } catch (IllegalArgumentException e) {
-                                        LogManager.getInstance(context)
-                                                .logException(e);
+                                        bundle.putString(RobotHealthProbe.SCHEME_CONFIG, file.toString());
                                     }
 
-                                    if (prefs.getBoolean(
-                                            "config_probe_robot_scheme_config",
-                                            RobotHealthProbe.DEFAULT_SCHEME)) {
-                                        SchemeConfigFile file = new SchemeConfigFile(
-                                                context);
+                                    if (prefs.getBoolean("config_probe_robot_json_config",
+                                            RobotHealthProbe.DEFAULT_JAVASCRIPT))
+                                    {
+                                        JSONConfigFile file = new JSONConfigFile(context);
 
-                                        bundle.putString(
-                                                RobotHealthProbe.SCHEME_CONFIG,
-                                                file.toString());
-                                    }
-
-                                    if (prefs
-                                            .getBoolean(
-                                                    "config_probe_robot_json_config",
-                                                    RobotHealthProbe.DEFAULT_JAVASCRIPT)) {
-                                        JSONConfigFile file = new JSONConfigFile(
-                                                context);
-
-                                        bundle.putString(
-                                                RobotHealthProbe.JSON_CONFIG,
-                                                file.toString());
+                                        bundle.putString(RobotHealthProbe.JSON_CONFIG, file.toString());
                                     }
 
                                     bundle.putLong(RobotHealthProbe.LAST_BOOT,
-                                            prefs.getLong(
-                                                    BootUpReceiver.BOOT_KEY, 0));
-                                    bundle.putLong(
-                                            RobotHealthProbe.LAST_HALT,
-                                            prefs.getLong(
-                                                    ShutdownReceiver.SHUTDOWN_KEY,
-                                                    0));
+                                            prefs.getLong(BootUpReceiver.BOOT_KEY, 0));
+                                    bundle.putLong(RobotHealthProbe.LAST_HALT,
+                                            prefs.getLong(ShutdownReceiver.SHUTDOWN_KEY, 0));
 
                                     ArrayList<String> errors = new ArrayList<String>();
 
-                                    for (String check : SanityManager
-                                            .getInstance(context).errors()
-                                            .values())
+                                    for (String check : SanityManager.getInstance(context).errors().values())
                                         errors.add(check);
 
                                     if (errors.size() > 0)
-                                        bundle.putStringArrayList(
-                                                "CHECK_ERRORS", errors);
+                                        bundle.putStringArrayList("CHECK_ERRORS", errors);
 
                                     ArrayList<String> warnings = new ArrayList<String>();
 
-                                    for (String check : SanityManager
-                                            .getInstance(context).warnings()
-                                            .values())
+                                    for (String check : SanityManager.getInstance(context).warnings().values())
                                         warnings.add(check);
 
                                     if (warnings.size() > 0)
-                                        bundle.putStringArrayList(
-                                                "CHECK_WARNINGS", warnings);
+                                        bundle.putStringArrayList("CHECK_WARNINGS", warnings);
 
-                                    bundle.putParcelableArrayList(
-                                            "TRIGGERS",
-                                            TriggerManager
-                                                    .getInstance(context)
-                                                    .allTriggersBundles(context));
+                                    bundle.putParcelableArrayList("TRIGGERS", TriggerManager.getInstance(context)
+                                            .allTriggersBundles(context));
 
                                     long later = System.currentTimeMillis();
 
@@ -466,7 +429,8 @@ public class RobotHealthProbe extends Probe {
         return false;
     }
 
-    public Bundle formattedBundle(Context context, Bundle bundle) {
+    public Bundle formattedBundle(Context context, Bundle bundle)
+    {
         Bundle formatted = super.formattedBundle(context, bundle);
 
         formatted.putLong(context.getString(R.string.robot_runtime_label),
@@ -488,10 +452,10 @@ public class RobotHealthProbe extends Probe {
         return formatted;
     };
 
-    public String summarizeValue(Context context, Bundle bundle) {
+    public String summarizeValue(Context context, Bundle bundle)
+    {
         int count = (int) bundle.getDouble(RobotHealthProbe.PENDING_COUNT);
-        double size = 0.0 + (int) bundle
-                .getDouble(RobotHealthProbe.PENDING_SIZE);
+        double size = 0.0 + (int) bundle.getDouble(RobotHealthProbe.PENDING_SIZE);
 
         long clear = (int) bundle.getDouble(RobotHealthProbe.CLEAR_TIME);
 
@@ -502,18 +466,16 @@ public class RobotHealthProbe extends Probe {
 
         double cpu = bundle.getDouble(RobotHealthProbe.CPU_USAGE);
 
-        return String.format(
-                context.getResources().getString(R.string.summary_robot_probe),
-                cpu, count, size, clear);
+        return String.format(context.getResources().getString(R.string.summary_robot_probe), cpu, count, size, clear);
     }
 
-    public Map<String, Object> configuration(Context context) {
+    public Map<String, Object> configuration(Context context)
+    {
         Map<String, Object> map = super.configuration(context);
 
         SharedPreferences prefs = Probe.getPreferences(context);
 
-        long freq = Long.parseLong(prefs.getString(
-                "config_probe_robot_frequency", Probe.DEFAULT_FREQUENCY));
+        long freq = Long.parseLong(prefs.getString("config_probe_robot_frequency", Probe.DEFAULT_FREQUENCY));
 
         map.put(Probe.PROBE_FREQUENCY, freq);
 
@@ -522,45 +484,48 @@ public class RobotHealthProbe extends Probe {
         return map;
     }
 
-    public void updateFromMap(Context context, Map<String, Object> params) {
+    public void updateFromMap(Context context, Map<String, Object> params)
+    {
         super.updateFromMap(context, params);
 
         SharedPreferences prefs = Probe.getPreferences(context);
         Editor e = prefs.edit();
 
-        if (params.containsKey(Probe.PROBE_FREQUENCY)) {
+        if (params.containsKey(Probe.PROBE_FREQUENCY))
+        {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
 
             if (frequency instanceof Long)
-                e.putString("config_probe_robot_frequency",
-                        frequency.toString());
+                e.putString("config_probe_robot_frequency", frequency.toString());
         }
 
-        if (params.containsKey(RobotHealthProbe.INCLUDE_SCHEME)) {
+        if (params.containsKey(RobotHealthProbe.INCLUDE_SCHEME))
+        {
             Object include = params.get(RobotHealthProbe.INCLUDE_SCHEME);
 
             if (include instanceof Boolean)
-                e.putBoolean("config_probe_robot_scheme_config",
-                        ((Boolean) include).booleanValue());
+                e.putBoolean("config_probe_robot_scheme_config", ((Boolean) include).booleanValue());
         }
 
-        if (params.containsKey(RobotHealthProbe.INCLUDE_JSON)) {
+        if (params.containsKey(RobotHealthProbe.INCLUDE_JSON))
+        {
             Object include = params.get(RobotHealthProbe.INCLUDE_JSON);
 
             if (include instanceof Boolean)
-                e.putBoolean("config_probe_robot_json_config",
-                        ((Boolean) include).booleanValue());
+                e.putBoolean("config_probe_robot_json_config", ((Boolean) include).booleanValue());
         }
 
         e.commit();
     }
 
-    public String summary(Context context) {
+    public String summary(Context context)
+    {
         return context.getString(R.string.summary_robot_probe_desc);
     }
 
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    {
         PreferenceManager manager = activity.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(activity);

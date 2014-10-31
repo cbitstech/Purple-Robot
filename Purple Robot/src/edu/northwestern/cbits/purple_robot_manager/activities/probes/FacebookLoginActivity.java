@@ -18,16 +18,19 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.FacebookProbe;
 
-public class FacebookLoginActivity extends ActionBarActivity {
+public class FacebookLoginActivity extends ActionBarActivity
+{
     private boolean _inited = false;
 
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
         this.setContentView(R.layout.layout_facebook_activity);
     }
 
-    protected void onResume() {
+    protected void onResume()
+    {
         super.onResume();
 
         if (this._inited)
@@ -35,8 +38,7 @@ public class FacebookLoginActivity extends ActionBarActivity {
 
         this._inited = true;
 
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(this);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         Editor e = prefs.edit();
         e.remove(FacebookProbe.TOKEN);
         e.commit();
@@ -47,11 +49,11 @@ public class FacebookLoginActivity extends ActionBarActivity {
 
         Session session = builder.setApplicationId("266981220119291").build();
 
-        session.addCallback(new Session.StatusCallback() {
-            public void call(Session session, SessionState state,
-                    Exception exception) {
-                if (SessionState.OPENED == state
-                        || SessionState.OPENED_TOKEN_UPDATED == state)
+        session.addCallback(new Session.StatusCallback()
+        {
+            public void call(Session session, SessionState state, Exception exception)
+            {
+                if (SessionState.OPENED == state || SessionState.OPENED_TOKEN_UPDATED == state)
                     me.onSessionStateChange(session, state, exception);
                 else
                     session.addCallback(this);
@@ -68,43 +70,46 @@ public class FacebookLoginActivity extends ActionBarActivity {
         session.openForRead(request);
     }
 
-    private void onSessionStateChange(Session session, SessionState state,
-            Exception exception) {
+    private void onSessionStateChange(Session session, SessionState state, Exception exception)
+    {
         if (state.isOpened())
             this.go(session);
 
         final FacebookLoginActivity me = this;
 
-        if (Session.getActiveSession() == null
-                || Session.getActiveSession().isClosed()) {
-            Session.openActiveSession(this, true, new Session.StatusCallback() {
-                public void call(Session session, SessionState state,
-                        Exception exception) {
+        if (Session.getActiveSession() == null || Session.getActiveSession().isClosed())
+        {
+            Session.openActiveSession(this, true, new Session.StatusCallback()
+            {
+                public void call(Session session, SessionState state, Exception exception)
+                {
                     session = Session.getActiveSession();
 
                     me.onSessionStateChange(session, state, exception);
                 }
             });
-        } else
+        }
+        else
             this.go(session);
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (Session.getActiveSession() != null)
-            Session.getActiveSession().onActivityResult(this, requestCode,
-                    resultCode, data);
+            Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
     }
 
-    private void go(Session session) {
+    private void go(Session session)
+    {
         final FacebookLoginActivity me = this;
 
         String token = session.getAccessToken();
 
-        if (token != null && token.trim().length() > 0) {
-            SharedPreferences prefs = PreferenceManager
-                    .getDefaultSharedPreferences(this);
+        if (token != null && token.trim().length() > 0)
+        {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
             Editor e = prefs.edit();
             e.putString(FacebookProbe.TOKEN, token);
             e.commit();
@@ -119,36 +124,40 @@ public class FacebookLoginActivity extends ActionBarActivity {
 
             builder = builder.setTitle(R.string.title_facebook_success);
             builder = builder.setMessage(R.string.message_facebook_success);
-            builder = builder.setPositiveButton(
-                    R.string.confirm_facebook_success,
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
+            builder = builder.setPositiveButton(R.string.confirm_facebook_success,
+                    new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int which)
+                        {
                             me.finish();
                         }
                     });
 
             builder.create().show();
-        } else {
+        }
+        else
+        {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
             builder = builder.setTitle(R.string.title_facebook_failure);
             builder = builder.setMessage(R.string.message_facebook_failure);
-            builder = builder.setPositiveButton(
-                    R.string.confirm_facebook_success,
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
+            builder = builder.setPositiveButton(R.string.confirm_facebook_success,
+                    new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int which)
+                        {
                             me.finish();
                         }
                     });
 
-            builder = builder.setNegativeButton(
-                    R.string.confirm_facebook_try_again,
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
+            builder = builder.setNegativeButton(R.string.confirm_facebook_try_again,
+                    new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int which)
+                        {
                             me.finish();
 
-                            Intent intent = new Intent(me,
-                                    FacebookLoginActivity.class);
+                            Intent intent = new Intent(me, FacebookLoginActivity.class);
                             me.startActivity(intent);
                         }
                     });

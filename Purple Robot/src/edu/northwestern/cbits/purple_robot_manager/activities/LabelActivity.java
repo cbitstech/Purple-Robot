@@ -50,7 +50,8 @@ import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 
 @SuppressLint("SimpleDateFormat")
-public class LabelActivity extends ActionBarActivity {
+public class LabelActivity extends ActionBarActivity
+{
     public static final String TIMESTAMP = "LABEL TIMESTAMP";
     public static final String LABEL_CONTEXT = "LABEL_CONTEXT";
     public static final String LABEL_KEY = "LABEL_KEY";
@@ -66,68 +67,74 @@ public class LabelActivity extends ActionBarActivity {
 
     private HashMap<String, Object> _values = new HashMap<String, Object>();
 
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
         this.setContentView(R.layout.layout_label_activity);
 
-        getWindow().setLayout(LayoutParams.MATCH_PARENT,
-                LayoutParams.MATCH_PARENT);
+        getWindow().setLayout(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
     }
 
-    private String[] savedLabels() {
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(this);
+    private String[] savedLabels()
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         String[] labels = new String[0];
 
-        try {
-            JSONArray jsonLabels = new JSONArray(prefs.getString(
-                    "list_label_values",
+        try
+        {
+            JSONArray jsonLabels = new JSONArray(prefs.getString("list_label_values",
                     "['Activity', 'Location', 'Social Context']"));
 
             labels = new String[jsonLabels.length()];
 
-            for (int i = 0; i < jsonLabels.length(); i++) {
+            for (int i = 0; i < jsonLabels.length(); i++)
+            {
                 labels[i] = jsonLabels.getString(i);
             }
-        } catch (JSONException e) {
+        }
+        catch (JSONException e)
+        {
             LogManager.getInstance(this).logException(e);
         }
 
         return labels;
     }
 
-    private String[] savedValues() {
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(this);
+    private String[] savedValues()
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         String[] values = new String[0];
 
-        try {
-            JSONArray jsonValues = new JSONArray(prefs.getString(
-                    "list_value_values", "[]"));
+        try
+        {
+            JSONArray jsonValues = new JSONArray(prefs.getString("list_value_values", "[]"));
 
             values = new String[jsonValues.length()];
 
-            for (int i = 0; i < jsonValues.length(); i++) {
+            for (int i = 0; i < jsonValues.length(); i++)
+            {
                 values[i] = jsonValues.getString(i);
             }
-        } catch (JSONException e) {
+        }
+        catch (JSONException e)
+        {
             LogManager.getInstance(this).logException(e);
         }
 
         return values;
     }
 
-    private void saveLabels(String[] labels) {
+    private void saveLabels(String[] labels)
+    {
         JSONArray array = new JSONArray();
 
         for (String label : labels)
             array.put(label);
 
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(this);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         Editor e = prefs.edit();
 
         e.putString("list_label_values", array.toString());
@@ -135,14 +142,14 @@ public class LabelActivity extends ActionBarActivity {
         e.commit();
     }
 
-    private void saveValues(String[] values) {
+    private void saveValues(String[] values)
+    {
         JSONArray array = new JSONArray();
 
         for (String value : values)
             array.put(value);
 
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(this);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         Editor e = prefs.edit();
 
         e.putString("list_value_values", array.toString());
@@ -150,14 +157,16 @@ public class LabelActivity extends ActionBarActivity {
         e.commit();
     }
 
-    protected void onNewIntent(Intent intent) {
+    protected void onNewIntent(Intent intent)
+    {
         super.onNewIntent(intent);
 
         this.setIntent(intent);
     }
 
     @SuppressWarnings("deprecation")
-    protected void onResume() {
+    protected void onResume()
+    {
         super.onResume();
 
         Bundle extras = this.getIntent().getExtras();
@@ -174,17 +183,15 @@ public class LabelActivity extends ActionBarActivity {
 
         ActionBar actionBar = this.getSupportActionBar();
 
-        if (extras.containsKey(LabelActivity.INSTRUCTIONS)) {
-            final TextView instructions = (TextView) this
-                    .findViewById(R.id.text_label_message);
+        if (extras.containsKey(LabelActivity.INSTRUCTIONS))
+        {
+            final TextView instructions = (TextView) this.findViewById(R.id.text_label_message);
 
             instructions.setText(extras.getString(LabelActivity.INSTRUCTIONS));
         }
 
-        final TextView contextText = (TextView) this
-                .findViewById(R.id.text_label_context);
-        contextText.setText(String.format(
-                this.getString(R.string.label_context), this._labelContext));
+        final TextView contextText = (TextView) this.findViewById(R.id.text_label_context);
+        contextText.setText(String.format(this.getString(R.string.label_context), this._labelContext));
 
         Date d = new Date((long) this._timestamp);
 
@@ -192,32 +199,28 @@ public class LabelActivity extends ActionBarActivity {
 
         HashMap<String, Object> payload = new HashMap<String, Object>();
 
-        final AutoCompleteTextView value = (AutoCompleteTextView) this
-                .findViewById(R.id.text_value_text);
-        final AutoCompleteTextView label = (AutoCompleteTextView) this
-                .findViewById(R.id.text_label_text);
-        final CheckBox remember = (CheckBox) this
-                .findViewById(R.id.check_remember_values);
+        final AutoCompleteTextView value = (AutoCompleteTextView) this.findViewById(R.id.text_value_text);
+        final AutoCompleteTextView label = (AutoCompleteTextView) this.findViewById(R.id.text_label_text);
+        final CheckBox remember = (CheckBox) this.findViewById(R.id.check_remember_values);
 
-        final SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(this);
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        if (extras.containsKey(LabelActivity.LABEL_DEFINITIONS)) {
+        if (extras.containsKey(LabelActivity.LABEL_DEFINITIONS))
+        {
             label.setVisibility(View.GONE);
             value.setVisibility(View.GONE);
             remember.setVisibility(View.GONE);
 
-            LinearLayout labelLayout = (LinearLayout) this
-                    .findViewById(R.id.layout_label);
+            LinearLayout labelLayout = (LinearLayout) this.findViewById(R.id.layout_label);
 
             labelLayout.removeAllViews();
 
-            Bundle definitions = extras
-                    .getBundle(LabelActivity.LABEL_DEFINITIONS);
+            Bundle definitions = extras.getBundle(LabelActivity.LABEL_DEFINITIONS);
 
             HashMap<String, String> sortedMap = new HashMap<String, String>();
 
-            for (String key : definitions.keySet()) {
+            for (String key : definitions.keySet())
+            {
                 Bundle field = definitions.getBundle(key);
 
                 String fieldName = field.getString("name");
@@ -228,19 +231,22 @@ public class LabelActivity extends ActionBarActivity {
 
             ArrayList<String> keyList = new ArrayList<String>();
 
-            for (String key : sortedMap.keySet()) {
+            for (String key : sortedMap.keySet())
+            {
                 if (key != null)
                     keyList.add(key);
             }
 
             Collections.sort(keyList);
 
-            for (String field : keyList) {
+            for (String field : keyList)
+            {
                 field = sortedMap.get(field);
 
                 Bundle fieldDef = definitions.getBundle(field);
 
-                if (fieldDef != null) {
+                if (fieldDef != null)
+                {
                     final TextView fieldName = new TextView(this);
 
                     if (fieldDef.containsKey("prompt"))
@@ -248,8 +254,8 @@ public class LabelActivity extends ActionBarActivity {
                     else
                         fieldName.setText(field);
 
-                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                            LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT,
+                            LayoutParams.WRAP_CONTENT);
                     params.setMargins(8, 24, 8, 8);
                     fieldName.setLayoutParams(params);
 
@@ -262,12 +268,11 @@ public class LabelActivity extends ActionBarActivity {
 
                     final String fieldPrompt = fieldName.getText().toString();
 
-                    if (fieldType.equalsIgnoreCase("real")) {
+                    if (fieldType.equalsIgnoreCase("real"))
+                    {
                         SeekBar seekBar = new SeekBar(this);
 
-                        params = new LinearLayout.LayoutParams(
-                                LayoutParams.FILL_PARENT,
-                                LayoutParams.WRAP_CONTENT);
+                        params = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
                         params.setMargins(8, 8, 8, 8);
                         seekBar.setLayoutParams(params);
 
@@ -275,9 +280,7 @@ public class LabelActivity extends ActionBarActivity {
                         final double max = fieldDef.getDouble("max", 10.0);
                         double step = fieldDef.getDouble("step", 1.0);
 
-                        float lastValue = prefs.getFloat(
-                                "label_field_" + field,
-                                (float) (((min + max) / 2) - min));
+                        float lastValue = prefs.getFloat("label_field_" + field, (float) (((min + max) / 2) - min));
 
                         seekBar.setMax((int) (max - min));
                         seekBar.setKeyProgressIncrement((int) step);
@@ -286,49 +289,49 @@ public class LabelActivity extends ActionBarActivity {
 
                         me._values.put(fieldLabel, Float.valueOf(lastValue));
 
-                        seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-                            public void onProgressChanged(SeekBar seekBar,
-                                    int progress, boolean fromUser) {
-                                fieldName.setText(fieldPrompt + ": "
-                                        + ((int) (min + progress)));
+                        seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
+                        {
+                            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
+                            {
+                                fieldName.setText(fieldPrompt + ": " + ((int) (min + progress)));
 
-                                me._values.put(fieldLabel,
-                                        Float.valueOf((float) (min + progress)));
+                                me._values.put(fieldLabel, Float.valueOf((float) (min + progress)));
                             }
 
-                            public void onStartTrackingTouch(SeekBar arg0) {
+                            public void onStartTrackingTouch(SeekBar arg0)
+                            {
 
                             }
 
-                            public void onStopTrackingTouch(SeekBar seekBar) {
+                            public void onStopTrackingTouch(SeekBar seekBar)
+                            {
 
                             }
                         });
 
                         labelLayout.addView(seekBar);
-                    } else if (fieldType.equalsIgnoreCase("nominal")) {
-                        if (fieldDef.containsKey("values")
-                                && fieldDef.getStringArrayList("values").size() > 0) {
+                    }
+                    else if (fieldType.equalsIgnoreCase("nominal"))
+                    {
+                        if (fieldDef.containsKey("values") && fieldDef.getStringArrayList("values").size() > 0)
+                        {
                             ScrollView scroller = new ScrollView(this);
-                            params = new LinearLayout.LayoutParams(
-                                    LayoutParams.FILL_PARENT, 0, 1);
+                            params = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, 0, 1);
                             scroller.setLayoutParams(params);
 
-                            String lastValue = prefs.getString("label_field_"
-                                    + field, null);
+                            String lastValue = prefs.getString("label_field_" + field, null);
 
                             RadioGroup radios = new RadioGroup(this);
 
-                            for (String nominalValue : fieldDef
-                                    .getStringArrayList("values")) {
+                            for (String nominalValue : fieldDef.getStringArrayList("values"))
+                            {
                                 RadioButton radio = new RadioButton(this);
                                 radio.setText(nominalValue);
 
                                 radios.addView(radio);
 
-                                if (lastValue != null
-                                        && nominalValue
-                                                .equalsIgnoreCase(lastValue)) {
+                                if (lastValue != null && nominalValue.equalsIgnoreCase(lastValue))
+                                {
                                     if (radio.isChecked() == false)
                                         radio.toggle();
                                 }
@@ -337,16 +340,17 @@ public class LabelActivity extends ActionBarActivity {
                             if (lastValue != null)
                                 me._values.put(fieldLabel, lastValue);
 
-                            radios.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-                                public void onCheckedChanged(RadioGroup radios,
-                                        int checkId) {
-                                    if (checkId != -1) {
-                                        RadioButton button = (RadioButton) radios
-                                                .findViewById(checkId);
+                            radios.setOnCheckedChangeListener(new OnCheckedChangeListener()
+                            {
+                                public void onCheckedChanged(RadioGroup radios, int checkId)
+                                {
+                                    if (checkId != -1)
+                                    {
+                                        RadioButton button = (RadioButton) radios.findViewById(checkId);
 
-                                        me._values.put(fieldLabel,
-                                                button.getText());
-                                    } else
+                                        me._values.put(fieldLabel, button.getText());
+                                    }
+                                    else
                                         me._values.remove(fieldLabel);
                                 }
                             });
@@ -354,47 +358,44 @@ public class LabelActivity extends ActionBarActivity {
                             scroller.addView(radios);
                             labelLayout.addView(scroller);
                         }
-                    } else if (fieldType.equalsIgnoreCase("text")) {
-                        AutoCompleteTextView textField = new AutoCompleteTextView(
-                                this);
+                    }
+                    else if (fieldType.equalsIgnoreCase("text"))
+                    {
+                        AutoCompleteTextView textField = new AutoCompleteTextView(this);
 
                         if (fieldDef.containsKey("placeholder"))
-                            textField
-                                    .setHint(fieldDef.getString("placeholder"));
+                            textField.setHint(fieldDef.getString("placeholder"));
 
-                        String valuesList = prefs.getString("label_field_"
-                                + field + "_saved_values", "");
+                        String valuesList = prefs.getString("label_field_" + field + "_saved_values", "");
 
                         ArrayList<String> savedValues = new ArrayList<String>();
 
                         for (String saved : valuesList.split(";"))
                             savedValues.add(saved);
 
-                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                                this,
-                                android.R.layout.simple_dropdown_item_1line,
-                                savedValues);
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                                android.R.layout.simple_dropdown_item_1line, savedValues);
                         textField.setAdapter(adapter);
                         textField.setThreshold(1);
 
-                        params = new LinearLayout.LayoutParams(
-                                LayoutParams.FILL_PARENT,
-                                LayoutParams.WRAP_CONTENT);
+                        params = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
                         params.setMargins(8, 8, 8, 8);
                         textField.setLayoutParams(params);
 
-                        textField.addTextChangedListener(new TextWatcher() {
-                            public void afterTextChanged(Editable s) {
+                        textField.addTextChangedListener(new TextWatcher()
+                        {
+                            public void afterTextChanged(Editable s)
+                            {
                                 me._values.put(fieldLabel, s.toString());
                             }
 
-                            public void beforeTextChanged(CharSequence s,
-                                    int start, int count, int after) {
+                            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+                            {
 
                             }
 
-                            public void onTextChanged(CharSequence s,
-                                    int start, int before, int count) {
+                            public void onTextChanged(CharSequence s, int start, int before, int count)
+                            {
 
                             }
                         });
@@ -403,38 +404,40 @@ public class LabelActivity extends ActionBarActivity {
                     }
                 }
             }
-        } else {
+        }
+        else
+        {
             label.setVisibility(View.VISIBLE);
             value.setVisibility(View.VISIBLE);
             remember.setVisibility(View.VISIBLE);
 
-            boolean rememberLabel = prefs.getBoolean(
-                    LabelActivity.REMEMBER_LABEL,
-                    LabelActivity.REMEMBER_LABEL_DEFAULT);
+            boolean rememberLabel = prefs
+                    .getBoolean(LabelActivity.REMEMBER_LABEL, LabelActivity.REMEMBER_LABEL_DEFAULT);
 
-            remember.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                public void onCheckedChanged(CompoundButton button,
-                        boolean checked) {
+            remember.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+            {
+                public void onCheckedChanged(CompoundButton button, boolean checked)
+                {
 
                 }
             });
 
             remember.setChecked(rememberLabel);
 
-            remember.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                public void onCheckedChanged(CompoundButton button,
-                        boolean checked) {
+            remember.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+            {
+                public void onCheckedChanged(CompoundButton button, boolean checked)
+                {
                     Editor e = prefs.edit();
                     e.putBoolean(LabelActivity.REMEMBER_LABEL, checked);
                     e.commit();
                 }
             });
 
-            if (rememberLabel) {
-                String labelName = prefs.getString(
-                        LabelActivity.REMEMBER_LABEL_NAME, null);
-                String labelValue = prefs.getString(
-                        LabelActivity.REMEMBER_LABEL_VALUE, null);
+            if (rememberLabel)
+            {
+                String labelName = prefs.getString(LabelActivity.REMEMBER_LABEL_NAME, null);
+                String labelValue = prefs.getString(LabelActivity.REMEMBER_LABEL_VALUE, null);
 
                 if (labelName != null)
                     label.setText(labelName);
@@ -443,20 +446,19 @@ public class LabelActivity extends ActionBarActivity {
                     value.setText(labelValue);
             }
 
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                    android.R.layout.simple_dropdown_item_1line,
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line,
                     this.savedLabels());
 
             label.setAdapter(adapter);
 
-            if (extras.containsKey(LabelActivity.LABEL_KEY)) {
+            if (extras.containsKey(LabelActivity.LABEL_KEY))
+            {
                 label.setText(extras.getString(LabelActivity.LABEL_KEY));
                 payload.put("label", extras.getString(LabelActivity.LABEL_KEY));
             }
 
             ArrayAdapter<String> valueAdapter = new ArrayAdapter<String>(this,
-                    android.R.layout.simple_dropdown_item_1line,
-                    this.savedValues());
+                    android.R.layout.simple_dropdown_item_1line, this.savedValues());
             value.setAdapter(valueAdapter);
 
             value.requestFocus();
@@ -471,7 +473,8 @@ public class LabelActivity extends ActionBarActivity {
         LogManager.getInstance(this).log("pr_label_prompt", payload);
     }
 
-    protected void onPause() {
+    protected void onPause()
+    {
         super.onPause();
 
         Bundle extras = this.getIntent().getExtras();
@@ -487,7 +490,8 @@ public class LabelActivity extends ActionBarActivity {
         LogManager.getInstance(this).log("pr_label_dismissed", payload);
     }
 
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
         MenuInflater inflater = this.getMenuInflater();
         inflater.inflate(R.menu.menu_label_activity, menu);
 
@@ -495,19 +499,22 @@ public class LabelActivity extends ActionBarActivity {
     }
 
     @SuppressLint("ValidFragment")
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
         final int itemId = item.getItemId();
 
-        if (itemId == R.id.menu_accept_label) {
+        if (itemId == R.id.menu_accept_label)
+        {
             Bundle extras = this.getIntent().getExtras();
 
-            SharedPreferences prefs = PreferenceManager
-                    .getDefaultSharedPreferences(this);
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-            if (extras.containsKey(LabelActivity.LABEL_DEFINITIONS)) {
+            if (extras.containsKey(LabelActivity.LABEL_DEFINITIONS))
+            {
                 Editor e = prefs.edit();
 
-                for (String key : this._values.keySet()) {
+                for (String key : this._values.keySet())
+                {
                     Object value = this._values.get(key);
 
                     JavaScriptEngine js = new JavaScriptEngine(this);
@@ -519,17 +526,15 @@ public class LabelActivity extends ActionBarActivity {
                     payload.put("label", key);
                     payload.put("label_value", value.toString());
 
-                    LogManager.getInstance(this)
-                            .log("pr_label_submit", payload);
+                    LogManager.getInstance(this).log("pr_label_submit", payload);
 
                     if (value instanceof Float)
-                        e.putFloat("label_field_" + key,
-                                ((Float) value).floatValue());
-                    else {
+                        e.putFloat("label_field_" + key, ((Float) value).floatValue());
+                    else
+                    {
                         e.putString("label_field_" + key, value.toString());
 
-                        String valuesList = prefs.getString("label_field_"
-                                + key + "_saved_values", "");
+                        String valuesList = prefs.getString("label_field_" + key + "_saved_values", "");
 
                         ArrayList<String> savedValues = new ArrayList<String>();
 
@@ -541,37 +546,37 @@ public class LabelActivity extends ActionBarActivity {
 
                         StringBuffer sb = new StringBuffer();
 
-                        for (String savedValue : savedValues) {
+                        for (String savedValue : savedValues)
+                        {
                             if (sb.length() > 0)
                                 sb.append(";");
 
                             sb.append(savedValue);
                         }
 
-                        e.putString("label_field_" + key + "_saved_values",
-                                sb.toString());
+                        e.putString("label_field_" + key + "_saved_values", sb.toString());
                     }
                 }
 
                 e.commit();
 
                 this.finish();
-            } else {
-                EditText keyText = (EditText) this
-                        .findViewById(R.id.text_label_text);
-                EditText valueText = (EditText) this
-                        .findViewById(R.id.text_value_text);
+            }
+            else
+            {
+                EditText keyText = (EditText) this.findViewById(R.id.text_label_text);
+                EditText valueText = (EditText) this.findViewById(R.id.text_value_text);
 
                 String key = keyText.getText().toString();
                 String value = valueText.getText().toString();
 
-                if (key != null && value != null && key.length() > 0
-                        && value.length() > 0) {
-                    boolean rememberLabel = prefs.getBoolean(
-                            LabelActivity.REMEMBER_LABEL,
+                if (key != null && value != null && key.length() > 0 && value.length() > 0)
+                {
+                    boolean rememberLabel = prefs.getBoolean(LabelActivity.REMEMBER_LABEL,
                             LabelActivity.REMEMBER_LABEL_DEFAULT);
 
-                    if (rememberLabel) {
+                    if (rememberLabel)
+                    {
                         Editor e = prefs.edit();
 
                         e.putString(LabelActivity.REMEMBER_LABEL_NAME, key);
@@ -583,15 +588,13 @@ public class LabelActivity extends ActionBarActivity {
                     JavaScriptEngine js = new JavaScriptEngine(this);
                     js.emitReading(key, value);
 
-                    List<String> labels = new ArrayList<String>(
-                            Arrays.asList(this.savedLabels()));
+                    List<String> labels = new ArrayList<String>(Arrays.asList(this.savedLabels()));
                     labels.remove(key);
                     labels.add(0, key);
                     String[] labelsArray = labels.toArray(new String[0]);
                     this.saveLabels(labelsArray);
 
-                    List<String> values = new ArrayList<String>(
-                            Arrays.asList(this.savedValues()));
+                    List<String> values = new ArrayList<String>(Arrays.asList(this.savedValues()));
                     values.remove(value);
                     values.add(0, value);
                     String[] valuesArray = values.toArray(new String[0]);
@@ -603,28 +606,30 @@ public class LabelActivity extends ActionBarActivity {
                     payload.put("label", key);
                     payload.put("label_value", value);
 
-                    LogManager.getInstance(this)
-                            .log("pr_label_submit", payload);
+                    LogManager.getInstance(this).log("pr_label_submit", payload);
 
                     this.finish();
-                } else {
+                }
+                else
+                {
                     FragmentManager manager = this.getSupportFragmentManager();
 
                     final LabelActivity me = this;
 
-                    DialogFragment dialog = new DialogFragment() {
-                        public Dialog onCreateDialog(Bundle savedInstanceState) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(
-                                    me);
+                    DialogFragment dialog = new DialogFragment()
+                    {
+                        public Dialog onCreateDialog(Bundle savedInstanceState)
+                        {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(me);
                             builder.setTitle(R.string.title_missing_label);
                             builder.setMessage(R.string.message_missing_label);
-                            builder.setPositiveButton(R.string.button_ok,
-                                    new OnClickListener() {
-                                        public void onClick(
-                                                DialogInterface dialog, int arg) {
+                            builder.setPositiveButton(R.string.button_ok, new OnClickListener()
+                            {
+                                public void onClick(DialogInterface dialog, int arg)
+                                {
 
-                                        }
-                                    });
+                                }
+                            });
 
                             return builder.create();
                         }
@@ -635,7 +640,8 @@ public class LabelActivity extends ActionBarActivity {
             }
         }
 
-        if (itemId == R.id.menu_cancel) {
+        if (itemId == R.id.menu_cancel)
+        {
             this.finish();
         }
 

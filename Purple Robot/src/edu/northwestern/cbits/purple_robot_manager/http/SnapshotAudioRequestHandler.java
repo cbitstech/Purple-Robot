@@ -19,30 +19,35 @@ import android.net.Uri;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.snapshots.SnapshotManager;
 
-public class SnapshotAudioRequestHandler implements HttpRequestHandler {
+public class SnapshotAudioRequestHandler implements HttpRequestHandler
+{
     private Context _context = null;
 
-    public SnapshotAudioRequestHandler(Context context) {
+    public SnapshotAudioRequestHandler(Context context)
+    {
         super();
 
         this._context = context;
     }
 
-    public void handle(HttpRequest request, HttpResponse response,
-            HttpContext argument) throws HttpException, IOException {
+    public void handle(HttpRequest request, HttpResponse response, HttpContext argument) throws HttpException,
+            IOException
+    {
         response.setStatusCode(HttpStatus.SC_OK);
 
-        if (request instanceof BasicHttpRequest) {
+        if (request instanceof BasicHttpRequest)
+        {
             Uri u = Uri.parse(request.getRequestLine().getUri());
 
             long timestamp = Long.parseLong(u.getQueryParameter("timestamp"));
 
-            JSONObject snapshot = SnapshotManager.getInstance(this._context)
-                    .jsonForTime(timestamp, true);
+            JSONObject snapshot = SnapshotManager.getInstance(this._context).jsonForTime(timestamp, true);
 
-            if (snapshot.has("audio")) {
+            if (snapshot.has("audio"))
+            {
 
-                try {
+                try
+                {
                     MediaPlayer mp = new MediaPlayer();
 
                     mp.setDataSource(snapshot.getString("audio"));
@@ -63,19 +68,30 @@ public class SnapshotAudioRequestHandler implements HttpRequestHandler {
                     response.setEntity(body);
 
                     return;
-                } catch (IllegalArgumentException e) {
+                }
+                catch (IllegalArgumentException e)
+                {
                     LogManager.getInstance(this._context).logException(e);
-                } catch (SecurityException e) {
+                }
+                catch (SecurityException e)
+                {
                     LogManager.getInstance(this._context).logException(e);
-                } catch (IllegalStateException e) {
+                }
+                catch (IllegalStateException e)
+                {
                     LogManager.getInstance(this._context).logException(e);
-                } catch (JSONException e) {
+                }
+                catch (JSONException e)
+                {
                     LogManager.getInstance(this._context).logException(e);
-                } catch (InterruptedException e) {
+                }
+                catch (InterruptedException e)
+                {
                     LogManager.getInstance(this._context).logException(e);
                 }
 
-                try {
+                try
+                {
                     JSONObject status = new JSONObject();
                     status.put("status", "error");
 
@@ -85,12 +101,15 @@ public class SnapshotAudioRequestHandler implements HttpRequestHandler {
                     response.setEntity(body);
 
                     return;
-                } catch (JSONException e) {
+                }
+                catch (JSONException e)
+                {
                     LogManager.getInstance(this._context).logException(e);
                 }
             }
 
-            try {
+            try
+            {
                 JSONObject status = new JSONObject();
                 status.put("status", "no-audio-found");
 
@@ -98,7 +117,9 @@ public class SnapshotAudioRequestHandler implements HttpRequestHandler {
                 body.setContentType("application/json");
 
                 response.setEntity(body);
-            } catch (JSONException e) {
+            }
+            catch (JSONException e)
+            {
                 LogManager.getInstance(this._context).logException(e);
             }
         }

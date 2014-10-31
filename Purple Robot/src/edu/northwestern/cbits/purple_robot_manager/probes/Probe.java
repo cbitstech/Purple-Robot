@@ -19,7 +19,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
-public abstract class Probe {
+public abstract class Probe
+{
     public static final String PROBE_READING = "edu.northwestern.cbits.purple_robot.PROBE_READING";
 
     public static final String DURATION = "DURATION";
@@ -45,8 +46,7 @@ public abstract class Probe {
 
     public abstract String probeCategory(Context context);
 
-    public abstract PreferenceScreen preferenceScreen(
-            PreferenceActivity settingsActivity);
+    public abstract PreferenceScreen preferenceScreen(PreferenceActivity settingsActivity);
 
     public abstract String summary(Context context);
 
@@ -55,15 +55,16 @@ public abstract class Probe {
 
     private static SharedPreferences _preferences = null;
 
-    public static SharedPreferences getPreferences(Context context) {
+    public static SharedPreferences getPreferences(Context context)
+    {
         if (Probe._preferences == null)
-            Probe._preferences = PreferenceManager
-                    .getDefaultSharedPreferences(context);
+            Probe._preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         return Probe._preferences;
     }
 
-    public void nudge(Context context) {
+    public void nudge(Context context)
+    {
         this.isEnabled(context);
     }
 
@@ -71,74 +72,85 @@ public abstract class Probe {
     private static List<Class> _probeClasses = new ArrayList<Class>();
 
     @SuppressWarnings("rawtypes")
-    public static void registerProbeClass(Class probeClass) {
+    public static void registerProbeClass(Class probeClass)
+    {
         if (!Probe._probeClasses.contains(probeClass))
             Probe._probeClasses.add(probeClass);
     }
 
     @SuppressWarnings("rawtypes")
-    public static List<Class> availableProbeClasses() {
+    public static List<Class> availableProbeClasses()
+    {
         return Probe._probeClasses;
     }
 
-    public static void loadProbeClasses(Context context) {
+    public static void loadProbeClasses(Context context)
+    {
         String packageName = Probe.class.getPackage().getName();
 
-        String[] probeClasses = context.getResources().getStringArray(
-                R.array.probe_classes);
+        String[] probeClasses = context.getResources().getStringArray(R.array.probe_classes);
 
-        for (String className : probeClasses) {
-            try {
-                Probe.registerProbeClass(Class.forName(packageName + "."
-                        + className));
-            } catch (ClassNotFoundException e) {
+        for (String className : probeClasses)
+        {
+            try
+            {
+                Probe.registerProbeClass(Class.forName(packageName + "." + className));
+            }
+            catch (ClassNotFoundException e)
+            {
                 LogManager.getInstance(context).logException(e);
             }
         }
     }
 
-    public static boolean probesEnabled(Context context) {
+    public static boolean probesEnabled(Context context)
+    {
         long now = System.currentTimeMillis();
 
-        if (now - Probe._lastEnabledCheck > 10000) {
+        if (now - Probe._lastEnabledCheck > 10000)
+        {
             Probe._lastEnabledCheck = now;
 
             SharedPreferences prefs = Probe.getPreferences(context);
 
-            Probe._lastEnabled = prefs.getBoolean("config_probes_enabled",
-                    false);
+            Probe._lastEnabled = prefs.getBoolean("config_probes_enabled", false);
         }
 
         return Probe._lastEnabled;
     }
 
-    public boolean isEnabled(Context context) {
+    public boolean isEnabled(Context context)
+    {
         long now = System.currentTimeMillis();
 
-        if (now - Probe._lastEnabledCheck > 10000) {
+        if (now - Probe._lastEnabledCheck > 10000)
+        {
             Probe._lastEnabledCheck = now;
 
             SharedPreferences prefs = Probe.getPreferences(context);
 
-            Probe._lastEnabled = prefs.getBoolean("config_probes_enabled",
-                    false);
+            Probe._lastEnabled = prefs.getBoolean("config_probes_enabled", false);
         }
 
         return Probe._lastEnabled;
     }
 
-    public String summarizeValue(Context context, Bundle bundle) {
+    public String summarizeValue(Context context, Bundle bundle)
+    {
         return bundle.toString();
     }
 
     // public abstract void updateFromJSON(Context context, JSONObject json)
     // throws JSONException;
 
-    public Bundle formattedBundle(Context context, Bundle bundle) {
+    public Bundle formattedBundle(Context context, Bundle bundle)
+    {
         Bundle formatted = new Bundle();
 
-        if (bundle.containsKey("TIMESTAMP")) {
-            try {
+        if (bundle.containsKey("TIMESTAMP"))
+        {
+            try
+            {
                 double time = bundle.getDouble("TIMESTAMP");
 
                 if (time == 0)
@@ -146,47 +158,48 @@ public abstract class Probe {
 
                 Date d = new Date(((long) time) * 1000);
 
-                formatted.putString(
-                        context.getString(R.string.display_date_recorded),
-                        d.toString());
-            } catch (ClassCastException e) {
+                formatted.putString(context.getString(R.string.display_date_recorded), d.toString());
+            }
+            catch (ClassCastException e)
+            {
                 long time = bundle.getLong("TIMESTAMP");
 
                 Date d = new Date(time * 1000);
 
-                formatted.putString(
-                        context.getString(R.string.display_date_recorded),
-                        d.toString());
+                formatted.putString(context.getString(R.string.display_date_recorded), d.toString());
             }
         }
 
         return formatted;
     };
 
-    protected void transmitData(Context context, Bundle data) {
-        if (context != null) {
+    protected void transmitData(Context context, Bundle data)
+    {
+        if (context != null)
+        {
             UUID uuid = UUID.randomUUID();
             data.putString("GUID", uuid.toString());
 
-            LocalBroadcastManager localManager = LocalBroadcastManager
-                    .getInstance(context);
-            Intent intent = new Intent(
-                    edu.northwestern.cbits.purple_robot_manager.probes.Probe.PROBE_READING);
+            LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(context);
+            Intent intent = new Intent(edu.northwestern.cbits.purple_robot_manager.probes.Probe.PROBE_READING);
             intent.putExtras(data);
 
             localManager.sendBroadcast(intent);
         }
     }
 
-    public Intent viewIntent(Context context) {
+    public Intent viewIntent(Context context)
+    {
         return null;
     }
 
-    public String getDisplayContent(Activity activity) {
+    public String getDisplayContent(Activity activity)
+    {
         return null;
     }
 
-    public String contentSubtitle(Context context) {
+    public String contentSubtitle(Context context)
+    {
         return null;
     }
 
@@ -194,7 +207,8 @@ public abstract class Probe {
 
     public abstract void disable(Context context);
 
-    public Map<String, Object> configuration(Context context) {
+    public Map<String, Object> configuration(Context context)
+    {
         HashMap<String, Object> map = new HashMap<String, Object>();
 
         map.put("name", this.name(context));
@@ -203,11 +217,14 @@ public abstract class Probe {
         return map;
     }
 
-    public void updateFromMap(Context context, Map<String, Object> params) {
-        if (params.containsKey(Probe.PROBE_ENABLED)) {
+    public void updateFromMap(Context context, Map<String, Object> params)
+    {
+        if (params.containsKey(Probe.PROBE_ENABLED))
+        {
             Object enabled = params.get(Probe.PROBE_ENABLED);
 
-            if (enabled instanceof Boolean) {
+            if (enabled instanceof Boolean)
+            {
                 if (((Boolean) enabled).booleanValue())
                     this.enable(context);
                 else

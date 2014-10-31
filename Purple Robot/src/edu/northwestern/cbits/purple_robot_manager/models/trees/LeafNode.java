@@ -7,7 +7,8 @@ import java.util.Map;
  * Encapsulates a leaf node that returns a prediction.
  */
 
-public class LeafNode extends TreeNode {
+public class LeafNode extends TreeNode
+{
     public static final String PREDICTION = "prediction";
     public static final String ACCURACY = "accuracy";
 
@@ -23,7 +24,8 @@ public class LeafNode extends TreeNode {
      *            keys as needed.
      */
 
-    public LeafNode(String name, HashMap<String, Object> prediction) {
+    public LeafNode(String name, HashMap<String, Object> prediction)
+    {
         super(name);
 
         this._prediction = prediction;
@@ -31,7 +33,8 @@ public class LeafNode extends TreeNode {
         this._prediction.put(TreeNode.NAME, name);
     }
 
-    public LeafNode(HashMap<String, Object> prediction) {
+    public LeafNode(HashMap<String, Object> prediction)
+    {
         super(null);
 
         this._prediction = prediction;
@@ -43,7 +46,8 @@ public class LeafNode extends TreeNode {
      * @see edu.northwestern.cbits.purple_robot_manager.models.trees.TreeNode#fetchPrediction(java.util.Map)
      */
 
-    public Map<String, Object> fetchPrediction(Map<String, Object> features) {
+    public Map<String, Object> fetchPrediction(Map<String, Object> features)
+    {
         return this._prediction;
     }
 
@@ -54,7 +58,8 @@ public class LeafNode extends TreeNode {
      * @see edu.northwestern.cbits.purple_robot_manager.models.trees.TreeNode#toString(int)
      */
 
-    public String toString(int indent) {
+    public String toString(int indent)
+    {
         StringBuffer sb = new StringBuffer();
 
         for (int i = 0; i < indent; i++)

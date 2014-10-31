@@ -7,13 +7,16 @@ import edu.northwestern.cbits.purple_robot_manager.models.trees.TreeNode.TreeNod
  * Abstract superclass responsible for mapping parsers to input content.
  */
 
-public abstract class TreeNodeParser {
+public abstract class TreeNodeParser
+{
     /**
      * Exception class for capturing parser-related errors and exceptions.
      */
 
-    public static class ParserNotFound extends Exception {
-        public ParserNotFound(String message) {
+    public static class ParserNotFound extends Exception
+    {
+        public ParserNotFound(String message)
+        {
             super(message);
         }
 
@@ -36,8 +39,8 @@ public abstract class TreeNodeParser {
      *             Thrown on tree errors.
      */
 
-    public static TreeNode parseString(String content) throws ParserNotFound,
-            TreeNodeException {
+    public static TreeNode parseString(String content) throws ParserNotFound, TreeNodeException
+    {
         TreeNodeParser parser = null;
 
         if (content.startsWith("digraph J48Tree"))
@@ -46,8 +49,7 @@ public abstract class TreeNodeParser {
             parser = new MatLabBinaryTreeParser();
 
         if (parser == null)
-            throw new TreeNodeParser.ParserNotFound(
-                    "Unable to find parser for content.");
+            throw new TreeNodeParser.ParserNotFound("Unable to find parser for content.");
 
         return parser.parse(content);
     }

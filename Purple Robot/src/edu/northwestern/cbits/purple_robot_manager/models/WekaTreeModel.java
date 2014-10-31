@@ -65,12 +65,14 @@ import android.util.Log;
  * </pre>
  */
 
-public class WekaTreeModel extends TrainedModel {
+public class WekaTreeModel extends TrainedModel
+{
     public static final String TYPE = "weka-decision-tree";
 
     private Graph _tree = null;
 
-    public WekaTreeModel(Context context, Uri uri) {
+    public WekaTreeModel(Context context, Uri uri)
+    {
         super(context, uri);
     }
 
@@ -78,26 +80,31 @@ public class WekaTreeModel extends TrainedModel {
      * Parses Graph object from the string provided in model to generate the
      * data structure that evaluates data to generate predictions.
      * 
-     * @see http
+     * @see http 
      *      ://www.alexander-merz.com/graphviz/doc/com/alexmerz/graphviz/objects
      *      /Graph.html
      * @see edu.northwestern.cbits.purple_robot_manager.models.TrainedModel#generateModel(android.content.Context,
      *      java.lang.Object)
      */
 
-    protected void generateModel(Context context, Object model) {
+    protected void generateModel(Context context, Object model)
+    {
         StringReader reader = new StringReader(model.toString());
 
         Parser parser = new Parser();
 
-        try {
-            if (parser.parse(reader)) {
+        try
+        {
+            if (parser.parse(reader))
+            {
                 ArrayList<Graph> graphs = parser.getGraphs();
 
                 if (graphs.size() > 0)
                     this._tree = graphs.get(0);
             }
-        } catch (ParseException e) {
+        }
+        catch (ParseException e)
+        {
             LogManager.getInstance(context).logException(e);
         }
     }
@@ -109,7 +116,8 @@ public class WekaTreeModel extends TrainedModel {
      *      java.util.Map)
      */
 
-    protected Object evaluateModel(Context context, Map<String, Object> snapshot) {
+    protected Object evaluateModel(Context context, Map<String, Object> snapshot)
+    {
         if (this._tree == null)
             return null;
 
@@ -140,9 +148,10 @@ public class WekaTreeModel extends TrainedModel {
      * @return Prediction given states.
      */
 
-    protected String fetchPrediction(Node node, List<Edge> edges,
-            Map<String, Object> snapshot) {
-        synchronized (this) {
+    protected String fetchPrediction(Node node, List<Edge> edges, Map<String, Object> snapshot)
+    {
+        synchronized (this)
+        {
             String nodeLabel = node.getAttribute("label").replaceAll("_", "");
 
             String[] tokens = nodeLabel.split(" ");
@@ -151,12 +160,14 @@ public class WekaTreeModel extends TrainedModel {
 
             List<Edge> testEdges = new ArrayList<Edge>();
 
-            for (Edge edge : edges) {
+            for (Edge edge : edges)
+            {
                 if (edge.getSource().getNode() == node)
                     testEdges.add(edge);
             }
 
-            if (testEdges.size() == 0) {
+            if (testEdges.size() == 0)
+            {
                 String prediction = node.getAttribute("label");
 
                 int colonIndex = prediction.indexOf(":");
@@ -171,10 +182,12 @@ public class WekaTreeModel extends TrainedModel {
                 return prediction;
             }
 
-            for (String key : snapshot.keySet()) {
+            for (String key : snapshot.keySet())
+            {
                 String testKey = key.replaceAll("_", "");
 
-                if (testKey.equalsIgnoreCase(nodeLabel)) {
+                if (testKey.equalsIgnoreCase(nodeLabel))
+                {
                     Object value = snapshot.get(key);
 
                     double testValue = Double.NaN;
@@ -190,7 +203,8 @@ public class WekaTreeModel extends TrainedModel {
 
                     Node nextNode = null;
 
-                    for (Edge edge : testEdges) {
+                    for (Edge edge : testEdges)
+                    {
                         String edgeLabel = edge.getAttribute("label").trim();
 
                         int index = edgeLabel.indexOf(" ");
@@ -198,33 +212,44 @@ public class WekaTreeModel extends TrainedModel {
                         String operation = edgeLabel.substring(0, index);
                         String edgeValue = edgeLabel.substring(index + 1);
 
-                        if (Double.isNaN(testValue) == false) {
+                        if (Double.isNaN(testValue) == false)
+                        {
                             double edgeQuantity = Double.parseDouble(edgeValue);
 
-                            if ("<=".equals(operation)) {
+                            if ("<=".equals(operation))
+                            {
                                 if (testValue <= edgeQuantity)
                                     nextNode = edge.getTarget().getNode();
-                            } else if (">=".equals(operation)) {
+                            }
+                            else if (">=".equals(operation))
+                            {
                                 if (testValue >= edgeQuantity)
                                     nextNode = edge.getTarget().getNode();
-                            } else if (">".equals(operation)) {
+                            }
+                            else if (">".equals(operation))
+                            {
                                 if (testValue > edgeQuantity)
                                     nextNode = edge.getTarget().getNode();
-                            } else if ("<".equals(operation)) {
+                            }
+                            else if ("<".equals(operation))
+                            {
                                 if (testValue < edgeQuantity)
                                     nextNode = edge.getTarget().getNode();
-                            } else
+                            }
+                            else
                                 Log.e("PR", "UNKNOWN OP: -" + operation + "-");
-                        } else if ("=".equals(operation)) {
-                            String valueString = value.toString().replaceAll(
-                                    "\\.", "");
+                        }
+                        else if ("=".equals(operation))
+                        {
+                            String valueString = value.toString().replaceAll("\\.", "");
                             // ^ TODO: Normalize
 
                             if (nextNode == null && "= ?".equals(edgeLabel))
                                 nextNode = edge.getTarget().getNode();
                             else if (valueString.equalsIgnoreCase(edgeValue))
                                 nextNode = edge.getTarget().getNode();
-                        } else
+                        }
+                        else
                             Log.e("PR", "UNKNOWN OP: -" + operation + "-");
                     }
 
@@ -237,11 +262,13 @@ public class WekaTreeModel extends TrainedModel {
         return null;
     }
 
-    public String modelType() {
+    public String modelType()
+    {
         return WekaTreeModel.TYPE;
     }
 
-    public String summary(Context context) {
+    public String summary(Context context)
+    {
         return context.getString(R.string.summary_model_tree);
     }
 

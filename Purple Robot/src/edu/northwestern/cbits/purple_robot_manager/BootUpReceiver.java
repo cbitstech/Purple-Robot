@@ -15,14 +15,15 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 
-public class BootUpReceiver extends BroadcastReceiver {
+public class BootUpReceiver extends BroadcastReceiver
+{
     public static final String BOOT_KEY = "system_last_boot";
 
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(Context context, Intent intent)
+    {
         long now = System.currentTimeMillis();
 
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(context);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         Editor e = prefs.edit();
 
@@ -36,18 +37,19 @@ public class BootUpReceiver extends BroadcastReceiver {
 
         TriggerManager.getInstance(context).fireMissedTriggers(context, now);
 
-        if (prefs.contains(BaseScriptEngine.STICKY_NOTIFICATION_PARAMS)) {
-            try {
-                JSONObject json = new JSONObject(prefs.getString(
-                        BaseScriptEngine.STICKY_NOTIFICATION_PARAMS, "{}"));
+        if (prefs.contains(BaseScriptEngine.STICKY_NOTIFICATION_PARAMS))
+        {
+            try
+            {
+                JSONObject json = new JSONObject(prefs.getString(BaseScriptEngine.STICKY_NOTIFICATION_PARAMS, "{}"));
 
                 JavaScriptEngine engine = new JavaScriptEngine(context);
 
-                engine.showScriptNotification(json.getString("title"),
-                        json.getString("message"),
-                        json.getBoolean("persistent"),
-                        json.getBoolean("sticky"), json.getString("script"));
-            } catch (JSONException ex) {
+                engine.showScriptNotification(json.getString("title"), json.getString("message"),
+                        json.getBoolean("persistent"), json.getBoolean("sticky"), json.getString("script"));
+            }
+            catch (JSONException ex)
+            {
                 LogManager.getInstance(context).logException(ex);
             }
 

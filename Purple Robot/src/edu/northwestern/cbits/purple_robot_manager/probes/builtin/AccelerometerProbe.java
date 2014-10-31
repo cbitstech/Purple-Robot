@@ -25,8 +25,8 @@ import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("SimpleDateFormat")
-public class AccelerometerProbe extends Continuous3DProbe implements
-        SensorEventListener {
+public class AccelerometerProbe extends Continuous3DProbe implements SensorEventListener
+{
     private static int BUFFER_SIZE = 1024;
 
     public static final String DB_TABLE = "accelerometer_probe";
@@ -55,28 +55,29 @@ public class AccelerometerProbe extends Continuous3DProbe implements
     private int bufferIndex = 0;
 
     @Override
-    public String probeCategory(Context context) {
+    public String probeCategory(Context context)
+    {
         return context.getString(R.string.probe_sensor_category);
     }
 
     @Override
-    public Map<String, String> databaseSchema() {
-        if (this._schema == null) {
+    public Map<String, String> databaseSchema()
+    {
+        if (this._schema == null)
+        {
             this._schema = new HashMap<String, String>();
 
-            this._schema.put(AccelerometerProbe.X_KEY,
-                    ProbeValuesProvider.REAL_TYPE);
-            this._schema.put(AccelerometerProbe.Y_KEY,
-                    ProbeValuesProvider.REAL_TYPE);
-            this._schema.put(AccelerometerProbe.Z_KEY,
-                    ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(AccelerometerProbe.X_KEY, ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(AccelerometerProbe.Y_KEY, ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(AccelerometerProbe.Z_KEY, ProbeValuesProvider.REAL_TYPE);
         }
 
         return this._schema;
     }
 
     @Override
-    public Bundle formattedBundle(Context context, Bundle bundle) {
+    public Bundle formattedBundle(Context context, Bundle bundle)
+    {
         Bundle formatted = super.formattedBundle(context, bundle);
 
         double[] eventTimes = bundle.getDoubleArray("EVENT_TIMESTAMP");
@@ -86,18 +87,20 @@ public class AccelerometerProbe extends Continuous3DProbe implements
 
         ArrayList<String> keys = new ArrayList<String>();
 
-        SimpleDateFormat sdf = new SimpleDateFormat(
-                context.getString(R.string.display_date_format));
+        SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.display_date_format));
 
-        if (x == null || y == null || z == null) {
+        if (x == null || y == null || z == null)
+        {
 
-        } else if (eventTimes.length > 1) {
+        }
+        else if (eventTimes.length > 1)
+        {
             Bundle readings = new Bundle();
 
-            for (int i = 0; i < eventTimes.length; i++) {
-                String formatString = String.format(
-                        context.getString(R.string.display_gyroscope_reading),
-                        x[i], y[i], z[i]);
+            for (int i = 0; i < eventTimes.length; i++)
+            {
+                String formatString = String.format(context.getString(R.string.display_gyroscope_reading), x[i], y[i],
+                        z[i]);
 
                 double time = eventTimes[i];
 
@@ -113,13 +116,12 @@ public class AccelerometerProbe extends Continuous3DProbe implements
             if (keys.size() > 0)
                 readings.putStringArrayList("KEY_ORDER", keys);
 
-            formatted.putBundle(
-                    context.getString(R.string.display_accelerometer_readings),
-                    readings);
-        } else if (eventTimes.length > 0) {
-            String formatString = String.format(
-                    context.getString(R.string.display_gyroscope_reading),
-                    x[0], y[0], z[0]);
+            formatted.putBundle(context.getString(R.string.display_accelerometer_readings), readings);
+        }
+        else if (eventTimes.length > 0)
+        {
+            String formatString = String
+                    .format(context.getString(R.string.display_gyroscope_reading), x[0], y[0], z[0]);
 
             double time = eventTimes[0];
 
@@ -132,64 +134,63 @@ public class AccelerometerProbe extends Continuous3DProbe implements
     };
 
     @Override
-    public long getFrequency() {
+    public long getFrequency()
+    {
         SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
 
-        return Long.parseLong(prefs.getString(
-                "config_probe_accelerometer_built_in_frequency",
+        return Long.parseLong(prefs.getString("config_probe_accelerometer_built_in_frequency",
                 ContinuousProbe.DEFAULT_FREQUENCY));
     }
 
     @Override
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return AccelerometerProbe.NAME;
     }
 
     @Override
-    public int getTitleResource() {
+    public int getTitleResource()
+    {
         return R.string.title_accelerometer_probe;
     }
 
     @Override
-    public boolean isEnabled(Context context) {
+    public boolean isEnabled(Context context)
+    {
         SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
         this._context = context.getApplicationContext();
 
-        SensorManager sensors = (SensorManager) context
-                .getSystemService(Context.SENSOR_SERVICE);
+        SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
-        if (super.isEnabled(context)) {
-            if (prefs.getBoolean("config_probe_accelerometer_built_in_enabled",
-                    ContinuousProbe.DEFAULT_ENABLED)) {
-                int frequency = Integer.parseInt(prefs.getString(
-                        "config_probe_accelerometer_built_in_frequency",
+        if (super.isEnabled(context))
+        {
+            if (prefs.getBoolean("config_probe_accelerometer_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
+            {
+                int frequency = Integer.parseInt(prefs.getString("config_probe_accelerometer_built_in_frequency",
                         ContinuousProbe.DEFAULT_FREQUENCY));
 
-                if (this._lastFrequency != frequency) {
+                if (this._lastFrequency != frequency)
+                {
                     sensors.unregisterListener(this, sensor);
 
-                    switch (frequency) {
+                    switch (frequency)
+                    {
                     case SensorManager.SENSOR_DELAY_FASTEST:
-                        sensors.registerListener(this, sensor,
-                                SensorManager.SENSOR_DELAY_FASTEST, null);
+                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST, null);
                         break;
                     case SensorManager.SENSOR_DELAY_GAME:
-                        sensors.registerListener(this, sensor,
-                                SensorManager.SENSOR_DELAY_GAME, null);
+                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME, null);
                         break;
                     case SensorManager.SENSOR_DELAY_UI:
-                        sensors.registerListener(this, sensor,
-                                SensorManager.SENSOR_DELAY_UI, null);
+                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI, null);
                         break;
                     case SensorManager.SENSOR_DELAY_NORMAL:
-                        sensors.registerListener(this, sensor,
-                                SensorManager.SENSOR_DELAY_NORMAL, null);
+                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL, null);
                         break;
                     default:
-                        sensors.registerListener(this, sensor,
-                                SensorManager.SENSOR_DELAY_GAME, null);
+                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME, null);
                         break;
                     }
 
@@ -197,11 +198,15 @@ public class AccelerometerProbe extends Continuous3DProbe implements
                 }
 
                 return true;
-            } else {
+            }
+            else
+            {
                 sensors.unregisterListener(this, sensor);
                 this._lastFrequency = -1;
             }
-        } else {
+        }
+        else
+        {
             sensors.unregisterListener(this, sensor);
             this._lastFrequency = -1;
         }
@@ -210,14 +215,15 @@ public class AccelerometerProbe extends Continuous3DProbe implements
     }
 
     @Override
-    protected boolean passesThreshold(SensorEvent event) {
+    protected boolean passesThreshold(SensorEvent event)
+    {
         long now = System.currentTimeMillis();
 
-        if (now - this.lastThresholdLookup > 5000) {
+        if (now - this.lastThresholdLookup > 5000)
+        {
             SharedPreferences prefs = Probe.getPreferences(this._context);
 
-            this.lastThreshold = Double.parseDouble(prefs.getString(
-                    AccelerometerProbe.PROBE_ACCEL_THRESHOLD,
+            this.lastThreshold = Double.parseDouble(prefs.getString(AccelerometerProbe.PROBE_ACCEL_THRESHOLD,
                     AccelerometerProbe.DEFAULT_THRESHOLD));
 
             this.lastThresholdLookup = now;
@@ -236,7 +242,8 @@ public class AccelerometerProbe extends Continuous3DProbe implements
         else if (Math.abs(z - this._lastZ) >= this.lastThreshold)
             passes = true;
 
-        if (passes) {
+        if (passes)
+        {
             this._lastX = x;
             this._lastY = y;
             this._lastZ = z;
@@ -246,7 +253,8 @@ public class AccelerometerProbe extends Continuous3DProbe implements
     }
 
     @Override
-    public Map<String, Object> configuration(Context context) {
+    public Map<String, Object> configuration(Context context)
+    {
         Map<String, Object> map = super.configuration(context);
 
         map.put(ContinuousProbe.PROBE_THRESHOLD, this.lastThreshold);
@@ -255,25 +263,28 @@ public class AccelerometerProbe extends Continuous3DProbe implements
     }
 
     @Override
-    public void updateFromMap(Context context, Map<String, Object> params) {
+    public void updateFromMap(Context context, Map<String, Object> params)
+    {
         super.updateFromMap(context, params);
 
-        if (params.containsKey(ContinuousProbe.PROBE_THRESHOLD)) {
+        if (params.containsKey(ContinuousProbe.PROBE_THRESHOLD))
+        {
             Object threshold = params.get(ContinuousProbe.PROBE_THRESHOLD);
 
-            if (threshold instanceof Double) {
+            if (threshold instanceof Double)
+            {
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putString("config_probe_accelerometer_threshold",
-                        threshold.toString());
+                e.putString("config_probe_accelerometer_threshold", threshold.toString());
                 e.commit();
             }
         }
     }
 
     @Override
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    {
         PreferenceScreen screen = super.preferenceScreen(activity);
 
         ListPreference threshold = new ListPreference(activity);
@@ -290,14 +301,17 @@ public class AccelerometerProbe extends Continuous3DProbe implements
     }
 
     @Override
-    public void onSensorChanged(SensorEvent event) {
+    public void onSensorChanged(SensorEvent event)
+    {
         if (this.shouldProcessEvent(event) == false)
             return;
 
         final double now = (double) System.currentTimeMillis();
 
-        if (this.passesThreshold(event)) {
-            synchronized (this) {
+        if (this.passesThreshold(event))
+        {
+            synchronized (this)
+            {
                 double elapsed = (double) SystemClock.uptimeMillis();
                 double boot = (now - elapsed) * 1000 * 1000;
 
@@ -313,27 +327,26 @@ public class AccelerometerProbe extends Continuous3DProbe implements
 
                 accuracyBuffer[bufferIndex] = event.accuracy;
 
-                for (int i = 0; i < event.values.length; i++) {
+                for (int i = 0; i < event.values.length; i++)
+                {
                     valueBuffer[i][bufferIndex] = event.values[i];
                 }
 
-                double[] plotValues = { timeBuffer[0] / 1000,
-                        valueBuffer[0][bufferIndex],
-                        valueBuffer[1][bufferIndex],
+                double[] plotValues =
+                { timeBuffer[0] / 1000, valueBuffer[0][bufferIndex], valueBuffer[1][bufferIndex],
                         valueBuffer[2][bufferIndex] };
-                RealTimeProbeViewActivity.plotIfVisible(
-                        this.getTitleResource(), plotValues);
+                RealTimeProbeViewActivity.plotIfVisible(this.getTitleResource(), plotValues);
 
                 bufferIndex += 1;
 
-                if (bufferIndex >= timeBuffer.length) {
+                if (bufferIndex >= timeBuffer.length)
+                {
                     Sensor sensor = event.sensor;
 
                     Bundle data = new Bundle();
 
                     Bundle sensorBundle = new Bundle();
-                    sensorBundle.putFloat("MAXIMUM_RANGE",
-                            sensor.getMaximumRange());
+                    sensorBundle.putFloat("MAXIMUM_RANGE", sensor.getMaximumRange());
                     sensorBundle.putString("NAME", sensor.getName());
                     sensorBundle.putFloat("POWER", sensor.getPower());
                     sensorBundle.putFloat("RESOLUTION", sensor.getResolution());
@@ -350,45 +363,41 @@ public class AccelerometerProbe extends Continuous3DProbe implements
                     data.putDoubleArray("EVENT_TIMESTAMP", timeBuffer);
                     data.putIntArray("ACCURACY", accuracyBuffer);
 
-                    for (int i = 0; i < fieldNames.length; i++) {
+                    for (int i = 0; i < fieldNames.length; i++)
+                    {
                         data.putFloatArray(fieldNames[i], valueBuffer[i]);
                     }
 
                     this.transmitData(this._context, data);
 
-                    if (timeBuffer.length > 0) {
+                    if (timeBuffer.length > 0)
+                    {
                         double x = Double.NaN;
                         double y = Double.NaN;
                         double z = Double.NaN;
 
-                        for (int i = 0; i < fieldNames.length; i++) {
+                        for (int i = 0; i < fieldNames.length; i++)
+                        {
                             if (fieldNames[i].equals(AccelerometerProbe.X_KEY))
                                 x = valueBuffer[i][0];
-                            else if (fieldNames[i]
-                                    .equals(AccelerometerProbe.Y_KEY))
+                            else if (fieldNames[i].equals(AccelerometerProbe.Y_KEY))
                                 y = valueBuffer[i][0];
-                            else if (fieldNames[i]
-                                    .equals(AccelerometerProbe.Z_KEY))
+                            else if (fieldNames[i].equals(AccelerometerProbe.Z_KEY))
                                 z = valueBuffer[i][0];
                         }
 
-                        if (Double.isNaN(x) == false
-                                && Double.isNaN(y) == false
-                                && Double.isNaN(z) == false) {
-                            Map<String, Object> values = new HashMap<String, Object>(
-                                    4);
+                        if (Double.isNaN(x) == false && Double.isNaN(y) == false && Double.isNaN(z) == false)
+                        {
+                            Map<String, Object> values = new HashMap<String, Object>(4);
 
                             values.put(AccelerometerProbe.X_KEY, x);
                             values.put(AccelerometerProbe.Y_KEY, y);
                             values.put(AccelerometerProbe.Z_KEY, z);
 
-                            values.put(ProbeValuesProvider.TIMESTAMP,
-                                    Double.valueOf(timeBuffer[0] / 1000));
+                            values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[0] / 1000));
 
-                            ProbeValuesProvider.getProvider(this._context)
-                                    .insertValue(this._context,
-                                            AccelerometerProbe.DB_TABLE,
-                                            this.databaseSchema(), values);
+                            ProbeValuesProvider.getProvider(this._context).insertValue(this._context,
+                                    AccelerometerProbe.DB_TABLE, this.databaseSchema(), values);
                         }
                     }
 
@@ -399,40 +408,43 @@ public class AccelerometerProbe extends Continuous3DProbe implements
     }
 
     @Override
-    public String getPreferenceKey() {
+    public String getPreferenceKey()
+    {
         return "accelerometer_built_in";
     }
 
     @Override
-    public String summarizeValue(Context context, Bundle bundle) {
+    public String summarizeValue(Context context, Bundle bundle)
+    {
         double xReading = bundle.getDoubleArray("X")[0];
         double yReading = bundle.getDoubleArray("Y")[0];
         double zReading = bundle.getDoubleArray("Z")[0];
 
-        return String.format(
-                context.getResources().getString(
-                        R.string.summary_accelerator_probe), xReading,
-                yReading, zReading);
+        return String.format(context.getResources().getString(R.string.summary_accelerator_probe), xReading, yReading,
+                zReading);
     }
 
     @Override
-    public int getSummaryResource() {
+    public int getSummaryResource()
+    {
         return R.string.summary_accelerometer_probe_desc;
     }
 
     @Override
-    protected String tableName() {
+    protected String tableName()
+    {
         return AccelerometerProbe.DB_TABLE;
     }
 
-    public double getThreshold() {
+    public double getThreshold()
+    {
         SharedPreferences prefs = Probe.getPreferences(this._context);
 
-        return Double.parseDouble(prefs.getString(
-                AccelerometerProbe.PROBE_ACCEL_THRESHOLD, "-1"));
+        return Double.parseDouble(prefs.getString(AccelerometerProbe.PROBE_ACCEL_THRESHOLD, "-1"));
     }
 
-    public void setThreshold(double threshold) {
+    public void setThreshold(double threshold)
+    {
         SharedPreferences prefs = Probe.getPreferences(this._context);
 
         Editor e = prefs.edit();

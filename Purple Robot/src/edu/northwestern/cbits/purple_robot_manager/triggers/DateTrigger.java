@@ -37,8 +37,10 @@ import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
-@SuppressLint({ "SimpleDateFormat", "TrulyRandom" })
-public class DateTrigger extends Trigger {
+@SuppressLint(
+{ "SimpleDateFormat", "TrulyRandom" })
+public class DateTrigger extends Trigger
+{
     public static final String TYPE_NAME = "datetime";
 
     public static final String DATETIME_START = "datetime_start";
@@ -75,19 +77,22 @@ public class DateTrigger extends Trigger {
     private static List<Runnable> pendingRefreshes = new ArrayList<Runnable>();
     private static boolean isRefreshing = false;
 
-    private abstract class RefreshRunnable implements Runnable {
+    private abstract class RefreshRunnable implements Runnable
+    {
         private String _identifier = null;
 
-        public RefreshRunnable(String identifier) {
+        public RefreshRunnable(String identifier)
+        {
             this._identifier = identifier;
         }
 
-        public int hashCode() {
-            return new HashCodeBuilder(17, 31).append(this._identifier)
-                    .toHashCode();
+        public int hashCode()
+        {
+            return new HashCodeBuilder(17, 31).append(this._identifier).toHashCode();
         }
 
-        public boolean equals(Object obj) {
+        public boolean equals(Object obj)
+        {
             if (obj == null)
                 return false;
 
@@ -95,19 +100,26 @@ public class DateTrigger extends Trigger {
         }
     }
 
-    static {
-        try {
+    static
+    {
+        try
+        {
             DateTrigger.random = SecureRandom.getInstance("SHA1PRNG");
-        } catch (NoSuchAlgorithmException e) {
+        }
+        catch (NoSuchAlgorithmException e)
+        {
             LogManager.getInstance(null).logException(e);
         }
     }
 
-    public void refresh(final Context context) {
+    public void refresh(final Context context)
+    {
         final DateTrigger me = this;
 
-        RefreshRunnable r = new RefreshRunnable(this.identifier()) {
-            public void run() {
+        RefreshRunnable r = new RefreshRunnable(this.identifier())
+        {
+            public void run()
+            {
                 me.refreshTrigger(context);
             }
         };
@@ -115,19 +127,24 @@ public class DateTrigger extends Trigger {
         if (DateTrigger.pendingRefreshes.contains(r) == false)
             DateTrigger.pendingRefreshes.add(r);
 
-        if (DateTrigger.isRefreshing == false) {
+        if (DateTrigger.isRefreshing == false)
+        {
             DateTrigger.isRefreshing = true;
 
-            Runnable s = new Runnable() {
-                public void run() {
-                    if (DateTrigger.pendingRefreshes.size() > 0) {
+            Runnable s = new Runnable()
+            {
+                public void run()
+                {
+                    if (DateTrigger.pendingRefreshes.size() > 0)
+                    {
                         Runnable r = DateTrigger.pendingRefreshes.remove(0);
 
                         if (r != null)
                             r.run();
 
                         this.run();
-                    } else
+                    }
+                    else
                         DateTrigger.isRefreshing = false;
                 }
             };
@@ -138,10 +155,12 @@ public class DateTrigger extends Trigger {
         }
     }
 
-    public void refreshTrigger(final Context context) {
+    public void refreshTrigger(final Context context)
+    {
         long now = System.currentTimeMillis();
 
-        if (now - this._lastFireCalcDate > (3600 * 1000)) {
+        if (now - this._lastFireCalcDate > (3600 * 1000))
+        {
             this._lastFireCalcDate = now;
 
             this.refreshCalendar(context);
@@ -159,62 +178,75 @@ public class DateTrigger extends Trigger {
 
             Date currentDate = new Date(now);
 
-            while (current < now + (hour * 48) && upcoming.size() < maxCount) {
+            while (current < now + (hour * 48) && upcoming.size() < maxCount)
+            {
                 DateTime from = new DateTime(new Date(current));
                 DateTime to = new DateTime(new Date(current + hour));
 
-                try {
-                    for (Object o : this._calendar.getComponents("VEVENT")) {
+                try
+                {
+                    for (Object o : this._calendar.getComponents("VEVENT"))
+                    {
                         Component c = (Component) o;
 
                         Period period = new Period(from, to);
 
                         PeriodList l = c.calculateRecurrenceSet(period);
 
-                        for (Object po : l) {
-                            if (po instanceof Period) {
+                        for (Object po : l)
+                        {
+                            if (po instanceof Period)
+                            {
                                 Period p = (Period) po;
 
                                 Date start = p.getRangeStart();
 
-                                if (start.after(currentDate)) {
+                                if (start.after(currentDate))
+                                {
                                     if (upcoming.contains(start) == false)
                                         upcoming.add(start);
                                 }
                             }
                         }
                     }
-                } catch (NullPointerException e) {
+                }
+                catch (NullPointerException e)
+                {
 
-                } catch (IllegalArgumentException e) {
+                }
+                catch (IllegalArgumentException e)
+                {
                     LogManager.getInstance(context).logException(e);
                 }
 
                 current += hour;
             }
 
-            synchronized (this._upcomingFireDates) {
+            synchronized (this._upcomingFireDates)
+            {
                 this._upcomingFireDates.clear();
                 this._upcomingFireDates.addAll(upcoming);
             }
         }
     }
 
-    public void reset(Context context) {
+    public void reset(Context context)
+    {
         super.reset(context);
 
         String key = "last_fired_" + this.identifier();
 
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(context);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         Editor edit = prefs.edit();
         edit.remove(key);
         edit.commit();
     }
 
-    public void merge(Context context, Trigger trigger) {
-        if (trigger instanceof DateTrigger) {
+    public void merge(Context context, Trigger trigger)
+    {
+        if (trigger instanceof DateTrigger)
+        {
             super.merge(trigger);
 
             DateTrigger dateTrigger = (DateTrigger) trigger;
@@ -226,73 +258,91 @@ public class DateTrigger extends Trigger {
         }
     }
 
-    private void refreshCalendar(Context context) {
+    private void refreshCalendar(Context context)
+    {
         if (this._icalString == null)
             return;
 
-        try {
-            StringReader sin = new StringReader(this.adjustCalendar(context,
-                    this._icalString));
+        try
+        {
+            StringReader sin = new StringReader(this.adjustCalendar(context, this._icalString));
             CalendarBuilder builder = new CalendarBuilder();
 
             this._calendar = builder.build(sin);
-        } catch (NullPointerException e) {
+        }
+        catch (NullPointerException e)
+        {
             LogManager.getInstance(context).logException(e);
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             LogManager.getInstance(context).logException(e);
-        } catch (ParserException e) {
+        }
+        catch (ParserException e)
+        {
             LogManager.getInstance(context).logException(e);
         }
     }
 
-    private String adjustCalendar(Context context, String original) {
-        if (original.contains("FREQ=MINUTELY")) {
+    private String adjustCalendar(Context context, String original)
+    {
+        if (original.contains("FREQ=MINUTELY"))
+        {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
 
             StringBuffer newCalendar = new StringBuffer();
 
             long day = (24 * 60 * 60 * 1000);
 
-            for (String line : original.split("\n")) {
-                if (line.startsWith("DTSTART")) {
-                    try {
+            for (String line : original.split("\n"))
+            {
+                if (line.startsWith("DTSTART"))
+                {
+                    try
+                    {
                         Date originalDate = sdf.parse(line.substring(8));
 
                         long now = System.currentTimeMillis();
 
-                        long newTime = now - day - (now % day)
-                                + (originalDate.getTime() % day);
+                        long newTime = now - day - (now % day) + (originalDate.getTime() % day);
 
                         Date newDate = new Date(newTime);
 
                         String newLine = "DTSTART:" + sdf.format(newDate);
 
                         newCalendar.append(newLine + "\n");
-                    } catch (ParseException e) {
+                    }
+                    catch (ParseException e)
+                    {
                         LogManager.getInstance(context).logException(e);
 
                         return original;
                     }
-                } else if (line.startsWith("DTEND")) {
-                    try {
+                }
+                else if (line.startsWith("DTEND"))
+                {
+                    try
+                    {
                         Date originalDate = sdf.parse(line.substring(6));
 
                         long now = System.currentTimeMillis();
 
-                        long newTime = now - day - (now % day)
-                                + (originalDate.getTime() % day);
+                        long newTime = now - day - (now % day) + (originalDate.getTime() % day);
 
                         Date newDate = new Date(newTime);
 
                         String newLine = "DTEND:" + sdf.format(newDate);
 
                         newCalendar.append(newLine + "\n");
-                    } catch (ParseException e) {
+                    }
+                    catch (ParseException e)
+                    {
                         LogManager.getInstance(context).logException(e);
 
                         return original;
                     }
-                } else
+                }
+                else
                     newCalendar.append(line + "\n");
             }
 
@@ -302,8 +352,10 @@ public class DateTrigger extends Trigger {
         return original;
     }
 
-    public boolean updateFromMap(Context context, Map<String, Object> map) {
-        if (super.updateFromMap(context, map)) {
+    public boolean updateFromMap(Context context, Map<String, Object> map)
+    {
+        if (super.updateFromMap(context, map))
+        {
             if (map.containsKey(DateTrigger.DATETIME_START))
                 this._start = map.get(DateTrigger.DATETIME_START).toString();
             if (map.containsKey(DateTrigger.DATETIME_END))
@@ -316,7 +368,8 @@ public class DateTrigger extends Trigger {
 
             long now = System.currentTimeMillis();
 
-            try {
+            try
+            {
                 if (this._end == null)
                     this._end = this._start;
 
@@ -326,16 +379,19 @@ public class DateTrigger extends Trigger {
                 long startTime = startDate.getTime();
                 long endTime = endDate.getTime();
 
-                while ((now - startTime) > (180 * 24 * 60 * 60 * 1000L)) {
+                while ((now - startTime) > (180 * 24 * 60 * 60 * 1000L))
+                {
                     startTime += (24 * 60 * 60 * 1000);
                     endTime += (24 * 60 * 60 * 1000);
                 }
 
-                while ((endTime - now) > (180 * 24 * 60 * 60 * 1000L)) {
+                while ((endTime - now) > (180 * 24 * 60 * 60 * 1000L))
+                {
                     endTime -= (24 * 60 * 60 * 1000);
                 }
 
-                if (startTime > endTime) {
+                if (startTime > endTime)
+                {
                     long holder = startTime;
                     startTime = endTime;
                     endTime = holder;
@@ -343,12 +399,16 @@ public class DateTrigger extends Trigger {
 
                 this._start = sdf.format(new Date(startTime));
                 this._end = sdf.format(new Date(endTime));
-            } catch (ParseException ee) {
+            }
+            catch (ParseException ee)
+            {
                 LogManager.getInstance(context).logException(ee);
             }
 
-            if (this._start != null && this._start.equals(this._end)) {
-                try {
+            if (this._start != null && this._start.equals(this._end))
+            {
+                try
+                {
                     Date start = sdf.parse(this._start);
 
                     long time = start.getTime();
@@ -358,22 +418,21 @@ public class DateTrigger extends Trigger {
                     Date end = new Date(time);
 
                     this._end = sdf.format(end);
-                } catch (ParseException e) {
+                }
+                catch (ParseException e)
+                {
                     LogManager.getInstance(context).logException(e);
                 }
             }
 
             if (map.containsKey(DateTrigger.DATETIME_REPEATS))
-                this._repeats = map.get(DateTrigger.DATETIME_REPEATS)
-                        .toString();
+                this._repeats = map.get(DateTrigger.DATETIME_REPEATS).toString();
 
             if (map.containsKey(DateTrigger.DATETIME_RANDOM))
-                this._random = ((Boolean) map.get(DateTrigger.DATETIME_RANDOM))
-                        .booleanValue();
+                this._random = ((Boolean) map.get(DateTrigger.DATETIME_RANDOM)).booleanValue();
 
             if (map.containsKey(DateTrigger.FIRE_ON_BOOT))
-                this._fireOnBoot = ((Boolean) map.get(DateTrigger.FIRE_ON_BOOT))
-                        .booleanValue();
+                this._fireOnBoot = ((Boolean) map.get(DateTrigger.FIRE_ON_BOOT)).booleanValue();
 
             if ("null".equals(this._repeats))
                 this._repeats = null;
@@ -383,9 +442,8 @@ public class DateTrigger extends Trigger {
             if (this._repeats != null)
                 repeatString = "\nRRULE:" + this._repeats;
 
-            this._icalString = String.format(
-                    context.getString(R.string.ical_template), this._start,
-                    this._end, this.name(), repeatString);
+            this._icalString = String.format(context.getString(R.string.ical_template), this._start, this._end,
+                    this.name(), repeatString);
 
             this._lastFireCalcDate = 0;
             this.refresh(context);
@@ -402,7 +460,8 @@ public class DateTrigger extends Trigger {
         return false;
     }
 
-    public Map<String, Object> configuration(Context context) {
+    public Map<String, Object> configuration(Context context)
+    {
         Map<String, Object> config = super.configuration(context);
 
         config.put(DateTrigger.DATETIME_START, this._start);
@@ -415,19 +474,23 @@ public class DateTrigger extends Trigger {
         return config;
     }
 
-    public DateTrigger(Context context, Map<String, Object> map) {
+    public DateTrigger(Context context, Map<String, Object> map)
+    {
         super(context, map);
 
         this.updateFromMap(context, map);
     }
 
-    public Period getPeriod(Context context, long timestamp) {
+    public Period getPeriod(Context context, long timestamp)
+    {
         Date date = new Date(timestamp);
 
         PeriodList periodList = null;
 
-        if (this._calendar != null && periodList == null) {
-            try {
+        if (this._calendar != null && periodList == null)
+        {
+            try
+            {
                 Date fromDate = new Date(timestamp - 5000);
                 Date toDate = new Date(timestamp + (15 * 60 * 1000));
 
@@ -436,7 +499,8 @@ public class DateTrigger extends Trigger {
 
                 Period period = new Period(from, to);
 
-                for (Object o : this._calendar.getComponents("VEVENT")) {
+                for (Object o : this._calendar.getComponents("VEVENT"))
+                {
                     Component c = (Component) o;
 
                     PeriodList l = c.calculateRecurrenceSet(period);
@@ -444,41 +508,48 @@ public class DateTrigger extends Trigger {
                     if (l != null && l.size() > 0)
                         periodList = l;
                 }
-            } catch (IllegalArgumentException e) {
+            }
+            catch (IllegalArgumentException e)
+            {
                 LogManager.getInstance(context).logException(e);
             }
         }
 
-        try {
-            for (Object po : periodList) {
-                if (po instanceof Period) {
+        try
+        {
+            for (Object po : periodList)
+            {
+                if (po instanceof Period)
+                {
                     Period p = (Period) po;
 
                     DateRange range = new DateRange(p.getStart(), p.getEnd());
 
-                    if (range.includes(date, DateRange.INCLUSIVE_START
-                            | DateRange.INCLUSIVE_END))
+                    if (range.includes(date, DateRange.INCLUSIVE_START | DateRange.INCLUSIVE_END))
                         return p;
                 }
             }
-        } catch (NullPointerException e) {
+        }
+        catch (NullPointerException e)
+        {
 
         }
 
         return null;
     }
 
-    public void execute(Context context, boolean force) {
+    public void execute(Context context, boolean force)
+    {
         long now = System.currentTimeMillis();
 
         Period p = this.getPeriod(context, now);
 
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(context);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         String key = "last_fired_" + this.identifier();
 
-        if (p != null && force == false) {
+        if (p != null && force == false)
+        {
             long lastFired = prefs.getLong(key, 0);
 
             Date lastFireDate = new Date(lastFired);
@@ -488,11 +559,11 @@ public class DateTrigger extends Trigger {
 
             DateRange range = new DateRange(start, end);
 
-            if (range.includes(lastFireDate, DateRange.INCLUSIVE_START
-                    | DateRange.INCLUSIVE_END))
+            if (range.includes(lastFireDate, DateRange.INCLUSIVE_START | DateRange.INCLUSIVE_END))
                 return; // Already fired.
 
-            if (this._random && DateTrigger.random != null) {
+            if (this._random && DateTrigger.random != null)
+            {
                 long timeLeft = System.currentTimeMillis();
                 long periodEnd = end.getTime();
 
@@ -501,7 +572,8 @@ public class DateTrigger extends Trigger {
                 delta = (delta - 1) / (60 * 1000); // Normalize to minutes, drop
                                                    // last minute
 
-                if (delta > 1) {
+                if (delta > 1)
+                {
                     double fireThreshold = 1.0 / (double) delta;
 
                     double randomDouble = random.nextDouble();
@@ -519,8 +591,10 @@ public class DateTrigger extends Trigger {
         super.execute(context, force);
     }
 
-    public boolean matches(Context context, Object obj) {
-        if (obj instanceof Date) {
+    public boolean matches(Context context, Object obj)
+    {
+        if (obj instanceof Date)
+        {
             if (this._calendar == null)
                 this.refreshCalendar(context);
 
@@ -535,13 +609,13 @@ public class DateTrigger extends Trigger {
     }
 
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    {
         PreferenceScreen screen = super.preferenceScreen(activity);
 
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss, yyyy-MM-dd");
 
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(activity);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 
         Preference lastFire = new Preference(activity);
         lastFire.setSummary(R.string.label_trigger_last_fire);
@@ -551,7 +625,8 @@ public class DateTrigger extends Trigger {
 
         if (lastFireTime == 0)
             lastFire.setTitle(R.string.label_trigger_last_fire_never);
-        else {
+        else
+        {
             Date d = new Date(lastFireTime);
 
             lastFire.setTitle(sdf.format(d));
@@ -559,25 +634,24 @@ public class DateTrigger extends Trigger {
 
         screen.addPreference(lastFire);
 
-        synchronized (this._upcomingFireDates) {
-            if (this._upcomingFireDates.size() > 0) {
+        synchronized (this._upcomingFireDates)
+        {
+            if (this._upcomingFireDates.size() > 0)
+            {
                 PreferenceManager manager = activity.getPreferenceManager();
 
-                PreferenceScreen upcomingScreen = manager
-                        .createPreferenceScreen(activity);
-                upcomingScreen
-                        .setSummary(R.string.label_trigger_upcoming_fires);
+                PreferenceScreen upcomingScreen = manager.createPreferenceScreen(activity);
+                upcomingScreen.setSummary(R.string.label_trigger_upcoming_fires);
 
                 if (this._upcomingFireDates.size() == 1)
-                    upcomingScreen
-                            .setTitle(R.string.label_trigger_upcoming_fire_summary);
+                    upcomingScreen.setTitle(R.string.label_trigger_upcoming_fire_summary);
                 else
-                    upcomingScreen
-                            .setTitle(String.format(
-                                    activity.getString(R.string.label_trigger_upcoming_fires_summary),
-                                    this._upcomingFireDates.size()));
+                    upcomingScreen.setTitle(String.format(
+                            activity.getString(R.string.label_trigger_upcoming_fires_summary),
+                            this._upcomingFireDates.size()));
 
-                for (Date d : this._upcomingFireDates) {
+                for (Date d : this._upcomingFireDates)
+                {
                     Preference upcomingFire = new Preference(activity);
                     upcomingFire.setTitle(sdf.format(d));
 
@@ -585,19 +659,19 @@ public class DateTrigger extends Trigger {
                 }
 
                 screen.addPreference(upcomingScreen);
-            } else {
+            }
+            else
+            {
                 Preference upcomingFires = new Preference(activity);
 
                 upcomingFires.setSummary(R.string.label_trigger_upcoming_fires);
-                upcomingFires
-                        .setTitle(R.string.label_trigger_upcoming_fires_none);
+                upcomingFires.setTitle(R.string.label_trigger_upcoming_fires_none);
 
                 screen.addPreference(upcomingFires);
             }
 
             Preference originalStartString = new Preference(activity);
-            originalStartString
-                    .setSummary(R.string.label_trigger_original_start);
+            originalStartString.setSummary(R.string.label_trigger_original_start);
             originalStartString.setTitle(this._originalStart);
             screen.addPreference(originalStartString);
 
@@ -635,23 +709,21 @@ public class DateTrigger extends Trigger {
         return screen;
     }
 
-    public String getDiagnosticString(Context context) {
+    public String getDiagnosticString(Context context)
+    {
         String name = this.name();
         String identifier = this.identifier();
 
         long lastFired = this.lastFireTime(context);
 
-        String lastFiredString = context
-                .getString(R.string.trigger_fired_never);
+        String lastFiredString = context.getString(R.string.trigger_fired_never);
 
-        if (lastFired != 0) {
-            DateFormat formatter = android.text.format.DateFormat
-                    .getMediumDateFormat(context);
-            DateFormat timeFormatter = android.text.format.DateFormat
-                    .getTimeFormat(context);
+        if (lastFired != 0)
+        {
+            DateFormat formatter = android.text.format.DateFormat.getMediumDateFormat(context);
+            DateFormat timeFormatter = android.text.format.DateFormat.getTimeFormat(context);
 
-            lastFiredString = formatter.format(new Date(lastFired)) + " "
-                    + timeFormatter.format(new Date(lastFired));
+            lastFiredString = formatter.format(new Date(lastFired)) + " " + timeFormatter.format(new Date(lastFired));
         }
 
         String enabled = context.getString(R.string.trigger_disabled);
@@ -659,11 +731,11 @@ public class DateTrigger extends Trigger {
         if (this.enabled(context))
             enabled = context.getString(R.string.trigger_enabled);
 
-        return context.getString(R.string.trigger_diagnostic_string, name,
-                identifier, enabled, lastFiredString);
+        return context.getString(R.string.trigger_diagnostic_string, name, identifier, enabled, lastFiredString);
     }
 
-    public Bundle bundle(Context context) {
+    public Bundle bundle(Context context)
+    {
         Bundle bundle = super.bundle(context);
 
         bundle.putBoolean(DateTrigger.RANDOM, this._random);
@@ -689,19 +761,23 @@ public class DateTrigger extends Trigger {
         return bundle;
     }
 
-    public boolean missedFire(Context context, long end) {
-        if (this._fireOnBoot) {
+    public boolean missedFire(Context context, long end)
+    {
+        if (this._fireOnBoot)
+        {
             this.refreshCalendar(context);
 
             long start = this.lastFireTime(context);
 
-            try {
+            try
+            {
                 DateTime from = new DateTime(new Date(start));
                 DateTime to = new DateTime(new Date(end));
 
                 Period period = new Period(from, to);
 
-                for (Object o : this._calendar.getComponents("VEVENT")) {
+                for (Object o : this._calendar.getComponents("VEVENT"))
+                {
                     Component c = (Component) o;
 
                     PeriodList l = c.calculateRecurrenceSet(period);
@@ -709,7 +785,9 @@ public class DateTrigger extends Trigger {
                     if (l != null && l.size() > 0)
                         return true;
                 }
-            } catch (IllegalArgumentException e) {
+            }
+            catch (IllegalArgumentException e)
+            {
                 LogManager.getInstance(context).logException(e);
             }
         }
@@ -717,10 +795,12 @@ public class DateTrigger extends Trigger {
         return false;
     }
 
-    public List<Long> fireTimes(Context context, long start, long end) {
+    public List<Long> fireTimes(Context context, long start, long end)
+    {
         ArrayList<Long> times = new ArrayList<Long>();
 
-        while (start <= end) {
+        while (start <= end)
+        {
             Period p = this.getPeriod(context, start);
 
             if (p != null)

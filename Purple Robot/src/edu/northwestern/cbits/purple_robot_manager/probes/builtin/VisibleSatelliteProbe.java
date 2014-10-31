@@ -21,8 +21,9 @@ import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
-public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener,
-        GpsStatus.NmeaListener, LocationListener {
+public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, GpsStatus.NmeaListener,
+        LocationListener
+{
     private static final boolean DEFAULT_ENABLED = false;
 
     protected Context _context = null;
@@ -34,46 +35,51 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener,
 
     private boolean _listening = false;
 
-    public Map<String, Object> configuration(Context context) {
+    public Map<String, Object> configuration(Context context)
+    {
         Map<String, Object> map = super.configuration(context);
 
         SharedPreferences prefs = Probe.getPreferences(context);
 
-        long freq = Long.parseLong(prefs.getString(
-                "config_probe_satellites_frequency", Probe.DEFAULT_FREQUENCY));
+        long freq = Long.parseLong(prefs.getString("config_probe_satellites_frequency", Probe.DEFAULT_FREQUENCY));
 
         map.put(Probe.PROBE_FREQUENCY, freq);
 
         return map;
     }
 
-    public String probeCategory(Context context) {
+    public String probeCategory(Context context)
+    {
         return context.getString(R.string.probe_external_environment_category);
     }
 
-    public void updateFromMap(Context context, Map<String, Object> params) {
+    public void updateFromMap(Context context, Map<String, Object> params)
+    {
         super.updateFromMap(context, params);
 
-        if (params.containsKey(Probe.PROBE_FREQUENCY)) {
+        if (params.containsKey(Probe.PROBE_FREQUENCY))
+        {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
 
-            if (frequency instanceof Long) {
+            if (frequency instanceof Long)
+            {
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putString("config_probe_satellites_frequency",
-                        frequency.toString());
+                e.putString("config_probe_satellites_frequency", frequency.toString());
                 e.commit();
             }
         }
     }
 
-    public String summary(Context context) {
+    public String summary(Context context)
+    {
         return context.getString(R.string.summary_visible_satellite_probe_desc);
     }
 
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    {
         PreferenceManager manager = activity.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(activity);
@@ -101,7 +107,8 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener,
         return screen;
     }
 
-    public void enable(Context context) {
+    public void enable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -110,7 +117,8 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener,
         e.commit();
     }
 
-    public void disable(Context context) {
+    public void disable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -119,21 +127,22 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener,
         e.commit();
     }
 
-    public boolean isEnabled(Context context) {
-        LocationManager locationManager = (LocationManager) context
-                .getSystemService(Context.LOCATION_SERVICE);
+    public boolean isEnabled(Context context)
+    {
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
-        if (super.isEnabled(context)) {
+        if (super.isEnabled(context))
+        {
             this._context = context.getApplicationContext();
 
             long now = System.currentTimeMillis();
 
             SharedPreferences prefs = Probe.getPreferences(context);
 
-            if (prefs.getBoolean("config_probe_satellites_enabled",
-                    VisibleSatelliteProbe.DEFAULT_ENABLED)) {
-                if (locationManager
-                        .isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            if (prefs.getBoolean("config_probe_satellites_enabled", VisibleSatelliteProbe.DEFAULT_ENABLED))
+            {
+                if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+                {
                     Looper looper = Looper.myLooper();
 
                     if (looper == null)
@@ -142,27 +151,27 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener,
                     locationManager.addGpsStatusListener(this);
                     locationManager.addNmeaListener(this);
 
-                    synchronized (this) {
-                        long freq = Long.parseLong(prefs.getString(
-                                "config_probe_satellite_frequency",
+                    synchronized (this)
+                    {
+                        long freq = Long.parseLong(prefs.getString("config_probe_satellite_frequency",
                                 Probe.DEFAULT_FREQUENCY));
 
-                        if (now - this._lastCheck > 60000
-                                && now - this._lastCheck < freq) // Try to get
-                                                                 // satellites
-                                                                 // in 60
-                                                                 // seconds...
+                        if (now - this._lastCheck > 60000 && now - this._lastCheck < freq) // Try
+                                                                                           // to
+                                                                                           // get
+                                                                                           // satellites
+                                                                                           // in
+                                                                                           // 60
+                                                                                           // seconds...
                         {
                             locationManager.removeGpsStatusListener(this);
                             locationManager.removeNmeaListener(this);
 
                             locationManager.removeUpdates(this);
                         }
-                        if (now - this._lastCheck > freq) {
-                            locationManager
-                                    .requestLocationUpdates(
-                                            LocationManager.GPS_PROVIDER, 1000,
-                                            1, this);
+                        if (now - this._lastCheck > freq)
+                        {
+                            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
 
                             this._lastCheck = now;
                             this._startCheck = now;
@@ -184,12 +193,14 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener,
         return false;
     }
 
-    public String title(Context context) {
+    public String title(Context context)
+    {
         return context.getString(R.string.title_visible_satellite_probe);
     }
 
     @SuppressWarnings("unchecked")
-    public void onGpsStatusChanged(int event) {
+    public void onGpsStatusChanged(int event)
+    {
         long now = System.currentTimeMillis();
 
         if (now - this._lastTransmit < 10000) // 10s
@@ -197,7 +208,8 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener,
 
         this._lastTransmit = now;
 
-        switch (event) {
+        switch (event)
+        {
         case GpsStatus.GPS_EVENT_STARTED:
             break;
         case GpsStatus.GPS_EVENT_STOPPED:
@@ -231,7 +243,8 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener,
             float snrSum = 0;
             int snrCount = 0;
 
-            for (GpsSatellite sat : sats) {
+            for (GpsSatellite sat : sats)
+            {
                 Bundle satBundle = new Bundle();
 
                 satBundle.putFloat("AZIMUTH", sat.getAzimuth());
@@ -252,8 +265,7 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener,
 
             bundle.putString("PROBE", this.name(this._context));
             bundle.putLong("TIMESTAMP", now / 1000);
-            bundle.putParcelableArrayList("SATELLITES",
-                    (ArrayList<Bundle>) this._satellites.clone());
+            bundle.putParcelableArrayList("SATELLITES", (ArrayList<Bundle>) this._satellites.clone());
             bundle.putInt("SATELLITE_COUNT", this._satellites.size());
 
             if (snrSum > 0)
@@ -261,19 +273,23 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener,
 
             bundle.putFloat("AVERAGE_SIGNAL_RATIO", snrSum);
 
-            synchronized (this) {
+            synchronized (this)
+            {
                 this.transmitData(this._context, bundle);
             }
 
             break;
         }
 
-        if (this._context != null) {
+        if (this._context != null)
+        {
             LocationManager locationManager = (LocationManager) this._context
                     .getSystemService(Context.LOCATION_SERVICE);
 
-            if (now - this._startCheck > 10000 && this._listening) {
-                synchronized (this) {
+            if (now - this._startCheck > 10000 && this._listening)
+            {
+                synchronized (this)
+                {
                     this._listening = false;
 
                     locationManager.removeUpdates(this);
@@ -288,98 +304,84 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener,
         }
     }
 
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.VisibleSatelliteProbe";
     }
 
-    public void onNmeaReceived(long timestamp, String nmea) {
+    public void onNmeaReceived(long timestamp, String nmea)
+    {
         // Log.e("PRM", "NMEA (" + timestamp + "): " + nmea);
     }
 
-    public void onLocationChanged(Location location) {
+    public void onLocationChanged(Location location)
+    {
         // Log.e("PRM", "LOCATION CHANGED: " + location);
     }
 
-    public String summarizeValue(Context context, Bundle bundle) {
+    public String summarizeValue(Context context, Bundle bundle)
+    {
         int count = (int) bundle.getDouble("SATELLITE_COUNT");
         float snr = bundle.getFloat("AVERAGE_SIGNAL_RATIO");
 
-        return String.format(
-                context.getResources().getString(
-                        R.string.summary_satellite_probe), count, snr);
+        return String.format(context.getResources().getString(R.string.summary_satellite_probe), count, snr);
     }
 
-    public void onProviderDisabled(String provider) {
-
-    }
-
-    public void onProviderEnabled(String provider) {
+    public void onProviderDisabled(String provider)
+    {
 
     }
 
-    public void onStatusChanged(String provider, int status, Bundle extras) {
+    public void onProviderEnabled(String provider)
+    {
 
     }
 
-    private Bundle bundleForSatelliteArray(Context context,
-            ArrayList<Bundle> objects) {
+    public void onStatusChanged(String provider, int status, Bundle extras)
+    {
+
+    }
+
+    private Bundle bundleForSatelliteArray(Context context, ArrayList<Bundle> objects)
+    {
         Bundle bundle = new Bundle();
 
-        for (Bundle value : objects) {
+        for (Bundle value : objects)
+        {
             ArrayList<String> keys = new ArrayList<String>();
 
-            String key = String.format(
-                    context.getString(R.string.display_satellite_label),
+            String key = String.format(context.getString(R.string.display_satellite_label),
                     value.getInt("RANDOM_NUMBER"));
 
             Bundle satBundle = new Bundle();
 
-            satBundle.putInt(
-                    context.getString(R.string.display_satellite_id_label),
-                    value.getInt("RANDOM_NUMBER"));
-            satBundle.putFloat(context
-                    .getString(R.string.display_satellite_elevation_label),
+            satBundle.putInt(context.getString(R.string.display_satellite_id_label), value.getInt("RANDOM_NUMBER"));
+            satBundle.putFloat(context.getString(R.string.display_satellite_elevation_label),
                     value.getFloat("ELEVATION"));
-            satBundle
-                    .putFloat(
-                            context.getString(R.string.display_satellite_azimuth_label),
-                            value.getFloat("AZIMUTH"));
-            satBundle.putFloat(
-                    context.getString(R.string.display_satellite_signal_label),
+            satBundle.putFloat(context.getString(R.string.display_satellite_azimuth_label), value.getFloat("AZIMUTH"));
+            satBundle.putFloat(context.getString(R.string.display_satellite_signal_label),
                     value.getFloat("SIGNAL_RATIO"));
 
             if (value.getBoolean("HAS_EPHEMERIS"))
-                satBundle
-                        .putString(
-                                context.getString(R.string.display_satellite_ephemeris_label),
-                                context.getString(R.string.display_satellite_has_ephemeris));
+                satBundle.putString(context.getString(R.string.display_satellite_ephemeris_label),
+                        context.getString(R.string.display_satellite_has_ephemeris));
             else
-                satBundle
-                        .putString(
-                                context.getString(R.string.display_satellite_ephemeris_label),
-                                context.getString(R.string.display_satellite_no_ephemeris));
+                satBundle.putString(context.getString(R.string.display_satellite_ephemeris_label),
+                        context.getString(R.string.display_satellite_no_ephemeris));
 
             if (value.getBoolean("HAS_ALMANAC"))
-                satBundle
-                        .putString(
-                                context.getString(R.string.display_satellite_almanac_label),
-                                context.getString(R.string.display_satellite_has_almanac));
+                satBundle.putString(context.getString(R.string.display_satellite_almanac_label),
+                        context.getString(R.string.display_satellite_has_almanac));
             else
-                satBundle
-                        .putString(
-                                context.getString(R.string.display_satellite_almanac_label),
-                                context.getString(R.string.display_satellite_no_almanac));
+                satBundle.putString(context.getString(R.string.display_satellite_almanac_label),
+                        context.getString(R.string.display_satellite_no_almanac));
 
             keys.add(context.getString(R.string.display_satellite_id_label));
-            keys.add(context
-                    .getString(R.string.display_satellite_elevation_label));
-            keys.add(context
-                    .getString(R.string.display_satellite_azimuth_label));
+            keys.add(context.getString(R.string.display_satellite_elevation_label));
+            keys.add(context.getString(R.string.display_satellite_azimuth_label));
             keys.add(context.getString(R.string.display_satellite_signal_label));
-            keys.add(context
-                    .getString(R.string.display_satellite_ephemeris_label));
-            keys.add(context
-                    .getString(R.string.display_satellite_almanac_label));
+            keys.add(context.getString(R.string.display_satellite_ephemeris_label));
+            keys.add(context.getString(R.string.display_satellite_almanac_label));
 
             satBundle.putStringArrayList("KEY_ORDER", keys);
 
@@ -389,7 +391,8 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener,
         return bundle;
     }
 
-    public Bundle formattedBundle(Context context, Bundle bundle) {
+    public Bundle formattedBundle(Context context, Bundle bundle)
+    {
         Bundle formatted = super.formattedBundle(context, bundle);
 
         @SuppressWarnings("unchecked")
@@ -398,12 +401,9 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener,
 
         Bundle satsBundle = this.bundleForSatelliteArray(context, array);
 
-        formatted.putBundle(String.format(
-                context.getString(R.string.display_satellites_title), count),
-                satsBundle);
+        formatted.putBundle(String.format(context.getString(R.string.display_satellites_title), count), satsBundle);
 
-        formatted.putFloat(
-                context.getString(R.string.display_satellites_signal_ratio),
+        formatted.putFloat(context.getString(R.string.display_satellites_signal_ratio),
                 bundle.getFloat("AVERAGE_SIGNAL_RATIO"));
 
         return formatted;

@@ -33,7 +33,8 @@ import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
-public class StepCounterProbe extends Probe implements SensorEventListener {
+public class StepCounterProbe extends Probe implements SensorEventListener
+{
     private static final String DB_TABLE = "step_counter_probe";
 
     private static final String STEPS_KEY = "STEPS";
@@ -46,32 +47,36 @@ public class StepCounterProbe extends Probe implements SensorEventListener {
 
     private Context _context;
 
-    public Intent viewIntent(Context context) {
+    public Intent viewIntent(Context context)
+    {
         Intent i = new Intent(context, WebkitLandscapeActivity.class);
 
         return i;
     }
 
-    public String probeCategory(Context context) {
+    public String probeCategory(Context context)
+    {
         return context.getResources().getString(R.string.probe_sensor_category);
     }
 
-    public String contentSubtitle(Context context) {
-        Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(
-                context, StepCounterProbe.DB_TABLE, this.databaseSchema());
+    public String contentSubtitle(Context context)
+    {
+        Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(context, StepCounterProbe.DB_TABLE,
+                this.databaseSchema());
 
         int count = -1;
 
-        if (c != null) {
+        if (c != null)
+        {
             count = c.getCount();
             c.close();
         }
 
-        return String.format(context.getString(R.string.display_item_count),
-                count);
+        return String.format(context.getString(R.string.display_item_count), count);
     }
 
-    public Map<String, String> databaseSchema() {
+    public Map<String, String> databaseSchema()
+    {
         HashMap<String, String> schema = new HashMap<String, String>();
 
         schema.put(StepCounterProbe.STEPS_KEY, ProbeValuesProvider.REAL_TYPE);
@@ -79,30 +84,30 @@ public class StepCounterProbe extends Probe implements SensorEventListener {
         return schema;
     }
 
-    public String getDisplayContent(Activity activity) {
-        try {
-            String template = WebkitActivity.stringForAsset(activity,
-                    "webkit/chart_spline_full.html");
+    public String getDisplayContent(Activity activity)
+    {
+        try
+        {
+            String template = WebkitActivity.stringForAsset(activity, "webkit/chart_spline_full.html");
 
             SplineChart c = new SplineChart();
 
             ArrayList<Double> battery = new ArrayList<Double>();
             ArrayList<Double> time = new ArrayList<Double>();
 
-            Cursor cursor = ProbeValuesProvider.getProvider(activity)
-                    .retrieveValues(activity, StepCounterProbe.DB_TABLE,
-                            this.databaseSchema());
+            Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(activity,
+                    StepCounterProbe.DB_TABLE, this.databaseSchema());
 
             int count = -1;
 
-            if (cursor != null) {
+            if (cursor != null)
+            {
                 count = cursor.getCount();
 
-                while (cursor.moveToNext()) {
-                    double d = cursor.getDouble(cursor
-                            .getColumnIndex(StepCounterProbe.STEPS_KEY));
-                    double t = cursor.getDouble(cursor
-                            .getColumnIndex(ProbeValuesProvider.TIMESTAMP));
+                while (cursor.moveToNext())
+                {
+                    double d = cursor.getDouble(cursor.getColumnIndex(StepCounterProbe.STEPS_KEY));
+                    double t = cursor.getDouble(cursor.getColumnIndex(ProbeValuesProvider.TIMESTAMP));
 
                     battery.add(d);
                     time.add(t);
@@ -116,30 +121,36 @@ public class StepCounterProbe extends Probe implements SensorEventListener {
 
             JSONObject json = c.dataJson(activity);
 
-            template = template.replace("{{{ highchart_json }}}",
-                    json.toString());
+            template = template.replace("{{{ highchart_json }}}", json.toString());
             template = template.replace("{{{ highchart_count }}}", "" + count);
 
             return template;
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             LogManager.getInstance(activity).logException(e);
-        } catch (JSONException e) {
+        }
+        catch (JSONException e)
+        {
             LogManager.getInstance(activity).logException(e);
         }
 
         return null;
     }
 
-    public String name(Context context) {
+    public String name(Context context)
+    {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.StepCounterProbe";
     }
 
-    public String title(Context context) {
+    public String title(Context context)
+    {
         return context.getString(R.string.title_step_counter_probe);
     }
 
     @SuppressLint("InlinedApi")
-    public boolean isEnabled(Context context) {
+    public boolean isEnabled(Context context)
+    {
         if (Build.VERSION.SDK_INT < 19)
             return false;
 
@@ -147,17 +158,16 @@ public class StepCounterProbe extends Probe implements SensorEventListener {
 
         SharedPreferences prefs = ContinuousProbe.getPreferences(context);
 
-        SensorManager sensors = (SensorManager) context
-                .getSystemService(Context.SENSOR_SERVICE);
+        SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
 
         sensors.unregisterListener(this, sensor);
 
-        if (super.isEnabled(context)) {
-            if (prefs.getBoolean("config_probe_step_counter_enabled",
-                    ContinuousProbe.DEFAULT_ENABLED)) {
-                sensors.registerListener(this, sensor,
-                        SensorManager.SENSOR_DELAY_NORMAL, null);
+        if (super.isEnabled(context))
+        {
+            if (prefs.getBoolean("config_probe_step_counter_enabled", ContinuousProbe.DEFAULT_ENABLED))
+            {
+                sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL, null);
 
                 return true;
             }
@@ -166,7 +176,8 @@ public class StepCounterProbe extends Probe implements SensorEventListener {
         return false;
     }
 
-    public void enable(Context context) {
+    public void enable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -175,7 +186,8 @@ public class StepCounterProbe extends Probe implements SensorEventListener {
         e.commit();
     }
 
-    public void disable(Context context) {
+    public void disable(Context context)
+    {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
@@ -184,20 +196,21 @@ public class StepCounterProbe extends Probe implements SensorEventListener {
         e.commit();
     }
 
-    public String summarizeValue(Context context, Bundle bundle) {
+    public String summarizeValue(Context context, Bundle bundle)
+    {
         double steps = bundle.getDouble(StepCounterProbe.STEP_COUNT);
 
-        return String.format(
-                context.getResources().getString(
-                        R.string.summary_step_counter_probe), (int) steps);
+        return String.format(context.getResources().getString(R.string.summary_step_counter_probe), (int) steps);
     }
 
-    public String summary(Context context) {
+    public String summary(Context context)
+    {
         return context.getString(R.string.summary_step_counter_probe_desc);
     }
 
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity) {
+    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    {
         PreferenceManager manager = activity.getPreferenceManager();
 
         PreferenceScreen screen = manager.createPreferenceScreen(activity);
@@ -214,14 +227,17 @@ public class StepCounterProbe extends Probe implements SensorEventListener {
         return screen;
     }
 
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    public void onAccuracyChanged(Sensor sensor, int accuracy)
+    {
 
     }
 
-    public void onSensorChanged(SensorEvent event) {
+    public void onSensorChanged(SensorEvent event)
+    {
         float steps = event.values[0];
 
-        if (this._steps < steps) {
+        if (this._steps < steps)
+        {
             Bundle bundle = new Bundle();
             bundle.putString("PROBE", this.name(this._context));
             bundle.putLong("TIMESTAMP", event.timestamp / 1000000000);
@@ -232,11 +248,9 @@ public class StepCounterProbe extends Probe implements SensorEventListener {
             Map<String, Object> values = new HashMap<String, Object>();
 
             values.put(StepCounterProbe.STEPS_KEY, bundle.getFloat("STEPS"));
-            values.put(ProbeValuesProvider.TIMESTAMP,
-                    Double.valueOf(bundle.getLong("TIMESTAMP")));
+            values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(bundle.getLong("TIMESTAMP")));
 
-            ProbeValuesProvider.getProvider(this._context).insertValue(
-                    this._context, StepCounterProbe.DB_TABLE,
+            ProbeValuesProvider.getProvider(this._context).insertValue(this._context, StepCounterProbe.DB_TABLE,
                     this.databaseSchema(), values);
 
             this._steps = steps;
