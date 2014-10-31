@@ -58,6 +58,7 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.ScheduleManager;
 import edu.northwestern.cbits.purple_robot_manager.activities.DialogActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.LabelActivity;
+import edu.northwestern.cbits.purple_robot_manager.activities.NfcActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.TestActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebActivity;
@@ -1549,5 +1550,17 @@ public abstract class BaseScriptEngine {
                 .getDefaultSharedPreferences(this._context);
 
         return prefs.getString(DataUploadPlugin.UPLOAD_URI, null);
+    }
+
+    public void scanNFC() {
+        NfcActivity.startScan(this._context);
+    }
+
+    public boolean canScanNFC() {
+        return NfcActivity.canScan(this._context);
+    }
+
+    public void cancelNFCScan() {
+        NfcActivity.cancelScan();
     }
 }

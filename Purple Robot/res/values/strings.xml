@@ -1291,6 +1291,19 @@
     <string name="summary_significant_motion_probe_desc">Generates an event when the device detects sudden motion.</string>
     <string name="summary_significant_motion_probe">Last significant motion: %1$s</string>
     
+    <string name="title_nfc_scanner">NFC Tag Scanner</string>
+    <string name="subtitle_nfc_scanner">Place your device near the item to scan it.</string>
+    <string name="title_nfc_unavailable">NFC Unavailable</string>
+    <string name="message_nfc_unavailable">This device does not have the necessary hardware to support NFC scanning.</string>
+    
+    <string name="label_nfc_current_status">Current Status:</string>
+    <string name="label_nfc_looking">Scanning for tags&#8230;</string>
+    <string name="label_nfc_found">Tag scanned!</string>
+    <string name="label_nfc_tag_id">Tag ID:</string>
+    <string name="label_nfc_technologies">Technologies:</string>
+    
+    <string name="title_nfc_probe">Near Field Communications Probe</string>
+    <string name="summary_nfc_probe_desc">Generates readings when NFC tags are scanned.</string>
+    
+    <string name="summary_nfc_probe">Scanned Tag: %1$s</string>
 </resources>
-
-

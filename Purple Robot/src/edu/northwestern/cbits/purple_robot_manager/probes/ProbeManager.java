@@ -41,6 +41,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LinkedInProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.MediaRouterDeviceProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.NetworkProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.NfcProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RandomNoiseProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RawLocationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RobotHealthProbe;
@@ -430,6 +431,11 @@ public class ProbeManager {
                 P20FeaturesProbe p20 = (P20FeaturesProbe) probe;
 
                 if (p20.name(context).equalsIgnoreCase(name))
+                    found = true;
+            } else if (probe instanceof NfcProbe) {
+                NfcProbe nfc = (NfcProbe) probe;
+
+                if (nfc.name(context).equalsIgnoreCase(name))
                     found = true;
             }
 

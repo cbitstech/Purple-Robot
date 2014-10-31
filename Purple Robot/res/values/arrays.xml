@@ -51,7 +51,8 @@
         <item>features.FitbitApiFeature</item>
         
         <item>builtin.RandomNoiseProbe</item>
-		<item>sample.SampleProbe</item>
+        <item>builtin.NfcProbe</item>
+   		<item>sample.SampleProbe</item>
 		<item>features.p20.P20FeaturesProbe</item>
 		
         <item>features.AccelerometerFrequencyFeature</item>

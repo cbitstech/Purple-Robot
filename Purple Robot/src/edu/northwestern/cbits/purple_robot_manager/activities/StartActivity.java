@@ -89,6 +89,7 @@ public class StartActivity extends ActionBarActivity {
     protected HashMap<String, Boolean> _enabledCache = new HashMap<String, Boolean>();
 
     private static OnSharedPreferenceChangeListener _prefListener = new OnSharedPreferenceChangeListener() {
+        @Override
         public void onSharedPreferenceChanged(SharedPreferences prefs,
                 String key) {
             if (SettingsActivity.USER_ID_KEY.equals(key)) {
@@ -115,6 +116,7 @@ public class StartActivity extends ActionBarActivity {
         this.startActivity(intent);
     }
 
+    @Override
     @SuppressLint("SimpleDateFormat")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -146,8 +148,10 @@ public class StartActivity extends ActionBarActivity {
                 .findViewById(R.id.list_probes);
 
         this._receiver = new BroadcastReceiver() {
+            @Override
             public void onReceive(Context context, final Intent intent) {
                 me.runOnUiThread(new Runnable() {
+                    @Override
                     public void run() {
                         if (StartActivity.UPDATE_MESSAGE.equals(intent
                                 .getAction())) {
@@ -155,6 +159,7 @@ public class StartActivity extends ActionBarActivity {
                                     .getStringExtra(StartActivity.DISPLAY_MESSAGE);
 
                             me.runOnUiThread(new Runnable() {
+                                @Override
                                 public void run() {
                                     if (me.getString(
                                             R.string.message_reading_complete)
@@ -198,6 +203,7 @@ public class StartActivity extends ActionBarActivity {
                 "recorded DESC");
 
         final CursorAdapter adapter = new CursorAdapter(this, c, true) {
+            @Override
             public void bindView(final View view, Context context, Cursor cursor) {
                 final String sensorName = cursor.getString(cursor
                         .getColumnIndex("source"));
@@ -211,6 +217,7 @@ public class StartActivity extends ActionBarActivity {
                         .getColumnIndex("value"));
 
                 Runnable r = new Runnable() {
+                    @Override
                     public void run() {
                         Bundle value = OutputPlugin.bundleForJson(me,
                                 jsonString);
@@ -271,6 +278,7 @@ public class StartActivity extends ActionBarActivity {
                         final boolean tintProbe = (enabled == false);
 
                         me.runOnUiThread(new Runnable() {
+                            @Override
                             public void run() {
                                 TextView nameField = (TextView) view
                                         .findViewById(R.id.text_sensor_name);
@@ -296,6 +304,8 @@ public class StartActivity extends ActionBarActivity {
                 t.start();
             }
 
+            @SuppressLint("InflateParams")
+            @Override
             public View newView(Context context, Cursor cursor, ViewGroup parent) {
                 LayoutInflater inflater = (LayoutInflater) me
                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -311,6 +321,7 @@ public class StartActivity extends ActionBarActivity {
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new OnItemClickListener() {
+            @Override
             public void onItemClick(AdapterView<?> parent, View view,
                     int position, long id) {
                 Uri uri = ContentUris.withAppendedId(
@@ -367,6 +378,7 @@ public class StartActivity extends ActionBarActivity {
         final String savedPassword = prefs.getString("config_password", null);
 
         listView.setOnItemLongClickListener(new OnItemLongClickListener() {
+            @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view,
                     int position, long id) {
                 Uri uri = ContentUris.withAppendedId(
@@ -394,6 +406,7 @@ public class StartActivity extends ActionBarActivity {
                                 builder.setPositiveButton(
                                         R.string.button_disable,
                                         new OnClickListener() {
+                                            @Override
                                             public void onClick(
                                                     DialogInterface arg0,
                                                     int arg1) {
@@ -408,6 +421,7 @@ public class StartActivity extends ActionBarActivity {
                                 builder.setPositiveButton(
                                         R.string.button_enable,
                                         new OnClickListener() {
+                                            @Override
                                             public void onClick(
                                                     DialogInterface arg0,
                                                     int arg1) {
@@ -441,6 +455,7 @@ public class StartActivity extends ActionBarActivity {
                                     builder.setPositiveButton(
                                             R.string.button_disable,
                                             new OnClickListener() {
+                                                @Override
                                                 public void onClick(
                                                         DialogInterface arg0,
                                                         int arg1) {
@@ -455,6 +470,7 @@ public class StartActivity extends ActionBarActivity {
                                     builder.setPositiveButton(
                                             R.string.button_enable,
                                             new OnClickListener() {
+                                                @Override
                                                 public void onClick(
                                                         DialogInterface arg0,
                                                         int arg1) {
@@ -488,6 +504,7 @@ public class StartActivity extends ActionBarActivity {
         LegacyJSONConfigFile.getSharedFile(this.getApplicationContext());
     }
 
+    @Override
     protected void onDestroy() {
         LocalBroadcastManager broadcastManager = LocalBroadcastManager
                 .getInstance(this);
@@ -496,6 +513,7 @@ public class StartActivity extends ActionBarActivity {
         super.onDestroy();
     }
 
+    @Override
     protected void onPause() {
         super.onPause();
 
@@ -532,6 +550,7 @@ public class StartActivity extends ActionBarActivity {
         final StartActivity me = this;
 
         Runnable r = new Runnable() {
+            @Override
             public void run() {
                 try {
                     Thread.sleep(500);
@@ -540,6 +559,7 @@ public class StartActivity extends ActionBarActivity {
                 }
 
                 me.runOnUiThread(new Runnable() {
+                    @Override
                     public void run() {
                         LegacyJSONConfigFile.updateFromOnline(me);
                     }
@@ -551,11 +571,13 @@ public class StartActivity extends ActionBarActivity {
         t.start();
     }
 
+    @Override
     protected void onResume() {
         super.onResume();
 
         CrashManager.register(this, "7550093e020b1a4a6df90f1e9dde68b6",
                 new CrashManagerListener() {
+                    @Override
                     public Boolean onCrashesFound() {
                         return true;
                     }
@@ -617,6 +639,7 @@ public class StartActivity extends ActionBarActivity {
 
         if (this._observer == null) {
             this._observer = new ContentObserver(new Handler()) {
+                @Override
                 public void onChange(boolean selfChange, Uri uri) {
                     ListAdapter listAdapter = listView.getAdapter();
 
@@ -644,6 +667,7 @@ public class StartActivity extends ActionBarActivity {
                     me.updateAlertIcon();
                 };
 
+                @Override
                 public void onChange(boolean selfChange) {
                     this.onChange(selfChange, null);
                 }
@@ -663,9 +687,13 @@ public class StartActivity extends ActionBarActivity {
         }
     }
 
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = this.getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
+
+        if (NfcActivity.canScan(this) == false)
+            menu.removeItem(R.id.menu_nfc_item);
 
         this._menu = menu;
 
@@ -674,6 +702,8 @@ public class StartActivity extends ActionBarActivity {
         return true;
     }
 
+    @SuppressLint("InflateParams")
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         final StartActivity me = this;
 
@@ -688,8 +718,7 @@ public class StartActivity extends ActionBarActivity {
             Intent snapIntent = new Intent(this, SnapshotsActivity.class);
 
             this.startActivity(snapIntent);
-        }
-        if (itemId == R.id.menu_trigger_item) {
+        } else if (itemId == R.id.menu_trigger_item) {
             builder.setTitle(R.string.title_fire_triggers);
 
             if (savedPassword == null || savedPassword.equals("")) {
@@ -701,6 +730,7 @@ public class StartActivity extends ActionBarActivity {
                             this, android.R.layout.simple_list_item_1, triggers);
 
                     builder.setAdapter(adapter, new OnClickListener() {
+                        @Override
                         public void onClick(DialogInterface dialog, int which) {
                             Trigger target = triggers.get(which);
 
@@ -712,6 +742,7 @@ public class StartActivity extends ActionBarActivity {
 
                     builder.setPositiveButton(R.string.button_close,
                             new OnClickListener() {
+                                @Override
                                 public void onClick(DialogInterface arg0,
                                         int arg1) {
 
@@ -723,43 +754,39 @@ public class StartActivity extends ActionBarActivity {
 
                 builder.setPositiveButton(R.string.button_close,
                         new OnClickListener() {
+                            @Override
                             public void onClick(DialogInterface arg0, int arg1) {
 
                             }
                         });
             }
             builder.create().show();
-        }
-        if (itemId == R.id.menu_label_item) {
-            Intent labelIntent = new Intent();
-            labelIntent.setClass(this, LabelActivity.class);
+        } else if (itemId == R.id.menu_label_item) {
+            Intent labelIntent = new Intent(this, LabelActivity.class);
 
             labelIntent.putExtra(LabelActivity.LABEL_CONTEXT, "Home Screen");
             labelIntent.putExtra(LabelActivity.TIMESTAMP,
                     ((double) System.currentTimeMillis()));
 
             this.startActivity(labelIntent);
-        }
-        if (itemId == R.id.menu_upload_item) {
+        } else if (itemId == R.id.menu_upload_item) {
             LocalBroadcastManager localManager = LocalBroadcastManager
                     .getInstance(this);
             Intent intent = new Intent(OutputPlugin.FORCE_UPLOAD);
 
             localManager.sendBroadcast(intent);
-        }
-        if (itemId == R.id.menu_diagnostic_item) {
-            Intent diagIntent = new Intent();
-            diagIntent.setClass(this, DiagnosticActivity.class);
+        } else if (itemId == R.id.menu_diagnostic_item) {
+            Intent diagIntent = new Intent(this, DiagnosticActivity.class);
 
             this.startActivity(diagIntent);
-        }
-        if (itemId == R.id.menu_settings_item) {
+        } else if (itemId == R.id.menu_settings_item) {
             if (savedPassword == null || savedPassword.equals(""))
                 this.launchPreferences();
             else {
                 builder.setMessage(R.string.dialog_password_prompt);
                 builder.setPositiveButton(R.string.dialog_password_submit,
                         new DialogInterface.OnClickListener() {
+                            @Override
                             public void onClick(DialogInterface dialog,
                                     int which) {
                                 AlertDialog alertDialog = (AlertDialog) dialog;
@@ -786,6 +813,9 @@ public class StartActivity extends ActionBarActivity {
 
                 alert.show();
             }
+        } else if (itemId == R.id.menu_nfc_item) {
+            Intent nfcIntent = new Intent(this, NfcActivity.class);
+            this.startActivity(nfcIntent);
         }
 
         return true;
