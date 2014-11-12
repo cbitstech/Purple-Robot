@@ -1287,6 +1287,9 @@
     <string name="summary_probe_p20_features">A collection of accelerometer and gyroscope features used by CBITs P20 project.</string>
     <string name="summary_p20_features_probe">%1$d ms processing time</string>
 
+    <string name="title_p20_external_app_probe">P20 External Helper App Probe</string>
+    <string name="summary_p20_external_app_probe">Helper probe for collecting data from the P20 helper app.</string>
+    
     <string name="title_significant_motion_probe">Significant Motion Probe</string>
     <string name="summary_significant_motion_probe_desc">Generates an event when the device detects sudden motion.</string>
     <string name="summary_significant_motion_probe">Last significant motion: %1$s</string>

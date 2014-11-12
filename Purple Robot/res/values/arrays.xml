@@ -53,7 +53,8 @@
         <item>builtin.RandomNoiseProbe</item>
 		<item>sample.SampleProbe</item>
 		<item>features.p20.P20FeaturesProbe</item>
-		
+		<item>features.p20.ExternalAppHelperProbe</item>
+				
         <item>features.AccelerometerFrequencyFeature</item>
         
         <item>LabelProbe</item>
