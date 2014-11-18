@@ -2,6 +2,10 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
 import java.util.ArrayList;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -18,54 +22,61 @@ import android.view.View.OnTouchListener;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class TouchEventsProbe extends Probe
 {
     private static final boolean DEFAULT_ENABLED = false;
 
-    private static final String ENABLED_KEY = "config_probe_activity_detection_enabled";
+    private static final String ENABLED = "config_probe_activity_detection_enabled";
 
     private Context _context = null;
     private View _overlay = null;
-    private ArrayList<Long> _timestamps = new ArrayList<Long>();
+    private final ArrayList<Long> _timestamps = new ArrayList<Long>();
     private long _lastTouch = 0;
 
+    @Override
     public String name(Context context)
     {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.TouchEventsProbe";
     }
 
+    @Override
     public String title(Context context)
     {
         return context.getString(R.string.title_touch_events_probe);
     }
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getResources().getString(R.string.probe_misc_category);
     }
 
+    @Override
     public void enable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean(TouchEventsProbe.ENABLED_KEY, true);
+        e.putBoolean(TouchEventsProbe.ENABLED, true);
 
         e.commit();
     }
 
+    @Override
     public void disable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean(TouchEventsProbe.ENABLED_KEY, false);
+        e.putBoolean(TouchEventsProbe.ENABLED, false);
 
         e.commit();
     }
 
+    @Override
     public boolean isEnabled(Context context)
     {
         final SharedPreferences prefs = Probe.getPreferences(context);
@@ -76,7 +87,7 @@ public class TouchEventsProbe extends Probe
             this._context = context.getApplicationContext();
 
         if (enabled)
-            enabled = prefs.getBoolean(TouchEventsProbe.ENABLED_KEY, TouchEventsProbe.DEFAULT_ENABLED);
+            enabled = prefs.getBoolean(TouchEventsProbe.ENABLED, TouchEventsProbe.DEFAULT_ENABLED);
 
         if (enabled)
         {
@@ -106,6 +117,7 @@ public class TouchEventsProbe extends Probe
                     this._overlay.setHapticFeedbackEnabled(true);
                     this._overlay.setOnTouchListener(new OnTouchListener()
                     {
+                        @Override
                         public boolean onTouch(View arg0, MotionEvent event)
                         {
                             me._lastTouch = System.currentTimeMillis();
@@ -151,6 +163,7 @@ public class TouchEventsProbe extends Probe
         return false;
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         int count = (int) bundle.getDouble("TOUCH_COUNT");
@@ -162,6 +175,7 @@ public class TouchEventsProbe extends Probe
         return context.getResources().getString(R.string.summary_touch_events_probe, count, delay);
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(PreferenceActivity activity)
     {
@@ -173,7 +187,7 @@ public class TouchEventsProbe extends Probe
 
         CheckBoxPreference enabled = new CheckBoxPreference(activity);
         enabled.setTitle(R.string.title_enable_probe);
-        enabled.setKey(TouchEventsProbe.ENABLED_KEY);
+        enabled.setKey(TouchEventsProbe.ENABLED);
         enabled.setDefaultValue(TouchEventsProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
@@ -181,8 +195,32 @@ public class TouchEventsProbe extends Probe
         return screen;
     }
 
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_touch_events_probe_desc);
+    }
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
     }
 }

@@ -34,9 +34,7 @@ import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.widget.Toast;
-
 import edu.northwestern.cbits.anthracite.LogService;
-
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.PersistentService;
 import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;
@@ -52,8 +50,7 @@ import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
-public class SettingsActivity extends PreferenceActivity implements OnPreferenceClickListener,
-        OnPreferenceChangeListener
+public class SettingsActivity extends PreferenceActivity implements OnPreferenceClickListener, OnPreferenceChangeListener
 {
     public static final String PROBES_SCREEN_KEY = "config_probes_screen";
     private static final String MANUAL_REFRESH_KEY = "config_json_refresh_manually";
@@ -72,6 +69,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
     public static final String PROBES_DISABLE_EACH_KEY = "config_disable_each_probe";
     private static final String RUN_TESTS_KEY = "config_run_tests";
 
+    @Override
     @SuppressWarnings("deprecation")
     public void onCreate(Bundle savedInstanceState)
     {
@@ -94,6 +92,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
         ListPreference haptic = (ListPreference) prefs.findPreference(HAPTIC_PATTERN_KEY);
         haptic.setOnPreferenceChangeListener(new OnPreferenceChangeListener()
         {
+            @Override
             public boolean onPreferenceChange(Preference preference, Object newValue)
             {
                 String pattern = (String) newValue;
@@ -115,8 +114,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 
         PreferenceScreen triggersScreen = TriggerManager.getInstance(this).buildPreferenceScreen(this);
 
-        PreferenceCategory triggerCategory = (PreferenceCategory) prefs
-                .findPreference("config_settings_trigger_category");
+        PreferenceCategory triggerCategory = (PreferenceCategory) prefs.findPreference("config_settings_trigger_category");
         triggerCategory.addPreference(triggersScreen);
 
         PreferenceScreen modelsScreen = ModelManager.getInstance(this).buildPreferenceScreen(this);
@@ -148,6 +146,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
         LogManager.getInstance(me).log("pr_settings_visited", null);
     }
 
+    @Override
     protected void onDestroy()
     {
         super.onDestroy();
@@ -155,6 +154,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
         LogManager.getInstance(this).log("pr_settings_exited", null);
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public boolean onPreferenceClick(Preference preference)
     {
@@ -213,8 +213,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
         }
         else if (ZIP_ARCHIVES_KEY.equals(preference.getKey()))
         {
-            HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance.pluginForClass(this,
-                    HttpUploadPlugin.class);
+            HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance.pluginForClass(this, HttpUploadPlugin.class);
 
             if (plugin != null)
             {
@@ -225,8 +224,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
         }
         else if (DELETE_ARCHIVES_KEY.equals(preference.getKey()))
         {
-            HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance.pluginForClass(this,
-                    HttpUploadPlugin.class);
+            HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance.pluginForClass(this, HttpUploadPlugin.class);
 
             if (plugin != null)
             {
@@ -269,10 +267,8 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
                 fout.close();
 
                 Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
-                emailIntent.putExtra(android.content.Intent.EXTRA_TEXT,
-                        this.getString(R.string.message_mail_app_schema));
-                emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
-                        this.getString(R.string.subject_mail_app_schema));
+                emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, this.getString(R.string.message_mail_app_schema));
+                emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, this.getString(R.string.subject_mail_app_schema));
                 emailIntent.setType("text/plain");
 
                 Uri uri = Uri.fromFile(configJsonFile);
@@ -305,6 +301,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 
             builder = builder.setPositiveButton(R.string.button_clear_yes, new OnClickListener()
             {
+                @Override
                 public void onClick(DialogInterface dialog, int which)
                 {
                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(me);
@@ -342,6 +339,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 
             builder = builder.setNegativeButton(R.string.button_clear_no, new OnClickListener()
             {
+                @Override
                 public void onClick(DialogInterface dialog, int which)
                 {
                     // TODO Auto-generated method stub
@@ -429,6 +427,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
         return prefJson;
     }
 
+    @Override
     public boolean onPreferenceChange(Preference pref, Object value)
     {
         if (CHECK_UPDATES_KEY.equals(pref.getKey()))

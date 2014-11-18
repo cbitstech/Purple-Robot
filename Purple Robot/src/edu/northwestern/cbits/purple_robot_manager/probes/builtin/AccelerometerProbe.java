@@ -37,6 +37,8 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
 
     private static final String PROBE_ACCEL_THRESHOLD = "config_probe_accelerometer_threshold";
 
+    private static final String FREQUENCY = "config_probe_accelerometer_built_in_frequency";
+
     private long lastThresholdLookup = 0;
     private double lastThreshold = 0.5;
 
@@ -138,8 +140,7 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
     {
         SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
 
-        return Long.parseLong(prefs.getString("config_probe_accelerometer_built_in_frequency",
-                ContinuousProbe.DEFAULT_FREQUENCY));
+        return Long.parseLong(prefs.getString(AccelerometerProbe.FREQUENCY, ContinuousProbe.DEFAULT_FREQUENCY));
     }
 
     @Override
@@ -168,7 +169,7 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
         {
             if (prefs.getBoolean("config_probe_accelerometer_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
             {
-                int frequency = Integer.parseInt(prefs.getString("config_probe_accelerometer_built_in_frequency",
+                int frequency = Integer.parseInt(prefs.getString(AccelerometerProbe.FREQUENCY,
                         ContinuousProbe.DEFAULT_FREQUENCY));
 
                 if (this._lastFrequency != frequency)

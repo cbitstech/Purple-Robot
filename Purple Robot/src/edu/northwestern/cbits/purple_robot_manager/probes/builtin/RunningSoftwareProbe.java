@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -36,44 +39,52 @@ public class RunningSoftwareProbe extends Probe
     private static final String TASK_STACK_INDEX = "TASK_STACK_INDEX";
 
     private static final boolean DEFAULT_ENABLED = true;
+    private static final String ENABLED = "config_probe_running_software_enabled";
+    private static final String FREQUENCY = "config_probe_running_software_frequency";
 
     private long _lastCheck = 0;
 
+    @Override
     public String name(Context context)
     {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.RunningSoftwareProbe";
     }
 
+    @Override
     public String title(Context context)
     {
         return context.getString(R.string.title_running_software_probe);
     }
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getResources().getString(R.string.probe_device_info_category);
     }
 
+    @Override
     public void enable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_running_software_enabled", true);
+        e.putBoolean(RunningSoftwareProbe.ENABLED, true);
 
         e.commit();
     }
 
+    @Override
     public void disable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_running_software_enabled", false);
+        e.putBoolean(RunningSoftwareProbe.ENABLED, false);
 
         e.commit();
     }
 
+    @Override
     public boolean isEnabled(final Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
@@ -82,12 +93,12 @@ public class RunningSoftwareProbe extends Probe
         {
             final long now = System.currentTimeMillis();
 
-            if (prefs.getBoolean("config_probe_running_software_enabled", RunningSoftwareProbe.DEFAULT_ENABLED))
+            if (prefs.getBoolean(RunningSoftwareProbe.ENABLED, RunningSoftwareProbe.DEFAULT_ENABLED))
             {
                 synchronized (this)
                 {
-                    long freq = Long.parseLong(prefs.getString("config_probe_running_software_frequency",
-                            Probe.DEFAULT_FREQUENCY));
+                    long freq = Long
+                            .parseLong(prefs.getString(RunningSoftwareProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
 
                     if (now - this._lastCheck > freq)
                     {
@@ -95,6 +106,7 @@ public class RunningSoftwareProbe extends Probe
 
                         Runnable r = new Runnable()
                         {
+                            @Override
                             @SuppressWarnings("deprecation")
                             public void run()
                             {
@@ -161,6 +173,7 @@ public class RunningSoftwareProbe extends Probe
 
         try
         {
+            // TODO: Replace with constant...
             if (prefs.getBoolean("config_restrict_data_wifi", true))
             {
                 if (WiFiHelper.wifiAvailable(context) == false)
@@ -230,6 +243,7 @@ public class RunningSoftwareProbe extends Probe
         return category;
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         int count = (int) bundle.getDouble(RunningSoftwareProbe.RUNNING_TASK_COUNT);
@@ -259,6 +273,7 @@ public class RunningSoftwareProbe extends Probe
         return bundle;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public Bundle formattedBundle(Context context, Bundle bundle)
     {
@@ -275,19 +290,21 @@ public class RunningSoftwareProbe extends Probe
         return formatted;
     };
 
+    @Override
     public Map<String, Object> configuration(Context context)
     {
         Map<String, Object> map = super.configuration(context);
 
         SharedPreferences prefs = Probe.getPreferences(context);
 
-        long freq = Long.parseLong(prefs.getString("config_probe_running_software_frequency", Probe.DEFAULT_FREQUENCY));
+        long freq = Long.parseLong(prefs.getString(RunningSoftwareProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
 
         map.put(Probe.PROBE_FREQUENCY, freq);
 
         return map;
     }
 
+    @Override
     public void updateFromMap(Context context, Map<String, Object> params)
     {
         super.updateFromMap(context, params);
@@ -296,22 +313,26 @@ public class RunningSoftwareProbe extends Probe
         {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
 
-            if (frequency instanceof Long)
-            {
-                SharedPreferences prefs = Probe.getPreferences(context);
-                Editor e = prefs.edit();
+            if ((frequency instanceof Double) == false)
+                frequency = Double.valueOf(frequency.toString()).longValue();
+            else
+                frequency = ((Double) frequency).longValue();
 
-                e.putString("config_probe_running_software_frequency", frequency.toString());
-                e.commit();
-            }
+            SharedPreferences prefs = Probe.getPreferences(context);
+            Editor e = prefs.edit();
+
+            e.putString(RunningSoftwareProbe.FREQUENCY, frequency.toString());
+            e.commit();
         }
     }
 
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_running_software_probe_desc);
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(PreferenceActivity activity)
     {
@@ -323,13 +344,13 @@ public class RunningSoftwareProbe extends Probe
 
         CheckBoxPreference enabled = new CheckBoxPreference(activity);
         enabled.setTitle(R.string.title_enable_probe);
-        enabled.setKey("config_probe_running_software_enabled");
+        enabled.setKey(RunningSoftwareProbe.ENABLED);
         enabled.setDefaultValue(RunningSoftwareProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
 
         ListPreference duration = new ListPreference(activity);
-        duration.setKey("config_probe_running_software_frequency");
+        duration.setKey(RunningSoftwareProbe.FREQUENCY);
         duration.setEntryValues(R.array.probe_low_frequency_values);
         duration.setEntries(R.array.probe_low_frequency_labels);
         duration.setTitle(R.string.probe_frequency_label);
@@ -338,5 +359,42 @@ public class RunningSoftwareProbe extends Probe
         screen.addPreference(duration);
 
         return screen;
+    }
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+
+            JSONObject frequency = new JSONObject();
+            frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
+            values = new JSONArray();
+
+            String[] options = context.getResources().getStringArray(R.array.probe_low_frequency_values);
+
+            for (String option : options)
+            {
+                values.put(Long.parseLong(option));
+            }
+
+            frequency.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_FREQUENCY, frequency);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
     }
 }

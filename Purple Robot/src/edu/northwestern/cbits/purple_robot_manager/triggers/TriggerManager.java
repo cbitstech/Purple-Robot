@@ -20,7 +20,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-
+import android.util.Log;
 import edu.emory.mathcs.backport.java.util.Collections;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -33,7 +33,7 @@ public class TriggerManager
 {
     private static TriggerManager _instance = null;
 
-    private List<Trigger> _triggers = new ArrayList<Trigger>();
+    private final List<Trigger> _triggers = new ArrayList<Trigger>();
     private Timer _timer = null;
 
     private boolean _triggersInited = false;
@@ -58,9 +58,10 @@ public class TriggerManager
     @SuppressLint("Wakelock")
     public void nudgeTriggers(Context context)
     {
+        Log.e("PR", "NUDGE TRIGGERS");
+
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-        WakeLock wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP
-                | PowerManager.ON_AFTER_RELEASE, "trigger_wakelock");
+        WakeLock wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, "trigger_wakelock");
         wakeLock.acquire();
 
         Date now = new Date();
@@ -76,6 +77,8 @@ public class TriggerManager
                     if (trigger.matches(context, now))
                         execute = true;
                 }
+
+                Log.e("PR", "TRIGGER " + trigger.identifier() + " -- " + execute);
 
                 if (execute)
                 {
@@ -154,6 +157,7 @@ public class TriggerManager
 
             this._timer.schedule(new TimerTask()
             {
+                @Override
                 public void run()
                 {
                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -173,6 +177,8 @@ public class TriggerManager
         }
 
         Intent intent = new Intent(ManagerService.UPDATE_TRIGGER_SCHEDULE_INTENT);
+        intent.setClass(context, ManagerService.class);
+
         context.startService(intent);
     }
 
@@ -364,8 +370,7 @@ public class TriggerManager
         ArrayList<Long> upcoming = new ArrayList<Long>();
 
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-        WakeLock wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP
-                | PowerManager.ON_AFTER_RELEASE, "trigger_wakelock");
+        WakeLock wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, "trigger_wakelock");
         wakeLock.acquire();
 
         long now = System.currentTimeMillis();

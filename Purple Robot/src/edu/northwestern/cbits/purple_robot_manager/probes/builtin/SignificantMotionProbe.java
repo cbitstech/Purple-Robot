@@ -4,6 +4,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -21,13 +25,14 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class SignificantMotionProbe extends Probe
 {
     private static final String EVENT_TIME = "EVENT_TIME";
 
-    private static final String IS_ENABLED = "config_probe_significant_motion_built_in_enabled";
+    private static final String ENABLED = "config_probe_significant_motion_built_in_enabled";
     private static final boolean DEFAULT_ENABLED = false;
 
     private Context _context;
@@ -117,7 +122,7 @@ public class SignificantMotionProbe extends Probe
             Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION);
 
             if (super.isEnabled(context)
-                    && prefs.getBoolean(SignificantMotionProbe.IS_ENABLED, SignificantMotionProbe.DEFAULT_ENABLED))
+                    && prefs.getBoolean(SignificantMotionProbe.ENABLED, SignificantMotionProbe.DEFAULT_ENABLED))
             {
                 sensors.requestTriggerSensor(me._trigger, sensor);
 
@@ -136,7 +141,7 @@ public class SignificantMotionProbe extends Probe
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean(SignificantMotionProbe.IS_ENABLED, true);
+        e.putBoolean(SignificantMotionProbe.ENABLED, true);
 
         e.commit();
     }
@@ -147,7 +152,7 @@ public class SignificantMotionProbe extends Probe
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean(SignificantMotionProbe.IS_ENABLED, false);
+        e.putBoolean(SignificantMotionProbe.ENABLED, false);
 
         e.commit();
     }
@@ -180,11 +185,34 @@ public class SignificantMotionProbe extends Probe
 
         CheckBoxPreference enabled = new CheckBoxPreference(activity);
         enabled.setTitle(R.string.title_enable_probe);
-        enabled.setKey(SignificantMotionProbe.IS_ENABLED);
+        enabled.setKey(SignificantMotionProbe.ENABLED);
         enabled.setDefaultValue(SignificantMotionProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
 
         return screen;
+    }
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
     }
 }

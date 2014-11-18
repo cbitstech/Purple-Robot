@@ -1237,10 +1237,12 @@
 	<string name="name_http_server_test">HTTP Server Tests</string>
 	<string name="name_scheme_test">Scheme Tests</string>
 	<string name="name_javascript_test">JavaScript Tests</string>
+	<string name="name_javascript_probe_config_test">JavaScript Probe Configuration Tests</string>
 	<string name="name_models_test">Models Tests</string>
 	<string name="name_date_trigger_test">Date Trigger Tests</string>
 	<string name="name_half_hour_date_trigger_test">Half-Hour Date Trigger Tests</string>
 	<string name="name_repeating_date_trigger_test">Repeating Date Trigger Tests</string>
+	<string name="name_random_date_trigger_test">Random Date Trigger Tests</string>
 	<string name="name_accelerometer_probe_test">Basic Accelerometer Probe Tests</string>
 	<string name="name_health_probe_test">Basic Purple Robot Health Probe Tests</string>
 	<string name="name_weka_tree_model_test">Weka Tree Model Tests</string>

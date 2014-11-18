@@ -31,51 +31,57 @@ public class ApplicationLaunchProbe extends Probe
     private static final String WAKE_ACTION = "ACTIVITY_LAUNCH_WAKE";
     private static final String DEFAULT_FREQUENCY = "100";
 
-    private static final String ENABLED_KEY = "config_probe_application_launch_enabled";
-    private static final String FREQUENCY_KEY = "config_probe_application_launch_frequency";
+    private static final String ENABLED = "config_probe_application_launch_enabled";
+    private static final String FREQUENCY = "config_probe_application_launch_frequency";
 
     private PendingIntent _pollIntent = null;
-    private long _lastInterval = 0;
+    private final long _lastInterval = 0;
 
     private String _lastPkgName = null;
     private String _lastName = null;
     private long _lastStart = 0;
 
+    @Override
     public String name(Context context)
     {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.ApplicationLaunchProbe";
     }
 
+    @Override
     public String title(Context context)
     {
         return context.getString(R.string.title_application_launch_probe);
     }
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getResources().getString(R.string.probe_device_info_category);
     }
 
+    @Override
     public void enable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean(ApplicationLaunchProbe.ENABLED_KEY, true);
+        e.putBoolean(ApplicationLaunchProbe.ENABLED, true);
 
         e.commit();
     }
 
+    @Override
     public void disable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean(ApplicationLaunchProbe.ENABLED_KEY, false);
+        e.putBoolean(ApplicationLaunchProbe.ENABLED, false);
 
         e.commit();
     }
 
+    @Override
     public boolean isEnabled(final Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
@@ -90,9 +96,9 @@ public class ApplicationLaunchProbe extends Probe
 
         if (super.isEnabled(context))
         {
-            if (prefs.getBoolean(ApplicationLaunchProbe.ENABLED_KEY, ApplicationLaunchProbe.DEFAULT_ENABLED))
+            if (prefs.getBoolean(ApplicationLaunchProbe.ENABLED, ApplicationLaunchProbe.DEFAULT_ENABLED))
             {
-                interval = Long.parseLong(prefs.getString(ApplicationLaunchProbe.FREQUENCY_KEY, "10"));
+                interval = Long.parseLong(prefs.getString(ApplicationLaunchProbe.FREQUENCY, "10"));
 
                 if (interval != this._lastInterval)
                 {
@@ -117,6 +123,7 @@ public class ApplicationLaunchProbe extends Probe
 
             context.registerReceiver(new BroadcastReceiver()
             {
+                @Override
                 @SuppressWarnings("deprecation")
                 public void onReceive(final Context context, Intent intent)
                 {
@@ -146,6 +153,7 @@ public class ApplicationLaunchProbe extends Probe
                     {
                         Runnable r = new Runnable()
                         {
+                            @Override
                             public void run()
                             {
                                 Bundle bundle = new Bundle();
@@ -191,6 +199,7 @@ public class ApplicationLaunchProbe extends Probe
         return isEnabled;
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         String app = bundle.getString("CURRENT_APP_NAME");
@@ -199,19 +208,21 @@ public class ApplicationLaunchProbe extends Probe
         return String.format(context.getResources().getString(R.string.summary_app_launch_probe), app, category);
     }
 
+    @Override
     public Map<String, Object> configuration(Context context)
     {
         Map<String, Object> map = super.configuration(context);
 
         SharedPreferences prefs = Probe.getPreferences(context);
 
-        long freq = Long.parseLong(prefs.getString(ApplicationLaunchProbe.FREQUENCY_KEY, Probe.DEFAULT_FREQUENCY));
+        long freq = Long.parseLong(prefs.getString(ApplicationLaunchProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
 
         map.put(Probe.PROBE_FREQUENCY, freq);
 
         return map;
     }
 
+    @Override
     public void updateFromMap(Context context, Map<String, Object> params)
     {
         super.updateFromMap(context, params);
@@ -225,17 +236,19 @@ public class ApplicationLaunchProbe extends Probe
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putString(ApplicationLaunchProbe.FREQUENCY_KEY, frequency.toString());
+                e.putString(ApplicationLaunchProbe.FREQUENCY, frequency.toString());
                 e.commit();
             }
         }
     }
 
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_application_launch_probe_desc);
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(PreferenceActivity activity)
     {
@@ -247,7 +260,7 @@ public class ApplicationLaunchProbe extends Probe
 
         CheckBoxPreference enabled = new CheckBoxPreference(activity);
         enabled.setTitle(R.string.title_enable_probe);
-        enabled.setKey(ApplicationLaunchProbe.ENABLED_KEY);
+        enabled.setKey(ApplicationLaunchProbe.ENABLED);
         enabled.setDefaultValue(ApplicationLaunchProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);

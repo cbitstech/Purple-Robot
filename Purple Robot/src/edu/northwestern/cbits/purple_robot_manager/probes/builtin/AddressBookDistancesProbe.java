@@ -38,6 +38,9 @@ public class AddressBookDistancesProbe extends Probe
     private static final String DEFAULT_FREQUENCY = "3600000";
 
     private static final String NOW = "NOW";
+    private static final String FREQUENCY = "config_probe_distances_frequency";
+    private static final String ENABLED = "config_probe_distances_enabled";
+    private static final String HASH_DATA = "config_probe_distances_hash_data";
 
     private long _lastCheck = 0;
     private double _lastLatitude = 100;
@@ -45,41 +48,47 @@ public class AddressBookDistancesProbe extends Probe
 
     private LocationListener _listener = null;
 
+    @Override
     public String name(Context context)
     {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.AddressBookDistancesProbe";
     }
 
+    @Override
     public String title(Context context)
     {
         return context.getString(R.string.title_distances_probe);
     }
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getResources().getString(R.string.probe_personal_info_category);
     }
 
+    @Override
     public void enable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_distances_enabled", true);
+        e.putBoolean(AddressBookDistancesProbe.ENABLED, true);
 
         e.commit();
     }
 
+    @Override
     public void disable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_distances_enabled", false);
+        e.putBoolean(AddressBookDistancesProbe.ENABLED, false);
 
         e.commit();
     }
 
+    @Override
     public boolean isEnabled(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
@@ -89,14 +98,14 @@ public class AddressBookDistancesProbe extends Probe
         {
             long now = System.currentTimeMillis();
 
-            if (prefs.getBoolean("config_probe_distances_enabled", AddressBookDistancesProbe.DEFAULT_ENABLED))
+            if (prefs.getBoolean(AddressBookDistancesProbe.ENABLED, AddressBookDistancesProbe.DEFAULT_ENABLED))
             {
 
                 HashMap<String, String> addresses = new HashMap<String, String>();
 
-                long freq = Long.parseLong(prefs.getString("config_probe_distances_frequency",
+                long freq = Long.parseLong(prefs.getString(AddressBookDistancesProbe.FREQUENCY,
                         AddressBookDistancesProbe.DEFAULT_FREQUENCY));
-                boolean doHash = prefs.getBoolean("config_probe_distances_hash_data", Probe.DEFAULT_HASH_DATA);
+                boolean doHash = prefs.getBoolean(AddressBookDistancesProbe.HASH_DATA, Probe.DEFAULT_HASH_DATA);
 
                 synchronized (this)
                 {
@@ -106,22 +115,26 @@ public class AddressBookDistancesProbe extends Probe
                     {
                         this._listener = new LocationListener()
                         {
+                            @Override
                             public void onLocationChanged(Location location)
                             {
                                 me._lastLatitude = location.getLatitude();
                                 me._lastLongitude = location.getLongitude();
                             }
 
+                            @Override
                             public void onProviderDisabled(String provider)
                             {
 
                             }
 
+                            @Override
                             public void onProviderEnabled(String provider)
                             {
 
                             }
 
+                            @Override
                             public void onStatusChanged(String provider, int status, Bundle extras)
                             {
 
@@ -404,6 +417,7 @@ public class AddressBookDistancesProbe extends Probe
         return bundle;
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         float minDistance = Float.MAX_VALUE;
@@ -425,22 +439,24 @@ public class AddressBookDistancesProbe extends Probe
         return context.getResources().getString(R.string.summary_distances_probe, minLabel, minDistance);
     }
 
+    @Override
     public Map<String, Object> configuration(Context context)
     {
         Map<String, Object> map = super.configuration(context);
 
         SharedPreferences prefs = Probe.getPreferences(context);
 
-        long freq = Long.parseLong(prefs.getString("config_probe_distance_frequency",
+        long freq = Long.parseLong(prefs.getString(AddressBookDistancesProbe.FREQUENCY,
                 AddressBookDistancesProbe.DEFAULT_FREQUENCY));
         map.put(Probe.PROBE_FREQUENCY, freq);
 
-        boolean hash = prefs.getBoolean("config_probe_distances_hash_data", Probe.DEFAULT_HASH_DATA);
+        boolean hash = prefs.getBoolean(AddressBookDistancesProbe.HASH_DATA, Probe.DEFAULT_HASH_DATA);
         map.put(Probe.HASH_DATA, hash);
 
         return map;
     }
 
+    @Override
     public void updateFromMap(Context context, Map<String, Object> params)
     {
         super.updateFromMap(context, params);
@@ -454,7 +470,7 @@ public class AddressBookDistancesProbe extends Probe
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putString("config_probe_distances_frequency", frequency.toString());
+                e.putString(AddressBookDistancesProbe.FREQUENCY, frequency.toString());
                 e.commit();
             }
         }
@@ -468,12 +484,13 @@ public class AddressBookDistancesProbe extends Probe
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putBoolean("config_probe_distances_hash_data", ((Boolean) hash).booleanValue());
+                e.putBoolean(AddressBookDistancesProbe.HASH_DATA, ((Boolean) hash).booleanValue());
                 e.commit();
             }
         }
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(PreferenceActivity activity)
     {
@@ -485,13 +502,13 @@ public class AddressBookDistancesProbe extends Probe
 
         CheckBoxPreference enabled = new CheckBoxPreference(activity);
         enabled.setTitle(R.string.title_enable_probe);
-        enabled.setKey("config_probe_distances_enabled");
+        enabled.setKey(AddressBookDistancesProbe.ENABLED);
         enabled.setDefaultValue(AddressBookDistancesProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
 
         ListPreference duration = new ListPreference(activity);
-        duration.setKey("config_probe_distances_frequency");
+        duration.setKey(AddressBookDistancesProbe.FREQUENCY);
         duration.setEntryValues(R.array.probe_distance_frequency_values);
         duration.setEntries(R.array.probe_distance_frequency_labels);
         duration.setTitle(R.string.probe_frequency_label);
@@ -500,7 +517,7 @@ public class AddressBookDistancesProbe extends Probe
         screen.addPreference(duration);
 
         CheckBoxPreference hash = new CheckBoxPreference(activity);
-        hash.setKey("config_probe_distances_hash_data");
+        hash.setKey(AddressBookDistancesProbe.HASH_DATA);
         hash.setDefaultValue(Probe.DEFAULT_HASH_DATA);
         hash.setTitle(R.string.config_probe_distances_hash_title);
         hash.setSummary(R.string.config_probe_distances_hash_summary);
@@ -510,6 +527,7 @@ public class AddressBookDistancesProbe extends Probe
         return screen;
     }
 
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_distances_probe_desc);

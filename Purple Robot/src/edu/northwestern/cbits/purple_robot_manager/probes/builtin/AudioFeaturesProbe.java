@@ -22,27 +22,31 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 public class AudioFeaturesProbe extends Probe
 {
     private static final boolean DEFAULT_ENABLED = false;
-    private static final String ENABLED_KEY = "config_probe_audio_feature_enabled";
+    private static final String ENABLED = "config_probe_audio_feature_enabled";
 
-    private double[] samples = new double[32768];
+    private final double[] samples = new double[32768];
 
     private boolean _recording = false;
 
+    @Override
     public String name(Context context)
     {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.AudioFeaturesProbe";
     }
 
+    @Override
     public String title(Context context)
     {
         return context.getString(R.string.title_audio_features_probe);
     }
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getString(R.string.probe_sensor_category);
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(PreferenceActivity activity)
     {
@@ -54,7 +58,7 @@ public class AudioFeaturesProbe extends Probe
 
         CheckBoxPreference enabled = new CheckBoxPreference(activity);
         enabled.setTitle(R.string.title_enable_probe);
-        enabled.setKey(AudioFeaturesProbe.ENABLED_KEY);
+        enabled.setKey(AudioFeaturesProbe.ENABLED);
         enabled.setDefaultValue(AudioFeaturesProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
@@ -62,13 +66,14 @@ public class AudioFeaturesProbe extends Probe
         return screen;
     }
 
+    @Override
     public boolean isEnabled(final Context context)
     {
         if (super.isEnabled(context))
         {
             SharedPreferences prefs = Probe.getPreferences(context);
 
-            boolean enabled = prefs.getBoolean(AudioFeaturesProbe.ENABLED_KEY, AudioFeaturesProbe.DEFAULT_ENABLED);
+            boolean enabled = prefs.getBoolean(AudioFeaturesProbe.ENABLED, AudioFeaturesProbe.DEFAULT_ENABLED);
 
             if (this._recording == false && enabled)
             {
@@ -78,6 +83,7 @@ public class AudioFeaturesProbe extends Probe
 
                 Runnable r = new Runnable()
                 {
+                    @Override
                     @SuppressWarnings("deprecation")
                     public void run()
                     {
@@ -197,31 +203,35 @@ public class AudioFeaturesProbe extends Probe
         return false;
     }
 
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_audio_features_probe_desc);
     }
 
+    @Override
     public void enable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean(AudioFeaturesProbe.ENABLED_KEY, true);
+        e.putBoolean(AudioFeaturesProbe.ENABLED, true);
 
         e.commit();
     }
 
+    @Override
     public void disable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean(AudioFeaturesProbe.ENABLED_KEY, false);
+        e.putBoolean(AudioFeaturesProbe.ENABLED, false);
 
         e.commit();
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         double freq = bundle.getDouble("FREQUENCY");
