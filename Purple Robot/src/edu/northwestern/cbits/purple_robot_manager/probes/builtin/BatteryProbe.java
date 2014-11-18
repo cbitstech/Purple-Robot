@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -38,11 +39,14 @@ public class BatteryProbe extends Probe
 
     private static final boolean DEFAULT_ENABLED = true;
 
+    private static final String ENABLED = "config_probe_battery_enabled";
+
     private boolean _isInited = false;
     private boolean _isEnabled = false;
 
     private BroadcastReceiver _receiver = null;;
 
+    @Override
     public Intent viewIntent(Context context)
     {
         Intent i = new Intent(context, WebkitLandscapeActivity.class);
@@ -50,11 +54,13 @@ public class BatteryProbe extends Probe
         return i;
     }
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getResources().getString(R.string.probe_device_info_category);
     }
 
+    @Override
     public String contentSubtitle(Context context)
     {
         Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(context, BatteryProbe.DB_TABLE,
@@ -80,6 +86,7 @@ public class BatteryProbe extends Probe
         return schema;
     }
 
+    @Override
     public String getDisplayContent(Activity activity)
     {
         try
@@ -134,16 +141,19 @@ public class BatteryProbe extends Probe
         return null;
     }
 
+    @Override
     public String name(Context context)
     {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.BatteryProbe";
     }
 
+    @Override
     public String title(Context context)
     {
         return context.getString(R.string.title_battery_probe);
     }
 
+    @Override
     public Bundle formattedBundle(Context context, Bundle bundle)
     {
         Bundle formatted = super.formattedBundle(context, bundle);
@@ -237,6 +247,7 @@ public class BatteryProbe extends Probe
         return formatted;
     };
 
+    @Override
     public boolean isEnabled(Context context)
     {
         if (!this._isInited)
@@ -247,6 +258,7 @@ public class BatteryProbe extends Probe
 
             this._receiver = new BroadcastReceiver()
             {
+                @Override
                 public void onReceive(Context context, Intent intent)
                 {
                     if (me._isEnabled)
@@ -281,33 +293,36 @@ public class BatteryProbe extends Probe
 
         if (super.isEnabled(context))
         {
-            if (prefs.getBoolean("config_probe_battery_enabled", BatteryProbe.DEFAULT_ENABLED))
+            if (prefs.getBoolean(BatteryProbe.ENABLED, BatteryProbe.DEFAULT_ENABLED))
                 this._isEnabled = true;
         }
 
         return this._isEnabled;
     }
 
+    @Override
     public void enable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_battery_enabled", true);
+        e.putBoolean(BatteryProbe.ENABLED, true);
 
         e.commit();
     }
 
+    @Override
     public void disable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_battery_enabled", false);
+        e.putBoolean(BatteryProbe.ENABLED, false);
 
         e.commit();
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         String status = this.getStatus(context, (int) bundle.getDouble(BatteryManager.EXTRA_STATUS));
@@ -351,11 +366,13 @@ public class BatteryProbe extends Probe
      * return formatted; };
      */
 
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_battery_probe_desc);
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(PreferenceActivity activity)
     {
@@ -367,11 +384,34 @@ public class BatteryProbe extends Probe
 
         CheckBoxPreference enabled = new CheckBoxPreference(activity);
         enabled.setTitle(R.string.title_enable_probe);
-        enabled.setKey("config_probe_battery_enabled");
+        enabled.setKey(BatteryProbe.ENABLED);
         enabled.setDefaultValue(BatteryProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
 
         return screen;
+    }
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
     }
 }

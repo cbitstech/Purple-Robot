@@ -50,44 +50,53 @@ public class CommunicationLogProbe extends Probe
     private static final String RECENT_GROUP = "RECENT_GROUP";
 
     private static final boolean DEFAULT_ENABLED = true;
+    private static final String ENABLED = "config_probe_communication_enabled";
+    private static final String FREQUENCY = "config_probe_communication_frequency";
+    private static final String HASH_DATA = "config_probe_communication_hash_data";
 
     private long _lastCheck = 0;
 
+    @Override
     public String name(Context context)
     {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.CommunicationLogProbe";
     }
 
+    @Override
     public String title(Context context)
     {
         return context.getString(R.string.title_communication_probe);
     }
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getResources().getString(R.string.probe_personal_info_category);
     }
 
+    @Override
     public void enable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_communication_enabled", true);
+        e.putBoolean(CommunicationLogProbe.ENABLED, true);
 
         e.commit();
     }
 
+    @Override
     public void disable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_communication_enabled", false);
+        e.putBoolean(CommunicationLogProbe.ENABLED, false);
 
         e.commit();
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public boolean isEnabled(Context context)
     {
@@ -97,13 +106,13 @@ public class CommunicationLogProbe extends Probe
         {
             long now = System.currentTimeMillis();
 
-            if (prefs.getBoolean("config_probe_communication_enabled", CommunicationLogProbe.DEFAULT_ENABLED))
+            if (prefs.getBoolean(CommunicationLogProbe.ENABLED, CommunicationLogProbe.DEFAULT_ENABLED))
             {
                 synchronized (this)
                 {
-                    long freq = Long.parseLong(prefs.getString("config_probe_communication_frequency",
-                            Probe.DEFAULT_FREQUENCY));
-                    boolean doHash = prefs.getBoolean("config_probe_communication_hash_data", Probe.DEFAULT_HASH_DATA);
+                    long freq = Long.parseLong(prefs
+                            .getString(CommunicationLogProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
+                    boolean doHash = prefs.getBoolean(CommunicationLogProbe.HASH_DATA, Probe.DEFAULT_HASH_DATA);
 
                     if (now - this._lastCheck > freq)
                     {
@@ -259,6 +268,7 @@ public class CommunicationLogProbe extends Probe
         return false;
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         int count = (int) bundle.getDouble(CommunicationLogProbe.CALL_TOTAL_COUNT);
@@ -266,13 +276,14 @@ public class CommunicationLogProbe extends Probe
         return String.format(context.getResources().getString(R.string.summary_call_log_probe), count);
     }
 
+    @Override
     public Map<String, Object> configuration(Context context)
     {
         Map<String, Object> map = super.configuration(context);
 
         SharedPreferences prefs = Probe.getPreferences(context);
 
-        long freq = Long.parseLong(prefs.getString("config_probe_communication_frequency", Probe.DEFAULT_FREQUENCY));
+        long freq = Long.parseLong(prefs.getString(CommunicationLogProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
         map.put(Probe.PROBE_FREQUENCY, freq);
 
         boolean hash = prefs.getBoolean("config_probe_communication_hash_data", Probe.DEFAULT_HASH_DATA);
@@ -281,6 +292,7 @@ public class CommunicationLogProbe extends Probe
         return map;
     }
 
+    @Override
     public void updateFromMap(Context context, Map<String, Object> params)
     {
         super.updateFromMap(context, params);
@@ -294,7 +306,7 @@ public class CommunicationLogProbe extends Probe
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putString("config_probe_communication_frequency", frequency.toString());
+                e.putString(CommunicationLogProbe.FREQUENCY, frequency.toString());
                 e.commit();
             }
         }
@@ -308,17 +320,19 @@ public class CommunicationLogProbe extends Probe
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putBoolean("config_probe_communication_hash_data", ((Boolean) hash).booleanValue());
+                e.putBoolean(CommunicationLogProbe.HASH_DATA, ((Boolean) hash).booleanValue());
                 e.commit();
             }
         }
     }
 
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_communication_probe_desc);
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(final PreferenceActivity activity)
     {
@@ -330,13 +344,13 @@ public class CommunicationLogProbe extends Probe
 
         CheckBoxPreference enabled = new CheckBoxPreference(activity);
         enabled.setTitle(R.string.title_enable_probe);
-        enabled.setKey("config_probe_communication_enabled");
+        enabled.setKey(CommunicationLogProbe.ENABLED);
         enabled.setDefaultValue(CommunicationLogProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
 
         ListPreference duration = new ListPreference(activity);
-        duration.setKey("config_probe_communication_frequency");
+        duration.setKey(CommunicationLogProbe.FREQUENCY);
         duration.setEntryValues(R.array.probe_low_frequency_values);
         duration.setEntries(R.array.probe_low_frequency_labels);
         duration.setTitle(R.string.probe_frequency_label);
@@ -345,7 +359,7 @@ public class CommunicationLogProbe extends Probe
         screen.addPreference(duration);
 
         CheckBoxPreference hash = new CheckBoxPreference(activity);
-        hash.setKey("config_probe_communication_hash_data");
+        hash.setKey(CommunicationLogProbe.HASH_DATA);
         hash.setDefaultValue(Probe.DEFAULT_HASH_DATA);
         hash.setTitle(R.string.config_probe_communication_hash_title);
         hash.setSummary(R.string.config_probe_communication_hash_summary);
@@ -356,6 +370,7 @@ public class CommunicationLogProbe extends Probe
         calibrate.setTitle(R.string.config_probe_calibrate_title);
         calibrate.setOnPreferenceClickListener(new OnPreferenceClickListener()
         {
+            @Override
             public boolean onPreferenceClick(Preference pref)
             {
                 Intent intent = new Intent(activity, AddressBookLabelActivity.class);
@@ -391,6 +406,7 @@ public class CommunicationLogProbe extends Probe
         return bundle;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public Bundle formattedBundle(Context context, Bundle bundle)
     {

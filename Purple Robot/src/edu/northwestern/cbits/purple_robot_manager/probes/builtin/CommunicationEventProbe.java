@@ -51,44 +51,56 @@ public class CommunicationEventProbe extends Probe
     private static final boolean DEFAULT_ENABLED = true;
     private static final boolean DEFAULT_RETRIEVE = false;
     private static final boolean DEFAULT_ENCRYPT = true;
+    private static final String ENABLED = "config_probe_communication_event_enabled";
+    private static final String FREQUENCY = "config_probe_communication_event_frequency";
+    private static final String HASH_DATA = "config_probe_communication_event_hash_data";
+    private static final String RECENT_EVENT = "config_probe_communication_event_recent";
+    private static final String RETRIEVE_DATA = "config_probe_communication_event_retrieve_data";
+    private static final String ENCRYPT_DATA = "config_probe_communication_event_encrypt_data";
 
     private long _lastCheck = 0;
 
+    @Override
     public String name(Context context)
     {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.CommunicationEventProbe";
     }
 
+    @Override
     public String title(Context context)
     {
         return context.getString(R.string.title_communication_event_probe);
     }
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getResources().getString(R.string.probe_personal_info_category);
     }
 
+    @Override
     public void enable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_communication_event_enabled", true);
+        e.putBoolean(CommunicationEventProbe.ENABLED, true);
 
         e.commit();
     }
 
+    @Override
     public void disable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_communication_event_enabled", false);
+        e.putBoolean(CommunicationEventProbe.ENABLED, false);
 
         e.commit();
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public boolean isEnabled(Context context)
     {
@@ -98,18 +110,17 @@ public class CommunicationEventProbe extends Probe
         {
             long now = System.currentTimeMillis();
 
-            if (prefs.getBoolean("config_probe_communication_event_enabled", CommunicationEventProbe.DEFAULT_ENABLED))
+            if (prefs.getBoolean(CommunicationEventProbe.ENABLED, CommunicationEventProbe.DEFAULT_ENABLED))
             {
                 synchronized (this)
                 {
-                    long freq = Long.parseLong(prefs.getString("config_probe_communication_event_frequency",
+                    long freq = Long.parseLong(prefs.getString(CommunicationEventProbe.FREQUENCY,
                             Probe.DEFAULT_FREQUENCY));
-                    boolean doHash = prefs.getBoolean("config_probe_communication_event_hash_data",
-                            Probe.DEFAULT_HASH_DATA);
+                    boolean doHash = prefs.getBoolean(CommunicationEventProbe.HASH_DATA, Probe.DEFAULT_HASH_DATA);
 
                     if (now - this._lastCheck > freq)
                     {
-                        long mostRecent = prefs.getLong("config_probe_communication_event_recent", 0);
+                        long mostRecent = prefs.getLong(CommunicationEventProbe.RECENT_EVENT, 0);
                         long newRecent = mostRecent;
 
                         try
@@ -276,9 +287,9 @@ public class CommunicationEventProbe extends Probe
 
                                 bundle.putString(CommunicationEventProbe.DIRECTION, CommunicationEventProbe.OUTGOING);
 
-                                boolean retrieve = prefs.getBoolean("config_probe_communication_event_retrieve_data",
+                                boolean retrieve = prefs.getBoolean(CommunicationEventProbe.RETRIEVE_DATA,
                                         CommunicationEventProbe.DEFAULT_RETRIEVE);
-                                boolean encrypt = prefs.getBoolean("config_probe_communication_event_encrypt_data",
+                                boolean encrypt = prefs.getBoolean(CommunicationEventProbe.ENCRYPT_DATA,
                                         CommunicationEventProbe.DEFAULT_ENCRYPT);
 
                                 if (retrieve)
@@ -307,7 +318,7 @@ public class CommunicationEventProbe extends Probe
                         this._lastCheck = now;
 
                         Editor e = prefs.edit();
-                        e.putLong("config_probe_communication_event_recent", newRecent);
+                        e.putLong(CommunicationEventProbe.RECENT_EVENT, newRecent);
                         e.commit();
                     }
                 }
@@ -319,6 +330,7 @@ public class CommunicationEventProbe extends Probe
         return false;
     }
 
+    @Override
     @SuppressLint("SimpleDateFormat")
     public String summarizeValue(Context context, Bundle bundle)
     {
@@ -338,22 +350,23 @@ public class CommunicationEventProbe extends Probe
                 format.format(new Date(timestamp)));
     }
 
+    @Override
     public Map<String, Object> configuration(Context context)
     {
         Map<String, Object> map = super.configuration(context);
 
         SharedPreferences prefs = Probe.getPreferences(context);
 
-        long freq = Long.parseLong(prefs.getString("config_probe_communication_event_frequency",
-                Probe.DEFAULT_FREQUENCY));
+        long freq = Long.parseLong(prefs.getString(CommunicationEventProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
         map.put(Probe.PROBE_FREQUENCY, freq);
 
-        boolean hash = prefs.getBoolean("config_probe_communication_event_hash_data", Probe.DEFAULT_HASH_DATA);
+        boolean hash = prefs.getBoolean(CommunicationEventProbe.HASH_DATA, Probe.DEFAULT_HASH_DATA);
         map.put(Probe.HASH_DATA, hash);
 
         return map;
     }
 
+    @Override
     public void updateFromMap(Context context, Map<String, Object> params)
     {
         super.updateFromMap(context, params);
@@ -367,7 +380,7 @@ public class CommunicationEventProbe extends Probe
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putString("config_probe_communication_event_frequency", frequency.toString());
+                e.putString(CommunicationEventProbe.FREQUENCY, frequency.toString());
                 e.commit();
             }
         }
@@ -381,17 +394,19 @@ public class CommunicationEventProbe extends Probe
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putBoolean("config_probe_communication_event_hash_data", ((Boolean) hash).booleanValue());
+                e.putBoolean(CommunicationEventProbe.HASH_DATA, ((Boolean) hash).booleanValue());
                 e.commit();
             }
         }
     }
 
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_communication_event_probe_desc);
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(final PreferenceActivity activity)
     {
@@ -403,13 +418,13 @@ public class CommunicationEventProbe extends Probe
 
         CheckBoxPreference enabled = new CheckBoxPreference(activity);
         enabled.setTitle(R.string.title_enable_probe);
-        enabled.setKey("config_probe_communication_event_enabled");
+        enabled.setKey(CommunicationEventProbe.ENABLED);
         enabled.setDefaultValue(CommunicationEventProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
 
         ListPreference duration = new ListPreference(activity);
-        duration.setKey("config_probe_communication_event_frequency");
+        duration.setKey(CommunicationEventProbe.FREQUENCY);
         duration.setEntryValues(R.array.probe_low_frequency_values);
         duration.setEntries(R.array.probe_low_frequency_labels);
         duration.setTitle(R.string.probe_frequency_label);
@@ -418,7 +433,7 @@ public class CommunicationEventProbe extends Probe
         screen.addPreference(duration);
 
         CheckBoxPreference hash = new CheckBoxPreference(activity);
-        hash.setKey("config_probe_communication_event_hash_data");
+        hash.setKey(CommunicationEventProbe.HASH_DATA);
         hash.setDefaultValue(Probe.DEFAULT_HASH_DATA);
         hash.setTitle(R.string.config_probe_communication_hash_title);
         hash.setSummary(R.string.config_probe_communication_hash_summary);
@@ -426,13 +441,14 @@ public class CommunicationEventProbe extends Probe
         screen.addPreference(hash);
 
         CheckBoxPreference retrieve = new CheckBoxPreference(activity);
-        retrieve.setKey("config_probe_communication_event_retrieve_data");
+        retrieve.setKey(CommunicationEventProbe.RETRIEVE_DATA);
         retrieve.setDefaultValue(CommunicationEventProbe.DEFAULT_RETRIEVE);
         retrieve.setTitle(R.string.config_probe_communication_retrieve_title);
         retrieve.setSummary(R.string.config_probe_communication_retrieve_summary);
 
         retrieve.setOnPreferenceChangeListener(new OnPreferenceChangeListener()
         {
+            @Override
             public boolean onPreferenceChange(Preference arg0, Object newValue)
             {
                 Boolean b = (Boolean) newValue;
@@ -454,7 +470,7 @@ public class CommunicationEventProbe extends Probe
         screen.addPreference(retrieve);
 
         CheckBoxPreference encrypt = new CheckBoxPreference(activity);
-        encrypt.setKey("config_probe_communication_event_encrypt_data");
+        encrypt.setKey(CommunicationEventProbe.ENCRYPT_DATA);
         encrypt.setDefaultValue(CommunicationEventProbe.DEFAULT_ENCRYPT);
         encrypt.setTitle(R.string.config_probe_communication_encrypt_title);
         encrypt.setSummary(R.string.config_probe_communication_encrypt_summary);
@@ -465,6 +481,7 @@ public class CommunicationEventProbe extends Probe
         calibrate.setTitle(R.string.config_probe_calibrate_title);
         calibrate.setOnPreferenceClickListener(new OnPreferenceClickListener()
         {
+            @Override
             public boolean onPreferenceClick(Preference pref)
             {
                 Intent intent = new Intent(activity, AddressBookLabelActivity.class);

@@ -32,7 +32,6 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -46,7 +45,7 @@ public class DateTrigger extends Trigger
     public static final String DATETIME_START = "datetime_start";
     public static final String DATETIME_END = "datetime_end";
     public static final String DATETIME_REPEATS = "datetime_repeat";
-    private static final String DATETIME_RANDOM = "datetime_random";
+    public static final String DATETIME_RANDOM = "datetime_random";
 
     private static final String RANDOM = "random";
     private static final String START = "start";
@@ -86,11 +85,13 @@ public class DateTrigger extends Trigger
             this._identifier = identifier;
         }
 
+        @Override
         public int hashCode()
         {
             return new HashCodeBuilder(17, 31).append(this._identifier).toHashCode();
         }
 
+        @Override
         public boolean equals(Object obj)
         {
             if (obj == null)
@@ -112,12 +113,14 @@ public class DateTrigger extends Trigger
         }
     }
 
+    @Override
     public void refresh(final Context context)
     {
         final DateTrigger me = this;
 
         RefreshRunnable r = new RefreshRunnable(this.identifier())
         {
+            @Override
             public void run()
             {
                 me.refreshTrigger(context);
@@ -133,6 +136,7 @@ public class DateTrigger extends Trigger
 
             Runnable s = new Runnable()
             {
+                @Override
                 public void run()
                 {
                     if (DateTrigger.pendingRefreshes.size() > 0)
@@ -230,6 +234,7 @@ public class DateTrigger extends Trigger
         }
     }
 
+    @Override
     public void reset(Context context)
     {
         super.reset(context);
@@ -352,6 +357,7 @@ public class DateTrigger extends Trigger
         return original;
     }
 
+    @Override
     public boolean updateFromMap(Context context, Map<String, Object> map)
     {
         if (super.updateFromMap(context, map))
@@ -442,8 +448,7 @@ public class DateTrigger extends Trigger
             if (this._repeats != null)
                 repeatString = "\nRRULE:" + this._repeats;
 
-            this._icalString = String.format(context.getString(R.string.ical_template), this._start, this._end,
-                    this.name(), repeatString);
+            this._icalString = String.format(context.getString(R.string.ical_template), this._start, this._end, this.name(), repeatString);
 
             this._lastFireCalcDate = 0;
             this.refresh(context);
@@ -460,6 +465,7 @@ public class DateTrigger extends Trigger
         return false;
     }
 
+    @Override
     public Map<String, Object> configuration(Context context)
     {
         Map<String, Object> config = super.configuration(context);
@@ -538,6 +544,7 @@ public class DateTrigger extends Trigger
         return null;
     }
 
+    @Override
     public void execute(Context context, boolean force)
     {
         long now = System.currentTimeMillis();
@@ -569,7 +576,7 @@ public class DateTrigger extends Trigger
 
                 long delta = periodEnd - timeLeft;
 
-                delta = (delta - 1) / (60 * 1000); // Normalize to minutes, drop
+                delta = (delta / (60 * 1000)) - 1; // Normalize to minutes, drop
                                                    // last minute
 
                 if (delta > 1)
@@ -591,6 +598,7 @@ public class DateTrigger extends Trigger
         super.execute(context, force);
     }
 
+    @Override
     public boolean matches(Context context, Object obj)
     {
         if (obj instanceof Date)
@@ -608,6 +616,7 @@ public class DateTrigger extends Trigger
         return false;
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(PreferenceActivity activity)
     {
@@ -646,9 +655,7 @@ public class DateTrigger extends Trigger
                 if (this._upcomingFireDates.size() == 1)
                     upcomingScreen.setTitle(R.string.label_trigger_upcoming_fire_summary);
                 else
-                    upcomingScreen.setTitle(String.format(
-                            activity.getString(R.string.label_trigger_upcoming_fires_summary),
-                            this._upcomingFireDates.size()));
+                    upcomingScreen.setTitle(String.format(activity.getString(R.string.label_trigger_upcoming_fires_summary), this._upcomingFireDates.size()));
 
                 for (Date d : this._upcomingFireDates)
                 {
@@ -709,6 +716,7 @@ public class DateTrigger extends Trigger
         return screen;
     }
 
+    @Override
     public String getDiagnosticString(Context context)
     {
         String name = this.name();
@@ -734,6 +742,7 @@ public class DateTrigger extends Trigger
         return context.getString(R.string.trigger_diagnostic_string, name, identifier, enabled, lastFiredString);
     }
 
+    @Override
     public Bundle bundle(Context context)
     {
         Bundle bundle = super.bundle(context);
@@ -799,14 +808,20 @@ public class DateTrigger extends Trigger
     {
         ArrayList<Long> times = new ArrayList<Long>();
 
-        while (start <= end)
+        long offset = 0;
+
+        while (start + offset <= end)
         {
-            Period p = this.getPeriod(context, start);
+            Period p = this.getPeriod(context, start + offset);
 
             if (p != null)
-                times.add(Long.valueOf(p.getStart().getTime() + 5000));
+            {
+                long fireTime = Long.valueOf(start + offset + 5000);
 
-            start += 60000;
+                times.add(fireTime);
+            }
+
+            offset += 60000;
         }
 
         return times;

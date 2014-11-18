@@ -27,7 +27,7 @@ public class CallStateProbe extends Probe
 
     private static final boolean DEFAULT_ENABLED = true;
 
-    private static final String IS_ENABLED = "config_probe_call_state_enabled";
+    private static final String ENABLED = "config_probe_call_state_enabled";
 
     private long _lastXmit = 0;
     private BroadcastReceiver _receiver = null;
@@ -57,7 +57,7 @@ public class CallStateProbe extends Probe
         {
             SharedPreferences prefs = Probe.getPreferences(context);
 
-            if (prefs.getBoolean(CallStateProbe.IS_ENABLED, CallStateProbe.DEFAULT_ENABLED))
+            if (prefs.getBoolean(CallStateProbe.ENABLED, CallStateProbe.DEFAULT_ENABLED))
             {
                 if (this._receiver == null)
                 {
@@ -70,7 +70,7 @@ public class CallStateProbe extends Probe
                         {
                             SharedPreferences prefs = Probe.getPreferences(context);
 
-                            if (prefs.getBoolean(CallStateProbe.IS_ENABLED, CallStateProbe.DEFAULT_ENABLED))
+                            if (prefs.getBoolean(CallStateProbe.ENABLED, CallStateProbe.DEFAULT_ENABLED))
                             {
                                 TelephonyManager tm = (TelephonyManager) context
                                         .getSystemService(Context.TELEPHONY_SERVICE);
@@ -172,7 +172,7 @@ public class CallStateProbe extends Probe
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean(CallStateProbe.IS_ENABLED, true);
+        e.putBoolean(CallStateProbe.ENABLED, true);
         e.commit();
     }
 
@@ -182,7 +182,7 @@ public class CallStateProbe extends Probe
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean(CallStateProbe.IS_ENABLED, false);
+        e.putBoolean(CallStateProbe.ENABLED, false);
         e.commit();
     }
 
@@ -204,7 +204,7 @@ public class CallStateProbe extends Probe
 
         CheckBoxPreference enabled = new CheckBoxPreference(activity);
         enabled.setTitle(R.string.title_enable_probe);
-        enabled.setKey(CallStateProbe.IS_ENABLED);
+        enabled.setKey(CallStateProbe.ENABLED);
         enabled.setDefaultValue(CallStateProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);

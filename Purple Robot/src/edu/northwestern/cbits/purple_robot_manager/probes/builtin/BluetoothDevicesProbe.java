@@ -21,7 +21,6 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -38,24 +37,30 @@ public class BluetoothDevicesProbe extends Probe
     protected static final String DEVICES = "DEVICES";
 
     private static final boolean DEFAULT_ENABLED = false;
+    private static final String ENABLED = "config_probe_bluetooth_enabled";
+    private static final String HASH_DATA = "config_probe_bluetooth_hash_data";
+    private static final String FREQUENCY = "config_probe_bluetooth_frequency";
 
     private long _lastCheck = 0;
     private BroadcastReceiver _receiver = null;
 
     private BluetoothAdapter _adapter = null;
 
-    private ArrayList<Bundle> _foundDevices = new ArrayList<Bundle>();
+    private final ArrayList<Bundle> _foundDevices = new ArrayList<Bundle>();
 
+    @Override
     public String name(Context context)
     {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.BluetoothDevicesProbe";
     }
 
+    @Override
     public String title(Context context)
     {
         return context.getString(R.string.title_bluetooth_probe);
     }
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getResources().getString(R.string.probe_other_devices_category);
@@ -266,26 +271,29 @@ public class BluetoothDevicesProbe extends Probe
         return String.format("0x%08x %s", minorClass, deviceClassName);
     }
 
+    @Override
     public void enable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_bluetooth_enabled", true);
+        e.putBoolean(BluetoothDevicesProbe.ENABLED, true);
 
         e.commit();
     }
 
+    @Override
     public void disable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_bluetooth_enabled", false);
+        e.putBoolean(BluetoothDevicesProbe.ENABLED, false);
 
         e.commit();
     }
 
+    @Override
     @SuppressLint("InlinedApi")
     public boolean isEnabled(Context context)
     {
@@ -298,6 +306,7 @@ public class BluetoothDevicesProbe extends Probe
         {
             this._receiver = new BroadcastReceiver()
             {
+                @Override
                 @SuppressWarnings("unchecked")
                 public void onReceive(Context context, Intent intent)
                 {
@@ -305,8 +314,7 @@ public class BluetoothDevicesProbe extends Probe
                     {
                         if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction()))
                         {
-                            boolean doHash = prefs.getBoolean("config_probe_bluetooth_hash_data",
-                                    Probe.DEFAULT_HASH_DATA);
+                            boolean doHash = prefs.getBoolean(BluetoothDevicesProbe.HASH_DATA, Probe.DEFAULT_HASH_DATA);
 
                             BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
@@ -382,7 +390,7 @@ public class BluetoothDevicesProbe extends Probe
         boolean enabled = super.isEnabled(context);
 
         if (enabled)
-            enabled = prefs.getBoolean("config_probe_bluetooth_enabled", BluetoothDevicesProbe.DEFAULT_ENABLED);
+            enabled = prefs.getBoolean(BluetoothDevicesProbe.ENABLED, BluetoothDevicesProbe.DEFAULT_ENABLED);
 
         if (enabled)
         {
@@ -390,8 +398,8 @@ public class BluetoothDevicesProbe extends Probe
             {
                 try
                 {
-                    long freq = Long.parseLong(prefs.getString("config_probe_bluetooth_frequency",
-                            Probe.DEFAULT_FREQUENCY));
+                    long freq = Long.parseLong(prefs
+                            .getString(BluetoothDevicesProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
 
                     if (now - this._lastCheck > freq)
                     {
@@ -449,6 +457,7 @@ public class BluetoothDevicesProbe extends Probe
         return "Unknown or Error";
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         int count = (int) bundle.getDouble(BluetoothDevicesProbe.DEVICES_COUNT);
@@ -497,6 +506,7 @@ public class BluetoothDevicesProbe extends Probe
         return bundle;
     }
 
+    @Override
     public Bundle formattedBundle(Context context, Bundle bundle)
     {
         Bundle formatted = super.formattedBundle(context, bundle);
@@ -513,6 +523,7 @@ public class BluetoothDevicesProbe extends Probe
         return formatted;
     };
 
+    @Override
     public Map<String, Object> configuration(Context context)
     {
         Map<String, Object> map = super.configuration(context);
@@ -521,15 +532,16 @@ public class BluetoothDevicesProbe extends Probe
 
         // TODO: include whether enabled?
 
-        long freq = Long.parseLong(prefs.getString("config_probe_bluetooth_frequency", Probe.DEFAULT_FREQUENCY));
+        long freq = Long.parseLong(prefs.getString(BluetoothDevicesProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
         map.put(Probe.PROBE_FREQUENCY, freq);
 
-        boolean hash = prefs.getBoolean("config_probe_bluetooth_hash_data", Probe.DEFAULT_HASH_DATA);
+        boolean hash = prefs.getBoolean(BluetoothDevicesProbe.HASH_DATA, Probe.DEFAULT_HASH_DATA);
         map.put(Probe.HASH_DATA, hash);
 
         return map;
     }
 
+    @Override
     public void updateFromMap(Context context, Map<String, Object> params)
     {
         super.updateFromMap(context, params);
@@ -543,7 +555,7 @@ public class BluetoothDevicesProbe extends Probe
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putString("config_probe_bluetooth_frequency", frequency.toString());
+                e.putString(BluetoothDevicesProbe.FREQUENCY, frequency.toString());
                 e.commit();
             }
         }
@@ -557,17 +569,19 @@ public class BluetoothDevicesProbe extends Probe
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putBoolean("config_probe_bluetooth_hash_data", ((Boolean) hash).booleanValue());
+                e.putBoolean(BluetoothDevicesProbe.FREQUENCY, ((Boolean) hash).booleanValue());
                 e.commit();
             }
         }
     }
 
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_bluetooth_probe_desc);
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(PreferenceActivity activity)
     {
@@ -579,13 +593,13 @@ public class BluetoothDevicesProbe extends Probe
 
         CheckBoxPreference enabled = new CheckBoxPreference(activity);
         enabled.setTitle(R.string.title_enable_probe);
-        enabled.setKey("config_probe_bluetooth_enabled");
+        enabled.setKey(BluetoothDevicesProbe.ENABLED);
         enabled.setDefaultValue(BluetoothDevicesProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
 
         ListPreference duration = new ListPreference(activity);
-        duration.setKey("config_probe_bluetooth_frequency");
+        duration.setKey(BluetoothDevicesProbe.FREQUENCY);
         duration.setDefaultValue(Probe.DEFAULT_FREQUENCY);
         duration.setEntryValues(R.array.probe_satellite_frequency_values);
         duration.setEntries(R.array.probe_satellite_frequency_labels);
@@ -594,7 +608,7 @@ public class BluetoothDevicesProbe extends Probe
         screen.addPreference(duration);
 
         CheckBoxPreference hash = new CheckBoxPreference(activity);
-        hash.setKey("config_probe_bluetooth_hash_data");
+        hash.setKey(BluetoothDevicesProbe.HASH_DATA);
         hash.setDefaultValue(Probe.DEFAULT_HASH_DATA);
         hash.setTitle(R.string.config_probe_bluetooth_hash_title);
         hash.setSummary(R.string.config_probe_bluetooth_hash_summary);

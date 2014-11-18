@@ -85,6 +85,7 @@ public class ManagerService extends IntentService
         super(name);
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     protected void onHandleIntent(final Intent intent)
     {
@@ -98,6 +99,7 @@ public class ManagerService extends IntentService
         {
             Runnable r = new Runnable()
             {
+                @Override
                 public void run()
                 {
                     SanityManager.getInstance(me).refreshState();
@@ -211,6 +213,7 @@ public class ManagerService extends IntentService
                 {
                     Thread t = new Thread(new Runnable()
                     {
+                        @Override
                         public void run()
                         {
                             r.play();
@@ -241,26 +244,25 @@ public class ManagerService extends IntentService
             {
                 try
                 {
-                    final AssetFileDescriptor afd = this.getAssets().openFd(
-                            ManagerService.pathForSound(this, toneString));
+                    final AssetFileDescriptor afd = this.getAssets().openFd(ManagerService.pathForSound(this, toneString));
 
                     Runnable r = new Runnable()
                     {
+                        @Override
                         public void run()
                         {
                             ManagerService._player = new MediaPlayer();
 
                             try
                             {
-                                ManagerService._player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(),
-                                        afd.getLength());
-                                ManagerService._player.setLooping(intent.getBooleanExtra(ManagerService.RINGTONE_LOOPS,
-                                        false));
+                                ManagerService._player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+                                ManagerService._player.setLooping(intent.getBooleanExtra(ManagerService.RINGTONE_LOOPS, false));
 
                                 ManagerService._player.prepare();
 
                                 ManagerService._player.setOnCompletionListener(new OnCompletionListener()
                                 {
+                                    @Override
                                     public void onCompletion(MediaPlayer player)
                                     {
                                         ManagerService._player = null;
@@ -369,12 +371,16 @@ public class ManagerService extends IntentService
         {
             TriggerManager.getInstance(this).nudgeTriggers(this);
 
-            this.startService(new Intent(ManagerService.UPDATE_TRIGGER_SCHEDULE_INTENT));
+            Intent updateIntent = new Intent(ManagerService.UPDATE_TRIGGER_SCHEDULE_INTENT);
+            updateIntent.setClass(this, ManagerService.class);
+
+            this.startService(updateIntent);
         }
         else if (UPDATE_TRIGGER_SCHEDULE_INTENT.equals(action))
         {
             Runnable r = new Runnable()
             {
+                @Override
                 public void run()
                 {
                     if (ManagerService._updatingTriggerSchedule)
@@ -399,8 +405,7 @@ public class ManagerService extends IntentService
                         {
                             AlarmManager alarmManager = (AlarmManager) me.getSystemService(Context.ALARM_SERVICE);
 
-                            PendingIntent pi = PendingIntent.getService(me, 0, new Intent(
-                                    ManagerService.FIRE_TRIGGERS_INTENT), PendingIntent.FLAG_UPDATE_CURRENT);
+                            PendingIntent pi = PendingIntent.getService(me, 0, new Intent(ManagerService.FIRE_TRIGGERS_INTENT), PendingIntent.FLAG_UPDATE_CURRENT);
 
                             alarmManager.cancel(pi);
 
@@ -442,16 +447,15 @@ public class ManagerService extends IntentService
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-        PendingIntent pi = PendingIntent.getService(context, 0, new Intent(ManagerService.REFRESH_CONFIGURATION),
-                PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pi = PendingIntent.getService(context, 0, new Intent(ManagerService.REFRESH_CONFIGURATION), PendingIntent.FLAG_UPDATE_CURRENT);
         alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60000, pi);
 
-        pi = PendingIntent.getService(context, 0, new Intent(ManagerService.UPDATE_TRIGGER_SCHEDULE_INTENT),
-                PendingIntent.FLAG_UPDATE_CURRENT);
+        pi = PendingIntent.getService(context, 0, new Intent(ManagerService.UPDATE_TRIGGER_SCHEDULE_INTENT), PendingIntent.FLAG_UPDATE_CURRENT);
         alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), (15 * 60 * 1000), pi);
 
         prefs.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener()
         {
+            @Override
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
             {
                 Intent reloadIntent = new Intent(ManagerService.REFRESH_CONFIGURATION);

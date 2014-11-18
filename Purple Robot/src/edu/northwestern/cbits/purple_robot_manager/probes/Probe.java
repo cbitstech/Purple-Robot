@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -39,6 +41,11 @@ public abstract class Probe
 
     protected static final String BUNDLE_PROBE = "PROBE";
     protected static final String BUNDLE_TIMESTAMP = "TIMESTAMP";
+
+    public static final String PROBE_TYPE_LONG = "long";
+    public static final String PROBE_TYPE_BOOLEAN = "boolean";
+    public static final String PROBE_TYPE = "type";
+    public static final String PROBE_VALUES = "values";
 
     public abstract String name(Context context);
 
@@ -231,5 +238,21 @@ public abstract class Probe
                     this.disable(context);
             }
         }
+    }
+
+    public JSONObject fetchSettings(Context _context)
+    {
+        // TODO: Make abstract & implement across ALL probes...
+
+        return null;
+    }
+
+    public String shortName(Context context)
+    {
+        String name = this.name(context);
+
+        String[] components = name.split("\\.");
+
+        return components[components.length - 1];
     }
 }
