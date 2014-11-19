@@ -17,12 +17,12 @@ public abstract class XYZContinuousProbeFeature extends ContinuousProbeFeature
 
     protected abstract void analyzeBuffers(Context context);
 
+    @Override
     protected void processData(Context context, Bundle dataBundle)
     {
         if (this.isEnabled(context))
         {
-            if (dataBundle.containsKey("EVENT_TIMESTAMP") && dataBundle.containsKey("X") && dataBundle.containsKey("Y")
-                    && dataBundle.containsKey("Z"))
+            if (dataBundle.containsKey("EVENT_TIMESTAMP") && dataBundle.containsKey("X") && dataBundle.containsKey("Y") && dataBundle.containsKey("Z"))
             {
                 double[] incomingTimes = dataBundle.getDoubleArray("EVENT_TIMESTAMP");
                 float[] incomingX = dataBundle.getFloatArray("X");

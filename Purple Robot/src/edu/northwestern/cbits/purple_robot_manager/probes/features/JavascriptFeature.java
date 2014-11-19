@@ -35,20 +35,20 @@ public class JavascriptFeature extends Feature
     private String _formatter = null;
 
     private boolean _embedded = false;
-    private List<String> _sources = new ArrayList<String>();
+    private final List<String> _sources = new ArrayList<String>();
 
     public JavascriptFeature()
     {
         throw new RuntimeException("Invalid constructor. Please use JavascriptFeature(scriptName) instead...");
     }
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getResources().getString(R.string.probe_misc_category);
     }
 
-    public JavascriptFeature(String title, String name, String script, String formatter, List<String> sources,
-            boolean embedded)
+    public JavascriptFeature(String title, String name, String script, String formatter, List<String> sources, boolean embedded)
     {
         this._name = name;
         this._title = title;
@@ -66,16 +66,19 @@ public class JavascriptFeature extends Feature
         return this._embedded;
     }
 
+    @Override
     protected String featureKey()
     {
         return this._name.replaceAll(".", "_");
     }
 
+    @Override
     public String name(Context context)
     {
         return "javascript_" + this._name;
     }
 
+    @Override
     public String title(Context context)
     {
         return this._title;
@@ -91,6 +94,7 @@ public class JavascriptFeature extends Feature
         return context.getResources().getStringArray(R.array.js_feature_names);
     }
 
+    @Override
     public void enable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
@@ -101,6 +105,7 @@ public class JavascriptFeature extends Feature
         e.commit();
     }
 
+    @Override
     public void disable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
@@ -111,6 +116,7 @@ public class JavascriptFeature extends Feature
         e.commit();
     }
 
+    @Override
     public boolean isEnabled(Context context)
     {
         boolean enabled = super.isEnabled(context);
@@ -188,6 +194,7 @@ public class JavascriptFeature extends Feature
 
         Runnable r = new Runnable()
         {
+            @Override
             public void run()
             {
                 Looper.prepare();
@@ -286,11 +293,13 @@ public class JavascriptFeature extends Feature
         return b;
     }
 
+    @Override
     public String summary(Context context)
     {
         return null;
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         Object value = bundle.get(Feature.FEATURE_VALUE);
@@ -321,5 +330,11 @@ public class JavascriptFeature extends Feature
         Object o = engine.runScript(script);
 
         return o.toString();
+    }
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        return null;
     }
 }

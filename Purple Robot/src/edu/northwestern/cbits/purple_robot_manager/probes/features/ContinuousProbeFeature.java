@@ -1,5 +1,9 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.features;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,24 +12,30 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public abstract class ContinuousProbeFeature extends Feature
 {
+    @Override
     protected abstract String featureKey();
 
+    @Override
     public abstract String summary(Context context);
 
+    @Override
     public abstract String name(Context context);
 
     public abstract String source(Context context);
 
+    @Override
     public abstract String title(Context context);
 
     protected abstract void processData(Context context, Bundle dataBundle);
 
     private BroadcastReceiver _receiver = null;
 
+    @Override
     public boolean isEnabled(Context context)
     {
         if (super.isEnabled(context))
@@ -42,6 +52,7 @@ public abstract class ContinuousProbeFeature extends Feature
 
                     this._receiver = new BroadcastReceiver()
                     {
+                        @Override
                         public void onReceive(final Context context, Intent intent)
                         {
                             Bundle extras = intent.getExtras();
@@ -68,6 +79,7 @@ public abstract class ContinuousProbeFeature extends Feature
         return false;
     }
 
+    @Override
     public void disable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
@@ -86,6 +98,7 @@ public abstract class ContinuousProbeFeature extends Feature
         }
     }
 
+    @Override
     public void enable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
@@ -96,5 +109,28 @@ public abstract class ContinuousProbeFeature extends Feature
         e.commit();
 
         this.isEnabled(context);
+    }
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
     }
 }

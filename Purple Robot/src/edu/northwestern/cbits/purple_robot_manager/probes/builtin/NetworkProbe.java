@@ -23,7 +23,6 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.text.format.Formatter;
-import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -123,8 +122,7 @@ public class NetworkProbe extends Probe
 
                                     try
                                     {
-                                        bundle.putString(NetworkProbe.HOSTNAME, InetAddress.getByName(ipString)
-                                                .getHostName());
+                                        bundle.putString(NetworkProbe.HOSTNAME, InetAddress.getByName(ipString).getHostName());
                                     }
                                     catch (UnknownHostException e)
                                     {
@@ -139,8 +137,7 @@ public class NetworkProbe extends Probe
 
                                         NetworkInterface iface = null;
 
-                                        while (ifaces.hasMoreElements() && (iface = ifaces.nextElement()) != null
-                                                && bundle.containsKey(NetworkProbe.IP_ADDRESS) == false)
+                                        while (ifaces.hasMoreElements() && (iface = ifaces.nextElement()) != null && bundle.containsKey(NetworkProbe.IP_ADDRESS) == false)
                                         {
                                             if (iface.getName().equals("lo") == false)
                                             {
@@ -169,8 +166,7 @@ public class NetworkProbe extends Probe
 
                                 try
                                 {
-                                    NetworkInterface iface = NetworkInterface.getByInetAddress(InetAddress
-                                            .getByName("127.0.0.1"));
+                                    NetworkInterface iface = NetworkInterface.getByInetAddress(InetAddress.getByName("127.0.0.1"));
 
                                     bundle.putString(NetworkProbe.IFACE_NAME, iface.getName());
                                     bundle.putString(NetworkProbe.IFACE_DISPLAY_NAME, iface.getDisplayName());
@@ -240,14 +236,10 @@ public class NetworkProbe extends Probe
         {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
 
-            Log.e("PR", "NET GOT FREQ: " + frequency + " -- " + frequency.getClass());
-
             if ((frequency instanceof Double) == false)
                 frequency = Double.valueOf(frequency.toString()).longValue();
             else
                 frequency = ((Double) frequency).longValue();
-
-            Log.e("PR", "IS LONG " + frequency);
 
             SharedPreferences prefs = Probe.getPreferences(context);
             Editor e = prefs.edit();

@@ -240,6 +240,8 @@ public abstract class Probe
         }
     }
 
+    // public abstract JSONObject fetchSettings(Context _context);
+
     public JSONObject fetchSettings(Context _context)
     {
         // TODO: Make abstract & implement across ALL probes...
