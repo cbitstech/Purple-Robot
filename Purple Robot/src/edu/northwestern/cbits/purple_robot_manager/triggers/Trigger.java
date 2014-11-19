@@ -64,6 +64,7 @@ public abstract class Trigger
 
             Runnable r = new Runnable()
             {
+                @Override
                 public void run()
                 {
                     try
@@ -94,6 +95,7 @@ public abstract class Trigger
         }
     }
 
+    @Override
     public String toString()
     {
         return this.name();
@@ -104,6 +106,7 @@ public abstract class Trigger
         return this._name;
     }
 
+    @Override
     public boolean equals(Object obj)
     {
         if (obj != null && obj instanceof Trigger)
@@ -161,6 +164,7 @@ public abstract class Trigger
 
         viewAction.setOnPreferenceClickListener(new OnPreferenceClickListener()
         {
+            @Override
             public boolean onPreferenceClick(Preference preference)
             {
                 Intent intent = new Intent(activity, CodeViewerActivity.class);
@@ -185,6 +189,7 @@ public abstract class Trigger
 
         enabled.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
         {
+            @Override
             public boolean onPreferenceChange(Preference preference, Object newValue)
             {
                 return true;
@@ -200,6 +205,7 @@ public abstract class Trigger
 
         fireNow.setOnPreferenceClickListener(new OnPreferenceClickListener()
         {
+            @Override
             public boolean onPreferenceClick(Preference preference)
             {
                 me.execute(activity, true);

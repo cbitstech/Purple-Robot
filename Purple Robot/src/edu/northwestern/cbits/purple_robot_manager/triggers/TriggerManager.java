@@ -2,7 +2,6 @@ package edu.northwestern.cbits.purple_robot_manager.triggers;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -20,6 +19,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.support.v4.util.LongSparseArray;
 import android.util.Log;
 import edu.emory.mathcs.backport.java.util.Collections;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
@@ -330,9 +330,9 @@ public class TriggerManager
         return triggers;
     }
 
-    public void fireMissedTriggers(Context context, long now)
+    public void fireMissedTriggers(final Context context, long now)
     {
-        HashMap<Long, String> fireDates = new HashMap<Long, String>();
+        final LongSparseArray<String> fireDates = new LongSparseArray<String>();
 
         for (Trigger trigger : this._triggers)
         {
@@ -342,26 +342,47 @@ public class TriggerManager
 
                 if (dateTrig.missedFire(context, now))
                 {
-                    long lastFired = dateTrig.lastFireTime(context);
+                    long lastFired = dateTrig.lastMissedFireTime(context);
 
                     fireDates.put(Long.valueOf(lastFired), dateTrig.identifier());
                 }
             }
         }
 
-        ArrayList<Long> fireTimes = new ArrayList<Long>();
+        final TriggerManager me = this;
 
-        fireTimes.addAll(fireDates.keySet());
-
-        Collections.sort(fireTimes);
-
-        for (Long time : fireTimes)
+        Runnable r = new Runnable()
         {
-            for (Trigger t : this.triggersForId(fireDates.get(time)))
+            @Override
+            public void run()
             {
-                t.execute(context, true);
+                for (int i = 0; i < fireDates.size(); i++)
+                {
+                    long time = fireDates.keyAt(i);
+
+                    for (Trigger t : me.triggersForId(fireDates.get(time)))
+                    {
+                        t.execute(context, true);
+
+                        // Wait 5 seconds for this trigger to complete so things
+                        // run in some semblance of "order" if each script runs
+                        // in 5 sec. or less...
+
+                        try
+                        {
+                            Thread.sleep(5000);
+                        }
+                        catch (InterruptedException e)
+                        {
+                            LogManager.getInstance(context).logException(e);
+                        }
+                    }
+                }
             }
-        }
+        };
+
+        Thread t = new Thread(r);
+        t.start();
     }
 
     @SuppressLint("Wakelock")
