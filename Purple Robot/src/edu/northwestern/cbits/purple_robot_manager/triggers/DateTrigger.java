@@ -711,6 +711,16 @@ public class DateTrigger extends Trigger
                 randomString.setTitle(R.string.label_trigger_not_random);
 
             screen.addPreference(randomString);
+
+            Preference bootString = new Preference(activity);
+            bootString.setSummary(R.string.label_trigger_boot);
+
+            if (this._fireOnBoot)
+                bootString.setTitle(R.string.label_trigger_is_boot);
+            else
+                bootString.setTitle(R.string.label_trigger_not_boot);
+
+            screen.addPreference(bootString);
         }
 
         return screen;

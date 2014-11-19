@@ -1049,6 +1049,10 @@
 	<string name="label_trigger_is_random">True</string>	
 	<string name="label_trigger_not_random">False</string>	
 
+	<string name="label_trigger_boot">Fire on Boot</string>	
+	<string name="label_trigger_is_boot">True</string>	
+	<string name="label_trigger_not_boot">False</string>	
+	
 	<!-- Activity Detection Probe -->
 
 	<string name="title_activity_detection_probe">Activity Detection Probe</string>	
