@@ -32,6 +32,7 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import edu.emory.mathcs.backport.java.util.Collections;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -835,5 +836,31 @@ public class DateTrigger extends Trigger
         }
 
         return times;
+    }
+
+    public long lastMissedFireTime(Context context)
+    {
+        long now = System.currentTimeMillis();
+
+        long lastFired = this.lastFireTime(context);
+
+        // Assumes that the device has been on and fired at least once in
+        // the last two weeks. To go back indefinitely is computationally
+        // infeasible. (See method above why.)
+
+        if (lastFired == 0)
+            lastFired = now - (14 * 24 * 60 * 60 * 1000);
+
+        List<Long> missedFires = this.fireTimes(context, lastFired, now);
+
+        if (missedFires.size() > 0)
+        {
+            Collections.sort(missedFires);
+            Collections.reverse(missedFires);
+
+            return missedFires.get(0).longValue();
+        }
+
+        return 0;
     }
 }
