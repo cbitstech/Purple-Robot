@@ -1,9 +1,14 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.sample;
 
+import java.util.Map;
+
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.transform.DftNormalization;
 import org.apache.commons.math3.transform.FastFourierTransformer;
 import org.apache.commons.math3.transform.TransformType;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -17,7 +22,9 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 /**
@@ -68,7 +75,7 @@ public class SampleProbe extends Probe
     private static final String FREQUENCY = "config_probe_sample_frequency";
 
     private boolean _recording = false;
-    private double[] _samples = new double[32768];
+    private final double[] _samples = new double[32768];
 
     private long _lastCheck = 0;
 
@@ -197,6 +204,7 @@ public class SampleProbe extends Probe
      * regularly-recorded audio samples.
      */
 
+    @Override
     public boolean isEnabled(final Context context)
     {
         // First, check if probes are enabled across the app
@@ -254,6 +262,7 @@ public class SampleProbe extends Probe
 
                 Runnable r = new Runnable()
                 {
+                    @Override
                     @SuppressWarnings("deprecation")
                     public void run()
                     {
@@ -261,8 +270,7 @@ public class SampleProbe extends Probe
                         // will need
                         // to collect and store audio samples.
 
-                        int bufferSize = AudioRecord.getMinBufferSize(44100, AudioFormat.CHANNEL_CONFIGURATION_MONO,
-                                AudioFormat.ENCODING_PCM_16BIT);
+                        int bufferSize = AudioRecord.getMinBufferSize(44100, AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT);
 
                         // Find the highest sample rate the device supports and
                         // create an
@@ -277,9 +285,7 @@ public class SampleProbe extends Probe
                         {
                             if (recorder == null)
                             {
-                                AudioRecord newRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC, rate,
-                                        AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT,
-                                        bufferSize);
+                                AudioRecord newRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC, rate, AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize);
 
                                 if (newRecorder.getState() == AudioRecord.STATE_INITIALIZED)
                                     recorder = newRecorder;
@@ -350,8 +356,7 @@ public class SampleProbe extends Probe
                             bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
                             bundle.putInt("SAMPLE_RATE", recorder.getSampleRate());
                             bundle.putDouble("POWER", samplePower / me._samples.length);
-                            bundle.putDouble("NORMALIZED_AVG_MAGNITUDE", (sampleSum / Short.MAX_VALUE)
-                                    / me._samples.length);
+                            bundle.putDouble("NORMALIZED_AVG_MAGNITUDE", (sampleSum / Short.MAX_VALUE) / me._samples.length);
 
                             // The AudioRecord instance is no longer needed at
                             // the moment, free it...
@@ -444,6 +449,7 @@ public class SampleProbe extends Probe
      * returns a string formatting the most relevant details.
      */
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         double freq = bundle.getDouble("FREQUENCY");
@@ -451,4 +457,85 @@ public class SampleProbe extends Probe
         return String.format(context.getResources().getString(R.string.summary_audio_features_probe), freq);
     }
 
+    @Override
+    public void updateFromMap(Context context, Map<String, Object> params)
+    {
+        super.updateFromMap(context, params);
+
+        if (params.containsKey(Probe.PROBE_FREQUENCY))
+        {
+            Object frequency = params.get(Probe.PROBE_FREQUENCY);
+
+            Log.e("PR", "FREQ:" + frequency + " -- " + frequency.getClass());
+
+            if ((frequency instanceof Double) == false)
+                frequency = Double.valueOf(frequency.toString()).longValue();
+            else
+                frequency = ((Double) frequency).longValue();
+
+            SharedPreferences prefs = Probe.getPreferences(context);
+            Editor e = prefs.edit();
+
+            e.putString(SampleProbe.FREQUENCY, frequency.toString());
+            e.commit();
+        }
+    }
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+
+            JSONObject frequency = new JSONObject();
+            frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
+            values = new JSONArray();
+
+            String[] options = context.getResources().getStringArray(R.array.probe_builtin_frequency_values);
+
+            for (String option : options)
+            {
+                values.put(Long.parseLong(option));
+            }
+
+            frequency.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_FREQUENCY, frequency);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
+    }
+
+    @Override
+    public Map<String, Object> configuration(Context context)
+    {
+        Map<String, Object> map = super.configuration(context);
+
+        SharedPreferences prefs = Probe.getPreferences(context);
+
+        try
+        {
+            long freq = Long.parseLong(prefs.getString(SampleProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
+
+            map.put(Probe.PROBE_FREQUENCY, freq);
+        }
+        catch (NumberFormatException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return map;
+    }
 }

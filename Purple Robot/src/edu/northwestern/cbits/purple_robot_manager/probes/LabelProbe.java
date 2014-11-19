@@ -1,5 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager.probes;
 
+import org.json.JSONObject;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
@@ -10,6 +12,7 @@ public class LabelProbe extends Probe
 {
     public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.Label";
 
+    @Override
     public String name(Context context)
     {
         return LabelProbe.NAME;
@@ -21,33 +24,45 @@ public class LabelProbe extends Probe
         return context.getString(R.string.title_label_probe);
     }
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getResources().getString(R.string.probe_misc_category);
     }
 
+    @Override
     public PreferenceScreen preferenceScreen(PreferenceActivity settingsActivity)
     {
         return null;
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         return bundle.getString("KEY") + ": " + bundle.getString("VALUE");
     }
 
+    @Override
     public void enable(Context context)
     {
 
     }
 
+    @Override
     public void disable(Context context)
     {
 
     }
 
+    @Override
     public String summary(Context context)
     {
         return "";
+    }
+
+    @Override
+    public JSONObject fetchSettings(Context _context)
+    {
+        return null;
     }
 }

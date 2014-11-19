@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -44,31 +47,37 @@ public class CallHistoryFeature extends Feature
 
     private long _lastCheck = 0;
 
+    @Override
     protected String featureKey()
     {
         return "call_history";
     }
 
+    @Override
     public String name(Context context)
     {
         return "edu.northwestern.cbits.purple_robot_manager.probes.features.CallHistoryFeature";
     }
 
+    @Override
     public String title(Context context)
     {
         return context.getString(R.string.title_call_history_feature);
     }
 
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_call_history_feature_desc);
     }
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getResources().getString(R.string.probe_personal_info_category);
     }
 
+    @Override
     public void enable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
@@ -79,6 +88,7 @@ public class CallHistoryFeature extends Feature
         e.commit();
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public boolean isEnabled(final Context context)
     {
@@ -128,8 +138,7 @@ public class CallHistoryFeature extends Feature
                                 String[] selectionArgs =
                                 { "" + start };
 
-                                Cursor cursor = context.getContentResolver().query(CallLog.Calls.CONTENT_URI, null,
-                                        selection, selectionArgs, null);
+                                Cursor cursor = context.getContentResolver().query(CallLog.Calls.CONTENT_URI, null, selection, selectionArgs, null);
 
                                 while (cursor.moveToNext())
                                 {
@@ -166,8 +175,7 @@ public class CallHistoryFeature extends Feature
                                         }
                                     }
 
-                                    String number = PhoneNumberUtils.formatNumber(cursor.getString(cursor
-                                            .getColumnIndex(CallLog.Calls.NUMBER)));
+                                    String number = PhoneNumberUtils.formatNumber(cursor.getString(cursor.getColumnIndex(CallLog.Calls.NUMBER)));
 
                                     if (doHash)
                                         number = EncryptionManager.getInstance().createHash(context, number);
@@ -246,8 +254,7 @@ public class CallHistoryFeature extends Feature
 
                                         contactInfo.putString(CallHistoryFeature.IDENTIFIER, key);
                                         contactInfo.putDouble(CallHistoryFeature.TOTAL, calls.size());
-                                        contactInfo.putBoolean(CallHistoryFeature.IS_ACQUAINTANCE, calls.get(0)
-                                                .containsKey(CallLog.Calls.CACHED_NAME));
+                                        contactInfo.putBoolean(CallHistoryFeature.IS_ACQUAINTANCE, calls.get(0).containsKey(CallLog.Calls.CACHED_NAME));
 
                                         total = 0.0;
                                         totalDuration = 0;
@@ -369,6 +376,7 @@ public class CallHistoryFeature extends Feature
         return false;
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         ArrayList<Bundle> windows = bundle.getParcelableArrayList(CallHistoryFeature.WINDOWS);
@@ -379,10 +387,10 @@ public class CallHistoryFeature extends Feature
         double total = window.getDouble(CallHistoryFeature.TOTAL);
         double stdDev = window.getDouble(CallHistoryFeature.STD_DEVIATION);
 
-        return String.format(context.getResources().getString(R.string.summary_call_history_probe), total, avgDuration,
-                stdDev);
+        return String.format(context.getResources().getString(R.string.summary_call_history_probe), total, avgDuration, stdDev);
     }
 
+    @Override
     public void disable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
@@ -392,4 +400,28 @@ public class CallHistoryFeature extends Feature
 
         e.commit();
     }
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
+    }
+
 }

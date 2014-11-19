@@ -2,6 +2,10 @@ package edu.northwestern.cbits.purple_robot_manager.probes.features;
 
 import java.util.Calendar;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +19,7 @@ import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 import com.luckycatlabs.sunrisesunset.dto.Location;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
 
@@ -34,6 +39,7 @@ public class SunriseSunsetFeature extends Feature
     private boolean _isEnabled = false;
     private boolean _isInited = false;
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         long now = System.currentTimeMillis();
@@ -59,31 +65,37 @@ public class SunriseSunsetFeature extends Feature
         return context.getResources().getString(stringId, diff);
     }
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getString(R.string.probe_external_environment_category);
     }
 
+    @Override
     protected String featureKey()
     {
         return SunriseSunsetFeature.FEATURE_KEY;
     }
 
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_sunrise_sunset_feature_desc);
     }
 
+    @Override
     public String name(Context context)
     {
         return "edu.northwestern.cbits.purple_robot_manager.probes.features.SunriseSunsetFeature";
     }
 
+    @Override
     public String title(Context context)
     {
         return context.getString(R.string.title_sunrise_sunset_feature);
     }
 
+    @Override
     public void enable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
@@ -94,6 +106,7 @@ public class SunriseSunsetFeature extends Feature
         e.commit();
     }
 
+    @Override
     public void disable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
@@ -104,6 +117,7 @@ public class SunriseSunsetFeature extends Feature
         e.commit();
     }
 
+    @Override
     public boolean isEnabled(Context context)
     {
         if (!this._isInited)
@@ -114,6 +128,7 @@ public class SunriseSunsetFeature extends Feature
 
             BroadcastReceiver receiver = new BroadcastReceiver()
             {
+                @Override
                 public void onReceive(final Context context, Intent intent)
                 {
                     Bundle extras = intent.getExtras();
@@ -127,6 +142,7 @@ public class SunriseSunsetFeature extends Feature
 
                         Runnable r = new Runnable()
                         {
+                            @Override
                             public void run()
                             {
                                 if (me._isEnabled == false)
@@ -188,5 +204,28 @@ public class SunriseSunsetFeature extends Feature
         }
 
         return this._isEnabled;
+    }
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
     }
 }

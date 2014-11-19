@@ -91,8 +91,7 @@ public class TouchEventsProbe extends Probe
 
         if (enabled)
         {
-            WindowManager wm = (WindowManager) this._context.getApplicationContext().getSystemService(
-                    Context.WINDOW_SERVICE);
+            WindowManager wm = (WindowManager) this._context.getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
 
             synchronized (wm)
             {
@@ -106,9 +105,7 @@ public class TouchEventsProbe extends Probe
                     params.width = 1; // WindowManager.LayoutParams.MATCH_PARENT;
                     params.gravity = Gravity.RIGHT | Gravity.BOTTOM;
                     params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
-                    params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                            | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
-                            | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH;
+                    params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH;
 
                     final TouchEventsProbe me = this;
 
@@ -154,8 +151,15 @@ public class TouchEventsProbe extends Probe
         {
             WindowManager wm = (WindowManager) this._context.getSystemService(Context.WINDOW_SERVICE);
 
-            if (this._overlay.isAttachedToWindow())
-                wm.removeView(this._overlay);
+            try
+            {
+                if (this._overlay.isAttachedToWindow())
+                    wm.removeView(this._overlay);
+            }
+            catch (NoSuchMethodError e)
+            {
+                LogManager.getInstance(this._context).logException(e);
+            }
 
             this._overlay = null;
         }
