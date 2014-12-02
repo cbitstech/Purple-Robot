@@ -1,5 +1,9 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -9,12 +13,13 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class NfcProbe extends Probe
 {
 
-    private static final String IS_ENABLED = "config_probe_network_enabled";
+    private static final String ENABLED = "config_probe_network_enabled";
     private static final boolean DEFAULT_ENABLED = true;
 
     @Override
@@ -42,7 +47,7 @@ public class NfcProbe extends Probe
 
         if (super.isEnabled(context))
         {
-            return prefs.getBoolean(NfcProbe.IS_ENABLED, NfcProbe.DEFAULT_ENABLED);
+            return prefs.getBoolean(NfcProbe.ENABLED, NfcProbe.DEFAULT_ENABLED);
         }
 
         return false;
@@ -60,7 +65,7 @@ public class NfcProbe extends Probe
 
         CheckBoxPreference enabled = new CheckBoxPreference(activity);
         enabled.setTitle(R.string.title_enable_probe);
-        enabled.setKey(NfcProbe.IS_ENABLED);
+        enabled.setKey(NfcProbe.ENABLED);
         enabled.setDefaultValue(NfcProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
@@ -80,7 +85,7 @@ public class NfcProbe extends Probe
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean(NfcProbe.IS_ENABLED, true);
+        e.putBoolean(NfcProbe.ENABLED, true);
 
         e.commit();
     }
@@ -91,7 +96,7 @@ public class NfcProbe extends Probe
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean(NfcProbe.IS_ENABLED, false);
+        e.putBoolean(NfcProbe.ENABLED, false);
 
         e.commit();
     }
@@ -102,5 +107,28 @@ public class NfcProbe extends Probe
         String tagId = bundle.getString("TAG_ID");
 
         return String.format(context.getResources().getString(R.string.summary_nfc_probe), tagId);
+    }
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
     }
 }

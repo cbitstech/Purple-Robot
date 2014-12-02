@@ -3,6 +3,10 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 import java.util.ArrayList;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +21,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class ShionProbe extends Probe
@@ -36,32 +41,39 @@ public class ShionProbe extends Probe
 
     private static final boolean DEFAULT_ENABLED = false;
 
+    private static final String ENABLED = "config_probe_shion_enabled";
+    private static final String FREQUENCY = "config_probe_shion_frequency";
+
     private BroadcastReceiver _receiver = null;
 
     private long _lastCheck = 0;
 
+    @Override
     public String name(Context context)
     {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.ShionProbe";
     }
 
+    @Override
     public String title(Context context)
     {
         return context.getString(R.string.title_shion_probe);
     }
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getResources().getString(R.string.probe_misc_category);
     }
 
+    @Override
     public boolean isEnabled(final Context context)
     {
         if (super.isEnabled(context))
         {
             SharedPreferences prefs = Probe.getPreferences(context);
 
-            if (prefs.getBoolean("config_probe_shion_enabled", ShionProbe.DEFAULT_ENABLED))
+            if (prefs.getBoolean(ShionProbe.ENABLED, ShionProbe.DEFAULT_ENABLED))
             {
                 if (this._receiver == null)
                 {
@@ -69,6 +81,7 @@ public class ShionProbe extends Probe
 
                     this._receiver = new BroadcastReceiver()
                     {
+                        @Override
                         public void onReceive(Context context, Intent intent)
                         {
                             Parcelable[] devices = intent.getParcelableArrayExtra(ShionProbe.DEVICES);
@@ -124,8 +137,7 @@ public class ShionProbe extends Probe
 
                 synchronized (this)
                 {
-                    long freq = Long
-                            .parseLong(prefs.getString("config_probe_shion_frequency", Probe.DEFAULT_FREQUENCY));
+                    long freq = Long.parseLong(prefs.getString(ShionProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
 
                     if (now - this._lastCheck > freq)
                     {
@@ -150,26 +162,29 @@ public class ShionProbe extends Probe
         return false;
     }
 
+    @Override
     public void enable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_shion_enabled", true);
+        e.putBoolean(ShionProbe.ENABLED, true);
 
         e.commit();
     }
 
+    @Override
     public void disable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_shion_enabled", false);
+        e.putBoolean(ShionProbe.ENABLED, false);
 
         e.commit();
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         int count = (int) bundle.getDouble("DEVICE_COUNT");
@@ -186,19 +201,21 @@ public class ShionProbe extends Probe
         return context.getString(R.string.summary_shion_probe, count);
     }
 
+    @Override
     public Map<String, Object> configuration(Context context)
     {
         Map<String, Object> map = super.configuration(context);
 
         SharedPreferences prefs = Probe.getPreferences(context);
 
-        long freq = Long.parseLong(prefs.getString("config_probe_shion_frequency", Probe.DEFAULT_FREQUENCY));
+        long freq = Long.parseLong(prefs.getString(ShionProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
 
         map.put(Probe.PROBE_FREQUENCY, freq);
 
         return map;
     }
 
+    @Override
     public void updateFromMap(Context context, Map<String, Object> params)
     {
         super.updateFromMap(context, params);
@@ -207,17 +224,23 @@ public class ShionProbe extends Probe
         {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
 
+            if (frequency instanceof Double)
+            {
+                frequency = Long.valueOf(((Double) frequency).longValue());
+            }
+
             if (frequency instanceof Long)
             {
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putString("config_probe_shion_frequency", frequency.toString());
+                e.putString(ShionProbe.FREQUENCY, frequency.toString());
                 e.commit();
             }
         }
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(PreferenceActivity activity)
     {
@@ -229,13 +252,13 @@ public class ShionProbe extends Probe
 
         CheckBoxPreference enabled = new CheckBoxPreference(activity);
         enabled.setTitle(R.string.title_enable_probe);
-        enabled.setKey("config_probe_shion_enabled");
+        enabled.setKey(ShionProbe.ENABLED);
         enabled.setDefaultValue(ShionProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
 
         ListPreference duration = new ListPreference(activity);
-        duration.setKey("config_probe_shion_frequency");
+        duration.setKey(ShionProbe.FREQUENCY);
         duration.setEntryValues(R.array.probe_satellite_frequency_values);
         duration.setEntries(R.array.probe_satellite_frequency_labels);
         duration.setTitle(R.string.probe_frequency_label);
@@ -248,8 +271,46 @@ public class ShionProbe extends Probe
         return screen;
     }
 
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_shion_probe_desc);
+    }
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+
+            JSONObject frequency = new JSONObject();
+            frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
+            values = new JSONArray();
+
+            String[] options = context.getResources().getStringArray(R.array.probe_satellite_frequency_values);
+
+            for (String option : options)
+            {
+                values.put(Long.parseLong(option));
+            }
+
+            frequency.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_FREQUENCY, frequency);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
     }
 }

@@ -16,7 +16,6 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
@@ -35,6 +34,7 @@ public abstract class ContinuousProbe extends Probe
     private boolean _lastEnableResult = false;
     private long _lastEnableCheck = 0;
 
+    @Override
     public void enable(Context context)
     {
         String key = this.getPreferenceKey();
@@ -47,6 +47,7 @@ public abstract class ContinuousProbe extends Probe
         e.commit();
     }
 
+    @Override
     public void disable(Context context)
     {
         String key = this.getPreferenceKey();
@@ -67,12 +68,13 @@ public abstract class ContinuousProbe extends Probe
         {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
 
+            // TODO: Replace string keys below...
+
             String key = this.getPreferenceKey();
             this._lastEnableResult = prefs.getBoolean("config_probes_enabled", false);
 
             if (this._lastEnableResult)
-                this._lastEnableResult = prefs.getBoolean("config_probe_" + key + "_enabled",
-                        ContinuousProbe.DEFAULT_ENABLED);
+                this._lastEnableResult = prefs.getBoolean("config_probe_" + key + "_enabled", ContinuousProbe.DEFAULT_ENABLED);
 
             this._lastEnableCheck = now;
         }
@@ -80,6 +82,7 @@ public abstract class ContinuousProbe extends Probe
         return this._lastEnableResult;
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(PreferenceActivity activity)
     {
@@ -120,6 +123,7 @@ public abstract class ContinuousProbe extends Probe
         return screen;
     }
 
+    @Override
     public Map<String, Object> configuration(Context context)
     {
         Map<String, Object> map = super.configuration(context);
@@ -129,6 +133,7 @@ public abstract class ContinuousProbe extends Probe
         return map;
     }
 
+    @Override
     public void updateFromMap(Context context, Map<String, Object> params)
     {
         super.updateFromMap(context, params);
@@ -170,6 +175,7 @@ public abstract class ContinuousProbe extends Probe
         }
     }
 
+    @Override
     public Bundle formattedBundle(Context context, Bundle bundle)
     {
         Bundle formatted = super.formattedBundle(context, bundle);
@@ -202,16 +208,19 @@ public abstract class ContinuousProbe extends Probe
 
     }
 
+    @Override
     public String title(Context context)
     {
         return context.getString(this.getTitleResource());
     }
 
+    @Override
     public String summary(Context context)
     {
         return context.getString(this.getSummaryResource());
     }
 
+    @Override
     @SuppressLint("Wakelock")
     public boolean isEnabled(Context context)
     {

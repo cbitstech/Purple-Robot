@@ -6,6 +6,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -18,10 +22,12 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.RealTimeProbeViewActivity;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("SimpleDateFormat")
@@ -35,9 +41,9 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
 
     public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.AccelerometerProbe";
 
-    private static final String PROBE_ACCEL_THRESHOLD = "config_probe_accelerometer_threshold";
-
     private static final String FREQUENCY = "config_probe_accelerometer_built_in_frequency";
+    private static final String ENABLED = "config_probe_accelerometer_built_in_enabled";
+    private static final String THRESHOLD = "config_probe_accelerometer_threshold";
 
     private long lastThresholdLookup = 0;
     private double lastThreshold = 0.5;
@@ -101,8 +107,7 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
 
             for (int i = 0; i < eventTimes.length; i++)
             {
-                String formatString = String.format(context.getString(R.string.display_gyroscope_reading), x[i], y[i],
-                        z[i]);
+                String formatString = String.format(context.getString(R.string.display_gyroscope_reading), x[i], y[i], z[i]);
 
                 double time = eventTimes[i];
 
@@ -122,8 +127,7 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
         }
         else if (eventTimes.length > 0)
         {
-            String formatString = String
-                    .format(context.getString(R.string.display_gyroscope_reading), x[0], y[0], z[0]);
+            String formatString = String.format(context.getString(R.string.display_gyroscope_reading), x[0], y[0], z[0]);
 
             double time = eventTimes[0];
 
@@ -167,10 +171,9 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
 
         if (super.isEnabled(context))
         {
-            if (prefs.getBoolean("config_probe_accelerometer_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
+            if (prefs.getBoolean(AccelerometerProbe.ENABLED, ContinuousProbe.DEFAULT_ENABLED))
             {
-                int frequency = Integer.parseInt(prefs.getString(AccelerometerProbe.FREQUENCY,
-                        ContinuousProbe.DEFAULT_FREQUENCY));
+                int frequency = Integer.parseInt(prefs.getString(AccelerometerProbe.FREQUENCY, ContinuousProbe.DEFAULT_FREQUENCY));
 
                 if (this._lastFrequency != frequency)
                 {
@@ -224,8 +227,7 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
         {
             SharedPreferences prefs = Probe.getPreferences(this._context);
 
-            this.lastThreshold = Double.parseDouble(prefs.getString(AccelerometerProbe.PROBE_ACCEL_THRESHOLD,
-                    AccelerometerProbe.DEFAULT_THRESHOLD));
+            this.lastThreshold = Double.parseDouble(prefs.getString(AccelerometerProbe.THRESHOLD, AccelerometerProbe.DEFAULT_THRESHOLD));
 
             this.lastThresholdLookup = now;
         }
@@ -258,9 +260,62 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
     {
         Map<String, Object> map = super.configuration(context);
 
-        map.put(ContinuousProbe.PROBE_THRESHOLD, this.lastThreshold);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        map.put(ContinuousProbe.PROBE_THRESHOLD, Double.parseDouble(prefs.getString(AccelerometerProbe.THRESHOLD, AccelerometerProbe.DEFAULT_THRESHOLD)));
 
         return map;
+    }
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+
+            JSONObject frequency = new JSONObject();
+            frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
+            values = new JSONArray();
+
+            String[] options = this._context.getResources().getStringArray(this.getResourceFrequencyValues());
+
+            for (String option : options)
+            {
+                values.put(Long.parseLong(option));
+            }
+
+            frequency.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_FREQUENCY, frequency);
+
+            JSONObject threshold = new JSONObject();
+            threshold.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_DOUBLE);
+            values = new JSONArray();
+
+            options = this._context.getResources().getStringArray(R.array.probe_accelerometer_threshold);
+
+            for (String option : options)
+            {
+                values.put(Double.parseDouble(option));
+            }
+
+            threshold.put(Probe.PROBE_VALUES, values);
+            settings.put(ContinuousProbe.PROBE_THRESHOLD, threshold);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
     }
 
     @Override
@@ -277,7 +332,7 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putString("config_probe_accelerometer_threshold", threshold.toString());
+                e.putString(AccelerometerProbe.THRESHOLD, threshold.toString());
                 e.commit();
             }
         }
@@ -289,7 +344,7 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
         PreferenceScreen screen = super.preferenceScreen(activity);
 
         ListPreference threshold = new ListPreference(activity);
-        threshold.setKey(AccelerometerProbe.PROBE_ACCEL_THRESHOLD);
+        threshold.setKey(AccelerometerProbe.THRESHOLD);
         threshold.setDefaultValue(AccelerometerProbe.DEFAULT_THRESHOLD);
         threshold.setEntryValues(R.array.probe_accelerometer_threshold);
         threshold.setEntries(R.array.probe_accelerometer_threshold_labels);
@@ -334,8 +389,7 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
                 }
 
                 double[] plotValues =
-                { timeBuffer[0] / 1000, valueBuffer[0][bufferIndex], valueBuffer[1][bufferIndex],
-                        valueBuffer[2][bufferIndex] };
+                { timeBuffer[0] / 1000, valueBuffer[0][bufferIndex], valueBuffer[1][bufferIndex], valueBuffer[2][bufferIndex] };
                 RealTimeProbeViewActivity.plotIfVisible(this.getTitleResource(), plotValues);
 
                 bufferIndex += 1;
@@ -397,8 +451,7 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
 
                             values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[0] / 1000));
 
-                            ProbeValuesProvider.getProvider(this._context).insertValue(this._context,
-                                    AccelerometerProbe.DB_TABLE, this.databaseSchema(), values);
+                            ProbeValuesProvider.getProvider(this._context).insertValue(this._context, AccelerometerProbe.DB_TABLE, this.databaseSchema(), values);
                         }
                     }
 
@@ -421,8 +474,7 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
         double yReading = bundle.getDoubleArray("Y")[0];
         double zReading = bundle.getDoubleArray("Z")[0];
 
-        return String.format(context.getResources().getString(R.string.summary_accelerator_probe), xReading, yReading,
-                zReading);
+        return String.format(context.getResources().getString(R.string.summary_accelerator_probe), xReading, yReading, zReading);
     }
 
     @Override
@@ -441,7 +493,7 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
     {
         SharedPreferences prefs = Probe.getPreferences(this._context);
 
-        return Double.parseDouble(prefs.getString(AccelerometerProbe.PROBE_ACCEL_THRESHOLD, "-1"));
+        return Double.parseDouble(prefs.getString(AccelerometerProbe.THRESHOLD, AccelerometerProbe.DEFAULT_THRESHOLD));
     }
 
     public void setThreshold(double threshold)
@@ -449,7 +501,7 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
         SharedPreferences prefs = Probe.getPreferences(this._context);
 
         Editor e = prefs.edit();
-        e.putString(AccelerometerProbe.PROBE_ACCEL_THRESHOLD, "0.0");
+        e.putString(AccelerometerProbe.THRESHOLD, "" + threshold);
         e.commit();
     }
 }

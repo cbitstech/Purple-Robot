@@ -82,21 +82,25 @@ public class RobotHealthProbe extends Probe
     private long _lastOffset = 0;
     private long _lastTimeCheck = 0;
 
+    @Override
     public String name(Context context)
     {
         return RobotHealthProbe.NAME;
     }
 
+    @Override
     public String title(Context context)
     {
         return context.getString(R.string.title_robot_probe);
     }
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getResources().getString(R.string.probe_device_info_category);
     }
 
+    @Override
     public void enable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
@@ -107,6 +111,7 @@ public class RobotHealthProbe extends Probe
         e.commit();
     }
 
+    @Override
     public void disable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
@@ -130,8 +135,7 @@ public class RobotHealthProbe extends Probe
             String[] toks = load.split(" ");
 
             long idle1 = Long.parseLong(toks[5]);
-            long cpu1 = Long.parseLong(toks[2]) + Long.parseLong(toks[3]) + Long.parseLong(toks[4])
-                    + Long.parseLong(toks[6]) + Long.parseLong(toks[7]) + Long.parseLong(toks[8]);
+            long cpu1 = Long.parseLong(toks[2]) + Long.parseLong(toks[3]) + Long.parseLong(toks[4]) + Long.parseLong(toks[6]) + Long.parseLong(toks[7]) + Long.parseLong(toks[8]);
 
             try
             {
@@ -149,8 +153,7 @@ public class RobotHealthProbe extends Probe
             toks = load.split(" ");
 
             long idle2 = Long.parseLong(toks[5]);
-            long cpu2 = Long.parseLong(toks[2]) + Long.parseLong(toks[3]) + Long.parseLong(toks[4])
-                    + Long.parseLong(toks[6]) + Long.parseLong(toks[7]) + Long.parseLong(toks[8]);
+            long cpu2 = Long.parseLong(toks[2]) + Long.parseLong(toks[3]) + Long.parseLong(toks[4]) + Long.parseLong(toks[6]) + Long.parseLong(toks[7]) + Long.parseLong(toks[8]);
 
             return (float) (cpu2 - cpu1) / ((cpu2 + idle2) - (cpu1 + idle1));
 
@@ -163,6 +166,7 @@ public class RobotHealthProbe extends Probe
         return 0;
     }
 
+    @Override
     public boolean isEnabled(final Context context)
     {
         final SharedPreferences prefs = Probe.getPreferences(context);
@@ -175,13 +179,11 @@ public class RobotHealthProbe extends Probe
             {
                 synchronized (this)
                 {
-                    long freq = Long
-                            .parseLong(prefs.getString("config_probe_robot_frequency", Probe.DEFAULT_FREQUENCY));
+                    long freq = Long.parseLong(prefs.getString("config_probe_robot_frequency", Probe.DEFAULT_FREQUENCY));
 
                     if (now - this._lastCheck > freq)
                     {
-                        OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(context,
-                                HttpUploadPlugin.class);
+                        OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(context, HttpUploadPlugin.class);
 
                         if (plugin != null && plugin instanceof HttpUploadPlugin)
                         {
@@ -191,6 +193,7 @@ public class RobotHealthProbe extends Probe
 
                             Runnable r = new Runnable()
                             {
+                                @Override
                                 @SuppressWarnings("deprecation")
                                 public void run()
                                 {
@@ -206,8 +209,7 @@ public class RobotHealthProbe extends Probe
 
                                     if (prefs.getBoolean("config_enable_data_server", false))
                                     {
-                                        OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(
-                                                context, HttpUploadPlugin.class);
+                                        OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(context, HttpUploadPlugin.class);
 
                                         if (plugin instanceof HttpUploadPlugin)
                                         {
@@ -217,8 +219,7 @@ public class RobotHealthProbe extends Probe
                                     }
                                     else
                                     {
-                                        OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(
-                                                context, StreamingJacksonUploadPlugin.class);
+                                        OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(context, StreamingJacksonUploadPlugin.class);
 
                                         if (plugin instanceof StreamingJacksonUploadPlugin)
                                         {
@@ -231,8 +232,7 @@ public class RobotHealthProbe extends Probe
 
                                     if (prefs.getBoolean("config_enable_data_server", false))
                                     {
-                                        OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(
-                                                context, HttpUploadPlugin.class);
+                                        OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(context, HttpUploadPlugin.class);
 
                                         if (plugin instanceof HttpUploadPlugin)
                                         {
@@ -242,8 +242,7 @@ public class RobotHealthProbe extends Probe
                                     }
                                     else
                                     {
-                                        OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(
-                                                context, StreamingJacksonUploadPlugin.class);
+                                        OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(context, StreamingJacksonUploadPlugin.class);
 
                                         if (plugin instanceof StreamingJacksonUploadPlugin)
                                         {
@@ -274,8 +273,7 @@ public class RobotHealthProbe extends Probe
 
                                     try
                                     {
-                                        PackageInfo info = context.getPackageManager().getPackageInfo(
-                                                context.getPackageName(), 0);
+                                        PackageInfo info = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
 
                                         bundle.putString(RobotHealthProbe.APP_VERSION_NAME, info.versionName);
                                         bundle.putInt(RobotHealthProbe.APP_VERSION_CODE, info.versionCode);
@@ -329,8 +327,7 @@ public class RobotHealthProbe extends Probe
 
                                     bundle.putLong(RobotHealthProbe.TIME_OFFSET_MS, me._lastOffset);
 
-                                    bundle.putLong(RobotHealthProbe.ACTIVE_RUNTIME, System.currentTimeMillis()
-                                            - ManagerService.startTimestamp);
+                                    bundle.putLong(RobotHealthProbe.ACTIVE_RUNTIME, System.currentTimeMillis() - ManagerService.startTimestamp);
                                     bundle.putFloat(RobotHealthProbe.CPU_USAGE, me.readUsage(context));
 
                                     try
@@ -350,8 +347,7 @@ public class RobotHealthProbe extends Probe
 
                                     try
                                     {
-                                        StatFs external = new StatFs(Environment.getExternalStorageDirectory()
-                                                .getAbsolutePath());
+                                        StatFs external = new StatFs(Environment.getExternalStorageDirectory().getAbsolutePath());
 
                                         int externalFree = external.getAvailableBlocks() * external.getBlockSize();
                                         int externalTotal = external.getBlockCount() * external.getBlockSize();
@@ -364,26 +360,22 @@ public class RobotHealthProbe extends Probe
                                         LogManager.getInstance(context).logException(e);
                                     }
 
-                                    if (prefs.getBoolean("config_probe_robot_scheme_config",
-                                            RobotHealthProbe.DEFAULT_SCHEME))
+                                    if (prefs.getBoolean("config_probe_robot_scheme_config", RobotHealthProbe.DEFAULT_SCHEME))
                                     {
                                         SchemeConfigFile file = new SchemeConfigFile(context);
 
                                         bundle.putString(RobotHealthProbe.SCHEME_CONFIG, file.toString());
                                     }
 
-                                    if (prefs.getBoolean("config_probe_robot_json_config",
-                                            RobotHealthProbe.DEFAULT_JAVASCRIPT))
+                                    if (prefs.getBoolean("config_probe_robot_json_config", RobotHealthProbe.DEFAULT_JAVASCRIPT))
                                     {
                                         JSONConfigFile file = new JSONConfigFile(context);
 
                                         bundle.putString(RobotHealthProbe.JSON_CONFIG, file.toString());
                                     }
 
-                                    bundle.putLong(RobotHealthProbe.LAST_BOOT,
-                                            prefs.getLong(BootUpReceiver.BOOT_KEY, 0));
-                                    bundle.putLong(RobotHealthProbe.LAST_HALT,
-                                            prefs.getLong(ShutdownReceiver.SHUTDOWN_KEY, 0));
+                                    bundle.putLong(RobotHealthProbe.LAST_BOOT, prefs.getLong(BootUpReceiver.BOOT_KEY, 0));
+                                    bundle.putLong(RobotHealthProbe.LAST_HALT, prefs.getLong(ShutdownReceiver.SHUTDOWN_KEY, 0));
 
                                     ArrayList<String> errors = new ArrayList<String>();
 
@@ -401,8 +393,7 @@ public class RobotHealthProbe extends Probe
                                     if (warnings.size() > 0)
                                         bundle.putStringArrayList("CHECK_WARNINGS", warnings);
 
-                                    bundle.putParcelableArrayList("TRIGGERS", TriggerManager.getInstance(context)
-                                            .allTriggersBundles(context));
+                                    bundle.putParcelableArrayList("TRIGGERS", TriggerManager.getInstance(context).allTriggersBundles(context));
 
                                     long later = System.currentTimeMillis();
 
@@ -429,29 +420,24 @@ public class RobotHealthProbe extends Probe
         return false;
     }
 
+    @Override
     public Bundle formattedBundle(Context context, Bundle bundle)
     {
         Bundle formatted = super.formattedBundle(context, bundle);
 
-        formatted.putLong(context.getString(R.string.robot_runtime_label),
-                bundle.getLong(RobotHealthProbe.ACTIVE_RUNTIME, 0));
-        formatted.putFloat(context.getString(R.string.robot_cpu_load_label),
-                bundle.getFloat(RobotHealthProbe.CPU_USAGE, 0));
-        formatted.putLong(context.getString(R.string.robot_time_offset_label),
-                bundle.getLong(RobotHealthProbe.TIME_OFFSET_MS, 0));
-        formatted.putInt(context.getString(R.string.robot_pending_count_label),
-                (int) bundle.getDouble(RobotHealthProbe.PENDING_COUNT, 0));
-        formatted.putLong(context.getString(R.string.robot_pending_size_label),
-                bundle.getLong(RobotHealthProbe.PENDING_SIZE, 0));
-        formatted.putLong(context.getString(R.string.robot_clear_time_label),
-                bundle.getLong(RobotHealthProbe.CLEAR_TIME, 0));
+        formatted.putLong(context.getString(R.string.robot_runtime_label), bundle.getLong(RobotHealthProbe.ACTIVE_RUNTIME, 0));
+        formatted.putFloat(context.getString(R.string.robot_cpu_load_label), bundle.getFloat(RobotHealthProbe.CPU_USAGE, 0));
+        formatted.putLong(context.getString(R.string.robot_time_offset_label), bundle.getLong(RobotHealthProbe.TIME_OFFSET_MS, 0));
+        formatted.putInt(context.getString(R.string.robot_pending_count_label), (int) bundle.getDouble(RobotHealthProbe.PENDING_COUNT, 0));
+        formatted.putLong(context.getString(R.string.robot_pending_size_label), bundle.getLong(RobotHealthProbe.PENDING_SIZE, 0));
+        formatted.putLong(context.getString(R.string.robot_clear_time_label), bundle.getLong(RobotHealthProbe.CLEAR_TIME, 0));
 
-        formatted.putString(context.getString(R.string.robot_version_label),
-                bundle.getString(RobotHealthProbe.APP_VERSION_NAME));
+        formatted.putString(context.getString(R.string.robot_version_label), bundle.getString(RobotHealthProbe.APP_VERSION_NAME));
 
         return formatted;
     };
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         int count = (int) bundle.getDouble(RobotHealthProbe.PENDING_COUNT);
@@ -469,6 +455,7 @@ public class RobotHealthProbe extends Probe
         return String.format(context.getResources().getString(R.string.summary_robot_probe), cpu, count, size, clear);
     }
 
+    @Override
     public Map<String, Object> configuration(Context context)
     {
         Map<String, Object> map = super.configuration(context);
@@ -484,6 +471,7 @@ public class RobotHealthProbe extends Probe
         return map;
     }
 
+    @Override
     public void updateFromMap(Context context, Map<String, Object> params)
     {
         super.updateFromMap(context, params);
@@ -518,11 +506,13 @@ public class RobotHealthProbe extends Probe
         e.commit();
     }
 
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_robot_probe_desc);
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(PreferenceActivity activity)
     {

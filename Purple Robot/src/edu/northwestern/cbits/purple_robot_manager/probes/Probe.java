@@ -44,6 +44,7 @@ public abstract class Probe
 
     public static final String PROBE_TYPE_LONG = "long";
     public static final String PROBE_TYPE_BOOLEAN = "boolean";
+    public static final Object PROBE_TYPE_DOUBLE = "double";
     public static final String PROBE_TYPE = "type";
     public static final String PROBE_VALUES = "values";
 
@@ -240,11 +241,11 @@ public abstract class Probe
         }
     }
 
-    // public abstract JSONObject fetchSettings(Context _context);
+    // public abstract JSONObject fetchSettings(Context context);
 
-    public JSONObject fetchSettings(Context _context)
+    public JSONObject fetchSettings(Context context)
     {
-        // TODO: Make abstract & implement across ALL probes...
+        // // TODO: Make abstract & implement across ALL probes...
 
         return null;
     }

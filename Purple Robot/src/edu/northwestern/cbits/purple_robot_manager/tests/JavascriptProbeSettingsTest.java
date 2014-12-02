@@ -49,7 +49,7 @@ public class JavascriptProbeSettingsTest extends RobotTestCase
 
                 if (probe != null)
                 {
-                    this.broadcastUpdate("Testing " + probe.shortName(this._context) + "...");
+                    this.broadcastUpdate("Testing " + probe.title(this._context) + "...");
 
                     JSONObject settings = probeDefs.get(name);
 
@@ -72,20 +72,16 @@ public class JavascriptProbeSettingsTest extends RobotTestCase
                             payload.put(Probe.PROBE_NAME, name);
                             payload.put(key, option);
 
-                            Object returned = BaseScriptEngine.runScript(this._context, "PurpleRobot.updateProbe("
-                                    + payload.toString().replace("\"", "'") + ");");
+                            Object returned = BaseScriptEngine.runScript(this._context, "PurpleRobot.updateProbe(" + payload.toString().replace("\"", "'") + ");");
 
-                            Assert.assertEquals("JSPS0-" + probe.shortName(this._context) + "-" + key + "-" + option,
-                                    returned.getClass(), Boolean.class);
-                            Assert.assertTrue("JSPS1-" + probe.shortName(this._context) + "-" + key + "-" + option,
-                                    ((Boolean) returned).booleanValue());
+                            Assert.assertEquals("JSPS0-" + probe.shortName(this._context) + "-" + key + "-" + option, returned.getClass(), Boolean.class);
+                            Assert.assertTrue("JSPS1-" + probe.shortName(this._context) + "-" + key + "-" + option, ((Boolean) returned).booleanValue());
 
                             Thread.sleep(2000);
 
                             Map<String, Object> config = probe.configuration(this._context);
 
-                            Assert.assertEquals("JSPS2-" + probe.shortName(this._context) + "-" + key + "-" + option,
-                                    config.get(key), option);
+                            Assert.assertEquals("JSPS2-" + probe.shortName(this._context) + "-" + key + "-" + option, config.get(key), option);
 
                             Thread.sleep(2000);
                         }
