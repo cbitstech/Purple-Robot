@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -43,10 +44,13 @@ public class StepCounterProbe extends Probe implements SensorEventListener
 
     private static final String STEP_COUNT = "STEP_COUNT";
 
+    private static final String ENABLED = "config_probe_step_counter_enabled";
+
     private float _steps = 0;
 
     private Context _context;
 
+    @Override
     public Intent viewIntent(Context context)
     {
         Intent i = new Intent(context, WebkitLandscapeActivity.class);
@@ -54,15 +58,16 @@ public class StepCounterProbe extends Probe implements SensorEventListener
         return i;
     }
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getResources().getString(R.string.probe_sensor_category);
     }
 
+    @Override
     public String contentSubtitle(Context context)
     {
-        Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(context, StepCounterProbe.DB_TABLE,
-                this.databaseSchema());
+        Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(context, StepCounterProbe.DB_TABLE, this.databaseSchema());
 
         int count = -1;
 
@@ -84,6 +89,7 @@ public class StepCounterProbe extends Probe implements SensorEventListener
         return schema;
     }
 
+    @Override
     public String getDisplayContent(Activity activity)
     {
         try
@@ -95,8 +101,7 @@ public class StepCounterProbe extends Probe implements SensorEventListener
             ArrayList<Double> battery = new ArrayList<Double>();
             ArrayList<Double> time = new ArrayList<Double>();
 
-            Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(activity,
-                    StepCounterProbe.DB_TABLE, this.databaseSchema());
+            Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(activity, StepCounterProbe.DB_TABLE, this.databaseSchema());
 
             int count = -1;
 
@@ -138,16 +143,19 @@ public class StepCounterProbe extends Probe implements SensorEventListener
         return null;
     }
 
+    @Override
     public String name(Context context)
     {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.StepCounterProbe";
     }
 
+    @Override
     public String title(Context context)
     {
         return context.getString(R.string.title_step_counter_probe);
     }
 
+    @Override
     @SuppressLint("InlinedApi")
     public boolean isEnabled(Context context)
     {
@@ -165,7 +173,7 @@ public class StepCounterProbe extends Probe implements SensorEventListener
 
         if (super.isEnabled(context))
         {
-            if (prefs.getBoolean("config_probe_step_counter_enabled", ContinuousProbe.DEFAULT_ENABLED))
+            if (prefs.getBoolean(StepCounterProbe.ENABLED, ContinuousProbe.DEFAULT_ENABLED))
             {
                 sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL, null);
 
@@ -176,26 +184,29 @@ public class StepCounterProbe extends Probe implements SensorEventListener
         return false;
     }
 
+    @Override
     public void enable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_step_counter_enabled", true);
+        e.putBoolean(StepCounterProbe.ENABLED, true);
 
         e.commit();
     }
 
+    @Override
     public void disable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_step_counter_enabled", false);
+        e.putBoolean(StepCounterProbe.ENABLED, false);
 
         e.commit();
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         double steps = bundle.getDouble(StepCounterProbe.STEP_COUNT);
@@ -203,11 +214,13 @@ public class StepCounterProbe extends Probe implements SensorEventListener
         return String.format(context.getResources().getString(R.string.summary_step_counter_probe), (int) steps);
     }
 
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_step_counter_probe_desc);
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(PreferenceActivity activity)
     {
@@ -219,7 +232,7 @@ public class StepCounterProbe extends Probe implements SensorEventListener
 
         CheckBoxPreference enabled = new CheckBoxPreference(activity);
         enabled.setTitle(R.string.title_enable_probe);
-        enabled.setKey("config_probe_step_counter_enabled");
+        enabled.setKey(StepCounterProbe.ENABLED);
         enabled.setDefaultValue(StepCounterProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
@@ -227,11 +240,13 @@ public class StepCounterProbe extends Probe implements SensorEventListener
         return screen;
     }
 
+    @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy)
     {
 
     }
 
+    @Override
     public void onSensorChanged(SensorEvent event)
     {
         float steps = event.values[0];
@@ -250,10 +265,33 @@ public class StepCounterProbe extends Probe implements SensorEventListener
             values.put(StepCounterProbe.STEPS_KEY, bundle.getFloat("STEPS"));
             values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(bundle.getLong("TIMESTAMP")));
 
-            ProbeValuesProvider.getProvider(this._context).insertValue(this._context, StepCounterProbe.DB_TABLE,
-                    this.databaseSchema(), values);
+            ProbeValuesProvider.getProvider(this._context).insertValue(this._context, StepCounterProbe.DB_TABLE, this.databaseSchema(), values);
 
             this._steps = steps;
         }
     }
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
+    }
+
 }

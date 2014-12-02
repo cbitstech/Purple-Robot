@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -33,44 +37,52 @@ public class SoftwareInformationProbe extends Probe
     private static final String INSTALLED_APP_COUNT = "INSTALLED_APP_COUNT";
 
     private static final boolean DEFAULT_ENABLED = true;
+    private static final String ENABLED = "config_probe_software_enabled";
+    private static final String FREQUENCY = "config_probe_software_frequency";
 
     private long _lastCheck = 0;
 
+    @Override
     public String name(Context context)
     {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.SoftwareInformationProbe";
     }
 
+    @Override
     public String title(Context context)
     {
         return context.getString(R.string.title_software_info_probe);
     }
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getResources().getString(R.string.probe_device_info_category);
     }
 
+    @Override
     public void enable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_software_enabled", true);
+        e.putBoolean(SoftwareInformationProbe.ENABLED, true);
 
         e.commit();
     }
 
+    @Override
     public void disable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_software_enabled", false);
+        e.putBoolean(SoftwareInformationProbe.ENABLED, false);
 
         e.commit();
     }
 
+    @Override
     public boolean isEnabled(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
@@ -79,12 +91,11 @@ public class SoftwareInformationProbe extends Probe
         {
             long now = System.currentTimeMillis();
 
-            if (prefs.getBoolean("config_probe_software_enabled", SoftwareInformationProbe.DEFAULT_ENABLED))
+            if (prefs.getBoolean(SoftwareInformationProbe.ENABLED, SoftwareInformationProbe.DEFAULT_ENABLED))
             {
                 synchronized (this)
                 {
-                    long freq = Long.parseLong(prefs.getString("config_probe_software_frequency",
-                            Probe.DEFAULT_FREQUENCY));
+                    long freq = Long.parseLong(prefs.getString(SoftwareInformationProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
 
                     if (now - this._lastCheck > freq)
                     {
@@ -111,8 +122,7 @@ public class SoftwareInformationProbe extends Probe
                                 {
                                     Bundle appBundle = new Bundle();
 
-                                    appBundle.putString(SoftwareInformationProbe.APP_NAME, info.loadLabel(pm)
-                                            .toString());
+                                    appBundle.putString(SoftwareInformationProbe.APP_NAME, info.loadLabel(pm).toString());
                                     appBundle.putString(SoftwareInformationProbe.PACKAGE_NAME, info.packageName);
 
                                     installed.add(appBundle);
@@ -144,6 +154,7 @@ public class SoftwareInformationProbe extends Probe
         return false;
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         String release = bundle.getString(SoftwareInformationProbe.RELEASE);
@@ -173,6 +184,7 @@ public class SoftwareInformationProbe extends Probe
         return bundle;
     }
 
+    @Override
     public Bundle formattedBundle(Context context, Bundle bundle)
     {
         Bundle formatted = super.formattedBundle(context, bundle);
@@ -184,25 +196,26 @@ public class SoftwareInformationProbe extends Probe
         Bundle appsBundle = this.bundleForAppArray(context, array);
 
         formatted.putBundle(String.format(context.getString(R.string.display_installed_apps_title), count), appsBundle);
-        formatted.putString(context.getString(R.string.display_android_version_title),
-                bundle.getString(SoftwareInformationProbe.RELEASE));
+        formatted.putString(context.getString(R.string.display_android_version_title), bundle.getString(SoftwareInformationProbe.RELEASE));
 
         return formatted;
     };
 
+    @Override
     public Map<String, Object> configuration(Context context)
     {
         Map<String, Object> map = super.configuration(context);
 
         SharedPreferences prefs = Probe.getPreferences(context);
 
-        long freq = Long.parseLong(prefs.getString("config_probe_software_frequency", Probe.DEFAULT_FREQUENCY));
+        long freq = Long.parseLong(prefs.getString(SoftwareInformationProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
 
         map.put(Probe.PROBE_FREQUENCY, freq);
 
         return map;
     }
 
+    @Override
     public void updateFromMap(Context context, Map<String, Object> params)
     {
         super.updateFromMap(context, params);
@@ -211,22 +224,28 @@ public class SoftwareInformationProbe extends Probe
         {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
 
+            if (frequency instanceof Double)
+            {
+                frequency = Long.valueOf(((Double) frequency).longValue());
+            }
+
             if (frequency instanceof Long)
             {
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
-
-                e.putString("config_probe_software_frequency", frequency.toString());
+                e.putString(SoftwareInformationProbe.FREQUENCY, frequency.toString());
                 e.commit();
             }
         }
     }
 
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_software_info_probe_desc);
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(PreferenceActivity activity)
     {
@@ -238,13 +257,13 @@ public class SoftwareInformationProbe extends Probe
 
         CheckBoxPreference enabled = new CheckBoxPreference(activity);
         enabled.setTitle(R.string.title_enable_probe);
-        enabled.setKey("config_probe_software_enabled");
+        enabled.setKey(SoftwareInformationProbe.ENABLED);
         enabled.setDefaultValue(SoftwareInformationProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
 
         ListPreference duration = new ListPreference(activity);
-        duration.setKey("config_probe_software_frequency");
+        duration.setKey(SoftwareInformationProbe.FREQUENCY);
         duration.setEntryValues(R.array.probe_low_frequency_values);
         duration.setEntries(R.array.probe_low_frequency_labels);
         duration.setTitle(R.string.probe_frequency_label);
@@ -253,5 +272,42 @@ public class SoftwareInformationProbe extends Probe
         screen.addPreference(duration);
 
         return screen;
+    }
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+
+            JSONObject frequency = new JSONObject();
+            frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
+            values = new JSONArray();
+
+            String[] options = context.getResources().getStringArray(R.array.probe_low_frequency_values);
+
+            for (String option : options)
+            {
+                values.put(Long.parseLong(option));
+            }
+
+            frequency.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_FREQUENCY, frequency);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
     }
 }
