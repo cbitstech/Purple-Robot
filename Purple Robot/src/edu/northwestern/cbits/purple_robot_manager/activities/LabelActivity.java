@@ -65,8 +65,9 @@ public class LabelActivity extends ActionBarActivity
     private double _timestamp = 0;
     private String _labelContext = null;
 
-    private HashMap<String, Object> _values = new HashMap<String, Object>();
+    private final HashMap<String, Object> _values = new HashMap<String, Object>();
 
+    @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
@@ -84,8 +85,9 @@ public class LabelActivity extends ActionBarActivity
 
         try
         {
-            JSONArray jsonLabels = new JSONArray(prefs.getString("list_label_values",
-                    "['Activity', 'Location', 'Social Context']"));
+            // TODO: Pull into strings.xml...
+
+            JSONArray jsonLabels = new JSONArray(prefs.getString("list_label_values", "['Activity', 'Location', 'Social Context']"));
 
             labels = new String[jsonLabels.length()];
 
@@ -157,6 +159,7 @@ public class LabelActivity extends ActionBarActivity
         e.commit();
     }
 
+    @Override
     protected void onNewIntent(Intent intent)
     {
         super.onNewIntent(intent);
@@ -164,6 +167,7 @@ public class LabelActivity extends ActionBarActivity
         this.setIntent(intent);
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     protected void onResume()
     {
@@ -254,8 +258,7 @@ public class LabelActivity extends ActionBarActivity
                     else
                         fieldName.setText(field);
 
-                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT,
-                            LayoutParams.WRAP_CONTENT);
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
                     params.setMargins(8, 24, 8, 8);
                     fieldName.setLayoutParams(params);
 
@@ -291,6 +294,7 @@ public class LabelActivity extends ActionBarActivity
 
                         seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
                         {
+                            @Override
                             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
                             {
                                 fieldName.setText(fieldPrompt + ": " + ((int) (min + progress)));
@@ -298,11 +302,13 @@ public class LabelActivity extends ActionBarActivity
                                 me._values.put(fieldLabel, Float.valueOf((float) (min + progress)));
                             }
 
+                            @Override
                             public void onStartTrackingTouch(SeekBar arg0)
                             {
 
                             }
 
+                            @Override
                             public void onStopTrackingTouch(SeekBar seekBar)
                             {
 
@@ -342,6 +348,7 @@ public class LabelActivity extends ActionBarActivity
 
                             radios.setOnCheckedChangeListener(new OnCheckedChangeListener()
                             {
+                                @Override
                                 public void onCheckedChanged(RadioGroup radios, int checkId)
                                 {
                                     if (checkId != -1)
@@ -373,8 +380,7 @@ public class LabelActivity extends ActionBarActivity
                         for (String saved : valuesList.split(";"))
                             savedValues.add(saved);
 
-                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                                android.R.layout.simple_dropdown_item_1line, savedValues);
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, savedValues);
                         textField.setAdapter(adapter);
                         textField.setThreshold(1);
 
@@ -384,16 +390,19 @@ public class LabelActivity extends ActionBarActivity
 
                         textField.addTextChangedListener(new TextWatcher()
                         {
+                            @Override
                             public void afterTextChanged(Editable s)
                             {
                                 me._values.put(fieldLabel, s.toString());
                             }
 
+                            @Override
                             public void beforeTextChanged(CharSequence s, int start, int count, int after)
                             {
 
                             }
 
+                            @Override
                             public void onTextChanged(CharSequence s, int start, int before, int count)
                             {
 
@@ -411,11 +420,11 @@ public class LabelActivity extends ActionBarActivity
             value.setVisibility(View.VISIBLE);
             remember.setVisibility(View.VISIBLE);
 
-            boolean rememberLabel = prefs
-                    .getBoolean(LabelActivity.REMEMBER_LABEL, LabelActivity.REMEMBER_LABEL_DEFAULT);
+            boolean rememberLabel = prefs.getBoolean(LabelActivity.REMEMBER_LABEL, LabelActivity.REMEMBER_LABEL_DEFAULT);
 
             remember.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
             {
+                @Override
                 public void onCheckedChanged(CompoundButton button, boolean checked)
                 {
 
@@ -426,6 +435,7 @@ public class LabelActivity extends ActionBarActivity
 
             remember.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
             {
+                @Override
                 public void onCheckedChanged(CompoundButton button, boolean checked)
                 {
                     Editor e = prefs.edit();
@@ -446,8 +456,7 @@ public class LabelActivity extends ActionBarActivity
                     value.setText(labelValue);
             }
 
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line,
-                    this.savedLabels());
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, this.savedLabels());
 
             label.setAdapter(adapter);
 
@@ -457,8 +466,7 @@ public class LabelActivity extends ActionBarActivity
                 payload.put("label", extras.getString(LabelActivity.LABEL_KEY));
             }
 
-            ArrayAdapter<String> valueAdapter = new ArrayAdapter<String>(this,
-                    android.R.layout.simple_dropdown_item_1line, this.savedValues());
+            ArrayAdapter<String> valueAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, this.savedValues());
             value.setAdapter(valueAdapter);
 
             value.requestFocus();
@@ -473,6 +481,7 @@ public class LabelActivity extends ActionBarActivity
         LogManager.getInstance(this).log("pr_label_prompt", payload);
     }
 
+    @Override
     protected void onPause()
     {
         super.onPause();
@@ -490,6 +499,7 @@ public class LabelActivity extends ActionBarActivity
         LogManager.getInstance(this).log("pr_label_dismissed", payload);
     }
 
+    @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
         MenuInflater inflater = this.getMenuInflater();
@@ -498,6 +508,7 @@ public class LabelActivity extends ActionBarActivity
         return true;
     }
 
+    @Override
     @SuppressLint("ValidFragment")
     public boolean onOptionsItemSelected(MenuItem item)
     {
@@ -572,8 +583,7 @@ public class LabelActivity extends ActionBarActivity
 
                 if (key != null && value != null && key.length() > 0 && value.length() > 0)
                 {
-                    boolean rememberLabel = prefs.getBoolean(LabelActivity.REMEMBER_LABEL,
-                            LabelActivity.REMEMBER_LABEL_DEFAULT);
+                    boolean rememberLabel = prefs.getBoolean(LabelActivity.REMEMBER_LABEL, LabelActivity.REMEMBER_LABEL_DEFAULT);
 
                     if (rememberLabel)
                     {
@@ -618,6 +628,7 @@ public class LabelActivity extends ActionBarActivity
 
                     DialogFragment dialog = new DialogFragment()
                     {
+                        @Override
                         public Dialog onCreateDialog(Bundle savedInstanceState)
                         {
                             AlertDialog.Builder builder = new AlertDialog.Builder(me);
@@ -625,6 +636,7 @@ public class LabelActivity extends ActionBarActivity
                             builder.setMessage(R.string.message_missing_label);
                             builder.setPositiveButton(R.string.button_ok, new OnClickListener()
                             {
+                                @Override
                                 public void onClick(DialogInterface dialog, int arg)
                                 {
 
