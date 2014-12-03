@@ -123,8 +123,7 @@ public class JavaScriptEngine extends BaseScriptEngine
         return this.broadcastIntent(action, JavaScriptEngine.nativeToMap(extras));
     }
 
-    public boolean updateWidget(final String title, final String message, final String applicationName,
-            final NativeObject launchParams, final String script)
+    public boolean updateWidget(final String title, final String message, final String applicationName, final NativeObject launchParams, final String script)
     {
         return this.updateWidget(title, message, applicationName, JavaScriptEngine.nativeToMap(launchParams), script);
     }
@@ -134,18 +133,14 @@ public class JavaScriptEngine extends BaseScriptEngine
         return this.launchApplication(applicationName, JavaScriptEngine.nativeToMap(launchParams), script);
     }
 
-    public boolean showApplicationLaunchNotification(String title, String message, String applicationName,
-            long displayWhen, boolean persistent, final NativeObject launchParams, final String script)
+    public boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen, boolean persistent, final NativeObject launchParams, final String script)
     {
-        return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen, persistent,
-                JavaScriptEngine.nativeToMap(launchParams), script);
+        return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen, persistent, JavaScriptEngine.nativeToMap(launchParams), script);
     }
 
-    public boolean showApplicationLaunchNotification(String title, String message, String applicationName,
-            long displayWhen, final NativeObject launchParams, final String script)
+    public boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen, final NativeObject launchParams, final String script)
     {
-        return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen,
-                JavaScriptEngine.nativeToMap(launchParams), script);
+        return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen, JavaScriptEngine.nativeToMap(launchParams), script);
     }
 
     public boolean updateTrigger(String triggerId, NativeObject nativeJson)
@@ -155,9 +150,11 @@ public class JavaScriptEngine extends BaseScriptEngine
 
     public void emitReading(String name, Object value)
     {
+        double now = System.currentTimeMillis();
+
         Bundle bundle = new Bundle();
         bundle.putString("PROBE", name);
-        bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+        bundle.putDouble("TIMESTAMP", now / 1000);
 
         if (value instanceof String)
             bundle.putString(Feature.FEATURE_VALUE, value.toString());
@@ -248,6 +245,7 @@ public class JavaScriptEngine extends BaseScriptEngine
         return json;
     }
 
+    @Override
     protected String language()
     {
         return "JavaScript";
@@ -309,6 +307,7 @@ public class JavaScriptEngine extends BaseScriptEngine
         return super.updateConfig(paramsMap);
     }
 
+    @Override
     public NativeArray fetchNamespaces()
     {
         List<String> namespaces = super.fetchNamespaces();
@@ -323,6 +322,7 @@ public class JavaScriptEngine extends BaseScriptEngine
         return new NativeArray(values);
     }
 
+    @Override
     public NativeArray fetchTriggerIds()
     {
         List<String> triggerIds = super.fetchTriggerIds();
@@ -337,6 +337,7 @@ public class JavaScriptEngine extends BaseScriptEngine
         return new NativeArray(values);
     }
 
+    @Override
     public NativeArray fetchSnapshotIds()
     {
         List<String> snapshotIds = super.fetchSnapshotIds();
@@ -351,6 +352,7 @@ public class JavaScriptEngine extends BaseScriptEngine
         return new NativeArray(values);
     }
 
+    @Override
     public NativeObject fetchSnapshot(String timestamp)
     {
         Map<String, Object> snapshot = super.fetchSnapshot(timestamp);
@@ -368,6 +370,7 @@ public class JavaScriptEngine extends BaseScriptEngine
         return JavaScriptEngine.mapToNative(this._jsContext, this._scope, map);
     }
 
+    @Override
     public NativeObject fetchTrigger(String id)
     {
         Map<String, Object> trigger = super.fetchTrigger(id);
@@ -399,6 +402,7 @@ public class JavaScriptEngine extends BaseScriptEngine
         return JavaScriptEngine.mapToNative(this._jsContext, this._scope, predictions);
     }
 
+    @Override
     public NativeObject fetchWidget(String identifier)
     {
         Map<String, Object> map = super.fetchWidget(identifier);
@@ -406,6 +410,7 @@ public class JavaScriptEngine extends BaseScriptEngine
         return JavaScriptEngine.mapToNative(this._jsContext, this._scope, map);
     }
 
+    @Override
     public NativeArray widgets()
     {
         List<String> widgets = super.widgets();
