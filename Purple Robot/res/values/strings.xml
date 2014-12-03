@@ -680,6 +680,10 @@
     <!-- Magnetic Field Statistics Probe -->
     <string name="title_magnetic_statistics_feature">Magnetic Field Statistics</string>
     
+    <!-- Pebble Probe -->
+    <string name="title_pebble_probe">Pebble Watch</string>
+    <string name="summary_pebble_probe_desc">Collects data from a Pebble smartwatch.</string>
+    
     <!-- Logging Strings -->
     <string name="title_log_upload_section">Network Logging Settings</string>
     <string name="logging_enabled">Enable Event Logging</string>

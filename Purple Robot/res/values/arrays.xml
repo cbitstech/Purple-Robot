@@ -80,6 +80,8 @@
         <item>builtin.ShionProbe</item>
         <item>builtin.SaintProbe</item>
         
+        <item>devices.PebbleProbe</item>
+        
         <item>builtin.TouchEventsProbe</item>
         <!-- <item>builtin.BluetoothReceiverProbe</item> -->
         <!-- <item>builtin.ZeroconfProbe</item> -->

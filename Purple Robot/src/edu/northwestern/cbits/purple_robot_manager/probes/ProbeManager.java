@@ -59,6 +59,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TouchEventsPro
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TwitterProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.VisibleSatelliteProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.WifiAccessPointsProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.devices.PebbleProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.AccelerometerBasicStatisticsFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.AccelerometerFrequencyFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.CallHistoryFeature;
@@ -570,6 +571,13 @@ public class ProbeManager
                 if (nfc.name(context).equalsIgnoreCase(name))
                     found = true;
             }
+            else if (probe instanceof PebbleProbe)
+            {
+                PebbleProbe pebble = (PebbleProbe) probe;
+
+                if (pebble.name(context).equalsIgnoreCase(name))
+                    found = true;
+            }
 
             if (found)
             {
@@ -691,8 +699,7 @@ public class ProbeManager
         ProbeManager._cachedProbes.clear();
     }
 
-    public static void addFeature(String title, String name, String script, String formatter, List<String> sources,
-            boolean b)
+    public static void addFeature(String title, String name, String script, String formatter, List<String> sources, boolean b)
     {
         if (ProbeManager._inited == false)
             return;
