@@ -11,10 +11,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-		<receiver android:enabled="true" android:name=".DataReceiver">
+		<!--  <receiver android:enabled="true" android:name=".DataReceiver">
 			<intent-filter>
 				<action android:name="com.getpebble.action.app.RECEIVE" />
 			</intent-filter>
-		</receiver>
+		</receiver> -->
     </application>
 </manifest>
