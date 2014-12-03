@@ -1,5 +1,2 @@
 include ':anthracite-clients-android'
 project(':anthracite-clients-android').projectDir = new File(settingsDir, '../anthracite-clients-android')
-
-include ':facebook-sdk'
-project(':facebook-sdk').projectDir = new File(settingsDir, '../facebook-android-sdk/facebook')

@@ -11,6 +11,11 @@ buildscript {
 apply plugin: 'android'
 
 android {
+    repositories {
+        mavenCentral()
+        maven { url "https://oss.sonatype.org/content/groups/public/" }
+    }
+
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -42,8 +47,9 @@ android {
         compile 'com.android.support:appcompat-v7:19.+'
         compile 'com.android.support:mediarouter-v7:19.+'
 	compile 'com.google.android.gms:play-services:6.+'
+        compile 'com.getpebble:pebblekit:2.6.0'
+        compile 'com.facebook.android:facebook-android-sdk:3.20.0'
         compile project(':anthracite-clients-android')
-        compile project(':facebook-sdk')
     	compile fileTree(dir: 'libs', include: '*.jar')
     }
 
