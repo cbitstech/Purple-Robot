@@ -4,3 +4,6 @@
 [submodule "anthracite-clients-android"]
 	path = anthracite-clients-android
 	url = https://github.com/cbitstech/anthracite-clients-android.git
+[submodule "pebble-android-sdk"]
+	path = pebble-android-sdk
+	url = https://github.com/pebble/pebble-android-sdk.git
