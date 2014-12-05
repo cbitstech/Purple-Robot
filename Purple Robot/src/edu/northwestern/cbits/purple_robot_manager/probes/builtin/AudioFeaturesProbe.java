@@ -4,6 +4,9 @@ import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.transform.DftNormalization;
 import org.apache.commons.math3.transform.FastFourierTransformer;
 import org.apache.commons.math3.transform.TransformType;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -17,6 +20,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class AudioFeaturesProbe extends Probe
@@ -87,8 +91,7 @@ public class AudioFeaturesProbe extends Probe
                     @SuppressWarnings("deprecation")
                     public void run()
                     {
-                        int bufferSize = AudioRecord.getMinBufferSize(44100, AudioFormat.CHANNEL_CONFIGURATION_MONO,
-                                AudioFormat.ENCODING_PCM_16BIT);
+                        int bufferSize = AudioRecord.getMinBufferSize(44100, AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT);
 
                         AudioRecord recorder = null;
 
@@ -99,9 +102,7 @@ public class AudioFeaturesProbe extends Probe
                         {
                             if (recorder == null)
                             {
-                                AudioRecord newRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC, rate,
-                                        AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT,
-                                        bufferSize);
+                                AudioRecord newRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC, rate, AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize);
 
                                 if (newRecorder.getState() == AudioRecord.STATE_INITIALIZED)
                                     recorder = newRecorder;
@@ -173,8 +174,7 @@ public class AudioFeaturesProbe extends Probe
                             }
 
                             bundle.putDouble("FREQUENCY", maxFrequency);
-                            bundle.putDouble("NORMALIZED_AVG_MAGNITUDE", (sampleSum / Short.MAX_VALUE)
-                                    / me.samples.length);
+                            bundle.putDouble("NORMALIZED_AVG_MAGNITUDE", (sampleSum / Short.MAX_VALUE) / me.samples.length);
                             bundle.putDouble("POWER", samplePower / me.samples.length);
 
                             me.transmitData(context, bundle);
@@ -237,5 +237,28 @@ public class AudioFeaturesProbe extends Probe
         double freq = bundle.getDouble("FREQUENCY");
 
         return String.format(context.getResources().getString(R.string.summary_audio_features_probe), freq);
+    }
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
     }
 }

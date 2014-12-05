@@ -4,6 +4,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -114,8 +118,7 @@ public class CommunicationEventProbe extends Probe
             {
                 synchronized (this)
                 {
-                    long freq = Long.parseLong(prefs.getString(CommunicationEventProbe.FREQUENCY,
-                            Probe.DEFAULT_FREQUENCY));
+                    long freq = Long.parseLong(prefs.getString(CommunicationEventProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
                     boolean doHash = prefs.getBoolean(CommunicationEventProbe.HASH_DATA, Probe.DEFAULT_HASH_DATA);
 
                     if (now - this._lastCheck > freq)
@@ -131,8 +134,7 @@ public class CommunicationEventProbe extends Probe
                             String[] args =
                             { "" + mostRecent };
 
-                            Cursor c = context.getContentResolver().query(CallLog.Calls.CONTENT_URI, null, selection,
-                                    args, "date");
+                            Cursor c = context.getContentResolver().query(CallLog.Calls.CONTENT_URI, null, selection, args, "date");
 
                             while (c.moveToNext())
                             {
@@ -143,8 +145,7 @@ public class CommunicationEventProbe extends Probe
                                 bundle.putString(CommunicationEventProbe.TYPE, CommunicationEventProbe.TYPE_PHONE);
 
                                 String numberName = c.getString(c.getColumnIndex(Calls.CACHED_NAME));
-                                String phoneNumber = PhoneNumberUtils.formatNumber(c.getString(c
-                                        .getColumnIndex(Calls.NUMBER)));
+                                String phoneNumber = PhoneNumberUtils.formatNumber(c.getString(c.getColumnIndex(Calls.NUMBER)));
 
                                 if (numberName == null)
                                     numberName = phoneNumber;
@@ -173,17 +174,14 @@ public class CommunicationEventProbe extends Probe
                                 if (callTime > newRecent)
                                     newRecent = callTime;
 
-                                bundle.putLong(CommunicationEventProbe.DURATION,
-                                        c.getLong(c.getColumnIndex(Calls.DURATION)));
+                                bundle.putLong(CommunicationEventProbe.DURATION, c.getLong(c.getColumnIndex(Calls.DURATION)));
 
                                 int callType = c.getInt(c.getColumnIndex(Calls.TYPE));
 
                                 if (callType == Calls.OUTGOING_TYPE)
-                                    bundle.putString(CommunicationEventProbe.DIRECTION,
-                                            CommunicationEventProbe.OUTGOING);
+                                    bundle.putString(CommunicationEventProbe.DIRECTION, CommunicationEventProbe.OUTGOING);
                                 else if (callType == Calls.INCOMING_TYPE)
-                                    bundle.putString(CommunicationEventProbe.DIRECTION,
-                                            CommunicationEventProbe.INCOMING);
+                                    bundle.putString(CommunicationEventProbe.DIRECTION, CommunicationEventProbe.INCOMING);
                                 else if (callType == Calls.MISSED_TYPE)
                                     bundle.putString(CommunicationEventProbe.DIRECTION, CommunicationEventProbe.MISSED);
                                 else
@@ -194,8 +192,7 @@ public class CommunicationEventProbe extends Probe
 
                             c.close();
 
-                            c = context.getContentResolver().query(Uri.parse("content://sms/inbox"), null, selection,
-                                    args, "date");
+                            c = context.getContentResolver().query(Uri.parse("content://sms/inbox"), null, selection, args, "date");
 
                             while (c.moveToNext())
                             {
@@ -206,8 +203,7 @@ public class CommunicationEventProbe extends Probe
                                 bundle.putString(CommunicationEventProbe.TYPE, CommunicationEventProbe.TYPE_SMS);
 
                                 String numberName = c.getString(c.getColumnIndex("person"));
-                                String phoneNumber = PhoneNumberUtils.formatNumber(c.getString(c
-                                        .getColumnIndex("address")));
+                                String phoneNumber = PhoneNumberUtils.formatNumber(c.getString(c.getColumnIndex("address")));
 
                                 if (numberName == null)
                                     numberName = phoneNumber;
@@ -243,8 +239,7 @@ public class CommunicationEventProbe extends Probe
 
                             c.close();
 
-                            c = context.getContentResolver().query(Uri.parse("content://sms/sent"), null, selection,
-                                    args, "date");
+                            c = context.getContentResolver().query(Uri.parse("content://sms/sent"), null, selection, args, "date");
 
                             while (c.moveToNext())
                             {
@@ -255,8 +250,7 @@ public class CommunicationEventProbe extends Probe
                                 bundle.putString(CommunicationEventProbe.TYPE, CommunicationEventProbe.TYPE_SMS);
 
                                 String numberName = c.getString(c.getColumnIndex("person"));
-                                String phoneNumber = PhoneNumberUtils.formatNumber(c.getString(c
-                                        .getColumnIndex("address")));
+                                String phoneNumber = PhoneNumberUtils.formatNumber(c.getString(c.getColumnIndex("address")));
 
                                 if (numberName == null)
                                     numberName = phoneNumber;
@@ -287,10 +281,8 @@ public class CommunicationEventProbe extends Probe
 
                                 bundle.putString(CommunicationEventProbe.DIRECTION, CommunicationEventProbe.OUTGOING);
 
-                                boolean retrieve = prefs.getBoolean(CommunicationEventProbe.RETRIEVE_DATA,
-                                        CommunicationEventProbe.DEFAULT_RETRIEVE);
-                                boolean encrypt = prefs.getBoolean(CommunicationEventProbe.ENCRYPT_DATA,
-                                        CommunicationEventProbe.DEFAULT_ENCRYPT);
+                                boolean retrieve = prefs.getBoolean(CommunicationEventProbe.RETRIEVE_DATA, CommunicationEventProbe.DEFAULT_RETRIEVE);
+                                boolean encrypt = prefs.getBoolean(CommunicationEventProbe.ENCRYPT_DATA, CommunicationEventProbe.DEFAULT_ENCRYPT);
 
                                 if (retrieve)
                                 {
@@ -346,8 +338,7 @@ public class CommunicationEventProbe extends Probe
 
         SimpleDateFormat format = new SimpleDateFormat("EEE, d MMM yyyy 'at' HH:mm");
 
-        return String.format(context.getResources().getString(R.string.summary_communication_events_probe), type, name,
-                format.format(new Date(timestamp)));
+        return String.format(context.getResources().getString(R.string.summary_communication_events_probe), type, name, format.format(new Date(timestamp)));
     }
 
     @Override
@@ -363,6 +354,12 @@ public class CommunicationEventProbe extends Probe
         boolean hash = prefs.getBoolean(CommunicationEventProbe.HASH_DATA, Probe.DEFAULT_HASH_DATA);
         map.put(Probe.HASH_DATA, hash);
 
+        boolean encrypt = prefs.getBoolean(CommunicationEventProbe.ENCRYPT_DATA, CommunicationEventProbe.DEFAULT_ENCRYPT);
+        map.put(CommunicationEventProbe.ENCRYPT_DATA, encrypt);
+
+        boolean retrieve = prefs.getBoolean(CommunicationEventProbe.RETRIEVE_DATA, CommunicationEventProbe.DEFAULT_RETRIEVE);
+        map.put(CommunicationEventProbe.RETRIEVE_DATA, retrieve);
+
         return map;
     }
 
@@ -374,6 +371,11 @@ public class CommunicationEventProbe extends Probe
         if (params.containsKey(Probe.PROBE_FREQUENCY))
         {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
+
+            if (frequency instanceof Double)
+            {
+                frequency = Long.valueOf(((Double) frequency).longValue());
+            }
 
             if (frequency instanceof Long)
             {
@@ -395,6 +397,34 @@ public class CommunicationEventProbe extends Probe
                 Editor e = prefs.edit();
 
                 e.putBoolean(CommunicationEventProbe.HASH_DATA, ((Boolean) hash).booleanValue());
+                e.commit();
+            }
+        }
+
+        if (params.containsKey(CommunicationEventProbe.RETRIEVE_DATA))
+        {
+            Object retrieve = params.get(CommunicationEventProbe.RETRIEVE_DATA);
+
+            if (retrieve instanceof Boolean)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putBoolean(CommunicationEventProbe.RETRIEVE_DATA, ((Boolean) retrieve).booleanValue());
+                e.commit();
+            }
+        }
+
+        if (params.containsKey(CommunicationEventProbe.ENCRYPT_DATA))
+        {
+            Object encrypt = params.get(CommunicationEventProbe.ENCRYPT_DATA);
+
+            if (encrypt instanceof Boolean)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putBoolean(CommunicationEventProbe.ENCRYPT_DATA, ((Boolean) encrypt).booleanValue());
                 e.commit();
             }
         }
@@ -494,5 +524,58 @@ public class CommunicationEventProbe extends Probe
         screen.addPreference(calibrate);
 
         return screen;
+    }
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+
+            JSONObject encrypt = new JSONObject();
+            encrypt.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            encrypt.put(Probe.PROBE_VALUES, values);
+            settings.put(CommunicationEventProbe.ENCRYPT_DATA, encrypt);
+
+            JSONObject retrieve = new JSONObject();
+            retrieve.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            retrieve.put(Probe.PROBE_VALUES, values);
+            settings.put(CommunicationEventProbe.RETRIEVE_DATA, retrieve);
+
+            JSONObject hash = new JSONObject();
+            hash.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            hash.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.HASH_DATA, hash);
+
+            JSONObject frequency = new JSONObject();
+            frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
+            values = new JSONArray();
+
+            String[] options = context.getResources().getStringArray(R.array.probe_low_frequency_values);
+
+            for (String option : options)
+            {
+                values.put(Long.parseLong(option));
+            }
+
+            frequency.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_FREQUENCY, frequency);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
     }
 }

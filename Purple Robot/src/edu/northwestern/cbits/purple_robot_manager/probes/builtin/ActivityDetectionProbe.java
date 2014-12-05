@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +31,7 @@ import com.google.android.gms.location.DetectedActivity;
 
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks, OnConnectionFailedListener
@@ -37,6 +42,7 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
     private static final String ACTIVITY_CONFIDENCE = "ACTIVITY_CONFIDENCE";
 
     private static final String FREQUENCY = "config_probe_activity_detection_frequency";
+    private static final String ENABLED = "config_probe_activity_detection_enabled";
 
     private static ActivityRecognitionClient _activityDetectionClient = null;
     private Context _context = null;
@@ -67,7 +73,7 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_activity_detection_enabled", true);
+        e.putBoolean(ActivityDetectionProbe.ENABLED, true);
 
         e.commit();
     }
@@ -78,7 +84,7 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_activity_detection_enabled", false);
+        e.putBoolean(ActivityDetectionProbe.ENABLED, false);
 
         e.commit();
     }
@@ -94,13 +100,11 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
             this._context = context.getApplicationContext();
 
         if (enabled)
-            enabled = prefs.getBoolean("config_probe_activity_detection_enabled",
-                    ActivityDetectionProbe.DEFAULT_ENABLED);
+            enabled = prefs.getBoolean(ActivityDetectionProbe.ENABLED, ActivityDetectionProbe.DEFAULT_ENABLED);
 
         if (enabled)
         {
-            long interval = Long.parseLong(prefs.getString("config_probe_activity_detection_frequency",
-                    Probe.DEFAULT_FREQUENCY));
+            long interval = Long.parseLong(prefs.getString(ActivityDetectionProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
 
             if (interval != this._lastFreq && ActivityDetectionProbe._activityDetectionClient != null)
             {
@@ -121,8 +125,7 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
 
                 if (ConnectionResult.SUCCESS == resultCode)
                 {
-                    ActivityDetectionProbe._activityDetectionClient = new ActivityRecognitionClient(
-                            context.getApplicationContext(), this, this);
+                    ActivityDetectionProbe._activityDetectionClient = new ActivityRecognitionClient(context.getApplicationContext(), this, this);
 
                     ActivityDetectionProbe._activityDetectionClient.connect();
                 }
@@ -149,8 +152,7 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
         boolean enabled = prefs.getBoolean("config_probes_enabled", false);
 
         if (enabled)
-            enabled = prefs.getBoolean("config_probe_activity_detection_enabled",
-                    ActivityDetectionProbe.DEFAULT_ENABLED);
+            enabled = prefs.getBoolean(ActivityDetectionProbe.ENABLED, ActivityDetectionProbe.DEFAULT_ENABLED);
 
         if (enabled && ActivityRecognitionResult.hasResult(intent))
         {
@@ -247,6 +249,11 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
         {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
 
+            if (frequency instanceof Double)
+            {
+                frequency = Long.valueOf(((Double) frequency).longValue());
+            }
+
             if (frequency instanceof Long)
             {
                 SharedPreferences prefs = Probe.getPreferences(context);
@@ -270,7 +277,7 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
 
         CheckBoxPreference enabled = new CheckBoxPreference(activity);
         enabled.setTitle(R.string.title_enable_probe);
-        enabled.setKey("config_probe_activity_detection_enabled");
+        enabled.setKey(ActivityDetectionProbe.ENABLED);
         enabled.setDefaultValue(ActivityDetectionProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
@@ -288,6 +295,43 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
     }
 
     @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+
+            JSONObject frequency = new JSONObject();
+            frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
+            values = new JSONArray();
+
+            String[] options = this._context.getResources().getStringArray(R.array.probe_activity_recognition_frequency_values);
+
+            for (String option : options)
+            {
+                values.put(Long.parseLong(option));
+            }
+
+            frequency.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_FREQUENCY, frequency);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
+    }
+
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_activity_detection_probe_desc);
@@ -301,8 +345,7 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
         long interval = Long.parseLong(prefs.getString(ActivityDetectionProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
 
         Intent intent = new Intent(ManagerService.GOOGLE_PLAY_ACTIVITY_DETECTED);
-        PendingIntent pendingIntent = PendingIntent.getService(this._context, 0, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getService(this._context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         if (ActivityDetectionProbe._activityDetectionClient.isConnected())
             ActivityDetectionProbe._activityDetectionClient.requestActivityUpdates(interval, pendingIntent);

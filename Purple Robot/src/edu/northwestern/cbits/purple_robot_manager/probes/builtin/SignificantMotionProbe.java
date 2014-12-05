@@ -4,6 +4,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -21,6 +25,7 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class SignificantMotionProbe extends Probe
@@ -186,5 +191,40 @@ public class SignificantMotionProbe extends Probe
         screen.addPreference(enabled);
 
         return screen;
+    }
+
+    @SuppressLint("InlinedApi")
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) == false)
+        {
+            SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+            Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION);
+
+            if (sensor == null)
+                return settings;
+        }
+        else
+            return settings;
+
+        try
+        {
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
     }
 }

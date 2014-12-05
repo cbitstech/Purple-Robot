@@ -36,6 +36,8 @@ public class LightProbe extends Continuous1DProbe implements SensorEventListener
 
     public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.LightProbe";
 
+    private static final String THRESHOLD = "config_probe_light_threshold";
+
     private static int BUFFER_SIZE = 128;
 
     private static String[] fieldNames =
@@ -46,8 +48,8 @@ public class LightProbe extends Continuous1DProbe implements SensorEventListener
     private long lastThresholdLookup = 0;
     private double lastThreshold = 10.0;
 
-    private float valueBuffer[][] = new float[1][BUFFER_SIZE];
-    private double timeBuffer[] = new double[BUFFER_SIZE];
+    private final float valueBuffer[][] = new float[1][BUFFER_SIZE];
+    private final double timeBuffer[] = new double[BUFFER_SIZE];
 
     private Map<String, String> _schema = null;
 
@@ -55,15 +57,16 @@ public class LightProbe extends Continuous1DProbe implements SensorEventListener
 
     private int _lastFrequency = -1;
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getString(R.string.probe_sensor_category);
     }
 
+    @Override
     public String contentSubtitle(Context context)
     {
-        Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(context, LightProbe.DB_TABLE,
-                this.databaseSchema());
+        Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(context, LightProbe.DB_TABLE, this.databaseSchema());
 
         int count = -1;
 
@@ -76,6 +79,7 @@ public class LightProbe extends Continuous1DProbe implements SensorEventListener
         return String.format(context.getString(R.string.display_item_count), count);
     }
 
+    @Override
     public Map<String, String> databaseSchema()
     {
         if (this._schema == null)
@@ -88,6 +92,7 @@ public class LightProbe extends Continuous1DProbe implements SensorEventListener
         return this._schema;
     }
 
+    @Override
     public Bundle formattedBundle(Context context, Bundle bundle)
     {
         Bundle formatted = super.formattedBundle(context, bundle);
@@ -140,24 +145,27 @@ public class LightProbe extends Continuous1DProbe implements SensorEventListener
         return formatted;
     };
 
+    @Override
     public long getFrequency()
     {
         SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
 
-        return Long.parseLong(prefs.getString("config_probe_light_built_in_frequency",
-                ContinuousProbe.DEFAULT_FREQUENCY));
+        return Long.parseLong(prefs.getString("config_probe_light_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
     }
 
+    @Override
     public String name(Context context)
     {
         return LightProbe.NAME;
     }
 
+    @Override
     public int getTitleResource()
     {
         return R.string.title_light_probe;
     }
 
+    @Override
     public boolean isEnabled(Context context)
     {
         SharedPreferences prefs = ContinuousProbe.getPreferences(context);
@@ -171,8 +179,7 @@ public class LightProbe extends Continuous1DProbe implements SensorEventListener
         {
             if (prefs.getBoolean("config_probe_light_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
             {
-                int frequency = Integer.parseInt(prefs.getString("config_probe_light_built_in_frequency",
-                        ContinuousProbe.DEFAULT_FREQUENCY));
+                int frequency = Integer.parseInt(prefs.getString("config_probe_light_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
 
                 if (this._lastFrequency != frequency)
                 {
@@ -215,15 +222,14 @@ public class LightProbe extends Continuous1DProbe implements SensorEventListener
 
     }
 
+    @Override
     protected boolean passesThreshold(SensorEvent event)
     {
         long now = System.currentTimeMillis();
 
         if (now - this.lastThresholdLookup > 5000)
         {
-            SharedPreferences prefs = Probe.getPreferences(this._context);
-            this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_light_threshold",
-                    LightProbe.DEFAULT_THRESHOLD));
+            this.lastThreshold = this.getThreshold();
 
             this.lastThresholdLookup = now;
         }
@@ -241,15 +247,7 @@ public class LightProbe extends Continuous1DProbe implements SensorEventListener
         return passes;
     }
 
-    public Map<String, Object> configuration(Context context)
-    {
-        Map<String, Object> map = super.configuration(context);
-
-        map.put(ContinuousProbe.PROBE_THRESHOLD, this.lastThreshold);
-
-        return map;
-    }
-
+    @Override
     public void updateFromMap(Context context, Map<String, Object> params)
     {
         super.updateFromMap(context, params);
@@ -263,18 +261,19 @@ public class LightProbe extends Continuous1DProbe implements SensorEventListener
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putString("config_probe_light_threshold", threshold.toString());
+                e.putString(LightProbe.THRESHOLD, threshold.toString());
                 e.commit();
             }
         }
     }
 
+    @Override
     public PreferenceScreen preferenceScreen(PreferenceActivity activity)
     {
         PreferenceScreen screen = super.preferenceScreen(activity);
 
         ListPreference threshold = new ListPreference(activity);
-        threshold.setKey("config_probe_light_threshold");
+        threshold.setKey(LightProbe.THRESHOLD);
         threshold.setDefaultValue(LightProbe.DEFAULT_THRESHOLD);
         threshold.setEntryValues(R.array.probe_light_threshold);
         threshold.setEntries(R.array.probe_light_threshold_labels);
@@ -286,6 +285,7 @@ public class LightProbe extends Continuous1DProbe implements SensorEventListener
         return screen;
     }
 
+    @Override
     @SuppressLint("NewApi")
     public void onSensorChanged(SensorEvent event)
     {
@@ -370,8 +370,7 @@ public class LightProbe extends Continuous1DProbe implements SensorEventListener
 
                             values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[j] / 1000));
 
-                            ProbeValuesProvider.getProvider(this._context).insertValue(this._context,
-                                    LightProbe.DB_TABLE, this.databaseSchema(), values);
+                            ProbeValuesProvider.getProvider(this._context).insertValue(this._context, LightProbe.DB_TABLE, this.databaseSchema(), values);
                         }
                     }
 
@@ -381,11 +380,13 @@ public class LightProbe extends Continuous1DProbe implements SensorEventListener
         }
     }
 
+    @Override
     public String getPreferenceKey()
     {
         return "light_built_in";
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         double lux = bundle.getDoubleArray(LIGHT_KEY)[0];
@@ -393,6 +394,7 @@ public class LightProbe extends Continuous1DProbe implements SensorEventListener
         return String.format(context.getResources().getString(R.string.summary_light_probe), lux);
     }
 
+    @Override
     public int getSummaryResource()
     {
         return R.string.summary_light_probe_desc;
@@ -402,5 +404,19 @@ public class LightProbe extends Continuous1DProbe implements SensorEventListener
     protected String tableName()
     {
         return LightProbe.DB_TABLE;
+    }
+
+    @Override
+    protected double getThreshold()
+    {
+        SharedPreferences prefs = Probe.getPreferences(this._context);
+
+        return Double.parseDouble(prefs.getString(LightProbe.THRESHOLD, LightProbe.DEFAULT_THRESHOLD));
+    }
+
+    @Override
+    protected int getResourceThresholdValues()
+    {
+        return R.array.probe_light_threshold;
     }
 }

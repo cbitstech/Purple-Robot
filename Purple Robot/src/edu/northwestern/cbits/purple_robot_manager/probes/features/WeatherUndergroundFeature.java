@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -44,11 +45,13 @@ public class WeatherUndergroundFeature extends Feature
     private boolean _isInited = false;
     private boolean _isEnabled = false;
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getString(R.string.probe_external_environment_category);
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         String weather = bundle.getString(WeatherUndergroundFeature.WEATHER);
@@ -58,26 +61,31 @@ public class WeatherUndergroundFeature extends Feature
         return context.getResources().getString(R.string.summary_weather_underground_probe, weather, temp, station);
     }
 
+    @Override
     protected String featureKey()
     {
         return WeatherUndergroundFeature.FEATURE_KEY;
     }
 
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_weather_underground_feature_desc);
     }
 
+    @Override
     public String name(Context context)
     {
         return "edu.northwestern.cbits.purple_robot_manager.probes.features.WeatherUndergroundFeature";
     }
 
+    @Override
     public String title(Context context)
     {
         return context.getString(R.string.title_weather_underground_feature);
     }
 
+    @Override
     public void enable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
@@ -97,6 +105,7 @@ public class WeatherUndergroundFeature extends Feature
         return prefs.getLong("config_last_weather_underground_check", 0);
     }
 
+    @Override
     public void disable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
@@ -107,6 +116,7 @@ public class WeatherUndergroundFeature extends Feature
         e.commit();
     }
 
+    @Override
     public boolean isEnabled(Context context)
     {
         if (!this._isInited)
@@ -117,6 +127,7 @@ public class WeatherUndergroundFeature extends Feature
 
             BroadcastReceiver receiver = new BroadcastReceiver()
             {
+                @Override
                 public void onReceive(final Context context, Intent intent)
                 {
                     Bundle extras = intent.getExtras();
@@ -147,13 +158,12 @@ public class WeatherUndergroundFeature extends Feature
 
                             Runnable r = new Runnable()
                             {
+                                @Override
                                 public void run()
                                 {
                                     try
                                     {
-                                        URL u = new URL(
-                                                "http://api.wunderground.com/api/eb50926364bb4c4f/conditions/q/"
-                                                        + latitude + "," + longitude + ".json");
+                                        URL u = new URL("http://api.wunderground.com/api/eb50926364bb4c4f/conditions/q/" + latitude + "," + longitude + ".json");
 
                                         HttpURLConnection conn = (HttpURLConnection) u.openConnection();
 
@@ -262,5 +272,28 @@ public class WeatherUndergroundFeature extends Feature
         }
 
         return this._isEnabled;
+    }
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
     }
 }

@@ -2,6 +2,10 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -17,6 +21,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public abstract class ContinuousProbe extends Probe
@@ -129,9 +134,12 @@ public abstract class ContinuousProbe extends Probe
         Map<String, Object> map = super.configuration(context);
 
         map.put(Probe.PROBE_FREQUENCY, this.getFrequency());
+        map.put(ContinuousProbe.PROBE_THRESHOLD, this.getThreshold());
 
         return map;
     }
+
+    protected abstract double getThreshold();
 
     @Override
     public void updateFromMap(Context context, Map<String, Object> params)
@@ -170,6 +178,42 @@ public abstract class ContinuousProbe extends Probe
                 Editor e = prefs.edit();
 
                 e.putString(key, frequency.toString());
+                e.commit();
+            }
+        }
+
+        if (params.containsKey(ContinuousProbe.PROBE_THRESHOLD))
+        {
+            Object threshold = params.get(ContinuousProbe.PROBE_THRESHOLD);
+
+            if (threshold instanceof Long || threshold instanceof Integer)
+            {
+                String key = "config_probe_" + this.getPreferenceKey() + "_threshold";
+
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString(key, "" + threshold);
+                e.commit();
+            }
+            if (threshold instanceof Double)
+            {
+                String key = "config_probe_" + this.getPreferenceKey() + "_threshold";
+
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString(key, "" + threshold);
+                e.commit();
+            }
+            else if (threshold instanceof String)
+            {
+                String key = "config_probe_" + this.getPreferenceKey() + "_threshold";
+
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString(key, "" + threshold);
                 e.commit();
             }
         }
@@ -265,4 +309,67 @@ public abstract class ContinuousProbe extends Probe
 
         return enabled;
     }
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+
+            int frequencyValues = this.getResourceFrequencyValues();
+
+            if (frequencyValues != -1)
+            {
+                JSONObject frequency = new JSONObject();
+                frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
+                values = new JSONArray();
+
+                String[] options = this._context.getResources().getStringArray(frequencyValues);
+
+                for (String option : options)
+                {
+                    values.put(Long.parseLong(option));
+                }
+
+                frequency.put(Probe.PROBE_VALUES, values);
+                settings.put(Probe.PROBE_FREQUENCY, frequency);
+            }
+
+            int thresholdValues = this.getResourceThresholdValues();
+
+            if (thresholdValues != -1)
+            {
+                JSONObject threshold = new JSONObject();
+                threshold.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_DOUBLE);
+                values = new JSONArray();
+
+                String[] options = this._context.getResources().getStringArray(thresholdValues);
+
+                for (String option : options)
+                {
+                    values.put(Double.parseDouble(option));
+                }
+
+                threshold.put(Probe.PROBE_VALUES, values);
+                settings.put(ContinuousProbe.PROBE_THRESHOLD, threshold);
+            }
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
+    }
+
+    protected abstract int getResourceThresholdValues();
 }

@@ -1,11 +1,10 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
-import java.util.Map;
+import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
@@ -13,7 +12,6 @@ import android.os.Build;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
-
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -25,10 +23,14 @@ public class GeomagneticRotationProbe extends RotationProbe
 
     public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.GeomagneticRotationProbe";
 
+    private static final String THRESHOLD = "config_probe_geomagnetic_rotation_built_in_threshold";
+    private static final String FREQUENCY = "config_probe_geomagnetic_rotation_built_in_frequency";
+    private static final String ENABLED = "config_probe_geomagnetic_rotation_built_in_enabled";
+
+    @Override
     public String contentSubtitle(Context context)
     {
-        Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(context, GeomagneticRotationProbe.DB_TABLE,
-                this.databaseSchema());
+        Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(context, GeomagneticRotationProbe.DB_TABLE, this.databaseSchema());
 
         int count = -1;
 
@@ -41,29 +43,44 @@ public class GeomagneticRotationProbe extends RotationProbe
         return String.format(context.getString(R.string.display_item_count), count);
     }
 
+    @Override
     public long getFrequency()
     {
         SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
 
-        return Long.parseLong(prefs.getString("config_probe_geomagnetic_rotation_built_in_frequency",
-                ContinuousProbe.DEFAULT_FREQUENCY));
+        return Long.parseLong(prefs.getString(GeomagneticRotationProbe.FREQUENCY, ContinuousProbe.DEFAULT_FREQUENCY));
     }
 
+    @Override
     public String name(Context context)
     {
         return GeomagneticRotationProbe.NAME;
     }
 
+    @Override
     public int getTitleResource()
     {
         return R.string.title_geomagnetic_rotation_probe;
     }
 
+    @Override
     protected String dbTable()
     {
         return GeomagneticRotationProbe.DB_TABLE;
     }
 
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        if (Build.VERSION.SDK_INT < 19)
+            return settings;
+
+        return super.fetchSettings(context);
+    }
+
+    @Override
     @SuppressLint("InlinedApi")
     public boolean isEnabled(Context context)
     {
@@ -79,10 +96,9 @@ public class GeomagneticRotationProbe extends RotationProbe
 
         if (super.isSuperEnabled(context))
         {
-            if (prefs.getBoolean("config_probe_geomagnetic_rotation_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
+            if (prefs.getBoolean(GeomagneticRotationProbe.ENABLED, ContinuousProbe.DEFAULT_ENABLED))
             {
-                int frequency = Integer.parseInt(prefs.getString(
-                        "config_probe_geomagnetic_rotation_built_in_frequency", ContinuousProbe.DEFAULT_FREQUENCY));
+                int frequency = Integer.parseInt(prefs.getString(GeomagneticRotationProbe.FREQUENCY, ContinuousProbe.DEFAULT_FREQUENCY));
 
                 if (this._lastFrequency != frequency)
                 {
@@ -127,33 +143,15 @@ public class GeomagneticRotationProbe extends RotationProbe
         return false;
     }
 
-    public void updateFromMap(Context context, Map<String, Object> params)
-    {
-        super.updateFromMap(context, params);
-
-        if (params.containsKey(ContinuousProbe.PROBE_THRESHOLD))
-        {
-            Object threshold = params.get(ContinuousProbe.PROBE_THRESHOLD);
-
-            if (threshold instanceof Double)
-            {
-                SharedPreferences prefs = Probe.getPreferences(context);
-                Editor e = prefs.edit();
-
-                e.putString("config_probe_geomagnetic_rotation_threshold", threshold.toString());
-                e.commit();
-            }
-        }
-    }
-
+    @Override
     public PreferenceScreen preferenceScreen(PreferenceActivity activity)
     {
         PreferenceScreen screen = super.preferenceScreen(activity);
 
-        screen.removePreference(screen.findPreference("config_probe_rotation_threshold"));
+        screen.removePreference(screen.findPreference(RotationProbe.THRESHOLD));
 
         ListPreference threshold = new ListPreference(activity);
-        threshold.setKey("config_probe_geomagnetic_rotation_threshold");
+        threshold.setKey(GeomagneticRotationProbe.THRESHOLD);
         threshold.setDefaultValue(RotationProbe.DEFAULT_THRESHOLD);
         threshold.setEntryValues(R.array.probe_rotation_threshold);
         threshold.setEntries(R.array.probe_rotation_threshold_labels);
@@ -165,13 +163,29 @@ public class GeomagneticRotationProbe extends RotationProbe
         return screen;
     }
 
+    @Override
     public String getPreferenceKey()
     {
         return "geomagnetic_rotation_built_in";
     }
 
+    @Override
     public int getSummaryResource()
     {
         return R.string.summary_geomagnetic_rotation_probe_desc;
+    }
+
+    @Override
+    protected double getThreshold()
+    {
+        SharedPreferences prefs = Probe.getPreferences(this._context);
+
+        return Double.parseDouble(prefs.getString(GeomagneticRotationProbe.THRESHOLD, RotationProbe.DEFAULT_THRESHOLD));
+    }
+
+    @Override
+    protected int getResourceThresholdValues()
+    {
+        return R.array.probe_rotation_threshold;
     }
 }

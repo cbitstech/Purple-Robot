@@ -3,6 +3,10 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 import java.util.ArrayList;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothClass;
@@ -322,10 +326,8 @@ public class BluetoothDevicesProbe extends Probe
 
                             if (doHash)
                             {
-                                deviceBundle.putString(BluetoothDevicesProbe.NAME,
-                                        em.createHash(context, device.getName()));
-                                deviceBundle.putString(BluetoothDevicesProbe.ADDRESS,
-                                        em.createHash(context, device.getAddress()));
+                                deviceBundle.putString(BluetoothDevicesProbe.NAME, em.createHash(context, device.getName()));
+                                deviceBundle.putString(BluetoothDevicesProbe.ADDRESS, em.createHash(context, device.getAddress()));
                             }
                             else
                             {
@@ -333,15 +335,12 @@ public class BluetoothDevicesProbe extends Probe
                                 deviceBundle.putString(BluetoothDevicesProbe.ADDRESS, device.getAddress());
                             }
 
-                            deviceBundle.putString(BluetoothDevicesProbe.BOND_STATE,
-                                    BluetoothDevicesProbe.bondState(device.getBondState()));
+                            deviceBundle.putString(BluetoothDevicesProbe.BOND_STATE, BluetoothDevicesProbe.bondState(device.getBondState()));
 
                             BluetoothClass deviceClass = device.getBluetoothClass();
 
-                            deviceBundle.putString(BluetoothDevicesProbe.MAJOR_CLASS,
-                                    BluetoothDevicesProbe.majorDeviceClass(deviceClass.getMajorDeviceClass()));
-                            deviceBundle.putString(BluetoothDevicesProbe.MINOR_CLASS,
-                                    BluetoothDevicesProbe.minorDeviceClass(deviceClass.getDeviceClass()));
+                            deviceBundle.putString(BluetoothDevicesProbe.MAJOR_CLASS, BluetoothDevicesProbe.majorDeviceClass(deviceClass.getMajorDeviceClass()));
+                            deviceBundle.putString(BluetoothDevicesProbe.MINOR_CLASS, BluetoothDevicesProbe.minorDeviceClass(deviceClass.getDeviceClass()));
 
                             me._foundDevices.add(deviceBundle);
                         }
@@ -351,8 +350,7 @@ public class BluetoothDevicesProbe extends Probe
 
                             bundle.putString("PROBE", me.name(context));
                             bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
-                            bundle.putParcelableArrayList(BluetoothDevicesProbe.DEVICES,
-                                    (ArrayList<Bundle>) me._foundDevices.clone());
+                            bundle.putParcelableArrayList(BluetoothDevicesProbe.DEVICES, (ArrayList<Bundle>) me._foundDevices.clone());
                             bundle.putInt(BluetoothDevicesProbe.DEVICES_COUNT, me._foundDevices.size());
 
                             synchronized (me)
@@ -398,8 +396,7 @@ public class BluetoothDevicesProbe extends Probe
             {
                 try
                 {
-                    long freq = Long.parseLong(prefs
-                            .getString(BluetoothDevicesProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
+                    long freq = Long.parseLong(prefs.getString(BluetoothDevicesProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
 
                     if (now - this._lastCheck > freq)
                     {
@@ -476,21 +473,15 @@ public class BluetoothDevicesProbe extends Probe
         {
             ArrayList<String> keys = new ArrayList<String>();
 
-            String key = String.format(context.getString(R.string.display_bluetooth_device_title),
-                    value.getString(BluetoothDevicesProbe.NAME), value.getString(BluetoothDevicesProbe.ADDRESS));
+            String key = String.format(context.getString(R.string.display_bluetooth_device_title), value.getString(BluetoothDevicesProbe.NAME), value.getString(BluetoothDevicesProbe.ADDRESS));
 
             Bundle deviceBundle = new Bundle();
 
-            deviceBundle.putString(context.getString(R.string.display_bluetooth_device_title_label),
-                    value.getString(BluetoothDevicesProbe.NAME));
-            deviceBundle.putString(context.getString(R.string.display_bluetooth_device_address_label),
-                    value.getString(BluetoothDevicesProbe.ADDRESS));
-            deviceBundle.putString(context.getString(R.string.display_bluetooth_device_pair),
-                    value.getString(BluetoothDevicesProbe.BOND_STATE));
-            deviceBundle.putString(context.getString(R.string.display_bluetooth_device_major),
-                    value.getString(BluetoothDevicesProbe.MAJOR_CLASS));
-            deviceBundle.putString(context.getString(R.string.display_bluetooth_device_minor),
-                    value.getString(BluetoothDevicesProbe.MINOR_CLASS));
+            deviceBundle.putString(context.getString(R.string.display_bluetooth_device_title_label), value.getString(BluetoothDevicesProbe.NAME));
+            deviceBundle.putString(context.getString(R.string.display_bluetooth_device_address_label), value.getString(BluetoothDevicesProbe.ADDRESS));
+            deviceBundle.putString(context.getString(R.string.display_bluetooth_device_pair), value.getString(BluetoothDevicesProbe.BOND_STATE));
+            deviceBundle.putString(context.getString(R.string.display_bluetooth_device_major), value.getString(BluetoothDevicesProbe.MAJOR_CLASS));
+            deviceBundle.putString(context.getString(R.string.display_bluetooth_device_minor), value.getString(BluetoothDevicesProbe.MINOR_CLASS));
 
             keys.add(context.getString(R.string.display_bluetooth_device_title_label));
             keys.add(context.getString(R.string.display_bluetooth_device_address_label));
@@ -517,8 +508,7 @@ public class BluetoothDevicesProbe extends Probe
 
         Bundle devicesBundle = this.bundleForDevicesArray(context, array);
 
-        formatted.putBundle(String.format(context.getString(R.string.display_bluetooth_devices_title), count),
-                devicesBundle);
+        formatted.putBundle(String.format(context.getString(R.string.display_bluetooth_devices_title), count), devicesBundle);
 
         return formatted;
     };
@@ -529,8 +519,6 @@ public class BluetoothDevicesProbe extends Probe
         Map<String, Object> map = super.configuration(context);
 
         SharedPreferences prefs = Probe.getPreferences(context);
-
-        // TODO: include whether enabled?
 
         long freq = Long.parseLong(prefs.getString(BluetoothDevicesProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
         map.put(Probe.PROBE_FREQUENCY, freq);
@@ -549,6 +537,11 @@ public class BluetoothDevicesProbe extends Probe
         if (params.containsKey(Probe.PROBE_FREQUENCY))
         {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
+
+            if (frequency instanceof Double)
+            {
+                frequency = Long.valueOf(((Double) frequency).longValue());
+            }
 
             if (frequency instanceof Long)
             {
@@ -569,7 +562,7 @@ public class BluetoothDevicesProbe extends Probe
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putBoolean(BluetoothDevicesProbe.FREQUENCY, ((Boolean) hash).booleanValue());
+                e.putBoolean(BluetoothDevicesProbe.HASH_DATA, ((Boolean) hash).booleanValue());
                 e.commit();
             }
         }
@@ -616,5 +609,48 @@ public class BluetoothDevicesProbe extends Probe
         screen.addPreference(hash);
 
         return screen;
+    }
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+
+            JSONObject hash = new JSONObject();
+            hash.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            hash.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.HASH_DATA, hash);
+
+            JSONObject frequency = new JSONObject();
+            frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
+            values = new JSONArray();
+
+            String[] options = context.getResources().getStringArray(R.array.probe_satellite_frequency_values);
+
+            for (String option : options)
+            {
+                values.put(Long.parseLong(option));
+            }
+
+            frequency.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_FREQUENCY, frequency);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
     }
 }

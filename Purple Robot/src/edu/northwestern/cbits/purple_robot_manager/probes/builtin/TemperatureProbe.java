@@ -3,12 +3,10 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Map;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -19,7 +17,6 @@ import android.os.SystemClock;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
-
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
@@ -29,6 +26,10 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
     private static final String DEFAULT_THRESHOLD = "1.0";
 
     public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.TemperatureProbe";
+
+    private static final String THRESHOLD = "config_probe_temperature_built_in_threshold";
+    private static final String FREQUENCY = "config_probe_temperature_built_in_frequency";
+    private static final String ENABLED = "config_probe_temperature_built_in_enabled";
 
     private static int BUFFER_SIZE = 32;
 
@@ -40,18 +41,20 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
     private long lastThresholdLookup = 0;
     private double lastThreshold = 1.0;
 
-    private float valueBuffer[][] = new float[1][BUFFER_SIZE];
-    private double timeBuffer[] = new double[BUFFER_SIZE];
+    private final float valueBuffer[][] = new float[1][BUFFER_SIZE];
+    private final double timeBuffer[] = new double[BUFFER_SIZE];
 
     private int bufferIndex = 0;
 
     private int _lastFrequency = -1;
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getString(R.string.probe_sensor_category);
     }
 
+    @Override
     public Bundle formattedBundle(Context context, Bundle bundle)
     {
         Bundle formatted = super.formattedBundle(context, bundle);
@@ -71,8 +74,7 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 
                 for (int i = 0; i < eventTimes.length; i++)
                 {
-                    String formatString = String.format(context.getString(R.string.display_temperature_reading),
-                            temp[i]);
+                    String formatString = String.format(context.getString(R.string.display_temperature_reading), temp[i]);
 
                     double time = eventTimes[i];
 
@@ -105,24 +107,27 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
         return formatted;
     };
 
+    @Override
     public long getFrequency()
     {
         SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
 
-        return Long.parseLong(prefs.getString("config_probe_temperature_built_in_frequency",
-                ContinuousProbe.DEFAULT_FREQUENCY));
+        return Long.parseLong(prefs.getString(TemperatureProbe.FREQUENCY, ContinuousProbe.DEFAULT_FREQUENCY));
     }
 
+    @Override
     public String name(Context context)
     {
         return TemperatureProbe.NAME;
     }
 
+    @Override
     public int getTitleResource()
     {
         return R.string.title_temperature_probe;
     }
 
+    @Override
     @SuppressLint("InlinedApi")
     @SuppressWarnings("deprecation")
     public boolean isEnabled(Context context)
@@ -139,10 +144,9 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
 
         if (super.isEnabled(context))
         {
-            if (prefs.getBoolean("config_probe_temperature_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
+            if (prefs.getBoolean(TemperatureProbe.ENABLED, ContinuousProbe.DEFAULT_ENABLED))
             {
-                int frequency = Integer.parseInt(prefs.getString("config_probe_temperature_built_in_frequency",
-                        ContinuousProbe.DEFAULT_FREQUENCY));
+                int frequency = Integer.parseInt(prefs.getString(TemperatureProbe.FREQUENCY, ContinuousProbe.DEFAULT_FREQUENCY));
 
                 if (this._lastFrequency != frequency)
                 {
@@ -188,15 +192,14 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
         return false;
     }
 
+    @Override
     protected boolean passesThreshold(SensorEvent event)
     {
         long now = System.currentTimeMillis();
 
         if (now - this.lastThresholdLookup > 5000)
         {
-            SharedPreferences prefs = Probe.getPreferences(this._context);
-            this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_temperature_threshold",
-                    TemperatureProbe.DEFAULT_THRESHOLD));
+            this.lastThreshold = this.getThreshold();
 
             this.lastThresholdLookup = now;
         }
@@ -214,40 +217,13 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
         return passes;
     }
 
-    public Map<String, Object> configuration(Context context)
-    {
-        Map<String, Object> map = super.configuration(context);
-
-        map.put(ContinuousProbe.PROBE_THRESHOLD, this.lastThreshold);
-
-        return map;
-    }
-
-    public void updateFromMap(Context context, Map<String, Object> params)
-    {
-        super.updateFromMap(context, params);
-
-        if (params.containsKey(ContinuousProbe.PROBE_THRESHOLD))
-        {
-            Object threshold = params.get(ContinuousProbe.PROBE_THRESHOLD);
-
-            if (threshold instanceof Double)
-            {
-                SharedPreferences prefs = Probe.getPreferences(context);
-                Editor e = prefs.edit();
-
-                e.putString("config_probe_temperature_threshold", threshold.toString());
-                e.commit();
-            }
-        }
-    }
-
+    @Override
     public PreferenceScreen preferenceScreen(PreferenceActivity activity)
     {
         PreferenceScreen screen = super.preferenceScreen(activity);
 
         ListPreference threshold = new ListPreference(activity);
-        threshold.setKey("config_probe_temperature_threshold");
+        threshold.setKey(TemperatureProbe.THRESHOLD);
         threshold.setDefaultValue(TemperatureProbe.DEFAULT_THRESHOLD);
         threshold.setEntryValues(R.array.probe_temperature_threshold);
         threshold.setEntries(R.array.probe_temperature_threshold_labels);
@@ -259,6 +235,7 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
         return screen;
     }
 
+    @Override
     @SuppressLint("NewApi")
     public void onSensorChanged(SensorEvent event)
     {
@@ -322,23 +299,39 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
         }
     }
 
+    @Override
     public String getPreferenceKey()
     {
         return "temperature_built_in";
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         double celsius = bundle.getDoubleArray("TEMPERATURE")[0];
         double faren = (celsius * 1.8) + 32;
         double kelvin = celsius + 273.15;
 
-        return String.format(context.getResources().getString(R.string.summary_temperature_probe), celsius, faren,
-                kelvin);
+        return String.format(context.getResources().getString(R.string.summary_temperature_probe), celsius, faren, kelvin);
     }
 
+    @Override
     public int getSummaryResource()
     {
         return R.string.summary_temperature_probe_desc;
+    }
+
+    @Override
+    protected double getThreshold()
+    {
+        SharedPreferences prefs = Probe.getPreferences(this._context);
+
+        return Double.parseDouble(prefs.getString(TemperatureProbe.THRESHOLD, TemperatureProbe.DEFAULT_THRESHOLD));
+    }
+
+    @Override
+    protected int getResourceThresholdValues()
+    {
+        return R.array.probe_temperature_threshold;
     }
 }

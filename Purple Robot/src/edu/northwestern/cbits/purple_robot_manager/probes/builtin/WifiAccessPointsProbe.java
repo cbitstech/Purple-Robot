@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -30,7 +34,7 @@ public class WifiAccessPointsProbe extends Probe
     protected static final String BSSID = "BSSID";
     protected static final String SSID = "SSID";
     protected static final String CAPABILITIES = "CAPABILITIES";
-    protected static final String FREQUENCY = "FREQUENCY";
+    protected static final String SCAN_FREQUENCY = "FREQUENCY";
     protected static final String LEVEL = "LEVEL";
     protected static final String CURRENT_SSID = "CURRENT_SSID";
     protected static final String CURRENT_RSSI = "CURRENT_RSSI";
@@ -38,35 +42,41 @@ public class WifiAccessPointsProbe extends Probe
     protected static final String CURRENT_LINK_SPEED = "CURRENT_LINK_SPEED";
 
     private static final boolean DEFAULT_ENABLED = true;
+    private static final String ENABLED = "config_probe_wifi_enabled";
+    private static final String FREQUENCY = "config_probe_wifi_frequency";
 
     private long _lastCheck = 0;
 
     private BroadcastReceiver _receiver = null;
 
-    private ArrayList<Bundle> _foundNetworks = new ArrayList<Bundle>();
+    private final ArrayList<Bundle> _foundNetworks = new ArrayList<Bundle>();
 
+    @Override
     public String name(Context context)
     {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.WifiAccessPointsProbe";
     }
 
+    @Override
     public String title(Context context)
     {
         return context.getString(R.string.title_wifi_probe);
     }
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getResources().getString(R.string.probe_other_devices_category);
     }
 
+    @Override
     public boolean isEnabled(Context context)
     {
         if (super.isEnabled(context))
         {
             final SharedPreferences prefs = Probe.getPreferences(context);
 
-            if (prefs.getBoolean("config_probe_wifi_enabled", WifiAccessPointsProbe.DEFAULT_ENABLED))
+            if (prefs.getBoolean(WifiAccessPointsProbe.ENABLED, WifiAccessPointsProbe.DEFAULT_ENABLED))
             {
                 final WifiAccessPointsProbe me = this;
 
@@ -74,9 +84,10 @@ public class WifiAccessPointsProbe extends Probe
                 {
                     this._receiver = new BroadcastReceiver()
                     {
+                        @Override
                         public void onReceive(Context context, Intent intent)
                         {
-                            if (prefs.getBoolean("config_probe_wifi_enabled", WifiAccessPointsProbe.DEFAULT_ENABLED) == false)
+                            if (prefs.getBoolean(WifiAccessPointsProbe.ENABLED, WifiAccessPointsProbe.DEFAULT_ENABLED) == false)
                                 return;
 
                             if (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(intent.getAction()))
@@ -104,7 +115,7 @@ public class WifiAccessPointsProbe extends Probe
                                         pointBundle.putString(WifiAccessPointsProbe.SSID, result.SSID);
                                         pointBundle.putString(WifiAccessPointsProbe.CAPABILITIES, result.capabilities);
 
-                                        pointBundle.putInt(WifiAccessPointsProbe.FREQUENCY, result.frequency);
+                                        pointBundle.putInt(WifiAccessPointsProbe.SCAN_FREQUENCY, result.frequency);
                                         pointBundle.putInt(WifiAccessPointsProbe.LEVEL, result.level);
 
                                         accessPoints.add(pointBundle);
@@ -138,7 +149,7 @@ public class WifiAccessPointsProbe extends Probe
 
                 synchronized (this)
                 {
-                    long freq = Long.parseLong(prefs.getString("config_probe_wifi_frequency", Probe.DEFAULT_FREQUENCY));
+                    long freq = Long.parseLong(prefs.getString(WifiAccessPointsProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
 
                     if (now - this._lastCheck > freq)
                     {
@@ -203,19 +214,14 @@ public class WifiAccessPointsProbe extends Probe
         {
             ArrayList<String> keys = new ArrayList<String>();
 
-            String key = String.format(context.getString(R.string.display_wifi_network_title),
-                    value.getString(WifiAccessPointsProbe.SSID), value.getString(WifiAccessPointsProbe.BSSID));
+            String key = String.format(context.getString(R.string.display_wifi_network_title), value.getString(WifiAccessPointsProbe.SSID), value.getString(WifiAccessPointsProbe.BSSID));
 
             Bundle wifiBundle = new Bundle();
 
-            wifiBundle.putString(context.getString(R.string.display_wifi_ssid_title),
-                    value.getString(WifiAccessPointsProbe.SSID));
-            wifiBundle.putString(context.getString(R.string.display_wifi_bssid_title),
-                    value.getString(WifiAccessPointsProbe.BSSID));
-            wifiBundle.putInt(context.getString(R.string.display_wifi_frequency_title),
-                    value.getInt(WifiAccessPointsProbe.FREQUENCY));
-            wifiBundle.putInt(context.getString(R.string.display_wifi_level_title),
-                    value.getInt(WifiAccessPointsProbe.LEVEL));
+            wifiBundle.putString(context.getString(R.string.display_wifi_ssid_title), value.getString(WifiAccessPointsProbe.SSID));
+            wifiBundle.putString(context.getString(R.string.display_wifi_bssid_title), value.getString(WifiAccessPointsProbe.BSSID));
+            wifiBundle.putInt(context.getString(R.string.display_wifi_frequency_title), value.getInt(WifiAccessPointsProbe.SCAN_FREQUENCY));
+            wifiBundle.putInt(context.getString(R.string.display_wifi_level_title), value.getInt(WifiAccessPointsProbe.LEVEL));
 
             keys.add(context.getString(R.string.display_wifi_ssid_title));
             keys.add(context.getString(R.string.display_wifi_bssid_title));
@@ -230,6 +236,7 @@ public class WifiAccessPointsProbe extends Probe
         return bundle;
     }
 
+    @Override
     public Bundle formattedBundle(Context context, Bundle bundle)
     {
         Bundle formatted = super.formattedBundle(context, bundle);
@@ -240,41 +247,39 @@ public class WifiAccessPointsProbe extends Probe
 
         Bundle devicesBundle = this.bundleForNetworksArray(context, array);
 
-        formatted.putBundle(String.format(context.getString(R.string.display_wifi_networks_title), count),
-                devicesBundle);
+        formatted.putBundle(String.format(context.getString(R.string.display_wifi_networks_title), count), devicesBundle);
 
-        formatted.putString(context.getString(R.string.display_current_ssid_title),
-                bundle.getString(WifiAccessPointsProbe.CURRENT_SSID));
-        formatted.putString(context.getString(R.string.display_current_bssid_title),
-                bundle.getString(WifiAccessPointsProbe.CURRENT_BSSID));
-        formatted.putInt(context.getString(R.string.display_current_speed_title),
-                (int) bundle.getDouble(WifiAccessPointsProbe.CURRENT_LINK_SPEED));
-        formatted.putInt(context.getString(R.string.display_current_rssi_title),
-                (int) bundle.getDouble(WifiAccessPointsProbe.CURRENT_RSSI));
+        formatted.putString(context.getString(R.string.display_current_ssid_title), bundle.getString(WifiAccessPointsProbe.CURRENT_SSID));
+        formatted.putString(context.getString(R.string.display_current_bssid_title), bundle.getString(WifiAccessPointsProbe.CURRENT_BSSID));
+        formatted.putInt(context.getString(R.string.display_current_speed_title), (int) bundle.getDouble(WifiAccessPointsProbe.CURRENT_LINK_SPEED));
+        formatted.putInt(context.getString(R.string.display_current_rssi_title), (int) bundle.getDouble(WifiAccessPointsProbe.CURRENT_RSSI));
 
         return formatted;
     }
 
+    @Override
     public void enable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_wifi_enabled", true);
+        e.putBoolean(WifiAccessPointsProbe.ENABLED, true);
 
         e.commit();
     }
 
+    @Override
     public void disable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_wifi_enabled", false);
+        e.putBoolean(WifiAccessPointsProbe.ENABLED, false);
 
         e.commit();
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         int count = (int) bundle.getDouble(WifiAccessPointsProbe.ACCESS_POINT_COUNT);
@@ -282,19 +287,21 @@ public class WifiAccessPointsProbe extends Probe
         return String.format(context.getResources().getString(R.string.summary_wifi_probe), count);
     }
 
+    @Override
     public Map<String, Object> configuration(Context context)
     {
         Map<String, Object> map = super.configuration(context);
 
         SharedPreferences prefs = Probe.getPreferences(context);
 
-        long freq = Long.parseLong(prefs.getString("config_probe_wifi_frequency", Probe.DEFAULT_FREQUENCY));
+        long freq = Long.parseLong(prefs.getString(WifiAccessPointsProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
 
         map.put(Probe.PROBE_FREQUENCY, freq);
 
         return map;
     }
 
+    @Override
     public void updateFromMap(Context context, Map<String, Object> params)
     {
         super.updateFromMap(context, params);
@@ -303,17 +310,23 @@ public class WifiAccessPointsProbe extends Probe
         {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
 
+            if (frequency instanceof Double)
+            {
+                frequency = Long.valueOf(((Double) frequency).longValue());
+            }
+
             if (frequency instanceof Long)
             {
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putString("config_probe_wifi_frequency", frequency.toString());
+                e.putString(WifiAccessPointsProbe.FREQUENCY, frequency.toString());
                 e.commit();
             }
         }
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(PreferenceActivity activity)
     {
@@ -325,13 +338,13 @@ public class WifiAccessPointsProbe extends Probe
 
         CheckBoxPreference enabled = new CheckBoxPreference(activity);
         enabled.setTitle(R.string.title_enable_probe);
-        enabled.setKey("config_probe_wifi_enabled");
+        enabled.setKey(WifiAccessPointsProbe.ENABLED);
         enabled.setDefaultValue(WifiAccessPointsProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
 
         ListPreference duration = new ListPreference(activity);
-        duration.setKey("config_probe_wifi_frequency");
+        duration.setKey(WifiAccessPointsProbe.FREQUENCY);
         duration.setEntryValues(R.array.probe_satellite_frequency_values);
         duration.setEntries(R.array.probe_satellite_frequency_labels);
         duration.setTitle(R.string.probe_frequency_label);
@@ -342,6 +355,44 @@ public class WifiAccessPointsProbe extends Probe
         return screen;
     }
 
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+
+            JSONObject frequency = new JSONObject();
+            frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
+            values = new JSONArray();
+
+            String[] options = context.getResources().getStringArray(R.array.probe_satellite_frequency_values);
+
+            for (String option : options)
+            {
+                values.put(Long.parseLong(option));
+            }
+
+            frequency.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_FREQUENCY, frequency);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
+    }
+
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_wifi_probe_desc);

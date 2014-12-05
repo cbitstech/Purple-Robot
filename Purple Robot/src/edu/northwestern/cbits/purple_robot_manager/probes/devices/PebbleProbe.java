@@ -21,15 +21,17 @@ import android.preference.CheckBoxPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.PebbleKit.FirmwareVersionInfo;
 import com.getpebble.android.kit.PebbleKit.PebbleDataLogReceiver;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.calibration.PebbleCalibrationHelper;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.AccelerometerProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.Continuous3DProbe;
 
 public class PebbleProbe extends Continuous3DProbe
@@ -55,8 +57,6 @@ public class PebbleProbe extends Continuous3DProbe
     {
         // TODO: Credit https://github.com/kramimus/pebble-accel-analyzer
 
-        private static final String TAG = AccelData.class.getSimpleName();
-
         final private int x;
         final private int y;
         final private int z;
@@ -78,7 +78,7 @@ public class PebbleProbe extends Continuous3DProbe
         }
 
         @SuppressWarnings("unused")
-        public JSONObject toJson()
+        public JSONObject toJson(Context context)
         {
             JSONObject json = new JSONObject();
 
@@ -89,12 +89,14 @@ public class PebbleProbe extends Continuous3DProbe
                 json.put("z", z);
                 json.put("ts", timestamp);
                 json.put("v", didVibrate);
+
                 return json;
             }
             catch (JSONException e)
             {
-                Log.w(TAG, "problem constructing accel data, skipping " + e);
+                LogManager.getInstance(context).logException(e);
             }
+
             return null;
         }
 
@@ -185,6 +187,8 @@ public class PebbleProbe extends Continuous3DProbe
         {
             if (prefs.getBoolean(PebbleProbe.ENABLED, PebbleProbe.DEFAULT_ENABLED))
             {
+                PebbleCalibrationHelper.check(context, true);
+
                 if (this._receiver == null)
                 {
                     final PebbleProbe me = this;
@@ -230,11 +234,28 @@ public class PebbleProbe extends Continuous3DProbe
 
                                     timeBuffer[me._index] = accel.getTimestamp();
 
-                                    valueBuffer[0][me._index] = 9.807 * ((double) accel.x) / 1000;
-                                    valueBuffer[1][me._index] = 9.807 * ((double) accel.y) / 1000;
-                                    valueBuffer[2][me._index] = 9.807 * ((double) accel.z) / 1000;
+                                    double x = 9.807 * ((double) accel.x) / 1000;
+                                    double y = 9.807 * ((double) accel.y) / 1000;
+                                    double z = 9.807 * ((double) accel.x) / 1000;
+
+                                    valueBuffer[0][me._index] = x;
+                                    valueBuffer[1][me._index] = y;
+                                    valueBuffer[2][me._index] = z;
 
                                     me._index += 1;
+
+                                    if (me._index % 10 == 0)
+                                    {
+                                        Map<String, Object> values = new HashMap<String, Object>(4);
+
+                                        values.put(AccelerometerProbe.X_KEY, x);
+                                        values.put(AccelerometerProbe.Y_KEY, y);
+                                        values.put(AccelerometerProbe.Z_KEY, z);
+
+                                        values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(accel.getTimestamp() / 1000));
+
+                                        ProbeValuesProvider.getProvider(context).insertValue(context, PebbleProbe.DB_TABLE, me.databaseSchema(), values);
+                                    }
                                 }
                             }
                         }
@@ -242,10 +263,12 @@ public class PebbleProbe extends Continuous3DProbe
 
                     PebbleKit.registerDataLogReceiver(context, this._receiver);
                 }
-            }
 
-            return true;
+                return true;
+            }
         }
+
+        PebbleCalibrationHelper.check(context, false);
 
         if (this._receiver != null)
         {
@@ -316,5 +339,23 @@ public class PebbleProbe extends Continuous3DProbe
         double zReading = bundle.getDoubleArray("Z")[0];
 
         return String.format(context.getResources().getString(R.string.summary_accelerator_probe), xReading, yReading, zReading);
+    }
+
+    @Override
+    protected double getThreshold()
+    {
+        return 0;
+    }
+
+    @Override
+    protected int getResourceThresholdValues()
+    {
+        return -1;
+    }
+
+    @Override
+    public int getResourceFrequencyValues()
+    {
+        return -1;
     }
 }

@@ -276,6 +276,9 @@ public class StepCounterProbe extends Probe implements SensorEventListener
     {
         JSONObject settings = new JSONObject();
 
+        if (Build.VERSION.SDK_INT < 19)
+            return settings;
+
         try
         {
             JSONObject enabled = new JSONObject();

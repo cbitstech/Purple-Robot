@@ -1317,4 +1317,7 @@
     
     <string name="summary_nfc_probe">Scanned Tag: %1$s</string>
     <string name="action_scan_nfc">Scan NFC tag</string>
+    
+    <string name="title_pebble_check">Pebble Software Missing</string>
+    <string name="message_pebble_check">Please install the Pebble companion app to use the Pebble Watch probe.</string>
 </resources>

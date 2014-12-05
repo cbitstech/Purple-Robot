@@ -30,7 +30,6 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -49,46 +48,56 @@ public class LinkedInProbe extends Probe
 
     protected static final String HOUR_COUNT = "HOUR_COUNT";
 
+    private static final String ENABLED = "config_probe_linkedin_enabled";
+    private static final String FREQUENCY = "config_probe_linkedin_frequency";
+    private static final String ENCRYPT_DATA = "config_probe_linkedin_encrypt_data";
+
     private long _lastCheck = 0;
 
     private String _token = null;
     private String _secret = null;
 
+    @Override
     public String name(Context context)
     {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.LinkedInProbe";
     }
 
+    @Override
     public String title(Context context)
     {
         return context.getString(R.string.title_linkedin_probe);
     }
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getResources().getString(R.string.probe_external_services_category);
     }
 
+    @Override
     public void enable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_linkedin_enabled", true);
+        e.putBoolean(LinkedInProbe.ENABLED, true);
 
         e.commit();
     }
 
+    @Override
     public void disable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_linkedin_enabled", false);
+        e.putBoolean(LinkedInProbe.ENABLED, false);
 
         e.commit();
     }
 
+    @Override
     public boolean isEnabled(final Context context)
     {
         final SharedPreferences prefs = Probe.getPreferences(context);
@@ -97,14 +106,12 @@ public class LinkedInProbe extends Probe
         {
             final long now = System.currentTimeMillis();
 
-            if (prefs.getBoolean("config_probe_linkedin_enabled", LinkedInProbe.DEFAULT_ENABLED))
+            if (prefs.getBoolean(LinkedInProbe.ENABLED, LinkedInProbe.DEFAULT_ENABLED))
             {
                 synchronized (this)
                 {
-                    long freq = Long.parseLong(prefs.getString("config_probe_linkedin_frequency",
-                            Probe.DEFAULT_FREQUENCY));
-                    final boolean doEncrypt = prefs.getBoolean("config_probe_linkedin_encrypt_data",
-                            LinkedInProbe.DEFAULT_ENCRYPT);
+                    long freq = Long.parseLong(prefs.getString(LinkedInProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
+                    final boolean doEncrypt = prefs.getBoolean(LinkedInProbe.ENCRYPT_DATA, LinkedInProbe.DEFAULT_ENCRYPT);
 
                     final EncryptionManager em = EncryptionManager.getInstance();
 
@@ -124,6 +131,7 @@ public class LinkedInProbe extends Probe
 
                             Runnable action = new Runnable()
                             {
+                                @Override
                                 public void run()
                                 {
                                     me.fetchAuth(context);
@@ -145,12 +153,12 @@ public class LinkedInProbe extends Probe
 
                             final OAuthService service = builder.build();
 
-                            final OAuthRequest request = new OAuthRequest(Verb.GET,
-                                    "http://api.linkedin.com/v1/people/~/network/updates?scope=self&type=RECU&type=SHAR&type=VIRL&format=json");
+                            final OAuthRequest request = new OAuthRequest(Verb.GET, "http://api.linkedin.com/v1/people/~/network/updates?scope=self&type=RECU&type=SHAR&type=VIRL&format=json");
                             service.signRequest(accessToken, request);
 
                             Runnable r = new Runnable()
                             {
+                                @Override
                                 public void run()
                                 {
                                     try
@@ -181,8 +189,7 @@ public class LinkedInProbe extends Probe
 
                                                     if (post.has("updateContent"))
                                                     {
-                                                        JSONObject content = post.getJSONObject("updateContent")
-                                                                .getJSONObject("person").getJSONObject("currentShare");
+                                                        JSONObject content = post.getJSONObject("updateContent").getJSONObject("person").getJSONObject("currentShare");
 
                                                         if (content.has("comment"))
                                                         {
@@ -196,20 +203,16 @@ public class LinkedInProbe extends Probe
 
                                                         if (content.has("content"))
                                                         {
-                                                            JSONObject contentContent = content
-                                                                    .getJSONObject("content");
+                                                            JSONObject contentContent = content.getJSONObject("content");
 
                                                             if (contentContent.has("title"))
-                                                                eventBundle.putString("CONTENT_TITLE",
-                                                                        contentContent.getString("title"));
+                                                                eventBundle.putString("CONTENT_TITLE", contentContent.getString("title"));
 
                                                             if (contentContent.has("submittedUrl"))
-                                                                eventBundle.putString("CONTENT_URL",
-                                                                        contentContent.getString("submittedUrl"));
+                                                                eventBundle.putString("CONTENT_URL", contentContent.getString("submittedUrl"));
 
                                                             if (contentContent.has("description"))
-                                                                eventBundle.putString("CONTENT_DESCRIPTION",
-                                                                        contentContent.getString("description"));
+                                                                eventBundle.putString("CONTENT_DESCRIPTION", contentContent.getString("description"));
                                                         }
                                                     }
 
@@ -278,6 +281,7 @@ public class LinkedInProbe extends Probe
         context.startActivity(intent);
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         if (bundle.containsKey("COMMENT"))
@@ -286,21 +290,23 @@ public class LinkedInProbe extends Probe
         return bundle.getString("TYPE");
     }
 
+    @Override
     public Map<String, Object> configuration(Context context)
     {
         Map<String, Object> map = super.configuration(context);
 
         SharedPreferences prefs = Probe.getPreferences(context);
 
-        long freq = Long.parseLong(prefs.getString("config_probe_linkedin_frequency", Probe.DEFAULT_FREQUENCY));
+        long freq = Long.parseLong(prefs.getString(LinkedInProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
         map.put(Probe.PROBE_FREQUENCY, freq);
 
-        boolean hash = prefs.getBoolean("config_probe_linkedin_encrypt_data", LinkedInProbe.DEFAULT_ENCRYPT);
+        boolean hash = prefs.getBoolean(LinkedInProbe.ENCRYPT_DATA, LinkedInProbe.DEFAULT_ENCRYPT);
         map.put(Probe.ENCRYPT_DATA, hash);
 
         return map;
     }
 
+    @Override
     public void updateFromMap(Context context, Map<String, Object> params)
     {
         super.updateFromMap(context, params);
@@ -309,12 +315,17 @@ public class LinkedInProbe extends Probe
         {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
 
+            if (frequency instanceof Double)
+            {
+                frequency = Long.valueOf(((Double) frequency).longValue());
+            }
+
             if (frequency instanceof Long)
             {
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putString("config_probe_linkedin_frequency", frequency.toString());
+                e.putString(LinkedInProbe.FREQUENCY, frequency.toString());
                 e.commit();
             }
         }
@@ -330,17 +341,19 @@ public class LinkedInProbe extends Probe
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putBoolean("config_probe_linkedin_encrypt_data", encryptBoolean.booleanValue());
+                e.putBoolean(LinkedInProbe.ENCRYPT_DATA, encryptBoolean.booleanValue());
                 e.commit();
             }
         }
     }
 
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_linkedin_probe_desc);
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(final PreferenceActivity activity)
     {
@@ -357,13 +370,13 @@ public class LinkedInProbe extends Probe
 
         CheckBoxPreference enabled = new CheckBoxPreference(activity);
         enabled.setTitle(R.string.title_enable_probe);
-        enabled.setKey("config_probe_linkedin_enabled");
+        enabled.setKey(LinkedInProbe.ENABLED);
         enabled.setDefaultValue(LinkedInProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
 
         ListPreference duration = new ListPreference(activity);
-        duration.setKey("config_probe_linkedin_frequency");
+        duration.setKey(LinkedInProbe.FREQUENCY);
         duration.setEntryValues(R.array.probe_low_frequency_values);
         duration.setEntries(R.array.probe_low_frequency_labels);
         duration.setTitle(R.string.probe_frequency_label);
@@ -372,7 +385,7 @@ public class LinkedInProbe extends Probe
         screen.addPreference(duration);
 
         CheckBoxPreference encrypt = new CheckBoxPreference(activity);
-        encrypt.setKey("config_probe_linkedin_encrypt_data");
+        encrypt.setKey(LinkedInProbe.ENCRYPT_DATA);
         encrypt.setDefaultValue(LinkedInProbe.DEFAULT_ENCRYPT);
         encrypt.setTitle(R.string.config_probe_linkedin_encrypt_title);
         encrypt.setSummary(R.string.config_probe_linkedin_encrypt_summary);
@@ -391,6 +404,7 @@ public class LinkedInProbe extends Probe
 
         authPreference.setOnPreferenceClickListener(new OnPreferenceClickListener()
         {
+            @Override
             public boolean onPreferenceClick(Preference preference)
             {
                 me.fetchAuth(activity);
@@ -404,6 +418,7 @@ public class LinkedInProbe extends Probe
 
         logoutPreference.setOnPreferenceClickListener(new OnPreferenceClickListener()
         {
+            @Override
             public boolean onPreferenceClick(Preference preference)
             {
                 Editor e = prefs.edit();
@@ -416,10 +431,10 @@ public class LinkedInProbe extends Probe
 
                 activity.runOnUiThread(new Runnable()
                 {
+                    @Override
                     public void run()
                     {
-                        Toast.makeText(activity, activity.getString(R.string.toast_linkedin_logout), Toast.LENGTH_LONG)
-                                .show();
+                        Toast.makeText(activity, activity.getString(R.string.toast_linkedin_logout), Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -434,4 +449,48 @@ public class LinkedInProbe extends Probe
 
         return screen;
     }
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+
+            JSONObject encrypt = new JSONObject();
+            encrypt.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            encrypt.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.ENCRYPT_DATA, encrypt);
+
+            JSONObject frequency = new JSONObject();
+            frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
+            values = new JSONArray();
+
+            String[] options = context.getResources().getStringArray(R.array.probe_low_frequency_values);
+
+            for (String option : options)
+            {
+                values.put(Long.parseLong(option));
+            }
+
+            frequency.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_FREQUENCY, frequency);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
+    }
+
 }

@@ -2,8 +2,6 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
 import java.util.ArrayList;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
@@ -11,6 +9,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
+import android.os.Looper;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
@@ -124,6 +123,9 @@ public class TouchEventsProbe extends Probe
                         }
                     });
 
+                    if (Looper.myLooper() == null)
+                        Looper.prepare();
+
                     wm.addView(this._overlay, params);
                 }
             }
@@ -208,23 +210,25 @@ public class TouchEventsProbe extends Probe
     @Override
     public JSONObject fetchSettings(Context context)
     {
-        JSONObject settings = new JSONObject();
+        return null;
 
-        try
-        {
-            JSONObject enabled = new JSONObject();
-            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
-            JSONArray values = new JSONArray();
-            values.put(true);
-            values.put(false);
-            enabled.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_ENABLED, enabled);
-        }
-        catch (JSONException e)
-        {
-            LogManager.getInstance(context).logException(e);
-        }
-
-        return settings;
+        // JSONObject settings = new JSONObject();
+        //
+        // try
+        // {
+        // JSONObject enabled = new JSONObject();
+        // enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+        // JSONArray values = new JSONArray();
+        // values.put(true);
+        // values.put(false);
+        // enabled.put(Probe.PROBE_VALUES, values);
+        // settings.put(Probe.PROBE_ENABLED, enabled);
+        // }
+        // catch (JSONException e)
+        // {
+        // LogManager.getInstance(context).logException(e);
+        // }
+        //
+        // return settings;
     }
 }

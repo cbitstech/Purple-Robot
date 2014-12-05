@@ -15,7 +15,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -47,6 +46,10 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 
     public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.ProximityProbe";
 
+    private static final String FREQUENCY = "config_probe_proximity_built_in_frequency";
+    private static final String THRESHOLD = "config_probe_proximity_built_in_threshold";
+    private static final String ENABLED = "config_probe_proximity_built_in_enabled";
+
     private static String[] fieldNames =
     { DISTANCE_KEY };
 
@@ -55,18 +58,20 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
     private long lastThresholdLookup = 0;
     private double lastThreshold = 5.0;
 
-    private float valueBuffer[][] = new float[1][BUFFER_SIZE];
-    private double timeBuffer[] = new double[BUFFER_SIZE];
+    private final float valueBuffer[][] = new float[1][BUFFER_SIZE];
+    private final double timeBuffer[] = new double[BUFFER_SIZE];
 
     private int bufferIndex = 0;
 
     private int _lastFrequency = -1;
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getString(R.string.probe_sensor_category);
     }
 
+    @Override
     public Intent viewIntent(Context context)
     {
         Intent i = new Intent(context, WebkitLandscapeActivity.class);
@@ -74,10 +79,10 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
         return i;
     }
 
+    @Override
     public String contentSubtitle(Context context)
     {
-        Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(context, ProximityProbe.DB_TABLE,
-                this.databaseSchema());
+        Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(context, ProximityProbe.DB_TABLE, this.databaseSchema());
 
         int count = -1;
 
@@ -99,6 +104,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
         return schema;
     }
 
+    @Override
     public String getDisplayContent(Activity activity)
     {
         try
@@ -108,8 +114,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
             ArrayList<Double> distance = new ArrayList<Double>();
             ArrayList<Double> time = new ArrayList<Double>();
 
-            Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(activity, ProximityProbe.DB_TABLE,
-                    this.databaseSchema());
+            Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(activity, ProximityProbe.DB_TABLE, this.databaseSchema());
 
             int count = -1;
 
@@ -153,6 +158,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
         return null;
     }
 
+    @Override
     public Bundle formattedBundle(Context context, Bundle bundle)
     {
         Bundle formatted = super.formattedBundle(context, bundle);
@@ -205,24 +211,27 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
         return formatted;
     };
 
+    @Override
     public long getFrequency()
     {
         SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
 
-        return Long.parseLong(prefs.getString("config_probe_proximity_built_in_frequency",
-                ContinuousProbe.DEFAULT_FREQUENCY));
+        return Long.parseLong(prefs.getString(ProximityProbe.FREQUENCY, ContinuousProbe.DEFAULT_FREQUENCY));
     }
 
+    @Override
     public String name(Context context)
     {
         return ProximityProbe.NAME;
     }
 
+    @Override
     public int getTitleResource()
     {
         return R.string.title_proximity_probe;
     }
 
+    @Override
     public boolean isEnabled(Context context)
     {
         SharedPreferences prefs = ContinuousProbe.getPreferences(context);
@@ -234,10 +243,9 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 
         if (super.isEnabled(context))
         {
-            if (prefs.getBoolean("config_probe_proximity_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
+            if (prefs.getBoolean(ProximityProbe.ENABLED, ContinuousProbe.DEFAULT_ENABLED))
             {
-                int frequency = Integer.parseInt(prefs.getString("config_probe_proximity_built_in_frequency",
-                        ContinuousProbe.DEFAULT_FREQUENCY));
+                int frequency = Integer.parseInt(prefs.getString(ProximityProbe.FREQUENCY, ContinuousProbe.DEFAULT_FREQUENCY));
 
                 if (this._lastFrequency != frequency)
                 {
@@ -282,34 +290,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
         return false;
     }
 
-    public Map<String, Object> configuration(Context context)
-    {
-        Map<String, Object> map = super.configuration(context);
-
-        map.put(ContinuousProbe.PROBE_THRESHOLD, this.lastThreshold);
-
-        return map;
-    }
-
-    public void updateFromMap(Context context, Map<String, Object> params)
-    {
-        super.updateFromMap(context, params);
-
-        if (params.containsKey(ContinuousProbe.PROBE_THRESHOLD))
-        {
-            Object threshold = params.get(ContinuousProbe.PROBE_THRESHOLD);
-
-            if (threshold instanceof Double)
-            {
-                SharedPreferences prefs = Probe.getPreferences(context);
-                Editor e = prefs.edit();
-
-                e.putString("config_probe_proximity_threshold", threshold.toString());
-                e.commit();
-            }
-        }
-    }
-
+    @Override
     public PreferenceScreen preferenceScreen(PreferenceActivity activity)
     {
         PreferenceScreen screen = super.preferenceScreen(activity);
@@ -327,15 +308,14 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
         return screen;
     }
 
+    @Override
     protected boolean passesThreshold(SensorEvent event)
     {
         long now = System.currentTimeMillis();
 
         if (now - this.lastThresholdLookup > 5000)
         {
-            SharedPreferences prefs = Probe.getPreferences(this._context);
-            this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_proximity_threshold",
-                    ProximityProbe.DEFAULT_THRESHOLD));
+            this.lastThreshold = this.getThreshold();
 
             this.lastThresholdLookup = now;
         }
@@ -353,6 +333,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
         return passes;
     }
 
+    @Override
     @SuppressLint("NewApi")
     public void onSensorChanged(SensorEvent event)
     {
@@ -428,8 +409,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 
                             values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[j] / 1000));
 
-                            ProbeValuesProvider.getProvider(this._context).insertValue(this._context,
-                                    ProximityProbe.DB_TABLE, this.databaseSchema(), values);
+                            ProbeValuesProvider.getProvider(this._context).insertValue(this._context, ProximityProbe.DB_TABLE, this.databaseSchema(), values);
                         }
                     }
 
@@ -439,11 +419,13 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
         }
     }
 
+    @Override
     public String getPreferenceKey()
     {
         return "proximity_built_in";
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         double distance = bundle.getDoubleArray("DISTANCE")[0];
@@ -451,8 +433,23 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
         return String.format(context.getResources().getString(R.string.summary_proximity_value_probe), distance);
     }
 
+    @Override
     public int getSummaryResource()
     {
         return R.string.summary_proximity_probe_desc;
+    }
+
+    @Override
+    protected double getThreshold()
+    {
+        SharedPreferences prefs = Probe.getPreferences(this._context);
+
+        return Double.parseDouble(prefs.getString(ProximityProbe.THRESHOLD, ProximityProbe.DEFAULT_THRESHOLD));
+    }
+
+    @Override
+    protected int getResourceThresholdValues()
+    {
+        return R.array.probe_proximity_threshold;
     }
 }

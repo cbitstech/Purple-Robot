@@ -1,5 +1,9 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +17,7 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.telephony.TelephonyManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class CallStateProbe extends Probe
@@ -72,8 +77,7 @@ public class CallStateProbe extends Probe
 
                             if (prefs.getBoolean(CallStateProbe.ENABLED, CallStateProbe.DEFAULT_ENABLED))
                             {
-                                TelephonyManager tm = (TelephonyManager) context
-                                        .getSystemService(Context.TELEPHONY_SERVICE);
+                                TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 
                                 Bundle bundle = new Bundle();
                                 bundle.putString(Probe.BUNDLE_PROBE, me.name(context));
@@ -210,5 +214,29 @@ public class CallStateProbe extends Probe
         screen.addPreference(enabled);
 
         return screen;
+    }
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
     }
 }

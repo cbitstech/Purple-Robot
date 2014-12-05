@@ -2,6 +2,10 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningTaskInfo;
 import android.app.AlarmManager;
@@ -22,6 +26,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class ApplicationLaunchProbe extends Probe
@@ -127,8 +132,7 @@ public class ApplicationLaunchProbe extends Probe
                 @SuppressWarnings("deprecation")
                 public void onReceive(final Context context, Intent intent)
                 {
-                    ActivityManager activityManager = (ActivityManager) context
-                            .getSystemService(Context.ACTIVITY_SERVICE);
+                    ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
 
                     RunningTaskInfo foregroundTaskInfo = activityManager.getRunningTasks(1).get(0);
                     final String pkgName = foregroundTaskInfo.topActivity.getPackageName();
@@ -146,8 +150,7 @@ public class ApplicationLaunchProbe extends Probe
 
                     }
 
-                    final String name = (String) ((applicationInfo != null) ? packageManager
-                            .getApplicationLabel(applicationInfo) : "???");
+                    final String name = (String) ((applicationInfo != null) ? packageManager.getApplicationLabel(applicationInfo) : "???");
 
                     if (pkgName.equals(me._lastPkgName) == false)
                     {
@@ -162,8 +165,7 @@ public class ApplicationLaunchProbe extends Probe
                                 {
                                     bundle.putString("PREVIOUS_APP_PKG", me._lastPkgName);
                                     bundle.putString("PREVIOUS_APP_NAME", me._lastName);
-                                    bundle.putString("PREVIOUS_CATEGORY",
-                                            RunningSoftwareProbe.fetchCategory(context, me._lastPkgName));
+                                    bundle.putString("PREVIOUS_CATEGORY", RunningSoftwareProbe.fetchCategory(context, me._lastPkgName));
                                     bundle.putLong("PREVIOUS_TIMESTAMP", me._lastStart);
                                 }
 
@@ -174,8 +176,7 @@ public class ApplicationLaunchProbe extends Probe
                                 bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
                                 bundle.putString("CURRENT_APP_PKG", pkgName);
                                 bundle.putString("CURRENT_APP_NAME", name);
-                                bundle.putString("CURRENT_CATEGORY",
-                                        RunningSoftwareProbe.fetchCategory(context, pkgName));
+                                bundle.putString("CURRENT_CATEGORY", RunningSoftwareProbe.fetchCategory(context, pkgName));
 
                                 me.transmitData(context, bundle);
 
@@ -231,6 +232,11 @@ public class ApplicationLaunchProbe extends Probe
         {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
 
+            if (frequency instanceof Double)
+            {
+                frequency = Long.valueOf(((Double) frequency).longValue());
+            }
+
             if (frequency instanceof Long)
             {
                 SharedPreferences prefs = Probe.getPreferences(context);
@@ -266,7 +272,7 @@ public class ApplicationLaunchProbe extends Probe
         screen.addPreference(enabled);
 
         ListPreference duration = new ListPreference(activity);
-        duration.setKey("config_probe_application_launch_frequency");
+        duration.setKey(ApplicationLaunchProbe.FREQUENCY);
         duration.setEntryValues(R.array.probe_app_launch_frequency_values);
         duration.setEntries(R.array.probe_app_launch_frequency_labels);
         duration.setTitle(R.string.probe_frequency_label);
@@ -276,4 +282,42 @@ public class ApplicationLaunchProbe extends Probe
 
         return screen;
     }
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+
+            JSONObject frequency = new JSONObject();
+            frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
+            values = new JSONArray();
+
+            String[] options = context.getResources().getStringArray(R.array.probe_app_launch_frequency_values);
+
+            for (String option : options)
+            {
+                values.put(Long.parseLong(option));
+            }
+
+            frequency.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_FREQUENCY, frequency);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
+    }
+
 }

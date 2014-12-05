@@ -6,10 +6,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -22,12 +18,10 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.RealTimeProbeViewActivity;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
-import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("SimpleDateFormat")
@@ -43,7 +37,7 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
 
     private static final String FREQUENCY = "config_probe_accelerometer_built_in_frequency";
     private static final String ENABLED = "config_probe_accelerometer_built_in_enabled";
-    private static final String THRESHOLD = "config_probe_accelerometer_threshold";
+    private static final String THRESHOLD = "config_probe_accelerometer_built_in_threshold";
 
     private long lastThresholdLookup = 0;
     private double lastThreshold = 0.5;
@@ -256,89 +250,6 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
     }
 
     @Override
-    public Map<String, Object> configuration(Context context)
-    {
-        Map<String, Object> map = super.configuration(context);
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-
-        map.put(ContinuousProbe.PROBE_THRESHOLD, Double.parseDouble(prefs.getString(AccelerometerProbe.THRESHOLD, AccelerometerProbe.DEFAULT_THRESHOLD)));
-
-        return map;
-    }
-
-    @Override
-    public JSONObject fetchSettings(Context context)
-    {
-        JSONObject settings = new JSONObject();
-
-        try
-        {
-            JSONObject enabled = new JSONObject();
-            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
-            JSONArray values = new JSONArray();
-            values.put(true);
-            values.put(false);
-            enabled.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_ENABLED, enabled);
-
-            JSONObject frequency = new JSONObject();
-            frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
-            values = new JSONArray();
-
-            String[] options = this._context.getResources().getStringArray(this.getResourceFrequencyValues());
-
-            for (String option : options)
-            {
-                values.put(Long.parseLong(option));
-            }
-
-            frequency.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_FREQUENCY, frequency);
-
-            JSONObject threshold = new JSONObject();
-            threshold.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_DOUBLE);
-            values = new JSONArray();
-
-            options = this._context.getResources().getStringArray(R.array.probe_accelerometer_threshold);
-
-            for (String option : options)
-            {
-                values.put(Double.parseDouble(option));
-            }
-
-            threshold.put(Probe.PROBE_VALUES, values);
-            settings.put(ContinuousProbe.PROBE_THRESHOLD, threshold);
-        }
-        catch (JSONException e)
-        {
-            LogManager.getInstance(context).logException(e);
-        }
-
-        return settings;
-    }
-
-    @Override
-    public void updateFromMap(Context context, Map<String, Object> params)
-    {
-        super.updateFromMap(context, params);
-
-        if (params.containsKey(ContinuousProbe.PROBE_THRESHOLD))
-        {
-            Object threshold = params.get(ContinuousProbe.PROBE_THRESHOLD);
-
-            if (threshold instanceof Double)
-            {
-                SharedPreferences prefs = Probe.getPreferences(context);
-                Editor e = prefs.edit();
-
-                e.putString(AccelerometerProbe.THRESHOLD, threshold.toString());
-                e.commit();
-            }
-        }
-    }
-
-    @Override
     public PreferenceScreen preferenceScreen(PreferenceActivity activity)
     {
         PreferenceScreen screen = super.preferenceScreen(activity);
@@ -489,10 +400,10 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
         return AccelerometerProbe.DB_TABLE;
     }
 
+    @Override
     public double getThreshold()
     {
         SharedPreferences prefs = Probe.getPreferences(this._context);
-
         return Double.parseDouble(prefs.getString(AccelerometerProbe.THRESHOLD, AccelerometerProbe.DEFAULT_THRESHOLD));
     }
 
@@ -503,5 +414,11 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
         Editor e = prefs.edit();
         e.putString(AccelerometerProbe.THRESHOLD, "" + threshold);
         e.commit();
+    }
+
+    @Override
+    protected int getResourceThresholdValues()
+    {
+        return R.array.probe_accelerometer_threshold;
     }
 }
