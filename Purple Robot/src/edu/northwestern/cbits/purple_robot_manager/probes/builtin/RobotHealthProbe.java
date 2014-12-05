@@ -10,6 +10,9 @@ import java.util.Map;
 
 import org.apache.commons.net.ntp.NTPUDPClient;
 import org.apache.commons.net.ntp.TimeInfo;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -73,9 +76,11 @@ public class RobotHealthProbe extends Probe
 
     private static final boolean DEFAULT_ENABLED = true;
     private static final boolean DEFAULT_SCHEME = true;
-    private static final boolean DEFAULT_JAVASCRIPT = true;
-    private static final Object INCLUDE_JSON = "include_json";
-    private static final Object INCLUDE_SCHEME = "include_scheme";
+    private static final boolean DEFAULT_JSON = true;
+    private static final String INCLUDE_SCHEME_CONFIG = "config_probe_robot_scheme_config";
+    private static final String ENABLED = "config_probe_robot_enabled";
+    private static final String FREQUENCY = "config_probe_robot_frequency";
+    private static final String INCLUDE_JSON_CONFIG = "config_probe_robot_json_config";
 
     public static String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.RobotHealthProbe";
 
@@ -106,7 +111,7 @@ public class RobotHealthProbe extends Probe
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_robot_enabled", true);
+        e.putBoolean(RobotHealthProbe.ENABLED, true);
 
         e.commit();
     }
@@ -117,7 +122,7 @@ public class RobotHealthProbe extends Probe
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_robot_enabled", false);
+        e.putBoolean(RobotHealthProbe.ENABLED, false);
 
         e.commit();
     }
@@ -175,11 +180,11 @@ public class RobotHealthProbe extends Probe
 
         if (super.isEnabled(context))
         {
-            if (prefs.getBoolean("config_probe_robot_enabled", RobotHealthProbe.DEFAULT_ENABLED))
+            if (prefs.getBoolean(RobotHealthProbe.ENABLED, RobotHealthProbe.DEFAULT_ENABLED))
             {
                 synchronized (this)
                 {
-                    long freq = Long.parseLong(prefs.getString("config_probe_robot_frequency", Probe.DEFAULT_FREQUENCY));
+                    long freq = Long.parseLong(prefs.getString(RobotHealthProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
 
                     if (now - this._lastCheck > freq)
                     {
@@ -206,6 +211,9 @@ public class RobotHealthProbe extends Probe
                                     me._checking = true;
 
                                     int pendingCount = 0;
+
+                                    // TODO: Pull string values into
+                                    // constants...
 
                                     if (prefs.getBoolean("config_enable_data_server", false))
                                     {
@@ -360,14 +368,14 @@ public class RobotHealthProbe extends Probe
                                         LogManager.getInstance(context).logException(e);
                                     }
 
-                                    if (prefs.getBoolean("config_probe_robot_scheme_config", RobotHealthProbe.DEFAULT_SCHEME))
+                                    if (prefs.getBoolean(RobotHealthProbe.INCLUDE_SCHEME_CONFIG, RobotHealthProbe.DEFAULT_SCHEME))
                                     {
                                         SchemeConfigFile file = new SchemeConfigFile(context);
 
                                         bundle.putString(RobotHealthProbe.SCHEME_CONFIG, file.toString());
                                     }
 
-                                    if (prefs.getBoolean("config_probe_robot_json_config", RobotHealthProbe.DEFAULT_JAVASCRIPT))
+                                    if (prefs.getBoolean(RobotHealthProbe.INCLUDE_JSON_CONFIG, RobotHealthProbe.DEFAULT_JSON))
                                     {
                                         JSONConfigFile file = new JSONConfigFile(context);
 
@@ -462,11 +470,12 @@ public class RobotHealthProbe extends Probe
 
         SharedPreferences prefs = Probe.getPreferences(context);
 
-        long freq = Long.parseLong(prefs.getString("config_probe_robot_frequency", Probe.DEFAULT_FREQUENCY));
+        long freq = Long.parseLong(prefs.getString(RobotHealthProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
 
         map.put(Probe.PROBE_FREQUENCY, freq);
 
-        // TODO: Add JS + Scheme params...
+        map.put(RobotHealthProbe.INCLUDE_SCHEME_CONFIG, prefs.getBoolean(RobotHealthProbe.INCLUDE_SCHEME_CONFIG, RobotHealthProbe.DEFAULT_SCHEME));
+        map.put(RobotHealthProbe.INCLUDE_JSON_CONFIG, prefs.getBoolean(RobotHealthProbe.INCLUDE_JSON_CONFIG, RobotHealthProbe.DEFAULT_JSON));
 
         return map;
     }
@@ -483,24 +492,29 @@ public class RobotHealthProbe extends Probe
         {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
 
+            if (frequency instanceof Double)
+            {
+                frequency = Long.valueOf(((Double) frequency).longValue());
+            }
+
             if (frequency instanceof Long)
-                e.putString("config_probe_robot_frequency", frequency.toString());
+                e.putString(RobotHealthProbe.FREQUENCY, frequency.toString());
         }
 
-        if (params.containsKey(RobotHealthProbe.INCLUDE_SCHEME))
+        if (params.containsKey(RobotHealthProbe.INCLUDE_SCHEME_CONFIG))
         {
-            Object include = params.get(RobotHealthProbe.INCLUDE_SCHEME);
+            Object include = params.get(RobotHealthProbe.INCLUDE_SCHEME_CONFIG);
 
             if (include instanceof Boolean)
-                e.putBoolean("config_probe_robot_scheme_config", ((Boolean) include).booleanValue());
+                e.putBoolean(RobotHealthProbe.INCLUDE_SCHEME_CONFIG, ((Boolean) include).booleanValue());
         }
 
-        if (params.containsKey(RobotHealthProbe.INCLUDE_JSON))
+        if (params.containsKey(RobotHealthProbe.INCLUDE_JSON_CONFIG))
         {
-            Object include = params.get(RobotHealthProbe.INCLUDE_JSON);
+            Object include = params.get(RobotHealthProbe.INCLUDE_JSON_CONFIG);
 
             if (include instanceof Boolean)
-                e.putBoolean("config_probe_robot_json_config", ((Boolean) include).booleanValue());
+                e.putBoolean(RobotHealthProbe.INCLUDE_JSON_CONFIG, ((Boolean) include).booleanValue());
         }
 
         e.commit();
@@ -524,13 +538,13 @@ public class RobotHealthProbe extends Probe
 
         CheckBoxPreference enabled = new CheckBoxPreference(activity);
         enabled.setTitle(R.string.title_enable_probe);
-        enabled.setKey("config_probe_robot_enabled");
+        enabled.setKey(RobotHealthProbe.ENABLED);
         enabled.setDefaultValue(RobotHealthProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
 
         ListPreference duration = new ListPreference(activity);
-        duration.setKey("config_probe_robot_frequency");
+        duration.setKey(RobotHealthProbe.FREQUENCY);
         duration.setEntryValues(R.array.probe_low_frequency_values);
         duration.setEntries(R.array.probe_low_frequency_labels);
         duration.setTitle(R.string.probe_frequency_label);
@@ -540,16 +554,56 @@ public class RobotHealthProbe extends Probe
 
         CheckBoxPreference scheme = new CheckBoxPreference(activity);
         scheme.setTitle(R.string.title_enable_scheme_config);
-        scheme.setKey("config_probe_robot_scheme_config");
+        scheme.setKey(RobotHealthProbe.INCLUDE_SCHEME_CONFIG);
         scheme.setDefaultValue(RobotHealthProbe.DEFAULT_SCHEME);
         screen.addPreference(scheme);
 
         CheckBoxPreference json = new CheckBoxPreference(activity);
         json.setTitle(R.string.title_enable_json_config);
-        json.setKey("config_probe_robot_json_config");
-        json.setDefaultValue(RobotHealthProbe.DEFAULT_JAVASCRIPT);
+        json.setKey(RobotHealthProbe.INCLUDE_JSON_CONFIG);
+        json.setDefaultValue(RobotHealthProbe.DEFAULT_JSON);
         screen.addPreference(json);
 
         return screen;
+    }
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+
+            settings.put(RobotHealthProbe.INCLUDE_JSON_CONFIG, enabled);
+            settings.put(RobotHealthProbe.INCLUDE_SCHEME_CONFIG, enabled);
+
+            JSONObject frequency = new JSONObject();
+            frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
+            values = new JSONArray();
+
+            String[] options = context.getResources().getStringArray(R.array.probe_low_frequency_values);
+
+            for (String option : options)
+            {
+                values.put(Long.parseLong(option));
+            }
+
+            frequency.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_FREQUENCY, frequency);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
     }
 }

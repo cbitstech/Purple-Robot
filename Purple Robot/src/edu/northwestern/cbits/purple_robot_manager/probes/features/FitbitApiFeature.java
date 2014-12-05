@@ -2,6 +2,7 @@ package edu.northwestern.cbits.purple_robot_manager.probes.features;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,6 +24,7 @@ import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -100,62 +102,75 @@ public class FitbitApiFeature extends Feature
     protected static final String MEASUREMENT_AWAKE_DURATION = "DURATION";
     protected static final String MEASUREMENT_MINUTES_AWAKE = "MINUTES_AWAKE";
 
+    private static final String SLEEP_ENABLED = "config_feature_fitbit_api_sleep_enabled";
+    private static final String FOOD_ENABLED = "config_feature_fitbit_api_food_enabled";
+    private static final String BODY_ENABLED = "config_feature_fitbit_api_body_enabled";
+    private static final String ENABLED = "config_feature_fitbit_api_enabled";
+
     private long _lastUpdate = 0;
     private long _lastFetch = 0;
 
     private String _token = null;
     private String _secret = null;
 
+    @Override
     protected String featureKey()
     {
         return "fitbit_api";
     }
 
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_fitbit_api_feature_desc);
     }
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getResources().getString(R.string.probe_external_services_category);
     }
 
+    @Override
     public String name(Context context)
     {
         return "edu.northwestern.cbits.purple_robot_manager.probes.features.FitBitApiFeature";
     }
 
+    @Override
     public String title(Context context)
     {
         return context.getString(R.string.title_fitbit_api_feature);
     }
 
+    @Override
     public void enable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_feature_fitbit_api_enabled", true);
+        e.putBoolean(FitbitApiFeature.ENABLED, true);
         e.commit();
     }
 
+    @Override
     public void disable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_feature_fitbit_api_enabled", false);
+        e.putBoolean(FitbitApiFeature.ENABLED, false);
         e.commit();
     }
 
+    @Override
     public boolean isEnabled(final Context context)
     {
         final SharedPreferences prefs = Probe.getPreferences(context);
 
         if (super.isEnabled(context))
         {
-            if (prefs.getBoolean("config_feature_fitbit_api_enabled", false))
+            if (prefs.getBoolean(FitbitApiFeature.ENABLED, false))
             {
                 long now = System.currentTimeMillis();
 
@@ -177,6 +192,7 @@ public class FitbitApiFeature extends Feature
 
                         Runnable action = new Runnable()
                         {
+                            @Override
                             public void run()
                             {
                                 me.fetchAuth(context);
@@ -195,6 +211,7 @@ public class FitbitApiFeature extends Feature
 
                             Runnable r = new Runnable()
                             {
+                                @Override
                                 public void run()
                                 {
                                     try
@@ -212,9 +229,7 @@ public class FitbitApiFeature extends Feature
 
                                         String dateString = sdf.format(new Date());
 
-                                        OAuthRequest request = new OAuthRequest(Verb.GET,
-                                                "https://api.fitbit.com/1/user/-/activities/date/" + dateString
-                                                        + ".json");
+                                        OAuthRequest request = new OAuthRequest(Verb.GET, "https://api.fitbit.com/1/user/-/activities/date/" + dateString + ".json");
                                         service.signRequest(accessToken, request);
 
                                         Response response = request.send();
@@ -239,14 +254,10 @@ public class FitbitApiFeature extends Feature
                                         bundle.putLong(FitbitApiFeature.LIGHTLY_ACTIVE_MINUTES, lightlyActive);
                                         bundle.putLong(FitbitApiFeature.SEDENTARY_MINUTES, sedentary);
 
-                                        bundle.putDouble(FitbitApiFeature.VERY_ACTIVE_RATIO, (double) veryActive
-                                                / (double) total);
-                                        bundle.putDouble(FitbitApiFeature.FAIRLY_ACTIVE_RATIO, (double) fairlyActive
-                                                / (double) total);
-                                        bundle.putDouble(FitbitApiFeature.LIGHTLY_ACTIVE_RATIO, (double) lightlyActive
-                                                / (double) total);
-                                        bundle.putDouble(FitbitApiFeature.SEDENTARY_RATIO, (double) sedentary
-                                                / (double) total);
+                                        bundle.putDouble(FitbitApiFeature.VERY_ACTIVE_RATIO, (double) veryActive / (double) total);
+                                        bundle.putDouble(FitbitApiFeature.FAIRLY_ACTIVE_RATIO, (double) fairlyActive / (double) total);
+                                        bundle.putDouble(FitbitApiFeature.LIGHTLY_ACTIVE_RATIO, (double) lightlyActive / (double) total);
+                                        bundle.putDouble(FitbitApiFeature.SEDENTARY_RATIO, (double) sedentary / (double) total);
 
                                         long steps = summary.getLong("steps");
                                         bundle.putLong(FitbitApiFeature.STEPS, steps);
@@ -254,10 +265,8 @@ public class FitbitApiFeature extends Feature
                                         long caloriesOut = summary.getLong("caloriesOut");
                                         bundle.putLong(FitbitApiFeature.CALORIES_OUT, caloriesOut);
                                         bundle.putLong(FitbitApiFeature.CALORIES_BMR, summary.getLong("caloriesBMR"));
-                                        bundle.putLong(FitbitApiFeature.MARGINAL_CALORIES,
-                                                summary.getLong("marginalCalories"));
-                                        bundle.putLong(FitbitApiFeature.ACTIVITY_CALORIES,
-                                                summary.getLong("activityCalories"));
+                                        bundle.putLong(FitbitApiFeature.MARGINAL_CALORIES, summary.getLong("marginalCalories"));
+                                        bundle.putLong(FitbitApiFeature.ACTIVITY_CALORIES, summary.getLong("activityCalories"));
 
                                         long score = summary.getLong("activeScore");
                                         bundle.putLong(FitbitApiFeature.ACTIVE_SCORE, score);
@@ -286,19 +295,13 @@ public class FitbitApiFeature extends Feature
                                         bundle.putLong(FitbitApiFeature.GOAL_STEPS, goalSteps);
                                         bundle.putLong(FitbitApiFeature.GOAL_CALORIES, goalCalories);
 
-                                        bundle.putDouble(FitbitApiFeature.GOAL_DISTANCE_RATIO, (double) distance
-                                                / (double) goalDistance);
-                                        bundle.putDouble(FitbitApiFeature.GOAL_STEPS_RATIO, (double) steps
-                                                / (double) goalSteps);
-                                        bundle.putDouble(FitbitApiFeature.GOAL_CALORIES_RATIO, (double) caloriesOut
-                                                / (double) goalCalories);
+                                        bundle.putDouble(FitbitApiFeature.GOAL_DISTANCE_RATIO, (double) distance / (double) goalDistance);
+                                        bundle.putDouble(FitbitApiFeature.GOAL_STEPS_RATIO, (double) steps / (double) goalSteps);
+                                        bundle.putDouble(FitbitApiFeature.GOAL_CALORIES_RATIO, (double) caloriesOut / (double) goalCalories);
 
-                                        if (prefs.getBoolean("config_feature_fitbit_api_sleep_enabled",
-                                                FitbitApiFeature.SLEEP_DEFAULT))
+                                        if (prefs.getBoolean(FitbitApiFeature.SLEEP_ENABLED, FitbitApiFeature.SLEEP_DEFAULT))
                                         {
-                                            request = new OAuthRequest(Verb.GET,
-                                                    "https://api.fitbit.com/1/user/-/sleep/date/" + dateString
-                                                            + ".json");
+                                            request = new OAuthRequest(Verb.GET, "https://api.fitbit.com/1/user/-/sleep/date/" + dateString + ".json");
                                             service.signRequest(accessToken, request);
 
                                             response = request.send();
@@ -344,35 +347,24 @@ public class FitbitApiFeature extends Feature
 
                                             Bundle sleepBundle = new Bundle();
 
-                                            sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_RESTLESS_COUNT,
-                                                    restlessCount);
-                                            sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_RESTLESS_DURATION,
-                                                    restlessDuration);
+                                            sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_RESTLESS_COUNT, restlessCount);
+                                            sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_RESTLESS_DURATION, restlessDuration);
                                             sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_AWAKE_COUNT, awakeCount);
-                                            sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_AWAKE_DURATION,
-                                                    awakeDuration);
-                                            sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_AWAKENINGS_COUNT,
-                                                    awakeningsCount);
-                                            sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_MINUTES_IN_BED_BEFORE,
-                                                    minutesInBedBefore);
-                                            sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_MINUTES_ASLEEP,
-                                                    minutesAsleep);
-                                            sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_MINUTES_AWAKE,
-                                                    minutesAwake);
-                                            sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_MINUTES_IN_BED_AFTER,
-                                                    minutesInBedAfter);
+                                            sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_AWAKE_DURATION, awakeDuration);
+                                            sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_AWAKENINGS_COUNT, awakeningsCount);
+                                            sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_MINUTES_IN_BED_BEFORE, minutesInBedBefore);
+                                            sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_MINUTES_ASLEEP, minutesAsleep);
+                                            sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_MINUTES_AWAKE, minutesAwake);
+                                            sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_MINUTES_IN_BED_AFTER, minutesInBedAfter);
                                             sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_TIME_IN_BED, timeInBed);
                                             sleepBundle.putDouble(FitbitApiFeature.MEASUREMENT_DURATION, duration);
 
                                             bundle.putBundle(FitbitApiFeature.MEASUREMENT_SLEEP, sleepBundle);
                                         }
 
-                                        if (prefs.getBoolean("config_feature_fitbit_api_food_enabled",
-                                                FitbitApiFeature.FOOD_DEFAULT))
+                                        if (prefs.getBoolean(FitbitApiFeature.FOOD_ENABLED, FitbitApiFeature.FOOD_DEFAULT))
                                         {
-                                            request = new OAuthRequest(Verb.GET,
-                                                    "https://api.fitbit.com/1/user/-/foods/log/date/" + dateString
-                                                            + ".json");
+                                            request = new OAuthRequest(Verb.GET, "https://api.fitbit.com/1/user/-/foods/log/date/" + dateString + ".json");
                                             service.signRequest(accessToken, request);
 
                                             response = request.send();
@@ -382,29 +374,20 @@ public class FitbitApiFeature extends Feature
 
                                             Bundle foodBundle = new Bundle();
 
-                                            foodBundle.putDouble(FitbitApiFeature.MEASUREMENT_WATER,
-                                                    (double) body.getInt("water"));
-                                            foodBundle.putDouble(FitbitApiFeature.MEASUREMENT_CALORIES,
-                                                    (double) body.getInt("calories"));
-                                            foodBundle.putDouble(FitbitApiFeature.MEASUREMENT_SODIUM,
-                                                    (double) body.getInt("sodium"));
-                                            foodBundle.putDouble(FitbitApiFeature.MEASUREMENT_FIBER,
-                                                    (double) body.getInt("fiber"));
-                                            foodBundle.putDouble(FitbitApiFeature.MEASUREMENT_CARBS,
-                                                    (double) body.getInt("carbs"));
-                                            foodBundle.putDouble(FitbitApiFeature.MEASUREMENT_PROTEIN,
-                                                    (double) body.getInt("protein"));
-                                            foodBundle.putDouble(FitbitApiFeature.MEASUREMENT_FAT_FOOD,
-                                                    (double) body.getInt("fat"));
+                                            foodBundle.putDouble(FitbitApiFeature.MEASUREMENT_WATER, (double) body.getInt("water"));
+                                            foodBundle.putDouble(FitbitApiFeature.MEASUREMENT_CALORIES, (double) body.getInt("calories"));
+                                            foodBundle.putDouble(FitbitApiFeature.MEASUREMENT_SODIUM, (double) body.getInt("sodium"));
+                                            foodBundle.putDouble(FitbitApiFeature.MEASUREMENT_FIBER, (double) body.getInt("fiber"));
+                                            foodBundle.putDouble(FitbitApiFeature.MEASUREMENT_CARBS, (double) body.getInt("carbs"));
+                                            foodBundle.putDouble(FitbitApiFeature.MEASUREMENT_PROTEIN, (double) body.getInt("protein"));
+                                            foodBundle.putDouble(FitbitApiFeature.MEASUREMENT_FAT_FOOD, (double) body.getInt("fat"));
 
                                             bundle.putBundle(FitbitApiFeature.MEASUREMENT_FOOD, foodBundle);
                                         }
 
-                                        if (prefs.getBoolean("config_feature_fitbit_api_body_enabled",
-                                                FitbitApiFeature.BODY_DEFAULT))
+                                        if (prefs.getBoolean(FitbitApiFeature.BODY_ENABLED, FitbitApiFeature.BODY_DEFAULT))
                                         {
-                                            request = new OAuthRequest(Verb.GET,
-                                                    "https://api.fitbit.com/1/user/-/body/date/" + dateString + ".json");
+                                            request = new OAuthRequest(Verb.GET, "https://api.fitbit.com/1/user/-/body/date/" + dateString + ".json");
                                             service.signRequest(accessToken, request);
 
                                             response = request.send();
@@ -414,28 +397,17 @@ public class FitbitApiFeature extends Feature
 
                                             Bundle bodyBundle = new Bundle();
 
-                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_BICEP,
-                                                    (double) body.getInt("bicep"));
-                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_BMI,
-                                                    (double) body.getInt("bmi"));
-                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_CALF,
-                                                    (double) body.getInt("calf"));
-                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_CHEST,
-                                                    (double) body.getInt("chest"));
-                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_FAT,
-                                                    (double) body.getInt("fat"));
-                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_FOREARM,
-                                                    (double) body.getInt("forearm"));
-                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_HIPS,
-                                                    (double) body.getInt("hips"));
-                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_NECK,
-                                                    (double) body.getInt("neck"));
-                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_THIGH,
-                                                    (double) body.getInt("thigh"));
-                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_WAIST,
-                                                    (double) body.getInt("waist"));
-                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_WEIGHT,
-                                                    (double) body.getInt("weight"));
+                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_BICEP, (double) body.getInt("bicep"));
+                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_BMI, (double) body.getInt("bmi"));
+                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_CALF, (double) body.getInt("calf"));
+                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_CHEST, (double) body.getInt("chest"));
+                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_FAT, (double) body.getInt("fat"));
+                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_FOREARM, (double) body.getInt("forearm"));
+                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_HIPS, (double) body.getInt("hips"));
+                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_NECK, (double) body.getInt("neck"));
+                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_THIGH, (double) body.getInt("thigh"));
+                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_WAIST, (double) body.getInt("waist"));
+                                            bodyBundle.putDouble(FitbitApiFeature.MEASUREMENT_WEIGHT, (double) body.getInt("weight"));
 
                                             bundle.putBundle(FitbitApiFeature.MEASUREMENT_BODY, bodyBundle);
                                         }
@@ -470,6 +442,7 @@ public class FitbitApiFeature extends Feature
         return false;
     }
 
+    @Override
     protected boolean defaultEnabled()
     {
         return false;
@@ -488,27 +461,119 @@ public class FitbitApiFeature extends Feature
         context.startActivity(intent);
     }
 
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+
+            settings.put(FitbitApiFeature.SLEEP_ENABLED, enabled);
+            settings.put(FitbitApiFeature.FOOD_ENABLED, enabled);
+            settings.put(FitbitApiFeature.BODY_ENABLED, enabled);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
+    }
+
+    @Override
+    public Map<String, Object> configuration(Context context)
+    {
+        Map<String, Object> map = super.configuration(context);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        map.put(FitbitApiFeature.SLEEP_ENABLED, prefs.getBoolean(FitbitApiFeature.SLEEP_ENABLED, FitbitApiFeature.SLEEP_DEFAULT));
+        map.put(FitbitApiFeature.FOOD_ENABLED, prefs.getBoolean(FitbitApiFeature.FOOD_ENABLED, FitbitApiFeature.FOOD_DEFAULT));
+        map.put(FitbitApiFeature.BODY_ENABLED, prefs.getBoolean(FitbitApiFeature.BODY_ENABLED, FitbitApiFeature.BODY_DEFAULT));
+
+        return map;
+    }
+
+    @Override
+    public void updateFromMap(Context context, Map<String, Object> params)
+    {
+        super.updateFromMap(context, params);
+
+        if (params.containsKey(FitbitApiFeature.SLEEP_ENABLED))
+        {
+            Object value = params.get(FitbitApiFeature.SLEEP_ENABLED);
+
+            if (value instanceof Boolean)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putBoolean(FitbitApiFeature.SLEEP_ENABLED, ((Boolean) value).booleanValue());
+                e.commit();
+            }
+        }
+
+        if (params.containsKey(FitbitApiFeature.BODY_ENABLED))
+        {
+            Object value = params.get(FitbitApiFeature.BODY_ENABLED);
+
+            if (value instanceof Boolean)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putBoolean(FitbitApiFeature.BODY_ENABLED, ((Boolean) value).booleanValue());
+                e.commit();
+            }
+        }
+
+        if (params.containsKey(FitbitApiFeature.FOOD_ENABLED))
+        {
+            Object value = params.get(FitbitApiFeature.FOOD_ENABLED);
+
+            if (value instanceof Boolean)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putBoolean(FitbitApiFeature.FOOD_ENABLED, ((Boolean) value).booleanValue());
+                e.commit();
+            }
+        }
+    }
+
+    @Override
     public PreferenceScreen preferenceScreen(final PreferenceActivity activity)
     {
         final PreferenceScreen screen = super.preferenceScreen(activity);
 
         CheckBoxPreference sleepPref = new CheckBoxPreference(activity);
-        sleepPref.setKey("config_feature_fitbit_api_sleep_enabled");
+        sleepPref.setKey(FitbitApiFeature.SLEEP_ENABLED);
         sleepPref.setDefaultValue(FitbitApiFeature.SLEEP_DEFAULT);
         sleepPref.setTitle(R.string.config_fitbit_sleep_title);
         screen.addPreference(sleepPref);
 
         CheckBoxPreference foodPref = new CheckBoxPreference(activity);
-        foodPref.setKey("config_feature_fitbit_api_food_enabled");
+        foodPref.setKey(FitbitApiFeature.FOOD_ENABLED);
         foodPref.setDefaultValue(FitbitApiFeature.FOOD_DEFAULT);
         foodPref.setTitle(R.string.config_fitbit_food_title);
         screen.addPreference(foodPref);
 
         CheckBoxPreference bodyPref = new CheckBoxPreference(activity);
-        bodyPref.setKey("config_feature_fitbit_api_body_enabled");
+        bodyPref.setKey(FitbitApiFeature.BODY_ENABLED);
         bodyPref.setDefaultValue(FitbitApiFeature.BODY_DEFAULT);
         bodyPref.setTitle(R.string.config_fitbit_body_title);
         screen.addPreference(bodyPref);
+
+        // TODO: Should activity have a boolean switch as well?
 
         final SharedPreferences prefs = Probe.getPreferences(activity);
 
@@ -527,6 +592,7 @@ public class FitbitApiFeature extends Feature
 
         authPreference.setOnPreferenceClickListener(new OnPreferenceClickListener()
         {
+            @Override
             public boolean onPreferenceClick(Preference preference)
             {
                 me.fetchAuth(activity);
@@ -540,6 +606,7 @@ public class FitbitApiFeature extends Feature
 
         logoutPreference.setOnPreferenceClickListener(new OnPreferenceClickListener()
         {
+            @Override
             public boolean onPreferenceClick(Preference preference)
             {
                 Editor e = prefs.edit();
@@ -554,10 +621,10 @@ public class FitbitApiFeature extends Feature
 
                 activity.runOnUiThread(new Runnable()
                 {
+                    @Override
                     public void run()
                     {
-                        Toast.makeText(activity, activity.getString(R.string.toast_fitbit_logout), Toast.LENGTH_LONG)
-                                .show();
+                        Toast.makeText(activity, activity.getString(R.string.toast_fitbit_logout), Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -573,6 +640,7 @@ public class FitbitApiFeature extends Feature
         return screen;
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         double steps = bundle.getDouble(FitbitApiFeature.STEPS);

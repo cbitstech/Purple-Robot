@@ -3,6 +3,10 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -16,8 +20,8 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class RawLocationProbe extends Probe implements LocationListener
@@ -58,14 +62,16 @@ public class RawLocationProbe extends Probe implements LocationListener
     private long _lastFrequency = 0;
     private boolean _listening = false;
 
-    private HashMap<String, Boolean> _lastEnabled = new HashMap<String, Boolean>();
-    private HashMap<String, Integer> _lastStatus = new HashMap<String, Integer>();
+    private final HashMap<String, Boolean> _lastEnabled = new HashMap<String, Boolean>();
+    private final HashMap<String, Integer> _lastStatus = new HashMap<String, Integer>();
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getString(R.string.probe_misc_category);
     }
 
+    @Override
     public void enable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
@@ -76,6 +82,7 @@ public class RawLocationProbe extends Probe implements LocationListener
         e.commit();
     }
 
+    @Override
     public void disable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
@@ -86,6 +93,7 @@ public class RawLocationProbe extends Probe implements LocationListener
         e.commit();
     }
 
+    @Override
     public Map<String, Object> configuration(Context context)
     {
         Map<String, Object> map = super.configuration(context);
@@ -99,6 +107,7 @@ public class RawLocationProbe extends Probe implements LocationListener
         return map;
     }
 
+    @Override
     public void updateFromMap(Context context, Map<String, Object> params)
     {
         super.updateFromMap(context, params);
@@ -106,6 +115,11 @@ public class RawLocationProbe extends Probe implements LocationListener
         if (params.containsKey(Probe.PROBE_FREQUENCY))
         {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
+
+            if (frequency instanceof Double)
+            {
+                frequency = Long.valueOf(((Double) frequency).longValue());
+            }
 
             if (frequency instanceof Long)
             {
@@ -118,11 +132,13 @@ public class RawLocationProbe extends Probe implements LocationListener
         }
     }
 
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_raw_location_probe_desc);
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(final PreferenceActivity activity)
     {
@@ -151,6 +167,44 @@ public class RawLocationProbe extends Probe implements LocationListener
         return screen;
     }
 
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+
+            JSONObject frequency = new JSONObject();
+            frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
+            values = new JSONArray();
+
+            String[] options = this._context.getResources().getStringArray(R.array.probe_satellite_frequency_values);
+
+            for (String option : options)
+            {
+                values.put(Long.parseLong(option));
+            }
+
+            frequency.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_FREQUENCY, frequency);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
+    }
+
+    @Override
     public boolean isEnabled(Context context)
     {
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
@@ -193,16 +247,19 @@ public class RawLocationProbe extends Probe implements LocationListener
         return false;
     }
 
+    @Override
     public String title(Context context)
     {
         return context.getString(R.string.title_raw_location_probe);
     }
 
+    @Override
     public String name(Context context)
     {
         return RawLocationProbe.NAME;
     }
 
+    @Override
     public void onLocationChanged(Location location)
     {
         if (location == null)
@@ -222,10 +279,8 @@ public class RawLocationProbe extends Probe implements LocationListener
 
         LocationManager locationManager = (LocationManager) this._context.getSystemService(Context.LOCATION_SERVICE);
 
-        bundle.putBoolean(RawLocationProbe.GPS_AVAILABLE,
-                locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER));
-        bundle.putBoolean(RawLocationProbe.NETWORK_AVAILABLE,
-                locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER));
+        bundle.putBoolean(RawLocationProbe.GPS_AVAILABLE, locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER));
+        bundle.putBoolean(RawLocationProbe.NETWORK_AVAILABLE, locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER));
 
         if (location.hasAccuracy())
             bundle.putFloat(RawLocationProbe.ACCURACY, location.getAccuracy());
@@ -254,6 +309,7 @@ public class RawLocationProbe extends Probe implements LocationListener
         this.transmitData(this._context, bundle);
     }
 
+    @Override
     public void onProviderDisabled(String provider)
     {
         if (this._lastEnabled.containsKey(provider) && this._lastEnabled.get(provider).booleanValue() == false)
@@ -273,6 +329,7 @@ public class RawLocationProbe extends Probe implements LocationListener
             this.isEnabled(this._context);
     }
 
+    @Override
     public void onProviderEnabled(String provider)
     {
         if (this._lastEnabled.containsKey(provider) && this._lastEnabled.get(provider).booleanValue() == true)
@@ -292,6 +349,7 @@ public class RawLocationProbe extends Probe implements LocationListener
             this.isEnabled(this._context);
     }
 
+    @Override
     public void onStatusChanged(String provider, int status, Bundle bundle)
     {
         if (this._lastStatus.containsKey(provider) && this._lastStatus.get(provider).intValue() == status)
@@ -323,6 +381,7 @@ public class RawLocationProbe extends Probe implements LocationListener
             this.isEnabled(this._context);
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         double latitude = bundle.getDouble(RawLocationProbe.LATITUDE);

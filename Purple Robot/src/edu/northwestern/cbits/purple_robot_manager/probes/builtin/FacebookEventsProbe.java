@@ -1,6 +1,7 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
 import org.apache.commons.lang.StringUtils;
+import org.json.JSONObject;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ public class FacebookEventsProbe extends Probe
 {
     public static final String PROBE_NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.FacebookEventsProbe";
 
+    @Override
     public String name(Context context)
     {
         return FacebookEventsProbe.PROBE_NAME;
@@ -24,35 +26,37 @@ public class FacebookEventsProbe extends Probe
         return context.getString(R.string.title_facebook_events_probe);
     }
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getResources().getString(R.string.probe_external_services_category);
     }
 
+    @Override
     public PreferenceScreen preferenceScreen(PreferenceActivity settingsActivity)
     {
         return null;
     }
 
-    {
-
-    }
-
+    @Override
     public void enable(Context context)
     {
 
     }
 
+    @Override
     public void disable(Context context)
     {
 
     }
 
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.title_facebook_events_probe);
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         String message = bundle.getString("MESSAGE");
@@ -64,10 +68,16 @@ public class FacebookEventsProbe extends Probe
             message = StringUtils.abbreviate(message, 512);
 
         if (obfuscated)
-            return String.format(context.getResources().getString(R.string.facebook_event_obfuscated_desc), message,
-                    type);
+            return String.format(context.getResources().getString(R.string.facebook_event_obfuscated_desc), message, type);
 
         return String.format(context.getResources().getString(R.string.facebook_event_clear_desc), message, type);
+    }
 
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        return settings;
     }
 }

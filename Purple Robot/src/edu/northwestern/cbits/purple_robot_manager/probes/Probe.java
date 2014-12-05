@@ -241,11 +241,11 @@ public abstract class Probe
         }
     }
 
-    // public abstract JSONObject fetchSettings(Context context);
+    public abstract JSONObject fetchSettings(Context context);
 
-    public JSONObject fetchSettings(Context context)
+    public JSONObject fetchSettingsFoo(Context context)
     {
-        // // TODO: Make abstract & implement across ALL probes...
+        // TODO: Make abstract & implement across ALL probes...
 
         return null;
     }

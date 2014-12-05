@@ -3,6 +3,10 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 import java.security.SecureRandom;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -15,6 +19,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class RandomNoiseProbe extends Probe
@@ -24,46 +29,54 @@ public class RandomNoiseProbe extends Probe
 
     private static final boolean DEFAULT_ENABLED = false;
     private static final boolean DEFAULT_PERSIST = false;
+    private static final String ENABLED = "config_probe_random_noise_enabled";
+    private static final String PERSIST = "config_probe_random_noise_persist";
 
     private PendingIntent _intent = null;
 
     public static RandomNoiseProbe instance = null;
 
+    @Override
     public String name(Context context)
     {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.RandomNoiseProbe";
     }
 
+    @Override
     public String title(Context context)
     {
         return context.getString(R.string.title_random_noise_probe);
     }
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getResources().getString(R.string.probe_misc_category);
     }
 
+    @Override
     public void enable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_random_noise_enabled", true);
+        e.putBoolean(RandomNoiseProbe.ENABLED, true);
 
         e.commit();
     }
 
+    @Override
     public void disable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_random_noise_enabled", false);
+        e.putBoolean(RandomNoiseProbe.ENABLED, false);
 
         e.commit();
     }
 
+    @Override
     public boolean isEnabled(Context context)
     {
         if (RandomNoiseProbe.instance == null)
@@ -73,7 +86,7 @@ public class RandomNoiseProbe extends Probe
 
         if (super.isEnabled(context))
         {
-            if (prefs.getBoolean("config_probe_random_noise_enabled", RandomNoiseProbe.DEFAULT_ENABLED))
+            if (prefs.getBoolean(RandomNoiseProbe.ENABLED, RandomNoiseProbe.DEFAULT_ENABLED))
             {
                 synchronized (this)
                 {
@@ -85,15 +98,13 @@ public class RandomNoiseProbe extends Probe
 
                     bundle.putFloat(RandomNoiseProbe.NOISE_VALUE, random.nextFloat());
 
-                    bundle.putBoolean("TRANSMIT",
-                            prefs.getBoolean("config_probe_random_noise_persist", RandomNoiseProbe.DEFAULT_PERSIST));
+                    bundle.putBoolean("TRANSMIT", prefs.getBoolean(RandomNoiseProbe.PERSIST, RandomNoiseProbe.DEFAULT_PERSIST));
 
                     this.transmitData(context, bundle);
 
                     if (this._intent == null)
                     {
-                        this._intent = PendingIntent.getService(context, 0, new Intent(RandomNoiseProbe.ACTION),
-                                PendingIntent.FLAG_UPDATE_CURRENT);
+                        this._intent = PendingIntent.getService(context, 0, new Intent(RandomNoiseProbe.ACTION), PendingIntent.FLAG_UPDATE_CURRENT);
 
                         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
@@ -116,6 +127,7 @@ public class RandomNoiseProbe extends Probe
         return false;
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         double noise = bundle.getDouble(RandomNoiseProbe.NOISE_VALUE);
@@ -123,11 +135,13 @@ public class RandomNoiseProbe extends Probe
         return String.format(context.getResources().getString(R.string.summary_random_noise_probe), noise);
     }
 
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_random_noise_probe_desc);
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(PreferenceActivity activity)
     {
@@ -139,47 +153,78 @@ public class RandomNoiseProbe extends Probe
 
         CheckBoxPreference enabled = new CheckBoxPreference(activity);
         enabled.setTitle(R.string.title_enable_probe);
-        enabled.setKey("config_probe_random_noise_enabled");
+        enabled.setKey(RandomNoiseProbe.ENABLED);
         enabled.setDefaultValue(RandomNoiseProbe.DEFAULT_ENABLED);
         screen.addPreference(enabled);
 
         CheckBoxPreference persist = new CheckBoxPreference(activity);
         persist.setTitle(R.string.title_probe_random_noise_persist);
         persist.setSummary(R.string.summary_probe_random_noise_persist);
-        persist.setKey("config_probe_random_noise_persist");
+        persist.setKey(RandomNoiseProbe.PERSIST);
         screen.addPreference(persist);
         persist.setDefaultValue(RandomNoiseProbe.DEFAULT_PERSIST);
 
         return screen;
     }
 
+    @Override
     public Map<String, Object> configuration(Context context)
     {
         Map<String, Object> map = super.configuration(context);
 
         SharedPreferences prefs = Probe.getPreferences(context);
 
-        map.put("retain", prefs.getBoolean("config_probe_random_noise_persist", false));
+        map.put(RandomNoiseProbe.PERSIST, prefs.getBoolean(RandomNoiseProbe.PERSIST, false));
 
         return map;
     }
 
+    @Override
     public void updateFromMap(Context context, Map<String, Object> params)
     {
         super.updateFromMap(context, params);
 
-        if (params.containsKey("retain"))
+        if (params.containsKey(RandomNoiseProbe.PERSIST))
         {
-            Object retain = params.get("retain");
+            Object retain = params.get(RandomNoiseProbe.PERSIST);
 
             if (retain instanceof Boolean)
             {
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putBoolean("config_probe_random_noise_persist", ((Boolean) retain).booleanValue());
+                e.putBoolean(RandomNoiseProbe.PERSIST, ((Boolean) retain).booleanValue());
                 e.commit();
             }
         }
+    }
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+
+            JSONObject persist = new JSONObject();
+            persist.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            persist.put(Probe.PROBE_VALUES, values);
+            settings.put(RandomNoiseProbe.PERSIST, persist);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
     }
 }

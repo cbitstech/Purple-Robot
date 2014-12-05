@@ -48,47 +48,56 @@ public class TwitterProbe extends Probe
     private static final boolean DEFAULT_ENCRYPT = false;
 
     protected static final String HOUR_COUNT = "HOUR_COUNT";
+    private static final String ENABLED = "config_probe_twitter_enabled";
+    private static final String FREQUENCY = "config_probe_twitter_frequency";
+    private static final String ENCRYPT_DATA = "config_probe_twitter_encrypt_data";
 
     private long _lastCheck = 0;
 
     private String _token = null;
     private String _secret = null;
 
+    @Override
     public String name(Context context)
     {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.TwitterProbe";
     }
 
+    @Override
     public String title(Context context)
     {
         return context.getString(R.string.title_twitter_probe);
     }
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getResources().getString(R.string.probe_external_services_category);
     }
 
+    @Override
     public void enable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_twitter_enabled", true);
+        e.putBoolean(TwitterProbe.ENABLED, true);
 
         e.commit();
     }
 
+    @Override
     public void disable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_twitter_enabled", false);
+        e.putBoolean(TwitterProbe.ENABLED, false);
 
         e.commit();
     }
 
+    @Override
     public boolean isEnabled(final Context context)
     {
         final SharedPreferences prefs = Probe.getPreferences(context);
@@ -97,14 +106,12 @@ public class TwitterProbe extends Probe
         {
             final long now = System.currentTimeMillis();
 
-            if (prefs.getBoolean("config_probe_twitter_enabled", TwitterProbe.DEFAULT_ENABLED))
+            if (prefs.getBoolean(TwitterProbe.ENABLED, TwitterProbe.DEFAULT_ENABLED))
             {
                 synchronized (this)
                 {
-                    long freq = Long.parseLong(prefs.getString("config_probe_twitter_frequency",
-                            Probe.DEFAULT_FREQUENCY));
-                    final boolean doEncrypt = prefs.getBoolean("config_probe_twitter_encrypt_data",
-                            TwitterProbe.DEFAULT_ENCRYPT);
+                    long freq = Long.parseLong(prefs.getString(TwitterProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
+                    final boolean doEncrypt = prefs.getBoolean(TwitterProbe.ENCRYPT_DATA, TwitterProbe.DEFAULT_ENCRYPT);
 
                     final EncryptionManager em = EncryptionManager.getInstance();
 
@@ -124,6 +131,7 @@ public class TwitterProbe extends Probe
 
                             Runnable action = new Runnable()
                             {
+                                @Override
                                 public void run()
                                 {
                                     me.fetchAuth(context);
@@ -145,18 +153,17 @@ public class TwitterProbe extends Probe
 
                             final OAuthService service = builder.build();
 
-                            final OAuthRequest request = new OAuthRequest(Verb.GET,
-                                    "https://api.twitter.com/1.1/statuses/user_timeline.json");
+                            final OAuthRequest request = new OAuthRequest(Verb.GET, "https://api.twitter.com/1.1/statuses/user_timeline.json");
                             service.signRequest(accessToken, request);
 
                             Runnable r = new Runnable()
                             {
+                                @Override
                                 public void run()
                                 {
                                     try
                                     {
-                                        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss ZZZZZ yyyy",
-                                                Locale.ENGLISH);
+                                        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss ZZZZZ yyyy", Locale.ENGLISH);
                                         sdf.setLenient(true);
 
                                         long mostRecent = prefs.getLong("config_twitter_most_recent", 0);
@@ -269,6 +276,7 @@ public class TwitterProbe extends Probe
         context.startActivity(intent);
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         String screenname = bundle.getString("SCREENNAME");
@@ -277,21 +285,23 @@ public class TwitterProbe extends Probe
         return "@" + screenname + ": " + message;
     }
 
+    @Override
     public Map<String, Object> configuration(Context context)
     {
         Map<String, Object> map = super.configuration(context);
 
         SharedPreferences prefs = Probe.getPreferences(context);
 
-        long freq = Long.parseLong(prefs.getString("config_probe_twitter_frequency", Probe.DEFAULT_FREQUENCY));
+        long freq = Long.parseLong(prefs.getString(TwitterProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
         map.put(Probe.PROBE_FREQUENCY, freq);
 
-        boolean hash = prefs.getBoolean("config_probe_twitter_encrypt_data", TwitterProbe.DEFAULT_ENCRYPT);
+        boolean hash = prefs.getBoolean(TwitterProbe.ENCRYPT_DATA, TwitterProbe.DEFAULT_ENCRYPT);
         map.put(Probe.ENCRYPT_DATA, hash);
 
         return map;
     }
 
+    @Override
     public void updateFromMap(Context context, Map<String, Object> params)
     {
         super.updateFromMap(context, params);
@@ -300,12 +310,17 @@ public class TwitterProbe extends Probe
         {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
 
+            if (frequency instanceof Double)
+            {
+                frequency = Long.valueOf(((Double) frequency).longValue());
+            }
+
             if (frequency instanceof Long)
             {
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putString("config_probe_twitter_frequency", frequency.toString());
+                e.putString(TwitterProbe.FREQUENCY, frequency.toString());
                 e.commit();
             }
         }
@@ -321,17 +336,19 @@ public class TwitterProbe extends Probe
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putBoolean("config_probe_twitter_encrypt_data", encryptBoolean.booleanValue());
+                e.putBoolean(TwitterProbe.ENCRYPT_DATA, encryptBoolean.booleanValue());
                 e.commit();
             }
         }
     }
 
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_twitter_probe_desc);
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(final PreferenceActivity activity)
     {
@@ -348,13 +365,13 @@ public class TwitterProbe extends Probe
 
         CheckBoxPreference enabled = new CheckBoxPreference(activity);
         enabled.setTitle(R.string.title_enable_probe);
-        enabled.setKey("config_probe_twitter_enabled");
+        enabled.setKey(TwitterProbe.ENABLED);
         enabled.setDefaultValue(TwitterProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
 
         ListPreference duration = new ListPreference(activity);
-        duration.setKey("config_probe_twitter_frequency");
+        duration.setKey(TwitterProbe.FREQUENCY);
         duration.setEntryValues(R.array.probe_low_frequency_values);
         duration.setEntries(R.array.probe_low_frequency_labels);
         duration.setTitle(R.string.probe_frequency_label);
@@ -363,7 +380,7 @@ public class TwitterProbe extends Probe
         screen.addPreference(duration);
 
         CheckBoxPreference encrypt = new CheckBoxPreference(activity);
-        encrypt.setKey("config_probe_twitter_encrypt_data");
+        encrypt.setKey(TwitterProbe.ENCRYPT_DATA);
         encrypt.setDefaultValue(TwitterProbe.DEFAULT_ENCRYPT);
         encrypt.setTitle(R.string.config_probe_twitter_encrypt_title);
         encrypt.setSummary(R.string.config_probe_twitter_encrypt_summary);
@@ -382,6 +399,7 @@ public class TwitterProbe extends Probe
 
         authPreference.setOnPreferenceClickListener(new OnPreferenceClickListener()
         {
+            @Override
             public boolean onPreferenceClick(Preference preference)
             {
                 me.fetchAuth(activity);
@@ -395,6 +413,7 @@ public class TwitterProbe extends Probe
 
         logoutPreference.setOnPreferenceClickListener(new OnPreferenceClickListener()
         {
+            @Override
             public boolean onPreferenceClick(Preference preference)
             {
                 Editor e = prefs.edit();
@@ -407,10 +426,10 @@ public class TwitterProbe extends Probe
 
                 activity.runOnUiThread(new Runnable()
                 {
+                    @Override
                     public void run()
                     {
-                        Toast.makeText(activity, activity.getString(R.string.toast_twitter_logout), Toast.LENGTH_LONG)
-                                .show();
+                        Toast.makeText(activity, activity.getString(R.string.toast_twitter_logout), Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -424,5 +443,48 @@ public class TwitterProbe extends Probe
             screen.addPreference(logoutPreference);
 
         return screen;
+    }
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+
+            JSONObject encrypt = new JSONObject();
+            encrypt.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            encrypt.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.ENCRYPT_DATA, encrypt);
+
+            JSONObject frequency = new JSONObject();
+            frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
+            values = new JSONArray();
+
+            String[] options = context.getResources().getStringArray(R.array.probe_low_frequency_values);
+
+            for (String option : options)
+            {
+                values.put(Long.parseLong(option));
+            }
+
+            frequency.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_FREQUENCY, frequency);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
     }
 }

@@ -9,7 +9,6 @@ import java.util.Map;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -34,6 +33,10 @@ public class PressureProbe extends Continuous1DProbe implements SensorEventListe
 
     public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.PressureProbe";
 
+    private static final String FREQUENCY = "config_probe_pressure_built_in_frequency";
+    private static final String ENABLED = "config_probe_pressure_built_in_enabled";
+    private static final String THRESHOLD = "config_probe_pressure_built_in_threshold";
+
     private static int BUFFER_SIZE = 512;
 
     private static String PRESSURE_KEY = "PRESSURE";
@@ -47,9 +50,9 @@ public class PressureProbe extends Continuous1DProbe implements SensorEventListe
     private long lastThresholdLookup = 0;
     private double lastThreshold = 0.5;
 
-    private float valueBuffer[][] = new float[2][BUFFER_SIZE];
-    private int accuracyBuffer[] = new int[BUFFER_SIZE];
-    private double timeBuffer[] = new double[BUFFER_SIZE];
+    private final float valueBuffer[][] = new float[2][BUFFER_SIZE];
+    private final int accuracyBuffer[] = new int[BUFFER_SIZE];
+    private final double timeBuffer[] = new double[BUFFER_SIZE];
 
     private int bufferIndex = 0;
 
@@ -57,15 +60,16 @@ public class PressureProbe extends Continuous1DProbe implements SensorEventListe
 
     private int _lastFrequency = -1;
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getString(R.string.probe_sensor_category);
     }
 
+    @Override
     public String contentSubtitle(Context context)
     {
-        Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(context, PressureProbe.DB_TABLE,
-                this.databaseSchema());
+        Cursor c = ProbeValuesProvider.getProvider(context).retrieveValues(context, PressureProbe.DB_TABLE, this.databaseSchema());
 
         int count = -1;
 
@@ -78,6 +82,7 @@ public class PressureProbe extends Continuous1DProbe implements SensorEventListe
         return String.format(context.getString(R.string.display_item_count), count);
     }
 
+    @Override
     public Bundle formattedBundle(Context context, Bundle bundle)
     {
         Bundle formatted = super.formattedBundle(context, bundle);
@@ -98,8 +103,7 @@ public class PressureProbe extends Continuous1DProbe implements SensorEventListe
 
                 for (int i = 0; i < eventTimes.length; i++)
                 {
-                    String formatString = String.format(context.getString(R.string.display_pressure_reading),
-                            pressures[i], altitudes[i]);
+                    String formatString = String.format(context.getString(R.string.display_pressure_reading), pressures[i], altitudes[i]);
 
                     double time = eventTimes[i];
 
@@ -119,8 +123,7 @@ public class PressureProbe extends Continuous1DProbe implements SensorEventListe
             }
             else if (eventTimes.length > 0)
             {
-                String formatString = String.format(context.getString(R.string.display_pressure_reading), pressures[0],
-                        altitudes[0]);
+                String formatString = String.format(context.getString(R.string.display_pressure_reading), pressures[0], altitudes[0]);
 
                 double time = eventTimes[0];
 
@@ -133,23 +136,26 @@ public class PressureProbe extends Continuous1DProbe implements SensorEventListe
         return formatted;
     };
 
+    @Override
     public long getFrequency()
     {
         SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
-        return Long.parseLong(prefs.getString("config_probe_pressure_built_in_frequency",
-                ContinuousProbe.DEFAULT_FREQUENCY));
+        return Long.parseLong(prefs.getString(PressureProbe.FREQUENCY, ContinuousProbe.DEFAULT_FREQUENCY));
     }
 
+    @Override
     public String name(Context context)
     {
         return PressureProbe.NAME;
     }
 
+    @Override
     public int getTitleResource()
     {
         return R.string.title_pressure_probe;
     }
 
+    @Override
     public boolean isEnabled(Context context)
     {
         SharedPreferences prefs = ContinuousProbe.getPreferences(context);
@@ -161,10 +167,9 @@ public class PressureProbe extends Continuous1DProbe implements SensorEventListe
 
         if (super.isEnabled(context))
         {
-            if (prefs.getBoolean("config_probe_pressure_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
+            if (prefs.getBoolean(PressureProbe.ENABLED, ContinuousProbe.DEFAULT_ENABLED))
             {
-                int frequency = Integer.parseInt(prefs.getString("config_probe_pressure_built_in_frequency",
-                        ContinuousProbe.DEFAULT_FREQUENCY));
+                int frequency = Integer.parseInt(prefs.getString(PressureProbe.FREQUENCY, ContinuousProbe.DEFAULT_FREQUENCY));
 
                 if (this._lastFrequency != frequency)
                 {
@@ -209,40 +214,13 @@ public class PressureProbe extends Continuous1DProbe implements SensorEventListe
         return false;
     }
 
-    public Map<String, Object> configuration(Context context)
-    {
-        Map<String, Object> map = super.configuration(context);
-
-        map.put(ContinuousProbe.PROBE_THRESHOLD, this.lastThreshold);
-
-        return map;
-    }
-
-    public void updateFromMap(Context context, Map<String, Object> params)
-    {
-        super.updateFromMap(context, params);
-
-        if (params.containsKey(ContinuousProbe.PROBE_THRESHOLD))
-        {
-            Object threshold = params.get(ContinuousProbe.PROBE_THRESHOLD);
-
-            if (threshold instanceof Double)
-            {
-                SharedPreferences prefs = Probe.getPreferences(context);
-                Editor e = prefs.edit();
-
-                e.putString("config_probe_pressure_threshold", threshold.toString());
-                e.commit();
-            }
-        }
-    }
-
+    @Override
     public PreferenceScreen preferenceScreen(PreferenceActivity activity)
     {
         PreferenceScreen screen = super.preferenceScreen(activity);
 
         ListPreference threshold = new ListPreference(activity);
-        threshold.setKey("config_probe_pressure_threshold");
+        threshold.setKey(PressureProbe.THRESHOLD);
         threshold.setDefaultValue(PressureProbe.DEFAULT_THRESHOLD);
         threshold.setEntryValues(R.array.probe_pressure_threshold);
         threshold.setEntries(R.array.probe_pressure_threshold_labels);
@@ -254,15 +232,14 @@ public class PressureProbe extends Continuous1DProbe implements SensorEventListe
         return screen;
     }
 
+    @Override
     protected boolean passesThreshold(SensorEvent event)
     {
         long now = System.currentTimeMillis();
 
         if (now - this.lastThresholdLookup > 5000)
         {
-            SharedPreferences prefs = Probe.getPreferences(this._context);
-            this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_pressure_threshold",
-                    PressureProbe.DEFAULT_THRESHOLD));
+            this.lastThreshold = this.getThreshold();
 
             this.lastThresholdLookup = now;
         }
@@ -280,6 +257,7 @@ public class PressureProbe extends Continuous1DProbe implements SensorEventListe
         return passes;
     }
 
+    @Override
     @SuppressLint("NewApi")
     public void onSensorChanged(SensorEvent event)
     {
@@ -314,8 +292,7 @@ public class PressureProbe extends Continuous1DProbe implements SensorEventListe
 
                 try
                 {
-                    valueBuffer[1][bufferIndex] = SensorManager.getAltitude(SensorManager.PRESSURE_STANDARD_ATMOSPHERE,
-                            event.values[0]);
+                    valueBuffer[1][bufferIndex] = SensorManager.getAltitude(SensorManager.PRESSURE_STANDARD_ATMOSPHERE, event.values[0]);
                 }
                 catch (Exception e)
                 {
@@ -376,8 +353,7 @@ public class PressureProbe extends Continuous1DProbe implements SensorEventListe
 
                             values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[j] / 1000));
 
-                            ProbeValuesProvider.getProvider(this._context).insertValue(this._context,
-                                    PressureProbe.DB_TABLE, this.databaseSchema(), values);
+                            ProbeValuesProvider.getProvider(this._context).insertValue(this._context, PressureProbe.DB_TABLE, this.databaseSchema(), values);
                         }
                     }
 
@@ -387,6 +363,7 @@ public class PressureProbe extends Continuous1DProbe implements SensorEventListe
         }
     }
 
+    @Override
     public Map<String, String> databaseSchema()
     {
         if (this._schema == null)
@@ -400,11 +377,13 @@ public class PressureProbe extends Continuous1DProbe implements SensorEventListe
         return this._schema;
     }
 
+    @Override
     public String getPreferenceKey()
     {
         return "pressure_built_in";
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         double pressure = bundle.getDoubleArray(PressureProbe.PRESSURE_KEY)[0];
@@ -413,13 +392,29 @@ public class PressureProbe extends Continuous1DProbe implements SensorEventListe
         return String.format(context.getResources().getString(R.string.summary_pressure_probe), pressure, altitude);
     }
 
+    @Override
     public int getSummaryResource()
     {
         return R.string.summary_pressure_probe_desc;
     }
 
+    @Override
     protected String tableName()
     {
         return PressureProbe.DB_TABLE;
+    }
+
+    @Override
+    protected double getThreshold()
+    {
+        SharedPreferences prefs = Probe.getPreferences(this._context);
+
+        return Double.parseDouble(prefs.getString(PressureProbe.THRESHOLD, PressureProbe.DEFAULT_THRESHOLD));
+    }
+
+    @Override
+    protected int getResourceThresholdValues()
+    {
+        return R.array.probe_pressure_threshold;
     }
 }

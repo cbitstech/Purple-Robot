@@ -3,12 +3,12 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Map;
+
+import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -35,7 +35,9 @@ public class AmbientHumidityProbe extends ContinuousProbe implements SensorEvent
     { "HUMIDITY" };
 
     private static final String FREQUENCY = "config_probe_humidity_built_in_frequency";
-    private static final String THRESHOLD = "config_probe_humidity_threshold";
+    private static final String THRESHOLD = "config_probe_humidity_built_in_threshold";
+
+    private static final String ENABLED = "config_probe_humidity_built_in_enabled";
 
     private double _lastValue = Double.MAX_VALUE;
 
@@ -75,8 +77,7 @@ public class AmbientHumidityProbe extends ContinuousProbe implements SensorEvent
 
                 for (int i = 0; i < eventTimes.length; i++)
                 {
-                    String formatString = String.format(context.getString(R.string.display_humidity_reading),
-                            humidity[i]);
+                    String formatString = String.format(context.getString(R.string.display_humidity_reading), humidity[i]);
 
                     double time = eventTimes[i];
 
@@ -145,10 +146,9 @@ public class AmbientHumidityProbe extends ContinuousProbe implements SensorEvent
 
         if (super.isEnabled(context))
         {
-            if (prefs.getBoolean("config_probe_humidity_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
+            if (prefs.getBoolean(AmbientHumidityProbe.ENABLED, ContinuousProbe.DEFAULT_ENABLED))
             {
-                int frequency = Integer.parseInt(prefs.getString("config_probe_humidity_built_in_frequency",
-                        ContinuousProbe.DEFAULT_FREQUENCY));
+                int frequency = Integer.parseInt(prefs.getString(AmbientHumidityProbe.FREQUENCY, ContinuousProbe.DEFAULT_FREQUENCY));
 
                 if (this._lastFrequency != frequency)
                 {
@@ -201,9 +201,7 @@ public class AmbientHumidityProbe extends ContinuousProbe implements SensorEvent
 
         if (now - this.lastThresholdLookup > 5000)
         {
-            SharedPreferences prefs = Probe.getPreferences(this._context);
-            this.lastThreshold = Double.parseDouble(prefs.getString(AmbientHumidityProbe.THRESHOLD,
-                    AmbientHumidityProbe.DEFAULT_THRESHOLD));
+            this.lastThreshold = this.getThreshold();
 
             this.lastThresholdLookup = now;
         }
@@ -219,36 +217,6 @@ public class AmbientHumidityProbe extends ContinuousProbe implements SensorEvent
             this._lastValue = value;
 
         return passes;
-    }
-
-    @Override
-    public Map<String, Object> configuration(Context context)
-    {
-        Map<String, Object> map = super.configuration(context);
-
-        map.put(ContinuousProbe.PROBE_THRESHOLD, this.lastThreshold);
-
-        return map;
-    }
-
-    @Override
-    public void updateFromMap(Context context, Map<String, Object> params)
-    {
-        super.updateFromMap(context, params);
-
-        if (params.containsKey(ContinuousProbe.PROBE_THRESHOLD))
-        {
-            Object threshold = params.get(ContinuousProbe.PROBE_THRESHOLD);
-
-            if (threshold instanceof Double)
-            {
-                SharedPreferences prefs = Probe.getPreferences(context);
-                Editor e = prefs.edit();
-
-                e.putString(AmbientHumidityProbe.THRESHOLD, threshold.toString());
-                e.commit();
-            }
-        }
     }
 
     @Override
@@ -351,5 +319,29 @@ public class AmbientHumidityProbe extends ContinuousProbe implements SensorEvent
     public int getSummaryResource()
     {
         return R.string.summary_humidity_probe_desc;
+    }
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        if (Build.VERSION.SDK_INT < 14)
+            return settings;
+
+        return super.fetchSettings(context);
+    }
+
+    @Override
+    protected double getThreshold()
+    {
+        SharedPreferences prefs = Probe.getPreferences(this._context);
+        return Double.parseDouble(prefs.getString(AmbientHumidityProbe.THRESHOLD, AmbientHumidityProbe.DEFAULT_THRESHOLD));
+    }
+
+    @Override
+    protected int getResourceThresholdValues()
+    {
+        return R.array.probe_humidity_threshold;
     }
 }

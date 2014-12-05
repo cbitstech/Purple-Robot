@@ -2,6 +2,10 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -19,7 +23,6 @@ import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
 import android.telephony.cdma.CdmaCellLocation;
 import android.telephony.gsm.GsmCellLocation;
-
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -54,6 +57,8 @@ public class TelephonyProbe extends Probe
     private static final String SERVICE_STATE = "SERVICE_STATE";
 
     private static final boolean DEFAULT_ENABLED = true;
+    private static final String ENABLED = "config_probe_telephony_enabled";
+    private static final String FREQUENCY = "config_probe_telephony_frequency";
 
     private long _lastCheck = 0;
     private long _lastSignalCheck = 0;
@@ -72,41 +77,47 @@ public class TelephonyProbe extends Probe
 
     private PhoneStateListener _listener = null;
 
+    @Override
     public String name(Context context)
     {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.TelephonyProbe";
     }
 
+    @Override
     public String title(Context context)
     {
         return context.getString(R.string.title_telephony_probe);
     }
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getResources().getString(R.string.probe_device_info_category);
     }
 
+    @Override
     public void enable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_telephony_enabled", true);
+        e.putBoolean(TelephonyProbe.ENABLED, true);
 
         e.commit();
     }
 
+    @Override
     public void disable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_telephony_enabled", false);
+        e.putBoolean(TelephonyProbe.ENABLED, false);
 
         e.commit();
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public boolean isEnabled(final Context context)
     {
@@ -126,6 +137,7 @@ public class TelephonyProbe extends Probe
 
                 this._listener = new PhoneStateListener()
                 {
+                    @Override
                     public void onCallForwardingIndicatorChanged(boolean forwarding)
                     {
                         if (me._isForwarding != forwarding)
@@ -135,6 +147,7 @@ public class TelephonyProbe extends Probe
                         }
                     }
 
+                    @Override
                     public void onSignalStrengthsChanged(SignalStrength signal)
                     {
                         long now = System.currentTimeMillis();
@@ -156,6 +169,7 @@ public class TelephonyProbe extends Probe
                         }
                     }
 
+                    @Override
                     public void onServiceStateChanged(ServiceState serviceState)
                     {
                         if (me._serviceState != serviceState.getState())
@@ -169,15 +183,13 @@ public class TelephonyProbe extends Probe
 
             long now = System.currentTimeMillis();
 
-            if (prefs.getBoolean("config_probe_telephony_enabled", TelephonyProbe.DEFAULT_ENABLED))
+            if (prefs.getBoolean(TelephonyProbe.ENABLED, TelephonyProbe.DEFAULT_ENABLED))
             {
                 synchronized (this)
                 {
-                    manager.listen(this._listener, PhoneStateListener.LISTEN_CALL_FORWARDING_INDICATOR
-                            | PhoneStateListener.LISTEN_SERVICE_STATE | PhoneStateListener.LISTEN_SIGNAL_STRENGTH);
+                    manager.listen(this._listener, PhoneStateListener.LISTEN_CALL_FORWARDING_INDICATOR | PhoneStateListener.LISTEN_SERVICE_STATE | PhoneStateListener.LISTEN_SIGNAL_STRENGTH);
 
-                    long freq = Long.parseLong(prefs.getString("config_probe_telephony_frequency",
-                            Probe.DEFAULT_FREQUENCY));
+                    long freq = Long.parseLong(prefs.getString(TelephonyProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
 
                     if (now - this._lastCheck > freq)
                     {
@@ -208,17 +220,13 @@ public class TelephonyProbe extends Probe
                             bundle.putBoolean(TelephonyProbe.IS_FORWARDING, this._isForwarding);
 
                             if (this._serviceState == ServiceState.STATE_EMERGENCY_ONLY)
-                                bundle.putString(TelephonyProbe.SERVICE_STATE,
-                                        context.getString(R.string.service_state_emergency));
+                                bundle.putString(TelephonyProbe.SERVICE_STATE, context.getString(R.string.service_state_emergency));
                             else if (this._serviceState == ServiceState.STATE_IN_SERVICE)
-                                bundle.putString(TelephonyProbe.SERVICE_STATE,
-                                        context.getString(R.string.service_state_in_service));
+                                bundle.putString(TelephonyProbe.SERVICE_STATE, context.getString(R.string.service_state_in_service));
                             if (this._serviceState == ServiceState.STATE_OUT_OF_SERVICE)
-                                bundle.putString(TelephonyProbe.SERVICE_STATE,
-                                        context.getString(R.string.service_state_out_service));
+                                bundle.putString(TelephonyProbe.SERVICE_STATE, context.getString(R.string.service_state_out_service));
                             if (this._serviceState == ServiceState.STATE_POWER_OFF)
-                                bundle.putString(TelephonyProbe.SERVICE_STATE,
-                                        context.getString(R.string.service_state_off));
+                                bundle.putString(TelephonyProbe.SERVICE_STATE, context.getString(R.string.service_state_off));
 
                             CellLocation location = manager.getCellLocation();
 
@@ -275,18 +283,18 @@ public class TelephonyProbe extends Probe
         return false;
     }
 
+    @Override
     public Bundle formattedBundle(Context context, Bundle bundle)
     {
         Bundle formatted = super.formattedBundle(context, bundle);
 
-        formatted.putString(context.getString(R.string.display_telephony_operator_title),
-                bundle.getString(TelephonyProbe.NETWORK_OPERATOR_NAME));
-        formatted.putString(context.getString(R.string.display_telephony_network_title),
-                bundle.getString(TelephonyProbe.PHONE_TYPE));
+        formatted.putString(context.getString(R.string.display_telephony_operator_title), bundle.getString(TelephonyProbe.NETWORK_OPERATOR_NAME));
+        formatted.putString(context.getString(R.string.display_telephony_network_title), bundle.getString(TelephonyProbe.PHONE_TYPE));
 
         return formatted;
     };
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         String operator = bundle.getString(TelephonyProbe.SIM_OPERATOR_NAME);
@@ -400,18 +408,20 @@ public class TelephonyProbe extends Probe
         return type;
     }
 
+    @Override
     public Map<String, Object> configuration(Context context)
     {
         Map<String, Object> map = super.configuration(context);
 
         SharedPreferences prefs = Probe.getPreferences(context);
 
-        long freq = Long.parseLong(prefs.getString("config_probe_telephony_frequency", Probe.DEFAULT_FREQUENCY));
+        long freq = Long.parseLong(prefs.getString(TelephonyProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
         map.put(Probe.PROBE_FREQUENCY, freq);
 
         return map;
     }
 
+    @Override
     public void updateFromMap(Context context, Map<String, Object> params)
     {
         super.updateFromMap(context, params);
@@ -420,22 +430,29 @@ public class TelephonyProbe extends Probe
         {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
 
+            if (frequency instanceof Double)
+            {
+                frequency = Long.valueOf(((Double) frequency).longValue());
+            }
+
             if (frequency instanceof Long)
             {
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putString("config_probe_telephony_frequency", frequency.toString());
+                e.putString(TelephonyProbe.FREQUENCY, frequency.toString());
                 e.commit();
             }
         }
     }
 
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_telephony_probe_desc);
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(PreferenceActivity activity)
     {
@@ -447,13 +464,13 @@ public class TelephonyProbe extends Probe
 
         CheckBoxPreference enabled = new CheckBoxPreference(activity);
         enabled.setTitle(R.string.title_enable_probe);
-        enabled.setKey("config_probe_telephony_enabled");
+        enabled.setKey(TelephonyProbe.ENABLED);
         enabled.setDefaultValue(TelephonyProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
 
         ListPreference duration = new ListPreference(activity);
-        duration.setKey("config_probe_telephony_frequency");
+        duration.setKey(TelephonyProbe.FREQUENCY);
         duration.setEntryValues(R.array.probe_satellite_frequency_values);
         duration.setEntries(R.array.probe_satellite_frequency_labels);
         duration.setTitle(R.string.probe_frequency_label);
@@ -462,5 +479,42 @@ public class TelephonyProbe extends Probe
         screen.addPreference(duration);
 
         return screen;
+    }
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+
+            JSONObject frequency = new JSONObject();
+            frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
+            values = new JSONArray();
+
+            String[] options = context.getResources().getStringArray(R.array.probe_satellite_frequency_values);
+
+            for (String option : options)
+            {
+                values.put(Long.parseLong(option));
+            }
+
+            frequency.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_FREQUENCY, frequency);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
     }
 }

@@ -6,14 +6,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -22,13 +17,10 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.RealTimeProbeViewActivity;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
-import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("SimpleDateFormat")
@@ -42,7 +34,7 @@ public class GyroscopeProbe extends Continuous3DProbe implements SensorEventList
 
     public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.GyroscopeProbe";
 
-    private static final String THRESHOLD = "config_probe_gyroscope_threshold";
+    private static final String THRESHOLD = "config_probe_gyroscope_built_in_threshold";
     private static final String ENABLED = "config_probe_gyroscope_built_in_enabled";
     private static String FREQUENCY = "config_probe_gyroscope_built_in_frequency";
 
@@ -71,43 +63,9 @@ public class GyroscopeProbe extends Continuous3DProbe implements SensorEventList
     private int _lastFrequency = -1;
 
     @Override
-    public Map<String, Object> configuration(Context context)
-    {
-        Map<String, Object> map = super.configuration(context);
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-
-        map.put(ContinuousProbe.PROBE_THRESHOLD, Double.parseDouble(prefs.getString(GyroscopeProbe.THRESHOLD, GyroscopeProbe.DEFAULT_THRESHOLD)));
-
-        return map;
-    }
-
-    @Override
     public String probeCategory(Context context)
     {
         return context.getString(R.string.probe_sensor_category);
-    }
-
-    @Override
-    public void updateFromMap(Context context, Map<String, Object> params)
-    {
-        super.updateFromMap(context, params);
-
-        if (params.containsKey(ContinuousProbe.PROBE_THRESHOLD))
-        {
-            Object threshold = params.get(ContinuousProbe.PROBE_THRESHOLD);
-
-            Log.e("PR", "GYR: TH: " + threshold + " -- " + threshold.getClass());
-
-            if (threshold instanceof Double)
-            {
-                SharedPreferences prefs = Probe.getPreferences(context);
-                Editor e = prefs.edit();
-
-                e.putString(GyroscopeProbe.THRESHOLD, threshold.toString());
-                e.commit();
-            }
-        }
     }
 
     @Override
@@ -264,8 +222,7 @@ public class GyroscopeProbe extends Continuous3DProbe implements SensorEventList
 
         if (now - this.lastThresholdLookup > 5000)
         {
-            SharedPreferences prefs = Probe.getPreferences(this._context);
-            this.lastThreshold = Double.parseDouble(prefs.getString(GyroscopeProbe.THRESHOLD, GyroscopeProbe.DEFAULT_THRESHOLD));
+            this.lastThreshold = this.getThreshold();
 
             this.lastThresholdLookup = now;
         }
@@ -443,53 +400,15 @@ public class GyroscopeProbe extends Continuous3DProbe implements SensorEventList
     }
 
     @Override
-    public JSONObject fetchSettings(Context context)
+    protected double getThreshold()
     {
-        JSONObject settings = new JSONObject();
+        SharedPreferences prefs = Probe.getPreferences(this._context);
+        return Double.parseDouble(prefs.getString(GyroscopeProbe.THRESHOLD, GyroscopeProbe.DEFAULT_THRESHOLD));
+    }
 
-        try
-        {
-            JSONObject enabled = new JSONObject();
-            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
-            JSONArray values = new JSONArray();
-            values.put(true);
-            values.put(false);
-            enabled.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_ENABLED, enabled);
-
-            JSONObject frequency = new JSONObject();
-            frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
-            values = new JSONArray();
-
-            String[] options = this._context.getResources().getStringArray(this.getResourceFrequencyValues());
-
-            for (String option : options)
-            {
-                values.put(Long.parseLong(option));
-            }
-
-            frequency.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_FREQUENCY, frequency);
-
-            JSONObject threshold = new JSONObject();
-            threshold.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_DOUBLE);
-            values = new JSONArray();
-
-            options = this._context.getResources().getStringArray(R.array.probe_gyroscope_threshold);
-
-            for (String option : options)
-            {
-                values.put(Double.parseDouble(option));
-            }
-
-            threshold.put(Probe.PROBE_VALUES, values);
-            settings.put(ContinuousProbe.PROBE_THRESHOLD, threshold);
-        }
-        catch (JSONException e)
-        {
-            LogManager.getInstance(context).logException(e);
-        }
-
-        return settings;
+    @Override
+    protected int getResourceThresholdValues()
+    {
+        return R.array.probe_gyroscope_threshold;
     }
 }

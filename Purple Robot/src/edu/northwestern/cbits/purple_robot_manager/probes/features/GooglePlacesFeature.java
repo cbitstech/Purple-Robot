@@ -20,9 +20,9 @@ import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
-
 import edu.emory.mathcs.backport.java.util.Arrays;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -33,55 +33,67 @@ public class GooglePlacesFeature extends Feature
 {
     private static final String DEFAULT_RADIUS = "1000";
 
+    private static final String RADIUS = "config_feature_google_places_radius";
+
+    private static final String ENABLED = "config_probe_google_places_enabled";
+
     private static String[] EXCLUDED_TYPES =
     { "establishment" };
 
     private BroadcastReceiver _receiver = null;
     protected long _lastCheck = 0;
 
+    @Override
     protected String featureKey()
     {
         return "google_places";
     }
 
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_google_places_feature_desc);
     }
 
+    @Override
     public String name(Context context)
     {
         return "edu.northwestern.cbits.purple_robot_manager.probes.features.GooglePlacesFeature";
     }
 
+    @Override
     public String title(Context context)
     {
         return context.getString(R.string.title_google_places_feature);
     }
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getResources().getString(R.string.probe_external_services_category);
     }
 
+    @Override
     public void enable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_google_places_enabled", true);
+        e.putBoolean(GooglePlacesFeature.ENABLED, true);
         e.commit();
     }
 
+    @Override
     public void disable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_google_places_enabled", false);
+        e.putBoolean(GooglePlacesFeature.ENABLED, false);
         e.commit();
     }
 
+    @Override
     public boolean isEnabled(Context context)
     {
         LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(context);
@@ -90,7 +102,7 @@ public class GooglePlacesFeature extends Feature
         {
             SharedPreferences prefs = Probe.getPreferences(context);
 
-            if (prefs.getBoolean("config_probe_google_places_enabled", true))
+            if (prefs.getBoolean(GooglePlacesFeature.ENABLED, true))
             {
                 if (this._receiver == null)
                 {
@@ -100,6 +112,7 @@ public class GooglePlacesFeature extends Feature
 
                     this._receiver = new BroadcastReceiver()
                     {
+                        @Override
                         public void onReceive(final Context context, Intent intent)
                         {
                             final Bundle extras = intent.getExtras();
@@ -114,13 +127,12 @@ public class GooglePlacesFeature extends Feature
                                 {
                                     Runnable r = new Runnable()
                                     {
+                                        @Override
                                         public void run()
                                         {
                                             try
                                             {
-                                                Map<String, Integer> place = GooglePlacesFeature.nearestLocation(
-                                                        context, extras.getDouble(LocationProbe.LATITUDE),
-                                                        extras.getDouble(LocationProbe.LONGITUDE));
+                                                Map<String, Integer> place = GooglePlacesFeature.nearestLocation(context, extras.getDouble(LocationProbe.LATITUDE), extras.getDouble(LocationProbe.LONGITUDE));
 
                                                 Bundle bundle = new Bundle();
                                                 bundle.putString("PROBE", me.name(context));
@@ -130,8 +142,7 @@ public class GooglePlacesFeature extends Feature
                                                 {
                                                     for (String key : place.keySet())
                                                     {
-                                                        if (Arrays.asList(GooglePlacesFeature.EXCLUDED_TYPES).contains(
-                                                                key) == false)
+                                                        if (Arrays.asList(GooglePlacesFeature.EXCLUDED_TYPES).contains(key) == false)
                                                             bundle.putInt(key, place.get(key).intValue());
                                                     }
 
@@ -174,17 +185,15 @@ public class GooglePlacesFeature extends Feature
         return false;
     }
 
-    protected static Map<String, Integer> nearestLocation(Context context, double latitude, double longitude)
-            throws IOException, JSONException
+    protected static Map<String, Integer> nearestLocation(Context context, double latitude, double longitude) throws IOException, JSONException
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         String key = context.getString(R.string.google_places_browser_key);
 
-        String radius = prefs.getString("config_feature_google_places_radius", GooglePlacesFeature.DEFAULT_RADIUS);
+        String radius = prefs.getString(GooglePlacesFeature.RADIUS, GooglePlacesFeature.DEFAULT_RADIUS);
 
-        URL u = new URL("https://maps.googleapis.com/maps/api/place/search/json?location=" + latitude + "," + longitude
-                + "&radius=" + radius + "&sensor=false&key=" + key);
+        URL u = new URL("https://maps.googleapis.com/maps/api/place/search/json?location=" + latitude + "," + longitude + "&radius=" + radius + "&sensor=false&key=" + key);
         InputStream in = u.openStream();
 
         String jsonString = IOUtils.toString(in);
@@ -228,6 +237,7 @@ public class GooglePlacesFeature extends Feature
         return place;
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         String frequentPlace = "none";
@@ -263,16 +273,16 @@ public class GooglePlacesFeature extends Feature
             }
         }
 
-        return String.format(context.getResources().getString(R.string.summary_google_places),
-                frequentPlace.replaceAll("_", " "), maxCount);
+        return String.format(context.getResources().getString(R.string.summary_google_places), frequentPlace.replaceAll("_", " "), maxCount);
     }
 
+    @Override
     public PreferenceScreen preferenceScreen(PreferenceActivity activity)
     {
         PreferenceScreen screen = super.preferenceScreen(activity);
 
         ListPreference radius = new ListPreference(activity);
-        radius.setKey("config_feature_google_places_radius");
+        radius.setKey(GooglePlacesFeature.RADIUS);
         radius.setEntryValues(R.array.feature_google_places_values);
         radius.setEntries(R.array.feature_google_places_labels);
         radius.setTitle(R.string.feature_google_places_radius_label);
@@ -281,5 +291,74 @@ public class GooglePlacesFeature extends Feature
         screen.addPreference(radius);
 
         return screen;
+    }
+
+    @Override
+    public Map<String, Object> configuration(Context context)
+    {
+        Map<String, Object> map = super.configuration(context);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        map.put(GooglePlacesFeature.RADIUS, Double.parseDouble(prefs.getString(GooglePlacesFeature.RADIUS, GooglePlacesFeature.DEFAULT_RADIUS)));
+
+        return map;
+    }
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+
+            JSONObject radius = new JSONObject();
+            radius.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
+            values = new JSONArray();
+
+            String[] options = context.getResources().getStringArray(R.array.feature_google_places_values);
+
+            for (String option : options)
+            {
+                values.put(Double.parseDouble(option));
+            }
+
+            radius.put(Probe.PROBE_VALUES, values);
+            settings.put(GooglePlacesFeature.RADIUS, radius);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
+    }
+
+    @Override
+    public void updateFromMap(Context context, Map<String, Object> params)
+    {
+        super.updateFromMap(context, params);
+
+        if (params.containsKey(GooglePlacesFeature.RADIUS))
+        {
+            Object radius = params.get(GooglePlacesFeature.RADIUS);
+
+            if (radius instanceof Double)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString(GooglePlacesFeature.RADIUS, radius.toString());
+                e.commit();
+            }
+        }
     }
 }

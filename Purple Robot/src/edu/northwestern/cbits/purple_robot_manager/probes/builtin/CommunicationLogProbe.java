@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -110,8 +114,7 @@ public class CommunicationLogProbe extends Probe
             {
                 synchronized (this)
                 {
-                    long freq = Long.parseLong(prefs
-                            .getString(CommunicationLogProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
+                    long freq = Long.parseLong(prefs.getString(CommunicationLogProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
                     boolean doHash = prefs.getBoolean(CommunicationLogProbe.HASH_DATA, Probe.DEFAULT_HASH_DATA);
 
                     if (now - this._lastCheck > freq)
@@ -136,16 +139,14 @@ public class CommunicationLogProbe extends Probe
                         {
                             EncryptionManager em = EncryptionManager.getInstance();
 
-                            Cursor c = context.getContentResolver().query(CallLog.Calls.CONTENT_URI, null, null, null,
-                                    null);
+                            Cursor c = context.getContentResolver().query(CallLog.Calls.CONTENT_URI, null, null, null, null);
 
                             while (c.moveToNext())
                             {
                                 Bundle contactBundle = new Bundle();
 
                                 String numberName = c.getString(c.getColumnIndex(Calls.CACHED_NAME));
-                                String phoneNumber = PhoneNumberUtils.formatNumber(c.getString(c
-                                        .getColumnIndex(Calls.NUMBER)));
+                                String phoneNumber = PhoneNumberUtils.formatNumber(c.getString(c.getColumnIndex(Calls.NUMBER)));
 
                                 if (numberName == null)
                                     numberName = phoneNumber;
@@ -168,14 +169,12 @@ public class CommunicationLogProbe extends Probe
                                 contactBundle.putString(CommunicationLogProbe.NUMBER_LABEL, phoneNumber);
 
                                 if (c.getColumnIndex(Calls.CACHED_NUMBER_TYPE) != -1)
-                                    contactBundle.putString(CommunicationLogProbe.NUMBER_TYPE,
-                                            c.getString(c.getColumnIndex(Calls.CACHED_NUMBER_TYPE)));
+                                    contactBundle.putString(CommunicationLogProbe.NUMBER_TYPE, c.getString(c.getColumnIndex(Calls.CACHED_NUMBER_TYPE)));
 
                                 long callTime = c.getLong(c.getColumnIndex(Calls.DATE));
 
                                 contactBundle.putLong(CommunicationLogProbe.CALL_TIMESTAMP, callTime);
-                                contactBundle.putLong(CommunicationLogProbe.CALL_DURATION,
-                                        c.getLong(c.getColumnIndex(Calls.DURATION)));
+                                contactBundle.putLong(CommunicationLogProbe.CALL_DURATION, c.getLong(c.getColumnIndex(Calls.DURATION)));
                                 contactBundle.putString(CommunicationLogProbe.NUMBER, phoneNumber);
 
                                 int callType = c.getInt(c.getColumnIndex(Calls.CACHED_NUMBER_TYPE));
@@ -209,8 +208,7 @@ public class CommunicationLogProbe extends Probe
                             bundle.putInt(CommunicationLogProbe.CALL_OUTGOING_COUNT, sentCount);
                             bundle.putInt(CommunicationLogProbe.CALL_INCOMING_COUNT, receivedCount);
                             bundle.putInt(CommunicationLogProbe.CALL_MISSED_COUNT, missedCount);
-                            bundle.putInt(CommunicationLogProbe.CALL_TOTAL_COUNT, missedCount + receivedCount
-                                    + sentCount);
+                            bundle.putInt(CommunicationLogProbe.CALL_TOTAL_COUNT, missedCount + receivedCount + sentCount);
 
                             if (recentName != null)
                                 bundle.putString(CommunicationLogProbe.RECENT_CALLER, recentName);
@@ -286,7 +284,7 @@ public class CommunicationLogProbe extends Probe
         long freq = Long.parseLong(prefs.getString(CommunicationLogProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
         map.put(Probe.PROBE_FREQUENCY, freq);
 
-        boolean hash = prefs.getBoolean("config_probe_communication_hash_data", Probe.DEFAULT_HASH_DATA);
+        boolean hash = prefs.getBoolean(CommunicationLogProbe.HASH_DATA, Probe.DEFAULT_HASH_DATA);
         map.put(Probe.HASH_DATA, hash);
 
         return map;
@@ -300,6 +298,11 @@ public class CommunicationLogProbe extends Probe
         if (params.containsKey(Probe.PROBE_FREQUENCY))
         {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
+
+            if (frequency instanceof Double)
+            {
+                frequency = Long.valueOf(((Double) frequency).longValue());
+            }
 
             if (frequency instanceof Long)
             {
@@ -385,6 +388,49 @@ public class CommunicationLogProbe extends Probe
         return screen;
     }
 
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+
+            JSONObject hash = new JSONObject();
+            hash.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            hash.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.HASH_DATA, hash);
+
+            JSONObject frequency = new JSONObject();
+            frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
+            values = new JSONArray();
+
+            String[] options = context.getResources().getStringArray(R.array.probe_low_frequency_values);
+
+            for (String option : options)
+            {
+                values.put(Long.parseLong(option));
+            }
+
+            frequency.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_FREQUENCY, frequency);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
+    }
+
     private Bundle bundleForCallArray(Context context, ArrayList<Bundle> objects)
     {
         Bundle bundle = new Bundle();
@@ -423,25 +469,18 @@ public class CommunicationLogProbe extends Probe
 
         formatted.putBundle(String.format(context.getString(R.string.display_calls_list_title), count), callsBundle);
 
-        formatted.putString(context.getString(R.string.display_calls_recent_caller_title),
-                bundle.getString(CommunicationLogProbe.RECENT_CALLER));
-        formatted.putString(context.getString(R.string.display_calls_recent_number_title),
-                bundle.getString(CommunicationLogProbe.RECENT_NUMBER));
+        formatted.putString(context.getString(R.string.display_calls_recent_caller_title), bundle.getString(CommunicationLogProbe.RECENT_CALLER));
+        formatted.putString(context.getString(R.string.display_calls_recent_number_title), bundle.getString(CommunicationLogProbe.RECENT_NUMBER));
 
         Date d = new Date(bundle.getLong(CommunicationLogProbe.RECENT_TIME));
 
         formatted.putString(context.getString(R.string.display_calls_recent_time_title), d.toString());
 
-        formatted.putInt(context.getString(R.string.display_calls_incoming_count_title),
-                (int) bundle.getDouble(CommunicationLogProbe.CALL_INCOMING_COUNT));
-        formatted.putInt(context.getString(R.string.display_calls_missed_count_title),
-                (int) bundle.getDouble(CommunicationLogProbe.CALL_MISSED_COUNT));
-        formatted.putInt(context.getString(R.string.display_calls_outgoing_count_title),
-                (int) bundle.getDouble(CommunicationLogProbe.CALL_OUTGOING_COUNT));
-        formatted.putInt(context.getString(R.string.display_sms_incoming_count_title),
-                (int) bundle.getDouble(CommunicationLogProbe.SMS_INCOMING_COUNT));
-        formatted.putInt(context.getString(R.string.display_sms_outgoing_count_title),
-                (int) bundle.getDouble(CommunicationLogProbe.SMS_OUTGOING_COUNT));
+        formatted.putInt(context.getString(R.string.display_calls_incoming_count_title), (int) bundle.getDouble(CommunicationLogProbe.CALL_INCOMING_COUNT));
+        formatted.putInt(context.getString(R.string.display_calls_missed_count_title), (int) bundle.getDouble(CommunicationLogProbe.CALL_MISSED_COUNT));
+        formatted.putInt(context.getString(R.string.display_calls_outgoing_count_title), (int) bundle.getDouble(CommunicationLogProbe.CALL_OUTGOING_COUNT));
+        formatted.putInt(context.getString(R.string.display_sms_incoming_count_title), (int) bundle.getDouble(CommunicationLogProbe.SMS_INCOMING_COUNT));
+        formatted.putInt(context.getString(R.string.display_sms_outgoing_count_title), (int) bundle.getDouble(CommunicationLogProbe.SMS_OUTGOING_COUNT));
 
         ArrayList<String> keys = new ArrayList<String>();
         keys.add(String.format(context.getString(R.string.display_calls_list_title), count));

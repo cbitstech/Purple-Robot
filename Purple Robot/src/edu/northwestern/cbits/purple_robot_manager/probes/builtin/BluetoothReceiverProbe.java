@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 
+import org.json.JSONObject;
+
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
@@ -23,26 +25,31 @@ public class BluetoothReceiverProbe extends Probe
 {
     private boolean isRegistered = false;
 
+    @Override
     public String name(Context context)
     {
         return "Bluetooth test probe";
     }
 
+    @Override
     public String summary(Context context)
     {
         return "";
     }
 
+    @Override
     public String title(Context context)
     {
         return this.name(context);
     }
 
+    @Override
     public String probeCategory(Context context)
     {
         return "PIZZA PIE";
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(PreferenceActivity activity)
     {
@@ -54,6 +61,7 @@ public class BluetoothReceiverProbe extends Probe
         return screen;
     }
 
+    @Override
     public void enable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
@@ -64,6 +72,7 @@ public class BluetoothReceiverProbe extends Probe
         e.commit();
     }
 
+    @Override
     public void disable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
@@ -74,6 +83,7 @@ public class BluetoothReceiverProbe extends Probe
         e.commit();
     }
 
+    @Override
     public boolean isEnabled(final Context context)
     {
         final BluetoothReceiverProbe me = this;
@@ -116,14 +126,14 @@ public class BluetoothReceiverProbe extends Probe
 
             Thread t = new Thread(new Runnable()
             {
+                @Override
                 public void run()
                 {
                     BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 
                     try
                     {
-                        BluetoothServerSocket server = adapter.listenUsingRfcommWithServiceRecord("Test Service",
-                                UUID.fromString("0000112f-0000-1000-8000-00805f9b34fb"));
+                        BluetoothServerSocket server = adapter.listenUsingRfcommWithServiceRecord("Test Service", UUID.fromString("0000112f-0000-1000-8000-00805f9b34fb"));
                         // BluetoothServerSocket server =
                         // adapter.listenUsingRfcommWithServiceRecord("Test Service",
                         // UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66"));
@@ -178,7 +188,12 @@ public class BluetoothReceiverProbe extends Probe
         socket.close();
     }
 
+    @Override
+    public JSONObject fetchSettings(Context context)
     {
+        // TODO: Implement!
 
+        return null;
     }
+
 }

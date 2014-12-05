@@ -49,48 +49,57 @@ public class FoursquareProbe extends Probe
     private static final boolean DEFAULT_PULL_ACTIVITY = false;
 
     protected static final String HOUR_COUNT = "HOUR_COUNT";
+
     private static final String PULL_ACTIVITY = "config_probe_foursquare_pull_activity";
+    private static final String ENABLED = "config_probe_foursquare_enabled";
+    private static final String FREQUENCY = "config_probe_foursquare_frequency";
 
     private long _lastCheck = 0;
 
     private String _token = null;
     private String _secret = null;
 
+    @Override
     public String name(Context context)
     {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.FoursquareProbe";
     }
 
+    @Override
     public String title(Context context)
     {
         return context.getString(R.string.title_foursquare_probe);
     }
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getResources().getString(R.string.probe_external_services_category);
     }
 
+    @Override
     public void enable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_foursquare_enabled", true);
+        e.putBoolean(FoursquareProbe.ENABLED, true);
 
         e.commit();
     }
 
+    @Override
     public void disable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_probe_foursquare_enabled", false);
+        e.putBoolean(FoursquareProbe.ENABLED, false);
 
         e.commit();
     }
 
+    @Override
     public boolean isEnabled(final Context context)
     {
         final SharedPreferences prefs = Probe.getPreferences(context);
@@ -99,14 +108,12 @@ public class FoursquareProbe extends Probe
         {
             final long now = System.currentTimeMillis();
 
-            if (prefs.getBoolean("config_probe_foursquare_enabled", FoursquareProbe.DEFAULT_ENABLED))
+            if (prefs.getBoolean(FoursquareProbe.ENABLED, FoursquareProbe.DEFAULT_ENABLED))
             {
                 synchronized (this)
                 {
-                    long freq = Long.parseLong(prefs.getString("config_probe_foursquare_frequency",
-                            Probe.DEFAULT_FREQUENCY));
-                    final boolean pullActivity = prefs.getBoolean("config_probe_foursquare_pull_activity",
-                            FoursquareProbe.DEFAULT_PULL_ACTIVITY);
+                    long freq = Long.parseLong(prefs.getString(FoursquareProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
+                    final boolean pullActivity = prefs.getBoolean(FoursquareProbe.PULL_ACTIVITY, FoursquareProbe.DEFAULT_PULL_ACTIVITY);
 
                     if (now - this._lastCheck > freq)
                     {
@@ -124,6 +131,7 @@ public class FoursquareProbe extends Probe
 
                             Runnable action = new Runnable()
                             {
+                                @Override
                                 public void run()
                                 {
                                     me.fetchAuth(context);
@@ -147,19 +155,17 @@ public class FoursquareProbe extends Probe
 
                                 final OAuthService service = builder.build();
 
-                                final OAuthRequest request = new OAuthRequest(Verb.GET,
-                                        "https://api.foursquare.com/v2/users/self/checkins?limit=250&sort=newestfirst&v=20130815&oauth_token="
-                                                + this._token);
+                                final OAuthRequest request = new OAuthRequest(Verb.GET, "https://api.foursquare.com/v2/users/self/checkins?limit=250&sort=newestfirst&v=20130815&oauth_token=" + this._token);
                                 service.signRequest(accessToken, request);
 
                                 Runnable r = new Runnable()
                                 {
+                                    @Override
                                     public void run()
                                     {
                                         try
                                         {
-                                            SimpleDateFormat sdf = new SimpleDateFormat(
-                                                    "EEE MMM dd HH:mm:ss ZZZZZ yyyy", Locale.ENGLISH);
+                                            SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss ZZZZZ yyyy", Locale.ENGLISH);
                                             sdf.setLenient(true);
 
                                             long mostRecent = prefs.getLong("config_foursquare_most_recent", 0);
@@ -170,8 +176,7 @@ public class FoursquareProbe extends Probe
 
                                             if (checkins.has("response"))
                                             {
-                                                JSONArray items = checkins.getJSONObject("response")
-                                                        .getJSONObject("checkins").getJSONArray("items");
+                                                JSONArray items = checkins.getJSONObject("response").getJSONObject("checkins").getJSONArray("items");
 
                                                 for (int i = (items.length() - 1); i >= 0; i--)
                                                 {
@@ -188,45 +193,36 @@ public class FoursquareProbe extends Probe
                                                         eventBundle.putString("PROBE", me.name(context));
                                                         eventBundle.putLong("TIMESTAMP", created / 1000);
 
-                                                        eventBundle.putString("CHECKIN_SOURCE",
-                                                                item.getJSONObject("source").getString("name"));
+                                                        eventBundle.putString("CHECKIN_SOURCE", item.getJSONObject("source").getString("name"));
 
                                                         if (item.has("venue"))
                                                         {
                                                             JSONObject venue = item.getJSONObject("venue");
                                                             JSONObject location = venue.getJSONObject("location");
 
-                                                            eventBundle
-                                                                    .putDouble("LATITUDE", location.getDouble("lat"));
-                                                            eventBundle.putDouble("LONGITUDE",
-                                                                    location.getDouble("lng"));
+                                                            eventBundle.putDouble("LATITUDE", location.getDouble("lat"));
+                                                            eventBundle.putDouble("LONGITUDE", location.getDouble("lng"));
 
                                                             if (location.has("address"))
-                                                                eventBundle.putString("ADDRESS",
-                                                                        location.getString("address"));
+                                                                eventBundle.putString("ADDRESS", location.getString("address"));
 
                                                             if (location.has("city"))
-                                                                eventBundle.putString("CITY",
-                                                                        location.getString("city"));
+                                                                eventBundle.putString("CITY", location.getString("city"));
 
                                                             if (location.has("state"))
-                                                                eventBundle.putString("STATE",
-                                                                        location.getString("state"));
+                                                                eventBundle.putString("STATE", location.getString("state"));
 
                                                             if (location.has("postalCode"))
-                                                                eventBundle.putString("POSTAL_CODE",
-                                                                        location.getString("postalCode"));
+                                                                eventBundle.putString("POSTAL_CODE", location.getString("postalCode"));
 
                                                             eventBundle.putString("COUNTRY", location.getString("cc"));
 
                                                             eventBundle.putString("VENUE_ID", venue.getString("id"));
 
                                                             if (venue.has("url"))
-                                                                eventBundle.putString("VENUE_URL",
-                                                                        venue.getString("url"));
+                                                                eventBundle.putString("VENUE_URL", venue.getString("url"));
 
-                                                            eventBundle
-                                                                    .putString("VENUE_NAME", venue.getString("name"));
+                                                            eventBundle.putString("VENUE_NAME", venue.getString("name"));
 
                                                             JSONArray categories = venue.getJSONArray("categories");
 
@@ -235,8 +231,7 @@ public class FoursquareProbe extends Probe
                                                                 JSONObject category = categories.getJSONObject(j);
 
                                                                 if (category.getBoolean("primary"))
-                                                                    eventBundle.putString("VENUE_CATEGORY",
-                                                                            category.getString("name"));
+                                                                    eventBundle.putString("VENUE_CATEGORY", category.getString("name"));
                                                             }
 
                                                             me.transmitData(context, eventBundle);
@@ -297,6 +292,7 @@ public class FoursquareProbe extends Probe
         context.startActivity(intent);
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         String venue = bundle.getString("VENUE_NAME");
@@ -304,22 +300,23 @@ public class FoursquareProbe extends Probe
         return context.getString(R.string.summary_foursquare_checkin_summary, venue);
     }
 
+    @Override
     public Map<String, Object> configuration(Context context)
     {
         Map<String, Object> map = super.configuration(context);
 
         SharedPreferences prefs = Probe.getPreferences(context);
 
-        long freq = Long.parseLong(prefs.getString("config_probe_foursquare_frequency", Probe.DEFAULT_FREQUENCY));
+        long freq = Long.parseLong(prefs.getString(FoursquareProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
         map.put(Probe.PROBE_FREQUENCY, freq);
 
-        boolean pullActivity = prefs.getBoolean("config_probe_foursquare_pull_activity",
-                FoursquareProbe.DEFAULT_PULL_ACTIVITY);
+        boolean pullActivity = prefs.getBoolean(FoursquareProbe.PULL_ACTIVITY, FoursquareProbe.DEFAULT_PULL_ACTIVITY);
         map.put(FoursquareProbe.PULL_ACTIVITY, pullActivity);
 
         return map;
     }
 
+    @Override
     public void updateFromMap(Context context, Map<String, Object> params)
     {
         super.updateFromMap(context, params);
@@ -328,12 +325,17 @@ public class FoursquareProbe extends Probe
         {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
 
+            if (frequency instanceof Double)
+            {
+                frequency = Long.valueOf(((Double) frequency).longValue());
+            }
+
             if (frequency instanceof Long)
             {
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putString("config_probe_foursquare_frequency", frequency.toString());
+                e.putString(FoursquareProbe.FREQUENCY, frequency.toString());
                 e.commit();
             }
         }
@@ -355,11 +357,13 @@ public class FoursquareProbe extends Probe
         }
     }
 
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_foursquare_probe_desc);
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(final PreferenceActivity activity)
     {
@@ -376,13 +380,13 @@ public class FoursquareProbe extends Probe
 
         CheckBoxPreference enabled = new CheckBoxPreference(activity);
         enabled.setTitle(R.string.title_enable_probe);
-        enabled.setKey("config_probe_foursquare_enabled");
+        enabled.setKey(FoursquareProbe.ENABLED);
         enabled.setDefaultValue(FoursquareProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
 
         ListPreference duration = new ListPreference(activity);
-        duration.setKey("config_probe_foursquare_frequency");
+        duration.setKey(FoursquareProbe.FREQUENCY);
         duration.setEntryValues(R.array.probe_low_frequency_values);
         duration.setEntries(R.array.probe_low_frequency_labels);
         duration.setTitle(R.string.probe_frequency_label);
@@ -391,7 +395,7 @@ public class FoursquareProbe extends Probe
         screen.addPreference(duration);
 
         CheckBoxPreference pull = new CheckBoxPreference(activity);
-        pull.setKey("config_probe_foursquare_pull_activity");
+        pull.setKey(FoursquareProbe.PULL_ACTIVITY);
         pull.setDefaultValue(FoursquareProbe.DEFAULT_PULL_ACTIVITY);
         pull.setTitle(R.string.config_probe_foursquare_pull_title);
         pull.setSummary(R.string.config_probe_foursquare_pull_summary);
@@ -410,6 +414,7 @@ public class FoursquareProbe extends Probe
 
         authPreference.setOnPreferenceClickListener(new OnPreferenceClickListener()
         {
+            @Override
             public boolean onPreferenceClick(Preference preference)
             {
                 me.fetchAuth(activity);
@@ -423,6 +428,7 @@ public class FoursquareProbe extends Probe
 
         logoutPreference.setOnPreferenceClickListener(new OnPreferenceClickListener()
         {
+            @Override
             public boolean onPreferenceClick(Preference preference)
             {
                 Editor e = prefs.edit();
@@ -435,10 +441,10 @@ public class FoursquareProbe extends Probe
 
                 activity.runOnUiThread(new Runnable()
                 {
+                    @Override
                     public void run()
                     {
-                        Toast.makeText(activity, activity.getString(R.string.toast_foursquare_logout),
-                                Toast.LENGTH_LONG).show();
+                        Toast.makeText(activity, activity.getString(R.string.toast_foursquare_logout), Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -454,15 +460,56 @@ public class FoursquareProbe extends Probe
         return screen;
     }
 
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+
+            JSONObject encrypt = new JSONObject();
+            encrypt.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            encrypt.put(Probe.PROBE_VALUES, values);
+            settings.put(FoursquareProbe.PULL_ACTIVITY, encrypt);
+
+            JSONObject frequency = new JSONObject();
+            frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
+            values = new JSONArray();
+
+            String[] options = context.getResources().getStringArray(R.array.probe_low_frequency_values);
+
+            for (String option : options)
+            {
+                values.put(Long.parseLong(option));
+            }
+
+            frequency.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_FREQUENCY, frequency);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
+    }
+
     public static void annotate(Context context, Bundle bundle)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        if (prefs.getBoolean("config_probe_foursquare_enabled", FoursquareProbe.DEFAULT_ENABLED))
+        if (prefs.getBoolean(FoursquareProbe.ENABLED, FoursquareProbe.DEFAULT_ENABLED))
         {
-            String urlString = "https://api.foursquare.com/v2/venues/search?client_id="
-                    + context.getString(R.string.foursquare_consumer_key) + "&client_secret="
-                    + context.getString(R.string.foursquare_consumer_secret) + "&v=20130815&ll=";
+            String urlString = "https://api.foursquare.com/v2/venues/search?client_id=" + context.getString(R.string.foursquare_consumer_key) + "&client_secret=" + context.getString(R.string.foursquare_consumer_secret) + "&v=20130815&ll=";
 
             double latitude = bundle.getDouble(LocationProbe.LATITUDE);
             double longitude = bundle.getDouble(LocationProbe.LONGITUDE);

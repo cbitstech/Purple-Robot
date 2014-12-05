@@ -9,7 +9,6 @@ import java.util.Map;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -42,6 +41,11 @@ public class MagneticFieldProbe extends Continuous3DProbe implements SensorEvent
 
     public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.MagneticFieldProbe";
 
+    private static final String FREQUENCY = "config_probe_magnetic_built_in_frequency";
+    private static final String THRESHOLD = "config_probe_magnetic_built_in_threshold";
+
+    private static final String ENABLED = "config_probe_magnetic_built_in_enabled";
+
     private double _lastX = Double.MAX_VALUE;
     private double _lastY = Double.MAX_VALUE;
     private double _lastZ = Double.MAX_VALUE;
@@ -49,9 +53,9 @@ public class MagneticFieldProbe extends Continuous3DProbe implements SensorEvent
     private long lastThresholdLookup = 0;
     private double lastThreshold = 1.0;
 
-    private float valueBuffer[][] = new float[3][BUFFER_SIZE];
-    private int accuracyBuffer[] = new int[BUFFER_SIZE];
-    private double timeBuffer[] = new double[BUFFER_SIZE];
+    private final float valueBuffer[][] = new float[3][BUFFER_SIZE];
+    private final int accuracyBuffer[] = new int[BUFFER_SIZE];
+    private final double timeBuffer[] = new double[BUFFER_SIZE];
 
     private Map<String, String> _schema = null;
 
@@ -59,11 +63,13 @@ public class MagneticFieldProbe extends Continuous3DProbe implements SensorEvent
 
     private int _lastFrequency = -1;
 
+    @Override
     public String probeCategory(Context context)
     {
         return context.getString(R.string.probe_sensor_category);
     }
 
+    @Override
     public Map<String, String> databaseSchema()
     {
         if (this._schema == null)
@@ -78,24 +84,27 @@ public class MagneticFieldProbe extends Continuous3DProbe implements SensorEvent
         return this._schema;
     }
 
+    @Override
     public long getFrequency()
     {
         SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
 
-        return Long.parseLong(prefs.getString("config_probe_magnetic_built_in_frequency",
-                ContinuousProbe.DEFAULT_FREQUENCY));
+        return Long.parseLong(prefs.getString(MagneticFieldProbe.FREQUENCY, ContinuousProbe.DEFAULT_FREQUENCY));
     }
 
+    @Override
     public String name(Context context)
     {
         return MagneticFieldProbe.NAME;
     }
 
+    @Override
     public int getTitleResource()
     {
         return R.string.title_magnetic_field_probe;
     }
 
+    @Override
     public boolean isEnabled(Context context)
     {
         SharedPreferences prefs = ContinuousProbe.getPreferences(context);
@@ -107,10 +116,9 @@ public class MagneticFieldProbe extends Continuous3DProbe implements SensorEvent
 
         if (super.isEnabled(context))
         {
-            if (prefs.getBoolean("config_probe_magnetic_built_in_enabled", ContinuousProbe.DEFAULT_ENABLED))
+            if (prefs.getBoolean(MagneticFieldProbe.ENABLED, ContinuousProbe.DEFAULT_ENABLED))
             {
-                int frequency = Integer.parseInt(prefs.getString("config_probe_magnetic_built_in_frequency",
-                        ContinuousProbe.DEFAULT_FREQUENCY));
+                int frequency = Integer.parseInt(prefs.getString(MagneticFieldProbe.FREQUENCY, ContinuousProbe.DEFAULT_FREQUENCY));
 
                 if (this._lastFrequency != frequency)
                 {
@@ -156,40 +164,13 @@ public class MagneticFieldProbe extends Continuous3DProbe implements SensorEvent
         return false;
     }
 
-    public Map<String, Object> configuration(Context context)
-    {
-        Map<String, Object> map = super.configuration(context);
-
-        map.put(ContinuousProbe.PROBE_THRESHOLD, this.lastThreshold);
-
-        return map;
-    }
-
-    public void updateFromMap(Context context, Map<String, Object> params)
-    {
-        super.updateFromMap(context, params);
-
-        if (params.containsKey(ContinuousProbe.PROBE_THRESHOLD))
-        {
-            Object threshold = params.get(ContinuousProbe.PROBE_THRESHOLD);
-
-            if (threshold instanceof Double)
-            {
-                SharedPreferences prefs = Probe.getPreferences(context);
-                Editor e = prefs.edit();
-
-                e.putString("config_probe_magnetic_threshold", threshold.toString());
-                e.commit();
-            }
-        }
-    }
-
+    @Override
     public PreferenceScreen preferenceScreen(PreferenceActivity activity)
     {
         PreferenceScreen screen = super.preferenceScreen(activity);
 
         ListPreference threshold = new ListPreference(activity);
-        threshold.setKey("config_probe_magnetic_threshold");
+        threshold.setKey(MagneticFieldProbe.THRESHOLD);
         threshold.setDefaultValue(MagneticFieldProbe.DEFAULT_THRESHOLD);
         threshold.setEntryValues(R.array.probe_magnetic_threshold);
         threshold.setEntries(R.array.probe_magnetic_threshold_labels);
@@ -201,15 +182,14 @@ public class MagneticFieldProbe extends Continuous3DProbe implements SensorEvent
         return screen;
     }
 
+    @Override
     protected boolean passesThreshold(SensorEvent event)
     {
         long now = System.currentTimeMillis();
 
         if (now - this.lastThresholdLookup > 5000)
         {
-            SharedPreferences prefs = Probe.getPreferences(this._context);
-            this.lastThreshold = Double.parseDouble(prefs.getString("config_probe_magnetic_threshold",
-                    MagneticFieldProbe.DEFAULT_THRESHOLD));
+            this.lastThreshold = this.getThreshold();
 
             this.lastThresholdLookup = now;
         }
@@ -237,6 +217,7 @@ public class MagneticFieldProbe extends Continuous3DProbe implements SensorEvent
         return passes;
     }
 
+    @Override
     public void onSensorChanged(SensorEvent event)
     {
         if (this.shouldProcessEvent(event) == false)
@@ -268,8 +249,7 @@ public class MagneticFieldProbe extends Continuous3DProbe implements SensorEvent
                 }
 
                 double[] plotValues =
-                { timeBuffer[0] / 1000, valueBuffer[0][bufferIndex], valueBuffer[1][bufferIndex],
-                        valueBuffer[2][bufferIndex] };
+                { timeBuffer[0] / 1000, valueBuffer[0][bufferIndex], valueBuffer[1][bufferIndex], valueBuffer[2][bufferIndex] };
                 RealTimeProbeViewActivity.plotIfVisible(this.getTitleResource(), plotValues);
 
                 bufferIndex += 1;
@@ -330,8 +310,7 @@ public class MagneticFieldProbe extends Continuous3DProbe implements SensorEvent
 
                             values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[0] / 1000));
 
-                            ProbeValuesProvider.getProvider(this._context).insertValue(this._context,
-                                    MagneticFieldProbe.DB_TABLE, this.databaseSchema(), values);
+                            ProbeValuesProvider.getProvider(this._context).insertValue(this._context, MagneticFieldProbe.DB_TABLE, this.databaseSchema(), values);
                         }
                     }
 
@@ -341,21 +320,23 @@ public class MagneticFieldProbe extends Continuous3DProbe implements SensorEvent
         }
     }
 
+    @Override
     public String getPreferenceKey()
     {
         return "magnetic_built_in";
     }
 
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
         double xReading = bundle.getDoubleArray("X")[0];
         double yReading = bundle.getDoubleArray("Y")[0];
         double zReading = bundle.getDoubleArray("Z")[0];
 
-        return String.format(context.getResources().getString(R.string.summary_magnetic_probe), xReading, yReading,
-                zReading);
+        return String.format(context.getResources().getString(R.string.summary_magnetic_probe), xReading, yReading, zReading);
     }
 
+    @Override
     public Bundle formattedBundle(Context context, Bundle bundle)
     {
         Bundle formatted = super.formattedBundle(context, bundle);
@@ -375,8 +356,7 @@ public class MagneticFieldProbe extends Continuous3DProbe implements SensorEvent
 
             for (int i = 0; i < eventTimes.length; i++)
             {
-                String formatString = String.format(context.getString(R.string.display_gyroscope_reading), x[i], y[i],
-                        z[i]);
+                String formatString = String.format(context.getString(R.string.display_gyroscope_reading), x[i], y[i], z[i]);
 
                 double time = eventTimes[i];
 
@@ -398,8 +378,7 @@ public class MagneticFieldProbe extends Continuous3DProbe implements SensorEvent
         }
         else if (eventTimes.length > 0)
         {
-            String formatString = String
-                    .format(context.getString(R.string.display_gyroscope_reading), x[0], y[0], z[0]);
+            String formatString = String.format(context.getString(R.string.display_gyroscope_reading), x[0], y[0], z[0]);
 
             double time = eventTimes[0];
 
@@ -411,13 +390,29 @@ public class MagneticFieldProbe extends Continuous3DProbe implements SensorEvent
         return formatted;
     }
 
+    @Override
     public int getSummaryResource()
     {
         return R.string.summary_magnetic_field_probe_desc;
     }
 
+    @Override
     protected String tableName()
     {
         return MagneticFieldProbe.DB_TABLE;
+    }
+
+    @Override
+    protected double getThreshold()
+    {
+        SharedPreferences prefs = Probe.getPreferences(this._context);
+
+        return Double.parseDouble(prefs.getString(MagneticFieldProbe.THRESHOLD, MagneticFieldProbe.DEFAULT_THRESHOLD));
+    }
+
+    @Override
+    protected int getResourceThresholdValues()
+    {
+        return R.array.probe_magnetic_threshold;
     };
 }

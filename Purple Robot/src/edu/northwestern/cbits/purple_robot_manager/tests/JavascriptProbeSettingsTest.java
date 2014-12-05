@@ -1,5 +1,6 @@
 package edu.northwestern.cbits.purple_robot_manager.tests;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -12,6 +13,7 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.util.Log;
+import edu.emory.mathcs.backport.java.util.Collections;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -43,13 +45,24 @@ public class JavascriptProbeSettingsTest extends RobotTestCase
 
         try
         {
+            ArrayList<String> names = new ArrayList<String>();
+
             for (String name : probeDefs.keySet())
             {
+                names.add(name);
+            }
+
+            Collections.sort(names);
+
+            for (int j = 0; j < names.size(); j++)
+            {
+                String name = names.get(j);
+
                 Probe probe = ProbeManager.probeForName(name, this._context);
 
                 if (probe != null)
                 {
-                    this.broadcastUpdate("Testing " + probe.title(this._context) + "...");
+                    this.broadcastUpdate("Testing " + probe.title(this._context) + " (" + (j + 1) + "/" + names.size() + ")...");
 
                     JSONObject settings = probeDefs.get(name);
 
@@ -77,13 +90,13 @@ public class JavascriptProbeSettingsTest extends RobotTestCase
                             Assert.assertEquals("JSPS0-" + probe.shortName(this._context) + "-" + key + "-" + option, returned.getClass(), Boolean.class);
                             Assert.assertTrue("JSPS1-" + probe.shortName(this._context) + "-" + key + "-" + option, ((Boolean) returned).booleanValue());
 
-                            Thread.sleep(2000);
+                            Thread.sleep(1000);
 
                             Map<String, Object> config = probe.configuration(this._context);
 
-                            Assert.assertEquals("JSPS2-" + probe.shortName(this._context) + "-" + key + "-" + option, config.get(key), option);
+                            Assert.assertEquals("JSPS2-" + probe.shortName(this._context) + "-" + key + "-" + option, option, config.get(key));
 
-                            Thread.sleep(2000);
+                            Thread.sleep(1000);
                         }
                     }
                 }
