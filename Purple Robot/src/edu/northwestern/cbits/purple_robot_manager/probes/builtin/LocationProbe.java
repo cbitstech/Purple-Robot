@@ -173,7 +173,7 @@ public class LocationProbe extends Probe implements LocationListener
             frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
             values = new JSONArray();
 
-            String[] options = this._context.getResources().getStringArray(R.array.probe_satellite_frequency_values);
+            String[] options = context.getResources().getStringArray(R.array.probe_satellite_frequency_values);
 
             for (String option : options)
             {

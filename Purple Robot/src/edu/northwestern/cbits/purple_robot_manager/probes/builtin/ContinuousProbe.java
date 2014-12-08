@@ -333,7 +333,7 @@ public abstract class ContinuousProbe extends Probe
                 frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
                 values = new JSONArray();
 
-                String[] options = this._context.getResources().getStringArray(frequencyValues);
+                String[] options = context.getResources().getStringArray(frequencyValues);
 
                 for (String option : options)
                 {
@@ -352,7 +352,7 @@ public abstract class ContinuousProbe extends Probe
                 threshold.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_DOUBLE);
                 values = new JSONArray();
 
-                String[] options = this._context.getResources().getStringArray(thresholdValues);
+                String[] options = context.getResources().getStringArray(thresholdValues);
 
                 for (String option : options)
                 {
