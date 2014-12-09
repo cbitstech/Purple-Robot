@@ -28,6 +28,7 @@ public class RealTimeProbeViewActivity extends WebkitActivity
 
     private int _probeId = -1;
 
+    @Override
     protected String contentString()
     {
         try
@@ -54,11 +55,13 @@ public class RealTimeProbeViewActivity extends WebkitActivity
         return null;
     }
 
+    @Override
     protected String contentSubtitle()
     {
         return this.getString(R.string.subtitle_streaming_live);
     }
 
+    @Override
     @SuppressLint("SetJavaScriptEnabled")
     protected void onResume()
     {
@@ -70,6 +73,7 @@ public class RealTimeProbeViewActivity extends WebkitActivity
 
         webview.setWebChromeClient(new WebChromeClient()
         {
+            @Override
             public boolean onConsoleMessage(ConsoleMessage cm)
             {
                 Log.e("PRM", cm.message() + " -- From line " + cm.lineNumber() + " of " + cm.sourceId());
@@ -117,6 +121,7 @@ public class RealTimeProbeViewActivity extends WebkitActivity
         RealTimeProbeViewActivity._currentActivity = this;
     }
 
+    @Override
     protected void onPause()
     {
         RealTimeProbeViewActivity._currentActivity = null;
@@ -142,6 +147,7 @@ public class RealTimeProbeViewActivity extends WebkitActivity
 
             me.runOnUiThread(new Runnable()
             {
+                @Override
                 public void run()
                 {
                     final WebView webview = (WebView) me.findViewById(R.id.webview);
