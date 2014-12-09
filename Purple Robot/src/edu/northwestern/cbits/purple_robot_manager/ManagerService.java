@@ -109,6 +109,9 @@ public class ManagerService extends IntentService
             Thread t = new Thread(r);
             t.start();
         }
+        else if (UPLOAD_LOGS_INTENT.equalsIgnoreCase(action))
+        {
+        }
         else if (UPDATE_WIDGETS.equalsIgnoreCase(action))
         {
             Intent broadcast = new Intent("edu.northwestern.cbits.purple.UPDATE_WIDGET");

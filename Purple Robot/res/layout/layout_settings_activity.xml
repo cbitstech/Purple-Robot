@@ -168,6 +168,11 @@
 	      	    android:summary="@string/summary_log_upload_wifi_only"
 	           	android:key="config_restrict_log_wifi"
 	           	android:defaultValue="true"/>
+	     	<CheckBoxPreference
+	      	    android:title="@string/title_log_heartbeat"
+	      	    android:summary="@string/summary_log_heartbeat"
+	           	android:key="config_log_heartbeat"
+	           	android:defaultValue="false"/>
 	        <ListPreference
 	            android:key="config_log_upload_interval"
 	            android:entries="@array/log_upload_interval_labels"

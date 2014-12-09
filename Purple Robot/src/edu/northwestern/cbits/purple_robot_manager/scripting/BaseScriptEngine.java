@@ -796,18 +796,15 @@ public abstract class BaseScriptEngine
         ProbeManager.enableProbe(this._context, probeName);
     }
 
-    protected boolean updateWidget(final String title, final String message, final String applicationName,
-            final Map<String, Object> launchParams, final String script)
+    protected boolean updateWidget(final String title, final String message, final String applicationName, final Map<String, Object> launchParams, final String script)
     {
         AppWidgetManager widgetManager = AppWidgetManager.getInstance(this._context);
 
-        ComponentName provider = new ComponentName(this._context.getPackageName(),
-                PurpleRobotAppWidgetProvider.class.getName());
+        ComponentName provider = new ComponentName(this._context.getPackageName(), PurpleRobotAppWidgetProvider.class.getName());
 
         int[] widgetIds = widgetManager.getAppWidgetIds(provider);
 
-        ComponentName wideProvider = new ComponentName(this._context.getPackageName(),
-                PurpleRobotAppWideWidgetProvider.class.getName());
+        ComponentName wideProvider = new ComponentName(this._context.getPackageName(), PurpleRobotAppWideWidgetProvider.class.getName());
 
         int[] wideWidgetIds = widgetManager.getAppWidgetIds(wideProvider);
 
@@ -827,16 +824,14 @@ public abstract class BaseScriptEngine
         {
             if (intent.getAction().equals(ManagerService.APPLICATION_LAUNCH_INTENT))
             {
-                PendingIntent pi = PendingIntent
-                        .getService(this._context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent pi = PendingIntent.getService(this._context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
                 views.setOnClickPendingIntent(R.id.widget_root_layout, pi);
                 wideViews.setOnClickPendingIntent(R.id.widget_root_layout, pi);
             }
             else
             {
-                PendingIntent pi = PendingIntent.getActivity(this._context, 0, intent,
-                        PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent pi = PendingIntent.getActivity(this._context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
                 views.setOnClickPendingIntent(R.id.widget_root_layout, pi);
                 wideViews.setOnClickPendingIntent(R.id.widget_root_layout, pi);
@@ -1005,15 +1000,12 @@ public abstract class BaseScriptEngine
         return false;
     }
 
-    protected boolean showApplicationLaunchNotification(String title, String message, String applicationName,
-            long displayWhen, Map<String, Object> launchParams, final String script)
+    protected boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen, Map<String, Object> launchParams, final String script)
     {
-        return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen, false,
-                launchParams, script);
+        return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen, false, launchParams, script);
     }
 
-    protected boolean showApplicationLaunchNotification(String title, String message, String applicationName,
-            long displayWhen, boolean persistent, Map<String, Object> launchParams, final String script)
+    protected boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen, boolean persistent, Map<String, Object> launchParams, final String script)
     {
         try
         {
@@ -1031,14 +1023,12 @@ public abstract class BaseScriptEngine
 
             if (intent != null)
             {
-                PendingIntent pendingIntent = PendingIntent.getActivity(this._context, 0, intent,
-                        PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent pendingIntent = PendingIntent.getActivity(this._context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
                 if (script != null)
                 {
                     Intent serviceIntent = this.constructLaunchIntent(applicationName, launchParams, script);
-                    pendingIntent = PendingIntent.getService(this._context, 0, serviceIntent,
-                            PendingIntent.FLAG_UPDATE_CURRENT);
+                    pendingIntent = PendingIntent.getService(this._context, 0, serviceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                 }
 
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(this._context);
@@ -1056,8 +1046,7 @@ public abstract class BaseScriptEngine
                     if (persistent)
                         note.flags = note.flags | Notification.FLAG_NO_CLEAR;
 
-                    NotificationManager noteManager = (NotificationManager) this._context
-                            .getSystemService(android.content.Context.NOTIFICATION_SERVICE);
+                    NotificationManager noteManager = (NotificationManager) this._context.getSystemService(android.content.Context.NOTIFICATION_SERVICE);
                     noteManager.notify(BaseScriptEngine.NOTIFICATION_ID, note);
                 }
                 catch (UnsupportedOperationException e)
@@ -1081,8 +1070,7 @@ public abstract class BaseScriptEngine
         return this.showScriptNotification(title, message, persistent, false, script);
     }
 
-    public boolean showScriptNotification(String title, String message, boolean persistent, boolean sticky,
-            final String script)
+    public boolean showScriptNotification(String title, String message, boolean persistent, boolean sticky, final String script)
     {
         try
         {
@@ -1091,8 +1079,7 @@ public abstract class BaseScriptEngine
 
             Intent serviceIntent = this.constructScriptIntent(script);
 
-            PendingIntent pendingIntent = PendingIntent.getService(this._context, 0, serviceIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pendingIntent = PendingIntent.getService(this._context, 0, serviceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this._context);
             builder = builder.setContentIntent(pendingIntent);
@@ -1131,8 +1118,7 @@ public abstract class BaseScriptEngine
                     e.commit();
                 }
 
-                NotificationManager noteManager = (NotificationManager) this._context
-                        .getSystemService(android.content.Context.NOTIFICATION_SERVICE);
+                NotificationManager noteManager = (NotificationManager) this._context.getSystemService(android.content.Context.NOTIFICATION_SERVICE);
                 noteManager.notify(BaseScriptEngine.NOTIFICATION_ID, note);
             }
             catch (UnsupportedOperationException e)
@@ -1152,8 +1138,7 @@ public abstract class BaseScriptEngine
 
     public void cancelScriptNotification()
     {
-        NotificationManager noteManager = (NotificationManager) this._context
-                .getSystemService(android.content.Context.NOTIFICATION_SERVICE);
+        NotificationManager noteManager = (NotificationManager) this._context.getSystemService(android.content.Context.NOTIFICATION_SERVICE);
         noteManager.cancel(BaseScriptEngine.NOTIFICATION_ID);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
@@ -1171,18 +1156,14 @@ public abstract class BaseScriptEngine
         return intent;
     }
 
-    public void showNativeDialog(final String title, final String message, final String confirmTitle,
-            final String cancelTitle, final String confirmScript, final String cancelScript)
+    public void showNativeDialog(final String title, final String message, final String confirmTitle, final String cancelTitle, final String confirmScript, final String cancelScript)
     {
-        DialogActivity.showNativeDialog(this._context, title, message, confirmTitle, cancelTitle, confirmScript,
-                cancelScript, null, 0);
+        DialogActivity.showNativeDialog(this._context, title, message, confirmTitle, cancelTitle, confirmScript, cancelScript, null, 0);
     }
 
-    public void showNativeDialog(final String title, final String message, final String confirmTitle,
-            final String cancelTitle, final String confirmScript, final String cancelScript, String tag, long priority)
+    public void showNativeDialog(final String title, final String message, final String confirmTitle, final String cancelTitle, final String confirmScript, final String cancelScript, String tag, long priority)
     {
-        DialogActivity.showNativeDialog(this._context, title, message, confirmTitle, cancelTitle, confirmScript,
-                cancelScript, tag, priority);
+        DialogActivity.showNativeDialog(this._context, title, message, confirmTitle, cancelTitle, confirmScript, cancelScript, tag, priority);
     }
 
     public void clearNativeDialogs()
@@ -1195,11 +1176,9 @@ public abstract class BaseScriptEngine
         DialogActivity.clearNativeDialogs(this._context, tag, null);
     }
 
-    public boolean showApplicationLaunchNotification(String title, String message, String applicationName,
-            long displayWhen)
+    public boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen)
     {
-        return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen,
-                new HashMap<String, Object>(), null);
+        return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen, new HashMap<String, Object>(), null);
     }
 
     public boolean updateWidget(final String title, final String message, final String applicationName)
@@ -1545,6 +1524,8 @@ public abstract class BaseScriptEngine
 
     public void clearTriggers()
     {
+        LogManager.getInstance(this._context).log("script_clear_triggers", null);
+
         for (String id : this.fetchTriggerIds())
         {
             this.deleteTrigger(id);

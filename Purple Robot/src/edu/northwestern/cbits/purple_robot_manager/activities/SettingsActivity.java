@@ -143,6 +143,24 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
         Preference reset = prefs.findPreference(RESET_KEY);
         reset.setOnPreferenceClickListener(this);
 
+        Preference logEnabled = prefs.findPreference(LogManager.ENABLED);
+        logEnabled.setOnPreferenceChangeListener(this);
+
+        Preference logUri = prefs.findPreference(LogManager.URI);
+        logUri.setOnPreferenceChangeListener(this);
+
+        Preference logLocation = prefs.findPreference(LogManager.INCLUDE_LOCATION);
+        logLocation.setOnPreferenceChangeListener(this);
+
+        Preference logWifi = prefs.findPreference(LogManager.WIFI_ONLY);
+        logWifi.setOnPreferenceChangeListener(this);
+
+        Preference logHeartbeat = prefs.findPreference(LogManager.HEARTBEAT);
+        logHeartbeat.setOnPreferenceChangeListener(this);
+
+        Preference logInterval = prefs.findPreference(LogManager.UPLOAD_INTERVAL);
+        logInterval.setOnPreferenceChangeListener(this);
+
         LogManager.getInstance(me).log("pr_settings_visited", null);
     }
 
@@ -454,6 +472,42 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
         else if (LogManager.ENABLED.equals(pref.getKey()))
         {
             LogManager.getInstance(this).setEnabled(((Boolean) value).booleanValue());
+
+            return true;
+        }
+        else if (LogManager.URI.equals(pref.getKey()))
+        {
+            LogManager.getInstance(this).setEndpoint(value.toString());
+
+            return true;
+        }
+        else if (LogManager.INCLUDE_LOCATION.equals(pref.getKey()))
+        {
+            LogManager.getInstance(this).setIncludeLocation(((Boolean) value).booleanValue());
+
+            return true;
+        }
+        else if (LogManager.UPLOAD_INTERVAL.equals(pref.getKey()))
+        {
+            LogManager.getInstance(this).setUploadInterval(Long.parseLong(value.toString()));
+
+            return true;
+        }
+        else if (LogManager.WIFI_ONLY.equals(pref.getKey()))
+        {
+            LogManager.getInstance(this).setWifiOnly(((Boolean) value).booleanValue());
+
+            return true;
+        }
+        else if (LogManager.LIBERAL_SSL.equals(pref.getKey()))
+        {
+            LogManager.getInstance(this).setLiberalSsl(((Boolean) value).booleanValue());
+
+            return true;
+        }
+        else if (LogManager.HEARTBEAT.equals(pref.getKey()))
+        {
+            LogManager.getInstance(this).setHeartbeat(((Boolean) value).booleanValue());
 
             return true;
         }
