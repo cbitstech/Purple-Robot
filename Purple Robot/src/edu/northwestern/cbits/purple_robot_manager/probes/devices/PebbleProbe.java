@@ -27,6 +27,7 @@ import com.getpebble.android.kit.PebbleKit.FirmwareVersionInfo;
 import com.getpebble.android.kit.PebbleKit.PebbleDataLogReceiver;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.RealTimeProbeViewActivity;
 import edu.northwestern.cbits.purple_robot_manager.calibration.PebbleCalibrationHelper;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -236,13 +237,11 @@ public class PebbleProbe extends Continuous3DProbe
 
                                     double x = 9.807 * ((double) accel.x) / 1000;
                                     double y = 9.807 * ((double) accel.y) / 1000;
-                                    double z = 9.807 * ((double) accel.x) / 1000;
+                                    double z = 9.807 * ((double) accel.z) / 1000;
 
                                     valueBuffer[0][me._index] = x;
                                     valueBuffer[1][me._index] = y;
                                     valueBuffer[2][me._index] = z;
-
-                                    me._index += 1;
 
                                     if (me._index % 10 == 0)
                                     {
@@ -255,7 +254,14 @@ public class PebbleProbe extends Continuous3DProbe
                                         values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(accel.getTimestamp() / 1000));
 
                                         ProbeValuesProvider.getProvider(context).insertValue(context, PebbleProbe.DB_TABLE, me.databaseSchema(), values);
+
+                                        double[] plotValues =
+                                        { timeBuffer[0] / 1000, x, y, z };
+
+                                        RealTimeProbeViewActivity.plotIfVisible(me.getTitleResource(), plotValues);
                                     }
+
+                                    me._index += 1;
                                 }
                             }
                         }
