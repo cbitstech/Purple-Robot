@@ -11,7 +11,6 @@ import org.json.JSONObject;
 import org.mozilla.javascript.NativeJavaObject;
 
 import android.content.Context;
-import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 import edu.northwestern.cbits.purple_robot_manager.triggers.DateTrigger;
@@ -71,8 +70,6 @@ public class RandomDateTriggerTestCase extends RobotTestCase
                 triggerDef.put(DateTrigger.DATETIME_START, sdf.format(new Date(now)));
                 triggerDef.put(DateTrigger.DATETIME_END, sdf.format(new Date(cal.getTimeInMillis())));
                 triggerDef.put(DateTrigger.DATETIME_RANDOM, true);
-
-                Log.e("PR", "TRIGGER: " + (new Date(now)) + " TO " + (new Date(cal.getTimeInMillis())));
 
                 String script = "PurpleRobot.updateTrigger('" + triggerId + "', " + triggerDef.toString().replace("'", "\\'").replace("\"", "'") + ");";
 

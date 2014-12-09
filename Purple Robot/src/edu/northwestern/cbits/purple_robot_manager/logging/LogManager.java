@@ -14,20 +14,23 @@ public class LogManager
     public static final String ENABLED = "config_enable_log_server";
     private static final boolean ENABLED_DEFAULT = false;
 
-    private static final String URI = "config_log_server_uri";
+    public static final String URI = "config_log_server_uri";
     private static final String URI_DEFAULT = null;
 
-    private static final String INCLUDE_LOCATION = "config_log_location";
+    public static final String INCLUDE_LOCATION = "config_log_location";
     private static final boolean INCLUDE_LOCATION_DEFAULT = false;
 
-    private static final String UPLOAD_INTERVAL = "config_log_upload_interval";
+    public static final String UPLOAD_INTERVAL = "config_log_upload_interval";
     private static final long UPLOAD_INTERVAL_DEFAULT = 300000;
 
-    private static final String WIFI_ONLY = "config_restrict_log_wifi";
+    public static final String WIFI_ONLY = "config_restrict_log_wifi";
     private static final boolean WIFI_ONLY_DEFAULT = true;
 
-    private static final String LIBERAL_SSL = "config_http_liberal_ssl";
+    public static final String LIBERAL_SSL = "config_http_liberal_ssl";
     private static final boolean LIBERAL_SSL_ONLY = false;
+
+    public static final String HEARTBEAT = "config_log_heartbeat";
+    private static final boolean HEARTBEAT_DEFAULT = false;
 
     private static LogManager _sharedInstance = null;
 
@@ -42,10 +45,11 @@ public class LogManager
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         this._logger.setEnabled(prefs.getBoolean(LogManager.ENABLED, LogManager.ENABLED_DEFAULT));
-        this._logger.setIncludeLocation(prefs.getBoolean(LogManager.INCLUDE_LOCATION,
-                LogManager.INCLUDE_LOCATION_DEFAULT));
+        this._logger.setHeartbeat(prefs.getBoolean(LogManager.HEARTBEAT, LogManager.HEARTBEAT_DEFAULT));
+        this._logger.setIncludeLocation(prefs.getBoolean(LogManager.INCLUDE_LOCATION, LogManager.INCLUDE_LOCATION_DEFAULT));
         this._logger.setWifiOnly(prefs.getBoolean(LogManager.WIFI_ONLY, LogManager.WIFI_ONLY_DEFAULT));
         this._logger.setLiberalSsl(prefs.getBoolean(LogManager.LIBERAL_SSL, LogManager.LIBERAL_SSL_ONLY));
+        this._logger.setHeartbeat(prefs.getBoolean(LogManager.HEARTBEAT, LogManager.HEARTBEAT_DEFAULT));
 
         try
         {
@@ -58,13 +62,11 @@ public class LogManager
 
         try
         {
-            this._logger.setUploadInterval(prefs
-                    .getLong(LogManager.UPLOAD_INTERVAL, LogManager.UPLOAD_INTERVAL_DEFAULT));
+            this._logger.setUploadInterval(prefs.getLong(LogManager.UPLOAD_INTERVAL, LogManager.UPLOAD_INTERVAL_DEFAULT));
         }
         catch (ClassCastException e)
         {
-            this._logger.setUploadInterval(Long.parseLong(prefs.getString(LogManager.UPLOAD_INTERVAL, ""
-                    + LogManager.UPLOAD_INTERVAL_DEFAULT)));
+            this._logger.setUploadInterval(Long.parseLong(prefs.getString(LogManager.UPLOAD_INTERVAL, "" + LogManager.UPLOAD_INTERVAL_DEFAULT)));
         }
     }
 
@@ -119,5 +121,30 @@ public class LogManager
     public void setEnabled(boolean enabled)
     {
         this._logger.setEnabled(enabled);
+    }
+
+    public void setIncludeLocation(boolean include)
+    {
+        this._logger.setIncludeLocation(include);
+    }
+
+    public void setUploadInterval(long interval)
+    {
+        this._logger.setUploadInterval(interval);
+    }
+
+    public void setWifiOnly(boolean wifiOnly)
+    {
+        this._logger.setWifiOnly(wifiOnly);
+    }
+
+    public void setLiberalSsl(boolean liberal)
+    {
+        this._logger.setLiberalSsl(liberal);
+    }
+
+    public void setHeartbeat(boolean heartbeat)
+    {
+        this._logger.setHeartbeat(heartbeat);
     }
 }
