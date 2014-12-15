@@ -1323,4 +1323,8 @@
     
     <string name="title_log_heartbeat">Emit Heartbeats</string>
     <string name="summary_log_heartbeat">Generate heartbeat status events on regular intervals.</string>
+    
+    <string name="config_settings_security">Security &amp; Encryption Options</string>
+    <string name="config_preferred_hash_function_label">Preferred Hash Function</string>
+    <string name="config_preferred_hash_function_message">Desired cryptographic hash function for protecting sensitive information.</string>
 </resources>

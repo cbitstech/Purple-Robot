@@ -22,6 +22,7 @@ public class PurpleRobotApplication extends Application
     private static Context _context;
     private static long _lastFix = 0;
 
+    @Override
     public void onCreate()
     {
         super.onCreate();
@@ -71,7 +72,7 @@ public class PurpleRobotApplication extends Application
 
             factory.setNamespaceAware(false);
 
-            XmlPullParser xpp = context.getResources().getXml(R.layout.layout_settings_activity);
+            XmlPullParser xpp = context.getResources().getXml(R.xml.settings);
             int eventType = xpp.getEventType();
 
             while (eventType != XmlPullParser.END_DOCUMENT)
