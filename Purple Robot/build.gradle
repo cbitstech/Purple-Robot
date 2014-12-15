@@ -30,12 +30,12 @@ android {
         androidTest.setRoot('tests')
     }
 
-    compileSdkVersion 19
-    buildToolsVersion "19.1"
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
 
     defaultConfig {
         minSdkVersion 10
-        targetSdkVersion 19
+        targetSdkVersion 21
     }
 
     compileOptions {
@@ -44,11 +44,11 @@ android {
     }
     
     dependencies {
-        compile 'com.android.support:appcompat-v7:19.+'
-        compile 'com.android.support:mediarouter-v7:19.+'
-	compile 'com.google.android.gms:play-services:6.+'
+        compile 'com.android.support:appcompat-v7:21.+'
+        compile 'com.android.support:mediarouter-v7:21.+'
+		compile 'com.google.android.gms:play-services:6.+'
         compile 'com.getpebble:pebblekit:2.6.0'
-        compile 'com.facebook.android:facebook-android-sdk:3.20.0'
+        compile 'com.facebook.android:facebook-android-sdk:3.+'
         compile project(':anthracite-clients-android')
     	compile fileTree(dir: 'libs', include: '*.jar')
     }
