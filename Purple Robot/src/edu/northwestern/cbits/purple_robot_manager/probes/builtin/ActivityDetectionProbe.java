@@ -22,10 +22,11 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
-import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.location.ActivityRecognitionClient;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.location.ActivityRecognition;
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
 
@@ -44,10 +45,12 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
     private static final String FREQUENCY = "config_probe_activity_detection_frequency";
     private static final String ENABLED = "config_probe_activity_detection_enabled";
 
-    private static ActivityRecognitionClient _activityDetectionClient = null;
+    private static GoogleApiClient _apiClient = null;
     private Context _context = null;
 
     private long _lastFreq = 0;
+
+    private PendingIntent _pendingIntent;
 
     @Override
     public String name(Context context)
@@ -106,40 +109,46 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
         {
             long interval = Long.parseLong(prefs.getString(ActivityDetectionProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
 
-            if (interval != this._lastFreq && ActivityDetectionProbe._activityDetectionClient != null)
+            if (interval != this._lastFreq && ActivityDetectionProbe._apiClient != null)
             {
                 this._lastFreq = interval;
 
-                if (ActivityDetectionProbe._activityDetectionClient.isConnected())
-                    ActivityDetectionProbe._activityDetectionClient.disconnect();
+                ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(ActivityDetectionProbe._apiClient,
+                        this._pendingIntent);
 
-                ActivityDetectionProbe._activityDetectionClient.unregisterConnectionCallbacks(this);
-                ActivityDetectionProbe._activityDetectionClient.unregisterConnectionFailedListener(this);
+                if (ActivityDetectionProbe._apiClient.isConnected())
+                    ActivityDetectionProbe._apiClient.disconnect();
 
-                ActivityDetectionProbe._activityDetectionClient = null;
+                ActivityDetectionProbe._apiClient.unregisterConnectionCallbacks(this);
+                ActivityDetectionProbe._apiClient.unregisterConnectionFailedListener(this);
+
+                ActivityDetectionProbe._apiClient = null;
             }
 
-            if (ActivityDetectionProbe._activityDetectionClient == null)
+            if (ActivityDetectionProbe._apiClient == null)
             {
+                ActivityDetectionProbe._apiClient = new GoogleApiClient.Builder(context)
+                        .addApi(ActivityRecognition.API).addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this).build();
+
                 int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(context);
 
                 if (ConnectionResult.SUCCESS == resultCode)
-                {
-                    ActivityDetectionProbe._activityDetectionClient = new ActivityRecognitionClient(context.getApplicationContext(), this, this);
-
-                    ActivityDetectionProbe._activityDetectionClient.connect();
-                }
+                    ActivityDetectionProbe._apiClient.connect();
             }
 
             return true;
         }
-        else if (ActivityDetectionProbe._activityDetectionClient != null)
+        else if (ActivityDetectionProbe._apiClient != null)
         {
-            ActivityDetectionProbe._activityDetectionClient.unregisterConnectionCallbacks(this);
-            ActivityDetectionProbe._activityDetectionClient.unregisterConnectionFailedListener(this);
-            ActivityDetectionProbe._activityDetectionClient.disconnect();
+            ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(ActivityDetectionProbe._apiClient,
+                    this._pendingIntent);
 
-            ActivityDetectionProbe._activityDetectionClient = null;
+            ActivityDetectionProbe._apiClient.unregisterConnectionCallbacks(this);
+            ActivityDetectionProbe._apiClient.unregisterConnectionFailedListener(this);
+            ActivityDetectionProbe._apiClient.disconnect();
+
+            ActivityDetectionProbe._apiClient = null;
         }
 
         return false;
@@ -313,7 +322,8 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
             frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
             values = new JSONArray();
 
-            String[] options = context.getResources().getStringArray(R.array.probe_activity_recognition_frequency_values);
+            String[] options = context.getResources().getStringArray(
+                    R.array.probe_activity_recognition_frequency_values);
 
             for (String option : options)
             {
@@ -345,23 +355,25 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
         long interval = Long.parseLong(prefs.getString(ActivityDetectionProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
 
         Intent intent = new Intent(ManagerService.GOOGLE_PLAY_ACTIVITY_DETECTED);
-        PendingIntent pendingIntent = PendingIntent.getService(this._context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        this._pendingIntent = PendingIntent.getService(this._context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        if (ActivityDetectionProbe._activityDetectionClient.isConnected())
-            ActivityDetectionProbe._activityDetectionClient.requestActivityUpdates(interval, pendingIntent);
+        if (ActivityDetectionProbe._apiClient.isConnected())
+            ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(ActivityDetectionProbe._apiClient,
+                    interval, this._pendingIntent);
         else
-            ActivityDetectionProbe._activityDetectionClient.connect();
-    }
-
-    @Override
-    public void onDisconnected()
-    {
-
+            ActivityDetectionProbe._apiClient.connect();
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult result)
     {
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int cause)
+    {
+        // TODO Auto-generated method stub
 
     }
 }
