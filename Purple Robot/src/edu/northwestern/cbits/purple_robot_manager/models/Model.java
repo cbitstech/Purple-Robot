@@ -26,7 +26,6 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
-
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -116,7 +115,7 @@ public abstract class Model
 
     public final static Model modelForUrl(Context context, String jsonUrl)
     {
-        String hash = EncryptionManager.getInstance().createHash(context, jsonUrl);
+        String hash = EncryptionManager.getInstance().createHash(context, jsonUrl, "MD5");
 
         SharedPreferences prefs = Probe.getPreferences(context);
 

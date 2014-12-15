@@ -138,7 +138,7 @@ public class EncryptionManager
         return cipher;
     }
 
-    public String createHash(Context context, String string)
+    public String createHash(Context context, String string, String algorithm)
     {
         if (string == null)
             return null;
@@ -147,7 +147,7 @@ public class EncryptionManager
 
         try
         {
-            MessageDigest md = MessageDigest.getInstance("MD5");
+            MessageDigest md = MessageDigest.getInstance(algorithm);
             byte[] digest = md.digest(string.getBytes("UTF-8"));
 
             hash = (new BigInteger(1, digest)).toString(16);
@@ -492,5 +492,25 @@ public class EncryptionManager
         Editor e = prefs.edit();
         e.putString("config_user_id", userId);
         e.commit();
+    }
+
+    public String createHash(Context context, String name)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        String algorithm = prefs.getString("config_preferred_hash_function", "MD5");
+
+        try
+        {
+            MessageDigest.getInstance(algorithm);
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            // Fall back to MD5 if SHA-2 is not present...
+
+            algorithm = "MD5";
+        }
+
+        return this.createHash(context, name, algorithm);
     }
 }
