@@ -50,7 +50,8 @@ import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
-public class SettingsActivity extends PreferenceActivity implements OnPreferenceClickListener, OnPreferenceChangeListener
+public class SettingsActivity extends PreferenceActivity implements OnPreferenceClickListener,
+        OnPreferenceChangeListener
 {
     public static final String PROBES_SCREEN_KEY = "config_probes_screen";
     private static final String MANUAL_REFRESH_KEY = "config_json_refresh_manually";
@@ -77,7 +78,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 
         PurpleRobotApplication.fixPreferences(this, true);
 
-        this.addPreferencesFromResource(R.layout.layout_settings_activity);
+        this.addPreferencesFromResource(R.xml.settings);
 
         PreferenceScreen prefs = this.getPreferenceScreen();
 
@@ -114,7 +115,8 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 
         PreferenceScreen triggersScreen = TriggerManager.getInstance(this).buildPreferenceScreen(this);
 
-        PreferenceCategory triggerCategory = (PreferenceCategory) prefs.findPreference("config_settings_trigger_category");
+        PreferenceCategory triggerCategory = (PreferenceCategory) prefs
+                .findPreference("config_settings_trigger_category");
         triggerCategory.addPreference(triggersScreen);
 
         PreferenceScreen modelsScreen = ModelManager.getInstance(this).buildPreferenceScreen(this);
@@ -231,7 +233,8 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
         }
         else if (ZIP_ARCHIVES_KEY.equals(preference.getKey()))
         {
-            HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance.pluginForClass(this, HttpUploadPlugin.class);
+            HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance.pluginForClass(this,
+                    HttpUploadPlugin.class);
 
             if (plugin != null)
             {
@@ -242,7 +245,8 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
         }
         else if (DELETE_ARCHIVES_KEY.equals(preference.getKey()))
         {
-            HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance.pluginForClass(this, HttpUploadPlugin.class);
+            HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance.pluginForClass(this,
+                    HttpUploadPlugin.class);
 
             if (plugin != null)
             {
@@ -285,8 +289,10 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
                 fout.close();
 
                 Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
-                emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, this.getString(R.string.message_mail_app_schema));
-                emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, this.getString(R.string.subject_mail_app_schema));
+                emailIntent.putExtra(android.content.Intent.EXTRA_TEXT,
+                        this.getString(R.string.message_mail_app_schema));
+                emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
+                        this.getString(R.string.subject_mail_app_schema));
                 emailIntent.setType("text/plain");
 
                 Uri uri = Uri.fromFile(configJsonFile);
