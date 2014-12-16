@@ -97,6 +97,8 @@ public class SaintProbe extends Probe
                         this._lastCheck = now;
 
                         Intent fetchIntent = new Intent(SaintProbe.FETCH_INTENT);
+                        fetchIntent.setClassName("edu.cornell.cs.pac.saint.helper",
+                                "edu.cornell.cs.pac.saint.helper.SaintService");
 
                         context.startService(fetchIntent);
                     }
@@ -172,7 +174,8 @@ public class SaintProbe extends Probe
             break;
         }
 
-        return context.getString(R.string.summary_saint_probe, context.getString(activityResource), context.getString(speechResource));
+        return context.getString(R.string.summary_saint_probe, context.getString(activityResource),
+                context.getString(speechResource));
     }
 
     @Override
