@@ -12,6 +12,7 @@ public class EncryptionTestCase extends RobotTestCase
         super(context, priority);
     }
 
+    @Override
     public void test()
     {
         if (this.isSelected(this._context) == false)
@@ -19,8 +20,12 @@ public class EncryptionTestCase extends RobotTestCase
 
         Assert.assertEquals("55502f40dc8b7c769880b10874abc9d0",
                 EncryptionManager.getInstance().createHash(this._context, "test@example.com"));
+
+        Assert.assertEquals("973dfe463ec85785f5f95af5ba3906eedb2d931c24e69824a89ea65dba4e813b", EncryptionManager
+                .getInstance().createHash(this._context, "test@example.com", "SHA-256"));
     }
 
+    @Override
     public String name(Context context)
     {
         return context.getString(R.string.name_encryption_test);

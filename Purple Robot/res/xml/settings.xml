@@ -185,6 +185,15 @@
             android:defaultValue="@string/value_zero" />
         </PreferenceScreen>
 	</PreferenceCategory>
+	<PreferenceCategory android:title="@string/config_settings_security">
+        <ListPreference
+            android:key="config_preferred_hash_function"
+            android:entries="@array/hash_function_labels"
+            android:entryValues="@array/hash_function_values"
+            android:title="@string/config_preferred_hash_function_label"
+            android:summary="@string/config_preferred_hash_function_message"
+            android:defaultValue="MD5" />
+    </PreferenceCategory>
 	<PreferenceCategory android:title="@string/config_settings_category">
         <EditTextPreference
             android:key="config_user_id"
