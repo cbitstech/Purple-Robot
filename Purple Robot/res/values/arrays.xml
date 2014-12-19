@@ -832,5 +832,15 @@
         <item>1000</item>
        	<item>5000</item>
        	<item>10000</item>
-s	</string-array>
+	</string-array>
+   	
+   	<array name="hash_function_labels">
+        <item>MD5 (Insecure, Legacy Default)</item>
+        <item>SHA-2 (Secure, Recommended)</item>
+    </array>
+
+   	<array name="hash_function_values">
+        <item>MD5</item>
+        <item>SHA-256</item>
+    </array>
 </resources>

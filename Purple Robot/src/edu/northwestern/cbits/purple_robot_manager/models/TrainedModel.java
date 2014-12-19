@@ -54,7 +54,7 @@ public abstract class TrainedModel extends Model
     public TrainedModel(final Context context, Uri uri)
     {
         this._source = uri;
-        this._sourceHash = EncryptionManager.getInstance().createHash(context, uri.toString());
+        this._sourceHash = EncryptionManager.getInstance().createHash(context, uri.toString(), "MD5");
 
         final TrainedModel me = this;
 
@@ -63,7 +63,7 @@ public abstract class TrainedModel extends Model
             @Override
             public void run()
             {
-                String hash = EncryptionManager.getInstance().createHash(context, me._source.toString());
+                String hash = EncryptionManager.getInstance().createHash(context, me._source.toString(), "MD5");
 
                 SharedPreferences prefs = Probe.getPreferences(context);
 
