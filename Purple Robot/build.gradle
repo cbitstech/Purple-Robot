@@ -4,12 +4,10 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.12.+'
+        classpath 'com.android.tools.build:gradle:1.0.0+'
     }
 }
-
 apply plugin: 'android'
-
 android {
     repositories {
         mavenCentral()
@@ -30,8 +28,8 @@ android {
         androidTest.setRoot('tests')
     }
 
-    compileSdkVersion 19
-    buildToolsVersion "19.1"
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
 
     defaultConfig {
         minSdkVersion 10
@@ -42,21 +40,21 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
     }
-    
+
     dependencies {
         compile 'com.android.support:appcompat-v7:19.+'
         compile 'com.android.support:mediarouter-v7:19.+'
-	compile 'com.google.android.gms:play-services:6.+'
+        compile 'com.google.android.gms:play-services:6.+'
         compile 'com.getpebble:pebblekit:2.6.0'
         compile 'com.facebook.android:facebook-android-sdk:3.20.0'
         compile project(':anthracite-clients-android')
-    	compile fileTree(dir: 'libs', include: '*.jar')
+        compile fileTree(dir: 'libs', include: '*.jar')
     }
 
     lintOptions {
         abortOnError false
     }
-    
+
     packagingOptions {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
@@ -68,16 +66,22 @@ android {
             storePassword STORE_PASSWORD
             keyAlias KEY_ALIAS
             keyPassword KEY_PASSWORD
-    	}
+        }
     }
 
     buildTypes {
         release {
-            runProguard true
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
             signingConfig signingConfigs.release
             debuggable false
         }
     }
-	
+}
+
+dependencies {
+    compile 'com.android.support:appcompat-v7:21.0.3'
+    compile 'com.google.android.gms:play-services:6.5.87'
+    compile 'com.android.support:mediarouter-v7:21.0.3'
+    compile 'com.facebook.android:facebook-android-sdk:3.21.1'
 }
