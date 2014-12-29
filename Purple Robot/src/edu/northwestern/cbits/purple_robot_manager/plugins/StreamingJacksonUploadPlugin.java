@@ -4,10 +4,13 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.security.SecureRandom;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.app.ActivityManager.RunningTaskInfo;
@@ -35,6 +38,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 @SuppressLint("NewApi")
 public class StreamingJacksonUploadPlugin extends DataUploadPlugin
 {
+    private final static String ERROR_EXTENSION = ".error";
     private final static String FILE_EXTENSION = ".jackson";
     private static final String TEMP_FILE_EXTENSION = ".jackson-temp";
 
@@ -115,6 +119,29 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
 
                             me._lastAttempt = 0;
                             me.uploadFiles(context, prefs);
+                        }
+                        else
+                        {
+                            try
+                            {
+                                JSONObject jsonPayload = new JSONObject(payload);
+
+                                // JSON is valid
+                            }
+                            catch (JSONException e)
+                            {
+                                // Invalid JSON, log results.
+
+                                LogManager.getInstance(context).logException(e);
+
+                                HashMap<String, Object> details = new HashMap<String, Object>();
+                                payloadFile.renameTo(new File(payloadFile.getAbsolutePath() + StreamingJacksonUploadPlugin.ERROR_EXTENSION));
+
+                                details.put("name", payloadFile.getAbsolutePath());
+                                details.put("size", payloadFile.length());
+
+                                LogManager.getInstance(context).log("corrupted_file", details);
+                            }
                         }
                     }
                     catch (IOException e)
