@@ -16,6 +16,8 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.BaseSettingsActivity;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.RobotPreferenceListener;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ActivityDetectionProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.AddressBookDistancesProbe;
@@ -597,7 +599,7 @@ public class ProbeManager
         PreferenceScreen screen = manager.createPreferenceScreen(settingsActivity);
         screen.setOrder(0);
         screen.setTitle(R.string.title_preference_probes_screen);
-        screen.setKey(SettingsActivity.PROBES_SCREEN_KEY);
+        screen.setKey(BaseSettingsActivity.PROBES_SCREEN_KEY);
 
         HashMap<String, ArrayList<PreferenceScreen>> probeMap = new HashMap<String, ArrayList<PreferenceScreen>>();
 
@@ -636,8 +638,8 @@ public class ProbeManager
 
         Preference disableAll = new Preference(settingsActivity);
         disableAll.setTitle(R.string.title_preference_probes_disable_each_probe);
-        disableAll.setKey(SettingsActivity.PROBES_DISABLE_EACH_KEY);
-        disableAll.setOnPreferenceClickListener((SettingsActivity) settingsActivity);
+        disableAll.setKey(BaseSettingsActivity.PROBES_DISABLE_EACH_KEY);
+        disableAll.setOnPreferenceClickListener(new RobotPreferenceListener(settingsActivity));
 
         globalCategory.addPreference(disableAll);
 

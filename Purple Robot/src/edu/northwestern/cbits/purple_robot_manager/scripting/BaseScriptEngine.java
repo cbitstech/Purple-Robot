@@ -62,6 +62,7 @@ import edu.northwestern.cbits.purple_robot_manager.activities.NfcActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.TestActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebActivity;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.BaseSettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;
@@ -778,7 +779,7 @@ public abstract class BaseScriptEngine
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
 
         Editor e = prefs.edit();
-        e.putBoolean(SettingsActivity.CHECK_UPDATES_KEY, true);
+        e.putBoolean(BaseSettingsActivity.CHECK_UPDATES_KEY, true);
         e.commit();
     }
 
@@ -787,7 +788,7 @@ public abstract class BaseScriptEngine
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
 
         Editor e = prefs.edit();
-        e.putBoolean(SettingsActivity.CHECK_UPDATES_KEY, false);
+        e.putBoolean(BaseSettingsActivity.CHECK_UPDATES_KEY, false);
         e.commit();
     }
 

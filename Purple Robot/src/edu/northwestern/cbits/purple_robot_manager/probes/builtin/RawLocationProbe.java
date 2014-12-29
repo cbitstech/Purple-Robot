@@ -15,6 +15,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Bundle;
+import android.os.Looper;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
@@ -316,6 +317,11 @@ public class RawLocationProbe extends Probe implements LocationListener
             return;
 
         this._lastFrequency = 0;
+
+        Looper looper = Looper.myLooper();
+
+        if (looper == null)
+            Looper.prepare();
 
         Bundle bundle = new Bundle();
         bundle.putString(RawLocationProbe.PROVIDER, provider);

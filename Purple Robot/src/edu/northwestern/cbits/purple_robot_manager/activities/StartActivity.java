@@ -55,6 +55,7 @@ import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.RobotContentProvider;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.BaseSettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
@@ -94,11 +95,11 @@ public class StartActivity extends ActionBarActivity
         @Override
         public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
         {
-            if (SettingsActivity.USER_ID_KEY.equals(key))
+            if (BaseSettingsActivity.USER_ID_KEY.equals(key))
             {
                 Editor e = prefs.edit();
 
-                e.remove(SettingsActivity.USER_HASH_KEY);
+                e.remove(BaseSettingsActivity.USER_HASH_KEY);
                 e.commit();
             }
         }
@@ -133,7 +134,7 @@ public class StartActivity extends ActionBarActivity
 
         if (this.getPackageManager().getInstallerPackageName(this.getPackageName()) == null)
         {
-            if (sharedPrefs.getBoolean(SettingsActivity.CHECK_UPDATES_KEY, false))
+            if (sharedPrefs.getBoolean(BaseSettingsActivity.CHECK_UPDATES_KEY, false))
                 UpdateManager.register(this, "7550093e020b1a4a6df90f1e9dde68b6");
         }
 

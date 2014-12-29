@@ -24,6 +24,7 @@ import edu.emory.mathcs.backport.java.util.Collections;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.BaseSettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.SchemeConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
@@ -222,7 +223,7 @@ public class TriggerManager
         PreferenceScreen screen = manager.createPreferenceScreen(settingsActivity);
         screen.setOrder(0);
         screen.setTitle(R.string.title_preference_triggers_screen);
-        screen.setKey(SettingsActivity.TRIGGERS_SCREEN_KEY);
+        screen.setKey(BaseSettingsActivity.TRIGGERS_SCREEN_KEY);
 
         PreferenceCategory triggersCategory = new PreferenceCategory(settingsActivity);
         triggersCategory.setTitle(R.string.title_preference_triggers_category);
