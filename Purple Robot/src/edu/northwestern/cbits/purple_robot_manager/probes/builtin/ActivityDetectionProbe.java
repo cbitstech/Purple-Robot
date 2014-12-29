@@ -109,15 +109,17 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
         {
             long interval = Long.parseLong(prefs.getString(ActivityDetectionProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
 
-            if (interval != this._lastFreq && ActivityDetectionProbe._apiClient != null)
+            if (interval != this._lastFreq && ActivityDetectionProbe._apiClient != null && ActivityDetectionProbe._apiClient.isConnected())
             {
                 this._lastFreq = interval;
 
-                ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(ActivityDetectionProbe._apiClient,
-                        this._pendingIntent);
-
                 if (ActivityDetectionProbe._apiClient.isConnected())
+                {
+                    ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(ActivityDetectionProbe._apiClient,
+                            this._pendingIntent);
+
                     ActivityDetectionProbe._apiClient.disconnect();
+                }
 
                 ActivityDetectionProbe._apiClient.unregisterConnectionCallbacks(this);
                 ActivityDetectionProbe._apiClient.unregisterConnectionFailedListener(this);

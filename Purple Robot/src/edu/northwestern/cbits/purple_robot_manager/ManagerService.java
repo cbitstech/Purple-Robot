@@ -26,6 +26,7 @@ import android.os.Build;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.BaseSettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
@@ -161,7 +162,7 @@ public class ManagerService extends IntentService
 
             Uri toneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-            String toneString = prefs.getString(SettingsActivity.RINGTONE_KEY, null);
+            String toneString = prefs.getString(BaseSettingsActivity.RINGTONE_KEY, null);
 
             String name = null;
 

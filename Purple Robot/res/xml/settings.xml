@@ -341,9 +341,9 @@
 		</PreferenceScreen>
 	</PreferenceCategory>
     <PreferenceCategory android:title="@string/config_special_category">
-		<Preference android:title="@string/title_mail_app_schema"
+		<!-- <Preference android:title="@string/title_mail_app_schema"
 	    	android:key="config_dump_json">
-        </Preference>
+        </Preference> -->
 		<Preference android:title="@string/title_run_tests"	android:key="config_run_tests">
         </Preference>
 	</PreferenceCategory>
