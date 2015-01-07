@@ -36,3 +36,6 @@ gradle.properties
 keys.xml.template
 res/values/keys.xml.template
 *~
+
+.idea
+*.iml

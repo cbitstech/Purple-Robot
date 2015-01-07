@@ -56,6 +56,10 @@ public class AppDisplayPlugin extends OutputPlugin
         }
         else
         {
+            String source = extras.getString("PROBE");
+
+            long now = System.currentTimeMillis();
+
             final ContentValues values = new ContentValues();
 
             Object ts = extras.get("TIMESTAMP");
@@ -65,7 +69,7 @@ public class AppDisplayPlugin extends OutputPlugin
             else if (ts instanceof Double)
                 values.put("recorded", ((Double) ts).longValue());
 
-            values.put("source", extras.getString("PROBE"));
+            values.put("source", source);
 
             if (extras.containsKey("FROM_MODEL"))
             {
@@ -113,7 +117,7 @@ public class AppDisplayPlugin extends OutputPlugin
                 this._valuesQueue.add(values);
             }
 
-            if (System.currentTimeMillis() - this._lastUpdate > 1000)
+            if (now - this._lastUpdate > 1000)
             {
                 this._lastUpdate = System.currentTimeMillis();
 
