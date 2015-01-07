@@ -325,57 +325,68 @@ public class StartActivity extends ActionBarActivity
         listView.setOnItemClickListener(new OnItemClickListener()
         {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            public void onItemClick(AdapterView<?> parent, View view, int position, final long id)
             {
-                Uri uri = ContentUris.withAppendedId(RobotContentProvider.RECENT_PROBE_VALUES, id);
-
-                Cursor c = me.getContentResolver().query(uri, null, null, null, null);
-
-                if (c.moveToNext())
+                Runnable r = new Runnable()
                 {
-                    String sensorName = c.getString(c.getColumnIndex("source"));
-                    String jsonString = c.getString(c.getColumnIndex("value"));
-                    Bundle value = OutputPlugin.bundleForJson(me, jsonString);
-
-                    final Probe probe = ProbeManager.probeForName(sensorName, me);
-
-                    if (probe != null)
+                    @Override
+                    public void run()
                     {
-                        Intent intent = probe.viewIntent(me);
+                        Uri uri = ContentUris.withAppendedId(RobotContentProvider.RECENT_PROBE_VALUES, id);
 
-                        if (intent == null)
-                        {
-                            Intent dataIntent = new Intent(me, ProbeViewerActivity.class);
+                        Cursor c = me.getContentResolver().query(uri, null, null, null, null);
 
-                            dataIntent.putExtra("probe_name", sensorName);
-                            dataIntent.putExtra("probe_bundle", value);
+                        if (c.moveToNext()) {
+                            final String sensorName = c.getString(c.getColumnIndex("source"));
+                            final String jsonString = c.getString(c.getColumnIndex("value"));
 
-                            me.startActivity(dataIntent);
+                            final Bundle value = OutputPlugin.bundleForJson(me, jsonString);
+
+                            me.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    final Probe probe = ProbeManager.probeForName(sensorName, me);
+
+                                    if (probe != null) {
+                                        Intent intent = probe.viewIntent(me);
+
+                                        if (intent == null) {
+                                            Intent dataIntent = new Intent(me, ProbeViewerActivity.class);
+
+                                            dataIntent.putExtra("probe_name", sensorName);
+                                            dataIntent.putExtra("probe_bundle", value);
+
+                                            me.startActivity(dataIntent);
+                                        } else {
+                                            intent.putExtra("probe_name", sensorName);
+                                            intent.putExtra("probe_bundle", value);
+
+                                            me.startActivity(intent);
+                                        }
+                                    } else {
+                                        Model model = ModelManager.getInstance(me).fetchModelByName(me, sensorName);
+
+                                        Intent dataIntent = new Intent(me, ProbeViewerActivity.class);
+
+                                        if (model != null)
+                                            dataIntent.putExtra("probe_name", model.title(me));
+                                        else
+                                            dataIntent.putExtra("probe_name", sensorName);
+
+                                        dataIntent.putExtra("is_model", true);
+                                        dataIntent.putExtra("probe_bundle", value);
+                                        me.startActivity(dataIntent);
+                                    }
+                                }
+                            });
                         }
-                        else
-                        {
-                            intent.putExtra("probe_name", sensorName);
-                            intent.putExtra("probe_bundle", value);
 
-                            me.startActivity(intent);
-                        }
+                        c.close();
                     }
-                    else
-                    {
-                        Model model = ModelManager.getInstance(me).fetchModelByName(me, sensorName);
+                };
 
-                        Intent dataIntent = new Intent(me, ProbeViewerActivity.class);
-
-                        if (model != null)
-                            dataIntent.putExtra("probe_name", model.title(me));
-                        else
-                            dataIntent.putExtra("probe_name", sensorName);
-
-                        dataIntent.putExtra("is_model", true);
-                        dataIntent.putExtra("probe_bundle", value);
-                        me.startActivity(dataIntent);
-                    }
-                }
+                Thread t = new Thread(r);
+                t.start();
             }
         });
 
