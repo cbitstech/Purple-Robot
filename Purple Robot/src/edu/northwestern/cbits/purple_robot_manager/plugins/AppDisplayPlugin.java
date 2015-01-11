@@ -3,6 +3,7 @@ package edu.northwestern.cbits.purple_robot_manager.plugins;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import android.annotation.SuppressLint;
 import android.content.ContentProviderOperation;
@@ -30,6 +31,7 @@ public class AppDisplayPlugin extends OutputPlugin
     private long _lastUpdate = 0;
 
     private ArrayList<ContentValues> _valuesQueue = new ArrayList<ContentValues>();
+    private HashMap<String, Long> _lastUpdates = new HashMap<String, Long>();
 
     public String[] respondsTo()
     {
@@ -58,7 +60,17 @@ public class AppDisplayPlugin extends OutputPlugin
         {
             String source = extras.getString("PROBE");
 
+            Long updated = this._lastUpdates.get(source);
+
+            if (updated == null)
+                updated = 0L;
+
             long now = System.currentTimeMillis();
+
+            if (now - updated < 1000)
+                return; // Only record a sample once a second for display purposes...
+
+            this._lastUpdates.put(source, now);
 
             final ContentValues values = new ContentValues();
 
