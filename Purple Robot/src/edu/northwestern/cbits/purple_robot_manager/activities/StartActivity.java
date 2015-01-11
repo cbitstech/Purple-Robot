@@ -621,8 +621,8 @@ public class StartActivity extends ActionBarActivity
         }
 
         final ListView listView = (ListView) this.findViewById(R.id.list_probes);
-        ImageView logoView = (ImageView) this.findViewById(R.id.logo_view);
-        logoView.setBackgroundColor(Color.WHITE);
+        // ImageView logoView = (ImageView) this.findViewById(R.id.logo_view);
+        //logoView.setBackgroundColor(Color.WHITE);
 
         boolean probesEnabled = prefs.getBoolean("config_probes_enabled", false);
 
@@ -631,22 +631,22 @@ public class StartActivity extends ActionBarActivity
         if (probesEnabled)
         {
             listView.setVisibility(View.VISIBLE);
-            logoView.setVisibility(View.GONE);
+        //    logoView.setVisibility(View.GONE);
         }
         else
         {
-            logoView.setImageResource(R.drawable.laptop);
+        //    logoView.setImageResource(R.drawable.laptop);
 
-            logoView.setScaleType(ScaleType.CENTER);
+        //    logoView.setScaleType(ScaleType.CENTER);
 
-            listView.setVisibility(View.GONE);
-            logoView.setVisibility(View.VISIBLE);
+        //    listView.setVisibility(View.GONE);
+        //    logoView.setVisibility(View.VISIBLE);
         }
 
         boolean showBackground = prefs.getBoolean("config_show_background", true);
 
-        if (showBackground == false)
-            logoView.setVisibility(View.GONE);
+//        if (showBackground == false)
+//            logoView.setVisibility(View.GONE);
 
         HashMap<String, Object> payload = new HashMap<String, Object>();
         payload.put("probes_enabled", probesEnabled);
