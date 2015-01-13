@@ -13,13 +13,14 @@ Purple Robot is a large application that includes a variety of service integrati
 Purple Robot depends upon the following packages for compilation and installation:
 
 * [Git](http://git-scm.com/): This may already be installed on your system.
-* [Android SDK](http://developer.android.com/sdk/index.html): SDK installations that accompany Android IDEs like Eclipse and Android Studio may be used to build Purple Robot.
-* [Gradle](http://www.gradle.org/): Install version 1.12, not 2.0.
+* [Android SDK](http://developer.android.com/sdk/index.html): An SDK installation is included with Android Studio.
+* [Gradle](http://www.gradle.org/): Install version 2.2.1
 * [Java](http://www.oracle.com/technetwork/java/index.html): This may already be installed.
 
 After installing these prerequisites, open the Android SDK Manager and verify that the following packages are installed:
 
-* Android 4.4.2 (API 19) SDK Platform
+* Android 5.0.1 (API 21) SDK Platform
+* Android SDK Build-tools 21.1.2
 * Android Support Repository
 * Google Repository
 * Google USB Driver (or suitable ADB driver for your device)
@@ -35,9 +36,9 @@ This will check out the Purple Robot app as well as some supporting technologies
     git submodule init
     git submodule update
 
-These commands will retrieve [the Facebook SDK](https://developers.facebook.com/docs/android) and [Anthracite](https://github.com/cbitstech/anthracite-clients-android) logging dependencies.
+These commands will retrieve the [Anthracite](https://github.com/cbitstech/anthracite-clients-android) logging dependency.
 
-### Building Purple Robot
+### Building Purple Robot from the command line
 
 Next, go to the `Purple Robot` folder and rename the following files:
 
@@ -62,6 +63,19 @@ If you receive an error about the Java heap size, you may need to set an environ
     export GRADLE_OPTS=-Xmx2048m
     
 On non-Unix platforms, you may also need to set your `JAVA_HOME` environment variable to point to you local copy of the Java Development Kit.
+
+### Building Purple Robot from Android Studio
+
+Once Purple Robot can be built from the command line, you can import the project into Android Studio and use that IDE as your primary Purple Robot development environment.
+
+Once Android Studio is installed, select "Import Non-Android Studio Project" and browse to the `Purple Robot` directory in downloaded repository.
+
+If prompted to use a different SDK, select Android Studio's default SDK. This will update the `local.properties` file.
+
+When prompted whether to use the Gradle wrapper, select `Cancel` and select the location of your Gradle 2.2.1 installation. Android Studio will sync the Purple Robot build files.
+
+Once Android Studio has successfully synced with the project, you should switch the build type to `release`, build the app's APK, and install it on your device.
+
 
 ### Questions or comments?
 
