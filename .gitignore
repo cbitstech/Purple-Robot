@@ -34,7 +34,7 @@ lint.xml
 *.keystore
 gradle.properties
 keys.xml.template
-res/values/keys.xml.template
+keys.xml
 *~
 
 .idea
