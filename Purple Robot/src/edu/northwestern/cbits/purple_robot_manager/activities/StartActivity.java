@@ -23,8 +23,8 @@ import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.database.ContentObserver;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -45,8 +45,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -56,6 +54,8 @@ import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.RobotContentProvider;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.BaseSettingsActivity;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.LegacySettingsActivity;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
@@ -115,10 +115,16 @@ public class StartActivity extends ActionBarActivity
 
     private void launchPreferences()
     {
-        Intent intent = new Intent();
-        intent.setClass(this, SettingsActivity.class);
-
-        this.startActivity(intent);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+        {
+            Intent intent = new Intent(this, LegacySettingsActivity.class);
+            this.startActivity(intent);
+        }
+        else
+        {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            this.startActivity(intent);
+        }
     }
 
     @Override

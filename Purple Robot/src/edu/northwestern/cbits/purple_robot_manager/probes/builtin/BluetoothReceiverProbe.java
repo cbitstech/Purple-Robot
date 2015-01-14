@@ -51,12 +51,10 @@ public class BluetoothReceiverProbe extends Probe
 
     @Override
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
     {
-        PreferenceManager manager = activity.getPreferenceManager();
-
-        PreferenceScreen screen = manager.createPreferenceScreen(activity);
-        screen.setTitle(this.title(activity));
+        PreferenceScreen screen = manager.createPreferenceScreen(context);
+        screen.setTitle(this.title(context));
 
         return screen;
     }

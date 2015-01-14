@@ -438,22 +438,20 @@ public class CommunicationEventProbe extends Probe
 
     @Override
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(final PreferenceActivity activity)
+    public PreferenceScreen preferenceScreen(final Context context, PreferenceManager manager)
     {
-        PreferenceManager manager = activity.getPreferenceManager();
-
-        PreferenceScreen screen = manager.createPreferenceScreen(activity);
-        screen.setTitle(this.title(activity));
+        PreferenceScreen screen = manager.createPreferenceScreen(context);
+        screen.setTitle(this.title(context));
         screen.setSummary(R.string.summary_communication_event_probe_desc);
 
-        CheckBoxPreference enabled = new CheckBoxPreference(activity);
+        CheckBoxPreference enabled = new CheckBoxPreference(context);
         enabled.setTitle(R.string.title_enable_probe);
         enabled.setKey(CommunicationEventProbe.ENABLED);
         enabled.setDefaultValue(CommunicationEventProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
 
-        ListPreference duration = new ListPreference(activity);
+        ListPreference duration = new ListPreference(context);
         duration.setKey(CommunicationEventProbe.FREQUENCY);
         duration.setEntryValues(R.array.probe_low_frequency_values);
         duration.setEntries(R.array.probe_low_frequency_labels);
@@ -462,7 +460,7 @@ public class CommunicationEventProbe extends Probe
 
         screen.addPreference(duration);
 
-        CheckBoxPreference hash = new CheckBoxPreference(activity);
+        CheckBoxPreference hash = new CheckBoxPreference(context);
         hash.setKey(CommunicationEventProbe.HASH_DATA);
         hash.setDefaultValue(Probe.DEFAULT_HASH_DATA);
         hash.setTitle(R.string.config_probe_communication_hash_title);
@@ -470,7 +468,7 @@ public class CommunicationEventProbe extends Probe
 
         screen.addPreference(hash);
 
-        CheckBoxPreference retrieve = new CheckBoxPreference(activity);
+        CheckBoxPreference retrieve = new CheckBoxPreference(context);
         retrieve.setKey(CommunicationEventProbe.RETRIEVE_DATA);
         retrieve.setDefaultValue(CommunicationEventProbe.DEFAULT_RETRIEVE);
         retrieve.setTitle(R.string.config_probe_communication_retrieve_title);
@@ -485,7 +483,7 @@ public class CommunicationEventProbe extends Probe
 
                 if (b)
                 {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
                     builder = builder.setTitle(R.string.config_probe_communication_retrieve_warning_title);
                     builder = builder.setMessage(R.string.config_probe_communication_retrieve_warning);
                     builder = builder.setPositiveButton(R.string.button_continue, null);
@@ -499,7 +497,7 @@ public class CommunicationEventProbe extends Probe
 
         screen.addPreference(retrieve);
 
-        CheckBoxPreference encrypt = new CheckBoxPreference(activity);
+        CheckBoxPreference encrypt = new CheckBoxPreference(context);
         encrypt.setKey(CommunicationEventProbe.ENCRYPT_DATA);
         encrypt.setDefaultValue(CommunicationEventProbe.DEFAULT_ENCRYPT);
         encrypt.setTitle(R.string.config_probe_communication_encrypt_title);
@@ -507,15 +505,15 @@ public class CommunicationEventProbe extends Probe
 
         screen.addPreference(encrypt);
 
-        Preference calibrate = new Preference(activity);
+        Preference calibrate = new Preference(context);
         calibrate.setTitle(R.string.config_probe_calibrate_title);
         calibrate.setOnPreferenceClickListener(new OnPreferenceClickListener()
         {
             @Override
             public boolean onPreferenceClick(Preference pref)
             {
-                Intent intent = new Intent(activity, AddressBookLabelActivity.class);
-                activity.startActivity(intent);
+                Intent intent = new Intent(context, AddressBookLabelActivity.class);
+                context.startActivity(intent);
 
                 return true;
             }

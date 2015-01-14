@@ -619,15 +619,15 @@ public class DateTrigger extends Trigger
 
     @Override
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
     {
-        PreferenceScreen screen = super.preferenceScreen(activity);
+        PreferenceScreen screen = super.preferenceScreen(context, manager);
 
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss, yyyy-MM-dd");
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        Preference lastFire = new Preference(activity);
+        Preference lastFire = new Preference(context);
         lastFire.setSummary(R.string.label_trigger_last_fire);
 
         String key = "last_fired_" + this.identifier();
@@ -648,19 +648,17 @@ public class DateTrigger extends Trigger
         {
             if (this._upcomingFireDates.size() > 0)
             {
-                PreferenceManager manager = activity.getPreferenceManager();
-
-                PreferenceScreen upcomingScreen = manager.createPreferenceScreen(activity);
+                PreferenceScreen upcomingScreen = manager.createPreferenceScreen(context);
                 upcomingScreen.setSummary(R.string.label_trigger_upcoming_fires);
 
                 if (this._upcomingFireDates.size() == 1)
                     upcomingScreen.setTitle(R.string.label_trigger_upcoming_fire_summary);
                 else
-                    upcomingScreen.setTitle(String.format(activity.getString(R.string.label_trigger_upcoming_fires_summary), this._upcomingFireDates.size()));
+                    upcomingScreen.setTitle(String.format(context.getString(R.string.label_trigger_upcoming_fires_summary), this._upcomingFireDates.size()));
 
                 for (Date d : this._upcomingFireDates)
                 {
-                    Preference upcomingFire = new Preference(activity);
+                    Preference upcomingFire = new Preference(context);
                     upcomingFire.setTitle(sdf.format(d));
 
                     upcomingScreen.addPreference(upcomingFire);
@@ -670,7 +668,7 @@ public class DateTrigger extends Trigger
             }
             else
             {
-                Preference upcomingFires = new Preference(activity);
+                Preference upcomingFires = new Preference(context);
 
                 upcomingFires.setSummary(R.string.label_trigger_upcoming_fires);
                 upcomingFires.setTitle(R.string.label_trigger_upcoming_fires_none);
@@ -678,32 +676,32 @@ public class DateTrigger extends Trigger
                 screen.addPreference(upcomingFires);
             }
 
-            Preference originalStartString = new Preference(activity);
+            Preference originalStartString = new Preference(context);
             originalStartString.setSummary(R.string.label_trigger_original_start);
             originalStartString.setTitle(this._originalStart);
             screen.addPreference(originalStartString);
 
-            Preference originalEndString = new Preference(activity);
+            Preference originalEndString = new Preference(context);
             originalEndString.setSummary(R.string.label_trigger_original_end);
             originalEndString.setTitle(this._originalEnd);
             screen.addPreference(originalEndString);
 
-            Preference startString = new Preference(activity);
+            Preference startString = new Preference(context);
             startString.setSummary(R.string.label_trigger_start);
             startString.setTitle(this._start);
             screen.addPreference(startString);
 
-            Preference endString = new Preference(activity);
+            Preference endString = new Preference(context);
             endString.setSummary(R.string.label_trigger_end);
             endString.setTitle(this._end);
             screen.addPreference(endString);
 
-            Preference repeatString = new Preference(activity);
+            Preference repeatString = new Preference(context);
             repeatString.setSummary(R.string.label_trigger_repeat);
             repeatString.setTitle(this._repeats);
             screen.addPreference(repeatString);
 
-            Preference randomString = new Preference(activity);
+            Preference randomString = new Preference(context);
             randomString.setSummary(R.string.label_trigger_random);
 
             if (this._random)
@@ -713,7 +711,7 @@ public class DateTrigger extends Trigger
 
             screen.addPreference(randomString);
 
-            Preference bootString = new Preference(activity);
+            Preference bootString = new Preference(context);
             bootString.setSummary(R.string.label_trigger_boot);
 
             if (this._fireOnBoot)

@@ -59,7 +59,6 @@ import edu.northwestern.cbits.purple_robot_manager.ScheduleManager;
 import edu.northwestern.cbits.purple_robot_manager.activities.DialogActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.LabelActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.NfcActivity;
-import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.TestActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.BaseSettingsActivity;

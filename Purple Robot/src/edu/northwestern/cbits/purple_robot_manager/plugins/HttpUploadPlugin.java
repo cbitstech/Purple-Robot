@@ -582,7 +582,7 @@ public class HttpUploadPlugin extends OutputPlugin
                             Notification note = new Notification(R.drawable.ic_note_normal, title,
                                     System.currentTimeMillis());
                             PendingIntent contentIntent = PendingIntent.getActivity(me.getContext(), 0,
-                                    new Intent(me.getContext(), StartActivity.class), Notification.FLAG_ONGOING_EVENT);
+                                    new Intent(me.getContext(), StartActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
                             note.setLatestEventInfo(me.getContext(), title, title, contentIntent);
 
@@ -1095,15 +1095,21 @@ public class HttpUploadPlugin extends OutputPlugin
         }
     }
 
-    public void mailArchiveFiles(final Activity activity)
+    public void mailArchiveFiles(final Context context)
     {
-        activity.runOnUiThread(new Runnable()
+        if (context instanceof Activity)
         {
-            public void run()
+            Activity activity = (Activity) context;
+
+            activity.runOnUiThread(new Runnable()
             {
-                Toast.makeText(activity, "Packaging archive files for mailing...", Toast.LENGTH_LONG).show();
-            }
-        });
+                public void run()
+                {
+                    Toast.makeText(context, "Packaging archive files for mailing...", Toast.LENGTH_LONG).show();
+                }
+            });
+
+        }
 
         final HttpUploadPlugin me = this;
 
@@ -1111,7 +1117,7 @@ public class HttpUploadPlugin extends OutputPlugin
         {
             public void run()
             {
-                File storage = activity.getExternalCacheDir();
+                File storage = context.getExternalCacheDir();
 
                 if (!storage.exists())
                     storage.mkdirs();
@@ -1176,52 +1182,50 @@ public class HttpUploadPlugin extends OutputPlugin
                     LogManager.getInstance(me.getContext()).logException(e);
                 }
 
-                activity.runOnUiThread(new Runnable()
-                {
-                    public void run()
-                    {
-                        AccountManager accountManager = AccountManager.get(activity);
+                if (context instanceof Activity) {
+                    Activity activity = (Activity) context;
 
-                        String email = null;
+                    activity.runOnUiThread(new Runnable() {
+                        public void run() {
+                            AccountManager accountManager = AccountManager.get(context);
 
-                        Account[] accounts = accountManager.getAccountsByType("com.google");
+                            String email = null;
 
-                        for (int i = 0; i < accounts.length && email == null; i++)
-                        {
-                            Account account = accounts[i];
+                            Account[] accounts = accountManager.getAccountsByType("com.google");
 
-                            email = account.name;
+                            for (int i = 0; i < accounts.length && email == null; i++) {
+                                Account account = accounts[i];
+
+                                email = account.name;
+                            }
+
+                            Uri fileUri = Uri.fromFile(zipfile);
+
+                            Intent sendIntent = new Intent(Intent.ACTION_SEND);
+                            sendIntent.setType("application/zip");
+                            sendIntent.putExtra(Intent.EXTRA_SUBJECT, "Purple Robot Archives");
+                            sendIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
+
+                            if (email != null) {
+                                String[] emails =
+                                        {email};
+                                sendIntent.putExtra(Intent.EXTRA_EMAIL, emails);
+                            }
+
+                            context.startActivity(sendIntent);
+
+                            int remaining = pendingFiles.length - toDelete.size();
+
+                            Toast.makeText(context,
+                                    toDelete.size() + " archives packaged, " + remaining + " left in the device.",
+                                    Toast.LENGTH_LONG).show();
+
+                            for (File f : toDelete) {
+                                f.delete();
+                            }
                         }
-
-                        Uri fileUri = Uri.fromFile(zipfile);
-
-                        Intent sendIntent = new Intent(Intent.ACTION_SEND);
-                        sendIntent.setType("application/zip");
-                        sendIntent.putExtra(Intent.EXTRA_SUBJECT, "Purple Robot Archives");
-                        sendIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
-
-                        if (email != null)
-                        {
-                            String[] emails =
-                            { email };
-                            sendIntent.putExtra(Intent.EXTRA_EMAIL, emails);
-                        }
-
-                        activity.startActivity(sendIntent);
-
-                        int remaining = pendingFiles.length - toDelete.size();
-
-                        Toast.makeText(activity,
-                                toDelete.size() + " archives packaged, " + remaining + " left in the device.",
-                                Toast.LENGTH_LONG).show();
-
-                        for (File f : toDelete)
-                        {
-                            f.delete();
-                        }
-                    }
-                });
-
+                    });
+                }
             }
         };
 
@@ -1230,7 +1234,7 @@ public class HttpUploadPlugin extends OutputPlugin
     }
 
     @SuppressLint("DefaultLocale")
-    public void deleteArchiveFiles(final Activity activity)
+    public void deleteArchiveFiles(final Context context)
     {
         final HttpUploadPlugin me = this;
 
@@ -1240,14 +1244,20 @@ public class HttpUploadPlugin extends OutputPlugin
             {
                 File pendingFolder = me.getArchiveFolder();
 
-                activity.runOnUiThread(new Runnable()
+                if (context instanceof Activity)
                 {
-                    public void run()
+                    Activity activity = (Activity) context;
+
+                    activity.runOnUiThread(new Runnable()
                     {
-                        Toast.makeText(activity, activity.getString(R.string.message_clearing_archive),
-                                Toast.LENGTH_LONG).show();
-                    }
-                });
+                        public void run()
+                        {
+                            Toast.makeText(context, context.getString(R.string.message_clearing_archive),
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+
 
                 try
                 {
@@ -1255,7 +1265,7 @@ public class HttpUploadPlugin extends OutputPlugin
                 }
                 catch (IOException e)
                 {
-                    LogManager.getInstance(activity).logException(e);
+                    LogManager.getInstance(context).logException(e);
                 }
             }
         };

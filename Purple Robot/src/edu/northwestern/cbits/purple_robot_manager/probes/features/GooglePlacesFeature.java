@@ -277,11 +277,11 @@ public class GooglePlacesFeature extends Feature
     }
 
     @Override
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
     {
-        PreferenceScreen screen = super.preferenceScreen(activity);
+        PreferenceScreen screen = super.preferenceScreen(context, manager);
 
-        ListPreference radius = new ListPreference(activity);
+        ListPreference radius = new ListPreference(context);
         radius.setKey(GooglePlacesFeature.RADIUS);
         radius.setEntryValues(R.array.feature_google_places_values);
         radius.setEntries(R.array.feature_google_places_labels);

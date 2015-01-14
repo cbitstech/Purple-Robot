@@ -1,4 +1,4 @@
-package edu.northwestern.cbits.purple_robot_manager.activities;
+package edu.northwestern.cbits.purple_robot_manager.activities.settings;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,14 +13,12 @@ import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;
 import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.activities.settings.BaseSettingsActivity;
-import edu.northwestern.cbits.purple_robot_manager.activities.settings.RobotPreferenceListener;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
-public class SettingsActivity extends PreferenceActivity
+public class LegacySettingsActivity extends PreferenceActivity
 {
     @SuppressWarnings("deprecation")
     public void onCreate(Bundle savedInstanceState)
@@ -41,7 +39,7 @@ public class SettingsActivity extends PreferenceActivity
         Preference logRefresh = prefs.findPreference(BaseSettingsActivity.LOG_REFRESH_KEY);
         logRefresh.setOnPreferenceClickListener(listener);
 
-        final SettingsActivity me = this;
+        final LegacySettingsActivity me = this;
 
         ListPreference haptic = (ListPreference) prefs.findPreference(BaseSettingsActivity.HAPTIC_PATTERN_KEY);
         haptic.setOnPreferenceChangeListener(new OnPreferenceChangeListener()
@@ -61,18 +59,18 @@ public class SettingsActivity extends PreferenceActivity
             }
         });
 
-        PreferenceScreen probesScreen = ProbeManager.buildPreferenceScreen(this);
+        PreferenceScreen probesScreen = ProbeManager.buildPreferenceScreen(this, this.getPreferenceManager());
 
         PreferenceCategory category = (PreferenceCategory) prefs.findPreference("config_settings_probe_category");
         category.addPreference(probesScreen);
 
-        PreferenceScreen triggersScreen = TriggerManager.getInstance(this).buildPreferenceScreen(this);
+        PreferenceScreen triggersScreen = TriggerManager.getInstance(this).buildPreferenceScreen(this, this.getPreferenceManager());
 
         PreferenceCategory triggerCategory = (PreferenceCategory) prefs
                 .findPreference("config_settings_trigger_category");
         triggerCategory.addPreference(triggersScreen);
 
-        PreferenceScreen modelsScreen = ModelManager.getInstance(this).buildPreferenceScreen(this);
+        PreferenceScreen modelsScreen = ModelManager.getInstance(this).buildPreferenceScreen(this, this.getPreferenceManager());
 
         PreferenceCategory modelCategory = (PreferenceCategory) prefs.findPreference("config_settings_models_category");
         modelCategory.addPreference(modelsScreen);

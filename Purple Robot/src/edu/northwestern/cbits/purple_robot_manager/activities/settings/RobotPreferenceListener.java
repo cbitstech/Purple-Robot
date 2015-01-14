@@ -2,6 +2,7 @@ package edu.northwestern.cbits.purple_robot_manager.activities.settings;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -34,7 +35,6 @@ import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.PersistentService;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.RobotContentProvider;
-import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.TestActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.db.DistancesProvider;
@@ -48,11 +48,11 @@ import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 public class RobotPreferenceListener implements Preference.OnPreferenceClickListener,
         Preference.OnPreferenceChangeListener
 {
-    private Activity _activity = null;
+    private Context _context = null;
 
-    public RobotPreferenceListener(Activity activity)
+    public RobotPreferenceListener(Context context)
     {
-        this._activity = activity;
+        this._context = context;
     }
 
     @Override
@@ -67,9 +67,9 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
 
             Intent intent = new Intent(ManagerService.HAPTIC_PATTERN_INTENT);
             intent.putExtra(ManagerService.HAPTIC_PATTERN_NAME, pattern);
-            intent.setClass(_activity, ManagerService.class);
+            intent.setClass(this._context, ManagerService.class);
 
-            this._activity.startService(intent);
+            this._context.startService(intent);
 
             return true;
         }
@@ -77,17 +77,17 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
             return true;
         else if (BaseSettingsActivity.MANUAL_REFRESH_KEY.equals(preference.getKey()))
         {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._activity.getApplicationContext());
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context.getApplicationContext());
             SharedPreferences.Editor editor = prefs.edit();
 
             editor.putLong(LegacyJSONConfigFile.JSON_LAST_UPDATE, 0);
             editor.putString(LegacyJSONConfigFile.JSON_LAST_HASH, "");
 
             editor.commit();
-            LegacyJSONConfigFile.update(this._activity, true);
+            LegacyJSONConfigFile.update(this._context, true);
 
-            ProbeManager.nudgeProbes(this._activity);
-            TriggerManager.getInstance(this._activity).refreshTriggers(this._activity);
+            ProbeManager.nudgeProbes(this._context);
+            TriggerManager.getInstance(this._context).refreshTriggers(this._context);
 
             return true;
         }
@@ -95,49 +95,49 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
         {
             try
             {
-                PackageInfo info = this._activity.getPackageManager().getPackageInfo(this._activity.getPackageName(), 0);
+                PackageInfo info = this._context.getPackageManager().getPackageInfo(this._context.getPackageName(), 0);
 
                 Intent refreshIntent = new Intent(info.packageName + ".UPLOAD_LOGS_INTENT");
                 refreshIntent.putExtra(LogService.LOG_FORCE_UPLOAD, true);
-                refreshIntent.setClass(this._activity, ManagerService.class);
+                refreshIntent.setClass(this._context, ManagerService.class);
 
-                this._activity.startService(refreshIntent);
+                this._context.startService(refreshIntent);
             }
             catch (PackageManager.NameNotFoundException e)
             {
-                LogManager.getInstance(this._activity).logException(e);
+                LogManager.getInstance(this._context).logException(e);
             }
 
             return true;
         }
         else if (BaseSettingsActivity.ZIP_ARCHIVES_KEY.equals(preference.getKey()))
         {
-            HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance.pluginForClass(this._activity,
+            HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance.pluginForClass(this._context,
                     HttpUploadPlugin.class);
 
             if (plugin != null)
             {
-                plugin.mailArchiveFiles(this._activity);
+                plugin.mailArchiveFiles(this._context);
 
                 return true;
             }
         }
         else if (BaseSettingsActivity.DELETE_ARCHIVES_KEY.equals(preference.getKey()))
         {
-            HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance.pluginForClass(this._activity,
+            HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance.pluginForClass(this._context,
                     HttpUploadPlugin.class);
 
             if (plugin != null)
             {
-                plugin.deleteArchiveFiles(this._activity);
+                plugin.deleteArchiveFiles(this._context);
 
                 return true;
             }
         }
         else if (BaseSettingsActivity.RUN_TESTS_KEY.equals(preference.getKey()))
         {
-            Intent intent = new Intent(this._activity, TestActivity.class);
-            this._activity.startActivity(intent);
+            Intent intent = new Intent(this._context, TestActivity.class);
+            this._context.startActivity(intent);
         }
         else if (BaseSettingsActivity.DUMP_JSON_KEY.equals(preference.getKey()))
         {
@@ -145,10 +145,10 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
             {
                 JSONObject root = new JSONObject();
 
-                ApplicationInfo info = this._activity.getApplicationInfo();
-                root.put("name", this._activity.getString(info.labelRes));
+                ApplicationInfo info = this._context.getApplicationInfo();
+                root.put("name", this._context.getString(info.labelRes));
 
-                PackageInfo pkgInfo = this._activity.getPackageManager().getPackageInfo(info.packageName, 0);
+                PackageInfo pkgInfo = this._context.getPackageManager().getPackageInfo(info.packageName, 0);
 
                 root.put("package_name", pkgInfo.packageName);
                 root.put("version", pkgInfo.versionCode);
@@ -156,16 +156,22 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
 
                 JSONObject config = null;
 
-                if (this._activity instanceof SettingsActivity)
+                if (this._context instanceof LegacySettingsActivity)
                 {
-                    SettingsActivity settingsActivity = (SettingsActivity) this._activity;
+                    LegacySettingsActivity settingsActivity = (LegacySettingsActivity) this._context;
+
+                    config = this.dumpJson(settingsActivity.getPreferenceScreen());
+                }
+                else if (this._context instanceof SettingsActivity)
+                {
+                    SettingsActivity settingsActivity = (SettingsActivity) this._context;
 
                     config = this.dumpJson(settingsActivity.getPreferenceScreen());
                 }
 
                 root.put("configuration", config);
 
-                File cacheDir = this._activity.getExternalCacheDir();
+                File cacheDir = this._context.getExternalCacheDir();
                 File configJsonFile = new File(cacheDir, "config.json");
 
                 FileOutputStream fout = new FileOutputStream(configJsonFile);
@@ -177,35 +183,35 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
 
                 Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
                 emailIntent.putExtra(android.content.Intent.EXTRA_TEXT,
-                        this._activity.getString(R.string.message_mail_app_schema));
+                        this._context.getString(R.string.message_mail_app_schema));
                 emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
-                        this._activity.getString(R.string.subject_mail_app_schema));
+                        this._context.getString(R.string.subject_mail_app_schema));
                 emailIntent.setType("text/plain");
 
                 Uri uri = Uri.fromFile(configJsonFile);
                 emailIntent.putExtra(Intent.EXTRA_STREAM, uri);
-                this._activity.startActivity(emailIntent);
+                this._context.startActivity(emailIntent);
             }
             catch (JSONException e)
             {
-                LogManager.getInstance(this._activity).logException(e);
+                LogManager.getInstance(this._context).logException(e);
             }
             catch (PackageManager.NameNotFoundException e)
             {
-                LogManager.getInstance(this._activity).logException(e);
+                LogManager.getInstance(this._context).logException(e);
             }
             catch (FileNotFoundException e)
             {
-                LogManager.getInstance(this._activity).logException(e);
+                LogManager.getInstance(this._context).logException(e);
             }
             catch (IOException e)
             {
-                LogManager.getInstance(this._activity).logException(e);
+                LogManager.getInstance(this._context).logException(e);
             }
         }
         else if (BaseSettingsActivity.RESET_KEY.equals(preference.getKey()))
         {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this._activity);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this._context);
 
             builder = builder.setTitle(R.string.title_clear_configuration);
             builder = builder.setMessage(R.string.message_clear_configuration);
@@ -217,7 +223,7 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
                 @Override
                 public void onClick(DialogInterface dialog, int which)
                 {
-                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(me._activity);
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(me._context);
                     SharedPreferences.Editor e = prefs.edit();
 
                     Map<String, ?> prefMap = prefs.getAll();
@@ -230,21 +236,21 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
                     e.commit();
 
                     Intent intent = new Intent(PersistentService.NUDGE_PROBES);
-                    intent.setClass(me._activity, PersistentService.class);
+                    intent.setClass(me._context, PersistentService.class);
 
-                    me._activity.startService(intent);
+                    me._context.startService(intent);
 
-                    TriggerManager.getInstance(me._activity).removeAllTriggers();
-                    TriggerManager.getInstance(me._activity).refreshTriggers(me._activity);
-                    HttpUploadPlugin.clearFiles(me._activity);
+                    TriggerManager.getInstance(me._context).removeAllTriggers();
+                    TriggerManager.getInstance(me._context).refreshTriggers(me._context);
+                    HttpUploadPlugin.clearFiles(me._context);
 
                     String where = "_id != -1";
 
-                    me._activity.getContentResolver().delete(RobotContentProvider.RECENT_PROBE_VALUES, where, null);
-                    me._activity.getContentResolver().delete(RobotContentProvider.SNAPSHOTS, where, null);
-                    me._activity.getContentResolver().delete(DistancesProvider.CONTENT_URI, where, null);
+                    me._context.getContentResolver().delete(RobotContentProvider.RECENT_PROBE_VALUES, where, null);
+                    me._context.getContentResolver().delete(RobotContentProvider.SNAPSHOTS, where, null);
+                    me._context.getContentResolver().delete(DistancesProvider.CONTENT_URI, where, null);
 
-                    ProbeValuesProvider.getProvider(me._activity).clear(me._activity);
+                    ProbeValuesProvider.getProvider(me._context).clear(me._context);
 
                     android.os.Process.killProcess(android.os.Process.myPid());
                 }
@@ -263,9 +269,9 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
         }
         else if (BaseSettingsActivity.PROBES_DISABLE_EACH_KEY.equals(preference.getKey()))
         {
-            ProbeManager.disableEachProbe(this._activity);
+            ProbeManager.disableEachProbe(this._context);
 
-            Toast.makeText(this._activity, R.string.message_disable_each_probe, Toast.LENGTH_LONG).show();
+            Toast.makeText(this._context, R.string.message_disable_each_probe, Toast.LENGTH_LONG).show();
         }
 
         return false;
@@ -352,64 +358,64 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
     {
         if (BaseSettingsActivity.CHECK_UPDATES_KEY.equals(pref.getKey()))
         {
-            Toast.makeText(this._activity, R.string.message_update_check, Toast.LENGTH_LONG).show();
+            Toast.makeText(this._context, R.string.message_update_check, Toast.LENGTH_LONG).show();
 
             return true;
         }
         else if (BaseSettingsActivity.RINGTONE_KEY.equals(pref.getKey()))
         {
-            String name = ManagerService.soundNameForPath(this._activity, value.toString());
+            String name = ManagerService.soundNameForPath(this._context, value.toString());
 
             Intent playIntent = new Intent(ManagerService.RINGTONE_INTENT);
 
             if (name != null)
                 playIntent.putExtra(BaseSettingsActivity.RINGTONE_KEY, name);
 
-            playIntent.setClass(this._activity, ManagerService.class);
+            playIntent.setClass(this._context, ManagerService.class);
 
-            this._activity.startService(playIntent);
+            this._context.startService(playIntent);
 
             return true;
         }
         else if (LogManager.ENABLED.equals(pref.getKey()))
         {
-            LogManager.getInstance(this._activity).setEnabled(((Boolean) value));
+            LogManager.getInstance(this._context).setEnabled(((Boolean) value));
 
             return true;
         }
         else if (LogManager.URI.equals(pref.getKey()))
         {
-            LogManager.getInstance(this._activity).setEndpoint(value.toString());
+            LogManager.getInstance(this._context).setEndpoint(value.toString());
 
             return true;
         }
         else if (LogManager.INCLUDE_LOCATION.equals(pref.getKey()))
         {
-            LogManager.getInstance(this._activity).setIncludeLocation(((Boolean) value));
+            LogManager.getInstance(this._context).setIncludeLocation(((Boolean) value));
 
             return true;
         }
         else if (LogManager.UPLOAD_INTERVAL.equals(pref.getKey()))
         {
-            LogManager.getInstance(this._activity).setUploadInterval(Long.parseLong(value.toString()));
+            LogManager.getInstance(this._context).setUploadInterval(Long.parseLong(value.toString()));
 
             return true;
         }
         else if (LogManager.WIFI_ONLY.equals(pref.getKey()))
         {
-            LogManager.getInstance(this._activity).setWifiOnly(((Boolean) value));
+            LogManager.getInstance(this._context).setWifiOnly(((Boolean) value));
 
             return true;
         }
         else if (LogManager.LIBERAL_SSL.equals(pref.getKey()))
         {
-            LogManager.getInstance(this._activity).setLiberalSsl(((Boolean) value));
+            LogManager.getInstance(this._context).setLiberalSsl(((Boolean) value));
 
             return true;
         }
         else if (LogManager.HEARTBEAT.equals(pref.getKey()))
         {
-            LogManager.getInstance(this._activity).setHeartbeat(((Boolean) value));
+            LogManager.getInstance(this._context).setHeartbeat(((Boolean) value));
 
             return true;
         }

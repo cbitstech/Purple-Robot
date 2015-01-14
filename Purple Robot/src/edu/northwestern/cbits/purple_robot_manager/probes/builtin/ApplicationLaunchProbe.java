@@ -256,22 +256,20 @@ public class ApplicationLaunchProbe extends Probe
 
     @Override
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
     {
-        PreferenceManager manager = activity.getPreferenceManager();
-
-        PreferenceScreen screen = manager.createPreferenceScreen(activity);
-        screen.setTitle(this.title(activity));
+        PreferenceScreen screen = manager.createPreferenceScreen(context);
+        screen.setTitle(this.title(context));
         screen.setSummary(R.string.summary_running_software_probe_desc);
 
-        CheckBoxPreference enabled = new CheckBoxPreference(activity);
+        CheckBoxPreference enabled = new CheckBoxPreference(context);
         enabled.setTitle(R.string.title_enable_probe);
         enabled.setKey(ApplicationLaunchProbe.ENABLED);
         enabled.setDefaultValue(ApplicationLaunchProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
 
-        ListPreference duration = new ListPreference(activity);
+        ListPreference duration = new ListPreference(context);
         duration.setKey(ApplicationLaunchProbe.FREQUENCY);
         duration.setEntryValues(R.array.probe_app_launch_frequency_values);
         duration.setEntries(R.array.probe_app_launch_frequency_labels);

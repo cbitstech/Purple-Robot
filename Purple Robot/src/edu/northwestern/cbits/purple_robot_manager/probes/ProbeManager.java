@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -12,12 +13,13 @@ import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
+import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.BaseSettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.RobotPreferenceListener;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ActivityDetectionProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.AddressBookDistancesProbe;
@@ -591,25 +593,22 @@ public class ProbeManager
         return match;
     }
 
-    @SuppressWarnings("deprecation")
-    public static PreferenceScreen buildPreferenceScreen(PreferenceActivity settingsActivity)
+    public static PreferenceScreen buildPreferenceScreen(Context context, PreferenceManager manager)
     {
-        PreferenceManager manager = settingsActivity.getPreferenceManager();
-
-        PreferenceScreen screen = manager.createPreferenceScreen(settingsActivity);
+        PreferenceScreen screen = manager.createPreferenceScreen(context);
         screen.setOrder(0);
         screen.setTitle(R.string.title_preference_probes_screen);
         screen.setKey(BaseSettingsActivity.PROBES_SCREEN_KEY);
 
         HashMap<String, ArrayList<PreferenceScreen>> probeMap = new HashMap<String, ArrayList<PreferenceScreen>>();
 
-        for (Probe probe : ProbeManager.allProbes(settingsActivity))
+        for (Probe probe : ProbeManager.allProbes(context))
         {
-            PreferenceScreen probeScreen = probe.preferenceScreen(settingsActivity);
+            PreferenceScreen probeScreen = probe.preferenceScreen(context, manager);
 
             if (probeScreen != null)
             {
-                String key = probe.probeCategory(settingsActivity);
+                String key = probe.probeCategory(context);
 
                 ArrayList<PreferenceScreen> screens = new ArrayList<PreferenceScreen>();
 
@@ -622,41 +621,41 @@ public class ProbeManager
             }
         }
 
-        PreferenceCategory globalCategory = new PreferenceCategory(settingsActivity);
+        PreferenceCategory globalCategory = new PreferenceCategory(context);
 
         globalCategory.setTitle(R.string.title_preference_probes_global_category);
         globalCategory.setKey("config_all_probes_options");
 
         screen.addPreference(globalCategory);
 
-        CheckBoxPreference enabled = new CheckBoxPreference(settingsActivity);
+        CheckBoxPreference enabled = new CheckBoxPreference(context);
         enabled.setTitle(R.string.title_preference_probes_enable_probes);
         enabled.setKey("config_probes_enabled");
         enabled.setDefaultValue(false);
 
         globalCategory.addPreference(enabled);
 
-        Preference disableAll = new Preference(settingsActivity);
+        Preference disableAll = new Preference(context);
         disableAll.setTitle(R.string.title_preference_probes_disable_each_probe);
         disableAll.setKey(BaseSettingsActivity.PROBES_DISABLE_EACH_KEY);
-        disableAll.setOnPreferenceClickListener(new RobotPreferenceListener(settingsActivity));
+        disableAll.setOnPreferenceClickListener(new RobotPreferenceListener(context));
 
         globalCategory.addPreference(disableAll);
 
-        PreferenceCategory probesCategory = new PreferenceCategory(settingsActivity);
+        PreferenceCategory probesCategory = new PreferenceCategory(context);
         probesCategory.setTitle(R.string.title_preference_probes_available_category);
         probesCategory.setKey("config_all_probes_list");
 
         screen.addPreference(probesCategory);
 
         ArrayList<String> probeCategories = new ArrayList<String>();
-        probeCategories.add(settingsActivity.getString(R.string.probe_sensor_category));
-        probeCategories.add(settingsActivity.getString(R.string.probe_device_info_category));
-        probeCategories.add(settingsActivity.getString(R.string.probe_other_devices_category));
-        probeCategories.add(settingsActivity.getString(R.string.probe_external_environment_category));
-        probeCategories.add(settingsActivity.getString(R.string.probe_personal_info_category));
-        probeCategories.add(settingsActivity.getString(R.string.probe_external_services_category));
-        probeCategories.add(settingsActivity.getString(R.string.probe_misc_category));
+        probeCategories.add(context.getString(R.string.probe_sensor_category));
+        probeCategories.add(context.getString(R.string.probe_device_info_category));
+        probeCategories.add(context.getString(R.string.probe_other_devices_category));
+        probeCategories.add(context.getString(R.string.probe_external_environment_category));
+        probeCategories.add(context.getString(R.string.probe_personal_info_category));
+        probeCategories.add(context.getString(R.string.probe_external_services_category));
+        probeCategories.add(context.getString(R.string.probe_misc_category));
 
         for (String key : probeMap.keySet())
         {
@@ -666,7 +665,7 @@ public class ProbeManager
 
         for (String key : probeCategories)
         {
-            PreferenceScreen probesScreen = manager.createPreferenceScreen(settingsActivity);
+            PreferenceScreen probesScreen = manager.createPreferenceScreen(context);
             probesScreen.setTitle(key);
 
             for (PreferenceScreen probeScreen : probeMap.get(key))

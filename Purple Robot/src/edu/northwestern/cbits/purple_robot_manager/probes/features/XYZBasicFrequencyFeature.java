@@ -616,9 +616,9 @@ public abstract class XYZBasicFrequencyFeature extends ContinuousProbeFeature
         return (last * (1.0 - a)) + (value * a);
     }
 
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
     {
-        PreferenceScreen screen = super.preferenceScreen(activity);
+        PreferenceScreen screen = super.preferenceScreen(context, manager);
 
         String key = this.featureKey();
 
@@ -626,7 +626,7 @@ public abstract class XYZBasicFrequencyFeature extends ContinuousProbeFeature
         // Include bandpass (dynamic)
         // Include lowpass (static)
 
-        ListPreference duration = new ListPreference(activity);
+        ListPreference duration = new ListPreference(context);
         duration.setKey("config_probe_" + key + "_frequency");
         duration.setEntryValues(R.array.frequency_probe_duration_values);
         duration.setEntries(R.array.frequency_probe_duration_labels);
@@ -635,19 +635,19 @@ public abstract class XYZBasicFrequencyFeature extends ContinuousProbeFeature
 
         screen.addPreference(duration);
 
-        CheckBoxPreference interpolated = new CheckBoxPreference(activity);
+        CheckBoxPreference interpolated = new CheckBoxPreference(context);
         interpolated.setTitle(R.string.title_enable_interpolated_probe);
         interpolated.setKey("config_probe_" + key + "_interpolated_enabled");
         interpolated.setDefaultValue(XYZBasicFrequencyFeature.INTERPOLATED_ENABLED);
         screen.addPreference(interpolated);
 
-        CheckBoxPreference bandpass = new CheckBoxPreference(activity);
+        CheckBoxPreference bandpass = new CheckBoxPreference(context);
         bandpass.setTitle(R.string.title_enable_bandpass_probe);
         bandpass.setKey("config_probe_" + key + "_bandpass_enabled");
         bandpass.setDefaultValue(XYZBasicFrequencyFeature.BANDPASS_ENABLED);
         screen.addPreference(bandpass);
 
-        CheckBoxPreference lowpass = new CheckBoxPreference(activity);
+        CheckBoxPreference lowpass = new CheckBoxPreference(context);
         lowpass.setTitle(R.string.title_enable_lowpass_probe);
         lowpass.setKey("config_probe_" + key + "_lowpass_enabled");
         lowpass.setDefaultValue(XYZBasicFrequencyFeature.LOWPASS_ENABLED);

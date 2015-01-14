@@ -139,25 +139,23 @@ public abstract class Trigger
     }
 
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(final PreferenceActivity activity)
+    public PreferenceScreen preferenceScreen(final Context context, PreferenceManager manager)
     {
-        PreferenceManager manager = activity.getPreferenceManager();
-
-        PreferenceScreen screen = manager.createPreferenceScreen(activity);
+        PreferenceScreen screen = manager.createPreferenceScreen(context);
         screen.setTitle(this._name);
 
-        String type = activity.getString(R.string.type_trigger_unknown);
+        String type = context.getString(R.string.type_trigger_unknown);
 
         if (this instanceof ProbeTrigger)
-            type = activity.getString(R.string.type_trigger_probe);
+            type = context.getString(R.string.type_trigger_probe);
         if (this instanceof DateTrigger)
-            type = activity.getString(R.string.type_trigger_datetime);
+            type = context.getString(R.string.type_trigger_datetime);
 
         screen.setSummary(type);
 
         final Trigger me = this;
 
-        Preference viewAction = new Preference(activity);
+        Preference viewAction = new Preference(context);
         viewAction.setTitle(R.string.label_trigger_show_action);
         viewAction.setSummary(R.string.label_trigger_show_action_desc);
         viewAction.setOrder(Integer.MAX_VALUE);
@@ -167,11 +165,11 @@ public abstract class Trigger
             @Override
             public boolean onPreferenceClick(Preference preference)
             {
-                Intent intent = new Intent(activity, CodeViewerActivity.class);
+                Intent intent = new Intent(context, CodeViewerActivity.class);
                 intent.putExtra(CodeViewerActivity.SOURCE_CODE, me._action);
                 intent.putExtra(CodeViewerActivity.TITLE, me.name());
 
-                activity.startActivity(intent);
+                context.startActivity(intent);
 
                 return true;
             }
@@ -179,7 +177,7 @@ public abstract class Trigger
 
         screen.addPreference(viewAction);
 
-        CheckBoxPreference enabled = new CheckBoxPreference(activity);
+        CheckBoxPreference enabled = new CheckBoxPreference(context);
         enabled.setTitle(R.string.label_trigger_enable_action);
         enabled.setSummary(R.string.label_trigger_enable_action_desc);
         enabled.setKey(this.enabledKey());
@@ -198,7 +196,7 @@ public abstract class Trigger
 
         screen.addPreference(enabled);
 
-        Preference fireNow = new Preference(activity);
+        Preference fireNow = new Preference(context);
         fireNow.setTitle(R.string.label_trigger_fire_now);
         fireNow.setSummary(R.string.label_trigger_fire_now_desc);
         fireNow.setOrder(Integer.MAX_VALUE / 2);
@@ -208,7 +206,7 @@ public abstract class Trigger
             @Override
             public boolean onPreferenceClick(Preference preference)
             {
-                me.execute(activity, true);
+                me.execute(context, true);
 
                 return true;
             }

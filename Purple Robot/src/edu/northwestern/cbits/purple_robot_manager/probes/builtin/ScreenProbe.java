@@ -160,15 +160,13 @@ public class ScreenProbe extends Probe
 
     @Override
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
     {
-        PreferenceManager manager = activity.getPreferenceManager();
-
-        PreferenceScreen screen = manager.createPreferenceScreen(activity);
-        screen.setTitle(this.title(activity));
+        PreferenceScreen screen = manager.createPreferenceScreen(context);
+        screen.setTitle(this.title(context));
         screen.setSummary(R.string.summary_screen_probe_desc);
 
-        CheckBoxPreference enabled = new CheckBoxPreference(activity);
+        CheckBoxPreference enabled = new CheckBoxPreference(context);
         enabled.setTitle(R.string.title_enable_probe);
         enabled.setKey(ScreenProbe.ENABLED);
         enabled.setDefaultValue(ScreenProbe.DEFAULT_ENABLED);

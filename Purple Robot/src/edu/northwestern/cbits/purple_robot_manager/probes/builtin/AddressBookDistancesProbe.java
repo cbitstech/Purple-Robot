@@ -485,22 +485,20 @@ public class AddressBookDistancesProbe extends Probe
 
     @Override
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
     {
-        PreferenceManager manager = activity.getPreferenceManager();
-
-        PreferenceScreen screen = manager.createPreferenceScreen(activity);
-        screen.setTitle(this.title(activity));
+        PreferenceScreen screen = manager.createPreferenceScreen(context);
+        screen.setTitle(this.title(context));
         screen.setSummary(R.string.summary_distances_probe_desc);
 
-        CheckBoxPreference enabled = new CheckBoxPreference(activity);
+        CheckBoxPreference enabled = new CheckBoxPreference(context);
         enabled.setTitle(R.string.title_enable_probe);
         enabled.setKey(AddressBookDistancesProbe.ENABLED);
         enabled.setDefaultValue(AddressBookDistancesProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
 
-        ListPreference duration = new ListPreference(activity);
+        ListPreference duration = new ListPreference(context);
         duration.setKey(AddressBookDistancesProbe.FREQUENCY);
         duration.setEntryValues(R.array.probe_distance_frequency_values);
         duration.setEntries(R.array.probe_distance_frequency_labels);
@@ -509,7 +507,7 @@ public class AddressBookDistancesProbe extends Probe
 
         screen.addPreference(duration);
 
-        CheckBoxPreference hash = new CheckBoxPreference(activity);
+        CheckBoxPreference hash = new CheckBoxPreference(context);
         hash.setKey(AddressBookDistancesProbe.HASH_DATA);
         hash.setDefaultValue(Probe.DEFAULT_HASH_DATA);
         hash.setTitle(R.string.config_probe_distances_hash_title);

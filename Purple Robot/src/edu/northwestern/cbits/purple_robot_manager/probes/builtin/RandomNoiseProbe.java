@@ -143,21 +143,19 @@ public class RandomNoiseProbe extends Probe
 
     @Override
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    public PreferenceScreen preferenceScreen(final Context context, PreferenceManager manager)
     {
-        PreferenceManager manager = activity.getPreferenceManager();
-
-        PreferenceScreen screen = manager.createPreferenceScreen(activity);
-        screen.setTitle(this.title(activity));
+        PreferenceScreen screen = manager.createPreferenceScreen(context);
+        screen.setTitle(this.title(context));
         screen.setSummary(R.string.summary_random_noise_probe_desc);
 
-        CheckBoxPreference enabled = new CheckBoxPreference(activity);
+        CheckBoxPreference enabled = new CheckBoxPreference(context);
         enabled.setTitle(R.string.title_enable_probe);
         enabled.setKey(RandomNoiseProbe.ENABLED);
         enabled.setDefaultValue(RandomNoiseProbe.DEFAULT_ENABLED);
         screen.addPreference(enabled);
 
-        CheckBoxPreference persist = new CheckBoxPreference(activity);
+        CheckBoxPreference persist = new CheckBoxPreference(context);
         persist.setTitle(R.string.title_probe_random_noise_persist);
         persist.setSummary(R.string.summary_probe_random_noise_persist);
         persist.setKey(RandomNoiseProbe.PERSIST);

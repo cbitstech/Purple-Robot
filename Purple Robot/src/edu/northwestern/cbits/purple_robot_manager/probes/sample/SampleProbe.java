@@ -123,15 +123,13 @@ public class SampleProbe extends Probe
      */
     @SuppressWarnings("deprecation")
     @Override
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
     {
-        PreferenceManager manager = activity.getPreferenceManager();
+        PreferenceScreen screen = manager.createPreferenceScreen(context);
+        screen.setTitle(this.title(context));
+        screen.setSummary(this.summary(context));
 
-        PreferenceScreen screen = manager.createPreferenceScreen(activity);
-        screen.setTitle(this.title(activity));
-        screen.setSummary(this.summary(activity));
-
-        CheckBoxPreference enabled = new CheckBoxPreference(activity);
+        CheckBoxPreference enabled = new CheckBoxPreference(context);
         enabled.setTitle(R.string.title_enable_probe);
         enabled.setKey(SampleProbe.ENABLE);
         enabled.setDefaultValue(SampleProbe.DEFAULT_ENABLED);
@@ -141,7 +139,7 @@ public class SampleProbe extends Probe
         // Adding a frequency parameter that limits how frequently the probe can
         // sample data...
 
-        ListPreference duration = new ListPreference(activity);
+        ListPreference duration = new ListPreference(context);
         duration.setKey(SampleProbe.FREQUENCY);
         duration.setDefaultValue(Probe.DEFAULT_FREQUENCY);
         duration.setEntryValues(R.array.probe_builtin_frequency_values);

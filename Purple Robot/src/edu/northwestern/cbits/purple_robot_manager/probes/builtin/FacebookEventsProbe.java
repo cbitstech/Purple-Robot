@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -33,7 +34,7 @@ public class FacebookEventsProbe extends Probe
     }
 
     @Override
-    public PreferenceScreen preferenceScreen(PreferenceActivity settingsActivity)
+    public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
     {
         return null;
     }
