@@ -43,7 +43,9 @@ These commands will retrieve the [Anthracite](https://github.com/cbitstech/anthr
 Next, go to the `Purple Robot` folder and rename the following files:
 
 * `gradle.properties.template` to `gradle.properties` 
+
     OR
+
 * Use the existing gradle.properties to sign with the testing key already contained within the repository.
 * `local.properties.template` to `local.properties`
 * `res/values/keys.xml.template` to `res/values/keys.xml`
