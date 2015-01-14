@@ -8,6 +8,7 @@ import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -354,6 +355,10 @@ public class LegacyJSONConfigFile
                                 });
                             }
                         }
+                    }
+                    catch (UnknownHostException e)
+                    {
+                        LogManager.getInstance(context).logException(e);
                     }
                     catch (MalformedURLException e)
                     {
