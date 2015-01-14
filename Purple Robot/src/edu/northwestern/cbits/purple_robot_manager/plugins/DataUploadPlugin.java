@@ -144,7 +144,7 @@ public abstract class DataUploadPlugin extends OutputPlugin
                 {
                     if (WiFiHelper.wifiAvailable(context) == false)
                     {
-                        me.broadcastMessage(context.getString(R.string.message_wifi_pending));
+                        me.broadcastMessage(context.getString(R.string.message_wifi_pending), false);
 
                         return DataUploadPlugin.RESULT_NO_CONNECTION;
                     }
@@ -243,7 +243,7 @@ public abstract class DataUploadPlugin extends OutputPlugin
 
                 String uploadMessage = String.format(context.getString(R.string.message_transmit_bytes), (httpPost
                         .getEntity().getContentLength() / 1024));
-                me.broadcastMessage(uploadMessage);
+                me.broadcastMessage(uploadMessage, false);
 
                 HttpResponse response = httpClient.execute(httpPost);
 
@@ -300,17 +300,17 @@ public abstract class DataUploadPlugin extends OutputPlugin
                         String uploadedMessage = String.format(context.getString(R.string.message_upload_successful),
                                 (httpPost.getEntity().getContentLength() / 1024));
 
-                        me.broadcastMessage(uploadedMessage);
+                        me.broadcastMessage(uploadedMessage, false);
                     }
                     else
-                        me.broadcastMessage(context.getString(R.string.message_checksum_failed));
+                        me.broadcastMessage(context.getString(R.string.message_checksum_failed), true);
 
                     return DataUploadPlugin.RESULT_SUCCESS;
                 }
                 else
                 {
                     String errorMessage = String.format(context.getString(R.string.message_server_error), status);
-                    me.broadcastMessage(errorMessage);
+                    me.broadcastMessage(errorMessage, true);
 
                     String payloadString = json.getString("Payload");
 
@@ -320,39 +320,43 @@ public abstract class DataUploadPlugin extends OutputPlugin
             }
             catch (HttpHostConnectException e)
             {
-                me.broadcastMessage(context.getString(R.string.message_http_connection_error));
+                me.broadcastMessage(context.getString(R.string.message_http_connection_error), true);
                 LogManager.getInstance(context).logException(e);
             }
             catch (SocketTimeoutException e)
             {
-                me.broadcastMessage(context.getString(R.string.message_socket_timeout_error));
+                me.broadcastMessage(context.getString(R.string.message_socket_timeout_error), true);
                 LogManager.getInstance(me.getContext()).logException(e);
             }
             catch (SocketException e)
             {
                 String errorMessage = String.format(context.getString(R.string.message_socket_error), e.getMessage());
-                me.broadcastMessage(errorMessage);
+                me.broadcastMessage(errorMessage, true);
                 LogManager.getInstance(me.getContext()).logException(e);
             }
             catch (UnknownHostException e)
             {
-                me.broadcastMessage(context.getString(R.string.message_unreachable_error));
+                me.broadcastMessage(context.getString(R.string.message_unreachable_error), true);
                 LogManager.getInstance(me.getContext()).logException(e);
             }
             catch (JSONException e)
             {
-                me.broadcastMessage(context.getString(R.string.message_response_error));
+                me.broadcastMessage(context.getString(R.string.message_response_error), true);
                 LogManager.getInstance(me.getContext()).logException(e);
             }
             catch (SSLPeerUnverifiedException e)
             {
                 LogManager.getInstance(me.getContext()).logException(e);
-                me.broadcastMessage(context.getString(R.string.message_unverified_server));
+                me.broadcastMessage(context.getString(R.string.message_unverified_server), true);
+
+                LogManager.getInstance(context).logException(e);
             }
             catch (Exception e)
             {
                 LogManager.getInstance(me.getContext()).logException(e);
-                me.broadcastMessage(context.getString(R.string.message_general_error, e.getMessage()));
+                me.broadcastMessage(context.getString(R.string.message_general_error, e.getMessage()), true);
+
+                LogManager.getInstance(context).logException(e);
             }
             finally
             {
@@ -362,7 +366,9 @@ public abstract class DataUploadPlugin extends OutputPlugin
         catch (OutOfMemoryError e)
         {
             LogManager.getInstance(me.getContext()).logException(e);
-            me.broadcastMessage(context.getString(R.string.message_general_error, e.getMessage()));
+            me.broadcastMessage(context.getString(R.string.message_general_error, e.getMessage()), true);
+
+            LogManager.getInstance(context).logException(e);
         }
 
         return DataUploadPlugin.RESULT_ERROR;

@@ -56,6 +56,9 @@ public class LocationProbe extends Probe implements LocationListener
     private static final String ENABLED = "config_probe_location_enabled";
     private static final String FREQUENCY = "config_probe_location_frequency";
 
+    public static final boolean DEFAULT_ENABLE_CALIBRATION_NOTIFICATIONS = true;
+    public static final String ENABLE_CALIBRATION_NOTIFICATIONS = "config_probe_location_calibration_notifications";
+
     protected Context _context = null;
 
     private long _lastCheck = 0;
@@ -120,6 +123,10 @@ public class LocationProbe extends Probe implements LocationListener
 
         map.put(Probe.PROBE_FREQUENCY, freq);
 
+        boolean calibrateNotes = prefs.getBoolean(LocationProbe.ENABLE_CALIBRATION_NOTIFICATIONS, LocationProbe.DEFAULT_ENABLE_CALIBRATION_NOTIFICATIONS);
+
+        map.put(Probe.PROBE_CALIBRATION_NOTIFICATIONS, calibrateNotes);
+
         return map;
     }
 
@@ -146,6 +153,20 @@ public class LocationProbe extends Probe implements LocationListener
                 e.commit();
             }
         }
+
+        if (params.containsKey(Probe.PROBE_CALIBRATION_NOTIFICATIONS))
+        {
+            Object enable = params.get(Probe.PROBE_CALIBRATION_NOTIFICATIONS);
+
+            if (enable instanceof Boolean)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putBoolean(LocationProbe.ENABLE_CALIBRATION_NOTIFICATIONS, ((Boolean) enable));
+                e.commit();
+            }
+        }
     }
 
     @Override
@@ -169,6 +190,8 @@ public class LocationProbe extends Probe implements LocationListener
             enabled.put(Probe.PROBE_VALUES, values);
             settings.put(Probe.PROBE_ENABLED, enabled);
 
+            settings.put(Probe.PROBE_CALIBRATION_NOTIFICATIONS, enabled);
+
             JSONObject frequency = new JSONObject();
             frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
             values = new JSONArray();
@@ -182,6 +205,7 @@ public class LocationProbe extends Probe implements LocationListener
 
             frequency.put(Probe.PROBE_VALUES, values);
             settings.put(Probe.PROBE_FREQUENCY, frequency);
+
         }
         catch (JSONException e)
         {
@@ -230,6 +254,14 @@ public class LocationProbe extends Probe implements LocationListener
         });
 
         screen.addPreference(calibrate);
+
+        CheckBoxPreference enableCalibrationNotifications = new CheckBoxPreference(context);
+        enableCalibrationNotifications.setTitle(R.string.title_enable_calibration_notifications);
+        enableCalibrationNotifications.setSummary(R.string.summary_enable_calibration_notifications);
+        enableCalibrationNotifications.setKey(LocationProbe.ENABLE_CALIBRATION_NOTIFICATIONS);
+        enableCalibrationNotifications.setDefaultValue(LocationProbe.DEFAULT_ENABLE_CALIBRATION_NOTIFICATIONS);
+
+        screen.addPreference(enableCalibrationNotifications);
 
         return screen;
     }
