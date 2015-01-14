@@ -14,11 +14,15 @@ import android.preference.PreferenceManager;
 import android.provider.CallLog;
 import android.provider.CallLog.Calls;
 import android.telephony.PhoneNumberUtils;
+import android.util.Log;
+
 import edu.emory.mathcs.backport.java.util.Collections;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.probes.AddressBookLabelActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CommunicationEventProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CommunicationLogProbe;
 
 public class ContactCalibrationHelper
 {
@@ -27,15 +31,24 @@ public class ContactCalibrationHelper
 
     public static void check(final Context context)
     {
-        if (ContactCalibrationHelper._cachedPrefs == null)
-            ContactCalibrationHelper._cachedPrefs = PreferenceManager.getDefaultSharedPreferences(context
-                    .getApplicationContext());
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
 
-        if (ContactCalibrationHelper._cachedPrefs.contains("last_address_book_calibration") == false)
+        final String title = context.getString(R.string.title_address_book_label_check);
+
+        final SanityManager sanity = SanityManager.getInstance(context);
+
+        boolean logEnabled = prefs.getBoolean(CommunicationLogProbe.ENABLED, CommunicationLogProbe.DEFAULT_ENABLED);
+        boolean logCalibrate = prefs.getBoolean(CommunicationLogProbe.ENABLE_CALIBRATION_NOTIFICATIONS, CommunicationLogProbe.DEFAULT_ENABLE_CALIBRATION_NOTIFICATIONS);
+
+        boolean eventEnabled = prefs.getBoolean(CommunicationEventProbe.ENABLED, CommunicationEventProbe.DEFAULT_ENABLED);
+        boolean eventCalibrate = prefs.getBoolean(CommunicationEventProbe.ENABLE_CALIBRATION_NOTIFICATIONS, CommunicationEventProbe.DEFAULT_ENABLE_CALIBRATION_NOTIFICATIONS);
+
+        if ((logEnabled == false || logCalibrate == false) && (eventEnabled == false || eventCalibrate == false))
         {
-            final SanityManager sanity = SanityManager.getInstance(context);
-
-            final String title = context.getString(R.string.title_address_book_label_check);
+            sanity.clearAlert(title);
+        }
+        else if (prefs.contains("last_address_book_calibration") == false)
+        {
             String message = context.getString(R.string.message_address_book_label_check);
 
             Runnable action = new Runnable()

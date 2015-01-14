@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.preference.PreferenceManager;
+import android.util.Log;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.probes.LocationLabelActivity;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
@@ -18,35 +20,42 @@ public class LocationCalibrationHelper
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
 
-        long lastCalibration = prefs.getLong("last_location_calibration", 0);
-        long now = System.currentTimeMillis();
+        final String title = context.getString(R.string.title_location_label_check);
 
-        Cursor cursor = ProbeValuesProvider.getProvider(context).retrieveValues(context, LocationProbe.DB_TABLE,
-                LocationProbe.databaseSchema());
+        final SanityManager sanity = SanityManager.getInstance(context);
 
-        int count = cursor.getCount();
-
-        cursor.close();
-
-        if (now - lastCalibration > (1000L * 60 * 60 * 24 * 30) && count > 500)
+        if (prefs.getBoolean(LocationProbe.ENABLE_CALIBRATION_NOTIFICATIONS, LocationProbe.DEFAULT_ENABLE_CALIBRATION_NOTIFICATIONS) == false)
         {
-            final SanityManager sanity = SanityManager.getInstance(context);
-
-            final String title = context.getString(R.string.title_location_label_check);
+            sanity.clearAlert(title);
+        }
+        else
+        {
             String message = context.getString(R.string.message_location_label_check);
 
-            Runnable action = new Runnable()
+            long lastCalibration = prefs.getLong("last_location_calibration", 0);
+            long now = System.currentTimeMillis();
+
+            Cursor cursor = ProbeValuesProvider.getProvider(context).retrieveValues(context, LocationProbe.DB_TABLE, LocationProbe.databaseSchema());
+
+            int count = cursor.getCount();
+
+            cursor.close();
+
+            if (now - lastCalibration > (1000L * 60 * 60 * 24 * 30) && count > 500)
             {
-                public void run()
+                Runnable action = new Runnable()
                 {
-                    Intent intent = new Intent(context, LocationLabelActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    public void run()
+                    {
+                        Intent intent = new Intent(context, LocationLabelActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                    context.startActivity(intent);
-                }
-            };
+                        context.startActivity(intent);
+                    }
+                };
 
-            sanity.addAlert(SanityCheck.WARNING, title, message, action);
+                sanity.addAlert(SanityCheck.WARNING, title, message, action);
+            }
         }
     }
 }

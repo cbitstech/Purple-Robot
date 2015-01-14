@@ -28,6 +28,7 @@ public abstract class Probe
     public static final String DURATION = "DURATION";
     public static final String PERIOD = "PERIOD";
 
+    public static final String PROBE_CALIBRATION_NOTIFICATIONS = "enable_calibration_notifications";
     public static final String PROBE_FREQUENCY = "frequency";
     public static final String HASH_DATA = "hash_data";
 
@@ -35,6 +36,7 @@ public abstract class Probe
     public static final boolean DEFAULT_HASH_DATA = true;
 
     public static final String ENCRYPT_DATA = "encrypt_data";
+
 
     public static final String PROBE_ENABLED = "enabled";
     public static final String PROBE_NAME = "name";

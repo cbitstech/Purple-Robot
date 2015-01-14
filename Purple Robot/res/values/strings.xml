@@ -908,8 +908,9 @@
 	<string name="title_fitbit_check">Fitbit feature requires authorization</string>	
 	<string name="message_fitbit_check">Please login to the Fitbit website from the settings to grant Purple Robot access to your Fitbit account.</string>	
 
-	<string name="config_probe_calibrate_title">Calibrate Probe</string>	
-	
+	<string name="config_probe_calibrate_title">Calibrate Probe</string>
+    <string name="title_enable_calibration_notifications">Enable Calibration Notifications</string>
+    <string name="summary_enable_calibration_notifications">Allow the probe to request more information once a sufficient amount of data has been collected</string>
 	<!-- Address Book Label Activity -->
 	<string name="title_address_book_label">People Calibrator</string>	
 	<string name="title_address_book_label_check">Friends &amp; Family Info Needed</string>	

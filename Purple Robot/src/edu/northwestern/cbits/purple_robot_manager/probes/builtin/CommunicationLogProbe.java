@@ -53,10 +53,13 @@ public class CommunicationLogProbe extends Probe
     private static final String NUMBER_GROUP = "NUMBER_GROUP";
     private static final String RECENT_GROUP = "RECENT_GROUP";
 
-    private static final boolean DEFAULT_ENABLED = true;
-    private static final String ENABLED = "config_probe_communication_enabled";
+    public static final boolean DEFAULT_ENABLED = true;
+    public static final String ENABLED = "config_probe_communication_enabled";
     private static final String FREQUENCY = "config_probe_communication_frequency";
     private static final String HASH_DATA = "config_probe_communication_hash_data";
+
+    public static final boolean DEFAULT_ENABLE_CALIBRATION_NOTIFICATIONS = true;
+    public static final String ENABLE_CALIBRATION_NOTIFICATIONS = "config_probe_communication_calibration_notifications";
 
     private long _lastCheck = 0;
 
@@ -287,6 +290,10 @@ public class CommunicationLogProbe extends Probe
         boolean hash = prefs.getBoolean(CommunicationLogProbe.HASH_DATA, Probe.DEFAULT_HASH_DATA);
         map.put(Probe.HASH_DATA, hash);
 
+        boolean calibrateNotes = prefs.getBoolean(CommunicationLogProbe.ENABLE_CALIBRATION_NOTIFICATIONS, CommunicationLogProbe.DEFAULT_ENABLE_CALIBRATION_NOTIFICATIONS);
+
+        map.put(Probe.PROBE_CALIBRATION_NOTIFICATIONS, calibrateNotes);
+
         return map;
     }
 
@@ -324,6 +331,20 @@ public class CommunicationLogProbe extends Probe
                 Editor e = prefs.edit();
 
                 e.putBoolean(CommunicationLogProbe.HASH_DATA, ((Boolean) hash).booleanValue());
+                e.commit();
+            }
+        }
+
+        if (params.containsKey(Probe.PROBE_CALIBRATION_NOTIFICATIONS))
+        {
+            Object enable = params.get(Probe.PROBE_CALIBRATION_NOTIFICATIONS);
+
+            if (enable instanceof Boolean)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putBoolean(CommunicationLogProbe.ENABLE_CALIBRATION_NOTIFICATIONS, ((Boolean) enable));
                 e.commit();
             }
         }
@@ -383,6 +404,14 @@ public class CommunicationLogProbe extends Probe
 
         screen.addPreference(calibrate);
 
+        CheckBoxPreference enableCalibrationNotifications = new CheckBoxPreference(context);
+        enableCalibrationNotifications.setTitle(R.string.title_enable_calibration_notifications);
+        enableCalibrationNotifications.setSummary(R.string.summary_enable_calibration_notifications);
+        enableCalibrationNotifications.setKey(CommunicationLogProbe.ENABLE_CALIBRATION_NOTIFICATIONS);
+        enableCalibrationNotifications.setDefaultValue(CommunicationLogProbe.DEFAULT_ENABLE_CALIBRATION_NOTIFICATIONS);
+
+        screen.addPreference(enableCalibrationNotifications);
+
         return screen;
     }
 
@@ -401,6 +430,8 @@ public class CommunicationLogProbe extends Probe
             enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
             enabled.put(Probe.PROBE_VALUES, values);
             settings.put(Probe.PROBE_ENABLED, enabled);
+
+            settings.put(Probe.PROBE_CALIBRATION_NOTIFICATIONS, enabled);
 
             JSONObject hash = new JSONObject();
             hash.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);

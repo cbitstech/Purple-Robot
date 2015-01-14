@@ -52,15 +52,18 @@ public class CommunicationEventProbe extends Probe
     private static final String DURATION = "DURATION";
     private static final String MESSAGE_BODY = "MESSAGE_BODY";
 
-    private static final boolean DEFAULT_ENABLED = true;
+    public static final boolean DEFAULT_ENABLED = true;
     private static final boolean DEFAULT_RETRIEVE = false;
     private static final boolean DEFAULT_ENCRYPT = true;
-    private static final String ENABLED = "config_probe_communication_event_enabled";
+    public static final String ENABLED = "config_probe_communication_event_enabled";
     private static final String FREQUENCY = "config_probe_communication_event_frequency";
     private static final String HASH_DATA = "config_probe_communication_event_hash_data";
     private static final String RECENT_EVENT = "config_probe_communication_event_recent";
     private static final String RETRIEVE_DATA = "config_probe_communication_event_retrieve_data";
     private static final String ENCRYPT_DATA = "config_probe_communication_event_encrypt_data";
+
+    public static final boolean DEFAULT_ENABLE_CALIBRATION_NOTIFICATIONS = true;
+    public static final String ENABLE_CALIBRATION_NOTIFICATIONS = "config_probe_communication_event_calibration_notifications";
 
     private long _lastCheck = 0;
 
@@ -360,6 +363,9 @@ public class CommunicationEventProbe extends Probe
         boolean retrieve = prefs.getBoolean(CommunicationEventProbe.RETRIEVE_DATA, CommunicationEventProbe.DEFAULT_RETRIEVE);
         map.put(CommunicationEventProbe.RETRIEVE_DATA, retrieve);
 
+        boolean calibrateNotes = prefs.getBoolean(CommunicationEventProbe.ENABLE_CALIBRATION_NOTIFICATIONS, CommunicationEventProbe.DEFAULT_ENABLE_CALIBRATION_NOTIFICATIONS);
+        map.put(Probe.PROBE_CALIBRATION_NOTIFICATIONS, calibrateNotes);
+
         return map;
     }
 
@@ -428,6 +434,21 @@ public class CommunicationEventProbe extends Probe
                 e.commit();
             }
         }
+
+        if (params.containsKey(Probe.PROBE_CALIBRATION_NOTIFICATIONS))
+        {
+            Object enable = params.get(Probe.PROBE_CALIBRATION_NOTIFICATIONS);
+
+            if (enable instanceof Boolean)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putBoolean(CommunicationEventProbe.ENABLE_CALIBRATION_NOTIFICATIONS, ((Boolean) enable));
+                e.commit();
+            }
+        }
+
     }
 
     @Override
@@ -520,6 +541,14 @@ public class CommunicationEventProbe extends Probe
         });
 
         screen.addPreference(calibrate);
+
+        CheckBoxPreference enableCalibrationNotifications = new CheckBoxPreference(context);
+        enableCalibrationNotifications.setTitle(R.string.title_enable_calibration_notifications);
+        enableCalibrationNotifications.setSummary(R.string.summary_enable_calibration_notifications);
+        enableCalibrationNotifications.setKey(CommunicationEventProbe.ENABLE_CALIBRATION_NOTIFICATIONS);
+        enableCalibrationNotifications.setDefaultValue(CommunicationEventProbe.DEFAULT_ENABLE_CALIBRATION_NOTIFICATIONS);
+
+        screen.addPreference(enableCalibrationNotifications);
 
         return screen;
     }
