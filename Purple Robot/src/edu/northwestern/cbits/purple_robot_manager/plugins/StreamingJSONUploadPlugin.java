@@ -104,7 +104,7 @@ public class StreamingJSONUploadPlugin extends DataUploadPlugin
                 catch (IOException e)
                 {
                     LogManager.getInstance(context).logException(e);
-                    me.broadcastMessage(context.getString(R.string.message_general_error));
+                    me.broadcastMessage(context.getString(R.string.message_general_error), true);
                 }
             }
         };

@@ -331,7 +331,7 @@ public class HttpUploadPlugin extends OutputPlugin
                 {
                     this._throughput = 0.0;
 
-                    this.broadcastMessage(R.string.message_wifi_pending);
+                    this.broadcastMessage(R.string.message_wifi_pending, false);
 
                     this._lastUpload = now;
                     this._uploading = false;
@@ -358,7 +358,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
                     File archiveFolder = me.getArchiveFolder();
 
-                    me.broadcastMessage(R.string.message_reading_files);
+                    me.broadcastMessage(R.string.message_reading_files, false);
 
                     String[] filenames = pendingFolder.list(new FilenameFilter()
                     {
@@ -427,7 +427,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
                     if (pendingObjects.size() > 0)
                     {
-                        me.broadcastMessage(R.string.message_package_upload);
+                        me.broadcastMessage(R.string.message_package_upload, false);
 
                         long tally = 0;
 
@@ -612,7 +612,7 @@ public class HttpUploadPlugin extends OutputPlugin
                                 String uploadMessage = String.format(resources
                                         .getString(R.string.message_transmit_bytes), (httpPost.getEntity()
                                         .getContentLength() / 1024));
-                                me.broadcastMessage(uploadMessage);
+                                me.broadcastMessage(uploadMessage, false);
 
                                 // noteManager.notify(12345, note);
 
@@ -678,7 +678,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
                                         me._failCount = 0;
 
-                                        me.broadcastMessage(uploadedMessage);
+                                        me.broadcastMessage(uploadedMessage, false);
 
                                         double elapsed = ((double) (System.currentTimeMillis() - start)) / 1000.0;
 
@@ -688,7 +688,7 @@ public class HttpUploadPlugin extends OutputPlugin
                                     }
                                     else
                                     {
-                                        me.broadcastMessage(R.string.message_checksum_failed);
+                                        me.broadcastMessage(R.string.message_checksum_failed, true);
                                         me._failCount += 1;
 
                                         me._throughput = 0.0;
@@ -696,9 +696,9 @@ public class HttpUploadPlugin extends OutputPlugin
                                 }
                                 else
                                 {
-                                    String errorMessage = String.format(
-                                            resources.getString(R.string.message_server_error), status);
-                                    me.broadcastMessage(errorMessage);
+                                    String errorMessage = String.format(resources.getString(R.string.message_server_error), status);
+
+                                    me.broadcastMessage(errorMessage, true);
 
                                     me._failCount += 1;
 
@@ -707,7 +707,7 @@ public class HttpUploadPlugin extends OutputPlugin
                             }
                             catch (HttpHostConnectException e)
                             {
-                                me.broadcastMessage(R.string.message_http_connection_error);
+                                me.broadcastMessage(R.string.message_http_connection_error, true);
                                 LogManager.getInstance(me.getContext()).logException(e);
 
                                 me._failCount += 1;
@@ -715,7 +715,7 @@ public class HttpUploadPlugin extends OutputPlugin
                             }
                             catch (SocketTimeoutException e)
                             {
-                                me.broadcastMessage(R.string.message_socket_timeout_error);
+                                me.broadcastMessage(R.string.message_socket_timeout_error, true);
                                 LogManager.getInstance(me.getContext()).logException(e);
 
                                 me._failCount += 1;
@@ -723,9 +723,8 @@ public class HttpUploadPlugin extends OutputPlugin
                             }
                             catch (SocketException e)
                             {
-                                String errorMessage = String.format(resources.getString(R.string.message_socket_error),
-                                        e.getMessage());
-                                me.broadcastMessage(errorMessage);
+                                String errorMessage = String.format(resources.getString(R.string.message_socket_error), e.getMessage());
+                                me.broadcastMessage(errorMessage, true);
                                 LogManager.getInstance(me.getContext()).logException(e);
 
                                 me._failCount += 1;
@@ -733,7 +732,7 @@ public class HttpUploadPlugin extends OutputPlugin
                             }
                             catch (UnknownHostException e)
                             {
-                                me.broadcastMessage(R.string.message_unreachable_error);
+                                me.broadcastMessage(R.string.message_unreachable_error, true);
                                 LogManager.getInstance(me.getContext()).logException(e);
 
                                 me._failCount += 1;
@@ -741,7 +740,7 @@ public class HttpUploadPlugin extends OutputPlugin
                             }
                             catch (JSONException e)
                             {
-                                me.broadcastMessage(R.string.message_response_error);
+                                me.broadcastMessage(R.string.message_response_error, true);
                                 LogManager.getInstance(me.getContext()).logException(e);
 
                                 me._failCount += 1;
@@ -750,7 +749,7 @@ public class HttpUploadPlugin extends OutputPlugin
                             catch (SSLPeerUnverifiedException e)
                             {
                                 LogManager.getInstance(me.getContext()).logException(e);
-                                me.broadcastMessage(R.string.message_unverified_server);
+                                me.broadcastMessage(R.string.message_unverified_server, true);
 
                                 me._failCount += 1;
                                 me._throughput = 0.0;
@@ -760,7 +759,7 @@ public class HttpUploadPlugin extends OutputPlugin
                                 LogManager.getInstance(me.getContext()).logException(e);
                                 String errorMessage = String.format(
                                         resources.getString(R.string.message_general_error), e.toString());
-                                me.broadcastMessage(errorMessage);
+                                me.broadcastMessage(errorMessage, true);
 
                                 me._failCount += 1;
                                 me._throughput = 0.0;
@@ -889,7 +888,7 @@ public class HttpUploadPlugin extends OutputPlugin
                         }
                     }
                     else if (me._failCount == 0)
-                        me.broadcastMessage(R.string.message_reading_complete);
+                        me.broadcastMessage(R.string.message_reading_complete, false);
                 }
             };
 
@@ -943,9 +942,9 @@ public class HttpUploadPlugin extends OutputPlugin
         return this.coerceBoolean(prefs, "config_enable_data_server", false);
     }
 
-    protected void broadcastMessage(int stringId)
+    protected void broadcastMessage(int stringId, boolean log)
     {
-        this.broadcastMessage(this.getContext().getResources().getString(stringId));
+        this.broadcastMessage(this.getContext().getResources().getString(stringId), log);
     }
 
     public File getPendingFolder()

@@ -58,13 +58,21 @@ public abstract class OutputPlugin
         return this._context;
     }
 
-    protected void broadcastMessage(String message)
+    protected void broadcastMessage(String message, boolean log)
     {
         Intent displayIntent = new Intent(OutputPlugin.DISPLAY_MESSAGE);
         displayIntent.putExtra("MESSAGE", message);
 
         LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this.getContext());
         manager.sendBroadcast(displayIntent);
+
+        if (log)
+        {
+            HashMap<String, Object> payload = new HashMap<String, Object>();
+            payload.put("message", message);
+
+            LogManager.getInstance(this.getContext()).log("broadcast_message", payload);
+        }
     }
 
     public boolean shouldRespond(String intentAction)
