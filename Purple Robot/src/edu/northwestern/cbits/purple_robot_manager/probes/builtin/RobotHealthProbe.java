@@ -315,15 +315,7 @@ public class RobotHealthProbe extends Probe
 
                                             }
                                         }
-                                        catch (UnknownHostException e)
-                                        {
-                                            LogManager.getInstance(context).logException(e);
-                                        }
-                                        catch (SocketTimeoutException e)
-                                        {
-                                            LogManager.getInstance(context).logException(e);
-                                        }
-                                        catch (IOException e)
+                                        catch (Exception e)
                                         {
                                             LogManager.getInstance(context).logException(e);
                                         }

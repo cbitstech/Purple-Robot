@@ -149,11 +149,7 @@ public class GooglePlacesFeature extends Feature
                                                     me.transmitData(context, bundle);
                                                 }
                                             }
-                                            catch (IOException e)
-                                            {
-                                                LogManager.getInstance(context).logException(e);
-                                            }
-                                            catch (JSONException e)
+                                            catch (Exception e)
                                             {
                                                 LogManager.getInstance(context).logException(e);
                                             }
@@ -185,7 +181,7 @@ public class GooglePlacesFeature extends Feature
         return false;
     }
 
-    protected static Map<String, Integer> nearestLocation(Context context, double latitude, double longitude) throws IOException, JSONException
+    protected static Map<String, Integer> nearestLocation(Context context, double latitude, double longitude) throws Exception
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
