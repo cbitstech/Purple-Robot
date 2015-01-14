@@ -78,6 +78,12 @@ android {
             signingConfig signingConfigs.release
             debuggable false
         }
+        debug {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
+            debuggable true
+        }
+
     }
 }
 
