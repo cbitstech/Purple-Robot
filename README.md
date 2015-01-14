@@ -14,7 +14,7 @@ Purple Robot depends upon the following packages for compilation and installatio
 
 * [Git](http://git-scm.com/): This may already be installed on your system.
 * [Android SDK](http://developer.android.com/sdk/index.html): An SDK installation is included with Android Studio.
-* [Gradle](http://www.gradle.org/): Install version 2.2.1
+* [Gradle](http://www.gradle.org/): Install version 2.2.1.
 * [Java](http://www.oracle.com/technetwork/java/index.html): This may already be installed.
 
 After installing these prerequisites, open the Android SDK Manager and verify that the following packages are installed:
@@ -42,11 +42,13 @@ These commands will retrieve the [Anthracite](https://github.com/cbitstech/anthr
 
 Next, go to the `Purple Robot` folder and rename the following files:
 
-* `gradle.properties.template` to `gradle.properties`
+* `gradle.properties.template` to `gradle.properties` 
+    OR
+* Use the existing gradle.properties to sign with the testing key already contained within the repository.
 * `local.properties.template` to `local.properties`
 * `res/values/keys.xml.template` to `res/values/keys.xml`
     
-In `local.properties`, set the location of your Android SDK. In `gradle.properties`, set the values for your Android signing keystore and key. Refer to [Google's signing documentation](http://developer.android.com/tools/publishing/app-signing.html) for more details.
+In `local.properties`, set the location of your Android SDK. In `gradle.properties`, set the values for your Android signing keystore and key. Refer to [Google's signing documentation](http://developer.android.com/tools/publishing/app-signing.html) for more details to set up your own key.
 
 In `keys.xml`, please obtain your own Google Places API key from the [Google API Console](https://code.google.com/apis/console/?pli=1) to enable integration with Google Play location services. (You may also leave the key empty if you're not using those features.)
 
