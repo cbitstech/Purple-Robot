@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -124,7 +125,7 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
                         {
                             try
                             {
-                                JSONObject jsonPayload = new JSONObject(payload);
+                                JSONArray jsonPayload = new JSONArray(payload);
 
                                 // JSON is valid
                             }
@@ -147,7 +148,7 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
                     catch (IOException e)
                     {
                         LogManager.getInstance(context).logException(e);
-                        me.broadcastMessage(context.getString(R.string.message_general_error));
+                        me.broadcastMessage(context.getString(R.string.message_general_error), true);
                     }
                 }
             }
