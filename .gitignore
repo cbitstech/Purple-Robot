@@ -34,8 +34,7 @@ lint.xml
 *.keystore
 gradle.properties
 keys.xml.template
-res/values/keys.xml.template
-Purple Robot/res/values/keys.xml
+keys.xml
 *~
 
 .idea
