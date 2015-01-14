@@ -15,6 +15,7 @@ import org.scribe.model.Token;
 import org.scribe.model.Verb;
 import org.scribe.oauth.OAuthService;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -551,23 +552,23 @@ public class FitbitApiFeature extends Feature
     }
 
     @Override
-    public PreferenceScreen preferenceScreen(final PreferenceActivity activity)
+    public PreferenceScreen preferenceScreen(final Context context, PreferenceManager manager)
     {
-        final PreferenceScreen screen = super.preferenceScreen(activity);
+        final PreferenceScreen screen = super.preferenceScreen(context, manager);
 
-        CheckBoxPreference sleepPref = new CheckBoxPreference(activity);
+        CheckBoxPreference sleepPref = new CheckBoxPreference(context);
         sleepPref.setKey(FitbitApiFeature.SLEEP_ENABLED);
         sleepPref.setDefaultValue(FitbitApiFeature.SLEEP_DEFAULT);
         sleepPref.setTitle(R.string.config_fitbit_sleep_title);
         screen.addPreference(sleepPref);
 
-        CheckBoxPreference foodPref = new CheckBoxPreference(activity);
+        CheckBoxPreference foodPref = new CheckBoxPreference(context);
         foodPref.setKey(FitbitApiFeature.FOOD_ENABLED);
         foodPref.setDefaultValue(FitbitApiFeature.FOOD_DEFAULT);
         foodPref.setTitle(R.string.config_fitbit_food_title);
         screen.addPreference(foodPref);
 
-        CheckBoxPreference bodyPref = new CheckBoxPreference(activity);
+        CheckBoxPreference bodyPref = new CheckBoxPreference(context);
         bodyPref.setKey(FitbitApiFeature.BODY_ENABLED);
         bodyPref.setDefaultValue(FitbitApiFeature.BODY_DEFAULT);
         bodyPref.setTitle(R.string.config_fitbit_body_title);
@@ -575,16 +576,16 @@ public class FitbitApiFeature extends Feature
 
         // TODO: Should activity have a boolean switch as well?
 
-        final SharedPreferences prefs = Probe.getPreferences(activity);
+        final SharedPreferences prefs = Probe.getPreferences(context);
 
         String token = prefs.getString("oauth_fitbit_token", null);
         String secret = prefs.getString("oauth_fitbit_secret", null);
 
-        final Preference authPreference = new Preference(activity);
+        final Preference authPreference = new Preference(context);
         authPreference.setTitle(R.string.title_authenticate_fitbit_probe);
         authPreference.setSummary(R.string.summary_authenticate_fitbit_probe);
 
-        final Preference logoutPreference = new Preference(activity);
+        final Preference logoutPreference = new Preference(context);
         logoutPreference.setTitle(R.string.title_logout_fitbit_probe);
         logoutPreference.setSummary(R.string.summary_logout_fitbit_probe);
 
@@ -595,7 +596,7 @@ public class FitbitApiFeature extends Feature
             @Override
             public boolean onPreferenceClick(Preference preference)
             {
-                me.fetchAuth(activity);
+                me.fetchAuth(context);
 
                 screen.addPreference(logoutPreference);
                 screen.removePreference(authPreference);
@@ -619,14 +620,18 @@ public class FitbitApiFeature extends Feature
                 screen.addPreference(authPreference);
                 screen.removePreference(logoutPreference);
 
-                activity.runOnUiThread(new Runnable()
+                if (context instanceof Activity)
                 {
-                    @Override
-                    public void run()
+                    Activity activity = (Activity) context;
+                    activity.runOnUiThread(new Runnable()
                     {
-                        Toast.makeText(activity, activity.getString(R.string.toast_fitbit_logout), Toast.LENGTH_LONG).show();
-                    }
-                });
+                        @Override
+                        public void run()
+                        {
+                            Toast.makeText(context, context.getString(R.string.toast_fitbit_logout), Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
 
                 return true;
             }

@@ -21,6 +21,7 @@ import org.scribe.model.Token;
 import org.scribe.model.Verb;
 import org.scribe.oauth.OAuthService;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -350,27 +351,25 @@ public class TwitterProbe extends Probe
 
     @Override
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(final PreferenceActivity activity)
+    public PreferenceScreen preferenceScreen(final Context context, PreferenceManager manager)
     {
-        PreferenceManager manager = activity.getPreferenceManager();
-
-        final PreferenceScreen screen = manager.createPreferenceScreen(activity);
-        screen.setTitle(this.title(activity));
+        final PreferenceScreen screen = manager.createPreferenceScreen(context);
+        screen.setTitle(this.title(context));
         screen.setSummary(R.string.summary_twitter_probe_desc);
 
-        final SharedPreferences prefs = Probe.getPreferences(activity);
+        final SharedPreferences prefs = Probe.getPreferences(context);
 
         String token = prefs.getString("oauth_twitter_token", null);
         String secret = prefs.getString("oauth_twitter_secret", null);
 
-        CheckBoxPreference enabled = new CheckBoxPreference(activity);
+        CheckBoxPreference enabled = new CheckBoxPreference(context);
         enabled.setTitle(R.string.title_enable_probe);
         enabled.setKey(TwitterProbe.ENABLED);
         enabled.setDefaultValue(TwitterProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
 
-        ListPreference duration = new ListPreference(activity);
+        ListPreference duration = new ListPreference(context);
         duration.setKey(TwitterProbe.FREQUENCY);
         duration.setEntryValues(R.array.probe_low_frequency_values);
         duration.setEntries(R.array.probe_low_frequency_labels);
@@ -379,7 +378,7 @@ public class TwitterProbe extends Probe
 
         screen.addPreference(duration);
 
-        CheckBoxPreference encrypt = new CheckBoxPreference(activity);
+        CheckBoxPreference encrypt = new CheckBoxPreference(context);
         encrypt.setKey(TwitterProbe.ENCRYPT_DATA);
         encrypt.setDefaultValue(TwitterProbe.DEFAULT_ENCRYPT);
         encrypt.setTitle(R.string.config_probe_twitter_encrypt_title);
@@ -387,13 +386,13 @@ public class TwitterProbe extends Probe
 
         screen.addPreference(encrypt);
 
-        final Preference authPreference = new Preference(activity);
+        final Preference authPreference = new Preference(context);
         authPreference.setTitle(R.string.title_authenticate_twitter_probe);
         authPreference.setSummary(R.string.summary_authenticate_twitter_probe);
 
         final TwitterProbe me = this;
 
-        final Preference logoutPreference = new Preference(activity);
+        final Preference logoutPreference = new Preference(context);
         logoutPreference.setTitle(R.string.title_logout_twitter_probe);
         logoutPreference.setSummary(R.string.summary_logout_twitter_probe);
 
@@ -402,7 +401,7 @@ public class TwitterProbe extends Probe
             @Override
             public boolean onPreferenceClick(Preference preference)
             {
-                me.fetchAuth(activity);
+                me.fetchAuth(context);
 
                 screen.addPreference(logoutPreference);
                 screen.removePreference(authPreference);
@@ -424,14 +423,20 @@ public class TwitterProbe extends Probe
                 screen.addPreference(authPreference);
                 screen.removePreference(logoutPreference);
 
-                activity.runOnUiThread(new Runnable()
+                if (context instanceof Activity)
                 {
-                    @Override
-                    public void run()
+                    Activity activity = (Activity) context;
+
+                    activity.runOnUiThread(new Runnable()
                     {
-                        Toast.makeText(activity, activity.getString(R.string.toast_twitter_logout), Toast.LENGTH_LONG).show();
-                    }
-                });
+                        @Override
+                        public void run()
+                        {
+                            Toast.makeText(context, context.getString(R.string.toast_twitter_logout), Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+
 
                 return true;
             }

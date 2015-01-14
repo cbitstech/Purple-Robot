@@ -11,6 +11,7 @@ import android.hardware.SensorManager;
 import android.os.Build;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
@@ -144,13 +145,13 @@ public class GeomagneticRotationProbe extends RotationProbe
     }
 
     @Override
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    public PreferenceScreen preferenceScreen(final Context context, PreferenceManager manager)
     {
-        PreferenceScreen screen = super.preferenceScreen(activity);
+        PreferenceScreen screen = super.preferenceScreen(context, manager);
 
         screen.removePreference(screen.findPreference(RotationProbe.THRESHOLD));
 
-        ListPreference threshold = new ListPreference(activity);
+        ListPreference threshold = new ListPreference(context);
         threshold.setKey(GeomagneticRotationProbe.THRESHOLD);
         threshold.setDefaultValue(RotationProbe.DEFAULT_THRESHOLD);
         threshold.setEntryValues(R.array.probe_rotation_threshold);

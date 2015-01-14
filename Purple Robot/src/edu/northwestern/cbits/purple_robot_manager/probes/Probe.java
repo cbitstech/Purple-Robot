@@ -54,7 +54,7 @@ public abstract class Probe
 
     public abstract String probeCategory(Context context);
 
-    public abstract PreferenceScreen preferenceScreen(PreferenceActivity settingsActivity);
+    public abstract PreferenceScreen preferenceScreen(Context context, PreferenceManager manager);
 
     public abstract String summary(Context context);
 

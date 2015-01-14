@@ -449,22 +449,20 @@ public class FacebookProbe extends Probe
 
     @Override
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(final PreferenceActivity activity)
+    public PreferenceScreen preferenceScreen(final  Context context, PreferenceManager manager)
     {
-        PreferenceManager manager = activity.getPreferenceManager();
-
-        PreferenceScreen screen = manager.createPreferenceScreen(activity);
-        screen.setTitle(this.title(activity));
+        PreferenceScreen screen = manager.createPreferenceScreen(context);
+        screen.setTitle(this.title(context));
         screen.setSummary(R.string.summary_facebook_probe_desc);
 
-        CheckBoxPreference enabled = new CheckBoxPreference(activity);
+        CheckBoxPreference enabled = new CheckBoxPreference(context);
         enabled.setTitle(R.string.title_enable_probe);
         enabled.setKey(FacebookProbe.ENABLED);
         enabled.setDefaultValue(FacebookProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
 
-        ListPreference duration = new ListPreference(activity);
+        ListPreference duration = new ListPreference(context);
         duration.setKey(FacebookProbe.FREQUENCY);
         duration.setEntryValues(R.array.probe_low_frequency_values);
         duration.setEntries(R.array.probe_low_frequency_labels);
@@ -473,7 +471,7 @@ public class FacebookProbe extends Probe
 
         screen.addPreference(duration);
 
-        CheckBoxPreference encrypt = new CheckBoxPreference(activity);
+        CheckBoxPreference encrypt = new CheckBoxPreference(context);
         encrypt.setKey(FacebookProbe.ENCRYPT_DATA);
         encrypt.setDefaultValue(FacebookProbe.DEFAULT_ENCRYPT);
         encrypt.setTitle(R.string.config_probe_facebook_encrypt_title);
@@ -481,15 +479,15 @@ public class FacebookProbe extends Probe
 
         screen.addPreference(encrypt);
 
-        Preference calibrate = new Preference(activity);
+        Preference calibrate = new Preference(context);
         calibrate.setTitle(R.string.config_probe_calibrate_title);
         calibrate.setOnPreferenceClickListener(new OnPreferenceClickListener()
         {
             @Override
             public boolean onPreferenceClick(Preference pref)
             {
-                Intent intent = new Intent(activity, FacebookLoginActivity.class);
-                activity.startActivity(intent);
+                Intent intent = new Intent(context, FacebookLoginActivity.class);
+                context.startActivity(intent);
 
                 return true;
             }

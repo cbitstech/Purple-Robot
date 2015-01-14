@@ -193,22 +193,20 @@ public class LocationProbe extends Probe implements LocationListener
 
     @Override
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(final PreferenceActivity activity)
+    public PreferenceScreen preferenceScreen(final Context context, PreferenceManager manager)
     {
-        PreferenceManager manager = activity.getPreferenceManager();
-
-        PreferenceScreen screen = manager.createPreferenceScreen(activity);
-        screen.setTitle(this.title(activity));
+        PreferenceScreen screen = manager.createPreferenceScreen(context);
+        screen.setTitle(this.title(context));
         screen.setSummary(R.string.summary_location_probe_desc);
 
-        CheckBoxPreference enabled = new CheckBoxPreference(activity);
+        CheckBoxPreference enabled = new CheckBoxPreference(context);
         enabled.setTitle(R.string.title_enable_probe);
         enabled.setKey(LocationProbe.ENABLED);
         enabled.setDefaultValue(LocationProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
 
-        ListPreference duration = new ListPreference(activity);
+        ListPreference duration = new ListPreference(context);
         duration.setKey(LocationProbe.FREQUENCY);
         duration.setDefaultValue(Probe.DEFAULT_FREQUENCY);
         duration.setEntryValues(R.array.probe_satellite_frequency_values);
@@ -217,15 +215,15 @@ public class LocationProbe extends Probe implements LocationListener
 
         screen.addPreference(duration);
 
-        Preference calibrate = new Preference(activity);
+        Preference calibrate = new Preference(context);
         calibrate.setTitle(R.string.config_probe_calibrate_title);
         calibrate.setOnPreferenceClickListener(new OnPreferenceClickListener()
         {
             @Override
             public boolean onPreferenceClick(Preference pref)
             {
-                Intent intent = new Intent(activity, LocationLabelActivity.class);
-                activity.startActivity(intent);
+                Intent intent = new Intent(context, LocationLabelActivity.class);
+                context.startActivity(intent);
 
                 return true;
             }

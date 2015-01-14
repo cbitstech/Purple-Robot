@@ -17,6 +17,7 @@ import org.scribe.model.Token;
 import org.scribe.model.Verb;
 import org.scribe.oauth.OAuthService;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -360,27 +361,25 @@ public class InstagramProbe extends Probe
 
     @Override
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(final PreferenceActivity activity)
+    public PreferenceScreen preferenceScreen(final Context context, PreferenceManager manager)
     {
-        PreferenceManager manager = activity.getPreferenceManager();
-
-        final PreferenceScreen screen = manager.createPreferenceScreen(activity);
-        screen.setTitle(this.title(activity));
+        final PreferenceScreen screen = manager.createPreferenceScreen(context);
+        screen.setTitle(this.title(context));
         screen.setSummary(R.string.summary_instagram_probe_desc);
 
-        final SharedPreferences prefs = Probe.getPreferences(activity);
+        final SharedPreferences prefs = Probe.getPreferences(context);
 
         String token = prefs.getString("oauth_instagram_token", null);
         String secret = prefs.getString("oauth_instagram_secret", null);
 
-        CheckBoxPreference enabled = new CheckBoxPreference(activity);
+        CheckBoxPreference enabled = new CheckBoxPreference(context);
         enabled.setTitle(R.string.title_enable_probe);
         enabled.setKey(InstagramProbe.ENABLED);
         enabled.setDefaultValue(InstagramProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
 
-        ListPreference duration = new ListPreference(activity);
+        ListPreference duration = new ListPreference(context);
         duration.setKey(InstagramProbe.FREQUENCY);
         duration.setEntryValues(R.array.probe_low_frequency_values);
         duration.setEntries(R.array.probe_low_frequency_labels);
@@ -389,7 +388,7 @@ public class InstagramProbe extends Probe
 
         screen.addPreference(duration);
 
-        CheckBoxPreference encrypt = new CheckBoxPreference(activity);
+        CheckBoxPreference encrypt = new CheckBoxPreference(context);
         encrypt.setKey(InstagramProbe.ENCRYPT_DATA);
         encrypt.setDefaultValue(InstagramProbe.DEFAULT_ENCRYPT);
         encrypt.setTitle(R.string.config_probe_instagram_encrypt_title);
@@ -397,13 +396,13 @@ public class InstagramProbe extends Probe
 
         screen.addPreference(encrypt);
 
-        final Preference authPreference = new Preference(activity);
+        final Preference authPreference = new Preference(context);
         authPreference.setTitle(R.string.title_authenticate_instagram_probe);
         authPreference.setSummary(R.string.summary_authenticate_instagram_probe);
 
         final InstagramProbe me = this;
 
-        final Preference logoutPreference = new Preference(activity);
+        final Preference logoutPreference = new Preference(context);
         logoutPreference.setTitle(R.string.title_logout_instagram_probe);
         logoutPreference.setSummary(R.string.summary_logout_instagram_probe);
 
@@ -412,7 +411,7 @@ public class InstagramProbe extends Probe
             @Override
             public boolean onPreferenceClick(Preference preference)
             {
-                me.fetchAuth(activity);
+                me.fetchAuth(context);
 
                 screen.addPreference(logoutPreference);
                 screen.removePreference(authPreference);
@@ -434,14 +433,19 @@ public class InstagramProbe extends Probe
                 screen.addPreference(authPreference);
                 screen.removePreference(logoutPreference);
 
-                activity.runOnUiThread(new Runnable()
+                if (context instanceof Activity)
                 {
-                    @Override
-                    public void run()
+                    Activity activity = (Activity) context;
+
+                    activity.runOnUiThread(new Runnable()
                     {
-                        Toast.makeText(activity, activity.getString(R.string.toast_instagram_logout), Toast.LENGTH_LONG).show();
-                    }
-                });
+                        @Override
+                        public void run()
+                        {
+                            Toast.makeText(context, context.getString(R.string.toast_instagram_logout), Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
 
                 return true;
             }

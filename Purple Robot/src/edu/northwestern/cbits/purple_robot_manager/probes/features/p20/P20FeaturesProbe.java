@@ -239,16 +239,13 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
     }
 
     @Override
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
     {
-        @SuppressWarnings("deprecation")
-        PreferenceManager manager = activity.getPreferenceManager();
+        PreferenceScreen screen = manager.createPreferenceScreen(context);
+        screen.setTitle(this.title(context));
+        screen.setSummary(this.summary(context));
 
-        PreferenceScreen screen = manager.createPreferenceScreen(activity);
-        screen.setTitle(this.title(activity));
-        screen.setSummary(this.summary(activity));
-
-        CheckBoxPreference enabled = new CheckBoxPreference(activity);
+        CheckBoxPreference enabled = new CheckBoxPreference(context);
         enabled.setTitle(R.string.title_enable_probe);
         enabled.setKey(P20FeaturesProbe.ENABLE);
         enabled.setDefaultValue(P20FeaturesProbe.DEFAULT_ENABLED);

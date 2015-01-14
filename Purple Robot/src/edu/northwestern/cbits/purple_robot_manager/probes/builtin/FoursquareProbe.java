@@ -21,6 +21,7 @@ import org.scribe.model.Token;
 import org.scribe.model.Verb;
 import org.scribe.oauth.OAuthService;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -365,27 +366,25 @@ public class FoursquareProbe extends Probe
 
     @Override
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(final PreferenceActivity activity)
+    public PreferenceScreen preferenceScreen(final Context context, PreferenceManager manager)
     {
-        PreferenceManager manager = activity.getPreferenceManager();
-
-        final PreferenceScreen screen = manager.createPreferenceScreen(activity);
-        screen.setTitle(this.title(activity));
+        final PreferenceScreen screen = manager.createPreferenceScreen(context);
+        screen.setTitle(this.title(context));
         screen.setSummary(R.string.summary_foursquare_probe_desc);
 
-        final SharedPreferences prefs = Probe.getPreferences(activity);
+        final SharedPreferences prefs = Probe.getPreferences(context);
 
         String token = prefs.getString("oauth_foursquare_token", null);
         String secret = prefs.getString("oauth_foursquare_secret", null);
 
-        CheckBoxPreference enabled = new CheckBoxPreference(activity);
+        CheckBoxPreference enabled = new CheckBoxPreference(context);
         enabled.setTitle(R.string.title_enable_probe);
         enabled.setKey(FoursquareProbe.ENABLED);
         enabled.setDefaultValue(FoursquareProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
 
-        ListPreference duration = new ListPreference(activity);
+        ListPreference duration = new ListPreference(context);
         duration.setKey(FoursquareProbe.FREQUENCY);
         duration.setEntryValues(R.array.probe_low_frequency_values);
         duration.setEntries(R.array.probe_low_frequency_labels);
@@ -394,7 +393,7 @@ public class FoursquareProbe extends Probe
 
         screen.addPreference(duration);
 
-        CheckBoxPreference pull = new CheckBoxPreference(activity);
+        CheckBoxPreference pull = new CheckBoxPreference(context);
         pull.setKey(FoursquareProbe.PULL_ACTIVITY);
         pull.setDefaultValue(FoursquareProbe.DEFAULT_PULL_ACTIVITY);
         pull.setTitle(R.string.config_probe_foursquare_pull_title);
@@ -402,13 +401,13 @@ public class FoursquareProbe extends Probe
 
         screen.addPreference(pull);
 
-        final Preference authPreference = new Preference(activity);
+        final Preference authPreference = new Preference(context);
         authPreference.setTitle(R.string.title_authenticate_foursquare_probe);
         authPreference.setSummary(R.string.summary_authenticate_foursquare_probe);
 
         final FoursquareProbe me = this;
 
-        final Preference logoutPreference = new Preference(activity);
+        final Preference logoutPreference = new Preference(context);
         logoutPreference.setTitle(R.string.title_logout_foursquare_probe);
         logoutPreference.setSummary(R.string.summary_logout_foursquare_probe);
 
@@ -417,7 +416,7 @@ public class FoursquareProbe extends Probe
             @Override
             public boolean onPreferenceClick(Preference preference)
             {
-                me.fetchAuth(activity);
+                me.fetchAuth(context);
 
                 screen.addPreference(logoutPreference);
                 screen.removePreference(authPreference);
@@ -439,14 +438,20 @@ public class FoursquareProbe extends Probe
                 screen.addPreference(authPreference);
                 screen.removePreference(logoutPreference);
 
-                activity.runOnUiThread(new Runnable()
+                if (context instanceof Activity)
                 {
-                    @Override
-                    public void run()
+                    Activity activity = (Activity) context;
+
+                    activity.runOnUiThread(new Runnable()
                     {
-                        Toast.makeText(activity, activity.getString(R.string.toast_foursquare_logout), Toast.LENGTH_LONG).show();
-                    }
-                });
+                        @Override
+                        public void run()
+                        {
+                            Toast.makeText(context, context.getString(R.string.toast_foursquare_logout), Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+                }
 
                 return true;
             }

@@ -310,24 +310,22 @@ public abstract class Model
      * Constructs a preference screen dynamically for an infividual model
      * instance for used in the user-facing app settings.
      * 
-     * @param activity
+     * @param context
      *            Parent settings activity.
      * 
      * @return Screen containing all the relevant options for a model instance.
      */
 
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
     {
-        PreferenceManager manager = activity.getPreferenceManager();
-
-        PreferenceScreen screen = manager.createPreferenceScreen(activity);
-        screen.setTitle(this.title(activity));
-        screen.setSummary(this.summary(activity));
+        PreferenceScreen screen = manager.createPreferenceScreen(context);
+        screen.setTitle(this.title(context));
+        screen.setSummary(this.summary(context));
 
         String key = this.getPreferenceKey();
 
-        CheckBoxPreference enabled = new CheckBoxPreference(activity);
+        CheckBoxPreference enabled = new CheckBoxPreference(context);
         enabled.setTitle(R.string.title_enable_model);
         enabled.setKey("config_model_" + key + "_enabled");
         enabled.setDefaultValue(Model.DEFAULT_ENABLED);

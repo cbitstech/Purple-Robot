@@ -27,7 +27,6 @@ import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.BaseSettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -73,37 +72,35 @@ public class ModelManager extends BroadcastReceiver
     }
 
     @SuppressWarnings("deprecation")
-    public PreferenceScreen buildPreferenceScreen(PreferenceActivity settingsActivity)
+    public PreferenceScreen buildPreferenceScreen(Context context, PreferenceManager manager)
     {
-        PreferenceManager manager = settingsActivity.getPreferenceManager();
-
-        PreferenceScreen screen = manager.createPreferenceScreen(settingsActivity);
+        PreferenceScreen screen = manager.createPreferenceScreen(context);
         screen.setOrder(0);
         screen.setTitle(R.string.title_preference_models_screen);
         screen.setKey(BaseSettingsActivity.MODELS_SCREEN_KEY);
 
-        PreferenceCategory globalCategory = new PreferenceCategory(settingsActivity);
+        PreferenceCategory globalCategory = new PreferenceCategory(context);
         globalCategory.setTitle(R.string.title_preference_models_global_category);
         globalCategory.setKey("key_available_models");
 
         screen.addPreference(globalCategory);
 
-        CheckBoxPreference enabled = new CheckBoxPreference(settingsActivity);
+        CheckBoxPreference enabled = new CheckBoxPreference(context);
         enabled.setTitle(R.string.title_preference_models_enable_models);
         enabled.setKey("config_models_enabled");
         enabled.setDefaultValue(Model.DEFAULT_ENABLED);
 
         globalCategory.addPreference(enabled);
 
-        PreferenceCategory probesCategory = new PreferenceCategory(settingsActivity);
+        PreferenceCategory probesCategory = new PreferenceCategory(context);
         probesCategory.setTitle(R.string.title_preference_models_available_category);
         probesCategory.setKey("key_available_models");
 
         screen.addPreference(probesCategory);
 
-        for (Model model : this.allModels(settingsActivity))
+        for (Model model : this.allModels(context))
         {
-            PreferenceScreen modelScreen = model.preferenceScreen(settingsActivity);
+            PreferenceScreen modelScreen = model.preferenceScreen(context, manager);
 
             if (modelScreen != null)
                 screen.addPreference(modelScreen);

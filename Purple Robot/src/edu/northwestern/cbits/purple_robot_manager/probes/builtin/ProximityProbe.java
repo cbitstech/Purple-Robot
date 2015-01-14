@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
@@ -291,11 +292,11 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
     }
 
     @Override
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
     {
-        PreferenceScreen screen = super.preferenceScreen(activity);
+        PreferenceScreen screen = super.preferenceScreen(context, manager);
 
-        ListPreference threshold = new ListPreference(activity);
+        ListPreference threshold = new ListPreference(context);
         threshold.setKey("config_probe_proximity_threshold");
         threshold.setDefaultValue(ProximityProbe.DEFAULT_THRESHOLD);
         threshold.setEntryValues(R.array.probe_proximity_threshold);

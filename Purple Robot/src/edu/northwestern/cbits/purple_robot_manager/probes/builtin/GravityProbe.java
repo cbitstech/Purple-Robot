@@ -25,6 +25,7 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
@@ -355,11 +356,11 @@ public class GravityProbe extends ContinuousProbe implements SensorEventListener
     }
 
     @Override
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
     {
-        PreferenceScreen screen = super.preferenceScreen(activity);
+        PreferenceScreen screen = super.preferenceScreen(context, manager);
 
-        ListPreference threshold = new ListPreference(activity);
+        ListPreference threshold = new ListPreference(context);
         threshold.setKey(GravityProbe.THRESHOLD);
         threshold.setDefaultValue(GravityProbe.DEFAULT_THRESHOLD);
         threshold.setEntryValues(R.array.probe_accelerometer_threshold);

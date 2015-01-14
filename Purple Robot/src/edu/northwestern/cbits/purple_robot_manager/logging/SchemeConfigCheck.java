@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.LegacySettingsActivity;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.SettingsActivity;
 import jscheme.JScheme;
 import jscheme.SchemeException;
 import jsint.Evaluator;
@@ -14,9 +16,9 @@ import jsint.Symbol;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.activities.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.scripting.JSONHelper;
 import edu.northwestern.cbits.purple_robot_manager.scripting.SchemeEngine;
 
@@ -215,10 +217,20 @@ public class SchemeConfigCheck extends SanityCheck
         {
             public void run()
             {
-                Intent intent = new Intent(context, SettingsActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+                {
+                    Intent intent = new Intent(context, LegacySettingsActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                context.startActivity(intent);
+                    context.startActivity(intent);
+                }
+                else
+                {
+                    Intent intent = new Intent(context, SettingsActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                    context.startActivity(intent);
+                }
             }
         };
 

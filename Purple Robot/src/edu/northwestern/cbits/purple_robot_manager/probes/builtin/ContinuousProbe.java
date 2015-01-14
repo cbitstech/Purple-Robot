@@ -87,26 +87,22 @@ public abstract class ContinuousProbe extends Probe
         return this._lastEnableResult;
     }
 
-    @Override
-    @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(PreferenceActivity activity)
+    public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
     {
-        PreferenceManager manager = activity.getPreferenceManager();
-
-        PreferenceScreen screen = manager.createPreferenceScreen(activity);
-        screen.setTitle(this.title(activity));
-        screen.setSummary(this.summary(activity));
+        PreferenceScreen screen = manager.createPreferenceScreen(context);
+        screen.setTitle(this.title(context));
+        screen.setSummary(this.summary(context));
 
         String key = this.getPreferenceKey();
 
-        CheckBoxPreference enabled = new CheckBoxPreference(activity);
+        CheckBoxPreference enabled = new CheckBoxPreference(context);
         enabled.setTitle(R.string.title_enable_probe);
         enabled.setKey("config_probe_" + key + "_enabled");
         enabled.setDefaultValue(ContinuousProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
 
-        ListPreference duration = new ListPreference(activity);
+        ListPreference duration = new ListPreference(context);
         duration.setKey("config_probe_" + key + "_frequency");
         duration.setEntryValues(this.getResourceFrequencyValues());
         duration.setEntries(this.getResourceFrequencyLabels());
@@ -115,7 +111,7 @@ public abstract class ContinuousProbe extends Probe
 
         screen.addPreference(duration);
 
-        ListPreference wakelock = new ListPreference(activity);
+        ListPreference wakelock = new ListPreference(context);
         wakelock.setKey("config_probe_" + key + "_wakelock");
         wakelock.setEntryValues(R.array.wakelock_values);
         wakelock.setEntries(R.array.wakelock_labels);
