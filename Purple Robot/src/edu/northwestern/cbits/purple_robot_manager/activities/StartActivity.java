@@ -622,8 +622,6 @@ public class StartActivity extends ActionBarActivity
 
         Uri incomingUri = this.getIntent().getData();
 
-        Log.e("PR", "INCOMING DATA URI: " + incomingUri);
-
         final SharedPreferences prefs = this.getPreferences(this);
 
         final String savedPassword = prefs.getString("config_password", null);
@@ -631,7 +629,11 @@ public class StartActivity extends ActionBarActivity
         if (incomingUri != null)
         {
             if (savedPassword == null || savedPassword.equals(""))
+            {
                 this.setJsonUri(incomingUri);
+
+                this.getIntent().setData(null);
+            }
             else
                 Toast.makeText(this, R.string.error_json_set_uri_password, Toast.LENGTH_LONG).show();
         }
