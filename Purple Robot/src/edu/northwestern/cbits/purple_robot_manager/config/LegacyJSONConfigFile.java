@@ -376,6 +376,10 @@ public class LegacyJSONConfigFile
                     {
                         LogManager.getInstance(context).logException(e);
                     }
+                    catch (Exception e)
+                    {
+                        LogManager.getInstance(context).logException(e);
+                    }
 
                     LegacyJSONConfigFile._sharedFile = new LegacyJSONConfigFile(context, next);
                 }
