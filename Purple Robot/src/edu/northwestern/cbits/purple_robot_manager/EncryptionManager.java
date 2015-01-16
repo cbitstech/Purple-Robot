@@ -171,7 +171,7 @@ public class EncryptionManager
 
     public String getUserId(Context context)
     {
-        return this.getUserId(context, true);
+        return this.getUserId(context, false);
     }
 
     public String getUserId(Context context, boolean log)
@@ -212,7 +212,7 @@ public class EncryptionManager
 
     public String getUserHash(Context context)
     {
-        return this.getUserHash(context, true);
+        return this.getUserHash(context, false);
     }
 
     public String getUserHash(Context context, boolean log)
