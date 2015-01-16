@@ -105,23 +105,19 @@ public class GeomagneticRotationProbe extends RotationProbe
                 {
                     sensors.unregisterListener(this, sensor);
 
-                    switch (frequency)
+                    if (frequency != SensorManager.SENSOR_DELAY_FASTEST && frequency != SensorManager.SENSOR_DELAY_UI &&
+                            frequency != SensorManager.SENSOR_DELAY_NORMAL)
                     {
-                    case SensorManager.SENSOR_DELAY_FASTEST:
-                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST, null);
-                        break;
-                    case SensorManager.SENSOR_DELAY_GAME:
-                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME, null);
-                        break;
-                    case SensorManager.SENSOR_DELAY_UI:
-                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI, null);
-                        break;
-                    case SensorManager.SENSOR_DELAY_NORMAL:
-                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL, null);
-                        break;
-                    default:
-                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME, null);
-                        break;
+                        frequency = SensorManager.SENSOR_DELAY_GAME;
+                    }
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                    {
+                        sensors.registerListener(this, sensor, frequency, 0);
+                    }
+                    else
+                    {
+                        sensors.registerListener(this, sensor, frequency, null);
                     }
 
                     this._lastFrequency = frequency;
