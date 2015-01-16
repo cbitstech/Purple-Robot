@@ -174,9 +174,11 @@ public class StartActivity extends ActionBarActivity
                                 @Override
                                 public void run()
                                 {
-                                    if (me.getString(R.string.message_reading_complete).equals(message)
-                                            && prefs.getBoolean("config_probes_enabled", false) == false)
+                                    if (me.getString(R.string.message_reading_complete).equals(message) &&
+                                        prefs.getBoolean("config_probes_enabled", false) == false)
+                                    {
                                         StartActivity._statusMessage = null;
+                                    }
                                     else
                                     {
                                         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
@@ -203,8 +205,7 @@ public class StartActivity extends ActionBarActivity
 
         final SimpleDateFormat sdf = new SimpleDateFormat("MMM d, H:mm:ss");
 
-        Cursor c = this.getContentResolver().query(RobotContentProvider.RECENT_PROBE_VALUES, null, null, null,
-                "recorded DESC");
+        Cursor c = this.getContentResolver().query(RobotContentProvider.RECENT_PROBE_VALUES, null, null, null, "recorded DESC");
 
         final CursorAdapter adapter = new CursorAdapter(this, c, true)
         {
@@ -547,6 +548,13 @@ public class StartActivity extends ActionBarActivity
         }
     }
 
+    protected void onNewIntent (Intent intent)
+    {
+        super.onNewIntent(intent);
+
+        this.setIntent(intent);
+    }
+
     private void setJsonUri(Uri jsonConfigUri)
     {
         if (jsonConfigUri.getScheme().equals("http") || jsonConfigUri.getScheme().equals("https"))
@@ -613,6 +621,8 @@ public class StartActivity extends ActionBarActivity
             this.getSupportActionBar().setSubtitle(StartActivity._statusMessage);
 
         Uri incomingUri = this.getIntent().getData();
+
+        Log.e("PR", "INCOMING DATA URI: " + incomingUri);
 
         final SharedPreferences prefs = this.getPreferences(this);
 
