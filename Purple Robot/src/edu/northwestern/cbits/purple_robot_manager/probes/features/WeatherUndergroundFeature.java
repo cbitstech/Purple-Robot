@@ -226,19 +226,7 @@ public class WeatherUndergroundFeature extends Feature
 
                                         me.transmitData(context, bundle);
                                     }
-                                    catch (MalformedURLException e)
-                                    {
-                                        LogManager.getInstance(context).logException(e);
-                                    }
-                                    catch (IOException e)
-                                    {
-                                        LogManager.getInstance(context).logException(e);
-                                    }
-                                    catch (JSONException e)
-                                    {
-                                        LogManager.getInstance(context).logException(e);
-                                    }
-                                    catch (NumberFormatException e)
+                                    catch (Exception e)
                                     {
                                         LogManager.getInstance(context).logException(e);
                                     }
