@@ -270,19 +270,17 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
     @Override
     public void onSensorChanged(SensorEvent event)
     {
+        final double now = (double) System.currentTimeMillis();
+
         if (this.shouldProcessEvent(event) == false)
             return;
-
-//        Log.e("PR", "SENSOR CHANGED");
-
-        final double now = (double) System.currentTimeMillis();
 
         if (this.passesThreshold(event))
         {
             synchronized (this)
             {
                 // Using wall clock instead of sensor clock so readings can be compared...
-                event.timestamp = System.currentTimeMillis() * 1000;
+                event.timestamp = ((long) now) * 1000;
 
 /*                double elapsed = (double) SystemClock.uptimeMillis();
                 double boot = (now - elapsed) * 1000 * 1000;
@@ -298,7 +296,6 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
                 double timestamp = event.timestamp;
 
                 timeBuffer[bufferIndex] = timestamp / 1000000;
-
                 accuracyBuffer[bufferIndex] = event.accuracy;
 
                 for (int i = 0; i < event.values.length; i++)

@@ -297,23 +297,19 @@ public class RotationProbe extends ContinuousProbe implements SensorEventListene
                 {
                     sensors.unregisterListener(this, sensor);
 
-                    switch (frequency)
+                    if (frequency != SensorManager.SENSOR_DELAY_FASTEST && frequency != SensorManager.SENSOR_DELAY_UI &&
+                            frequency != SensorManager.SENSOR_DELAY_NORMAL)
                     {
-                    case SensorManager.SENSOR_DELAY_FASTEST:
-                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST, null);
-                        break;
-                    case SensorManager.SENSOR_DELAY_GAME:
-                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME, null);
-                        break;
-                    case SensorManager.SENSOR_DELAY_UI:
-                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI, null);
-                        break;
-                    case SensorManager.SENSOR_DELAY_NORMAL:
-                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL, null);
-                        break;
-                    default:
-                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME, null);
-                        break;
+                        frequency = SensorManager.SENSOR_DELAY_GAME;
+                    }
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                    {
+                        sensors.registerListener(this, sensor, frequency, 0);
+                    }
+                    else
+                    {
+                        sensors.registerListener(this, sensor, frequency, null);
                     }
 
                     this._lastFrequency = frequency;
@@ -396,16 +392,19 @@ public class RotationProbe extends ContinuousProbe implements SensorEventListene
     @Override
     public void onSensorChanged(SensorEvent event)
     {
+        final double now = (double) System.currentTimeMillis();
+
         if (this.shouldProcessEvent(event) == false)
             return;
-
-        final double now = (double) System.currentTimeMillis();
 
         if (this.passesThreshold(event))
         {
             synchronized (this)
             {
-                double elapsed = (double) SystemClock.uptimeMillis();
+                // Using wall clock instead of sensor clock so readings can be compared...
+                event.timestamp = ((long) now) * 1000;
+
+/*                double elapsed = (double) SystemClock.uptimeMillis();
                 double boot = (now - elapsed) * 1000 * 1000;
 
                 double timestamp = event.timestamp + boot;
@@ -415,9 +414,10 @@ public class RotationProbe extends ContinuousProbe implements SensorEventListene
                                                            // have built-in
                                                            // times...
                     timestamp = event.timestamp;
+*/
+                double timestamp = event.timestamp;
 
                 timeBuffer[bufferIndex] = timestamp / 1000000;
-
                 accuracyBuffer[bufferIndex] = event.accuracy;
 
                 for (int i = 0; i < event.values.length; i++)

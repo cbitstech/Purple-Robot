@@ -14,6 +14,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.ListPreference;
@@ -176,23 +177,19 @@ public class PressureProbe extends Continuous1DProbe implements SensorEventListe
                 {
                     sensors.unregisterListener(this, sensor);
 
-                    switch (frequency)
+                    if (frequency != SensorManager.SENSOR_DELAY_FASTEST && frequency != SensorManager.SENSOR_DELAY_UI &&
+                            frequency != SensorManager.SENSOR_DELAY_NORMAL)
                     {
-                    case SensorManager.SENSOR_DELAY_FASTEST:
-                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST, null);
-                        break;
-                    case SensorManager.SENSOR_DELAY_GAME:
-                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME, null);
-                        break;
-                    case SensorManager.SENSOR_DELAY_UI:
-                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI, null);
-                        break;
-                    case SensorManager.SENSOR_DELAY_NORMAL:
-                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL, null);
-                        break;
-                    default:
-                        sensors.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME, null);
-                        break;
+                        frequency = SensorManager.SENSOR_DELAY_GAME;
+                    }
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                    {
+                        sensors.registerListener(this, sensor, frequency, 0);
+                    }
+                    else
+                    {
+                        sensors.registerListener(this, sensor, frequency, null);
                     }
 
                     this._lastFrequency = frequency;
@@ -262,16 +259,19 @@ public class PressureProbe extends Continuous1DProbe implements SensorEventListe
     @SuppressLint("NewApi")
     public void onSensorChanged(SensorEvent event)
     {
+        double now = System.currentTimeMillis();
+
         if (this.shouldProcessEvent(event) == false)
             return;
-
-        double now = System.currentTimeMillis();
 
         if (this.passesThreshold(event))
         {
             synchronized (this)
             {
-                double elapsed = SystemClock.uptimeMillis();
+                // Using wall clock instead of sensor clock so readings can be compared...
+                event.timestamp = ((long) now) * 1000;
+
+/*                double elapsed = (double) SystemClock.uptimeMillis();
                 double boot = (now - elapsed) * 1000 * 1000;
 
                 double timestamp = event.timestamp + boot;
@@ -281,6 +281,8 @@ public class PressureProbe extends Continuous1DProbe implements SensorEventListe
                                                            // have built-in
                                                            // times...
                     timestamp = event.timestamp;
+*/
+                double timestamp = event.timestamp;
 
                 timeBuffer[bufferIndex] = timestamp / 1000000;
                 accuracyBuffer[bufferIndex] = event.accuracy;
