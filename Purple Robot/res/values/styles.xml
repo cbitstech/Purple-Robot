@@ -6,4 +6,5 @@
 	<style name="lightListView">
     	<item name="android:background">#ffffff</item>
 	</style>
+    <style name="SettingsTheme" parent="Theme.AppCompat.NoActionBar" />
 </resources>

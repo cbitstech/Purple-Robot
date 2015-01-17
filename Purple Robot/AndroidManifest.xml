@@ -170,7 +170,7 @@
 		<activity android:name=".activities.WebkitLandscapeActivity" android:label="@string/app_name" android:screenOrientation="landscape" android:theme="@style/Theme.AppCompat" />
 		<activity android:name=".activities.RealTimeProbeViewActivity" android:label="@string/app_name" android:screenOrientation="landscape" android:theme="@style/Theme.AppCompat" />
         <activity android:name=".activities.settings.LegacySettingsActivity" android:label="@string/app_name" android:screenOrientation="portrait" android:theme="@style/Theme.AppCompat"/>
-        <activity android:name=".activities.settings.SettingsActivity" android:label="@string/app_name" android:screenOrientation="portrait" android:theme="@style/Theme.AppCompat"/>
+        <activity android:name=".activities.settings.SettingsActivity" android:label="@string/app_name" android:screenOrientation="portrait" android:theme="@style/SettingsTheme"/>
 		<activity android:name=".activities.DialogActivity" android:label="@string/app_name" android:launchMode="singleInstance" android:noHistory="true" android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 		<activity android:name=".activities.LabelActivity" android:label="@string/app_name" android:theme="@style/Theme.AppCompat" />
 		<activity android:name=".activities.CodeViewerActivity" android:label="@string/app_name" android:theme="@style/Theme.AppCompat" />
