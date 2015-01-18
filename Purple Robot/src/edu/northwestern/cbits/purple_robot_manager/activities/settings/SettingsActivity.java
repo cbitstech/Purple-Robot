@@ -14,12 +14,7 @@ import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -32,33 +27,21 @@ import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
-/**
- * Created by Administrator on 1/13/15.
- */
-
 @TargetApi(11)
 public class SettingsActivity extends ActionBarActivity
 {
     private static final String PREFERENCE_SCREEN_KEY = "PREFERENCE_SCREEN_KEY";
     private static HashMap<String, PreferenceScreen> _screens = new HashMap<String, PreferenceScreen>();
 
-    public void onNewIntent(Intent intent)
-    {
-        Log.e("PR", "NEW INTENT " + intent.getStringExtra(SettingsActivity.PREFERENCE_SCREEN_KEY));
-    }
-
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
 
         final String key = this.getIntent().getStringExtra(SettingsActivity.PREFERENCE_SCREEN_KEY);
-        Log.e("PR", "LAUNCHED WITH KEY: " + key);
 
         this.setContentView(R.layout.layout_settings_activity);
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         this.setSupportActionBar(toolbar);
-
-        final ViewGroup view = (ViewGroup) this.findViewById(R.id.content_frame);
 
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -73,6 +56,8 @@ public class SettingsActivity extends ActionBarActivity
             public void onCreate(Bundle savedInstanceState)
             {
                 super.onCreate(savedInstanceState);
+
+                // If launched with no key, build out settings from the top...
 
                 if (key == null)
                 {
@@ -161,6 +146,8 @@ public class SettingsActivity extends ActionBarActivity
 
                     final PreferenceFragment meFragment = this;
 
+                    // Delay for half a second so preferences can be completely constructed...
+
                     Runnable r = new Runnable()
                     {
                         public void run()
@@ -171,14 +158,15 @@ public class SettingsActivity extends ActionBarActivity
                             }
                             catch (InterruptedException e)
                             {
-                                e.printStackTrace();
+
                             }
 
                             me.runOnUiThread(new Runnable()
                             {
-                                @Override
                                 public void run()
                                 {
+                                    // After delay, build preference screen map...
+
                                     me.mapScreens(meFragment.getPreferenceScreen());
                                 }
                             });
@@ -192,18 +180,11 @@ public class SettingsActivity extends ActionBarActivity
                 }
                 else
                 {
+                    // If launched with a key, lookup the preference screen and go from there...
+
                     this.setPreferenceScreen(SettingsActivity._screens.get(key));
                     me.setTitle(SettingsActivity._screens.get(key).getTitle());
                 }
-            }
-
-            public boolean onPreferenceTreeClick(PreferenceScreen screen, Preference preference)
-            {
-                Log.e("PR", "PREF TREE CLICKED: " + preference.getTitle() + " -- " + (screen == null) + " -- " + TextUtils.isEmpty(screen.getTitle()));
-                Log.e("PR", "TOOLBAR VIZ(1): " + toolbar.getVisibility() + " -- " + me.getSupportActionBar());
-                Log.e("PR", "VIEW: " + view);
-
-                return super.onPreferenceTreeClick(screen, preference);
             }
         };
 
@@ -215,7 +196,7 @@ public class SettingsActivity extends ActionBarActivity
 
     private void mapScreens(PreferenceGroup screen)
     {
-        Log.e("PR", "MAP: " + screen.getClass().getCanonicalName());
+        // If the screen does not have a key, generate one.
 
         if (screen.getKey() == null)
         {
@@ -224,34 +205,31 @@ public class SettingsActivity extends ActionBarActivity
             screen.setKey(key);
         }
 
+        // If what we're looking at is a screen, add it to the shared map.
+
         if (screen instanceof PreferenceScreen)
             SettingsActivity._screens.put(screen.getKey(), (PreferenceScreen) screen);
+
+        // Iterate and recurse...
 
         for (int i = 0; i < screen.getPreferenceCount(); i++)
         {
             Preference pref = screen.getPreference(i);
 
-            Log.e("PR", "MAP PREF: " + pref.getClass().getCanonicalName());
+            // If this is a preference group, recursively map it.
 
             if (pref instanceof PreferenceGroup)
                 this.mapScreens((PreferenceGroup) pref);
 
             if (pref instanceof PreferenceScreen)
             {
-                Log.e("PR", "PREF: " + pref.getTitle() + " -- " + pref.getClass().getCanonicalName());
+                // Add activity intent to launch new SettingActivity instances to override
+                // dialog-based behavior.
 
                 Intent intent = new Intent(this, SettingsActivity.class);
                 intent.putExtra(SettingsActivity.PREFERENCE_SCREEN_KEY, pref.getKey());
 
-                Log.e("PR", "SWAPPING PREF");
-
-//                Preference newScreen = new Preference(this);
-//                newScreen.setTitle(pref.getTitle());
-//                newScreen.setOrder(pref.getOrder());
                 pref.setIntent(intent);
-
-//                screen.removePreference(pref);
-//                screen.addPreference(newScreen);
             }
         }
     }
