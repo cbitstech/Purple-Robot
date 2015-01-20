@@ -32,6 +32,8 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
+
 import edu.emory.mathcs.backport.java.util.Collections;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -292,7 +294,7 @@ public class DateTrigger extends Trigger
 
     private String adjustCalendar(Context context, String original)
     {
-        if (original.contains("FREQ=MINUTELY"))
+        if (original.contains("FREQ=MINUTELY") && original.contains("COUNT=") == false)
         {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
 
