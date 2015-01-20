@@ -19,10 +19,8 @@ import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -463,8 +461,6 @@ public class SampleProbe extends Probe
         if (params.containsKey(Probe.PROBE_FREQUENCY))
         {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
-
-            Log.e("PR", "FREQ:" + frequency + " -- " + frequency.getClass());
 
             if ((frequency instanceof Double) == false)
                 frequency = Double.valueOf(frequency.toString()).longValue();

@@ -1,33 +1,24 @@
 package edu.northwestern.cbits.purple_robot_manager.activities.settings;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.Map;
 
 import edu.northwestern.cbits.anthracite.LogService;
@@ -216,8 +207,6 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
 
         if (preference.getTitle() != null)
             prefJson.put("title", preference.getTitle());
-
-        Log.e("PR", "PREF THUS FAR: " + prefJson.toString(2));
 
         try {
             if (preference.getSummary() != null)

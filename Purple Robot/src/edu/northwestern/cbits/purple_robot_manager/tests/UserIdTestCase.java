@@ -45,13 +45,13 @@ public class UserIdTestCase extends RobotTestCase
 
             Thread.sleep(1000);
 
-            engine.setUserId(UserIdTestCase.TEST_ID_1);
+            engine.setUserId(UserIdTestCase.TEST_ID_1, false);
 
             Thread.sleep(1000);
 
             Assert.assertEquals("UID2", UserIdTestCase.TEST_ID_1, engine.fetchUserId());
 
-            engine.setUserId(UserIdTestCase.TEST_ID_2);
+            engine.setUserId(UserIdTestCase.TEST_ID_2, false);
 
             Thread.sleep(1000);
 
@@ -61,7 +61,7 @@ public class UserIdTestCase extends RobotTestCase
 
             JSONObject command = new JSONObject();
             command.put("command", "execute_script");
-            command.put("script", "PurpleRobot.setUserId('" + UserIdTestCase.TEST_ID_1 + "');");
+            command.put("script", "PurpleRobot.setUserId('" + UserIdTestCase.TEST_ID_1 + "', false);");
 
             HashMap<String, String> payload = new HashMap<String, String>();
             payload.put("json", command.toString(2));
@@ -93,7 +93,7 @@ public class UserIdTestCase extends RobotTestCase
 
             Thread.sleep(1000);
 
-            command.put("script", "PurpleRobot.setUserId('" + UserIdTestCase.TEST_ID_2 + "');");
+            command.put("script", "PurpleRobot.setUserId('" + UserIdTestCase.TEST_ID_2 + "', false);");
 
             payload.put("json", command.toString(2));
 
@@ -125,7 +125,7 @@ public class UserIdTestCase extends RobotTestCase
             this.broadcastUpdate("Testing over HTTP API... (3/3)");
 
             command.put("command", "execute_script");
-            command.put("script", "PurpleRobot.setUserId('" + UserIdTestCase.TEST_ID_1 + "');");
+            command.put("script", "PurpleRobot.setUserId('" + UserIdTestCase.TEST_ID_1 + "', false);");
 
             payload.put("json", command.toString(2));
 

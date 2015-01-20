@@ -144,6 +144,7 @@ public class ShionProbe extends Probe
                         this._lastCheck = now;
 
                         Intent fetchIntent = new Intent(ShionProbe.FETCH_INTENT);
+                        fetchIntent.setClassName("edu.northwestern.cbits.purple_robot.shionhelper", "edu.northwestern.cbits.purple_robot.shionhelper.ShionService");
 
                         context.startService(fetchIntent);
                     }
