@@ -51,6 +51,8 @@ public class JavascriptTestCase extends RobotTestCase
 
             Assert.assertNotNull("JST2", probe);
 
+            Thread.sleep(2000);
+
             Assert.assertEquals("JST3", probe.isEnabled(this._context), probeSettings.getBoolean(Probe.PROBE_ENABLED));
             Assert.assertEquals("JST4", probe.getFrequency(), probeSettings.getInt(Probe.PROBE_FREQUENCY));
             Assert.assertEquals("JST5", probe.getThreshold(), probeSettings.getDouble(ContinuousProbe.PROBE_THRESHOLD));
