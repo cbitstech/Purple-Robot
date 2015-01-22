@@ -312,13 +312,16 @@ public class DateTrigger extends Trigger
 
                         long now = System.currentTimeMillis();
 
-                        long newTime = now - day - (now % day) + (originalDate.getTime() % day);
+                        if (originalDate.getTime() < now - day)
+                        {
+                            long newTime = now - day - (now % day) + (originalDate.getTime() % day);
 
-                        Date newDate = new Date(newTime);
+                            Date newDate = new Date(newTime);
 
-                        String newLine = "DTSTART:" + sdf.format(newDate);
-
-                        newCalendar.append(newLine + "\n");
+                            newCalendar.append("DTSTART:" + sdf.format(newDate) + "\n");
+                        }
+                        else
+                            newCalendar.append("DTSTART:" + sdf.format(originalDate) + "\n");
                     }
                     catch (ParseException e)
                     {
@@ -335,13 +338,15 @@ public class DateTrigger extends Trigger
 
                         long now = System.currentTimeMillis();
 
-                        long newTime = now - day - (now % day) + (originalDate.getTime() % day);
+                        if (originalDate.getTime() < now - day) {
+                            long newTime = now - day - (now % day) + (originalDate.getTime() % day);
 
-                        Date newDate = new Date(newTime);
+                            Date newDate = new Date(newTime);
 
-                        String newLine = "DTEND:" + sdf.format(newDate);
-
-                        newCalendar.append(newLine + "\n");
+                            newCalendar.append("DTEND:" + sdf.format(newDate) + "\n");
+                        }
+                        else
+                            newCalendar.append("DTEND:" + sdf.format(originalDate) + "\n");
                     }
                     catch (ParseException e)
                     {
