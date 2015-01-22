@@ -50,7 +50,7 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
     @SuppressWarnings("deprecation")
     public boolean onPreferenceClick(Preference preference)
     {
-        if (BaseSettingsActivity.HAPTIC_PATTERN_KEY.equals(preference.getKey()))
+        if (SettingsKeys.HAPTIC_PATTERN_KEY.equals(preference.getKey()))
         {
             ListPreference listPref = (ListPreference) preference;
 
@@ -64,9 +64,9 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
 
             return true;
         }
-        else if (BaseSettingsActivity.PROBES_SCREEN_KEY.equals(preference.getKey()))
+        else if (SettingsKeys.PROBES_SCREEN_KEY.equals(preference.getKey()))
             return true;
-        else if (BaseSettingsActivity.MANUAL_REFRESH_KEY.equals(preference.getKey()))
+        else if (SettingsKeys.MANUAL_REFRESH_KEY.equals(preference.getKey()))
         {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context.getApplicationContext());
             SharedPreferences.Editor editor = prefs.edit();
@@ -82,7 +82,7 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
 
             return true;
         }
-        else if (BaseSettingsActivity.LOG_REFRESH_KEY.equals(preference.getKey()))
+        else if (SettingsKeys.LOG_REFRESH_KEY.equals(preference.getKey()))
         {
             try
             {
@@ -101,7 +101,7 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
 
             return true;
         }
-        else if (BaseSettingsActivity.ZIP_ARCHIVES_KEY.equals(preference.getKey()))
+        else if (SettingsKeys.ZIP_ARCHIVES_KEY.equals(preference.getKey()))
         {
             HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance.pluginForClass(this._context,
                     HttpUploadPlugin.class);
@@ -113,7 +113,7 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
                 return true;
             }
         }
-        else if (BaseSettingsActivity.DELETE_ARCHIVES_KEY.equals(preference.getKey()))
+        else if (SettingsKeys.DELETE_ARCHIVES_KEY.equals(preference.getKey()))
         {
             HttpUploadPlugin plugin = (HttpUploadPlugin) OutputPluginManager.sharedInstance.pluginForClass(this._context,
                     HttpUploadPlugin.class);
@@ -125,12 +125,12 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
                 return true;
             }
         }
-        else if (BaseSettingsActivity.RUN_TESTS_KEY.equals(preference.getKey()))
+        else if (SettingsKeys.RUN_TESTS_KEY.equals(preference.getKey()))
         {
             Intent intent = new Intent(this._context, TestActivity.class);
             this._context.startActivity(intent);
         }
-        else if (BaseSettingsActivity.RESET_KEY.equals(preference.getKey()))
+        else if (SettingsKeys.RESET_KEY.equals(preference.getKey()))
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(this._context);
 
@@ -188,7 +188,7 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
 
             builder.create().show();
         }
-        else if (BaseSettingsActivity.PROBES_DISABLE_EACH_KEY.equals(preference.getKey()))
+        else if (SettingsKeys.PROBES_DISABLE_EACH_KEY.equals(preference.getKey()))
         {
             ProbeManager.disableEachProbe(this._context);
 
@@ -275,20 +275,20 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
     @Override
     public boolean onPreferenceChange(Preference pref, Object value)
     {
-        if (BaseSettingsActivity.CHECK_UPDATES_KEY.equals(pref.getKey()))
+        if (SettingsKeys.CHECK_UPDATES_KEY.equals(pref.getKey()))
         {
             Toast.makeText(this._context, R.string.message_update_check, Toast.LENGTH_LONG).show();
 
             return true;
         }
-        else if (BaseSettingsActivity.RINGTONE_KEY.equals(pref.getKey()))
+        else if (SettingsKeys.RINGTONE_KEY.equals(pref.getKey()))
         {
             String name = ManagerService.soundNameForPath(this._context, value.toString());
 
             Intent playIntent = new Intent(ManagerService.RINGTONE_INTENT);
 
             if (name != null)
-                playIntent.putExtra(BaseSettingsActivity.RINGTONE_KEY, name);
+                playIntent.putExtra(SettingsKeys.RINGTONE_KEY, name);
 
             playIntent.setClass(this._context, ManagerService.class);
 

@@ -11,6 +11,7 @@ import java.util.Date;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -154,7 +155,10 @@ public class WebkitActivity extends ActionBarActivity
         }
         else
         {
-            Intent dataIntent = new Intent(this, ProbeViewerActivity.class);
+            Intent dataIntent = new Intent(this, LegacyProbeViewerActivity.class);
+
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB)
+                dataIntent = new Intent(this, ProbeViewerActivity.class);
 
             dataIntent.putExtra("probe_name", this.getIntent().getStringExtra("probe_name"));
             dataIntent.putExtra("probe_bundle", this.getIntent().getParcelableExtra("probe_bundle"));
@@ -205,7 +209,7 @@ public class WebkitActivity extends ActionBarActivity
     {
         if (item.getItemId() == R.id.menu_data_item)
         {
-            Intent dataIntent = new Intent(this, ProbeViewerActivity.class);
+            Intent dataIntent = new Intent(this, LegacyProbeViewerActivity.class);
 
             dataIntent.putExtra("probe_name", this.getIntent().getStringExtra("probe_name"));
             dataIntent.putExtra("probe_bundle", this.getIntent().getParcelableExtra("probe_bundle"));

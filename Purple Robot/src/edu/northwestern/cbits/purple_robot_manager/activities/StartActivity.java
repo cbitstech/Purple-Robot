@@ -53,7 +53,7 @@ import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.RobotContentProvider;
-import edu.northwestern.cbits.purple_robot_manager.activities.settings.BaseSettingsActivity;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.SettingsKeys;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.LegacySettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
@@ -95,11 +95,11 @@ public class StartActivity extends ActionBarActivity
         @Override
         public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
         {
-            if (BaseSettingsActivity.USER_ID_KEY.equals(key))
+            if (SettingsKeys.USER_ID_KEY.equals(key))
             {
                 Editor e = prefs.edit();
 
-                e.remove(BaseSettingsActivity.USER_HASH_KEY);
+                e.remove(SettingsKeys.USER_HASH_KEY);
                 e.commit();
             }
         }
@@ -140,7 +140,7 @@ public class StartActivity extends ActionBarActivity
 
         if (this.getPackageManager().getInstallerPackageName(this.getPackageName()) == null)
         {
-            if (sharedPrefs.getBoolean(BaseSettingsActivity.CHECK_UPDATES_KEY, false))
+            if (sharedPrefs.getBoolean(SettingsKeys.CHECK_UPDATES_KEY, false))
                 UpdateManager.register(this, "7550093e020b1a4a6df90f1e9dde68b6");
         }
 
@@ -351,29 +351,42 @@ public class StartActivity extends ActionBarActivity
 
                             me.runOnUiThread(new Runnable() {
                                 @Override
-                                public void run() {
+                                public void run()
+                                {
                                     final Probe probe = ProbeManager.probeForName(sensorName, me);
 
-                                    if (probe != null) {
+                                    if (probe != null)
+                                    {
                                         Intent intent = probe.viewIntent(me);
 
-                                        if (intent == null) {
-                                            Intent dataIntent = new Intent(me, ProbeViewerActivity.class);
+                                        if (intent == null)
+                                        {
+                                            Intent dataIntent = new Intent(me, LegacyProbeViewerActivity.class);
+
+                                            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB)
+                                                dataIntent = new Intent(me, ProbeViewerActivity.class);
 
                                             dataIntent.putExtra("probe_name", sensorName);
                                             dataIntent.putExtra("probe_bundle", value);
 
                                             me.startActivity(dataIntent);
-                                        } else {
+                                        }
+                                        else
+                                        {
                                             intent.putExtra("probe_name", sensorName);
                                             intent.putExtra("probe_bundle", value);
 
                                             me.startActivity(intent);
                                         }
-                                    } else {
+                                    }
+                                    else
+                                    {
                                         Model model = ModelManager.getInstance(me).fetchModelByName(me, sensorName);
 
-                                        Intent dataIntent = new Intent(me, ProbeViewerActivity.class);
+                                        Intent dataIntent = new Intent(me, LegacyProbeViewerActivity.class);
+
+                                        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB)
+                                            dataIntent = new Intent(me, ProbeViewerActivity.class);
 
                                         if (model != null)
                                             dataIntent.putExtra("probe_name", model.title(me));

@@ -5,6 +5,7 @@ import java.io.IOException;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.webkit.ConsoleMessage;
@@ -105,7 +106,10 @@ public class RealTimeProbeViewActivity extends WebkitActivity
         }
         else
         {
-            Intent dataIntent = new Intent(this, ProbeViewerActivity.class);
+            Intent dataIntent = new Intent(this, LegacyProbeViewerActivity.class);
+
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB)
+                dataIntent = new Intent(this, ProbeViewerActivity.class);
 
             dataIntent.putExtra("probe_name", this.getIntent().getStringExtra("probe_name"));
             dataIntent.putExtra("probe_bundle", this.getIntent().getParcelableExtra("probe_bundle"));

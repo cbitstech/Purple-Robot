@@ -65,6 +65,15 @@ public class JavaScriptEngine extends BaseScriptEngine
         if (extras != null && extrasName != null)
             script = "var " + extrasName + " = " + extras.toString() + "; " + script;
 
+        Log.e("PR", "JS SCRIPT LENGTH: " + script.length());
+
+        int end = script.length() - 512;
+
+        if (end < 0)
+            end = 0;
+
+        Log.e("PR", "JS SCRIPT END: " + script.substring(end));
+
         return this._jsContext.evaluateString(this._scope, script, "<engine>", 0, null);
     }
 
