@@ -24,6 +24,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
@@ -319,6 +320,11 @@ public abstract class DataUploadPlugin extends OutputPlugin
                 }
             }
             catch (HttpHostConnectException e)
+            {
+                me.broadcastMessage(context.getString(R.string.message_http_connection_error), true);
+                LogManager.getInstance(context).logException(e);
+            }
+            catch (ConnectTimeoutException e)
             {
                 me.broadcastMessage(context.getString(R.string.message_http_connection_error), true);
                 LogManager.getInstance(context).logException(e);

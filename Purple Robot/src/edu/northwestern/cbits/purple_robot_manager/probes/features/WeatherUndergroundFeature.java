@@ -3,6 +3,7 @@ package edu.northwestern.cbits.purple_robot_manager.probes.features;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -225,6 +226,10 @@ public class WeatherUndergroundFeature extends Feature
                                         bundle.putDouble(WeatherUndergroundFeature.VISIBILITY, visiblility);
 
                                         me.transmitData(context, bundle);
+                                    }
+                                    catch (ConnectException e)
+                                    {
+                                        LogManager.getInstance(context).logException(e);
                                     }
                                     catch (Exception e)
                                     {

@@ -6,12 +6,14 @@ import java.util.Date;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.LegacyProbeViewerActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.ProbeViewerActivity;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
@@ -79,7 +81,10 @@ public class LocationProbeActivity extends ActionBarActivity
 
         if (itemId == R.id.menu_data_item)
         {
-            Intent dataIntent = new Intent(this, ProbeViewerActivity.class);
+            Intent dataIntent = new Intent(this, LegacyProbeViewerActivity.class);
+
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB)
+                dataIntent = new Intent(this, ProbeViewerActivity.class);
 
             dataIntent.putExtra("probe_name", this.getIntent().getStringExtra("probe_name"));
             dataIntent.putExtra("probe_bundle", this.getIntent().getParcelableExtra("probe_bundle"));

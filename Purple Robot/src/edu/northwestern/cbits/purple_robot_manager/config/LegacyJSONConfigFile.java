@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -361,6 +362,10 @@ public class LegacyJSONConfigFile
                         LogManager.getInstance(context).logException(e);
                     }
                     catch (MalformedURLException e)
+                    {
+                        LogManager.getInstance(context).logException(e);
+                    }
+                    catch (ConnectException e)
                     {
                         LogManager.getInstance(context).logException(e);
                     }

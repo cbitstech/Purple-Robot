@@ -20,14 +20,13 @@ import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.activities.settings.BaseSettingsActivity;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.SettingsKeys;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.util.Slugify;
@@ -77,7 +76,7 @@ public class ModelManager extends BroadcastReceiver
         PreferenceScreen screen = manager.createPreferenceScreen(context);
         screen.setOrder(0);
         screen.setTitle(R.string.title_preference_models_screen);
-        screen.setKey(BaseSettingsActivity.MODELS_SCREEN_KEY);
+        screen.setKey(SettingsKeys.MODELS_SCREEN_KEY);
 
         PreferenceCategory globalCategory = new PreferenceCategory(context);
         globalCategory.setTitle(R.string.title_preference_models_global_category);

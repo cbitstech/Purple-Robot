@@ -69,13 +69,13 @@ public class SettingsActivity extends ActionBarActivity
 
                     PreferenceScreen prefs = this.getPreferenceScreen();
 
-                    Preference refresh = prefs.findPreference(BaseSettingsActivity.MANUAL_REFRESH_KEY);
+                    Preference refresh = prefs.findPreference(SettingsKeys.MANUAL_REFRESH_KEY);
                     refresh.setOnPreferenceClickListener(listener);
 
-                    Preference logRefresh = prefs.findPreference(BaseSettingsActivity.LOG_REFRESH_KEY);
+                    Preference logRefresh = prefs.findPreference(SettingsKeys.LOG_REFRESH_KEY);
                     logRefresh.setOnPreferenceClickListener(listener);
 
-                    ListPreference haptic = (ListPreference) prefs.findPreference(BaseSettingsActivity.HAPTIC_PATTERN_KEY);
+                    ListPreference haptic = (ListPreference) prefs.findPreference(SettingsKeys.HAPTIC_PATTERN_KEY);
                     haptic.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
                     {
                         @Override
@@ -108,22 +108,22 @@ public class SettingsActivity extends ActionBarActivity
                     PreferenceCategory modelCategory = (PreferenceCategory) prefs.findPreference("config_settings_models_category");
                     modelCategory.addPreference(modelsScreen);
 
-                    Preference archive = prefs.findPreference(BaseSettingsActivity.ZIP_ARCHIVES_KEY);
+                    Preference archive = prefs.findPreference(SettingsKeys.ZIP_ARCHIVES_KEY);
                     archive.setOnPreferenceClickListener(listener);
 
-                    Preference delete = prefs.findPreference(BaseSettingsActivity.DELETE_ARCHIVES_KEY);
+                    Preference delete = prefs.findPreference(SettingsKeys.DELETE_ARCHIVES_KEY);
                     delete.setOnPreferenceClickListener(listener);
 
-                    Preference test = prefs.findPreference(BaseSettingsActivity.RUN_TESTS_KEY);
+                    Preference test = prefs.findPreference(SettingsKeys.RUN_TESTS_KEY);
                     test.setOnPreferenceClickListener(listener);
 
-                    CheckBoxPreference update = (CheckBoxPreference) prefs.findPreference(BaseSettingsActivity.CHECK_UPDATES_KEY);
+                    CheckBoxPreference update = (CheckBoxPreference) prefs.findPreference(SettingsKeys.CHECK_UPDATES_KEY);
                     update.setOnPreferenceChangeListener(listener);
 
-                    ListPreference listUpdate = (ListPreference) prefs.findPreference(BaseSettingsActivity.RINGTONE_KEY);
+                    ListPreference listUpdate = (ListPreference) prefs.findPreference(SettingsKeys.RINGTONE_KEY);
                     listUpdate.setOnPreferenceChangeListener(listener);
 
-                    Preference reset = prefs.findPreference(BaseSettingsActivity.RESET_KEY);
+                    Preference reset = prefs.findPreference(SettingsKeys.RESET_KEY);
                     reset.setOnPreferenceClickListener(listener);
 
                     Preference logEnabled = prefs.findPreference(LogManager.ENABLED);
