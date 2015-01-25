@@ -849,6 +849,14 @@
 	<string name="name_sanity_script_duration">Script Duration</string>
 
     <string name="name_sanity_server_failure">Server Failures</string>
+
+    <string name="name_sanity_google_play">Google Play Services</string>
+    <string name="name_sanity_google_play_missing">Google Play services is missing.</string>
+    <string name="name_sanity_google_play_update_required">Google Play services is out of date.</string>
+    <string name="name_sanity_google_play_update_disabled">Google Play services is disabled.</string>
+    <string name="name_sanity_google_play_update_invalid">Google Play services is invalid.</string>
+    <string name="name_sanity_google_play_update_ok">Google Play services is working properly.</string>
+
     <string name="message_clearing_archive">Clearing archive files&#8230;</string>
     
     <string name="pending_files_label">Pending Uploads Count</string>
