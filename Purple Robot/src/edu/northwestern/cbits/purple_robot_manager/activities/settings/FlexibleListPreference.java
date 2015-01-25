@@ -1,7 +1,6 @@
 package edu.northwestern.cbits.purple_robot_manager.activities.settings;
 
 import android.annotation.TargetApi;
-import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.os.Build;
 import android.preference.ListPreference;
