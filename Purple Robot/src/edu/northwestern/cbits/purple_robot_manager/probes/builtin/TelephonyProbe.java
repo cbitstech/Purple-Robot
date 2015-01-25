@@ -12,8 +12,6 @@ import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.Looper;
 import android.preference.CheckBoxPreference;
-import android.preference.ListPreference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.telephony.CellLocation;
@@ -24,6 +22,7 @@ import android.telephony.TelephonyManager;
 import android.telephony.cdma.CdmaCellLocation;
 import android.telephony.gsm.GsmCellLocation;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
@@ -467,7 +466,7 @@ public class TelephonyProbe extends Probe
 
         screen.addPreference(enabled);
 
-        ListPreference duration = new ListPreference(context);
+        FlexibleListPreference duration = new FlexibleListPreference(context);
         duration.setKey(TelephonyProbe.FREQUENCY);
         duration.setEntryValues(R.array.probe_satellite_frequency_values);
         duration.setEntries(R.array.probe_satellite_frequency_labels);

@@ -17,11 +17,10 @@ import android.location.LocationProvider;
 import android.os.Bundle;
 import android.os.Looper;
 import android.preference.CheckBoxPreference;
-import android.preference.ListPreference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
@@ -154,7 +153,7 @@ public class RawLocationProbe extends Probe implements LocationListener
 
         screen.addPreference(enabled);
 
-        ListPreference duration = new ListPreference(context);
+        FlexibleListPreference duration = new FlexibleListPreference(context);
         duration.setKey(RawLocationProbe.FREQUENCY);
         duration.setDefaultValue(Probe.DEFAULT_FREQUENCY);
         duration.setEntryValues(R.array.probe_satellite_frequency_values);

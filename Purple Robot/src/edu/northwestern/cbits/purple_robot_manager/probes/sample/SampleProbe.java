@@ -18,10 +18,10 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
-import android.preference.ListPreference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
@@ -137,7 +137,7 @@ public class SampleProbe extends Probe
         // Adding a frequency parameter that limits how frequently the probe can
         // sample data...
 
-        ListPreference duration = new ListPreference(context);
+        FlexibleListPreference duration = new FlexibleListPreference(context);
         duration.setKey(SampleProbe.FREQUENCY);
         duration.setDefaultValue(Probe.DEFAULT_FREQUENCY);
         duration.setEntryValues(R.array.probe_builtin_frequency_values);

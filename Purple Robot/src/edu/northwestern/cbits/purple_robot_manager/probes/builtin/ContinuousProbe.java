@@ -16,11 +16,10 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.preference.CheckBoxPreference;
-import android.preference.ListPreference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
@@ -102,7 +101,7 @@ public abstract class ContinuousProbe extends Probe
 
         screen.addPreference(enabled);
 
-        ListPreference duration = new ListPreference(context);
+        FlexibleListPreference duration = new FlexibleListPreference(context);
         duration.setKey("config_probe_" + key + "_frequency");
         duration.setEntryValues(this.getResourceFrequencyValues());
         duration.setEntries(this.getResourceFrequencyLabels());
@@ -111,7 +110,7 @@ public abstract class ContinuousProbe extends Probe
 
         screen.addPreference(duration);
 
-        ListPreference wakelock = new ListPreference(context);
+        FlexibleListPreference wakelock = new FlexibleListPreference(context);
         wakelock.setKey("config_probe_" + key + "_wakelock");
         wakelock.setEntryValues(R.array.wakelock_values);
         wakelock.setEntries(R.array.wakelock_labels);

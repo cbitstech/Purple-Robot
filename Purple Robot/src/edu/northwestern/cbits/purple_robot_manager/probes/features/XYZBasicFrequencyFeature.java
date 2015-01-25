@@ -16,13 +16,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
-import android.preference.ListPreference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.emory.mathcs.backport.java.util.Arrays;
 import edu.emory.mathcs.backport.java.util.Collections;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
 
 public abstract class XYZBasicFrequencyFeature extends ContinuousProbeFeature
 {
@@ -626,7 +625,7 @@ public abstract class XYZBasicFrequencyFeature extends ContinuousProbeFeature
         // Include bandpass (dynamic)
         // Include lowpass (static)
 
-        ListPreference duration = new ListPreference(context);
+        FlexibleListPreference duration = new FlexibleListPreference(context);
         duration.setKey("config_probe_" + key + "_frequency");
         duration.setEntryValues(R.array.frequency_probe_duration_values);
         duration.setEntries(R.array.frequency_probe_duration_labels);
