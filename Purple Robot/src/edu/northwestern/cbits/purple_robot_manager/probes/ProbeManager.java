@@ -64,7 +64,6 @@ import edu.northwestern.cbits.purple_robot_manager.probes.features.Accelerometer
 import edu.northwestern.cbits.purple_robot_manager.probes.features.AccelerometerFrequencyFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.CallHistoryFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.DeviceInUseFeature;
-import edu.northwestern.cbits.purple_robot_manager.probes.features.FitbitApiFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.GooglePlacesFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.GyroscopeBasicStatisticsFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.JavascriptFeature;
@@ -77,6 +76,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.features.TemperaturePr
 import edu.northwestern.cbits.purple_robot_manager.probes.features.WeatherUndergroundFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.p20.P20FeaturesProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.sample.SampleProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.services.FitbitProbe;
 
 public class ProbeManager
 {
@@ -410,9 +410,9 @@ public class ProbeManager
                 if (places.name(context).equalsIgnoreCase(name))
                     found = true;
             }
-            else if (probe instanceof FitbitApiFeature)
+            else if (probe instanceof FitbitProbe)
             {
-                FitbitApiFeature fitbit = (FitbitApiFeature) probe;
+                FitbitProbe fitbit = (FitbitProbe) probe;
 
                 if (fitbit.name(context).equalsIgnoreCase(name))
                     found = true;

@@ -70,6 +70,13 @@ public class LogManager
         }
     }
 
+    public String getLogUrl(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        return prefs.getString(LogManager.URI, LogManager.URI_DEFAULT);
+    }
+
     public static LogManager getInstance(Context context)
     {
         if (LogManager._sharedInstance != null)

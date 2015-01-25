@@ -48,7 +48,8 @@
         <item>features.ProximityProbeBasicStatisticsFeature</item>
         <item>features.TemperatureProbeBasicStatisticsFeature</item>
         <item>features.GooglePlacesFeature</item>
-        <item>features.FitbitApiFeature</item>
+
+        <item>services.FitbitProbe</item>
         
         <item>builtin.RandomNoiseProbe</item>
         <item>builtin.NfcProbe</item>
