@@ -22,14 +22,12 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.SystemClock;
-import android.preference.ListPreference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebkitLandscapeActivity;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
 import edu.northwestern.cbits.purple_robot_manager.charts.SplineChart;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -376,7 +374,7 @@ public class RotationProbe extends ContinuousProbe implements SensorEventListene
     {
         PreferenceScreen screen = super.preferenceScreen(context, manager);
 
-        ListPreference threshold = new ListPreference(context);
+        FlexibleListPreference threshold = new FlexibleListPreference(context);
         threshold.setKey(RotationProbe.THRESHOLD);
         threshold.setDefaultValue(RotationProbe.DEFAULT_THRESHOLD);
         threshold.setEntryValues(R.array.probe_rotation_threshold);

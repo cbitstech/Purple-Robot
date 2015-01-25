@@ -18,13 +18,12 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
-import android.preference.ListPreference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
 import edu.emory.mathcs.backport.java.util.Arrays;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
@@ -277,7 +276,7 @@ public class GooglePlacesFeature extends Feature
     {
         PreferenceScreen screen = super.preferenceScreen(context, manager);
 
-        ListPreference radius = new ListPreference(context);
+        FlexibleListPreference radius = new FlexibleListPreference(context);
         radius.setKey(GooglePlacesFeature.RADIUS);
         radius.setEntryValues(R.array.feature_google_places_values);
         radius.setEntries(R.array.feature_google_places_labels);

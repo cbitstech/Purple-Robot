@@ -15,13 +15,11 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.SystemClock;
-import android.preference.ListPreference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.RealTimeProbeViewActivity;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
@@ -167,7 +165,7 @@ public class MagneticFieldProbe extends Continuous3DProbe implements SensorEvent
     {
         PreferenceScreen screen = super.preferenceScreen(context, manager);
 
-        ListPreference threshold = new ListPreference(context);
+        FlexibleListPreference threshold = new FlexibleListPreference(context);
         threshold.setKey(MagneticFieldProbe.THRESHOLD);
         threshold.setDefaultValue(MagneticFieldProbe.DEFAULT_THRESHOLD);
         threshold.setEntryValues(R.array.probe_magnetic_threshold);

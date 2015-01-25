@@ -9,11 +9,10 @@ import android.database.Cursor;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Build;
-import android.preference.ListPreference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
@@ -147,7 +146,7 @@ public class GeomagneticRotationProbe extends RotationProbe
 
         screen.removePreference(screen.findPreference(RotationProbe.THRESHOLD));
 
-        ListPreference threshold = new ListPreference(context);
+        FlexibleListPreference threshold = new FlexibleListPreference(context);
         threshold.setKey(GeomagneticRotationProbe.THRESHOLD);
         threshold.setDefaultValue(RotationProbe.DEFAULT_THRESHOLD);
         threshold.setEntryValues(R.array.probe_rotation_threshold);

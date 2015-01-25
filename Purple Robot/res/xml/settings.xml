@@ -17,14 +17,14 @@
 			android:defaultValue="false"/>
 	</PreferenceCategory>
     <PreferenceCategory android:title="@string/config_notifications_category">
-        <ListPreference
+        <edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference
 	        android:key="config_default_notification_sound"
 	        android:entries="@array/sound_effect_labels"
 	        android:entryValues="@array/sound_effect_values"
 	        android:title="@string/config_notification_sound_label"
 	        android:summary="@string/config_notification_sound_summary"
 	        android:defaultValue="@string/value_zero" />
-        <ListPreference
+        <edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference
             android:key="config_json_haptic_pattern"
             android:entries="@array/vibrator_pattern_labels"
             android:entryValues="@array/vibrator_pattern_values"
@@ -36,7 +36,7 @@
    		    android:summary="@string/summary_mute_warnings"
         	android:key="config_mute_warnings"
 			android:defaultValue="false"/>
-        <ListPreference
+        <edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference
             android:key="config_dialog_count"
             android:entries="@array/dialog_count_labels"
             android:entryValues="@array/dialog_count_values"
@@ -99,14 +99,14 @@
 	      	    android:summary="@string/summary_archive_enabled"
 	          	android:key="config_http_archive"
 	          	android:defaultValue="false"/>
-	        <ListPreference
+	        <edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference
 	            android:key="config_http_upload_interval"
 	            android:entries="@array/http_upload_interval_labels"
 	            android:entryValues="@array/http_upload_interval_values"
 	            android:title="@string/config_http_upload_interval_label"
 	            android:summary="@string/config_http_upload_interval_summary"
 	            android:defaultValue="@string/value_zero" />
-	        <ListPreference
+	        <edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference
 	            android:key="config_http_upload_size"
 	            android:entries="@array/http_upload_size_labels"
 	            android:entryValues="@array/http_upload_size_values"
@@ -130,14 +130,14 @@
 				android:title="@string/title_streaming_jackson_upload_enabled"
 	           	android:key="config_enable_streaming_jackson_data_server"
 	           	android:defaultValue="false"/>
-	        <ListPreference
+	        <edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference
 	            android:key="config_streaming_jackson_upload_interval"
 	            android:entries="@array/streaming_jackson_upload_interval_labels"
 	            android:entryValues="@array/streaming_jackson_upload_interval_values"
 	            android:title="@string/config_streaming_jackson_upload_interval_label"
 	            android:summary="@string/config_streaming_jackson_upload_interval_summary"
 	            android:defaultValue="@string/value_300" />
-	        <ListPreference
+	        <edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference
 	            android:key="config_streaming_jackson_upload_size"
 	            android:entries="@array/streaming_jackson_upload_size_labels"
 	            android:entryValues="@array/streaming_jackson_upload_size_values"
@@ -173,7 +173,7 @@
 	      	    android:summary="@string/summary_log_heartbeat"
 	           	android:key="config_log_heartbeat"
 	           	android:defaultValue="false"/>
-	        <ListPreference
+	        <edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference
 	            android:key="config_log_upload_interval"
 	            android:entries="@array/log_upload_interval_labels"
 	            android:entryValues="@array/log_upload_interval_values"
@@ -186,7 +186,7 @@
         </PreferenceScreen>
 	</PreferenceCategory>
 	<PreferenceCategory android:title="@string/config_settings_security">
-        <ListPreference
+        <edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference
             android:key="config_preferred_hash_function"
             android:entries="@array/hash_function_labels"
             android:entryValues="@array/hash_function_values"
@@ -214,7 +214,7 @@
             android:title="@string/config_json_url_label"
             android:dialogMessage="@string/config_json_url_message"
             android:defaultValue="" />
-        <ListPreference
+        <edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference
             android:key="config_json_refresh_interval"
             android:entries="@array/json_refresh_interval_labels"
             android:entryValues="@array/json_refresh_interval_values"

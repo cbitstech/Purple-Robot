@@ -86,7 +86,7 @@ public class PurpleRobotApplication extends Application
                     {
                         if ("EditTextPreference".equals(name))
                             map.put(key, prefs.getString(key, null));
-                        else if ("ListPreference".equals(name))
+                        else if ("ListPreference".equals(name) || "edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference".equals(name))
                             map.put(key, prefs.getString(key, null));
                         else if ("CheckBoxPreference".equals(name))
                         {

@@ -21,11 +21,10 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
-import android.preference.ListPreference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
@@ -269,7 +268,7 @@ public class ApplicationLaunchProbe extends Probe
 
         screen.addPreference(enabled);
 
-        ListPreference duration = new ListPreference(context);
+        FlexibleListPreference duration = new FlexibleListPreference(context);
         duration.setKey(ApplicationLaunchProbe.FREQUENCY);
         duration.setEntryValues(R.array.probe_app_launch_frequency_values);
         duration.setEntries(R.array.probe_app_launch_frequency_labels);

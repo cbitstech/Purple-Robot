@@ -25,16 +25,15 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
-import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.OAuthActivity;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
@@ -374,7 +373,7 @@ public class LinkedInProbe extends Probe
 
         screen.addPreference(enabled);
 
-        ListPreference duration = new ListPreference(context);
+        FlexibleListPreference duration = new FlexibleListPreference(context);
         duration.setKey(LinkedInProbe.FREQUENCY);
         duration.setEntryValues(R.array.probe_low_frequency_values);
         duration.setEntries(R.array.probe_low_frequency_labels);

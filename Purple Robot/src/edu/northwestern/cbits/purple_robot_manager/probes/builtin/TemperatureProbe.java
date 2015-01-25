@@ -13,10 +13,10 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.ListPreference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("SimpleDateFormat")
@@ -216,7 +216,7 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
     {
         PreferenceScreen screen = super.preferenceScreen(context, manager);
 
-        ListPreference threshold = new ListPreference(context);
+        FlexibleListPreference threshold = new FlexibleListPreference(context);
         threshold.setKey(TemperatureProbe.THRESHOLD);
         threshold.setDefaultValue(TemperatureProbe.DEFAULT_THRESHOLD);
         threshold.setEntryValues(R.array.probe_temperature_threshold);
