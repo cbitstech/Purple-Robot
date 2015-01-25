@@ -12,7 +12,6 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -107,10 +106,6 @@ public class FitbitProbe extends Probe
     private static final boolean DEFAULT_ENABLED = false;
 
     private long _lastUpdate = 0;
-    private long _lastFetch = 0;
-
-    private String _token = null;
-    private String _secret = null;
 
     @Override
     public String summary(Context context)
@@ -156,17 +151,10 @@ public class FitbitProbe extends Probe
         e.commit();
     }
 
-    private boolean keystoreInited()
-    {
-        return Keystore.contains("inited");
-    }
-
     private void initKeystore(Context context)
     {
         Keystore.put(FitbitApi.CONSUMER_KEY, context.getString(R.string.fitbit_consumer_key));
         Keystore.put(FitbitApi.CONSUMER_SECRET, context.getString(R.string.fitbit_consumer_secret));
-
-        Keystore.put("inited", "true");
     }
 
     @Override
@@ -178,8 +166,7 @@ public class FitbitProbe extends Probe
         {
             if (prefs.getBoolean(FitbitProbe.ENABLED, false))
             {
-                if (this.keystoreInited() == false)
-                    this.initKeystore(context);
+                this.initKeystore(context);
 
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -194,7 +181,7 @@ public class FitbitProbe extends Probe
                 final FitbitProbe me = this;
                 final long now = System.currentTimeMillis();
 
-                if (token == null || secret == null)
+                if (token == null || secret == null || token.trim().length() == 0 || secret.trim().length() == 0)
                 {
                     String message = context.getString(R.string.message_fitbit_check);
 
@@ -218,7 +205,7 @@ public class FitbitProbe extends Probe
 
                     if (now - this._lastUpdate > 1000 * 60 * 5)
                     {
-                        this._lastFetch = now;
+                        this._lastUpdate = now;
 
                         Runnable r = new Runnable()
                         {
@@ -227,7 +214,6 @@ public class FitbitProbe extends Probe
                                 try
                                 {
                                     JSONObject body = FitbitApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/date/" + dateString + ".json"));
-                                    Log.e("PR", "FITBIT CONTENT: " + body.toString(2));
 
                                     JSONObject summary = body.getJSONObject("summary");
 

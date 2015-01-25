@@ -50,7 +50,8 @@
         <item>features.GooglePlacesFeature</item>
 
         <item>services.FitbitProbe</item>
-        
+        <item>services.JawboneProbe</item>
+
         <item>builtin.RandomNoiseProbe</item>
         <item>builtin.NfcProbe</item>
    		<!-- <item>sample.SampleProbe</item> -->

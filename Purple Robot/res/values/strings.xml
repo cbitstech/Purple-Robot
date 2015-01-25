@@ -905,7 +905,7 @@
 	
 	
 	<!-- Fitbit API Feature -->
-   	<string name="title_fitbit_probe">Fitbit Measurements</string>
+   	<string name="title_fitbit_probe">Fitbit</string>
     <string name="summary_fitbit_probe_desc">Retrieves information from the your online Fitbit profile.</string>
 	<string name="title_authenticate_fitbit_probe">Login to Fitbit</string>	
 	<string name="summary_authenticate_fitbit_probe">Tap to go to the Fitbit website and login to give this device access to your activity data.</string>	
@@ -913,10 +913,21 @@
 	<string name="summary_logout_fitbit_probe">Tap to clear your Fitbit login information and revoke access to this device.</string>	
 	<string name="toast_fitbit_logout">Logged out of Fitbit.</string>	
     <string name="summary_fitbit">Steps: %1$.0f, Goal Progress: %2$.2f%% Complete</string>
-	<string name="title_fitbit_check">Fitbit feature requires authorization</string>	
+	<string name="title_fitbit_check">Fitbit requires authorization</string>
 	<string name="message_fitbit_check">Please login to the Fitbit website from the settings to grant Purple Robot access to your Fitbit account.</string>	
 
-	<string name="config_probe_calibrate_title">Calibrate Probe</string>
+    <!-- Jawbone Probe -->
+    <string name="title_jawbone_probe">Jawbone</string>
+    <string name="summary_jawbone_probe_desc">Retrieves information from the your online Jawbone profile.</string>
+    <string name="title_jawbone_check">Jawbone requires authorization</string>
+    <string name="message_jawbone_check">Please login to the Jawbone website from the settings to grant Purple Robot access to your Jawbone account.</string>
+    <string name="title_authenticate_jawbone_probe">Login to Jawbone</string>
+    <string name="summary_authenticate_jawbone_probe">Tap to go to the Jawbone website and login to give this device access to your activity data.</string>
+    <string name="title_logout_jawbone_probe">Log Out of Jawbone</string>
+    <string name="summary_logout_jawbone_probe">Tap to clear your Jawbone login information and revoke access to this device.</string>
+    <string name="toast_jawbone_logout">Logged out of Jawbone.</string>
+
+    <string name="config_probe_calibrate_title">Calibrate Probe</string>
     <string name="title_enable_calibration_notifications">Enable Calibration Notifications</string>
     <string name="summary_enable_calibration_notifications">Allow the probe to request more information once a sufficient amount of data has been collected</string>
 	<!-- Address Book Label Activity -->
