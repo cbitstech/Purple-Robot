@@ -17,7 +17,6 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -204,7 +203,7 @@ public class SanityManager
                 if (this._lastStatus != SanityCheck.OK)
                 {
                     contentIntent = PendingIntent.getActivity(this._context, 0, new Intent(this._context,
-                            DiagnosticActivity.class), Notification.FLAG_ONGOING_EVENT);
+                            DiagnosticActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
                     if (issueCount == 1)
                     {
