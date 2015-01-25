@@ -593,6 +593,7 @@
         <!-- <item>ScriptErrorCheck</item> -->
         <!-- <item>ServerFailureCheck</item> -->
         <item>UploadProgressCheck</item>
+        <item>GoogleServicesCheck</item>
         <!-- <item>TestErrorCheck</item> -->
         <!-- <item>TestWarningCheck</item> -->
    	</array>
