@@ -52,6 +52,7 @@ android {
         compile 'com.getpebble:pebblekit:2.6.0'
         compile 'com.facebook.android:facebook-android-sdk:3.+'
         compile project(':anthracite-clients-android')
+        compile project(':xsi-android')
         compile fileTree(dir: 'libs', include: '*.jar')
     }
 

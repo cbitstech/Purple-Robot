@@ -1,2 +1,4 @@
 include ':anthracite-clients-android'
 project(':anthracite-clients-android').projectDir = new File(settingsDir, '../anthracite-clients-android')
+include ':xsi-android'
+project(':xsi-android').projectDir = new File(settingsDir, '../xsi-android')

@@ -1,3 +1,6 @@
 [submodule "anthracite-clients-android"]
 	path = anthracite-clients-android
 	url = https://github.com/cbitstech/anthracite-clients-android.git
+[submodule "xsi-android"]
+	path = xsi-android
+	url = https://github.com/cbitstech/xsi-android.git
