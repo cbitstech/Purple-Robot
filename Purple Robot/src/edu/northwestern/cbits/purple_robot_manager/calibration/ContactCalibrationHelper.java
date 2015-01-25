@@ -14,7 +14,6 @@ import android.preference.PreferenceManager;
 import android.provider.CallLog;
 import android.provider.CallLog.Calls;
 import android.telephony.PhoneNumberUtils;
-import android.util.Log;
 
 import edu.emory.mathcs.backport.java.util.Collections;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -37,6 +36,15 @@ public class ContactCalibrationHelper
 
         final SanityManager sanity = SanityManager.getInstance(context);
 
+        int contactsCount = ContactCalibrationHelper.fetchContactRecords(context).size();
+
+        if (contactsCount == 0)
+        {
+            sanity.clearAlert(title);
+
+            return;
+        }
+
         boolean logEnabled = prefs.getBoolean(CommunicationLogProbe.ENABLED, CommunicationLogProbe.DEFAULT_ENABLED);
         boolean logCalibrate = prefs.getBoolean(CommunicationLogProbe.ENABLE_CALIBRATION_NOTIFICATIONS, CommunicationLogProbe.DEFAULT_ENABLE_CALIBRATION_NOTIFICATIONS);
 
@@ -50,7 +58,6 @@ public class ContactCalibrationHelper
         else if (prefs.contains("last_address_book_calibration") == false)
         {
             String message = context.getString(R.string.message_address_book_label_check);
-
             Runnable action = new Runnable()
             {
                 public void run()
@@ -61,6 +68,7 @@ public class ContactCalibrationHelper
                     context.startActivity(intent);
                 }
             };
+
 
             sanity.addAlert(SanityCheck.WARNING, title, message, action);
         }
