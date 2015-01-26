@@ -926,6 +926,7 @@
     <string name="title_logout_jawbone_probe">Log Out of Jawbone</string>
     <string name="summary_logout_jawbone_probe">Tap to clear your Jawbone login information and revoke access to this device.</string>
     <string name="toast_jawbone_logout">Logged out of Jawbone.</string>
+    <string name="summary_jawbone">Steps: %1$.0f, Goal Progress: %2$.2f%% Complete</string>
 
     <string name="config_probe_calibrate_title">Calibrate Probe</string>
     <string name="title_enable_calibration_notifications">Enable Calibration Notifications</string>
