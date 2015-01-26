@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.net.Uri;
+import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
@@ -98,10 +99,6 @@ public class JawboneProbe extends Probe
             {
                 this.initKeystore(context);
 
-//                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-
-//                final String dateString = sdf.format(new Date());
-
                 String token = prefs.getString("oauth_jawbone_token", "");
 
                 final String title = context.getString(R.string.title_jawbone_check);
@@ -127,13 +124,13 @@ public class JawboneProbe extends Probe
                 }
                 else
                 {
-
                     Keystore.put(JawboneApi.USER_TOKEN, token);
 
                     sanity.clearAlert(title);
 
-                    if (now - this._lastUpdate > 1000 * 60 * 5)
+                    if (now - this._lastUpdate > 1000 * 60 * 15) // 15 min refresh interval
                     {
+                        Log.e("PR", "3");
                         this._lastUpdate = now;
 
                         Runnable r = new Runnable()
@@ -142,27 +139,111 @@ public class JawboneProbe extends Probe
                             {
                                 try
                                 {
-                                    JSONObject content = JawboneApi.fetch(context, Uri.parse("https://jawbone.com/nudge/api/v.1.1/users/@me/goals"), "Purple Robot");
+                                    JSONObject goals = JawboneApi.fetch(context, Uri.parse("https://jawbone.com/nudge/api/v.1.1/users/@me/goals"), "Purple Robot");
 
-                                    Log.e("PR", "JAWBONE CONTENT: " + content.toString(2));
-
-/*
                                     Bundle bundle = new Bundle();
                                     bundle.putString("PROBE", me.name(context));
                                     bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
 
+                                    JSONObject data = goals.getJSONObject("data");
+                                    JSONObject remaining = data.getJSONObject("remaining_for_day");
+
+                                    if (data.has("move_steps"))
+                                    {
+                                        double goalSteps = data.getDouble("move_steps");
+                                        double remainingSteps = remaining.getDouble("move_steps_remaining");
+
+                                        bundle.putDouble("STEPS_GOAL", goalSteps);
+                                        bundle.putDouble("GOAL_STEPS", goalSteps - remainingSteps);
+                                    }
+
+                                    if (data.has("sleep_total"))
+                                    {
+                                        double goalSleep = data.getDouble("sleep_total");
+                                        double remainingSleep = remaining.getDouble("sleep_seconds_remaining");
+
+                                        bundle.putDouble("SLEEP_GOAL", goalSleep);
+                                        bundle.putDouble("GOAL_SLEEP", goalSleep - remainingSleep);
+                                    }
+
+                                    if (remaining.has("intake_calories_remaining"))
+                                        bundle.putDouble("CALORIES_REMAINING", remaining.getDouble("intake_calories_remaining"));
+
+                                    JSONObject mood = JawboneApi.fetch(context, Uri.parse("https://jawbone.com/nudge/api/v.1.1/users/@me/mood"), "Purple Robot");
+                                    data = mood.getJSONObject("data");
+
+                                    if (data.has("sub_type"))
+                                    {
+                                        bundle.putString("MOOD_TITLE", data.getString("title"));
+                                        bundle.putDouble("MOOD_TIMESTAMP", data.getDouble("time_updated"));
+
+                                        switch(data.getInt("sub_type"))
+                                        {
+                                            case 1:
+                                                bundle.putDouble("MOOD", 8.0);
+                                                break;
+                                            case 2:
+                                                bundle.putDouble("MOOD", 7.0);
+                                                break;
+                                            case 3:
+                                                bundle.putDouble("MOOD", 6.0);
+                                                break;
+                                            case 8:
+                                                bundle.putDouble("MOOD", 5.0);
+                                                break;
+                                            case 4:
+                                                bundle.putDouble("MOOD", 4.0);
+                                                break;
+                                            case 5:
+                                                bundle.putDouble("MOOD", 3.0);
+                                                break;
+                                            case 6:
+                                                bundle.putDouble("MOOD", 2.0);
+                                                break;
+                                            case 7:
+                                                bundle.putDouble("MOOD", 1.0);
+                                                break;
+
+                                        }
+                                    }
+
+                                    JSONObject moves = JawboneApi.fetch(context, Uri.parse("https://jawbone.com/nudge/api/v.1.1/users/@me/noves"), "Purple Robot");
+                                    data = moves.getJSONObject("data");
+
+                                    if (moves.has("items"))
+                                    {
+                                        JSONObject item = data.getJSONArray("items").getJSONObject(0);
+
+                                        bundle.putDouble("DISTANCE", item.getDouble("distance"));
+                                        bundle.putDouble("STEPS", item.getDouble("steps"));
+                                        bundle.putDouble("ACTIVE_TIME", item.getDouble("active_time"));
+                                        bundle.putDouble("LONGEST_ACTIVE", item.getDouble("longest_active"));
+                                        bundle.putDouble("INACTIVE_TIME", item.getDouble("inactive_time"));
+                                        bundle.putDouble("LONGEST_IDLE", item.getDouble("longest_idle"));
+                                        bundle.putDouble("CALORIES", item.getDouble("calories"));
+                                        bundle.putDouble("BMR_DAY", item.getDouble("bmr_day"));
+                                        bundle.putDouble("WO_CALORIES", item.getDouble("wo_calories"));
+                                        bundle.putDouble("WO_TIME", item.getDouble("wo_time"));
+                                        bundle.putDouble("WO_ACTIVE_TIME", item.getDouble("wo_active_time"));
+                                        bundle.putDouble("WO_COUNT", item.getDouble("wo_count"));
+                                    }
+
                                     me.transmitData(context, bundle);
-*/
+
                                 }
-                                catch (JSONException e)
+                                catch (Exception e)
                                 {
                                     e.printStackTrace();
                                 }
                             }
                         };
 
+                        Log.e("PR", "3.5");
+
+
                         Thread t = new Thread(r);
                         t.start();
+                        Log.e("PR", "3.9");
                     }
                 }
 
@@ -315,13 +396,12 @@ public class JawboneProbe extends Probe
         return screen;
     }
 
-    /*
     @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
-        double steps = bundle.getDouble(JawboneProbe.STEPS);
-        double progress = bundle.getDouble(JawboneProbe.GOAL_STEPS_RATIO) * 100;
+        double steps = bundle.getDouble("STEPS_GOAL");
+        double progress = (bundle.getDouble("GOAL_STEPS") / steps) * 100;
 
         return String.format(context.getResources().getString(R.string.summary_jawbone), steps, progress);
-    } */
+    }
 }

@@ -385,6 +385,10 @@ public class FitbitProbe extends Probe
                                 {
                                     e.printStackTrace();
                                 }
+                                catch (Exception e)
+                                {
+                                    e.printStackTrace();
+                                }
                             }
                         };
 
