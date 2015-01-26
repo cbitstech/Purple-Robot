@@ -14,7 +14,6 @@ import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 
 import java.util.HashMap;
@@ -188,8 +187,6 @@ public class SettingsActivity extends ActionBarActivity
                     this.setPreferenceScreen(screen);
                     me.setTitle(SettingsActivity._screens.get(key).getTitle());
 
-                    Log.e("PR", "++++*******************");
-
                     for (int i = 0; i < screen.getPreferenceCount(); i++)
                     {
                         Preference pref = screen.getPreference(i);
@@ -200,8 +197,6 @@ public class SettingsActivity extends ActionBarActivity
 
                             flexible.setContext(me);
                         }
-
-                        Log.e("PR", "PREF: " + pref.getKey() + " -- " + pref.getClass().getCanonicalName());
                     }
                 }
             }
@@ -231,13 +226,9 @@ public class SettingsActivity extends ActionBarActivity
 
         // Iterate and recurse...
 
-        Log.e("PR", "**********************");
-
         for (int i = 0; i < screen.getPreferenceCount(); i++)
         {
             Preference pref = screen.getPreference(i);
-
-            Log.e("PR", "PREF: " + pref.getKey() + " -- " + pref.getClass().getCanonicalName());
 
             // If this is a preference group, recursively map it.
 
