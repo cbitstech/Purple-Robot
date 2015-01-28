@@ -41,7 +41,7 @@ public class LocationCalibrationHelper
 
             cursor.close();
 
-            if (now - lastCalibration > (1000L * 60 * 60 * 24 * 30) && count > 500)
+            if (now - lastCalibration > (1000L * 60L * 60L * 24L * 30L) && count > 500)
             {
                 Runnable action = new Runnable()
                 {
@@ -55,6 +55,10 @@ public class LocationCalibrationHelper
                 };
 
                 sanity.addAlert(SanityCheck.WARNING, title, message, action);
+            }
+            else
+            {
+                sanity.clearAlert(title);
             }
         }
     }
