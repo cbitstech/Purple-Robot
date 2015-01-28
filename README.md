@@ -36,7 +36,7 @@ This will check out the Purple Robot app as well as some supporting technologies
     git submodule init
     git submodule update
 
-These commands will retrieve the [Anthracite](https://github.com/cbitstech/anthracite-clients-android) logging dependency.
+These commands will retrieve the [Anthracite](https://github.com/cbitstech/anthracite-clients-android) logging and [XSI-Android](https://github.com/cbitstech/xsi-android) service integration dependencies.
 
 ### Building Purple Robot from the command line
 
