@@ -211,6 +211,9 @@ public class WebkitActivity extends ActionBarActivity
         {
             Intent dataIntent = new Intent(this, LegacyProbeViewerActivity.class);
 
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB)
+                dataIntent = new Intent(this, ProbeViewerActivity.class);
+
             dataIntent.putExtra("probe_name", this.getIntent().getStringExtra("probe_name"));
             dataIntent.putExtra("probe_bundle", this.getIntent().getParcelableExtra("probe_bundle"));
 
