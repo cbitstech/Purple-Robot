@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="edu.northwestern.cbits.purple_robot_manager"
 	xmlns:tools="http://schemas.android.com/tools"
-	android:versionCode="10526" android:versionName="1.5.26">
+	android:versionCode="10527" android:versionName="1.5.27">
    	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
