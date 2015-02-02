@@ -140,10 +140,9 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
 
             return true;
         }
-        else if (ActivityDetectionProbe._apiClient != null)
+        else if (ActivityDetectionProbe._apiClient != null && ActivityDetectionProbe._apiClient.isConnected())
         {
-            ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(ActivityDetectionProbe._apiClient,
-                    this._pendingIntent);
+            ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(ActivityDetectionProbe._apiClient, this._pendingIntent);
 
             ActivityDetectionProbe._apiClient.unregisterConnectionCallbacks(this);
             ActivityDetectionProbe._apiClient.unregisterConnectionFailedListener(this);
