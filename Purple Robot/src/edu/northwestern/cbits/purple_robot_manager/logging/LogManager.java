@@ -38,9 +38,9 @@ public class LogManager
 
     public LogManager(Context context)
     {
-        String userId = EncryptionManager.getInstance().getUserHash(context, false);
+        String userHash = EncryptionManager.getInstance().getUserHash(context);
 
-        this._logger = Logger.getInstance(context, userId);
+        this._logger = Logger.getInstance(context, userHash);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 

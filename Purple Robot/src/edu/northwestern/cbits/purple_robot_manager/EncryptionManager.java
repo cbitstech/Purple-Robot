@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
@@ -32,6 +33,8 @@ import android.net.Uri;
 import android.net.Uri.Builder;
 import android.preference.PreferenceManager;
 import android.util.Base64;
+import android.util.Log;
+
 import edu.emory.mathcs.backport.java.util.Arrays;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.SettingsKeys;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -360,20 +363,63 @@ public class EncryptionManager
         return false;
     }
 
-    public void setConfigUri(Context context, Uri jsonConfigUri)
+    public void setConfigUri(Context context, Uri configUri)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         Editor e = prefs.edit();
 
-        if (jsonConfigUri != null)
-            e.putString(SettingsKeys.CONFIG_URL, jsonConfigUri.toString());
+        if (configUri != null)
+        {
+            Builder builder = new Builder();
+
+            builder.scheme(configUri.getScheme());
+            builder.encodedAuthority(configUri.getAuthority());
+
+            if (configUri.getPath() != null)
+                builder.encodedPath(configUri.getPath());
+
+            if (configUri.getFragment() != null)
+                builder.encodedFragment(configUri.getFragment());
+
+            String query = configUri.getQuery();
+
+            ArrayList<String> keys = new ArrayList<String>();
+
+            if (query != null)
+            {
+                String[] params = query.split("&");
+
+                for (String param : params)
+                {
+                    String[] components = param.split("=");
+
+                    keys.add(components[0]);
+                }
+            }
+
+            for (String key : keys)
+            {
+                if ("user_id".equals(key))
+                {
+                    // Skip for now.
+                }
+                else
+                    builder.appendQueryParameter(key, configUri.getQueryParameter(key));
+            }
+
+            builder.appendQueryParameter("user_id", this.getUserId(context));
+
+            configUri = builder.build();
+
+            e.putString(SettingsKeys.CONFIG_URL, configUri.toString());
+        }
         else
             e.remove(SettingsKeys.CONFIG_URL);
 
         e.commit();
     }
 
-    public Uri getConfigUri(Context context, String newUserId)
+    public Uri getConfigUri(Context context)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -413,14 +459,7 @@ public class EncryptionManager
             for (String key : keys)
             {
                 if ("user_id".equals(key))
-                {
-                    // Save id - don't keep in URL...
-
-                    if (newUserId == null)
-                        this.setUserId(context, uri.getQueryParameter(key));
-                    else
-                        this.setUserId(context, newUserId);
-                }
+                    this.setUserId(context, uri.getQueryParameter(key));
                 else
                     builder.appendQueryParameter(key, uri.getQueryParameter(key));
             }
@@ -428,8 +467,6 @@ public class EncryptionManager
             builder.appendQueryParameter("user_id", this.getUserId(context));
 
             uri = builder.build();
-
-            this.setConfigUri(context, uri);
 
             return uri;
         }
@@ -449,8 +486,6 @@ public class EncryptionManager
 
     public void setUserId(Context context, String userId)
     {
-        this.getConfigUri(context, userId);
-
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         HashMap<String, Object> payload = new HashMap<String, Object>();
@@ -463,6 +498,8 @@ public class EncryptionManager
         Editor e = prefs.edit();
         e.putString(SettingsKeys.USER_ID_KEY, userId);
         e.commit();
+
+        this.setConfigUri(context, Uri.parse(prefs.getString(SettingsKeys.CONFIG_URL, context.getString(R.string.json_config_url))));
     }
 
     public String createHash(Context context, String name)
