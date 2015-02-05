@@ -63,7 +63,6 @@ public class LegacyJSONConfigFile
     public static final String FIRST_RUN = "json_config_first_run";
 
     public static final String USER_ID = "user_id";
-    public static final String USER_HASH = "user_hash";
     public static final String JSON_CONFIGURATION = "json_configuration_contents";
     public static final String JSON_LAST_UPDATE = "json_configuration_last_update";
     public static final String JSON_LAST_HASH = "json_configuration_last_update_hash";
@@ -87,7 +86,7 @@ public class LegacyJSONConfigFile
 
                 final EncryptionManager encryption = EncryptionManager.getInstance();
 
-                Uri uri = encryption.getConfigUri(context, null);
+                Uri uri = encryption.getConfigUri(context);
 
                 if (uri != null && uri.toString().trim().length() > 0)
                 {
@@ -103,8 +102,7 @@ public class LegacyJSONConfigFile
                         {
                             public java.security.cert.X509Certificate[] getAcceptedIssuers()
                             {
-                                return new java.security.cert.X509Certificate[]
-                                {};
+                                return new java.security.cert.X509Certificate[]{};
                             }
 
                             public void checkClientTrusted(X509Certificate[] chain, String authType)

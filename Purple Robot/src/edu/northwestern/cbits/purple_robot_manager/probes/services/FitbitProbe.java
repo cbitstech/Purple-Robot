@@ -406,7 +406,7 @@ public class FitbitProbe extends Probe
 
     private void fetchAuth(Context context)
     {
-        String userId = EncryptionManager.getInstance().getUserHash(context, false);
+        String userId = EncryptionManager.getInstance().getUserHash(context);
 
         Intent intent = new Intent(context, OAuthActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
