@@ -229,6 +229,10 @@ public class RunningSoftwareProbe extends Probe
         {
             LogManager.getInstance(context).logException(ex);
         }
+        catch (NullPointerException ex)
+        {
+            LogManager.getInstance(context).logException(ex);
+        }
 
         if (category == null)
             category = context.getString(R.string.app_category_unknown);
