@@ -12,7 +12,7 @@ public class SettingsKeys
     public static final String ZIP_ARCHIVES_KEY = "config_mail_archives";
     public static final String DELETE_ARCHIVES_KEY = "config_delete_archives";
     public static final String USER_ID_KEY = "config_user_id";
-    public static final String USER_HASH_KEY = "config_user_hash";
+    public static final String CONFIG_URL = "config_json_url";
     public static final String CHECK_UPDATES_KEY = "config_hockey_update";
     public static final String TRIGGERS_SCREEN_KEY = "config_triggers_screen";
     public static final String MODELS_SCREEN_KEY = "config_models_screen";

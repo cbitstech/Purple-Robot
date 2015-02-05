@@ -19,8 +19,6 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
@@ -90,21 +88,6 @@ public class StartActivity extends ActionBarActivity
     private ContentObserver _observer = null;
     protected HashMap<String, Boolean> _enabledCache = new HashMap<String, Boolean>();
 
-    private static OnSharedPreferenceChangeListener _prefListener = new OnSharedPreferenceChangeListener()
-    {
-        @Override
-        public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
-        {
-            if (SettingsKeys.USER_ID_KEY.equals(key))
-            {
-                Editor e = prefs.edit();
-
-                e.remove(SettingsKeys.USER_HASH_KEY);
-                e.commit();
-            }
-        }
-    };
-
     private SharedPreferences getPreferences(Context context)
     {
         if (this.prefs == null)
@@ -148,8 +131,6 @@ public class StartActivity extends ActionBarActivity
         this.setContentView(R.layout.layout_startup_activity);
 
         ManagerService.setupPeriodicCheck(this);
-
-        sharedPrefs.registerOnSharedPreferenceChangeListener(StartActivity._prefListener);
 
         final StartActivity me = this;
 

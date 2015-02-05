@@ -535,15 +535,11 @@ public class LegacyJSONConfigFile
     private void updateSharedPreferences(Context context)
     {
         String userId = null;
-        String userHash = null;
 
         try
         {
             if (this.parameters.has(LegacyJSONConfigFile.USER_ID))
                 userId = this.parameters.getString(LegacyJSONConfigFile.USER_ID);
-
-            if (this.parameters.has(LegacyJSONConfigFile.USER_HASH))
-                userHash = this.parameters.getString(LegacyJSONConfigFile.USER_HASH);
         }
         catch (JSONException e)
         {
@@ -554,7 +550,7 @@ public class LegacyJSONConfigFile
         Editor editor = prefs.edit();
 
         if (userId == null)
-            userId = prefs.getString("config_user_id", null);
+            userId = EncryptionManager.getInstance().getUserId(context);
 
         if (userId == null)
         {
@@ -570,35 +566,8 @@ public class LegacyJSONConfigFile
             }
         }
 
-        if (userId != null && userHash == null)
-        {
-            try
-            {
-                MessageDigest md = MessageDigest.getInstance("MD5");
-                byte[] digest = md.digest(userId.getBytes("UTF-8"));
-
-                userHash = (new BigInteger(1, digest)).toString(16);
-
-                while (userHash.length() < 32)
-                {
-                    userHash = "0" + userHash;
-                }
-            }
-            catch (NoSuchAlgorithmException e)
-            {
-                LogManager.getInstance(context).logException(e);
-            }
-            catch (UnsupportedEncodingException e)
-            {
-                LogManager.getInstance(context).logException(e);
-            }
-        }
-
         if (userId != null)
-            editor.putString("config_user_id", userId);
-
-        if (userHash != null)
-            editor.putString("config_user_hash", userHash);
+            EncryptionManager.getInstance().setUserId(context, userId);
 
         if (this.parameters.has(LegacyJSONConfigFile.FEATURES))
         {
