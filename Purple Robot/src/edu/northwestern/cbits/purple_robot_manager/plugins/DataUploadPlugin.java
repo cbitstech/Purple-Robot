@@ -11,6 +11,7 @@ import java.net.UnknownHostException;
 import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -131,7 +132,10 @@ public abstract class DataUploadPlugin extends OutputPlugin
             prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         if (payload == null || payload.trim().length() == 0)
+        {
+            LogManager.getInstance(context).log("null_or_empty_payload", null);
             return DataUploadPlugin.RESULT_SUCCESS;
+        }
 
         final DataUploadPlugin me = this;
 
@@ -155,10 +159,6 @@ public abstract class DataUploadPlugin extends OutputPlugin
 
                 jsonMessage.put(OPERATION_KEY, "SubmitProbes");
 
-                // if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
-                // payload = Normalizer.normalize(payload,
-                // Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
-
                 payload = payload.replaceAll("\r", "");
                 payload = payload.replaceAll("\n", "");
 
@@ -172,7 +172,7 @@ public abstract class DataUploadPlugin extends OutputPlugin
 
                 byte[] checksummed = (jsonMessage.get(USER_HASH_KEY).toString()
                         + jsonMessage.get(OPERATION_KEY).toString() + jsonMessage.get(PAYLOAD_KEY).toString())
-                        .getBytes("UTF-8"); // .getBytes("US-ASCII");
+                        .getBytes("UTF-8");
 
                 byte[] digest = md.digest(checksummed);
 
@@ -217,8 +217,7 @@ public abstract class DataUploadPlugin extends OutputPlugin
                 String title = me.getContext().getString(R.string.notify_upload_data);
 
                 Notification note = new Notification(R.drawable.ic_note_normal, title, System.currentTimeMillis());
-                PendingIntent contentIntent = PendingIntent.getActivity(me.getContext(), 0, new Intent(me.getContext(),
-                        StartActivity.class), Notification.FLAG_ONGOING_EVENT);
+                PendingIntent contentIntent = PendingIntent.getActivity(me.getContext(), 0, new Intent(me.getContext(), StartActivity.class), Notification.FLAG_ONGOING_EVENT);
 
                 note.setLatestEventInfo(me.getContext(), title, title, contentIntent);
 
@@ -226,8 +225,7 @@ public abstract class DataUploadPlugin extends OutputPlugin
 
                 String body = null;
 
-                String uriString = prefs.getString(DataUploadPlugin.UPLOAD_URI,
-                        context.getString(R.string.sensor_upload_url));
+                String uriString = prefs.getString(DataUploadPlugin.UPLOAD_URI, context.getString(R.string.sensor_upload_url));
 
                 URI siteUri = new URI(uriString);
 
@@ -242,8 +240,7 @@ public abstract class DataUploadPlugin extends OutputPlugin
 
                 httpPost.setEntity(entity);
 
-                String uploadMessage = String.format(context.getString(R.string.message_transmit_bytes), (httpPost
-                        .getEntity().getContentLength() / 1024));
+                String uploadMessage = String.format(context.getString(R.string.message_transmit_bytes), (httpPost.getEntity().getContentLength() / 1024));
                 me.broadcastMessage(uploadMessage, false);
 
                 HttpResponse response = httpClient.execute(httpPost);
@@ -302,21 +299,26 @@ public abstract class DataUploadPlugin extends OutputPlugin
                                 (httpPost.getEntity().getContentLength() / 1024));
 
                         me.broadcastMessage(uploadedMessage, false);
+
+                        return DataUploadPlugin.RESULT_SUCCESS;
                     }
                     else
-                        me.broadcastMessage(context.getString(R.string.message_checksum_failed), true);
+                    {
+                        HashMap<String, Object> logPayload = new HashMap<String, Object>();
+                        logPayload.put("remote_checksum", json.getString(CHECKSUM_KEY));
+                        logPayload.put("local_checksum", responseChecksum);
 
-                    return DataUploadPlugin.RESULT_SUCCESS;
+                        LogManager.getInstance(context).log("null_or_empty_payload", logPayload);
+
+                        me.broadcastMessage(context.getString(R.string.message_checksum_failed), true);
+                    }
+
+                    return DataUploadPlugin.RESULT_ERROR;
                 }
                 else
                 {
                     String errorMessage = String.format(context.getString(R.string.message_server_error), status);
                     me.broadcastMessage(errorMessage, true);
-
-                    String payloadString = json.getString("Payload");
-
-                    if (payloadString.length() > 512)
-                        payloadString = payloadString.substring(payloadString.length() - 512);
                 }
             }
             catch (HttpHostConnectException e)
