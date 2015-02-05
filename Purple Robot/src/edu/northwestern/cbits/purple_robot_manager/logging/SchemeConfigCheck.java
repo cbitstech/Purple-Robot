@@ -8,6 +8,7 @@ import java.util.Map;
 
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.LegacySettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.SettingsActivity;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.SettingsKeys;
 import jscheme.JScheme;
 import jscheme.SchemeException;
 import jsint.Evaluator;
@@ -126,7 +127,7 @@ public class SchemeConfigCheck extends SanityCheck
                                         {
                                             boolean mismatched = true;
 
-                                            if ("config_json_url".equals(key))
+                                            if (SettingsKeys.CONFIG_URL.equals(key))
                                             {
                                                 if (pref.indexOf(cfgObject.toString()) == 0)
                                                     mismatched = false;
@@ -135,8 +136,7 @@ public class SchemeConfigCheck extends SanityCheck
                                             if (mismatched)
                                             {
                                                 this._errorLevel = SanityCheck.WARNING;
-                                                this._errorMessage = context.getString(
-                                                        R.string.scheme_config_check_changed, key);
+                                                this._errorMessage = context.getString(R.string.scheme_config_check_changed, key);
                                             }
                                         }
                                     }

@@ -15,6 +15,8 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.SettingsKeys;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
 public class PurpleRobotApplication extends Application
@@ -46,8 +48,10 @@ public class PurpleRobotApplication extends Application
 
             if (value instanceof String)
             {
-                if ("config_json_url".equals(key))
+                if (SettingsKeys.CONFIG_URL.equals(key))
                     EncryptionManager.getInstance().setConfigUri(context, Uri.parse(value.toString()));
+                else if (SettingsKeys.USER_ID_KEY.equals(key))
+                    EncryptionManager.getInstance().setUserId(context, value.toString());
                 else
                     e.putString(key, value.toString());
             }

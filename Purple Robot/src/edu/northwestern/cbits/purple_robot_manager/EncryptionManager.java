@@ -33,12 +33,14 @@ import android.net.Uri.Builder;
 import android.preference.PreferenceManager;
 import android.util.Base64;
 import edu.emory.mathcs.backport.java.util.Arrays;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.SettingsKeys;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
 public class EncryptionManager
 {
     private static final String CRYPTO_ALGORITHM = "AES/CBC/PKCS5Padding";
-    private static final String JSON_CONFIGURATION_URL = "config_json_url";
+
+    private HashMap<String, String> _cachedHashes = new HashMap<String, String>();
 
     private static final EncryptionManager _instance = new EncryptionManager();
 
@@ -171,18 +173,9 @@ public class EncryptionManager
 
     public String getUserId(Context context)
     {
-        return this.getUserId(context, false);
-    }
-
-    public String getUserId(Context context, boolean log)
-    {
         SharedPreferences prefs = EncryptionManager.getPreferences(context);
 
-        String userId = prefs.getString("config_user_id", null);
-
-        HashMap<String, Object> payload = new HashMap<String, Object>();
-        payload.put("source", "EncryptionManager");
-        payload.put("stored_id", prefs.getString("config_user_id", ""));
+        String userId = prefs.getString(SettingsKeys.USER_ID_KEY, null);
 
         if (userId == null)
         {
@@ -198,53 +191,26 @@ public class EncryptionManager
                 userId = list[0].name;
 
             Editor e = prefs.edit();
-            e.putString("config_user_id", userId);
+            e.putString(SettingsKeys.USER_ID_KEY, userId);
             e.commit();
-
-            payload.put("retrieved_id", userId);
         }
-
-        if (log)
-            LogManager.getInstance(context).log("get_user_id", payload);
 
         return userId;
     }
 
     public String getUserHash(Context context)
     {
-        return this.getUserHash(context, false);
-    }
+        String userId = this.getUserId(context);
 
-    public String getUserHash(Context context, boolean log)
-    {
-        SharedPreferences prefs = EncryptionManager.getPreferences(context);
+        String hash = this._cachedHashes.get(userId);
 
-        String userHash = prefs.getString("config_user_hash", null);
-
-        HashMap<String, Object> payload = new HashMap<String, Object>();
-        payload.put("source", "EncryptionManager");
-        payload.put("stored_hash", prefs.getString("config_user_hash", ""));
-
-        if (userHash == null)
+        if (hash == null)
         {
-            String userId = this.getUserId(context, log);
-
-            userHash = this.createHash(context, userId);
-
-            Editor e = prefs.edit();
-
-            if (userHash != null)
-                e.putString("config_user_hash", userHash);
-
-            e.commit();
-
-            payload.put("retrieved_hash", userHash);
+            hash = this.createHash(context, userId);
+            this._cachedHashes.put(userId, hash);
         }
 
-        if (log)
-            LogManager.getInstance(context).log("get_user_hash", payload);
-
-        return userHash;
+        return hash;
     }
 
     public SecretKeySpec keyForCipher(Context context, String cipherName) throws UnsupportedEncodingException
@@ -400,19 +366,18 @@ public class EncryptionManager
         Editor e = prefs.edit();
 
         if (jsonConfigUri != null)
-            e.putString(EncryptionManager.JSON_CONFIGURATION_URL, jsonConfigUri.toString());
+            e.putString(SettingsKeys.CONFIG_URL, jsonConfigUri.toString());
         else
-            e.remove(EncryptionManager.JSON_CONFIGURATION_URL);
+            e.remove(SettingsKeys.CONFIG_URL);
 
         e.commit();
-
     }
 
     public Uri getConfigUri(Context context, String newUserId)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        String uriString = prefs.getString(EncryptionManager.JSON_CONFIGURATION_URL, null);
+        String uriString = prefs.getString(SettingsKeys.CONFIG_URL, null);
 
         if (uriString != null)
         {
@@ -451,14 +416,10 @@ public class EncryptionManager
                 {
                     // Save id - don't keep in URL...
 
-                    Editor e = prefs.edit();
-
                     if (newUserId == null)
-                        e.putString("config_user_id", uri.getQueryParameter(key));
+                        this.setUserId(context, uri.getQueryParameter(key));
                     else
-                        e.putString("config_user_id", newUserId);
-
-                    e.commit();
+                        this.setUserId(context, newUserId);
                 }
                 else
                     builder.appendQueryParameter(key, uri.getQueryParameter(key));
@@ -476,6 +437,16 @@ public class EncryptionManager
         return null;
     }
 
+    public void restoreDefaultId(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        Editor e = prefs.edit();
+        e.remove(SettingsKeys.USER_ID_KEY);
+        e.commit();
+
+        LogManager.getInstance(context).log("restored_default_user_id", null);
+    }
+
     public void setUserId(Context context, String userId)
     {
         this.getConfigUri(context, userId);
@@ -485,12 +456,12 @@ public class EncryptionManager
         HashMap<String, Object> payload = new HashMap<String, Object>();
         payload.put("source", "EncryptionManager");
         payload.put("new_id", userId);
-        payload.put("old_id", prefs.getString("config_user_id", ""));
+        payload.put("old_id", prefs.getString(SettingsKeys.USER_ID_KEY, ""));
 
         LogManager.getInstance(context).log("set_user_id", payload);
 
         Editor e = prefs.edit();
-        e.putString("config_user_id", userId);
+        e.putString(SettingsKeys.USER_ID_KEY, userId);
         e.commit();
     }
 

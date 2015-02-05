@@ -763,12 +763,7 @@ public abstract class BaseScriptEngine
 
         LogManager.getInstance(this._context).log("restore_default_id", payload);
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
-
-        Editor e = prefs.edit();
-        e.remove("config_user_id");
-
-        e.commit();
+        EncryptionManager.getInstance().restoreDefaultId(this._context);
 
         this.refreshConfigUrl();
     }
