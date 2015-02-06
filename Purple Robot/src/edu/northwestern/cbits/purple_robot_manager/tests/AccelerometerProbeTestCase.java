@@ -13,6 +13,7 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.AccelerometerProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
 
 public class AccelerometerProbeTestCase extends RobotTestCase
 {
@@ -41,7 +42,7 @@ public class AccelerometerProbeTestCase extends RobotTestCase
 
                 if (AccelerometerProbe.NAME.equals(name))
                 {
-                    double[] times = intent.getDoubleArrayExtra("EVENT_TIMESTAMP");
+                    double[] times = intent.getDoubleArrayExtra(ContinuousProbe.EVENT_TIMESTAMP);
 
                     long count = values.getAsLong("count");
                     double start = values.getAsDouble("start");

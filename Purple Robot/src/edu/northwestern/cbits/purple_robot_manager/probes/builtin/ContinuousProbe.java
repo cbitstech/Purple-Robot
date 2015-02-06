@@ -25,6 +25,19 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public abstract class ContinuousProbe extends Probe
 {
+    public static final String EVENT_TIMESTAMP = "EVENT_TIMESTAMP";
+    public static final String SENSOR_TIMESTAMP = "SENSOR_TIMESTAMP";
+
+    public static final String SENSOR_MAXIMUM_RANGE = "MAXIMUM_RANGE";
+    public static final String SENSOR_NAME = "NAME";
+    public static final String SENSOR_POWER = "POWER";
+    public static final String SENSOR_TYPE = "TYPE";
+    public static final String SENSOR_VENDOR = "VENDOR";
+    public static final String SENSOR_VERSION = "VERSION";
+    public static final String SENSOR_RESOLUTION = "RESOLUTION";
+    public static final String BUNDLE_SENSOR = "SENSOR";
+    public static final String SENSOR_ACCURACY = "ACCURACY";
+
     public static final String PROBE_THRESHOLD = "threshold";
 
     protected static final boolean DEFAULT_ENABLED = false;

@@ -34,9 +34,12 @@ import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.AccelerometerProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.Continuous3DProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
 
 public class PebbleProbe extends Continuous3DProbe
 {
+    private static final String FIRMWARE_VERSION = "FIRMWARE_VERSION";
+
     private static UUID WATCHAPP_UUID = UUID.fromString("3cab0453-ff04-4594-8223-fa357112c305");
 
     private static final String ENABLED = "config_probe_pebble_enabled";
@@ -210,14 +213,14 @@ public class PebbleProbe extends Continuous3DProbe
                                         long now = System.currentTimeMillis();
 
                                         Bundle data = new Bundle();
-                                        data.putDouble("TIMESTAMP", now / 1000);
-                                        data.putString("PROBE", me.name(me._context));
+                                        data.putDouble(Probe.BUNDLE_TIMESTAMP, now / 1000);
+                                        data.putString(Probe.BUNDLE_PROBE, me.name(me._context));
 
                                         FirmwareVersionInfo info = PebbleKit.getWatchFWVersion(context);
 
-                                        data.putString("FIRMWARE_VERSION", "" + info.getMajor() + "." + info.getMinor() + "." + info.getPoint() + " " + info.getTag());
+                                        data.putString(PebbleProbe.FIRMWARE_VERSION, "" + info.getMajor() + "." + info.getMinor() + "." + info.getPoint() + " " + info.getTag());
 
-                                        data.putDoubleArray("EVENT_TIMESTAMP", timeBuffer);
+                                        data.putDoubleArray(ContinuousProbe.SENSOR_TIMESTAMP, timeBuffer);
 
                                         for (int i = 0; i < fieldNames.length; i++)
                                         {
@@ -253,8 +256,7 @@ public class PebbleProbe extends Continuous3DProbe
 
                                         ProbeValuesProvider.getProvider(context).insertValue(context, PebbleProbe.DB_TABLE, me.databaseSchema(), values);
 
-                                        double[] plotValues =
-                                        { timeBuffer[0] / 1000, x, y, z };
+                                        double[] plotValues = { timeBuffer[0] / 1000, x, y, z };
 
                                         RealTimeProbeViewActivity.plotIfVisible(me.getTitleResource(), plotValues);
                                     }

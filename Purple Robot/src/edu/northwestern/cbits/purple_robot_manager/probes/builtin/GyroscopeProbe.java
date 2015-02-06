@@ -42,8 +42,7 @@ public class GyroscopeProbe extends Continuous3DProbe implements SensorEventList
     private static String Y_KEY = "Y";
     private static String Z_KEY = "Z";
 
-    private static String[] fieldNames =
-    { X_KEY, Y_KEY, Z_KEY };
+    private static String[] fieldNames = { X_KEY, Y_KEY, Z_KEY };
 
     private double _lastX = Double.MAX_VALUE;
     private double _lastY = Double.MAX_VALUE;
@@ -55,6 +54,7 @@ public class GyroscopeProbe extends Continuous3DProbe implements SensorEventList
     private final float valueBuffer[][] = new float[3][BUFFER_SIZE];
     private final int accuracyBuffer[] = new int[BUFFER_SIZE];
     private final double timeBuffer[] = new double[BUFFER_SIZE];
+    private final double sensorTimeBuffer[] = new double[BUFFER_SIZE];
 
     private Map<String, String> _schema = null;
 
@@ -88,10 +88,10 @@ public class GyroscopeProbe extends Continuous3DProbe implements SensorEventList
     {
         Bundle formatted = super.formattedBundle(context, bundle);
 
-        double[] eventTimes = bundle.getDoubleArray("EVENT_TIMESTAMP");
-        double[] x = bundle.getDoubleArray("X");
-        double[] y = bundle.getDoubleArray("Y");
-        double[] z = bundle.getDoubleArray("Z");
+        double[] eventTimes = bundle.getDoubleArray(ContinuousProbe.EVENT_TIMESTAMP);
+        double[] x = bundle.getDoubleArray(Continuous3DProbe.X_KEY);
+        double[] y = bundle.getDoubleArray(Continuous3DProbe.Y_KEY);
+        double[] z = bundle.getDoubleArray(Continuous3DProbe.Z_KEY);
 
         ArrayList<String> keys = new ArrayList<String>();
 
@@ -258,23 +258,9 @@ public class GyroscopeProbe extends Continuous3DProbe implements SensorEventList
         {
             synchronized (this)
             {
-                // Using wall clock instead of sensor clock so readings can be compared...
-                event.timestamp = ((long) now) * 1000;
+                sensorTimeBuffer[bufferIndex] = event.timestamp;
+                timeBuffer[bufferIndex] = now / 1000;
 
-/*                double elapsed = (double) SystemClock.uptimeMillis();
-                double boot = (now - elapsed) * 1000 * 1000;
-
-                double timestamp = event.timestamp + boot;
-
-                if (timestamp > now * (1000 * 1000) * 1.1) // Used to detect if
-                                                           // sensors already
-                                                           // have built-in
-                                                           // times...
-                    timestamp = event.timestamp;
-*/
-                double timestamp = event.timestamp;
-
-                timeBuffer[bufferIndex] = timestamp / 1000000;
                 accuracyBuffer[bufferIndex] = event.accuracy;
 
                 for (int i = 0; i < event.values.length; i++)
@@ -282,8 +268,11 @@ public class GyroscopeProbe extends Continuous3DProbe implements SensorEventList
                     valueBuffer[i][bufferIndex] = event.values[i];
                 }
 
-                double[] plotValues =
-                { timeBuffer[0] / 1000, valueBuffer[0][bufferIndex], valueBuffer[1][bufferIndex], valueBuffer[2][bufferIndex] };
+                double[] plotValues = { timeBuffer[0] / 1000,
+                                        valueBuffer[0][bufferIndex],
+                                        valueBuffer[1][bufferIndex],
+                                        valueBuffer[2][bufferIndex] };
+
                 RealTimeProbeViewActivity.plotIfVisible(this.getTitleResource(), plotValues);
 
                 bufferIndex += 1;
@@ -295,21 +284,22 @@ public class GyroscopeProbe extends Continuous3DProbe implements SensorEventList
                     Bundle data = new Bundle();
 
                     Bundle sensorBundle = new Bundle();
-                    sensorBundle.putFloat("MAXIMUM_RANGE", sensor.getMaximumRange());
-                    sensorBundle.putString("NAME", sensor.getName());
-                    sensorBundle.putFloat("POWER", sensor.getPower());
-                    sensorBundle.putFloat("RESOLUTION", sensor.getResolution());
-                    sensorBundle.putInt("TYPE", sensor.getType());
-                    sensorBundle.putString("VENDOR", sensor.getVendor());
-                    sensorBundle.putInt("VERSION", sensor.getVersion());
+                    sensorBundle.putFloat(ContinuousProbe.SENSOR_MAXIMUM_RANGE, sensor.getMaximumRange());
+                    sensorBundle.putString(ContinuousProbe.SENSOR_NAME, sensor.getName());
+                    sensorBundle.putFloat(ContinuousProbe.SENSOR_POWER, sensor.getPower());
+                    sensorBundle.putFloat(ContinuousProbe.SENSOR_RESOLUTION, sensor.getResolution());
+                    sensorBundle.putInt(ContinuousProbe.SENSOR_TYPE, sensor.getType());
+                    sensorBundle.putString(ContinuousProbe.SENSOR_VENDOR, sensor.getVendor());
+                    sensorBundle.putInt(ContinuousProbe.SENSOR_VERSION, sensor.getVersion());
 
-                    data.putString("PROBE", this.name(this._context));
+                    data.putDouble(Probe.BUNDLE_TIMESTAMP, now / 1000);
+                    data.putString(Probe.BUNDLE_PROBE, this.name(this._context));
 
-                    data.putBundle("SENSOR", sensorBundle);
-                    data.putDouble("TIMESTAMP", now / 1000);
+                    data.putBundle(ContinuousProbe.BUNDLE_SENSOR, sensorBundle);
 
-                    data.putDoubleArray("EVENT_TIMESTAMP", timeBuffer);
-                    data.putIntArray("ACCURACY", accuracyBuffer);
+                    data.putDoubleArray(ContinuousProbe.EVENT_TIMESTAMP, timeBuffer);
+                    data.putDoubleArray(ContinuousProbe.SENSOR_TIMESTAMP, sensorTimeBuffer);
+                    data.putIntArray(ContinuousProbe.SENSOR_ACCURACY, accuracyBuffer);
 
                     for (int i = 0; i < fieldNames.length; i++)
                     {
@@ -381,9 +371,9 @@ public class GyroscopeProbe extends Continuous3DProbe implements SensorEventList
     @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
-        double xReading = bundle.getDoubleArray("X")[0];
-        double yReading = bundle.getDoubleArray("Y")[0];
-        double zReading = bundle.getDoubleArray("Z")[0];
+        double xReading = bundle.getDoubleArray(GyroscopeProbe.X_KEY)[0];
+        double yReading = bundle.getDoubleArray(GyroscopeProbe.Y_KEY)[0];
+        double zReading = bundle.getDoubleArray(GyroscopeProbe.Z_KEY)[0];
 
         return String.format(context.getResources().getString(R.string.summary_gyroscope_probe), xReading, yReading, zReading);
     }

@@ -93,19 +93,19 @@ public class SignificantMotionProbe extends Probe
                         Bundle data = new Bundle();
 
                         Bundle sensorBundle = new Bundle();
-                        sensorBundle.putFloat("MAXIMUM_RANGE", sensor.getMaximumRange());
-                        sensorBundle.putString("NAME", sensor.getName());
-                        sensorBundle.putFloat("POWER", sensor.getPower());
-                        sensorBundle.putFloat("RESOLUTION", sensor.getResolution());
-                        sensorBundle.putInt("TYPE", sensor.getType());
-                        sensorBundle.putString("VENDOR", sensor.getVendor());
-                        sensorBundle.putInt("VERSION", sensor.getVersion());
+                        sensorBundle.putFloat(ContinuousProbe.SENSOR_MAXIMUM_RANGE, sensor.getMaximumRange());
+                        sensorBundle.putString(ContinuousProbe.SENSOR_NAME, sensor.getName());
+                        sensorBundle.putFloat(ContinuousProbe.SENSOR_POWER, sensor.getPower());
+                        sensorBundle.putFloat(ContinuousProbe.SENSOR_RESOLUTION, sensor.getResolution());
+                        sensorBundle.putInt(ContinuousProbe.SENSOR_TYPE, sensor.getType());
+                        sensorBundle.putString(ContinuousProbe.SENSOR_VENDOR, sensor.getVendor());
+                        sensorBundle.putInt(ContinuousProbe.SENSOR_VERSION, sensor.getVersion());
 
-                        data.putString("PROBE", me.name(context));
+                        data.putDouble(Probe.BUNDLE_TIMESTAMP, now / 1000);
+                        data.putString(Probe.BUNDLE_PROBE, me.name(context));
 
-                        data.putBundle("SENSOR", sensorBundle);
-                        data.putDouble("TIMESTAMP", now / 1000);
-                        data.putDouble("EVENT_TIMESTAMP", timestamp);
+                        data.putBundle(ContinuousProbe.BUNDLE_SENSOR, sensorBundle);
+                        data.putDouble(ContinuousProbe.SENSOR_TIMESTAMP, timestamp);
 
                         me.transmitData(me._context, data);
 

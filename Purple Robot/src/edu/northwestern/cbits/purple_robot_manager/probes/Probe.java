@@ -37,7 +37,6 @@ public abstract class Probe
 
     public static final String ENCRYPT_DATA = "encrypt_data";
 
-
     public static final String PROBE_ENABLED = "enabled";
     public static final String PROBE_NAME = "name";
 
