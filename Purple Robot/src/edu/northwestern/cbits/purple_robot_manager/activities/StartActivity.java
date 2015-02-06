@@ -2,6 +2,7 @@ package edu.northwestern.cbits.purple_robot_manager.activities;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -549,20 +550,27 @@ public class StartActivity extends ActionBarActivity
         this.setIntent(intent);
     }
 
-    private void setJsonUri(Uri jsonConfigUri)
+    private void setJsonUri(Uri configUri)
     {
-        if (jsonConfigUri.getScheme().equals("http") || jsonConfigUri.getScheme().equals("https"))
-            jsonConfigUri = Uri.parse(jsonConfigUri.toString().replace("//pr-config/", "//"));
-        else if (jsonConfigUri.getScheme().equals("cbits-prm") || jsonConfigUri.getScheme().equals("cbits-pr"))
+        if (configUri.getScheme().equals("http") || configUri.getScheme().equals("https"))
+            configUri = Uri.parse(configUri.toString().replace("//pr-config/", "//"));
+        else if (configUri.getScheme().equals("cbits-prm") || configUri.getScheme().equals("cbits-pr"))
         {
-            Uri.Builder b = jsonConfigUri.buildUpon();
+            Uri.Builder b = configUri.buildUpon();
 
             b.scheme("http");
 
-            jsonConfigUri = b.build();
+            configUri = b.build();
         }
 
-        EncryptionManager.getInstance().setConfigUri(this, jsonConfigUri);
+        String userId = configUri.getQueryParameter("user_id");
+
+        if (userId != null)
+            EncryptionManager.getInstance().setUserId(this, userId);
+
+        Log.e("PR", "ACTIVITY SETTING URI: " + configUri);
+
+        EncryptionManager.getInstance().setConfigUri(this, configUri);
 
         final StartActivity me = this;
 

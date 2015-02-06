@@ -118,8 +118,7 @@ public class LegacyJSONConfigFile
                             }
                         };
 
-                        TrustManager[] trustAllCerts =
-                        { trust };
+                        TrustManager[] trustAllCerts = { trust };
 
                         SSLContext sc = null;
 
