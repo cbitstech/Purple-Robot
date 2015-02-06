@@ -22,6 +22,7 @@ import edu.emory.mathcs.backport.java.util.Arrays;
 import edu.emory.mathcs.backport.java.util.Collections;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
 
 public abstract class XYZBasicFrequencyFeature extends ContinuousProbeFeature
 {
@@ -179,10 +180,10 @@ public abstract class XYZBasicFrequencyFeature extends ContinuousProbeFeature
 
     protected void processData(final Context context, Bundle dataBundle)
     {
-        if (dataBundle.containsKey("EVENT_TIMESTAMP") && dataBundle.containsKey("X") && dataBundle.containsKey("Y")
+        if (dataBundle.containsKey(ContinuousProbe.EVENT_TIMESTAMP) && dataBundle.containsKey("X") && dataBundle.containsKey("Y")
                 && dataBundle.containsKey("Z"))
         {
-            double[] incomingTimes = dataBundle.getDoubleArray("EVENT_TIMESTAMP");
+            double[] incomingTimes = dataBundle.getDoubleArray(ContinuousProbe.EVENT_TIMESTAMP);
 
             float[] incomingX = dataBundle.getFloatArray("X");
             float[] incomingY = dataBundle.getFloatArray("Y");

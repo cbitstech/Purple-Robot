@@ -3,6 +3,9 @@ package edu.northwestern.cbits.purple_robot_manager.probes.features;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
+
 import android.content.Context;
 import android.os.Bundle;
 
@@ -39,8 +42,8 @@ public abstract class UnivariateContinuousProbeFeature extends ContinuousProbeFe
 
                     Bundle data = new Bundle();
 
-                    data.putDouble("TIMESTAMP", now / 1000);
-                    data.putString("PROBE", me.name(context));
+                    data.putDouble(Probe.BUNDLE_TIMESTAMP, now / 1000);
+                    data.putString(Probe.BUNDLE_PROBE, me.name(context));
 
                     double maxTime = Double.MIN_VALUE;
                     double minTime = Double.MAX_VALUE;
@@ -84,9 +87,9 @@ public abstract class UnivariateContinuousProbeFeature extends ContinuousProbeFe
     {
         String key = this.valueKey();
 
-        if (dataBundle.containsKey(key) && dataBundle.containsKey("EVENT_TIMESTAMP"))
+        if (dataBundle.containsKey(key) && dataBundle.containsKey(ContinuousProbe.EVENT_TIMESTAMP))
         {
-            double[] incomingTimes = dataBundle.getDoubleArray("EVENT_TIMESTAMP");
+            double[] incomingTimes = dataBundle.getDoubleArray(ContinuousProbe.EVENT_TIMESTAMP);
             float[] values = dataBundle.getFloatArray(key);
 
             if (values != null)
@@ -119,5 +122,4 @@ public abstract class UnivariateContinuousProbeFeature extends ContinuousProbeFe
         return String.format(context.getResources().getString(R.string.summary_univariate_statistics_feature), mean,
                 stdDev, rootMeanSquare);
     }
-
 }

@@ -27,11 +27,11 @@ public class AmbientHumidityProbe extends ContinuousProbe implements SensorEvent
     private static final String DEFAULT_THRESHOLD = "5.0";
 
     public static final String NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.AmbientHumidityProbe";
+    private static final String HUMIDITY = "HUMIDITY";
 
     private static int BUFFER_SIZE = 32;
 
-    private static String[] fieldNames =
-    { "HUMIDITY" };
+    private static String[] fieldNames = { AmbientHumidityProbe.HUMIDITY };
 
     private static final String FREQUENCY = "config_probe_humidity_built_in_frequency";
     private static final String THRESHOLD = "config_probe_humidity_built_in_threshold";
@@ -45,6 +45,7 @@ public class AmbientHumidityProbe extends ContinuousProbe implements SensorEvent
 
     private final float valueBuffer[][] = new float[1][BUFFER_SIZE];
     private final double timeBuffer[] = new double[BUFFER_SIZE];
+    private final double sensorTimeBuffer[] = new double[BUFFER_SIZE];
 
     private int bufferIndex = 0;
 
@@ -61,8 +62,8 @@ public class AmbientHumidityProbe extends ContinuousProbe implements SensorEvent
     {
         Bundle formatted = super.formattedBundle(context, bundle);
 
-        double[] eventTimes = bundle.getDoubleArray("EVENT_TIMESTAMP");
-        double[] humidity = bundle.getDoubleArray("HUMIDITY");
+        double[] eventTimes = bundle.getDoubleArray(ContinuousProbe.EVENT_TIMESTAMP);
+        double[] humidity = bundle.getDoubleArray(AmbientHumidityProbe.HUMIDITY);
 
         ArrayList<String> keys = new ArrayList<String>();
 
@@ -244,23 +245,9 @@ public class AmbientHumidityProbe extends ContinuousProbe implements SensorEvent
         {
             synchronized (this)
             {
-                // Using wall clock instead of sensor clock so readings can be compared...
-                event.timestamp = ((long) now) * 1000;
+                sensorTimeBuffer[bufferIndex] = event.timestamp;
+                timeBuffer[bufferIndex] = now / 1000;
 
-/*                double elapsed = (double) SystemClock.uptimeMillis();
-                double boot = (now - elapsed) * 1000 * 1000;
-
-                double timestamp = event.timestamp + boot;
-
-                if (timestamp > now * (1000 * 1000) * 1.1) // Used to detect if
-                                                           // sensors already
-                                                           // have built-in
-                                                           // times...
-                    timestamp = event.timestamp;
-*/
-                double timestamp = event.timestamp;
-
-                timeBuffer[bufferIndex] = timestamp / 1000000;
                 valueBuffer[0][bufferIndex] = event.values[0];
 
                 bufferIndex += 1;
@@ -272,20 +259,21 @@ public class AmbientHumidityProbe extends ContinuousProbe implements SensorEvent
                     Bundle data = new Bundle();
 
                     Bundle sensorBundle = new Bundle();
-                    sensorBundle.putFloat("MAXIMUM_RANGE", sensor.getMaximumRange());
-                    sensorBundle.putString("NAME", sensor.getName());
-                    sensorBundle.putFloat("POWER", sensor.getPower());
-                    sensorBundle.putFloat("RESOLUTION", sensor.getResolution());
-                    sensorBundle.putInt("TYPE", sensor.getType());
-                    sensorBundle.putString("VENDOR", sensor.getVendor());
-                    sensorBundle.putInt("VERSION", sensor.getVersion());
+                    sensorBundle.putFloat(ContinuousProbe.SENSOR_MAXIMUM_RANGE, sensor.getMaximumRange());
+                    sensorBundle.putString(ContinuousProbe.SENSOR_NAME, sensor.getName());
+                    sensorBundle.putFloat(ContinuousProbe.SENSOR_POWER, sensor.getPower());
+                    sensorBundle.putFloat(ContinuousProbe.SENSOR_RESOLUTION, sensor.getResolution());
+                    sensorBundle.putInt(ContinuousProbe.SENSOR_TYPE, sensor.getType());
+                    sensorBundle.putString(ContinuousProbe.SENSOR_VENDOR, sensor.getVendor());
+                    sensorBundle.putInt(ContinuousProbe.SENSOR_VERSION, sensor.getVersion());
 
-                    data.putString("PROBE", this.name(this._context));
+                    data.putString(Probe.BUNDLE_PROBE, this.name(this._context));
 
-                    data.putBundle("SENSOR", sensorBundle);
-                    data.putDouble("TIMESTAMP", now / 1000);
+                    data.putBundle(ContinuousProbe.BUNDLE_SENSOR, sensorBundle);
+                    data.putDouble(Probe.BUNDLE_TIMESTAMP, now / 1000);
 
-                    data.putDoubleArray("EVENT_TIMESTAMP", timeBuffer);
+                    data.putDoubleArray(ContinuousProbe.EVENT_TIMESTAMP, timeBuffer);
+                    data.putDoubleArray(ContinuousProbe.SENSOR_TIMESTAMP, sensorTimeBuffer);
 
                     for (int i = 0; i < fieldNames.length; i++)
                     {
@@ -309,7 +297,7 @@ public class AmbientHumidityProbe extends ContinuousProbe implements SensorEvent
     @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
-        double humidity = bundle.getDoubleArray("HUMIDITY")[0];
+        double humidity = bundle.getDoubleArray(AmbientHumidityProbe.HUMIDITY)[0];
 
         return String.format(context.getResources().getString(R.string.summary_humidity_probe), humidity);
     }

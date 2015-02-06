@@ -3,6 +3,8 @@ package edu.northwestern.cbits.purple_robot_manager.probes.features;
 import android.content.Context;
 import android.os.Bundle;
 
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
+
 public abstract class XYZContinuousProbeFeature extends ContinuousProbeFeature
 {
     protected static int BUFFER_SIZE = 512;
@@ -22,9 +24,9 @@ public abstract class XYZContinuousProbeFeature extends ContinuousProbeFeature
     {
         if (this.isEnabled(context))
         {
-            if (dataBundle.containsKey("EVENT_TIMESTAMP") && dataBundle.containsKey("X") && dataBundle.containsKey("Y") && dataBundle.containsKey("Z"))
+            if (dataBundle.containsKey(ContinuousProbe.EVENT_TIMESTAMP) && dataBundle.containsKey("X") && dataBundle.containsKey("Y") && dataBundle.containsKey("Z"))
             {
-                double[] incomingTimes = dataBundle.getDoubleArray("EVENT_TIMESTAMP");
+                double[] incomingTimes = dataBundle.getDoubleArray(ContinuousProbe.EVENT_TIMESTAMP);
                 float[] incomingX = dataBundle.getFloatArray("X");
                 float[] incomingY = dataBundle.getFloatArray("Y");
                 float[] incomingZ = dataBundle.getFloatArray("Z");
