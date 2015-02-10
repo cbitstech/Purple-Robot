@@ -761,10 +761,13 @@
         <item>Significant Other</item>
         <item>Friend</item>
         <item>Family</item>
+        <item>Acquaintance</item>
        	<item>Coworker</item>
-       	<item>Acquaintance</item>
        	<item>Customer</item>
-       	<item>Client</item>
+        <item>Supervisor</item>
+        <item>Caretaker</item>
+        <item>Service Provider</item>
+        <item>Religious Figure</item>
        	<item>Stranger</item>
   	</string-array>
 
@@ -781,7 +784,6 @@
        	<item>Shopping</item>
        	<item>Other Recreational Facility</item>
 	</string-array>
-	
 
 	<string-array name="wakelock_labels">
         <item>None</item>

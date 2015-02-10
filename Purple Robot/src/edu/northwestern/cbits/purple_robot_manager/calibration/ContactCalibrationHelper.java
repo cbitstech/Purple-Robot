@@ -81,8 +81,7 @@ public class ContactCalibrationHelper
             return null;
 
         if (ContactCalibrationHelper._cachedPrefs == null)
-            ContactCalibrationHelper._cachedPrefs = PreferenceManager.getDefaultSharedPreferences(context
-                    .getApplicationContext());
+            ContactCalibrationHelper._cachedPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
 
         String group = ContactCalibrationHelper._cachedPrefs.getString("contact_calibration_" + key + "_group", null);
 
