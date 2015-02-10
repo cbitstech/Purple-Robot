@@ -51,6 +51,7 @@
 
         <item>services.FitbitProbe</item>
         <item>services.JawboneProbe</item>
+        <item>services.GitHubProbe</item>
 
         <item>builtin.RandomNoiseProbe</item>
         <item>builtin.NfcProbe</item>
