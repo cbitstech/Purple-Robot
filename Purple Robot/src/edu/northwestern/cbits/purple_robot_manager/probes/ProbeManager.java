@@ -77,6 +77,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.features.WeatherUnderg
 import edu.northwestern.cbits.purple_robot_manager.probes.features.p20.P20FeaturesProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.sample.SampleProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.services.FitbitProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.services.GitHubProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.services.JawboneProbe;
 
 public class ProbeManager
@@ -423,6 +424,13 @@ public class ProbeManager
                 JawboneProbe jawbone = (JawboneProbe) probe;
 
                 if (jawbone.name(context).equalsIgnoreCase(name))
+                    found = true;
+            }
+            else if (probe instanceof GitHubProbe)
+            {
+                GitHubProbe github = (GitHubProbe) probe;
+
+                if (github.name(context).equalsIgnoreCase(name))
                     found = true;
             }
             else if (probe instanceof TwitterProbe)

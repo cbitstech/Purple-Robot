@@ -12,7 +12,6 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -130,7 +129,6 @@ public class JawboneProbe extends Probe
 
                     if (now - this._lastUpdate > 1000 * 60 * 15) // 15 min refresh interval
                     {
-                        Log.e("PR", "3");
                         this._lastUpdate = now;
 
                         Runnable r = new Runnable()
@@ -238,12 +236,8 @@ public class JawboneProbe extends Probe
                             }
                         };
 
-                        Log.e("PR", "3.5");
-
-
                         Thread t = new Thread(r);
                         t.start();
-                        Log.e("PR", "3.9");
                     }
                 }
 
@@ -260,8 +254,6 @@ public class JawboneProbe extends Probe
 
         Intent intent = new Intent(context, OAuthActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-        Log.e("PR", "JBK: " + context.getString(R.string.jawbone_consumer_key) + " -- " + context.getString(R.string.jawbone_consumer_secret));
 
         intent.putExtra(OAuthActivity.CONSUMER_KEY, context.getString(R.string.jawbone_consumer_key));
         intent.putExtra(OAuthActivity.CONSUMER_SECRET, context.getString(R.string.jawbone_consumer_secret));

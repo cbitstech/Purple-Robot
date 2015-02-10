@@ -928,6 +928,18 @@
     <string name="toast_jawbone_logout">Logged out of Jawbone.</string>
     <string name="summary_jawbone">Steps: %1$.0f, Goal Progress: %2$.2f%% Complete</string>
 
+    <!-- GitHub Probe -->
+    <string name="title_github_probe">GitHub</string>
+    <string name="summary_github_probe_desc">Retrieves activity data from the your GitHub account.</string>
+    <string name="title_github_check">GitHub requires authorization</string>
+    <string name="message_github_check">Please login to the GitHub website from the settings to grant Purple Robot access to your GItHub account.</string>
+    <string name="title_authenticate_github_probe">Login to GitHub</string>
+    <string name="summary_authenticate_github_probe">Tap to go to the GitHub website and login to give this device access to your activity data.</string>
+    <string name="title_logout_github_probe">Log Out of GitHub</string>
+    <string name="summary_logout_github_probe">Tap to clear your GitHub login information and revoke access to this device.</string>
+    <string name="toast_github_logout">Logged out of GitHub.</string>
+    <string name="summary_github">Last Commit: %2$s (%1$s)</string>
+
     <string name="config_probe_calibrate_title">Calibrate Probe</string>
     <string name="title_enable_calibration_notifications">Enable Calibration Notifications</string>
     <string name="summary_enable_calibration_notifications">Allow the probe to request more information once a sufficient amount of data has been collected</string>
