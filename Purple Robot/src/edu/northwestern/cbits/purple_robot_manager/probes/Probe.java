@@ -14,7 +14,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
@@ -24,9 +23,6 @@ import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 public abstract class Probe
 {
     public static final String PROBE_READING = "edu.northwestern.cbits.purple_robot.PROBE_READING";
-
-    public static final String DURATION = "DURATION";
-    public static final String PERIOD = "PERIOD";
 
     public static final String PROBE_CALIBRATION_NOTIFICATIONS = "enable_calibration_notifications";
     public static final String PROBE_FREQUENCY = "frequency";
