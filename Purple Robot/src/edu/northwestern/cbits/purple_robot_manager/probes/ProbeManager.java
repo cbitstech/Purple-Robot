@@ -31,7 +31,6 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProb
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.DateCalendarProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.FacebookEventsProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.FacebookProbe;
-import edu.northwestern.cbits.purple_robot_manager.probes.builtin.FoursquareProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.GeomagneticRotationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.GravityProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.HardwareInformationProbe;
@@ -74,6 +73,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.features.WeatherUnderg
 import edu.northwestern.cbits.purple_robot_manager.probes.features.p20.P20FeaturesProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.sample.SampleProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.services.FitbitProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.services.FoursquareProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.services.GitHubProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.services.InstagramProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.services.JawboneProbe;
