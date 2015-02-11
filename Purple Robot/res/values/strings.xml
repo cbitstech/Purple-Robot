@@ -1021,7 +1021,7 @@
 	<string name="confirm_facebook_try_again">Try Again</string>	
     
    	<!-- Twitter API Feature -->
-    <string name="title_twitter_probe">Twitter Probe</string>
+    <string name="title_twitter_probe">Twitter</string>
     <string name="summary_twitter_probe_desc">Collects profile data &amp; tweets from Twitter.</string>
     <string name="config_probe_twitter_encrypt_title">Encrypt Tweet Contents</string>
     <string name="config_probe_twitter_encrypt_summary">Encrypts the contents of posted tweets.</string>

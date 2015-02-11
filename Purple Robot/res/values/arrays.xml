@@ -52,6 +52,7 @@
         <item>services.FitbitProbe</item>
         <item>services.JawboneProbe</item>
         <item>services.GitHubProbe</item>
+        <item>services.TwitterProbe</item>
 
         <item>builtin.RandomNoiseProbe</item>
         <item>builtin.NfcProbe</item>
@@ -73,7 +74,6 @@
         
         <item>builtin.FacebookProbe</item>
         <item>builtin.FacebookEventsProbe</item>
-        <item>builtin.TwitterProbe</item>
         <item>builtin.InstagramProbe</item>
         <item>builtin.LinkedInProbe</item>
         <item>builtin.FoursquareProbe</item>
