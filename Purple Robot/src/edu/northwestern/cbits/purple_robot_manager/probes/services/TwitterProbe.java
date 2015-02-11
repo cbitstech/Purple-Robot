@@ -265,10 +265,10 @@ public class TwitterProbe extends Probe
         Intent intent = new Intent(context, OAuthActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-        intent.putExtra(edu.northwestern.cbits.purple_robot_manager.activities.OAuthActivity.CONSUMER_KEY, context.getString(R.string.twitter_consumer_key));
-        intent.putExtra(edu.northwestern.cbits.purple_robot_manager.activities.OAuthActivity.CONSUMER_SECRET, context.getString(R.string.twitter_consumer_secret));
-        intent.putExtra(edu.northwestern.cbits.purple_robot_manager.activities.OAuthActivity.REQUESTER, "twitter");
-        intent.putExtra(edu.northwestern.cbits.purple_robot_manager.activities.OAuthActivity.CALLBACK_URL, "http://pr-oauth/oauth/twitter");
+        intent.putExtra(OAuthActivity.CONSUMER_KEY, context.getString(R.string.twitter_consumer_key));
+        intent.putExtra(OAuthActivity.CONSUMER_SECRET, context.getString(R.string.twitter_consumer_secret));
+        intent.putExtra(OAuthActivity.REQUESTER, "twitter");
+        intent.putExtra(OAuthActivity.CALLBACK_URL, "http://pr-oauth/oauth/twitter");
         intent.putExtra(OAuthActivity.LOG_URL, LogManager.getInstance(context).getLogUrl(context));
         intent.putExtra(OAuthActivity.HASH_SECRET, userId);
 
