@@ -144,7 +144,7 @@ public class GitHubProbe extends Probe
 
                     sanity.clearAlert(title);
 
-                    if (now - this._lastUpdate > 1000 * 60 * 5) // 5 min refresh interval
+                    if (now - this._lastUpdate > 1000 * 60 * 15) // 15 min refresh interval
                     {
                         this._lastUpdate = now;
 
