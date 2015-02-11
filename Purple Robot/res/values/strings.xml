@@ -1063,7 +1063,7 @@
 	<string name="message_linkedin_check">Please login to the LinkedIn website from the settings to grant Purple Robot access to your LinkedIn account.</string>	
 
 	<!-- Foursquare API Feature -->
-    <string name="title_foursquare_probe">Foursquare Probe</string>
+    <string name="title_foursquare_probe">Foursquare</string>
     <string name="summary_foursquare_probe_desc">Collects activity from Foursquare as well as names for current locations.</string>
 
 	<string name="title_authenticate_foursquare_probe">Login to Foursquare</string>	

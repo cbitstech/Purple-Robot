@@ -55,6 +55,7 @@
         <item>services.TwitterProbe</item>
         <item>services.InstagramProbe</item>
         <item>services.LinkedInProbe</item>
+        <item>services.FoursquareProbe</item>
 
         <item>builtin.RandomNoiseProbe</item>
         <item>builtin.NfcProbe</item>
@@ -76,7 +77,6 @@
         
         <item>builtin.FacebookProbe</item>
         <item>builtin.FacebookEventsProbe</item>
-        <item>builtin.FoursquareProbe</item>
 
         <item>builtin.RawLocationProbe</item>
         <item>builtin.MediaRouterDeviceProbe</item>

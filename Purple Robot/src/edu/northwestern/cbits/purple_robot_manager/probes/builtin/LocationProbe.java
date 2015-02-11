@@ -29,6 +29,7 @@ import edu.northwestern.cbits.purple_robot_manager.calibration.LocationCalibrati
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
+import edu.northwestern.cbits.purple_robot_manager.probes.services.FoursquareProbe;
 import edu.northwestern.cbits.purple_robot_manager.util.DBSCAN;
 
 public class LocationProbe extends Probe implements LocationListener

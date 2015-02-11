@@ -28,7 +28,6 @@ import android.preference.PreferenceManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
-import edu.northwestern.cbits.purple_robot_manager.probes.builtin.FoursquareProbe;
 
 public class OAuthActivity extends Activity
 {
@@ -174,14 +173,6 @@ public class OAuthActivity extends Activity
                         String consumerKey = null;
                         String consumerSecret = null;
                         String callback = null;
-
-                        if ("foursquare".equalsIgnoreCase(requester))
-                        {
-                            apiClass = Foursquare2Api.class;
-                            consumerKey = this.getString(R.string.foursquare_consumer_key);
-                            consumerSecret = this.getString(R.string.foursquare_consumer_secret);
-                            callback = FoursquareProbe.CALLBACK;
-                        }
 
                         if (apiClass != null && consumerKey != null && consumerSecret != null)
                         {
