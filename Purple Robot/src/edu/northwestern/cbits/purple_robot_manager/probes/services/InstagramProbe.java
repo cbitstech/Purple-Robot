@@ -202,6 +202,18 @@ public class InstagramProbe extends Probe
                                                 }
 
                                                 eventBundle.putBoolean("IS_OBFUSCATED", doEncrypt);
+
+                                                try
+                                                {
+                                                    // Sleep so initial load is delivered in order...
+                                                    if (i == 0)
+                                                        Thread.sleep(5000);
+                                                }
+                                                catch (InterruptedException e)
+                                                {
+                                                    e.printStackTrace();
+                                                }
+
                                                 me.transmitData(context, eventBundle);
                                             }
                                         }
