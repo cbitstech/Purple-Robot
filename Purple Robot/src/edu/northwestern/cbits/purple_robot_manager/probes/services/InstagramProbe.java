@@ -11,7 +11,6 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -260,10 +259,10 @@ public class InstagramProbe extends Probe
         Intent intent = new Intent(context, OAuthActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-        intent.putExtra(edu.northwestern.cbits.purple_robot_manager.activities.OAuthActivity.CONSUMER_KEY, context.getString(R.string.instagram_consumer_key));
-        intent.putExtra(edu.northwestern.cbits.purple_robot_manager.activities.OAuthActivity.CONSUMER_SECRET, context.getString(R.string.instagram_consumer_secret));
-        intent.putExtra(edu.northwestern.cbits.purple_robot_manager.activities.OAuthActivity.REQUESTER, "instagram");
-        intent.putExtra(edu.northwestern.cbits.purple_robot_manager.activities.OAuthActivity.CALLBACK_URL, "http://tech.cbits.northwestern.edu/oauth/instagram");
+        intent.putExtra(OAuthActivity.CONSUMER_KEY, context.getString(R.string.instagram_consumer_key));
+        intent.putExtra(OAuthActivity.CONSUMER_SECRET, context.getString(R.string.instagram_consumer_secret));
+        intent.putExtra(OAuthActivity.REQUESTER, "instagram");
+        intent.putExtra(OAuthActivity.CALLBACK_URL, "http://tech.cbits.northwestern.edu/oauth/instagram");
         intent.putExtra(OAuthActivity.LOG_URL, LogManager.getInstance(context).getLogUrl(context));
         intent.putExtra(OAuthActivity.HASH_SECRET, userId);
 
