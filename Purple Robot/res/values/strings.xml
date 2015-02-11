@@ -1049,7 +1049,7 @@
 	<string name="message_instagram_check">Please login to the Instagram website from the settings to grant Purple Robot access to your Instagram account.</string>	
 
 	<!-- LinkedIn API Feature -->
-    <string name="title_linkedin_probe">LinkedIn Probe</string>
+    <string name="title_linkedin_probe">LinkedIn</string>
     <string name="summary_linkedin_probe_desc">Collects profile data &amp; posts from LinkedIn.</string>
     <string name="config_probe_linkedin_encrypt_title">Encrypt LinkedIn Contents</string>
     <string name="config_probe_linkedin_encrypt_summary">Encrypts the contents of data retrieved from LinkedIn.</string>
