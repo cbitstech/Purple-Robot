@@ -1,22 +1,4 @@
-package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
-
-import java.io.UnsupportedEncodingException;
-import java.util.Map;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.scribe.builder.ServiceBuilder;
-import org.scribe.builder.api.LinkedInApi;
-import org.scribe.exceptions.OAuthException;
-import org.scribe.model.OAuthRequest;
-import org.scribe.model.Response;
-import org.scribe.model.Token;
-import org.scribe.model.Verb;
-import org.scribe.oauth.OAuthService;
+package edu.northwestern.cbits.purple_robot_manager.probes.services;
 
 import android.app.Activity;
 import android.content.Context;
@@ -30,43 +12,46 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
+import java.util.Map;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.activities.OAuthActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
+import edu.northwestern.cbits.xsi.oauth.Keystore;
+import edu.northwestern.cbits.xsi.oauth.LinkedInApi;
+import edu.northwestern.cbits.xsi.oauth.OAuthActivity;
 
 public class LinkedInProbe extends Probe
 {
-    public static final String CALLBACK = "http://purple.robot.com/oauth/linkedin";
-
     private static final boolean DEFAULT_ENABLED = false;
-    private static final boolean DEFAULT_ENCRYPT = false;
-
-    protected static final String HOUR_COUNT = "HOUR_COUNT";
+    private static final String OAUTH_TOKEN = "oauth_linkedin_token";
+    private static final String OAUTH_SECRET = "oauth_linkedin_secret";
 
     private static final String ENABLED = "config_probe_linkedin_enabled";
     private static final String FREQUENCY = "config_probe_linkedin_frequency";
     private static final String ENCRYPT_DATA = "config_probe_linkedin_encrypt_data";
+    private static final boolean DEFAULT_ENCRYPT = true;
+    private static final String MOST_RECENT = "\"config_linkedin_most_recent\"" ;
 
     private long _lastCheck = 0;
 
-    private String _token = null;
-    private String _secret = null;
-
     @Override
-    public String name(Context context)
+    public String summary(Context context)
     {
-        return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.LinkedInProbe";
-    }
-
-    @Override
-    public String title(Context context)
-    {
-        return context.getString(R.string.title_linkedin_probe);
+        return context.getString(R.string.summary_linkedin_probe_desc);
     }
 
     @Override
@@ -76,13 +61,24 @@ public class LinkedInProbe extends Probe
     }
 
     @Override
+    public String name(Context context)
+    {
+        return "edu.northwestern.cbits.purple_robot_manager.probes.services.LinkedInProbe";
+    }
+
+    @Override
+    public String title(Context context)
+    {
+        return context.getString(R.string.title_linkedin_probe);
+    }
+
+    @Override
     public void enable(Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
         e.putBoolean(LinkedInProbe.ENABLED, true);
-
         e.commit();
     }
 
@@ -93,11 +89,15 @@ public class LinkedInProbe extends Probe
 
         Editor e = prefs.edit();
         e.putBoolean(LinkedInProbe.ENABLED, false);
-
         e.commit();
     }
 
-    @Override
+    private void initKeystore(Context context)
+    {
+        Keystore.put(LinkedInApi.CONSUMER_KEY, context.getString(R.string.linkedin_consumer_key));
+        Keystore.put(LinkedInApi.CONSUMER_SECRET, context.getString(R.string.linkedin_consumer_secret));
+    }
+
     public boolean isEnabled(final Context context)
     {
         final SharedPreferences prefs = Probe.getPreferences(context);
@@ -110,6 +110,8 @@ public class LinkedInProbe extends Probe
             {
                 synchronized (this)
                 {
+                    this.initKeystore(context);
+
                     long freq = Long.parseLong(prefs.getString(LinkedInProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
                     final boolean doEncrypt = prefs.getBoolean(LinkedInProbe.ENCRYPT_DATA, LinkedInProbe.DEFAULT_ENCRYPT);
 
@@ -119,13 +121,13 @@ public class LinkedInProbe extends Probe
                     {
                         final LinkedInProbe me = this;
 
-                        this._token = prefs.getString("oauth_linkedin_token", null);
-                        this._secret = prefs.getString("oauth_linkedin_secret", null);
+                        final String token  = prefs.getString(LinkedInProbe.OAUTH_TOKEN, null);
+                        final String secret = prefs.getString(LinkedInProbe.OAUTH_SECRET, null);
 
                         final String title = context.getString(R.string.title_linkedin_check);
                         final SanityManager sanity = SanityManager.getInstance(context);
 
-                        if (this._token == null || this._secret == null)
+                        if (token == null || secret == null)
                         {
                             String message = context.getString(R.string.message_linkedin_check);
 
@@ -144,30 +146,19 @@ public class LinkedInProbe extends Probe
                         {
                             sanity.clearAlert(title);
 
-                            Token accessToken = new Token(this._token, this._secret);
-
-                            ServiceBuilder builder = new ServiceBuilder();
-                            builder = builder.provider(LinkedInApi.class);
-                            builder = builder.apiKey(context.getString(R.string.linkedin_consumer_key));
-                            builder = builder.apiSecret(context.getString(R.string.linkedin_consumer_secret));
-
-                            final OAuthService service = builder.build();
-
-                            final OAuthRequest request = new OAuthRequest(Verb.GET, "http://api.linkedin.com/v1/people/~/network/updates?scope=self&type=RECU&type=SHAR&type=VIRL&format=json");
-                            service.signRequest(accessToken, request);
+                            Keystore.put(LinkedInApi.USER_TOKEN, token);
+                            Keystore.put(LinkedInApi.USER_SECRET, secret);
 
                             Runnable r = new Runnable()
                             {
                                 @Override
                                 public void run()
                                 {
+                                    long mostRecent = prefs.getLong(LinkedInProbe.MOST_RECENT, 0);
+
                                     try
                                     {
-                                        long mostRecent = prefs.getLong("config_linkedin_most_recent", 0);
-
-                                        Response response = request.send();
-
-                                        JSONObject root = new JSONObject(response.getBody());
+                                        JSONObject root = LinkedInApi.fetch("http://api.linkedin.com/v1/people/~/network/updates?scope=self&type=RECU&type=SHAR&type=VIRL&format=json");
 
                                         if (root.getInt("_total") > 0)
                                         {
@@ -182,8 +173,8 @@ public class LinkedInProbe extends Probe
                                                 if (postTime > mostRecent)
                                                 {
                                                     Bundle eventBundle = new Bundle();
-                                                    eventBundle.putString("PROBE", me.name(context));
-                                                    eventBundle.putLong("TIMESTAMP", postTime / 1000);
+                                                    eventBundle.putString(Probe.BUNDLE_PROBE, me.name(context));
+                                                    eventBundle.putLong(Probe.BUNDLE_TIMESTAMP, postTime / 1000);
 
                                                     eventBundle.putString("TYPE", post.getString("updateType"));
 
@@ -223,12 +214,8 @@ public class LinkedInProbe extends Probe
                                         }
 
                                         Editor e = prefs.edit();
-                                        e.putLong("config_linkedin_most_recent", System.currentTimeMillis());
+                                        e.putLong(LinkedInProbe.MOST_RECENT, System.currentTimeMillis());
                                         e.commit();
-                                    }
-                                    catch (OAuthException e)
-                                    {
-                                        LogManager.getInstance(context).logException(e);
                                     }
                                     catch (JSONException e)
                                     {
@@ -270,24 +257,19 @@ public class LinkedInProbe extends Probe
 
     private void fetchAuth(Context context)
     {
+        String userId = EncryptionManager.getInstance().getUserHash(context);
+
         Intent intent = new Intent(context, OAuthActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         intent.putExtra(OAuthActivity.CONSUMER_KEY, context.getString(R.string.linkedin_consumer_key));
         intent.putExtra(OAuthActivity.CONSUMER_SECRET, context.getString(R.string.linkedin_consumer_secret));
         intent.putExtra(OAuthActivity.REQUESTER, "linkedin");
-        intent.putExtra(OAuthActivity.CALLBACK_URL, CALLBACK);
+        intent.putExtra(OAuthActivity.CALLBACK_URL, "http://tech.cbits.northwestern.edu/oauth/linkedin");
+        intent.putExtra(OAuthActivity.LOG_URL, LogManager.getInstance(context).getLogUrl(context));
+        intent.putExtra(OAuthActivity.HASH_SECRET, userId);
 
         context.startActivity(intent);
-    }
-
-    @Override
-    public String summarizeValue(Context context, Bundle bundle)
-    {
-        if (bundle.containsKey("COMMENT"))
-            return bundle.getString("COMMENT") + " (" + bundle.getString("TYPE") + ")";
-
-        return bundle.getString("TYPE");
     }
 
     @Override
@@ -348,12 +330,6 @@ public class LinkedInProbe extends Probe
     }
 
     @Override
-    public String summary(Context context)
-    {
-        return context.getString(R.string.summary_linkedin_probe_desc);
-    }
-
-    @Override
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(final Context context, PreferenceManager manager)
     {
@@ -363,8 +339,8 @@ public class LinkedInProbe extends Probe
 
         final SharedPreferences prefs = Probe.getPreferences(context);
 
-        String token = prefs.getString("oauth_linkedin_token", null);
-        String secret = prefs.getString("oauth_linkedin_secret", null);
+        String token = prefs.getString(LinkedInProbe.OAUTH_TOKEN, null);
+        String secret = prefs.getString(LinkedInProbe.OAUTH_SECRET, null);
 
         CheckBoxPreference enabled = new CheckBoxPreference(context);
         enabled.setTitle(R.string.title_enable_probe);
@@ -420,8 +396,8 @@ public class LinkedInProbe extends Probe
             public boolean onPreferenceClick(Preference preference)
             {
                 Editor e = prefs.edit();
-                e.remove("oauth_linkedin_token");
-                e.remove("oauth_linkedin_secret");
+                e.remove(LinkedInProbe.OAUTH_TOKEN);
+                e.remove(LinkedInProbe.OAUTH_SECRET);
                 e.commit();
 
                 screen.addPreference(authPreference);
@@ -440,6 +416,7 @@ public class LinkedInProbe extends Probe
                         }
                     });
                 }
+
 
                 return true;
             }
@@ -496,4 +473,12 @@ public class LinkedInProbe extends Probe
         return settings;
     }
 
+    @Override
+    public String summarizeValue(Context context, Bundle bundle)
+    {
+        if (bundle.containsKey("COMMENT"))
+            return bundle.getString("COMMENT") + " (" + bundle.getString("TYPE") + ")";
+
+        return bundle.getString("TYPE");
+    }
 }
