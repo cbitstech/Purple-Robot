@@ -970,8 +970,8 @@
     <string name="name_sanity_last_upload_warning">Sensor data has not been uploaded in the last 12 hours.</string> -->    
 
     <string name="probe_device_info_category">Device Information &amp; Configuration Probes</string>
-    <string name="probe_external_services_category">External Services Probes</string>
-    <string name="probe_other_devices_category">External Devices Probes</string>
+    <string name="probe_external_services_category">External Service Probes</string>
+    <string name="probe_other_devices_category">External Device Probes</string>
     <string name="probe_external_environment_category">External Environment Probes</string>
     <string name="probe_misc_category">Miscellaneous Probes</string>
     <string name="probe_personal_info_category">Personal Information Probes</string>
@@ -1035,7 +1035,7 @@
 	<string name="message_twitter_check">Please login to the Twitter website from the settings to grant Purple Robot access to your Twitter account.</string>	
 
 	<!-- Instagram API Feature -->
-    <string name="title_instagram_probe">Instagram Probe</string>
+    <string name="title_instagram_probe">Instagram</string>
     <string name="summary_instagram_probe_desc">Collects profile data &amp; posts from Instagram.</string>
     <string name="config_probe_instagram_encrypt_title">Encrypt Instagram Contents</string>
     <string name="config_probe_instagram_encrypt_summary">Encrypts the contents of data retrieved from Instagram.</string>

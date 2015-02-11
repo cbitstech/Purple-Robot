@@ -9,7 +9,6 @@ import org.scribe.builder.api.DefaultApi10a;
 import org.scribe.builder.api.DefaultApi20;
 import org.scribe.builder.api.Foursquare2Api;
 import org.scribe.builder.api.LinkedInApi;
-import org.scribe.builder.api.TwitterApi;
 import org.scribe.exceptions.OAuthConnectionException;
 import org.scribe.exceptions.OAuthException;
 import org.scribe.model.OAuthConfig;
@@ -29,10 +28,7 @@ import android.preference.PreferenceManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
-import edu.northwestern.cbits.purple_robot_manager.oauth.FitbitApi;
-import edu.northwestern.cbits.purple_robot_manager.oauth.InstagramApi;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.FoursquareProbe;
-import edu.northwestern.cbits.purple_robot_manager.probes.builtin.InstagramProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LinkedInProbe;
 
 public class OAuthActivity extends Activity
@@ -63,13 +59,7 @@ public class OAuthActivity extends Activity
 
             Class api = null;
 
-            if ("fitbit".equals(requester))
-                api = FitbitApi.class;
-            else if ("twitter".equals(requester))
-                api = TwitterApi.SSL.class;
-            else if ("instagram".equalsIgnoreCase(requester))
-                api = InstagramApi.class;
-            else if ("linkedin".equalsIgnoreCase(requester))
+            if ("linkedin".equalsIgnoreCase(requester))
                 api = LinkedInApi.class;
             else if ("foursquare".equalsIgnoreCase(requester))
                 api = Foursquare2Api.class;
@@ -186,26 +176,7 @@ public class OAuthActivity extends Activity
                         String consumerSecret = null;
                         String callback = null;
 
-                        if ("fitbit".equals(requester))
-                        {
-                            apiClass = FitbitApi.class;
-                            consumerKey = this.getString(R.string.fitbit_consumer_key);
-                            consumerSecret = this.getString(R.string.fitbit_consumer_secret);
-                        }
-                        else if ("twitter".equals(requester))
-                        {
-                            apiClass = TwitterApi.SSL.class;
-                            consumerKey = this.getString(R.string.twitter_consumer_key);
-                            consumerSecret = this.getString(R.string.twitter_consumer_secret);
-                        }
-                        else if ("instagram".equals(requester))
-                        {
-                            apiClass = InstagramApi.class;
-                            consumerKey = this.getString(R.string.instagram_consumer_key);
-                            consumerSecret = this.getString(R.string.instagram_consumer_secret);
-                            callback = InstagramProbe.CALLBACK;
-                        }
-                        else if ("linkedin".equalsIgnoreCase(requester))
+                        if ("linkedin".equalsIgnoreCase(requester))
                         {
                             apiClass = LinkedInApi.class;
                             consumerKey = this.getString(R.string.linkedin_consumer_key);

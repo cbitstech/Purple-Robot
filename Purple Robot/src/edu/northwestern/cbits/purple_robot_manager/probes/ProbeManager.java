@@ -35,7 +35,6 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.FoursquareProb
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.GeomagneticRotationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.GravityProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.HardwareInformationProbe;
-import edu.northwestern.cbits.purple_robot_manager.probes.builtin.InstagramProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LinearAccelerationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LinkedInProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
@@ -77,6 +76,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.features.p20.P20Featur
 import edu.northwestern.cbits.purple_robot_manager.probes.sample.SampleProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.services.FitbitProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.services.GitHubProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.services.InstagramProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.services.JawboneProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.services.TwitterProbe;
 
