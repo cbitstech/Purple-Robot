@@ -399,8 +399,8 @@ public class TwitterProbe extends Probe
             public boolean onPreferenceClick(Preference preference)
             {
                 Editor e = prefs.edit();
-                e.remove("oauth_twitter_token");
-                e.remove("oauth_twitter_secret");
+                e.remove(TwitterProbe.OAUTH_TOKEN);
+                e.remove(TwitterProbe.OAUTH_SECRET);
                 e.commit();
 
                 screen.addPreference(authPreference);
