@@ -35,8 +35,7 @@ public class AppDisplayPlugin extends OutputPlugin
 
     public String[] respondsTo()
     {
-        String[] activeActions =
-        { Probe.PROBE_READING, OutputPlugin.LOG_EVENT, AppDisplayPlugin.DISPLAY_MESSAGE };
+        String[] activeActions = { Probe.PROBE_READING, OutputPlugin.LOG_EVENT, AppDisplayPlugin.DISPLAY_MESSAGE };
 
         return activeActions;
     }
