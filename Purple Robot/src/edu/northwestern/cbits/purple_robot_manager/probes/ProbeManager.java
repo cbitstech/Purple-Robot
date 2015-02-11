@@ -56,7 +56,6 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.StepCounterPro
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TelephonyProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TemperatureProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TouchEventsProbe;
-import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TwitterProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.VisibleSatelliteProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.WifiAccessPointsProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.devices.PebbleProbe;
@@ -79,6 +78,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.sample.SampleProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.services.FitbitProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.services.GitHubProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.services.JawboneProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.services.TwitterProbe;
 
 public class ProbeManager
 {
