@@ -27,10 +27,13 @@ public class LogManager
     private static final boolean WIFI_ONLY_DEFAULT = true;
 
     public static final String LIBERAL_SSL = "config_http_liberal_ssl";
-    private static final boolean LIBERAL_SSL_ONLY = false;
+    private static final boolean LIBERAL_SSL_DEFAULT = false;
 
     public static final String HEARTBEAT = "config_log_heartbeat";
     private static final boolean HEARTBEAT_DEFAULT = false;
+
+    private static final String CHARGING_ONLY = "config_restrict_log_charging";
+    private static final boolean CHARGING_ONLY_DEFAULT = false;
 
     private static LogManager _sharedInstance = null;
 
@@ -49,7 +52,8 @@ public class LogManager
         this._logger.setHeartbeat(prefs.getBoolean(LogManager.HEARTBEAT, LogManager.HEARTBEAT_DEFAULT));
         this._logger.setIncludeLocation(prefs.getBoolean(LogManager.INCLUDE_LOCATION, LogManager.INCLUDE_LOCATION_DEFAULT));
         this._logger.setWifiOnly(prefs.getBoolean(LogManager.WIFI_ONLY, LogManager.WIFI_ONLY_DEFAULT));
-        this._logger.setLiberalSsl(prefs.getBoolean(LogManager.LIBERAL_SSL, LogManager.LIBERAL_SSL_ONLY));
+        this._logger.setLiberalSsl(prefs.getBoolean(LogManager.LIBERAL_SSL, LogManager.LIBERAL_SSL_DEFAULT));
+        this._logger.setChargingOnly(prefs.getBoolean(LogManager.CHARGING_ONLY, LogManager.CHARGING_ONLY_DEFAULT));
 
         try
         {

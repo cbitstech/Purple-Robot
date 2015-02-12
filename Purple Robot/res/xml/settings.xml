@@ -82,12 +82,17 @@
 	           	android:dialogMessage="@string/summary_http_upload_uri"
 	           	android:summary="@string/summary_http_upload_uri"
 	           	android:defaultValue="@string/sensor_upload_url" />
-	     	<CheckBoxPreference
-	      	    android:title="@string/title_http_upload_wifi_only"
-	      	    android:summary="@string/summary_http_upload_wifi_only"
-	           	android:key="config_restrict_data_wifi"
-	           	android:defaultValue="true"/>
-     	</PreferenceScreen>	        				    
+            <CheckBoxPreference
+                android:title="@string/title_http_upload_wifi_only"
+                android:summary="@string/summary_http_upload_wifi_only"
+                android:key="config_restrict_data_wifi"
+                android:defaultValue="false"/>
+            <CheckBoxPreference
+                android:title="@string/title_upload_charging_only"
+                android:summary="@string/summary_upload_charging_only"
+                android:key="config_restrict_data_charging"
+                android:defaultValue="false"/>
+     	</PreferenceScreen>
 		<PreferenceScreen android:title="@string/title_http_upload_section"
 		    android:summary="@string/summary_http_upload_section">
 			<CheckBoxPreference
@@ -163,11 +168,16 @@
 	      	    android:summary="@string/summary_log_location"
 	           	android:key="config_log_location"
 	           	android:defaultValue="false"/>
-	     	<CheckBoxPreference
-	      	    android:title="@string/title_log_upload_wifi_only"
-	      	    android:summary="@string/summary_log_upload_wifi_only"
-	           	android:key="config_restrict_log_wifi"
-	           	android:defaultValue="true"/>
+            <CheckBoxPreference
+                android:title="@string/title_log_upload_wifi_only"
+                android:summary="@string/summary_log_upload_wifi_only"
+                android:key="config_restrict_log_wifi"
+                android:defaultValue="true"/>
+            <CheckBoxPreference
+                android:title="@string/title_log_upload_charging_only"
+                android:summary="@string/summary_log_upload_charging_only"
+                android:key="config_restrict_log_charging"
+                android:defaultValue="false"/>
 	     	<CheckBoxPreference
 	      	    android:title="@string/title_log_heartbeat"
 	      	    android:summary="@string/summary_log_heartbeat"

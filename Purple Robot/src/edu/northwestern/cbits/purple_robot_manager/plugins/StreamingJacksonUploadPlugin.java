@@ -68,7 +68,7 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
 
         long duration = Long.parseLong(prefs.getString(StreamingJacksonUploadPlugin.UPLOAD_INTERVAL, StreamingJacksonUploadPlugin.UPLOAD_INTERVAL_DEFAULT)) * 1000;
 
-        if (now - this._lastAttempt < duration)
+        if (now - this._lastAttempt < duration || this.shouldAttemptUpload(context) == false)
             return;
 
         this._lastAttempt = now;
