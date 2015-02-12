@@ -1,11 +1,10 @@
-package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
+package edu.northwestern.cbits.purple_robot_manager.probes.services;
 
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -13,7 +12,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class FacebookEventsProbe extends Probe
 {
-    public static final String PROBE_NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.FacebookEventsProbe";
+    public static final String PROBE_NAME = "edu.northwestern.cbits.purple_robot_manager.probes.services.FacebookEventsProbe";
 
     @Override
     public String name(Context context)
