@@ -1000,27 +1000,28 @@
 
     <string name="title_facebook_events_probe">Recent Facebook Events Probe</string>
     
-    <string name="title_facebook_probe">Facebook Probe</string>
+    <string name="title_facebook_probe">Facebook</string>
     <string name="summary_facebook_probe_desc">Collects profile &amp; behavioral data from Facebook.</string>
     <string name="config_probe_facebook_encrypt_title">Encrypt Message Contents</string>
     <string name="config_probe_facebook_encrypt_summary">Encrypts the contents of outgoing messages and posts to your Facebook wall.</string>
 
     <string name="title_facebook_check">Facebook Login Required</string>	
-	<string name="message_facebook_check">Please login to Facebook to complete the setup of the Facebook Probe.</string>	
-    <string name="facebook_app_id">266981220119291</string>	
-    
-    <string name="facebook_count_desc">%1$d Post(s) in the Last Hour, %2$d Friends</string>	
-    <string name="facebook_event_obfuscated_desc">Obfuscated: %1$s (%2$s)</string>	
-    <string name="facebook_event_clear_desc">%1$s (%2$s)</string>	
+	<string name="message_facebook_check">Please login to Facebook to complete the setup of the Facebook Probe.</string>
 
-    <string name="title_facebook_success">Facebook Login Successful!</string>	
-	<string name="message_facebook_success">Purple Robot has successfully logged in to Facebook and can now fetch data from the service.</string>	
-    <string name="title_facebook_failure">Facebook Login Failed!</string>	
-	<string name="message_facebook_failure">Purple Robot was unable to log in to Facebook. Please try again.</string>	
-	<string name="confirm_facebook_success">OK</string>	
-	<string name="confirm_facebook_try_again">Try Again</string>	
-    
-   	<!-- Twitter API Feature -->
+    <string name="facebook_count_desc">%1$d Posts in the Last Hour, %2$d Posts in the Last Day</string>
+    <string name="facebook_count_desc_single_hour">1 Post in the Last Hour, %1$d Posts in the Last Day</string>
+    <string name="facebook_count_desc_single_day">%1$d Posts in the Last Hour, 1 Post in the Last Day</string>
+    <string name="facebook_count_desc_single_both">1 Post in the Last Hour, 1 Post in the Last Day</string>
+    <string name="facebook_event_obfuscated_desc">Obfuscated: %1$s (%2$s)</string>
+    <string name="facebook_event_clear_desc">%1$s (%2$s)</string>
+
+    <string name="title_authenticate_facebook_probe">Login to Facebook</string>
+    <string name="summary_authenticate_facebook_probe">Tap to go to login to Facebook and grant this device access to your posts and statuses.</string>
+    <string name="title_logout_facebook_probe">Log Out of Facebook</string>
+    <string name="summary_logout_facebook_probe">Tap to clear your Facebook login information and revoke access to this device.</string>
+    <string name="toast_facebook_logout">Logged out of Facebook.</string>
+
+    <!-- Twitter API Feature -->
     <string name="title_twitter_probe">Twitter</string>
     <string name="summary_twitter_probe_desc">Collects profile data &amp; tweets from Twitter.</string>
     <string name="config_probe_twitter_encrypt_title">Encrypt Tweet Contents</string>

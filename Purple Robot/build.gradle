@@ -50,7 +50,6 @@ android {
         compile 'com.google.android.gms:play-services-maps:6.5.87'
         compile 'com.google.android.gms:play-services-cast:6.5.87'
         compile 'com.getpebble:pebblekit:2.6.0'
-        compile 'com.facebook.android:facebook-android-sdk:3.+'
         compile project(':anthracite-clients-android')
         compile project(':xsi-android')
         compile fileTree(dir: 'libs', include: '*.jar')
