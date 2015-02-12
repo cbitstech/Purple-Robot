@@ -52,6 +52,7 @@ import android.net.http.AndroidHttpClient;
 import android.preference.PreferenceManager;
 
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
+import edu.northwestern.cbits.purple_robot_manager.PowerHelper;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.WiFiHelper;
 import edu.northwestern.cbits.purple_robot_manager.activities.StartActivity;
@@ -75,12 +76,16 @@ public abstract class DataUploadPlugin extends OutputPlugin
     private static final boolean RESTRICT_TO_WIFI_DEFAULT = true;
     public static final String UPLOAD_URI = "config_data_server_uri";
 
+    private static final String RESTRICT_TO_CHARGING = "config_restrict_data_charging";
+    private static final boolean RESTRICT_TO_CHARGING_DEFAULT = false;
+
     public static final String ALLOW_ALL_SSL_CERTIFICATES = "config_http_liberal_ssl";
     public static final boolean ALLOW_ALL_SSL_CERTIFICATES_DEFAULT = true;
 
     protected static final int RESULT_SUCCESS = 0;
     protected static final int RESULT_NO_CONNECTION = 1;
     protected static final int RESULT_ERROR = 2;
+    protected static final int RESULT_NO_POWER = 3;
 
     public File getPendingFolder()
     {
@@ -123,6 +128,55 @@ public abstract class DataUploadPlugin extends OutputPlugin
         }
     }
 
+    private boolean restrictToCharging(SharedPreferences prefs)
+    {
+        try
+        {
+            return prefs.getBoolean(DataUploadPlugin.RESTRICT_TO_CHARGING, DataUploadPlugin.RESTRICT_TO_CHARGING_DEFAULT);
+        }
+        catch (ClassCastException e)
+        {
+            String enabled = prefs.getString(DataUploadPlugin.RESTRICT_TO_CHARGING,
+                    "" + DataUploadPlugin.RESTRICT_TO_CHARGING_DEFAULT).toLowerCase(Locale.ENGLISH);
+
+            boolean isRestricted = ("false".equals(enabled) == false);
+
+            Editor edit = prefs.edit();
+            edit.putBoolean(DataUploadPlugin.RESTRICT_TO_CHARGING, isRestricted);
+            edit.commit();
+
+            return isRestricted;
+        }
+    }
+
+    public boolean shouldAttemptUpload(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        final DataUploadPlugin me = this;
+
+        if (this.restrictToWifi(prefs))
+        {
+            if (WiFiHelper.wifiAvailable(context) == false)
+            {
+                me.broadcastMessage(context.getString(R.string.message_wifi_pending), false);
+
+                return false;
+            }
+        }
+
+        if (this.restrictToCharging(prefs))
+        {
+            if (PowerHelper.isPluggedIn(context) == false)
+            {
+                me.broadcastMessage(context.getString(R.string.message_charging_pending), false);
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     @SuppressWarnings("deprecation")
     protected int transmitPayload(SharedPreferences prefs, String payload)
     {
@@ -152,6 +206,16 @@ public abstract class DataUploadPlugin extends OutputPlugin
                         me.broadcastMessage(context.getString(R.string.message_wifi_pending), false);
 
                         return DataUploadPlugin.RESULT_NO_CONNECTION;
+                    }
+                }
+
+                if (this.restrictToCharging(prefs))
+                {
+                    if (PowerHelper.isPluggedIn(context) == false)
+                    {
+                        me.broadcastMessage(context.getString(R.string.message_charging_pending), false);
+
+                        return DataUploadPlugin.RESULT_NO_POWER;
                     }
                 }
 

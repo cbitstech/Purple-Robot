@@ -338,6 +338,14 @@
     <string name="title_http_upload_wifi_only">Only Use WiFi Connection</string>
     <string name="summary_http_upload_wifi_only">Disable uploads using cellular and other mobile connection types.</string>
 
+    <string name="message_charging_pending">Waiting for power&#8230;</string>
+
+    <string name="title_upload_charging_only">Only Upload When Charging</string>
+    <string name="summary_upload_charging_only">Disable uploads when the mobile device is only using battery power and is not plugged in to a power source (wall socket or USB port).</string>
+
+    <string name="title_log_upload_charging_only">Only Upload When Charging</string>
+    <string name="summary_log_upload_charging_only">Disable log uploads when the mobile device is only using battery power and is not plugged in to a power source (wall socket or USB port).</string>
+
     <string name="title_http_encrypt">Encrypt Sensor Data</string>
     <string name="summary_http_encrypt">Encrypt the collected sensor data on the local device and in transmissions.</string>
 
