@@ -40,6 +40,13 @@ public class HttpStoreRequestHandler implements HttpRequestHandler
     public void handle(HttpRequest request, HttpResponse response, HttpContext argument) throws HttpException,
             IOException
     {
+        if (BasicAuthHelper.isAuthenticated(request) == false)
+        {
+            BasicAuthHelper.unauthedResponse(response);
+
+            return;
+        }
+
         response.setStatusCode(HttpStatus.SC_OK);
         response.setHeader("Access-Control-Allow-Origin", "*");
 

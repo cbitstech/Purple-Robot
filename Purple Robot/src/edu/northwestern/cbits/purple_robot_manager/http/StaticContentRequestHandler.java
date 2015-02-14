@@ -37,6 +37,13 @@ public class StaticContentRequestHandler implements HttpRequestHandler
 
     public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException
     {
+        if (BasicAuthHelper.isAuthenticated(request) == false)
+        {
+            BasicAuthHelper.unauthedResponse(response);
+
+            return;
+        }
+
         String method = request.getRequestLine().getMethod().toUpperCase(Locale.ENGLISH);
 
         if (!method.equals("GET") && !method.equals("HEAD") && !method.equals("POST"))

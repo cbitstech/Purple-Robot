@@ -37,6 +37,8 @@ public class PersistentService extends Service
 {
     public static final String NUDGE_PROBES = "purple_robot_manager_nudge_probe";
     public static final String SCRIPT_ACTION = "edu.northwestern.cbits.purplerobot.run_script";
+    public static final String START_HTTP_SERVICE = "purple_robot_start_http_service";
+    public static final String STOP_HTTP_SERVICE = "purple_robot_stop_http_service";
 
     private LocalHttpServer _httpServer = new LocalHttpServer();
 
@@ -79,8 +81,10 @@ public class PersistentService extends Service
 
         OutputPlugin.loadPluginClasses(this);
 
-        if (prefs.getBoolean("config_http_server_enabled", true))
+        if (prefs.getBoolean(LocalHttpServer.BUILTIN_HTTP_SERVER_ENABLED, LocalHttpServer.BUILTIN_HTTP_SERVER_ENABLED_DEFAULT))
             this._httpServer.start(this);
+        else
+            this._httpServer.stop(this);
 
         BroadcastReceiver scriptReceiver = new BroadcastReceiver()
         {
@@ -200,6 +204,10 @@ public class PersistentService extends Service
             }
             else if (RandomNoiseProbe.ACTION.equals(action) && RandomNoiseProbe.instance != null)
                 RandomNoiseProbe.instance.isEnabled(this);
+            else if (START_HTTP_SERVICE.equals(action))
+                this._httpServer.start(this);
+            else if (STOP_HTTP_SERVICE.equals(action))
+                this._httpServer.stop(this);
         }
 
         return Service.START_STICKY;
