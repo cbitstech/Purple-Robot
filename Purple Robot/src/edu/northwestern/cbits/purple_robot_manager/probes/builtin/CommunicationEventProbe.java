@@ -236,6 +236,19 @@ public class CommunicationEventProbe extends Probe
 
                                 bundle.putString(CommunicationEventProbe.DIRECTION, CommunicationEventProbe.INCOMING);
 
+                                boolean retrieve = prefs.getBoolean(CommunicationEventProbe.RETRIEVE_DATA, CommunicationEventProbe.DEFAULT_RETRIEVE);
+                                boolean encrypt = prefs.getBoolean(CommunicationEventProbe.ENCRYPT_DATA, CommunicationEventProbe.DEFAULT_ENCRYPT);
+
+                                if (retrieve)
+                                {
+                                    String body = c.getString(c.getColumnIndex("body"));
+
+                                    if (encrypt)
+                                        body = em.encryptString(context, body);
+
+                                    bundle.putString(CommunicationEventProbe.MESSAGE_BODY, body);
+                                }
+
                                 this.transmitData(context, bundle);
                             }
 
