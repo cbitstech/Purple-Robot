@@ -22,6 +22,7 @@ import java.util.UUID;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.http.LocalHttpServer;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
@@ -144,6 +145,9 @@ public class SettingsActivity extends ActionBarActivity
                     Preference logInterval = prefs.findPreference(LogManager.UPLOAD_INTERVAL);
                     logInterval.setOnPreferenceChangeListener(listener);
 
+                    Preference enableHttpServer = prefs.findPreference(LocalHttpServer.BUILTIN_HTTP_SERVER_ENABLED);
+                    enableHttpServer.setOnPreferenceChangeListener(listener);
+
                     final PreferenceFragment meFragment = this;
 
                     // Delay for half a second so preferences can be completely constructed...
@@ -194,6 +198,12 @@ public class SettingsActivity extends ActionBarActivity
                         if (pref instanceof FlexibleListPreference)
                         {
                             FlexibleListPreference flexible = (FlexibleListPreference) pref;
+
+                            flexible.setContext(me);
+                        }
+                        else if (pref instanceof FlexibleEditTextPreference)
+                        {
+                            FlexibleEditTextPreference flexible = (FlexibleEditTextPreference) pref;
 
                             flexible.setContext(me);
                         }

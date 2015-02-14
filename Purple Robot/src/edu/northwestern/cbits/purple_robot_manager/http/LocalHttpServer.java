@@ -32,13 +32,39 @@ import android.content.Context;
 
 public class LocalHttpServer
 {
+    public static final String BUILTIN_HTTP_SERVER_ENABLED = "config_enable_builtin_http_server";
+    public static final boolean BUILTIN_HTTP_SERVER_ENABLED_DEFAULT = true;
+
+    public static final String BUILTIN_HTTP_SERVER_PASSWORD = "config_builtin_http_server_password";
+    public static final String BUILTIN_HTTP_SERVER_PASSWORD_DEFAULT = "";
+
     private static int SERVER_PORT = 12345;
+
+    private Thread _serverThread = null;
 
     public void start(final Context context)
     {
-        Thread t = new RequestListenerThread(context.getApplicationContext(), SERVER_PORT);
-        t.setDaemon(false);
-        t.start();
+        if (this._serverThread == null || this._serverThread.isInterrupted())
+        {
+            BasicAuthHelper.getInstance(context);
+
+            this._serverThread = new RequestListenerThread(context.getApplicationContext(), SERVER_PORT);
+            this._serverThread.setDaemon(false);
+            this._serverThread.start();
+        }
+
+        LogManager.getInstance(context).log("started_builtin_http_server", null);
+    }
+
+    public void stop(final Context context)
+    {
+        if (this._serverThread != null)
+        {
+            this._serverThread.interrupt();
+            this._serverThread = null;
+        }
+
+        LogManager.getInstance(context).log("stopped_builtin_http_server", null);
     }
 
     static class RequestListenerThread extends Thread

@@ -74,7 +74,7 @@
       		    android:summary="@string/summary_http_liberal_ssl"
 	        	android:key="config_http_liberal_ssl"
 	           	android:defaultValue="true"/>
-			<EditTextPreference
+			<edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleEditTextPreference
 	           	android:key="config_data_server_uri"
 	           	android:inputType="textUri|textMultiLine"
 	           	android:title="@string/title_http_upload_uri"
@@ -123,12 +123,6 @@
 				<Preference android:title="@string/title_delete_files" android:key="config_delete_archives" android:defaultValue="@string/value_zero" />
  			</PreferenceScreen>
  		</PreferenceScreen>
-    	<!-- <PreferenceScreen android:title="@string/title_streaming_json_upload_section">
-			<CheckBoxPreference
-				android:title="@string/title_streaming_json_upload_enabled"
-	           	android:key="config_enable_streaming_json_data_server"
-	           	android:defaultValue="false"/>
-  		</PreferenceScreen> -->
     	<PreferenceScreen android:title="@string/title_streaming_jackson_upload_section"
     	    android:summary="@string/summary_streaming_jackson_upload_section">
 			<CheckBoxPreference
@@ -149,13 +143,28 @@
 	            android:title="@string/config_streaming_jackson_upload_size_label"
 	            android:defaultValue="@string/value_256k" />
 		</PreferenceScreen>
+        <PreferenceScreen android:title="@string/title_builtin_http_server_section">
+            <CheckBoxPreference
+                android:title="@string/title_builtin_http_server_enabled"
+                android:summary="@string/summary_builtin_http_server_enabled"
+                android:key="config_enable_builtin_http_server"
+                android:defaultValue="true"/>
+            <edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleEditTextPreference
+                android:key="config_builtin_http_server_password"
+                android:inputType="textWebPassword"
+                android:title="@string/title_builtin_http_server_password"
+                android:dialogTitle="@string/title_builtin_http_server_password"
+                android:dialogMessage="@string/summary_builtin_http_server_password"
+                android:summary="@string/summary_builtin_http_server_password"
+                android:defaultValue="" />
+        </PreferenceScreen>
 		<PreferenceScreen android:title="@string/title_log_upload_section">
 			<CheckBoxPreference
 				android:title="@string/logging_enabled"
 	           	android:summary="@string/summary_logging_enabled"
 	           	android:key="config_enable_log_server"
 	           	android:defaultValue="false"/>
-			<EditTextPreference
+			<edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleEditTextPreference
 	           	android:key="config_log_server_uri"
 	           	android:inputType="textUri|textMultiLine"
 	           	android:title="@string/title_log_upload_uri"
@@ -205,20 +214,20 @@
             android:defaultValue="MD5" />
     </PreferenceCategory>
 	<PreferenceCategory android:title="@string/config_settings_category">
-        <EditTextPreference
+        <edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleEditTextPreference
             android:key="config_user_id"
             android:title="@string/config_user_id_label"
             android:dialogTitle="@string/config_user_id_title"
             android:dialogMessage="@string/config_user_id_message"
             android:defaultValue="" />
-        <EditTextPreference
+        <edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleEditTextPreference
           	android:inputType="textWebPassword"
             android:key="config_password"
             android:title="@string/config_password_label"
             android:dialogTitle="@string/config_password_title"
             android:dialogMessage="@string/config_password_message"
             android:defaultValue="" />
-        <EditTextPreference
+        <edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleEditTextPreference
             android:key="config_json_url"
           	android:inputType="textUri|textMultiLine"
             android:title="@string/config_json_url_label"

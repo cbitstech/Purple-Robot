@@ -30,6 +30,7 @@ import edu.northwestern.cbits.purple_robot_manager.activities.TestActivity;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.db.DistancesProvider;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
+import edu.northwestern.cbits.purple_robot_manager.http.LocalHttpServer;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
@@ -338,6 +339,28 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
 
             return true;
         }
+        else if (LocalHttpServer.BUILTIN_HTTP_SERVER_ENABLED.equals(pref.getKey()))
+        {
+            Boolean enable = (Boolean) value;
+
+            if (enable)
+            {
+                Intent intent = new Intent(PersistentService.START_HTTP_SERVICE);
+                intent.setClass(this._context, PersistentService.class);
+
+                this._context.startService(intent);
+            }
+            else
+            {
+                Intent intent = new Intent(PersistentService.STOP_HTTP_SERVICE);
+                intent.setClass(this._context, PersistentService.class);
+
+                this._context.startService(intent);
+            }
+
+            return true;
+        }
+
 
         return false;
     }

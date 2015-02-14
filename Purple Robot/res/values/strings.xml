@@ -49,7 +49,8 @@
 								
     <string name="error_malformed_request">Malformed request. Please try again.</string>
     <string name="error_empty_payload">No payload to transmit.</string>
-    
+    <string name="error_unauthed_request">Authentication failed. Please try again.</string>
+
     <string name="activity_diagnostic_title">Diagnostics</string>
     <string name="user_id_label">User Identifier</string>
     <string name="user_id_placeholder">Unknown</string>
@@ -1370,4 +1371,10 @@
     <string name="config_settings_security">Security &amp; Encryption Options</string>
     <string name="config_preferred_hash_function_label">Preferred Hash Function</string>
     <string name="config_preferred_hash_function_message">Desired cryptographic hash function for protecting sensitive information.</string>
+
+    <string name="title_builtin_http_server_section">Built-In HTTP Server</string>
+    <string name="title_builtin_http_server_enabled">Enable Built-In HTTP Server</string>
+    <string name="summary_builtin_http_server_enabled">Enable the HTTP server running on the local device. This is used primarily for inter-app communication via the scripting endpoints.</string>
+    <string name="title_builtin_http_server_password">Built-In HTTP Server Password</string>
+    <string name="summary_builtin_http_server_password">Password to allow access to the local HTTP server via HTTP Basic Authentication</string>
 </resources>
