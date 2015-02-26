@@ -30,11 +30,7 @@ public class MagneticFieldProbe extends Continuous3DProbe implements SensorEvent
 
     public static final String DB_TABLE = "magnetic_probe";
 
-    private static final String X_KEY = "X";
-    private static final String Y_KEY = "Y";
-    private static final String Z_KEY = "Z";
-
-    private static final String[] fieldNames = { X_KEY, Y_KEY, Z_KEY };
+    private static final String[] fieldNames = { Continuous3DProbe.X_KEY, Continuous3DProbe.Y_KEY, Continuous3DProbe.Z_KEY };
 
     private static final String DEFAULT_THRESHOLD = "1.0";
 
@@ -75,9 +71,9 @@ public class MagneticFieldProbe extends Continuous3DProbe implements SensorEvent
         {
             this._schema = new HashMap<String, String>();
 
-            this._schema.put(MagneticFieldProbe.X_KEY, ProbeValuesProvider.REAL_TYPE);
-            this._schema.put(MagneticFieldProbe.Y_KEY, ProbeValuesProvider.REAL_TYPE);
-            this._schema.put(MagneticFieldProbe.Z_KEY, ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(Continuous3DProbe.X_KEY, ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(Continuous3DProbe.Y_KEY, ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(Continuous3DProbe.Z_KEY, ProbeValuesProvider.REAL_TYPE);
         }
 
         return this._schema;
@@ -281,11 +277,11 @@ public class MagneticFieldProbe extends Continuous3DProbe implements SensorEvent
 
                         for (int i = 0; i < fieldNames.length; i++)
                         {
-                            if (fieldNames[i].equals(MagneticFieldProbe.X_KEY))
+                            if (fieldNames[i].equals(Continuous3DProbe.X_KEY))
                                 x = valueBuffer[i][0];
-                            else if (fieldNames[i].equals(MagneticFieldProbe.Y_KEY))
+                            else if (fieldNames[i].equals(Continuous3DProbe.Y_KEY))
                                 y = valueBuffer[i][0];
-                            else if (fieldNames[i].equals(MagneticFieldProbe.Z_KEY))
+                            else if (fieldNames[i].equals(Continuous3DProbe.Z_KEY))
                                 z = valueBuffer[i][0];
                         }
 
@@ -293,9 +289,9 @@ public class MagneticFieldProbe extends Continuous3DProbe implements SensorEvent
                         {
                             Map<String, Object> values = new HashMap<String, Object>(4);
 
-                            values.put(MagneticFieldProbe.X_KEY, x);
-                            values.put(MagneticFieldProbe.Y_KEY, y);
-                            values.put(MagneticFieldProbe.Z_KEY, z);
+                            values.put(Continuous3DProbe.X_KEY, x);
+                            values.put(Continuous3DProbe.Y_KEY, y);
+                            values.put(Continuous3DProbe.Z_KEY, z);
 
                             values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[0] / 1000));
 
@@ -318,9 +314,9 @@ public class MagneticFieldProbe extends Continuous3DProbe implements SensorEvent
     @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
-        double xReading = bundle.getDoubleArray(MagneticFieldProbe.X_KEY)[0];
-        double yReading = bundle.getDoubleArray(MagneticFieldProbe.Y_KEY)[0];
-        double zReading = bundle.getDoubleArray(MagneticFieldProbe.Z_KEY)[0];
+        double xReading = bundle.getDoubleArray(Continuous3DProbe.X_KEY)[0];
+        double yReading = bundle.getDoubleArray(Continuous3DProbe.Y_KEY)[0];
+        double zReading = bundle.getDoubleArray(Continuous3DProbe.Z_KEY)[0];
 
         return String.format(context.getResources().getString(R.string.summary_magnetic_probe), xReading, yReading, zReading);
     }
@@ -331,9 +327,9 @@ public class MagneticFieldProbe extends Continuous3DProbe implements SensorEvent
         Bundle formatted = super.formattedBundle(context, bundle);
 
         double[] eventTimes = bundle.getDoubleArray(ContinuousProbe.EVENT_TIMESTAMP);
-        double[] x = bundle.getDoubleArray(MagneticFieldProbe.X_KEY);
-        double[] y = bundle.getDoubleArray(MagneticFieldProbe.Y_KEY);
-        double[] z = bundle.getDoubleArray(MagneticFieldProbe.Z_KEY);
+        double[] x = bundle.getDoubleArray(Continuous3DProbe.X_KEY);
+        double[] y = bundle.getDoubleArray(Continuous3DProbe.Y_KEY);
+        double[] z = bundle.getDoubleArray(Continuous3DProbe.Z_KEY);
 
         ArrayList<String> keys = new ArrayList<String>();
 

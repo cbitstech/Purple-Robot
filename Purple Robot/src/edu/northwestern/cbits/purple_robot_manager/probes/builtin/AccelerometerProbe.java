@@ -71,9 +71,9 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
         {
             this._schema = new HashMap<String, String>();
 
-            this._schema.put(AccelerometerProbe.X_KEY, ProbeValuesProvider.REAL_TYPE);
-            this._schema.put(AccelerometerProbe.Y_KEY, ProbeValuesProvider.REAL_TYPE);
-            this._schema.put(AccelerometerProbe.Z_KEY, ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(Continuous3DProbe.X_KEY, ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(Continuous3DProbe.Y_KEY, ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(Continuous3DProbe.Z_KEY, ProbeValuesProvider.REAL_TYPE);
         }
 
         return this._schema;
@@ -335,11 +335,11 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
 
                         for (int i = 0; i < fieldNames.length; i++)
                         {
-                            if (fieldNames[i].equals(AccelerometerProbe.X_KEY))
+                            if (fieldNames[i].equals(Continuous3DProbe.X_KEY))
                                 x = valueBuffer[i][0];
-                            else if (fieldNames[i].equals(AccelerometerProbe.Y_KEY))
+                            else if (fieldNames[i].equals(Continuous3DProbe.Y_KEY))
                                 y = valueBuffer[i][0];
-                            else if (fieldNames[i].equals(AccelerometerProbe.Z_KEY))
+                            else if (fieldNames[i].equals(Continuous3DProbe.Z_KEY))
                                 z = valueBuffer[i][0];
                         }
 
@@ -347,9 +347,9 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
                         {
                             Map<String, Object> values = new HashMap<String, Object>(4);
 
-                            values.put(AccelerometerProbe.X_KEY, x);
-                            values.put(AccelerometerProbe.Y_KEY, y);
-                            values.put(AccelerometerProbe.Z_KEY, z);
+                            values.put(Continuous3DProbe.X_KEY, x);
+                            values.put(Continuous3DProbe.Y_KEY, y);
+                            values.put(Continuous3DProbe.Z_KEY, z);
 
                             values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[0] / 1000));
 

@@ -34,18 +34,15 @@ import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("SimpleDateFormat")
-public class GravityProbe extends ContinuousProbe implements SensorEventListener
+public class GravityProbe extends Continuous3DProbe implements SensorEventListener
 {
     private static int BUFFER_SIZE = 1024;
 
     public static final String DB_TABLE = "gravity_probe";
 
-    private static final String X_KEY = "X";
-    private static final String Y_KEY = "Y";
-    private static final String Z_KEY = "Z";
-
-    private static final String[] fieldNames =
-    { X_KEY, Y_KEY, Z_KEY };
+    private static final String[] fieldNames = { Continuous3DProbe.X_KEY,
+                                                 Continuous3DProbe.Y_KEY,
+                                                 Continuous3DProbe.Z_KEY };
 
     private static final String DEFAULT_THRESHOLD = "0.5";
 
@@ -82,6 +79,12 @@ public class GravityProbe extends ContinuousProbe implements SensorEventListener
     }
 
     @Override
+    protected String tableName()
+    {
+        return GravityProbe.DB_TABLE;
+    }
+
+    @Override
     public String probeCategory(Context context)
     {
         return context.getString(R.string.probe_sensor_category);
@@ -109,9 +112,9 @@ public class GravityProbe extends ContinuousProbe implements SensorEventListener
         {
             this._schema = new HashMap<String, String>();
 
-            this._schema.put(GravityProbe.X_KEY, ProbeValuesProvider.REAL_TYPE);
-            this._schema.put(GravityProbe.Y_KEY, ProbeValuesProvider.REAL_TYPE);
-            this._schema.put(GravityProbe.Z_KEY, ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(Continuous3DProbe.X_KEY, ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(Continuous3DProbe.Y_KEY, ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(Continuous3DProbe.Z_KEY, ProbeValuesProvider.REAL_TYPE);
         }
 
         return this._schema;
@@ -139,9 +142,9 @@ public class GravityProbe extends ContinuousProbe implements SensorEventListener
 
                 while (cursor.moveToNext())
                 {
-                    double xd = cursor.getDouble(cursor.getColumnIndex(GravityProbe.X_KEY));
-                    double yd = cursor.getDouble(cursor.getColumnIndex(GravityProbe.Y_KEY));
-                    double zd = cursor.getDouble(cursor.getColumnIndex(GravityProbe.Z_KEY));
+                    double xd = cursor.getDouble(cursor.getColumnIndex(Continuous3DProbe.X_KEY));
+                    double yd = cursor.getDouble(cursor.getColumnIndex(Continuous3DProbe.Y_KEY));
+                    double zd = cursor.getDouble(cursor.getColumnIndex(Continuous3DProbe.Z_KEY));
 
                     double t = cursor.getDouble(cursor.getColumnIndex(ProbeValuesProvider.TIMESTAMP));
 
@@ -431,11 +434,11 @@ public class GravityProbe extends ContinuousProbe implements SensorEventListener
 
                         for (int i = 0; i < fieldNames.length; i++)
                         {
-                            if (fieldNames[i].equals(GravityProbe.X_KEY))
+                            if (fieldNames[i].equals(Continuous3DProbe.X_KEY))
                                 x = Double.valueOf(valueBuffer[i][j]);
-                            else if (fieldNames[i].equals(GravityProbe.Y_KEY))
+                            else if (fieldNames[i].equals(Continuous3DProbe.Y_KEY))
                                 y = Double.valueOf(valueBuffer[i][j]);
-                            else if (fieldNames[i].equals(GravityProbe.Z_KEY))
+                            else if (fieldNames[i].equals(Continuous3DProbe.Z_KEY))
                                 z = Double.valueOf(valueBuffer[i][j]);
                         }
 
@@ -443,9 +446,9 @@ public class GravityProbe extends ContinuousProbe implements SensorEventListener
                         {
                             Map<String, Object> values = new HashMap<String, Object>();
 
-                            values.put(GravityProbe.X_KEY, x);
-                            values.put(GravityProbe.Y_KEY, y);
-                            values.put(GravityProbe.Z_KEY, z);
+                            values.put(Continuous3DProbe.X_KEY, x);
+                            values.put(Continuous3DProbe.Y_KEY, y);
+                            values.put(Continuous3DProbe.Z_KEY, z);
 
                             values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[j] / 1000));
 
@@ -460,6 +463,12 @@ public class GravityProbe extends ContinuousProbe implements SensorEventListener
     }
 
     @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy)
+    {
+
+    }
+
+    @Override
     public String getPreferenceKey()
     {
         return "gravity_built_in";
@@ -468,9 +477,9 @@ public class GravityProbe extends ContinuousProbe implements SensorEventListener
     @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
-        double xReading = bundle.getDoubleArray(GravityProbe.X_KEY)[0];
-        double yReading = bundle.getDoubleArray(GravityProbe.Y_KEY)[0];
-        double zReading = bundle.getDoubleArray(GravityProbe.Z_KEY)[0];
+        double xReading = bundle.getDoubleArray(Continuous3DProbe.X_KEY)[0];
+        double yReading = bundle.getDoubleArray(Continuous3DProbe.Y_KEY)[0];
+        double zReading = bundle.getDoubleArray(Continuous3DProbe.Z_KEY)[0];
 
         return String.format(context.getResources().getString(R.string.summary_gravity_probe), xReading, yReading, zReading);
     }

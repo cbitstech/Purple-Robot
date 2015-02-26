@@ -34,17 +34,13 @@ import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("SimpleDateFormat")
-public class LinearAccelerationProbe extends ContinuousProbe implements SensorEventListener
+public class LinearAccelerationProbe extends Continuous3DProbe implements SensorEventListener
 {
     private static int BUFFER_SIZE = 1024;
 
     public static final String DB_TABLE = "linear_acceleration_probe";
 
-    private static final String X_KEY = "X";
-    private static final String Y_KEY = "Y";
-    private static final String Z_KEY = "Z";
-
-    private static final String[] fieldNames = { X_KEY, Y_KEY, Z_KEY };
+    private static final String[] fieldNames = { Continuous3DProbe.X_KEY, Continuous3DProbe.Y_KEY, Continuous3DProbe.Z_KEY };
 
     private static final String DEFAULT_THRESHOLD = "0.5";
 
@@ -81,6 +77,12 @@ public class LinearAccelerationProbe extends ContinuousProbe implements SensorEv
     }
 
     @Override
+    protected String tableName()
+    {
+        return LinearAccelerationProbe.DB_TABLE;
+    }
+
+    @Override
     public String probeCategory(Context context)
     {
         return context.getString(R.string.probe_sensor_category);
@@ -108,9 +110,9 @@ public class LinearAccelerationProbe extends ContinuousProbe implements SensorEv
         {
             this._schema = new HashMap<String, String>();
 
-            this._schema.put(LinearAccelerationProbe.X_KEY, ProbeValuesProvider.REAL_TYPE);
-            this._schema.put(LinearAccelerationProbe.Y_KEY, ProbeValuesProvider.REAL_TYPE);
-            this._schema.put(LinearAccelerationProbe.Z_KEY, ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(Continuous3DProbe.X_KEY, ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(Continuous3DProbe.Y_KEY, ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(Continuous3DProbe.Z_KEY, ProbeValuesProvider.REAL_TYPE);
         }
 
         return this._schema;
@@ -138,9 +140,9 @@ public class LinearAccelerationProbe extends ContinuousProbe implements SensorEv
 
                 while (cursor.moveToNext())
                 {
-                    double xd = cursor.getDouble(cursor.getColumnIndex(LinearAccelerationProbe.X_KEY));
-                    double yd = cursor.getDouble(cursor.getColumnIndex(LinearAccelerationProbe.Y_KEY));
-                    double zd = cursor.getDouble(cursor.getColumnIndex(LinearAccelerationProbe.Z_KEY));
+                    double xd = cursor.getDouble(cursor.getColumnIndex(Continuous3DProbe.X_KEY));
+                    double yd = cursor.getDouble(cursor.getColumnIndex(Continuous3DProbe.Y_KEY));
+                    double zd = cursor.getDouble(cursor.getColumnIndex(Continuous3DProbe.Z_KEY));
 
                     double t = cursor.getDouble(cursor.getColumnIndex(ProbeValuesProvider.TIMESTAMP));
 
@@ -430,11 +432,11 @@ public class LinearAccelerationProbe extends ContinuousProbe implements SensorEv
 
                         for (int i = 0; i < fieldNames.length; i++)
                         {
-                            if (fieldNames[i].equals(LinearAccelerationProbe.X_KEY))
+                            if (fieldNames[i].equals(Continuous3DProbe.X_KEY))
                                 x = Double.valueOf(valueBuffer[i][j]);
-                            else if (fieldNames[i].equals(LinearAccelerationProbe.Y_KEY))
+                            else if (fieldNames[i].equals(Continuous3DProbe.Y_KEY))
                                 y = Double.valueOf(valueBuffer[i][j]);
-                            else if (fieldNames[i].equals(LinearAccelerationProbe.Z_KEY))
+                            else if (fieldNames[i].equals(Continuous3DProbe.Z_KEY))
                                 z = Double.valueOf(valueBuffer[i][j]);
                         }
 
@@ -442,9 +444,9 @@ public class LinearAccelerationProbe extends ContinuousProbe implements SensorEv
                         {
                             Map<String, Object> values = new HashMap<String, Object>();
 
-                            values.put(LinearAccelerationProbe.X_KEY, x);
-                            values.put(LinearAccelerationProbe.Y_KEY, y);
-                            values.put(LinearAccelerationProbe.Z_KEY, z);
+                            values.put(Continuous3DProbe.X_KEY, x);
+                            values.put(Continuous3DProbe.Y_KEY, y);
+                            values.put(Continuous3DProbe.Z_KEY, z);
 
                             values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[j] / 1000));
 
@@ -467,9 +469,9 @@ public class LinearAccelerationProbe extends ContinuousProbe implements SensorEv
     @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
-        double xReading = bundle.getDoubleArray(LinearAccelerationProbe.X_KEY)[0];
-        double yReading = bundle.getDoubleArray(LinearAccelerationProbe.Y_KEY)[0];
-        double zReading = bundle.getDoubleArray(LinearAccelerationProbe.Z_KEY)[0];
+        double xReading = bundle.getDoubleArray(Continuous3DProbe.X_KEY)[0];
+        double yReading = bundle.getDoubleArray(Continuous3DProbe.Y_KEY)[0];
+        double zReading = bundle.getDoubleArray(Continuous3DProbe.Z_KEY)[0];
 
         return String.format(context.getResources().getString(R.string.summary_linear_acceleration_probe), xReading, yReading, zReading);
     }

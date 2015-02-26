@@ -248,9 +248,9 @@ public class PebbleProbe extends Continuous3DProbe
                                     {
                                         Map<String, Object> values = new HashMap<String, Object>(4);
 
-                                        values.put(AccelerometerProbe.X_KEY, x);
-                                        values.put(AccelerometerProbe.Y_KEY, y);
-                                        values.put(AccelerometerProbe.Z_KEY, z);
+                                        values.put(Continuous3DProbe.X_KEY, x);
+                                        values.put(Continuous3DProbe.Y_KEY, y);
+                                        values.put(Continuous3DProbe.Z_KEY, z);
 
                                         values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(accel.getTimestamp() / 1000));
 
@@ -299,9 +299,9 @@ public class PebbleProbe extends Continuous3DProbe
         {
             this._schema = new HashMap<String, String>();
 
-            this._schema.put(PebbleProbe.X_KEY, ProbeValuesProvider.REAL_TYPE);
-            this._schema.put(PebbleProbe.Y_KEY, ProbeValuesProvider.REAL_TYPE);
-            this._schema.put(PebbleProbe.Z_KEY, ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(Continuous3DProbe.X_KEY, ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(Continuous3DProbe.Y_KEY, ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(Continuous3DProbe.Z_KEY, ProbeValuesProvider.REAL_TYPE);
         }
 
         return this._schema;

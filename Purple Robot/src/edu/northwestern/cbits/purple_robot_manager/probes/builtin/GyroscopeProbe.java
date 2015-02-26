@@ -38,11 +38,7 @@ public class GyroscopeProbe extends Continuous3DProbe implements SensorEventList
     private static final String ENABLED = "config_probe_gyroscope_built_in_enabled";
     private static String FREQUENCY = "config_probe_gyroscope_built_in_frequency";
 
-    private static String X_KEY = "X";
-    private static String Y_KEY = "Y";
-    private static String Z_KEY = "Z";
-
-    private static String[] fieldNames = { X_KEY, Y_KEY, Z_KEY };
+    private static String[] fieldNames = { Continuous3DProbe.X_KEY, Continuous3DProbe.Y_KEY, Continuous3DProbe.Z_KEY };
 
     private double _lastX = Double.MAX_VALUE;
     private double _lastY = Double.MAX_VALUE;
@@ -75,9 +71,9 @@ public class GyroscopeProbe extends Continuous3DProbe implements SensorEventList
         {
             this._schema = new HashMap<String, String>();
 
-            this._schema.put(GyroscopeProbe.X_KEY, ProbeValuesProvider.REAL_TYPE);
-            this._schema.put(GyroscopeProbe.Y_KEY, ProbeValuesProvider.REAL_TYPE);
-            this._schema.put(GyroscopeProbe.Z_KEY, ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(Continuous3DProbe.X_KEY, ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(Continuous3DProbe.Y_KEY, ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(Continuous3DProbe.Z_KEY, ProbeValuesProvider.REAL_TYPE);
         }
 
         return this._schema;
@@ -316,11 +312,11 @@ public class GyroscopeProbe extends Continuous3DProbe implements SensorEventList
 
                         for (int i = 0; i < fieldNames.length; i++)
                         {
-                            if (fieldNames[i].equals(GyroscopeProbe.X_KEY))
+                            if (fieldNames[i].equals(Continuous3DProbe.X_KEY))
                                 x = valueBuffer[i][0];
-                            else if (fieldNames[i].equals(GyroscopeProbe.Y_KEY))
+                            else if (fieldNames[i].equals(Continuous3DProbe.Y_KEY))
                                 y = valueBuffer[i][0];
-                            else if (fieldNames[i].equals(GyroscopeProbe.Z_KEY))
+                            else if (fieldNames[i].equals(Continuous3DProbe.Z_KEY))
                                 z = valueBuffer[i][0];
                         }
 
@@ -328,9 +324,9 @@ public class GyroscopeProbe extends Continuous3DProbe implements SensorEventList
                         {
                             Map<String, Object> values = new HashMap<String, Object>(4);
 
-                            values.put(GyroscopeProbe.X_KEY, x);
-                            values.put(GyroscopeProbe.Y_KEY, y);
-                            values.put(GyroscopeProbe.Z_KEY, z);
+                            values.put(Continuous3DProbe.X_KEY, x);
+                            values.put(Continuous3DProbe.Y_KEY, y);
+                            values.put(Continuous3DProbe.Z_KEY, z);
 
                             values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[0] / 1000));
 
@@ -371,9 +367,9 @@ public class GyroscopeProbe extends Continuous3DProbe implements SensorEventList
     @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
-        double xReading = bundle.getDoubleArray(GyroscopeProbe.X_KEY)[0];
-        double yReading = bundle.getDoubleArray(GyroscopeProbe.Y_KEY)[0];
-        double zReading = bundle.getDoubleArray(GyroscopeProbe.Z_KEY)[0];
+        double xReading = bundle.getDoubleArray(Continuous3DProbe.X_KEY)[0];
+        double yReading = bundle.getDoubleArray(Continuous3DProbe.Y_KEY)[0];
+        double zReading = bundle.getDoubleArray(Continuous3DProbe.Z_KEY)[0];
 
         return String.format(context.getResources().getString(R.string.summary_gyroscope_probe), xReading, yReading, zReading);
     }
