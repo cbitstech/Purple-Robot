@@ -40,13 +40,10 @@ public class RotationProbe extends ContinuousProbe implements SensorEventListene
 
     public static final String DB_TABLE = "rotation_probe";
 
-    private static final String X_KEY = "X";
-    private static final String Y_KEY = "Y";
-    private static final String Z_KEY = "Z";
     private static final String COSINE = "COSINE";
     private static final String ACCURACY = "ACCURACY";
 
-    private static final String[] fieldNames = { X_KEY, Y_KEY, Z_KEY, COSINE, ACCURACY };
+    private static final String[] fieldNames = { Continuous3DProbe.X_KEY, Continuous3DProbe.Y_KEY, Continuous3DProbe.Z_KEY, COSINE, ACCURACY };
 
     protected static final String DEFAULT_THRESHOLD = "15.0";
 
@@ -111,9 +108,9 @@ public class RotationProbe extends ContinuousProbe implements SensorEventListene
         {
             this._schema = new HashMap<String, String>();
 
-            this._schema.put(RotationProbe.X_KEY, ProbeValuesProvider.REAL_TYPE);
-            this._schema.put(RotationProbe.Y_KEY, ProbeValuesProvider.REAL_TYPE);
-            this._schema.put(RotationProbe.Z_KEY, ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(Continuous3DProbe.X_KEY, ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(Continuous3DProbe.Y_KEY, ProbeValuesProvider.REAL_TYPE);
+            this._schema.put(Continuous3DProbe.Z_KEY, ProbeValuesProvider.REAL_TYPE);
             this._schema.put(RotationProbe.COSINE, ProbeValuesProvider.REAL_TYPE);
             this._schema.put(RotationProbe.ACCURACY, ProbeValuesProvider.REAL_TYPE);
         }
@@ -145,9 +142,9 @@ public class RotationProbe extends ContinuousProbe implements SensorEventListene
 
                 while (cursor.moveToNext())
                 {
-                    double xd = cursor.getDouble(cursor.getColumnIndex(RotationProbe.X_KEY));
-                    double yd = cursor.getDouble(cursor.getColumnIndex(RotationProbe.Y_KEY));
-                    double zd = cursor.getDouble(cursor.getColumnIndex(RotationProbe.Z_KEY));
+                    double xd = cursor.getDouble(cursor.getColumnIndex(Continuous3DProbe.X_KEY));
+                    double yd = cursor.getDouble(cursor.getColumnIndex(Continuous3DProbe.Y_KEY));
+                    double zd = cursor.getDouble(cursor.getColumnIndex(Continuous3DProbe.Z_KEY));
                     double cd = cursor.getDouble(cursor.getColumnIndex(RotationProbe.COSINE));
                     double ad = cursor.getDouble(cursor.getColumnIndex(RotationProbe.ACCURACY));
 
@@ -451,11 +448,11 @@ public class RotationProbe extends ContinuousProbe implements SensorEventListene
 
                         for (int i = 0; i < fieldNames.length; i++)
                         {
-                            if (fieldNames[i].equals(RotationProbe.X_KEY))
+                            if (fieldNames[i].equals(Continuous3DProbe.X_KEY))
                                 x = Double.valueOf(valueBuffer[i][j]);
-                            else if (fieldNames[i].equals(RotationProbe.Y_KEY))
+                            else if (fieldNames[i].equals(Continuous3DProbe.Y_KEY))
                                 y = Double.valueOf(valueBuffer[i][j]);
-                            else if (fieldNames[i].equals(RotationProbe.Z_KEY))
+                            else if (fieldNames[i].equals(Continuous3DProbe.Z_KEY))
                                 z = Double.valueOf(valueBuffer[i][j]);
                             else if (fieldNames[i].equals(RotationProbe.COSINE))
                                 c = Double.valueOf(valueBuffer[i][j]);
@@ -467,9 +464,9 @@ public class RotationProbe extends ContinuousProbe implements SensorEventListene
                         {
                             Map<String, Object> values = new HashMap<String, Object>();
 
-                            values.put(RotationProbe.X_KEY, x);
-                            values.put(RotationProbe.Y_KEY, y);
-                            values.put(RotationProbe.Z_KEY, z);
+                            values.put(Continuous3DProbe.X_KEY, x);
+                            values.put(Continuous3DProbe.Y_KEY, y);
+                            values.put(Continuous3DProbe.Z_KEY, z);
                             values.put(RotationProbe.COSINE, c);
                             values.put(RotationProbe.ACCURACY, a);
 
@@ -499,9 +496,9 @@ public class RotationProbe extends ContinuousProbe implements SensorEventListene
     @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
-        double xReading = bundle.getDoubleArray(RotationProbe.X_KEY)[0];
-        double yReading = bundle.getDoubleArray(RotationProbe.Y_KEY)[0];
-        double zReading = bundle.getDoubleArray(RotationProbe.Z_KEY)[0];
+        double xReading = bundle.getDoubleArray(Continuous3DProbe.X_KEY)[0];
+        double yReading = bundle.getDoubleArray(Continuous3DProbe.Y_KEY)[0];
+        double zReading = bundle.getDoubleArray(Continuous3DProbe.Z_KEY)[0];
         double cReading = bundle.getDoubleArray(RotationProbe.COSINE)[0];
 
         return String.format(context.getResources().getString(R.string.summary_rotation_probe), xReading, yReading, zReading, cReading);
