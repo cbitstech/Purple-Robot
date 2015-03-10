@@ -379,7 +379,6 @@ public class FitbitProbe extends Probe
                                     }
 
                                     me.transmitData(context, bundle);
-
                                 }
                                 catch (JSONException e)
                                 {
