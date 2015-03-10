@@ -126,7 +126,15 @@ public class TouchEventsProbe extends Probe
                     if (Looper.myLooper() == null)
                         Looper.prepare();
 
-                    wm.addView(this._overlay, params);
+
+                    try
+                    {
+                        wm.addView(this._overlay, params);
+                    }
+                    catch (IllegalStateException e)
+                    {
+                        LogManager.getInstance(context).logException(e);
+                    }
                 }
             }
 
