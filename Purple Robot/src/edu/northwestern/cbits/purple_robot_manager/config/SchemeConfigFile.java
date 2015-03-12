@@ -47,6 +47,9 @@ public class SchemeConfigFile
     {
         Pair rest = Pair.EMPTY;
 
+        if (configs.size() == 0)
+            return rest;
+
         for (Map<String, Object> config : configs)
         {
             rest = new Pair(new Pair(Symbol.intern("pr-update-trigger"), this.pairsList(config)), rest);
