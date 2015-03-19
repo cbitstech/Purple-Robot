@@ -815,6 +815,12 @@ public class StartActivity extends ActionBarActivity
 
             this.startActivity(labelIntent);
         }
+        else if (itemId == R.id.menu_mark_time)
+        {
+            Intent markIntent = new Intent(this, MarkTimeActivity.class);
+
+            this.startActivity(markIntent);
+        }
         else if (itemId == R.id.menu_upload_item)
         {
             LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(this);

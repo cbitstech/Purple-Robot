@@ -99,6 +99,11 @@
 
     <string name="menu_email_label">E-Mail Diagnostics</string>
 
+    <string name="menu_mark_time">Mark time points</string>
+    <string name="title_mark_time">Mark Time Points</string>
+    <string name="label_timestamp_name">Next Time Point Name</string>
+    <string name="hint_timestamp_name">Enter time point name&#8230;</string>
+
     <string name="title_settings">Settings</string>
     <string name="config_settings_category">Configuration Options</string>
     <string name="config_notifications_category">Notification Options</string>

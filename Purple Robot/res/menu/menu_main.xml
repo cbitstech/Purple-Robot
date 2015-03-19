@@ -18,6 +18,9 @@
     <item android:id="@+id/menu_label_item"
         android:title="@string/menu_label_label"
         robot:showAsAction="never" />
+    <item android:id="@+id/menu_mark_time"
+        android:title="@string/menu_mark_time"
+        robot:showAsAction="never" />
     <item android:id="@+id/menu_nfc_item"
         android:title="@string/action_scan_nfc"
         robot:showAsAction="never" />
