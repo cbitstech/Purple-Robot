@@ -18,7 +18,6 @@ import android.content.SharedPreferences.Editor;
 import android.hardware.SensorEvent;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 
@@ -278,7 +277,13 @@ public class PebbleProbe extends Continuous3DProbe
 
         if (this._receiver != null)
         {
-            context.unregisterReceiver(this._receiver);
+            try {
+                context.unregisterReceiver(this._receiver);
+            }
+            catch (IllegalArgumentException e)
+            {
+                // Do nothing - receiver not registered...
+            }
 
             this._receiver = null;
         }
