@@ -134,9 +134,7 @@ public class PebbleProbe extends Continuous3DProbe
     @Override
     public String probeCategory(Context context)
     {
-        // TODO: Recategorize...
-
-        return context.getResources().getString(R.string.probe_misc_category);
+        return context.getResources().getString(R.string.probe_other_devices_category);
     }
 
     @Override
