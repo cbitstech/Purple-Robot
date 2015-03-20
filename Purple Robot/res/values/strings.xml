@@ -103,6 +103,20 @@
     <string name="title_mark_time">Mark Time Points</string>
     <string name="label_timestamp_name">Next Time Point Name</string>
     <string name="hint_timestamp_name">Enter time point name&#8230;</string>
+    <string name="menu_email_timestamps">E-mail time points</string>
+    <string name="menu_clear_timestamps">Clear time points</string>
+    <string name="title_clear_timestamps">Clear time points?</string>
+    <string name="message_clear_timestamps">Would you like to remove all the time points collected?\n\nThis action cannot be undone.</string>
+    <string name="value_anonymous_timestamp">(Unnamed time point)</string>
+    <string name="placeholder_timestamps">Enter a name and tap the button below to mark a time point.</string>
+
+    <string name="title_clear_timestamp">Clear time point?</string>
+    <string name="message_clear_timestamp">Would you like to clear this time point?\n\n%1$s\n%2$s\n\nThis action cannot be undone.</string>
+    <string name="email_timetamp_subject">Purple Robot Time Points</string>
+    <string name="email_timetamp_message">The collected time points are attached.\n\n-Purple Robot\n\n</string>
+
+    <string name="action_clear">Clear</string>
+    <string name="action_cancel">Cancel</string>
 
     <string name="title_settings">Settings</string>
     <string name="config_settings_category">Configuration Options</string>
