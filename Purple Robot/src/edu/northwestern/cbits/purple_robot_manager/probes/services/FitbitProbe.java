@@ -104,6 +104,8 @@ public class FitbitProbe extends Probe
     private static final String BODY_ENABLED = "config_feature_fitbit_probe_body_enabled";
     private static final String ENABLED = "config_feature_fitbit_probe_enabled";
     private static final boolean DEFAULT_ENABLED = false;
+    private static final String OAUTH_TOKEN = "oauth_fitbit_token";
+    private static final String OAUTH_SECRET = "oauth_fitbit_secret";
 
     private long _lastUpdate = 0;
 
@@ -172,8 +174,8 @@ public class FitbitProbe extends Probe
 
                 final String dateString = sdf.format(new Date());
 
-                String token = prefs.getString("oauth_fitbit_token", "");
-                String secret = prefs.getString("oauth_fitbit_secret", "");
+                String token = prefs.getString(FitbitProbe.OAUTH_TOKEN, "");
+                String secret = prefs.getString(FitbitProbe.OAUTH_SECRET, "");
 
                 final String title = context.getString(R.string.title_fitbit_check);
                 final SanityManager sanity = SanityManager.getInstance(context);
@@ -218,8 +220,8 @@ public class FitbitProbe extends Probe
                                     JSONObject summary = body.getJSONObject("summary");
 
                                     Bundle bundle = new Bundle();
-                                    bundle.putString("PROBE", me.name(context));
-                                    bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+                                    bundle.putString(Probe.BUNDLE_PROBE, me.name(context));
+                                    bundle.putLong(Probe.BUNDLE_TIMESTAMP, System.currentTimeMillis() / 1000);
 
                                     long veryActive = summary.getLong("veryActiveMinutes");
                                     long fairlyActive = summary.getLong("fairlyActiveMinutes");
@@ -545,8 +547,8 @@ public class FitbitProbe extends Probe
 
         final SharedPreferences prefs = Probe.getPreferences(context);
 
-        String token = prefs.getString("oauth_fitbit_token", null);
-        String secret = prefs.getString("oauth_fitbit_secret", null);
+        String token = prefs.getString(FitbitProbe.OAUTH_TOKEN, null);
+        String secret = prefs.getString(FitbitProbe.OAUTH_SECRET, null);
 
         final Preference authPreference = new Preference(context);
         authPreference.setTitle(R.string.title_authenticate_fitbit_probe);
@@ -578,8 +580,8 @@ public class FitbitProbe extends Probe
             public boolean onPreferenceClick(Preference preference)
             {
                 Editor e = prefs.edit();
-                e.remove("oauth_fitbit_token");
-                e.remove("oauth_fitbit_secret");
+                e.remove(FitbitProbe.OAUTH_TOKEN);
+                e.remove(FitbitProbe.OAUTH_SECRET);
                 e.commit();
 
                 me._lastUpdate = 0;
