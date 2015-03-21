@@ -193,6 +193,18 @@ public class MarkTimeActivity extends ActionBarActivity
         list.setAdapter(adapter);
         list.setEmptyView(this.findViewById(R.id.placeholder_timestamps));
 
+        final AutoCompleteTextView nameField = (AutoCompleteTextView) this.findViewById(R.id.text_label_text);
+
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                String name = me._timestamps.valueAt(position);
+
+                nameField.setText(name);
+            }
+        });
+
         list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
         {
             public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id)
