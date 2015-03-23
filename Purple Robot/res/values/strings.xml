@@ -1396,4 +1396,21 @@
     <string name="summary_builtin_http_server_enabled">Enable the HTTP server running on the local device. This is used primarily for inter-app communication via the scripting endpoints.</string>
     <string name="title_builtin_http_server_password">Built-In HTTP Server Password</string>
     <string name="summary_builtin_http_server_password">Password to allow access to the local HTTP server via HTTP Basic Authentication</string>
+
+    <!-- iHealth -->
+    <string name="title_ihealth_probe">iHealth Probe</string>
+    <string name="summary_ihealth_probe_desc">Retrieves information from the your online iHealth profile.</string>
+    <string name="title_authenticate_ihealth_probe">Login to iHealth</string>
+    <string name="summary_authenticate_ihealth_probe">Tap to go to the iHealth website and login to give this device access to your activity data.</string>
+    <string name="title_logout_ihealth_probe">Log Out of iHealth</string>
+    <string name="summary_logout_ihealth_probe">Tap to clear your iHealth login information and revoke access to this device.</string>
+    <string name="toast_ihealth_logout">Logged out of iHealth.</string>
+    <string name="title_ihealth_check">iHealth requires authorization</string>
+    <string name="message_ihealth_check">Please login to the iHealth website from the settings to grant Purple Robot access to your iHealth account.</string>
+    <string name="config_ihealth_blood_pressure_title">Blood Pressure</string>
+    <string name="config_ihealth_blood_oxygen_title">Blood Oxygen</string>
+    <string name="config_ihealth_blood_glucose_title">Blood Glucose</string>
+    <string name="config_ihealth_activity_title">Activity</string>
+    <string name="config_ihealth_sleep_title">Sleep</string>
+    <string name="config_ihealth_weight_title">Weight</string>
 </resources>
