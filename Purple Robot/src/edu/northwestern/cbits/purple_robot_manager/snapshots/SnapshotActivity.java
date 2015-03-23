@@ -67,8 +67,8 @@ public class SnapshotActivity extends ActionBarActivity
     {
         super.onCreate(savedInstanceState);
 
-        this.getSupportActionBar().setSubtitle("TODO: PROBE COUNT HERE");
         this.setContentView(R.layout.layout_snapshot_activity);
+        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         final SnapshotActivity me = this;
 
@@ -339,7 +339,11 @@ public class SnapshotActivity extends ActionBarActivity
     {
         final SnapshotActivity me = this;
 
-        if (item.getItemId() == R.id.menu_play_snapshot_item)
+        int itemId = item.getItemId();
+
+        if (itemId == android.R.id.home)
+            this.finish();
+        else if (itemId == R.id.menu_play_snapshot_item)
         {
             if (this._isPlaying == false)
             {

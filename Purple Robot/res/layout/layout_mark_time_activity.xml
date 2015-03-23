@@ -27,6 +27,12 @@
                 android:layout_height="8dp"
                 android:layout_gravity="bottom"
                 android:background="@drawable/shadow_inverted" />
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_marginTop="0dp"
+                android:layout_height="8dp"
+                android:layout_gravity="top"
+                android:background="@drawable/shadow" />
         </FrameLayout>
         <LinearLayout
             android:layout_width="match_parent"

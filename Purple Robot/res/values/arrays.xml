@@ -49,6 +49,7 @@
         <item>features.TemperatureProbeBasicStatisticsFeature</item>
         <item>features.GooglePlacesFeature</item>
 
+        <item>services.iHealthProbe</item>
         <item>services.FitbitProbe</item>
         <item>services.JawboneProbe</item>
         <item>services.GitHubProbe</item>

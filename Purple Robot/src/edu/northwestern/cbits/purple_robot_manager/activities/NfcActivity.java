@@ -16,10 +16,12 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;
@@ -40,6 +42,7 @@ public class NfcActivity extends ActionBarActivity
 
         this.getSupportActionBar().setTitle(R.string.title_nfc_scanner);
         this.getSupportActionBar().setSubtitle(R.string.subtitle_nfc_scanner);
+        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         this.setContentView(R.layout.layout_nfc_activity);
     }
 
@@ -263,7 +266,17 @@ public class NfcActivity extends ActionBarActivity
             i = in & 0x0f;
             out += hex[i];
         }
+
         return out;
     }
 
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        int itemId = item.getItemId();
+
+        if (itemId == android.R.id.home)
+            this.finish();
+
+        return true;
+    }
 }

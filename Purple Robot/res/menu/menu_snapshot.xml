@@ -4,5 +4,5 @@
     <item android:id="@+id/menu_play_snapshot_item"
         android:title="@string/menu_play_snapshot_label"
         robot:showAsAction="always"
-        android:icon="@drawable/action_snapshot_play" />
+        android:icon="@drawable/action_play" />
 </menu>

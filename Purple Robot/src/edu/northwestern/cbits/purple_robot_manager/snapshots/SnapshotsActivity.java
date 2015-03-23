@@ -39,6 +39,7 @@ public class SnapshotsActivity extends ActionBarActivity
         this.setContentView(R.layout.layout_snapshots_activity);
 
         this.getSupportActionBar().setTitle(R.string.title_snapshots);
+        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     protected void onResume()
@@ -134,7 +135,11 @@ public class SnapshotsActivity extends ActionBarActivity
     {
         final SnapshotsActivity me = this;
 
-        if (item.getItemId() == R.id.menu_snapshot)
+        int itemId = item.getItemId();
+
+        if (itemId == android.R.id.home)
+            this.finish();
+        else if (itemId == R.id.menu_snapshot)
         {
             String label = this.getString(R.string.snapshot_user_initiated);
 

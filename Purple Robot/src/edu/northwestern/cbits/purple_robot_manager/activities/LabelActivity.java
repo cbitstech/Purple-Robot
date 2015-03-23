@@ -75,6 +75,7 @@ public class LabelActivity extends ActionBarActivity
         this.setContentView(R.layout.layout_label_activity);
 
         getWindow().setLayout(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private String[] savedLabels()
@@ -514,7 +515,9 @@ public class LabelActivity extends ActionBarActivity
     {
         final int itemId = item.getItemId();
 
-        if (itemId == R.id.menu_accept_label)
+        if (itemId == android.R.id.home)
+            this.finish();
+        else if (itemId == R.id.menu_accept_label)
         {
             Bundle extras = this.getIntent().getExtras();
 
@@ -650,11 +653,6 @@ public class LabelActivity extends ActionBarActivity
                     dialog.show(manager, "label_error");
                 }
             }
-        }
-
-        if (itemId == R.id.menu_cancel)
-        {
-            this.finish();
         }
 
         return true;

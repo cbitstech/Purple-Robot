@@ -8,17 +8,36 @@
         android:layout_weight="2"
         android:layout_width="match_parent"
         android:layout_height="0dp">
-        <WebView android:id="@+id/json_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-  		<fragment android:id="@+id/map_fragment"
-		    class="com.google.android.gms.maps.SupportMapFragment"
-		    android:layout_width="match_parent"
-		    android:layout_height="match_parent" />
+        <FrameLayout android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <WebView android:id="@+id/json_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+            <fragment android:id="@+id/map_fragment"
+                class="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_marginTop="0dp"
+                android:layout_height="8dp"
+                android:layout_gravity="top"
+                android:background="@drawable/shadow" />
+        </FrameLayout>
     </LinearLayout>
-    <ListView android:id="@+id/list_probes"
+    <FrameLayout
         android:layout_weight="3"
         android:layout_width="match_parent"
         android:layout_height="0dp">
-    </ListView>
+        <ListView android:id="@+id/list_probes"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </ListView>
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_marginTop="0dp"
+            android:layout_height="8dp"
+            android:layout_gravity="top"
+            android:background="@drawable/shadow" />
+    </FrameLayout>
 </LinearLayout>
