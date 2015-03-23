@@ -35,7 +35,7 @@
             android:background="#212121"
             android:padding="8dp">
             <AutoCompleteTextView android:id="@+id/text_label_text"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:completionThreshold="1"
                 android:layout_marginRight="80dp"

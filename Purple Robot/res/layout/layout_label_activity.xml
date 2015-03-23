@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical"
     android:layout_gravity="top"
     android:padding="10dp"
@@ -22,24 +22,24 @@
         android:textAppearance="?android:attr/textAppearanceSmall" />
     <AutoCompleteTextView
         android:id="@+id/text_label_text"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="48dp"
 		android:completionThreshold="1"
         android:hint="@string/text_label_label_placeholder" />
     <AutoCompleteTextView
         android:id="@+id/text_value_text"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="48dp"
 		android:completionThreshold="1"
         android:hint="@string/text_label_value_placeholder" />
     <CheckBox android:id="@+id/check_remember_values"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="8dp"
         android:text="@string/checkbox_remember_response" />
 	<LinearLayout android:id="@+id/layout_label"
-	    android:layout_width="fill_parent"
+	    android:layout_width="match_parent"
 	    android:layout_height="0dp"
 	    android:layout_weight="1"
 	    android:orientation="vertical"

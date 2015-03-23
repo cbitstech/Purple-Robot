@@ -7,19 +7,19 @@
     android:id="@+id/layout_start_root"
     android:gravity="center_vertical" >
     <ListView android:id="@+id/list_probes"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     </ListView>
     <LinearLayout android:id="@+id/logo_view"
         android:orientation="vertical"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:background="#ffffff">
         <View android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1" />
         <LinearLayout android:orientation="horizontal"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <View android:layout_width="0dp"
                 android:layout_height="1dp"

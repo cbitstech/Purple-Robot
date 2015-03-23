@@ -7,28 +7,28 @@
 	    android:orientation="vertical"
 	    android:padding="10dp" >
 	    <TextView
-	        android:layout_width="fill_parent"
+	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 	        android:text="@string/user_id_label"
 	        android:textIsSelectable="true"
 	        android:textAppearance="?android:attr/textAppearanceSmall" />
 	    <TextView
 	        android:id="@+id/user_id_value"
-	        android:layout_width="fill_parent"
+	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 	        android:paddingBottom="10dp"
 	        android:text="@string/user_id_placeholder"
 	        android:textIsSelectable="true"
 	        android:textAppearance="?android:attr/textAppearanceMedium" />
   	    <TextView
-	        android:layout_width="fill_parent"
+	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 	        android:text="@string/ip_address_label"
 	        android:textIsSelectable="true"
 	        android:textAppearance="?android:attr/textAppearanceSmall" />
 	    <TextView
 	        android:id="@+id/ip_address_value"
-	        android:layout_width="fill_parent"
+	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 	        android:paddingBottom="10dp"
 	        android:text="@string/ip_address_placeholder"
@@ -97,7 +97,7 @@
 	        android:textIsSelectable="true"
 	        android:textAppearance="?android:attr/textAppearanceSmall" />
    	    <LinearLayout
-	        android:layout_width="fill_parent"
+	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 	        android:orientation="vertical"
 	        android:id="@+id/pr_error_list" 
