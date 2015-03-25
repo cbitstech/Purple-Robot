@@ -143,7 +143,7 @@ public class PebbleProbe extends Continuous3DProbe
     {
         PreferenceScreen screen = manager.createPreferenceScreen(context);
         screen.setTitle(this.title(context));
-        screen.setSummary(R.string.summary_battery_probe_desc);
+        screen.setSummary(R.string.summary_pebble_probe_desc);
 
         CheckBoxPreference enabled = new CheckBoxPreference(context);
         enabled.setTitle(R.string.title_enable_probe);

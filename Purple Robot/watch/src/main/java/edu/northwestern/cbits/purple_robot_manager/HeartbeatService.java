@@ -47,7 +47,7 @@ public class HeartbeatService extends IntentService
             else
                 alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), HeartbeatService.INTERVAL, pi);
 
-            Intent sensorIntent = new Intent(this, HeartbeatService.class);
+            Intent sensorIntent = new Intent(this, SensorService.class);
             this.startService(sensorIntent);
         }
     }

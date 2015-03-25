@@ -1413,4 +1413,8 @@
     <string name="config_ihealth_activity_title">Activity</string>
     <string name="config_ihealth_sleep_title">Sleep</string>
     <string name="config_ihealth_weight_title">Weight</string>
+
+    <!-- Android Wear -->
+    <string name="title_android_wear_probe">Android Wear Probe</string>
+    <string name="summary_android_wear_probe_desc">Retrieves sensor data from a connected Android Wear device.</string>
 </resources>

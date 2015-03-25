@@ -82,9 +82,10 @@
         <item>builtin.MediaRouterDeviceProbe</item>
         <item>builtin.ShionProbe</item>
         <item>builtin.SaintProbe</item>
-        
+
         <item>devices.PebbleProbe</item>
-        
+        <item>devices.AndroidWearProbe</item>
+
         <item>builtin.TouchEventsProbe</item>
         <!-- <item>builtin.BluetoothReceiverProbe</item> -->
         <!-- <item>builtin.ZeroconfProbe</item> -->
