@@ -3,7 +3,6 @@ package edu.northwestern.cbits.purple_robot_manager;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
-import android.util.Log;
 
 import com.google.android.gms.wearable.DataMap;
 

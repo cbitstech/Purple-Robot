@@ -10,17 +10,23 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
+import android.util.LongSparseArray;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
+import java.util.ArrayList;
+
 public class SensorService extends IntentService implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
 {
+    private static final String PATH_REQUEST_DATA = "/purple-robot/request-data";
+
     public static final String SENSOR_MAXIMUM_RANGE = "MAXIMUM_RANGE";
     public static final String SENSOR_NAME = "NAME";
     public static final String SENSOR_POWER = "POWER";
@@ -36,6 +42,7 @@ public class SensorService extends IntentService implements GoogleApiClient.Conn
 
     protected static final String BUNDLE_PROBE = "PROBE";
     protected static final String BUNDLE_TIMESTAMP = "TIMESTAMP";
+    private static final String BUNDLE_SOURCE = "SOURCE";
 
     private static final String LAST_FIRE = "SensorService.LAST_FIRE";
     private static final long INTERVAL = 10000;
@@ -57,10 +64,29 @@ public class SensorService extends IntentService implements GoogleApiClient.Conn
     private static SensorEventListener gyroscopeListener = null;
 
     private static GoogleApiClient _apiClient = null;
+    private static LongSparseArray<DataMap> _payloads = new LongSparseArray<DataMap>();
+    private static boolean _isTransmitting = false;
 
     public SensorService()
     {
         super("SensorService");
+    }
+
+    public void onCreate()
+    {
+        super.onCreate();
+
+        if (SensorService._apiClient == null)
+        {
+            GoogleApiClient.Builder builder = new GoogleApiClient.Builder(this);
+            builder.addApi(Wearable.API);
+            builder.addConnectionCallbacks(this);
+
+            builder.addOnConnectionFailedListener(this);
+            SensorService._apiClient = builder.build();
+
+            SensorService._apiClient.connect();
+        }
     }
 
     protected void onHandleIntent(Intent intent)
@@ -78,11 +104,8 @@ public class SensorService extends IntentService implements GoogleApiClient.Conn
 
             boolean accelEnabled = prefs.getBoolean(SensorService.ACCELEROMETER_ENABLED, SensorService.ACCELEROMETER_DEFAULT);
 
-            Log.e("PW", "ACCEL: " + accelEnabled + " -- " + SensorService.accelerometerListener);
-
             if (accelEnabled && SensorService.accelerometerListener == null)
             {
-                Log.e("PW", "SETTING UP ACCEL LISTENER");
                 SensorService.accelerometerListener = new SensorEventListener()
                 {
                     public void onSensorChanged(SensorEvent sensorEvent)
@@ -97,13 +120,9 @@ public class SensorService extends IntentService implements GoogleApiClient.Conn
                 };
 
                 sensors.registerListener(SensorService.accelerometerListener, sensors.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
-
-                Log.e("PW", "DONE SETTING UP ACCEL LISTENER: " + SensorService.accelerometerListener);
             }
             else if (accelEnabled == false && SensorService.accelerometerListener != null)
             {
-                Log.e("PW", "TEARING DOWN ACCEL LISTENER");
-
                 try
                 {
                     sensors.unregisterListener(SensorService.accelerometerListener);
@@ -114,8 +133,6 @@ public class SensorService extends IntentService implements GoogleApiClient.Conn
                 }
 
                 SensorService.accelerometerListener = null;
-
-                Log.e("PW", "DONE TEARING DOWN ACCEL LISTENER");
             }
 
 /*            boolean lightEnabled = prefs.getBoolean(SensorService.LIGHT_ENABLED, SensorService.LIGHT_DEFAULT);
@@ -218,51 +235,79 @@ public class SensorService extends IntentService implements GoogleApiClient.Conn
             }
 */
         }
-
-        if (SensorService._apiClient == null)
-        {
-            GoogleApiClient.Builder builder = new GoogleApiClient.Builder(this);
-            builder.addApi(Wearable.API);
-            builder.addConnectionCallbacks(this);
-
-            builder.addOnConnectionFailedListener(this);
-            SensorService._apiClient = builder.build();
-
-            SensorService._apiClient.connect();
-        }
     }
 
     public static void transmitData(String source, DataMap data)
     {
-        Log.e("PW", "IN XMIT");
-        if (SensorService._apiClient.isConnected())
+        synchronized (SensorService._payloads)
         {
-            Log.e("PW", "XMITTING");
-
-            PutDataMapRequest putDataMapReq = PutDataMapRequest.create(SensorService.URI_READING_PREFIX + "/" + source + "/" + System.currentTimeMillis());
-            putDataMapReq.getDataMap().putAll(data);
-
-            PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
-
-            Wearable.DataApi.putDataItem(SensorService._apiClient, putDataReq);
+            data.putString(SensorService.BUNDLE_SOURCE, source);
+            SensorService._payloads.append(System.currentTimeMillis(), data);
         }
     }
 
     @Override
     public void onConnected(Bundle bundle)
     {
-        Log.e("PW", "CONNECTED");
+        Wearable.MessageApi.addListener(SensorService._apiClient, new MessageApi.MessageListener()
+        {
+            public void onMessageReceived(MessageEvent event)
+            {
+                if (SensorService.PATH_REQUEST_DATA.equals(event.getPath()))
+                {
+                    if (SensorService._isTransmitting == false)
+                    {
+                        SensorService._isTransmitting = true;
+
+                        long now = System.currentTimeMillis();
+                        ArrayList<Long> transmitted = new ArrayList<Long>();
+
+                        synchronized (SensorService._payloads)
+                        {
+                            for (int i = 0; i < SensorService._payloads.size(); i++)
+                            {
+                                Long timestamp = SensorService._payloads.keyAt(i);
+
+                                if (timestamp < now)
+                                {
+                                    if (SensorService._apiClient.isConnected())
+                                    {
+                                        DataMap map = SensorService._payloads.valueAt(i);
+
+                                        PutDataMapRequest putDataMapReq = PutDataMapRequest.create(SensorService.URI_READING_PREFIX + "/" + map.getString(SensorService.BUNDLE_SOURCE) + "/" + System.currentTimeMillis());
+                                        putDataMapReq.getDataMap().putAll(map);
+
+                                        PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
+
+                                        Wearable.DataApi.putDataItem(SensorService._apiClient, putDataReq);
+
+                                        transmitted.add(timestamp);
+                                    }
+                                }
+                            }
+
+                            for (Long timestamp : transmitted)
+                            {
+                                SensorService._payloads.remove(timestamp);
+                            }
+                        }
+
+                        SensorService._isTransmitting = false;
+                    }
+                }
+            }
+        });
     }
 
     @Override
     public void onConnectionSuspended(int i)
     {
-        Log.e("PW", "CONNECTION SUSPENDED");
+
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult)
     {
-        Log.e("PW", "CONNECTION FAILED");
+
     }
 }

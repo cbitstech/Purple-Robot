@@ -16,7 +16,8 @@ public class MainActivity extends Activity
     {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_main);
+        this.setContentView(R.layout.activity_main);
+
         final MainActivity me = this;
 
         final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);

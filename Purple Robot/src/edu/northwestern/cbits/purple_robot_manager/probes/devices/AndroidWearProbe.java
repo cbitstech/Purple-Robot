@@ -3,13 +3,10 @@ package edu.northwestern.cbits.purple_robot_manager.probes.devices;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEvent;
@@ -23,6 +20,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import edu.northwestern.cbits.purple_robot_manager.AndroidWearService;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -35,6 +33,7 @@ public class AndroidWearProbe extends Probe implements DataApi.DataListener
 
     private GoogleApiClient _apiClient = null;
     private Context _context = null;
+    private long _lastRequest = 0;
 
     @Override
     public String name(Context context)
@@ -134,45 +133,14 @@ public class AndroidWearProbe extends Probe implements DataApi.DataListener
         {
             if (prefs.getBoolean(AndroidWearProbe.ENABLED, AndroidWearProbe.DEFAULT_ENABLED))
             {
-/*                synchronized (this) {
-                    Log.e("PR", "IN ANDROID WEAR");
+                long now = System.currentTimeMillis();
 
-                    final AndroidWearProbe me = this;
+                if (now - this._lastRequest > 1000 * 60 * 5)
+                {
+                    this._lastRequest = now;
 
-                    if (this._apiClient == null) {
-                        Log.e("PR", "SETTING UP API CLIENT");
-                        GoogleApiClient.Builder builder = new GoogleApiClient.Builder(context);
-                        builder.addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
-                            public void onConnected(Bundle connectionHint) {
-                                Log.e("PR", "onConnected: " + connectionHint);
-
-                                Log.e("PR", "SETTING UP DATA LISTENER");
-
-                                Wearable.DataApi.addListener(me._apiClient, me);
-                            }
-
-                            public void onConnectionSuspended(int cause) {
-                                Log.e("PR", "onConnectionSuspended: " + cause);
-                            }
-                        });
-
-                        builder.addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
-                            public void onConnectionFailed(ConnectionResult result) {
-                                Log.d("PR", "onConnectionFailed: " + result);
-                            }
-                        });
-
-                        builder.addApi(Wearable.API);
-
-                        this._apiClient = builder.build();
-                        this._apiClient.connect();
-
-                        Log.e("PR", "DONE SETTING UP API CLIENT");
-
-                    } else if (this._apiClient.isConnected()) {
-                        Log.e("PR", "HAVE API CLIENT");
-                    }
-                } */
+                    AndroidWearService.requestDataFromDevices(context);
+                }
 
                 return true;
             }
@@ -184,15 +152,11 @@ public class AndroidWearProbe extends Probe implements DataApi.DataListener
     @Override
     public void onDataChanged(DataEventBuffer dataEvents)
     {
-        Log.e("PR", "DATA CHANGE");
-
         for (DataEvent event : dataEvents)
         {
             if (event.getType() == DataEvent.TYPE_CHANGED)
             {
                 DataItem item = event.getDataItem();
-
-                Log.e("PR", "GOT ITEM: " + item.getUri());
 
                 if (item.getUri().getPath().compareTo(AndroidWearProbe.URI_READING_PREFIX) == 0)
                 {
