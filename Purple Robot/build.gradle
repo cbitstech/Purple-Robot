@@ -80,7 +80,7 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
             signingConfig signingConfigs.release
-            debuggable false
+            debuggable true
         }
         debug {
             minifyEnabled true

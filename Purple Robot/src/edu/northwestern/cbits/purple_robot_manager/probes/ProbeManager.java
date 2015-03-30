@@ -59,7 +59,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.features.Accelerometer
 import edu.northwestern.cbits.purple_robot_manager.probes.features.AccelerometerFrequencyFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.CallHistoryFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.DeviceInUseFeature;
-import edu.northwestern.cbits.purple_robot_manager.probes.features.GooglePlacesFeature;
+import edu.northwestern.cbits.purple_robot_manager.probes.services.GooglePlacesProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.GyroscopeBasicStatisticsFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.JavascriptFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.LightProbeBasicStatisticsFeature;
@@ -406,9 +406,9 @@ public class ProbeManager
                 if (stats.name(context).equalsIgnoreCase(name))
                     found = true;
             }
-            else if (probe instanceof GooglePlacesFeature)
+            else if (probe instanceof GooglePlacesProbe)
             {
-                GooglePlacesFeature places = (GooglePlacesFeature) probe;
+                GooglePlacesProbe places = (GooglePlacesProbe) probe;
 
                 if (places.name(context).equalsIgnoreCase(name))
                     found = true;

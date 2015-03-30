@@ -47,7 +47,6 @@
         <item>features.PressureProbeBasicStatisticsFeature</item>
         <item>features.ProximityProbeBasicStatisticsFeature</item>
         <item>features.TemperatureProbeBasicStatisticsFeature</item>
-        <item>features.GooglePlacesFeature</item>
 
         <item>services.iHealthProbe</item>
         <item>services.FitbitProbe</item>
@@ -59,6 +58,7 @@
         <item>services.FoursquareProbe</item>
         <item>services.FacebookProbe</item>
         <item>services.FacebookEventsProbe</item>
+        <item>services.GooglePlacesProbe</item>
 
         <item>builtin.RandomNoiseProbe</item>
         <item>builtin.NfcProbe</item>
@@ -598,6 +598,7 @@
         <!-- <item>ServerFailureCheck</item> -->
         <item>UploadProgressCheck</item>
         <item>GoogleServicesCheck</item>
+        <item>ByMinuteTriggerCheck</item>
         <!-- <item>TestErrorCheck</item> -->
         <!-- <item>TestWarningCheck</item> -->
    	</array>
