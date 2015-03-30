@@ -654,8 +654,8 @@
     <string name="summary_device_inactive">Device Curently Inactive</string>
 
     <!-- Google Places Feature -->
-    <string name="title_google_places_feature">Google Places</string>
-    <string name="summary_google_places_feature_desc">Counts the number of nearby location types.</string>
+    <string name="title_google_places_probe">Google Places</string>
+    <string name="summary_google_places_probe_desc">Counts the number of nearby location types.</string>
     <string name="summary_google_places">Most Frequent Place Type: %1$s (%2$d)</string>
     <string name="feature_google_places_radius_label">Search radius</string>
     
@@ -884,6 +884,9 @@
     <string name="name_sanity_google_play_update_disabled">Google Play services is disabled.</string>
     <string name="name_sanity_google_play_update_invalid">Google Play services is invalid.</string>
     <string name="name_sanity_google_play_update_ok">Google Play services is working properly.</string>
+
+    <string name="name_sanity_trigger_byminute">Trigger BYMINUTE</string>
+    <string name="name_sanity_trigger_byminute_warning">%1$s trigger defined using both FREQ=MINUTELY and BYMINUTE, introducing performance issues.</string>
 
     <string name="message_clearing_archive">Clearing archive files&#8230;</string>
     

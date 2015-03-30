@@ -69,13 +69,18 @@ public class DateTrigger extends Trigger
 
     private Calendar _calendar = null;
 
-    public String _icalString = null;
+    private String _icalString = null;
 
     private long _lastFireCalcDate = 0;
     private final List<Date> _upcomingFireDates = new ArrayList<Date>();
 
     private static List<Runnable> pendingRefreshes = new ArrayList<Runnable>();
     private static boolean isRefreshing = false;
+
+    public String getCalendarString()
+    {
+        return this._icalString;
+    }
 
     private abstract class RefreshRunnable implements Runnable
     {
