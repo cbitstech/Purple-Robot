@@ -13,11 +13,14 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.SettingsKeys;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.xsi.XSI;
 
 public class PurpleRobotApplication extends Application
 {
@@ -30,6 +33,18 @@ public class PurpleRobotApplication extends Application
         super.onCreate();
 
         PurpleRobotApplication._context = this.getApplicationContext();
+
+        try
+        {
+            PackageInfo info = PurpleRobotApplication._context.getPackageManager().getPackageInfo(PurpleRobotApplication._context.getPackageName(), 0);
+
+            XSI.setUserAgent(PurpleRobotApplication._context.getString(R.string.app_name) + " " + info.versionName);
+
+        }
+        catch (PackageManager.NameNotFoundException e)
+        {
+            LogManager.getInstance(PurpleRobotApplication._context).logException(e);
+        }
     }
 
     public static Context getAppContext()
