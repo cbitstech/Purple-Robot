@@ -80,6 +80,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.services.LinkedInProbe
 import edu.northwestern.cbits.purple_robot_manager.probes.services.TwitterProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.services.FacebookEventsProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.services.FacebookProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.services.iHealthProbe;
 
 public class ProbeManager
 {
@@ -593,6 +594,13 @@ public class ProbeManager
                 PebbleProbe pebble = (PebbleProbe) probe;
 
                 if (pebble.name(context).equalsIgnoreCase(name))
+                    found = true;
+            }
+            else if (probe instanceof iHealthProbe)
+            {
+                iHealthProbe ihealth = (iHealthProbe) probe;
+
+                if (ihealth.name(context).equalsIgnoreCase(name))
                     found = true;
             }
             else if (probe instanceof AndroidWearProbe)

@@ -1401,7 +1401,7 @@
     <string name="summary_builtin_http_server_password">Password to allow access to the local HTTP server via HTTP Basic Authentication</string>
 
     <!-- iHealth -->
-    <string name="title_ihealth_probe">iHealth Probe</string>
+    <string name="title_ihealth_probe">iHealth</string>
     <string name="summary_ihealth_probe_desc">Retrieves information from the your online iHealth profile.</string>
     <string name="title_authenticate_ihealth_probe">Login to iHealth</string>
     <string name="summary_authenticate_ihealth_probe">Tap to go to the iHealth website and login to give this device access to your activity data.</string>
@@ -1416,6 +1416,10 @@
     <string name="config_ihealth_activity_title">Activity</string>
     <string name="config_ihealth_sleep_title">Sleep</string>
     <string name="config_ihealth_weight_title">Weight</string>
+    <string name="summary_ihealth_steps">Steps: %1$.0f</string>
+    <string name="summary_ihealth_weight">Weight: %1$.0f</string>
+    <string name="summary_ihealth_pressure">Blood Pressure: %1$.0f/%2$.0f</string>
+    <string name="summary_ihealth_glucose">Blood Glucose: %1$.0f</string>
 
     <!-- Android Wear -->
     <string name="title_android_wear_probe">Android Wear Probe</string>
