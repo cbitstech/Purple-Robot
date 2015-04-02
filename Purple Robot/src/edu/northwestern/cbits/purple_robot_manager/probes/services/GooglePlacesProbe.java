@@ -15,10 +15,12 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -28,31 +30,29 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.maps.model.LatLng;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
-import edu.northwestern.cbits.purple_robot_manager.probes.features.Feature;
 
-public class GooglePlacesProbe extends Feature implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
+public class GooglePlacesProbe extends Probe implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
 {
     private static final String DEFAULT_RADIUS = "1000";
 
-    private static final String RADIUS = "config_feature_google_places_radius";
+    private static final String RADIUS = "config_probe_google_places_radius";
     private static final String ENABLED = "config_probe_google_places_enabled";
+    private static final boolean DEFAULT_ENABLED = false;
+    private static final String MOST_LIKELY_PLACE = "MOST_LIKELY_PLACE";
+    private static final String MOST_LIKELY_PLACE_ID = "MOST_LIKELY_PLACE_ID";
+    private static final String MOST_LIKELY_PLACE_LIKELIHOOD = "MOST_LIKELY_PLACE_LIKELIHOOD";
 
     private static String[] EXCLUDED_TYPES = { "establishment" };
 
     protected long _lastCheck = 0;
 
     private GoogleApiClient _client = null;
-
-    @Override
-    protected String featureKey()
-    {
-        return "google_places";
-    }
 
     @Override
     public String summary(Context context)
@@ -103,9 +103,9 @@ public class GooglePlacesProbe extends Feature implements GoogleApiClient.Connec
     {
         if (super.isEnabled(context))
         {
-            SharedPreferences prefs = Probe.getPreferences(context);
+            final SharedPreferences prefs = Probe.getPreferences(context);
 
-            if (prefs.getBoolean(GooglePlacesProbe.ENABLED, true))
+            if (prefs.getBoolean(GooglePlacesProbe.ENABLED, GooglePlacesProbe.DEFAULT_ENABLED))
             {
                 long now = System.currentTimeMillis();
 
@@ -115,7 +115,6 @@ public class GooglePlacesProbe extends Feature implements GoogleApiClient.Connec
 
                     if (this._client == null)
                     {
-                        Log.e("PR", "SETTING UP CLIENT");
                         GoogleApiClient.Builder builder = new GoogleApiClient.Builder(context);
                         builder = builder.addApi(Places.GEO_DATA_API);
                         builder = builder.addApi(Places.PLACE_DETECTION_API);
@@ -126,25 +125,34 @@ public class GooglePlacesProbe extends Feature implements GoogleApiClient.Connec
                         this._client.connect();
 
                         this._lastCheck = 0;
-
-                        Log.e("PR", "DONE SETTING UP CLIENT");
                     }
                     else if (this._client.isConnected())
                     {
-                        Log.e("PR", "STARTING PLACES LOOKUP");
-
                         PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi.getCurrentPlace(this._client, null);
-
-                        Log.e("PR", "PENDING: " + result);
 
                         result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>()
                         {
                              public void onResult(PlaceLikelihoodBuffer likelyPlaces)
                              {
-                                 Log.e("PR", "RESULT: " + this + " -- " + likelyPlaces);
+                                 LocationManager locations = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+
+                                 Location last = null;
+
+                                 if (locations.isProviderEnabled(LocationManager.GPS_PROVIDER))
+                                     last = locations.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                                 else if (locations.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
+                                     last = locations.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                                 else
+                                     last = locations.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+
+                                 double radius = Double.parseDouble(prefs.getString(GooglePlacesProbe.RADIUS, GooglePlacesProbe.DEFAULT_RADIUS));
+
+                                 if (last == null)
+                                     radius = Double.MAX_VALUE;
 
                                  float mostLikelihood = 0;
-                                 String mostLikelyPlace = "";
+                                 String mostLikelyPlaceName = null;
+                                 String mostLikelyPlaceId = null;
 
                                  HashMap<String, Integer> places = new HashMap<String, Integer>();
 
@@ -152,20 +160,34 @@ public class GooglePlacesProbe extends Feature implements GoogleApiClient.Connec
                                  {
                                      Place place = placeLikelihood.getPlace();
 
-                                     List<Integer> types = place.getPlaceTypes();
+                                     Location placeLocation = new Location(locations.PASSIVE_PROVIDER);
+                                     placeLocation.setLatitude(place.getLatLng().latitude);
+                                     placeLocation.setLongitude(place.getLatLng().longitude);
 
-                                     for (Integer type : types)
+                                     if (last == null || Math.abs(last.distanceTo(placeLocation)) < radius)
                                      {
-                                         String typeString = GooglePlacesProbe.stringForType(type);
+                                         List<Integer> types = place.getPlaceTypes();
 
-                                         Integer count = places.get(typeString);
+                                         for (Integer type : types)
+                                         {
+                                             String typeString = GooglePlacesProbe.stringForType(type);
 
-                                         if (count == null)
-                                             count = 0;
+                                             Integer count = places.get(typeString);
 
-                                         count += 1;
+                                             if (count == null)
+                                                 count = 0;
 
-                                         places.put(typeString, count);
+                                             count += 1;
+
+                                             places.put(typeString, count);
+                                         }
+
+                                         if (placeLikelihood.getLikelihood() > mostLikelihood)
+                                         {
+                                             mostLikelyPlaceId = place.getId();
+                                             mostLikelyPlaceName = place.getName().toString();
+                                             mostLikelihood = placeLikelihood.getLikelihood();
+                                         }
                                      }
                                  }
 
@@ -174,6 +196,13 @@ public class GooglePlacesProbe extends Feature implements GoogleApiClient.Connec
                                 Bundle bundle = new Bundle();
                                 bundle.putString("PROBE", me.name(context));
                                 bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+
+                                 if (mostLikelyPlaceName != null)
+                                 {
+                                     bundle.putString(GooglePlacesProbe.MOST_LIKELY_PLACE, mostLikelyPlaceName);
+                                     bundle.putString(GooglePlacesProbe.MOST_LIKELY_PLACE_ID, mostLikelyPlaceId);
+                                     bundle.putFloat(GooglePlacesProbe.MOST_LIKELY_PLACE_LIKELIHOOD, mostLikelihood);
+                                 }
 
                                 for (String key : places.keySet())
                                 {
@@ -288,7 +317,16 @@ public class GooglePlacesProbe extends Feature implements GoogleApiClient.Connec
     @Override
     public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
     {
-        PreferenceScreen screen = super.preferenceScreen(context, manager);
+        final PreferenceScreen screen = manager.createPreferenceScreen(context);
+        screen.setTitle(this.title(context));
+        screen.setSummary(this.summary(context));
+
+        CheckBoxPreference enabled = new CheckBoxPreference(context);
+        enabled.setTitle(R.string.title_enable_probe);
+        enabled.setKey(GooglePlacesProbe.ENABLED);
+        enabled.setDefaultValue(GooglePlacesProbe.DEFAULT_ENABLED);
+
+        screen.addPreference(enabled);
 
         FlexibleListPreference radius = new FlexibleListPreference(context);
         radius.setKey(GooglePlacesProbe.RADIUS);
