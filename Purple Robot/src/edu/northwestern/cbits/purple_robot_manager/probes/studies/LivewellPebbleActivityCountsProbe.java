@@ -223,6 +223,8 @@ public class LivewellPebbleActivityCountsProbe extends Probe
         installWatchApp.setTitle(R.string.probe_livewell_pebble_install_label);
         installWatchApp.setIntent(new Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.probe_livewell_pebble_install_url))));
 
+        screen.addPreference(installWatchApp);
+
         return screen;
     }
 
