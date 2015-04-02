@@ -54,6 +54,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TouchEventsPro
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.VisibleSatelliteProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.WifiAccessPointsProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.devices.AndroidWearProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.devices.AsyncPebbleProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.devices.PebbleProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.AccelerometerBasicStatisticsFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.AccelerometerFrequencyFeature;
@@ -592,6 +593,13 @@ public class ProbeManager
             else if (probe instanceof PebbleProbe)
             {
                 PebbleProbe pebble = (PebbleProbe) probe;
+
+                if (pebble.name(context).equalsIgnoreCase(name))
+                    found = true;
+            }
+            else if (probe instanceof AsyncPebbleProbe)
+            {
+                AsyncPebbleProbe pebble = (AsyncPebbleProbe) probe;
 
                 if (pebble.name(context).equalsIgnoreCase(name))
                     found = true;

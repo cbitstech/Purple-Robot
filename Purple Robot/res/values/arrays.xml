@@ -83,6 +83,7 @@
         <item>builtin.ShionProbe</item>
         <item>builtin.SaintProbe</item>
 
+        <item>devices.AsyncPebbleProbe</item>
         <item>devices.PebbleProbe</item>
         <item>devices.AndroidWearProbe</item>
 
