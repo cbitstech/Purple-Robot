@@ -290,13 +290,7 @@ public class LocationProbe extends Probe implements LocationListener
 
                     long freq = Long.parseLong(prefs.getString(LocationProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
 
-                    if (now - this._lastCheck > 30000 && now - this._lastCheck < freq && this._listening) // Try
-                                                                                                          // to
-                                                                                                          // get
-                                                                                                          // position
-                                                                                                          // in
-                                                                                                          // 30
-                                                                                                          // seconds...
+                    if (now - this._lastCheck > 30000 && now - this._lastCheck < freq && this._listening)
                     {
                         locationManager.removeUpdates(this);
                         this._listening = false;

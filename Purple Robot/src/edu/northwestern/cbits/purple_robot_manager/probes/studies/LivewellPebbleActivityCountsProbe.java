@@ -1,10 +1,13 @@
-package edu.northwestern.cbits.purple_robot_manager.probes.devices;
+package edu.northwestern.cbits.purple_robot_manager.probes.studies;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
+import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.util.Log;
@@ -16,16 +19,19 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.UUID;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
 import edu.northwestern.cbits.purple_robot_manager.calibration.PebbleCalibrationHelper;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
-public class AsyncPebbleProbe extends Probe
+public class LivewellPebbleActivityCountsProbe extends Probe
 {
     private static final String FIRMWARE_VERSION = "FIRMWARE_VERSION";
     private static final byte COMMAND_FLUSH_BUFFER = 0x00;
@@ -37,10 +43,11 @@ public class AsyncPebbleProbe extends Probe
     private static final String BUNDLE_Y_DELTA = "BUNDLE_Y_DELTA";
     private static final String BUNDLE_Z_DELTA = "BUNDLE_Z_DELTA";
     private static final String BUNDLE_ALL_DELTA = "BUNDLE_ALL_DELTA";
+    private static final String FREQUENCY = "config_probe_livewell_pebble_frequency";
 
     private static UUID WATCHAPP_UUID = UUID.fromString("09e5f53c-651e-408a-8b10-3b5b0e1b6b09");
 
-    private static final String ENABLED = "config_probe_pebble_pull_enabled";
+    private static final String ENABLED = "config_probe_livewell_pebble_enabled";
     private static final boolean DEFAULT_ENABLED = false;
 
     private PebbleKit.PebbleDataReceiver _receiver = null;
@@ -48,6 +55,8 @@ public class AsyncPebbleProbe extends Probe
     private PebbleKit.PebbleAckReceiver _ackReceiver = null;
 
     private long _lastRefresh = 0;
+    private ArrayList<Bundle> _pendingReadings = new ArrayList<Bundle>();
+    private boolean _isTransmitting = false;
 
     private static class ActivityCount
     {
@@ -177,13 +186,13 @@ public class AsyncPebbleProbe extends Probe
     @Override
     public String name(Context context)
     {
-        return "edu.northwestern.cbits.purple_robot_manager.probes.devices.AsyncPebbleProbe";
+        return "edu.northwestern.cbits.purple_robot_manager.probes.studies.LivewellPebbleActivityCountsProbe";
     }
 
     @Override
     public String probeCategory(Context context)
     {
-        return context.getResources().getString(R.string.probe_other_devices_category);
+        return context.getResources().getString(R.string.probe_studies_category);
     }
 
     @Override
@@ -192,14 +201,27 @@ public class AsyncPebbleProbe extends Probe
     {
         PreferenceScreen screen = manager.createPreferenceScreen(context);
         screen.setTitle(this.title(context));
-        screen.setSummary(R.string.summary_async_pebble_probe_desc);
+        screen.setSummary(R.string.summary_livewell_pebble_probe_desc);
 
         CheckBoxPreference enabled = new CheckBoxPreference(context);
         enabled.setTitle(R.string.title_enable_probe);
-        enabled.setKey(AsyncPebbleProbe.ENABLED);
-        enabled.setDefaultValue(AsyncPebbleProbe.DEFAULT_ENABLED);
+        enabled.setKey(LivewellPebbleActivityCountsProbe.ENABLED);
+        enabled.setDefaultValue(LivewellPebbleActivityCountsProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
+
+        FlexibleListPreference duration = new FlexibleListPreference(context);
+        duration.setKey(LivewellPebbleActivityCountsProbe.FREQUENCY);
+        duration.setDefaultValue(Probe.DEFAULT_FREQUENCY);
+        duration.setEntryValues(R.array.probe_satellite_frequency_values);
+        duration.setEntries(R.array.probe_satellite_frequency_labels);
+        duration.setTitle(R.string.probe_frequency_label);
+
+        screen.addPreference(duration);
+
+        Preference installWatchApp = new Preference(context);
+        installWatchApp.setTitle(R.string.probe_livewell_pebble_install_label);
+        installWatchApp.setIntent(new Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.probe_livewell_pebble_install_url))));
 
         return screen;
     }
@@ -210,7 +232,7 @@ public class AsyncPebbleProbe extends Probe
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean(AsyncPebbleProbe.ENABLED, true);
+        e.putBoolean(LivewellPebbleActivityCountsProbe.ENABLED, true);
 
         e.commit();
     }
@@ -221,7 +243,7 @@ public class AsyncPebbleProbe extends Probe
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean(AsyncPebbleProbe.ENABLED, false);
+        e.putBoolean(LivewellPebbleActivityCountsProbe.ENABLED, false);
 
         e.commit();
     }
@@ -241,6 +263,20 @@ public class AsyncPebbleProbe extends Probe
             values.put(false);
             enabled.put(Probe.PROBE_VALUES, values);
             settings.put(Probe.PROBE_ENABLED, enabled);
+
+            JSONObject frequency = new JSONObject();
+            frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
+            values = new JSONArray();
+
+            String[] options = context.getResources().getStringArray(R.array.probe_satellite_frequency_values);
+
+            for (String option : options)
+            {
+                values.put(Long.parseLong(option));
+            }
+
+            frequency.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_FREQUENCY, frequency);
         }
         catch (JSONException e)
         {
@@ -257,32 +293,23 @@ public class AsyncPebbleProbe extends Probe
 
         if (super.isEnabled(context))
         {
-            if (prefs.getBoolean(AsyncPebbleProbe.ENABLED, AsyncPebbleProbe.DEFAULT_ENABLED))
+            if (prefs.getBoolean(LivewellPebbleActivityCountsProbe.ENABLED, LivewellPebbleActivityCountsProbe.DEFAULT_ENABLED))
             {
                 PebbleCalibrationHelper.check(context, true);
 
-                PebbleKit.startAppOnPebble(context, AsyncPebbleProbe.WATCHAPP_UUID);
+                PebbleKit.startAppOnPebble(context, LivewellPebbleActivityCountsProbe.WATCHAPP_UUID);
 
                 if (this._receiver == null)
                 {
-                    final AsyncPebbleProbe me = this;
+                    final LivewellPebbleActivityCountsProbe me = this;
 
-                    this._receiver =  new PebbleKit.PebbleDataReceiver(AsyncPebbleProbe.WATCHAPP_UUID)
+                    this._receiver =  new PebbleKit.PebbleDataReceiver(LivewellPebbleActivityCountsProbe.WATCHAPP_UUID)
                     {
                         public void receiveData(final Context context, final int transactionId, final PebbleDictionary dictionary)
                         {
                             PebbleKit.sendAckToPebble(context, transactionId);
 
                             ActivityCount count = new ActivityCount(dictionary.getBytes(1));
-
-                            try
-                            {
-                                Log.e("PR", "ACTIVITY-COUNT: " + count.toJson(context).toString(2));
-                            }
-                            catch (JSONException e)
-                            {
-                                e.printStackTrace();
-                            }
 
                             TimeZone here = Calendar.getInstance().getTimeZone();
                             count.applyTimezone(here);
@@ -293,17 +320,58 @@ public class AsyncPebbleProbe extends Probe
 
                             PebbleKit.FirmwareVersionInfo info = PebbleKit.getWatchFWVersion(context);
 
-                            data.putString(AsyncPebbleProbe.FIRMWARE_VERSION, "" + info.getMajor() + "." + info.getMinor() + "." + info.getPoint() + " " + info.getTag());
+                            data.putString(LivewellPebbleActivityCountsProbe.FIRMWARE_VERSION, "" + info.getMajor() + "." + info.getMinor() + "." + info.getPoint() + " " + info.getTag());
 
-                            data.putLong(AsyncPebbleProbe.BUNDLE_DURATION, count.duration());
-                            data.putInt(AsyncPebbleProbe.BUNDLE_NUM_SAMPLES, count.numSamples());
-                            data.putInt(AsyncPebbleProbe.BUNDLE_NUM_DUPLICATES, count.numDuplicates());
-                            data.putLong(AsyncPebbleProbe.BUNDLE_X_DELTA, count.xDelta());
-                            data.putLong(AsyncPebbleProbe.BUNDLE_Y_DELTA, count.yDelta());
-                            data.putLong(AsyncPebbleProbe.BUNDLE_Z_DELTA, count.zDelta());
-                            data.putDouble(AsyncPebbleProbe.BUNDLE_ALL_DELTA, count.activityCount());
+                            data.putLong(LivewellPebbleActivityCountsProbe.BUNDLE_DURATION, count.duration());
+                            data.putInt(LivewellPebbleActivityCountsProbe.BUNDLE_NUM_SAMPLES, count.numSamples());
+                            data.putInt(LivewellPebbleActivityCountsProbe.BUNDLE_NUM_DUPLICATES, count.numDuplicates());
+                            data.putLong(LivewellPebbleActivityCountsProbe.BUNDLE_X_DELTA, count.xDelta());
+                            data.putLong(LivewellPebbleActivityCountsProbe.BUNDLE_Y_DELTA, count.yDelta());
+                            data.putLong(LivewellPebbleActivityCountsProbe.BUNDLE_Z_DELTA, count.zDelta());
+                            data.putDouble(LivewellPebbleActivityCountsProbe.BUNDLE_ALL_DELTA, count.activityCount());
 
-                            me.transmitData(context, data);
+                            synchronized(me._pendingReadings)
+                            {
+                                me._pendingReadings.add(data);
+                            }
+
+                            Runnable r = new Runnable()
+                            {
+                                // Delay immediate transmission so display system can keep up - one reading per second.
+
+                                public void run()
+                                {
+                                    if (me._isTransmitting)
+                                        return;
+
+                                    me._isTransmitting = true;
+
+                                    while (me._pendingReadings.size() > 0)
+                                    {
+                                        synchronized(me._pendingReadings)
+                                        {
+                                            me.transmitData(context, me._pendingReadings.get(0));
+
+                                            me._pendingReadings.remove(0);
+                                        }
+
+                                        try
+                                        {
+
+                                            Thread.sleep(1000);
+                                        }
+                                        catch (InterruptedException e)
+                                        {
+                                            LogManager.getInstance(context).logException(e);
+                                        }
+                                    }
+
+                                    me._isTransmitting = false;
+                                }
+                            };
+
+                            Thread t = new Thread(r);
+                            t.start();
                         }
                     };
 
@@ -312,17 +380,19 @@ public class AsyncPebbleProbe extends Probe
 
                 long now = System.currentTimeMillis();
 
-                if (now - this._lastRefresh > 60000) // Attempt to flush remote buffer every 60 seconds...
+                long freq = Long.parseLong(prefs.getString(LivewellPebbleActivityCountsProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
+
+                if (now - this._lastRefresh > freq)
                 {
                     this._lastRefresh = now;
 
                     if (this._ackReceiver == null)
                     {
-                        this._ackReceiver = new PebbleKit.PebbleAckReceiver(AsyncPebbleProbe.WATCHAPP_UUID)
+                        this._ackReceiver = new PebbleKit.PebbleAckReceiver(LivewellPebbleActivityCountsProbe.WATCHAPP_UUID)
                         {
                             public void receiveAck(Context context, int i)
                             {
-                                Log.e("PR", "ACK: " + i);
+
                             }
                         };
 
@@ -331,11 +401,11 @@ public class AsyncPebbleProbe extends Probe
 
                     if (this._nackReceiver == null)
                     {
-                        this._nackReceiver = new PebbleKit.PebbleNackReceiver(AsyncPebbleProbe.WATCHAPP_UUID)
+                        this._nackReceiver = new PebbleKit.PebbleNackReceiver(LivewellPebbleActivityCountsProbe.WATCHAPP_UUID)
                         {
                             public void receiveNack(Context context, int i)
                             {
-                                Log.e("PR", "NACK: " + i);
+
                             }
                         };
 
@@ -343,12 +413,10 @@ public class AsyncPebbleProbe extends Probe
                     }
 
                     PebbleDictionary data = new PebbleDictionary();
-                    data.addUint8(0, AsyncPebbleProbe.COMMAND_FLUSH_BUFFER);
+                    data.addUint8(0, LivewellPebbleActivityCountsProbe.COMMAND_FLUSH_BUFFER);
 
-                    PebbleKit.sendDataToPebble(context, AsyncPebbleProbe.WATCHAPP_UUID, data);
+                    PebbleKit.sendDataToPebble(context, LivewellPebbleActivityCountsProbe.WATCHAPP_UUID, data);
                 }
-                else
-                    Log.e("PR", "PEBBLE NOT CONNECTED");
 
                 return true;
             }
@@ -403,23 +471,48 @@ public class AsyncPebbleProbe extends Probe
 
     public String summary(Context context)
     {
-        return context.getString(R.string.summary_async_pebble_probe_desc);
+        return context.getString(R.string.summary_livewell_pebble_probe_desc);
     }
 
     @Override
     public String title(Context context)
     {
-        return context.getString(R.string.title_async_pebble_probe);
+        return context.getString(R.string.title_livewell_pebble_probe);
     }
 
 
     @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
-        double count = bundle.getDouble(AsyncPebbleProbe.BUNDLE_ALL_DELTA);
-        double numSamples = bundle.getDouble(AsyncPebbleProbe.BUNDLE_NUM_SAMPLES);
-        double duration = bundle.getDouble(AsyncPebbleProbe.BUNDLE_DURATION);
+        double count = bundle.getDouble(LivewellPebbleActivityCountsProbe.BUNDLE_ALL_DELTA);
+        double numSamples = bundle.getDouble(LivewellPebbleActivityCountsProbe.BUNDLE_NUM_SAMPLES);
+        double duration = bundle.getDouble(LivewellPebbleActivityCountsProbe.BUNDLE_DURATION);
 
-        return String.format(context.getResources().getString(R.string.summary_async_pebble_probe), (duration / 1000), numSamples, count);
+        return String.format(context.getResources().getString(R.string.summary_livewell_pebble_probe), (duration / 1000), numSamples, count);
+    }
+
+    @Override
+    public void updateFromMap(Context context, Map<String, Object> params)
+    {
+        super.updateFromMap(context, params);
+
+        if (params.containsKey(Probe.PROBE_FREQUENCY))
+        {
+            Object frequency = params.get(Probe.PROBE_FREQUENCY);
+
+            if (frequency instanceof Double)
+            {
+                frequency = Long.valueOf(((Double) frequency).longValue());
+            }
+
+            if (frequency instanceof Long)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString(LivewellPebbleActivityCountsProbe.FREQUENCY, frequency.toString());
+                e.commit();
+            }
+        }
     }
 }
