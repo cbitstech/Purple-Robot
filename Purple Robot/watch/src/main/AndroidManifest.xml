@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="edu.northwestern.cbits.purple_robot_manager"
     android:versionCode="10533" android:versionName="1.5.33">
+    <uses-permission android:name="android.permission.BODY_SENSORS" />
     <uses-feature android:name="android.hardware.type.watch" />
     <application
         android:allowBackup="true"

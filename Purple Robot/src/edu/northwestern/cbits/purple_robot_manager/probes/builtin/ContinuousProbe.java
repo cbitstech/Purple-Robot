@@ -41,7 +41,7 @@ public abstract class ContinuousProbe extends Probe
     public static final String PROBE_THRESHOLD = "threshold";
 
     protected static final boolean DEFAULT_ENABLED = false;
-    protected static final String DEFAULT_FREQUENCY = "0";
+    public static final String DEFAULT_FREQUENCY = "0";
 
     private WakeLock _wakeLock = null;
     private int _wakeLockLevel = -1;

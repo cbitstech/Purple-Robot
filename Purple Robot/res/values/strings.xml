@@ -1432,4 +1432,11 @@
     <!-- Android Wear -->
     <string name="title_android_wear_probe">Android Wear Probe</string>
     <string name="summary_android_wear_probe_desc">Retrieves sensor data from a connected Android Wear device.</string>
+    <string name="title_android_wear_probe_accel_screen">Accelerometer Settings</string>
+    <string name="title_android_wear_probe_gyro_screen">Gyroscope Settings</string>
+    <string name="title_android_wear_probe_magnet_screen">Magnetometer Settings</string>
+    <string name="title_android_wear_probe_heart_screen">Heart Rate Settings</string>
+    <string name="title_android_wear_probe_light_screen">Light Sensor Settings</string>
+
+    <string name="title_sensor_enable_sensor">Enable Sensor</string>
 </resources>

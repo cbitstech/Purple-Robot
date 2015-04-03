@@ -7,26 +7,24 @@ import android.util.Log;
 
 import com.google.android.gms.wearable.DataMap;
 
-public class AccelerometerHandler
+public class HeartHandler
 {
     private static int BUFFER_SIZE = 512;
 
-    private static final float valueBuffer[][] = new float[3][BUFFER_SIZE];
+    private static final float valueBuffer[][] = new float[1][BUFFER_SIZE];
     private static final long accuracyBuffer[] = new long[BUFFER_SIZE];
     private static final long timeBuffer[] = new long[BUFFER_SIZE];
     private static final long sensorTimeBuffer[] = new long[BUFFER_SIZE];
 
     private static int bufferIndex = 0;
 
-    protected static final String X_KEY = "X";
-    protected static final String Y_KEY = "Y";
-    protected static final String Z_KEY = "Z";
+    protected static final String BPM_KEY = "BPM";
 
-    private static final String[] fieldNames = { X_KEY, Y_KEY, Z_KEY };
+    private static final String[] fieldNames = { BPM_KEY };
 
     private static String name()
     {
-        return "edu.northwestern.cbits.purple_robot_manager.WearAccelerometerProbe";
+        return "edu.northwestern.cbits.purple_robot_manager.WearHeartProbe";
     }
 
     public static void handleSensorEvent(SensorEvent event)
@@ -63,7 +61,7 @@ public class AccelerometerHandler
                 sensorBundle.putInt(SensorService.SENSOR_VERSION, sensor.getVersion());
 
                 data.putDouble(SensorService.BUNDLE_TIMESTAMP, now / 1000);
-                data.putString(SensorService.BUNDLE_PROBE, AccelerometerHandler.name());
+                data.putString(SensorService.BUNDLE_PROBE, HeartHandler.name());
 
                 data.putDataMap(SensorService.BUNDLE_SENSOR, sensorBundle);
 
@@ -76,7 +74,7 @@ public class AccelerometerHandler
                     data.putFloatArray(fieldNames[i], valueBuffer[i]);
                 }
 
-                SensorService.transmitData("accelerometer", data);
+                SensorService.transmitData("heart", data);
 
                 bufferIndex = 0;
             }

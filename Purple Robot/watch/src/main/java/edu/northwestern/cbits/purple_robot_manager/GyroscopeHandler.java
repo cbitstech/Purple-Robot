@@ -7,7 +7,7 @@ import android.util.Log;
 
 import com.google.android.gms.wearable.DataMap;
 
-public class AccelerometerHandler
+public class GyroscopeHandler
 {
     private static int BUFFER_SIZE = 512;
 
@@ -22,15 +22,20 @@ public class AccelerometerHandler
     protected static final String Y_KEY = "Y";
     protected static final String Z_KEY = "Z";
 
+    public static boolean _enabled = false;
+
     private static final String[] fieldNames = { X_KEY, Y_KEY, Z_KEY };
 
     private static String name()
     {
-        return "edu.northwestern.cbits.purple_robot_manager.WearAccelerometerProbe";
+        return "edu.northwestern.cbits.purple_robot_manager.WearGyroscopeProbe";
     }
 
     public static void handleSensorEvent(SensorEvent event)
     {
+        if (GyroscopeHandler._enabled == false)
+            return;
+
         final long now = System.currentTimeMillis();
 
         synchronized (valueBuffer)
@@ -63,7 +68,7 @@ public class AccelerometerHandler
                 sensorBundle.putInt(SensorService.SENSOR_VERSION, sensor.getVersion());
 
                 data.putDouble(SensorService.BUNDLE_TIMESTAMP, now / 1000);
-                data.putString(SensorService.BUNDLE_PROBE, AccelerometerHandler.name());
+                data.putString(SensorService.BUNDLE_PROBE, GyroscopeHandler.name());
 
                 data.putDataMap(SensorService.BUNDLE_SENSOR, sensorBundle);
 
@@ -76,7 +81,7 @@ public class AccelerometerHandler
                     data.putFloatArray(fieldNames[i], valueBuffer[i]);
                 }
 
-                SensorService.transmitData("accelerometer", data);
+                SensorService.transmitData("gyroscope", data);
 
                 bufferIndex = 0;
             }

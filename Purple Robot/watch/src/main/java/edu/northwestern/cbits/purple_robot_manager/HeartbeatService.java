@@ -32,11 +32,11 @@ public class HeartbeatService extends IntentService
 
         if (now - lastFire > HeartbeatService.INTERVAL)
         {
+            Log.e("PW", "HEARTBEAT");
+
             SharedPreferences.Editor e = prefs.edit();
             e.putLong(HeartbeatService.LAST_FIRE, now);
             e.commit();
-
-            Log.e("PW", "HEARTBEAT: " + now);
 
             AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
 

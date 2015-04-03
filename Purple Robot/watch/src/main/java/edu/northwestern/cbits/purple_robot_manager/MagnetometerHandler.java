@@ -7,7 +7,7 @@ import android.util.Log;
 
 import com.google.android.gms.wearable.DataMap;
 
-public class AccelerometerHandler
+public class MagnetometerHandler
 {
     private static int BUFFER_SIZE = 512;
 
@@ -26,7 +26,7 @@ public class AccelerometerHandler
 
     private static String name()
     {
-        return "edu.northwestern.cbits.purple_robot_manager.WearAccelerometerProbe";
+        return "edu.northwestern.cbits.purple_robot_manager.WearMagnetometerProbe";
     }
 
     public static void handleSensorEvent(SensorEvent event)
@@ -63,7 +63,7 @@ public class AccelerometerHandler
                 sensorBundle.putInt(SensorService.SENSOR_VERSION, sensor.getVersion());
 
                 data.putDouble(SensorService.BUNDLE_TIMESTAMP, now / 1000);
-                data.putString(SensorService.BUNDLE_PROBE, AccelerometerHandler.name());
+                data.putString(SensorService.BUNDLE_PROBE, MagnetometerHandler.name());
 
                 data.putDataMap(SensorService.BUNDLE_SENSOR, sensorBundle);
 
@@ -76,7 +76,7 @@ public class AccelerometerHandler
                     data.putFloatArray(fieldNames[i], valueBuffer[i]);
                 }
 
-                SensorService.transmitData("accelerometer", data);
+                SensorService.transmitData("magnetometer", data);
 
                 bufferIndex = 0;
             }
