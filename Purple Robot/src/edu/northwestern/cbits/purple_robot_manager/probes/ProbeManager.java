@@ -54,6 +54,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TouchEventsPro
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.VisibleSatelliteProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.WifiAccessPointsProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.devices.AndroidWearProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.studies.LivewellActivityCountsProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.studies.LivewellPebbleActivityCountsProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.devices.PebbleProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.AccelerometerBasicStatisticsFeature;
@@ -602,6 +603,13 @@ public class ProbeManager
                 LivewellPebbleActivityCountsProbe pebble = (LivewellPebbleActivityCountsProbe) probe;
 
                 if (pebble.name(context).equalsIgnoreCase(name))
+                    found = true;
+            }
+            else if (probe instanceof LivewellActivityCountsProbe)
+            {
+                LivewellActivityCountsProbe livewell = (LivewellActivityCountsProbe) probe;
+
+                if (livewell.name(context).equalsIgnoreCase(name))
                     found = true;
             }
             else if (probe instanceof iHealthProbe)

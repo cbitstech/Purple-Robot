@@ -713,12 +713,15 @@
     <string name="title_pebble_probe">Pebble Watch</string>
     <string name="summary_pebble_probe_desc">Collects data from a Pebble smartwatch.</string>
 
-    <!-- Async Pebble Probe -->
+    <!-- Livewell Pebble Probe -->
     <string name="title_livewell_pebble_probe">Livewell Pebble Activity Counts</string>
     <string name="summary_livewell_pebble_probe_desc">Collects activity count data from a Pebble smartwatch running the Livewell watchface.</string>
     <string name="summary_livewell_pebble_probe">%1$.2f seconds, %2$.0f samples: %3$.1f</string>
     <string name="probe_livewell_pebble_install_label">Install Livewell Watchface</string>
     <string name="probe_livewell_pebble_install_url">http://www.aetherial.net/static/pr/livewell.pbw</string>
+
+    <string name="title_livewell_activity_counts_probe">Livewell Phone Activity Counts</string>
+    <string name="summary_livewell_activity_counts_probe_desc">Collects activity count data from local device.</string>
 
     <!-- Logging Strings -->
     <string name="title_log_upload_section">Network Logging Settings</string>

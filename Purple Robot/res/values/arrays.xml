@@ -90,7 +90,8 @@
         <!-- <item>builtin.BluetoothReceiverProbe</item> -->
         <!-- <item>builtin.ZeroconfProbe</item> -->
 
-        <item>studies.LivewellPebbleActivityCountsProbe</item>
+        <item>studies.LivewellActivityCountsProbe</item>
+        <item>studies.LivewellPebbleActivityProbe</item>
     </array>
 
 	<array name="output_plugin_classes">
