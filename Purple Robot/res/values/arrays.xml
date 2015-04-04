@@ -91,7 +91,7 @@
         <!-- <item>builtin.ZeroconfProbe</item> -->
 
         <item>studies.LivewellActivityCountsProbe</item>
-        <item>studies.LivewellPebbleActivityProbe</item>
+        <item>studies.LivewellPebbleActivityCountsProbe</item>
     </array>
 
 	<array name="output_plugin_classes">

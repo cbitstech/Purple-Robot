@@ -13,6 +13,8 @@ import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.SettingsKeys;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.RobotPreferenceListener;
@@ -700,6 +702,7 @@ public class ProbeManager
         probeCategories.add(context.getString(R.string.probe_personal_info_category));
         probeCategories.add(context.getString(R.string.probe_external_services_category));
         probeCategories.add(context.getString(R.string.probe_misc_category));
+        probeCategories.add(context.getString(R.string.probe_studies_category));
 
         for (String key : probeMap.keySet())
         {
