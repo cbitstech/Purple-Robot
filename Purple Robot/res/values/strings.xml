@@ -544,6 +544,10 @@
     <string name="title_accelerometer_probe">Accelerometer Probe</string>
     <string name="summary_accelerometer_probe_desc">Measures the acceleration applied to the device. All values are in SI units (m/s^2).</string>
 
+    <!-- Accelerometer Probe -->
+    <string name="title_wear_accelerometer_probe">Android Wear Accelerometer Probe</string>
+    <string name="summary_wear_accelerometer_probe_desc">Measures the acceleration applied to the Android Wear device. All values are in SI units (m/s^2).</string>
+
     <!-- Gravity Probe -->
     <string name="title_gravity_probe">Gravity Probe</string>
     <string name="summary_gravity_probe_desc">Measures the gravitational force applied to the device. All values are in SI units (m/s^2).</string>
@@ -564,13 +568,25 @@
     <string name="title_gyroscope_probe">Gyroscope Probe</string>
     <string name="summary_gyroscope_probe_desc">Measures angular speed around each axis.</string>
 
+    <!-- Gyroscope Probe -->
+    <string name="title_wear_gyroscope_probe">Android Wear Gyroscope Probe</string>
+    <string name="summary_wear_gyroscope_probe_desc">Measures angular speed around each axis.</string>
+
     <!-- Light Probe -->
     <string name="title_light_probe">Light Probe</string>
     <string name="summary_light_probe_desc">Detects the ambient light level in SI lux units.</string>
 
+    <!-- Light Probe -->
+    <string name="title_wear_light_probe">Android Wear Light Probe</string>
+    <string name="summary_wear_light_probe_desc">Detects the ambient light level in SI lux units.</string>
+
     <!-- Magnetic Probe -->
     <string name="title_magnetic_field_probe">Magnetic Field Probe</string>
     <string name="summary_magnetic_field_probe_desc">Detect the local magnetic field. Can be used as to detect the earth\'s magnetic field, but may be distorted by metal objects around device.</string>
+
+    <!-- Magnetic Probe -->
+    <string name="title_wear_magnetic_field_probe">Android Wear Magnetic Field Probe</string>
+    <string name="summary_wear_magnetic_field_probe_desc">Detect the magnetic field from an Android Wear device. Can be used as to detect the earth\'s magnetic field, but may be distorted by metal objects around device.</string>
 
     <!-- Pressure Probe -->
     <string name="title_pressure_probe">Pressure Probe</string>
@@ -593,6 +609,10 @@
     <!-- Battery Probe -->
     <string name="title_battery_probe">Battery Probe</string>
     <string name="summary_battery_probe_desc">Information about the type and current state of the battery in the device.</string>
+
+    <!-- Battery Probe -->
+    <string name="title_wear_battery_probe">Android Wear Battery Probe</string>
+    <string name="summary_wear_battery_probe_desc">Information about the type and current state of the battery in the Android Wear device.</string>
 
     <!-- Step Counter Probe -->
     <string name="title_step_counter_probe">Step Counter Probe</string>
@@ -722,6 +742,15 @@
 
     <string name="title_livewell_activity_counts_probe">Livewell Phone Activity Counts</string>
     <string name="summary_livewell_activity_counts_probe_desc">Collects activity count data from local device.</string>
+
+    <string name="title_studies_options">Study-Specific Settings</string>
+    <string name="title_studies_livewell_options">Livewell Settings</string>
+
+    <string name="title_livewell_wear_activity_counts_probe">Android Wear Livewell Activity Counts</string>
+    <string name="summary_livewell_wear_activity_counts_probe_desc">Collects activity count data from an Android Wear device.</string>
+    <string name="title_livewell_wear_enable_sensor">Enable Activity Counts</string>
+    <string name="title_livewell_wear_bin_size">Bin Size</string>
+
 
     <!-- Logging Strings -->
     <string name="title_log_upload_section">Network Logging Settings</string>
@@ -897,6 +926,10 @@
 
     <string name="name_sanity_trigger_byminute">Trigger BYMINUTE</string>
     <string name="name_sanity_trigger_byminute_warning">%1$s trigger defined using both FREQ=MINUTELY and BYMINUTE, introducing performance issues.</string>
+
+    <string name="name_sanity_wear_battery">Android Wear Battery</string>
+    <string name="name_sanity_wear_battery_warning">The connected Android Wear device is running low on power. Please charge the device soon.</string>
+
 
     <string name="message_clearing_archive">Clearing archive files&#8230;</string>
     

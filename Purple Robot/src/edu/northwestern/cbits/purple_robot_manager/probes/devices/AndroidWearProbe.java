@@ -6,7 +6,6 @@ import android.content.SharedPreferences.Editor;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataApi;
@@ -21,17 +20,22 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Date;
+
 import edu.northwestern.cbits.purple_robot_manager.AndroidWearService;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.devices.wear.WearBatteryProbe;
 
 public class AndroidWearProbe extends Probe implements DataApi.DataListener
 {
-    private static final String ENABLED = "config_probe_android_wear_enabled";
-    private static final boolean DEFAULT_ENABLED = false;
+    public static final String ENABLED = "config_probe_android_wear_enabled";
+    public static final boolean DEFAULT_ENABLED = false;
     public static final String URI_READING_PREFIX = "/purple-robot-reading";
 
     public static final String ACCELEROMETER_ENABLED = "config_probe_android_wear_accelerometer_enabled";
@@ -39,18 +43,26 @@ public class AndroidWearProbe extends Probe implements DataApi.DataListener
     public static final String MAGNETOMETER_ENABLED = "config_probe_android_wear_magnetometer_enabled";
     public static final String LIGHT_METER_ENABLED = "config_probe_android_wear_light_meter_enabled";
     public static final String HEART_METER_ENABLED = "config_probe_android_wear_heart_meter_enabled";
+    public static final String LIVEWELL_COUNTS_ENABLED = "config_probe_android_wear_livewell_enabled";
 
     public static final boolean ACCELEROMETER_DEFAULT_ENABLED = true;
     public static final boolean GYROSCOPE_DEFAULT_ENABLED = false;
     public static final boolean MAGNETOMETER_DEFAULT_ENABLED = false;
     public static final boolean LIGHT_METER_DEFAULT_ENABLED = false;
     public static final boolean HEART_METER_DEFAULT_ENABLED = false;
+    public static final boolean LIVEWELL_COUNTS_DEFAULT_ENABLED = false;
 
     public static final String ACCELEROMETER_FREQUENCY = "config_probe_android_wear_accelerometer_frequency";
     public static final String GYROSCOPE_FREQUENCY = "config_probe_android_wear_gyroscope_frequency";
     public static final String MAGNETOMETER_FREQUENCY = "config_probe_android_wear_magnetometer_frequency";
     public static final String LIGHT_METER_FREQUENCY = "config_probe_android_wear_light_meter_frequency";
     public static final String HEART_METER_FREQUENCY = "config_probe_android_wear_heart_meter_frequency";
+    public static final String LIVEWELL_BIN_SIZE = "config_probe_android_wear_livewell_bin_size";
+
+    public static final String LIVEWELL_DEFAULT_BIN_SIZE = "60";
+
+    private static final String INTERVAL = "config_probe_android_wear_interval";
+    private static final String DEFAULT_INTERVAL = "300000";
 
     private GoogleApiClient _apiClient = null;
     private Context _context = null;
@@ -87,6 +99,14 @@ public class AndroidWearProbe extends Probe implements DataApi.DataListener
         enabled.setKey(AndroidWearProbe.ENABLED);
         enabled.setDefaultValue(AndroidWearProbe.DEFAULT_ENABLED);
         screen.addPreference(enabled);
+
+        FlexibleListPreference interval = new FlexibleListPreference(context);
+        interval.setKey(AndroidWearProbe.INTERVAL);
+        interval.setEntryValues(R.array.probe_satellite_frequency_values);
+        interval.setEntries(R.array.probe_satellite_frequency_labels);
+        interval.setTitle(R.string.probe_frequency_label);
+        interval.setDefaultValue(AndroidWearProbe.DEFAULT_INTERVAL);
+        screen.addPreference(interval);
 
         PreferenceScreen accel = manager.createPreferenceScreen(context);
         accel.setTitle(R.string.title_android_wear_probe_accel_screen);
@@ -183,6 +203,29 @@ public class AndroidWearProbe extends Probe implements DataApi.DataListener
 
         screen.addPreference(heart);
 
+        PreferenceScreen studyScreen = manager.createPreferenceScreen(context);
+        studyScreen.setTitle(R.string.title_studies_options);
+
+        PreferenceScreen livewellScreen = manager.createPreferenceScreen(context);
+        livewellScreen.setTitle(R.string.title_studies_livewell_options);
+
+        CheckBoxPreference livewellEnabled = new CheckBoxPreference(context);
+        livewellEnabled.setTitle(R.string.title_livewell_wear_enable_sensor);
+        livewellEnabled.setKey(AndroidWearProbe.LIVEWELL_COUNTS_ENABLED);
+        livewellEnabled.setDefaultValue(AndroidWearProbe.LIVEWELL_COUNTS_DEFAULT_ENABLED);
+        livewellScreen.addPreference(livewellEnabled);
+
+        FlexibleListPreference livewellBins = new FlexibleListPreference(context);
+        livewellBins.setKey(AndroidWearProbe.LIVEWELL_BIN_SIZE);
+        livewellBins.setEntryValues(R.array.probe_livewell_wear_bin_values);
+        livewellBins.setEntries(R.array.probe_livewell_wear_bin_labels);
+        livewellBins.setTitle(R.string.title_livewell_wear_bin_size);
+        livewellBins.setDefaultValue(AndroidWearProbe.LIVEWELL_DEFAULT_BIN_SIZE);
+        livewellScreen.addPreference(livewellBins);
+
+        studyScreen.addPreference(livewellScreen);
+        screen.addPreference(studyScreen);
+
         return screen;
     }
 
@@ -246,16 +289,14 @@ public class AndroidWearProbe extends Probe implements DataApi.DataListener
 
         if (super.isEnabled(context))
         {
-            Log.e("PR", "WEAR ENABLED: " + prefs.getBoolean(AndroidWearProbe.ENABLED, AndroidWearProbe.DEFAULT_ENABLED));
-
             if (prefs.getBoolean(AndroidWearProbe.ENABLED, AndroidWearProbe.DEFAULT_ENABLED))
             {
                 long now = System.currentTimeMillis();
 
-                if (now - this._lastRequest > 1000 * 60)
-                {
-                    Log.e("PR", "WEAR REQUEST");
+                long interval = Long.parseLong(prefs.getString(AndroidWearProbe.INTERVAL, AndroidWearProbe.DEFAULT_INTERVAL));
 
+                if (now - this._lastRequest > interval)
+                {
                     this._lastRequest = now;
 
                     AndroidWearService.requestDataFromDevices(context);
@@ -282,6 +323,25 @@ public class AndroidWearProbe extends Probe implements DataApi.DataListener
                     DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
 
                     this.transmitData(this._context, dataMap.toBundle());
+
+                    String probeName = dataMap.getString("PROBE", "");
+
+                    if (probeName.equals(WearBatteryProbe.NAME))
+                    {
+                        SanityManager sanity = SanityManager.getInstance(this._context);
+                        String name = this._context.getString(R.string.name_sanity_wear_battery);
+
+                        int level = dataMap.getInt("BATTERY_LEVEL", Integer.MAX_VALUE);
+
+                        if (level < 30)
+                        {
+                            String message = this._context.getString(R.string.name_sanity_wear_battery_warning);
+
+                            sanity.addAlert(SanityCheck.WARNING, name, message, null);
+                        }
+                        else
+                            sanity.clearAlert(name);
+                    }
 
                     Wearable.DataApi.deleteDataItems(this._apiClient, item.getUri());
                 }

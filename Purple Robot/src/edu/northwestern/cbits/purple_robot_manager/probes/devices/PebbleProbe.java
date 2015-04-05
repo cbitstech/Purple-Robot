@@ -31,7 +31,6 @@ import edu.northwestern.cbits.purple_robot_manager.calibration.PebbleCalibration
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
-import edu.northwestern.cbits.purple_robot_manager.probes.builtin.AccelerometerProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.Continuous3DProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
 

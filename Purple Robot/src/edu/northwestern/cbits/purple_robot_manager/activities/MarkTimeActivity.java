@@ -13,7 +13,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.util.LongSparseArray;
 import android.support.v7.app.ActionBarActivity;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;

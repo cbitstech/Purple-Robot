@@ -56,6 +56,13 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TouchEventsPro
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.VisibleSatelliteProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.WifiAccessPointsProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.devices.AndroidWearProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.devices.wear.WearAccelerometerProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.devices.wear.WearBatteryProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.devices.wear.WearGyroscopeProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.devices.wear.WearHeartRateProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.devices.wear.WearLightProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.devices.wear.WearLivewellActivityCountProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.devices.wear.WearMagneticFieldProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.studies.LivewellActivityCountsProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.studies.LivewellPebbleActivityCountsProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.devices.PebbleProbe;
@@ -624,6 +631,55 @@ public class ProbeManager
             else if (probe instanceof AndroidWearProbe)
             {
                 AndroidWearProbe wear = (AndroidWearProbe) probe;
+
+                if (wear.name(context).equalsIgnoreCase(name))
+                    found = true;
+            }
+            else if (probe instanceof WearLightProbe)
+            {
+                WearLightProbe wear = (WearLightProbe) probe;
+
+                if (wear.name(context).equalsIgnoreCase(name))
+                    found = true;
+            }
+            else if (probe instanceof WearBatteryProbe)
+            {
+                WearBatteryProbe wear = (WearBatteryProbe) probe;
+
+                if (wear.name(context).equalsIgnoreCase(name))
+                    found = true;
+            }
+            else if (probe instanceof WearLivewellActivityCountProbe)
+            {
+                WearLivewellActivityCountProbe wear = (WearLivewellActivityCountProbe) probe;
+
+                if (wear.name(context).equalsIgnoreCase(name))
+                    found = true;
+            }
+            else if (probe instanceof WearHeartRateProbe)
+            {
+                WearHeartRateProbe wear = (WearHeartRateProbe) probe;
+
+                if (wear.name(context).equalsIgnoreCase(name))
+                    found = true;
+            }
+            else if (probe instanceof WearAccelerometerProbe)
+            {
+                WearAccelerometerProbe wear = (WearAccelerometerProbe) probe;
+
+                if (wear.name(context).equalsIgnoreCase(name))
+                    found = true;
+            }
+            else if (probe instanceof WearGyroscopeProbe)
+            {
+                WearGyroscopeProbe wear = (WearGyroscopeProbe) probe;
+
+                if (wear.name(context).equalsIgnoreCase(name))
+                    found = true;
+            }
+            else if (probe instanceof WearMagneticFieldProbe)
+            {
+                WearMagneticFieldProbe wear = (WearMagneticFieldProbe) probe;
 
                 if (wear.name(context).equalsIgnoreCase(name))
                     found = true;

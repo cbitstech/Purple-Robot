@@ -31,18 +31,18 @@ public class LivewellActivityCountsProbe extends Probe implements SensorEventLis
     private static final String ENABLED = "config_probe_livewell_activities_enabled";
     private static final boolean DEFAULT_ENABLED = false;
     private static final String FREQUENCY = "config_probe_livewell_activities_frequency";
-    private static final String BUNDLE_DURATION = "BUNDLE_DURATION";
-    private static final String BUNDLE_NUM_SAMPLES = "BUNDLE_NUM_SAMPLES";
+    public static final String BUNDLE_DURATION = "BUNDLE_DURATION";
+    public static final String BUNDLE_NUM_SAMPLES = "BUNDLE_NUM_SAMPLES";
     private static final String BUNDLE_X_DELTA = "BUNDLE_X_DELTA";
     private static final String BUNDLE_Y_DELTA = "BUNDLE_Y_DELTA";
     private static final String BUNDLE_Z_DELTA = "BUNDLE_Z_DELTA";
-    private static final String BUNDLE_ALL_DELTA = "BUNDLE_ALL_DELTA";
+    public static final String BUNDLE_ALL_DELTA = "BUNDLE_ALL_DELTA";
 
     private static long BIN_SIZE_DEFAULT = 60000;
 
-    private double _lastX = Double.MAX_VALUE;
-    private double _lastY = Double.MAX_VALUE;
-    private double _lastZ = Double.MAX_VALUE;
+    private double _lastX = 0;
+    private double _lastY = 0;
+    private double _lastZ = 0;
 
     private double _xSum = 0;
     private double _ySum = 0;

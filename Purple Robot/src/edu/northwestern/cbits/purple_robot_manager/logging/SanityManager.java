@@ -254,10 +254,10 @@ public class SanityManager
     {
         switch (this.getErrorLevel())
         {
-        case SanityCheck.ERROR:
-            return R.drawable.action_error;
-        case SanityCheck.WARNING:
-            return R.drawable.action_warning;
+            case SanityCheck.ERROR:
+                return R.drawable.action_error;
+            case SanityCheck.WARNING:
+                return R.drawable.action_warning;
         }
 
         return R.drawable.action_about;

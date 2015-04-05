@@ -1,13 +1,11 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
-import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
-import android.util.Log;
 
 import com.google.android.gms.wearable.DataMap;
 
-public class MagnetometerHandler
+public class MagneticFieldHandler
 {
     private static int BUFFER_SIZE = 512;
 
@@ -26,7 +24,7 @@ public class MagnetometerHandler
 
     private static String name()
     {
-        return "edu.northwestern.cbits.purple_robot_manager.WearMagnetometerProbe";
+        return "edu.northwestern.cbits.purple_robot_manager.WearMagneticFieldProbe";
     }
 
     public static void handleSensorEvent(SensorEvent event)
@@ -63,7 +61,7 @@ public class MagnetometerHandler
                 sensorBundle.putInt(SensorService.SENSOR_VERSION, sensor.getVersion());
 
                 data.putDouble(SensorService.BUNDLE_TIMESTAMP, now / 1000);
-                data.putString(SensorService.BUNDLE_PROBE, MagnetometerHandler.name());
+                data.putString(SensorService.BUNDLE_PROBE, MagneticFieldHandler.name());
 
                 data.putDataMap(SensorService.BUNDLE_SENSOR, sensorBundle);
 

@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -28,8 +27,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.devices.AndroidWearProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.devices.wear.WearBatteryProbe;
 
 public class AndroidWearService extends WearableListenerService
 {
@@ -79,7 +81,6 @@ public class AndroidWearService extends WearableListenerService
                 {
                     NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(AndroidWearService._apiClient).await();
 
-                    Log.e("PR", "SENDING CONFIG");
                     byte[] config = AndroidWearService.byteConfig(context);
 
                     for (Node node : nodes.getNodes())
@@ -93,12 +94,10 @@ public class AndroidWearService extends WearableListenerService
                             {
                                 if (!sendMessageResult.getStatus().isSuccess())
                                 {
-                                    Log.e("PR", "Failed to send message (CONFIG) with status code: " + sendMessageResult.getStatus().getStatusCode());
+//                                    Log.e("PR", "Failed to send message (CONFIG) with status code: " + sendMessageResult.getStatus().getStatusCode());
                                 }
                             }
                         });
-
-                        Log.e("PR", "REQUEST_DATA");
 
                         result = Wearable.MessageApi.sendMessage(AndroidWearService._apiClient, node.getId(), PATH_REQUEST_DATA, new byte[0]);
 
@@ -109,7 +108,7 @@ public class AndroidWearService extends WearableListenerService
                             {
                                 if (!sendMessageResult.getStatus().isSuccess())
                                 {
-                                    Log.e("PR", "Failed to send message (DATA REQUEST) with status code: " + sendMessageResult.getStatus().getStatusCode());
+//                                    Log.e("PR", "Failed to send message (DATA REQUEST) with status code: " + sendMessageResult.getStatus().getStatusCode());
                                 }
                             }
                         });
@@ -124,7 +123,7 @@ public class AndroidWearService extends WearableListenerService
 
     private static byte[] byteConfig(Context context)
     {
-        byte[] config = new byte[10];
+        byte[] config = new byte[12];
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -133,16 +132,12 @@ public class AndroidWearService extends WearableListenerService
         else
             config[0] = 0x00;
 
-        Log.e("PR", "CFG.ACCEL: " + config[0]);
-
         config[1] = Byte.parseByte(prefs.getString(AndroidWearProbe.ACCELEROMETER_FREQUENCY, ContinuousProbe.DEFAULT_FREQUENCY));
 
         if (prefs.getBoolean(AndroidWearProbe.GYROSCOPE_ENABLED, AndroidWearProbe.GYROSCOPE_DEFAULT_ENABLED))
             config[2] = 0x01;
         else
             config[2] = 0x00;
-
-        Log.e("PR", "CFG.GYRO: " + config[2]);
 
         config[3] = Byte.parseByte(prefs.getString(AndroidWearProbe.GYROSCOPE_FREQUENCY, ContinuousProbe.DEFAULT_FREQUENCY));
 
@@ -151,16 +146,12 @@ public class AndroidWearService extends WearableListenerService
         else
             config[4] = 0x00;
 
-        Log.e("PR", "CFG.MAGNET: " + config[4]);
-
         config[5] = Byte.parseByte(prefs.getString(AndroidWearProbe.MAGNETOMETER_FREQUENCY, ContinuousProbe.DEFAULT_FREQUENCY));
 
         if (prefs.getBoolean(AndroidWearProbe.LIGHT_METER_ENABLED, AndroidWearProbe.LIGHT_METER_DEFAULT_ENABLED))
             config[6] = 0x01;
         else
             config[6] = 0x00;
-
-        Log.e("PR", "CFG.LIGHT: " + config[6]);
 
         config[7] = Byte.parseByte(prefs.getString(AndroidWearProbe.LIGHT_METER_FREQUENCY, ContinuousProbe.DEFAULT_FREQUENCY));
 
@@ -169,9 +160,15 @@ public class AndroidWearService extends WearableListenerService
         else
             config[8] = 0x00;
 
-        Log.e("PR", "CFG.HEART: " + config[8]);
-
         config[9] = Byte.parseByte(prefs.getString(AndroidWearProbe.HEART_METER_FREQUENCY, ContinuousProbe.DEFAULT_FREQUENCY));
+
+
+        if (prefs.getBoolean(AndroidWearProbe.LIVEWELL_COUNTS_ENABLED, AndroidWearProbe.LIVEWELL_COUNTS_DEFAULT_ENABLED))
+            config[10] = 0x01;
+        else
+            config[10] = 0x00;
+
+        config[11] = Byte.parseByte(prefs.getString(AndroidWearProbe.LIVEWELL_BIN_SIZE, AndroidWearProbe.LIVEWELL_DEFAULT_BIN_SIZE));
 
         return config;
     }
@@ -210,7 +207,26 @@ public class AndroidWearService extends WearableListenerService
 
                                 localManager.sendBroadcast(intent);
 
-                                Wearable.DataApi.deleteDataItems(me._apiClient, item.getUri());
+                                String probeName = dataMap.getString("PROBE", "");
+
+                                if (probeName.equals(WearBatteryProbe.NAME))
+                                {
+                                    SanityManager sanity = SanityManager.getInstance(me);
+                                    String name = me.getString(R.string.name_sanity_wear_battery);
+
+                                    int level = dataMap.getInt("BATTERY_LEVEL", Integer.MAX_VALUE);
+
+                                    if (level < 48)
+                                    {
+                                        String message = me.getString(R.string.name_sanity_wear_battery_warning);
+
+                                        sanity.addAlert(SanityCheck.WARNING, name, message, null);
+                                    } else
+                                        sanity.clearAlert(name);
+
+
+                                    Wearable.DataApi.deleteDataItems(me._apiClient, item.getUri());
+                                }
                             }
 
                             try

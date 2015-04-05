@@ -85,6 +85,13 @@
 
         <item>devices.PebbleProbe</item>
         <item>devices.AndroidWearProbe</item>
+        <item>devices.wear.WearLightProbe</item>
+        <item>devices.wear.WearBatteryProbe</item>
+        <item>devices.wear.WearLivewellActivityCountProbe</item>
+        <item>devices.wear.WearHeartRateProbe</item>
+        <item>devices.wear.WearAccelerometerProbe</item>
+        <item>devices.wear.WearGyroscopeProbe</item>
+        <item>devices.wear.WearMagneticFieldProbe</item>
 
         <item>builtin.TouchEventsProbe</item>
         <!-- <item>builtin.BluetoothReceiverProbe</item> -->
@@ -265,9 +272,25 @@
 	<string-array name="probe_continuous_frequency_values">
         <item>0</item>
         <item>1</item>
-        <item>2</item>
+        <item>2</item>probe_livewell_wear_bin_values
         <item>3</item>
    	</string-array>
+
+    <string-array name="probe_livewell_wear_bin_values">
+        <item>10</item>
+        <item>30</item>
+        <item>60</item>
+        <item>300</item>
+        <item>600</item>
+    </string-array>
+
+    <string-array name="probe_livewell_wear_bin_labels">
+        <item>10 seconds</item>
+        <item>30 seconds</item>
+        <item>1 minute</item>
+        <item>5 minutes</item>
+        <item>10 minutes</item>
+    </string-array>
 
 	<string-array name="probe_acceleration_frequency_labels">
         <item>200 per second</item>

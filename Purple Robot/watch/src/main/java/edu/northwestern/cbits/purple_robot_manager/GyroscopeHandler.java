@@ -22,8 +22,6 @@ public class GyroscopeHandler
     protected static final String Y_KEY = "Y";
     protected static final String Z_KEY = "Z";
 
-    public static boolean _enabled = false;
-
     private static final String[] fieldNames = { X_KEY, Y_KEY, Z_KEY };
 
     private static String name()
@@ -33,9 +31,6 @@ public class GyroscopeHandler
 
     public static void handleSensorEvent(SensorEvent event)
     {
-        if (GyroscopeHandler._enabled == false)
-            return;
-
         final long now = System.currentTimeMillis();
 
         synchronized (valueBuffer)

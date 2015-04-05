@@ -10,9 +10,8 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-/**
- * Created by Administrator on 3/24/15.
- */
+import java.util.Date;
+
 public class HeartbeatService extends IntentService
 {
     private static final String LAST_FIRE = "HeartbeatService.LAST_FIRE";
@@ -32,7 +31,7 @@ public class HeartbeatService extends IntentService
 
         if (now - lastFire > HeartbeatService.INTERVAL)
         {
-            Log.e("PW", "HEARTBEAT");
+            Log.e("PW", "HEARTBEAT "+ (new Date()));
 
             SharedPreferences.Editor e = prefs.edit();
             e.putLong(HeartbeatService.LAST_FIRE, now);
