@@ -706,7 +706,7 @@
     <!-- Call History Probe -->
     <string name="title_weather_underground_feature">Current Weather Conditions</string>
     <string name="summary_weather_underground_feature_desc">Acquires the latest weather data for the user\'s location from a Weather Underground station.</string>
-    <string name="summary_weather_underground_probe">%1$s:, %2$.1f&#176;C (%3$s)</string>
+    <string name="summary_weather_underground_probe">%1$s: %2$.1f&#176;C (%3$s)</string>
 
     <!-- Accelerometer Statistics Probe -->
     <string name="title_accelerator_statistics_feature">Accelerometer Statistics</string>

@@ -91,7 +91,7 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
 
                 Intent refreshIntent = new Intent(info.packageName + ".UPLOAD_LOGS_INTENT");
                 refreshIntent.putExtra(LogService.LOG_FORCE_UPLOAD, true);
-                refreshIntent.setClass(this._context, ManagerService.class);
+                refreshIntent.setClass(this._context, LogService.class);
 
                 this._context.startService(refreshIntent);
             }

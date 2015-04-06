@@ -26,6 +26,7 @@ import android.os.Build;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 
+import edu.northwestern.cbits.anthracite.LogService;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.SettingsKeys;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -109,9 +110,6 @@ public class ManagerService extends IntentService
 
             Thread t = new Thread(r);
             t.start();
-        }
-        else if (UPLOAD_LOGS_INTENT.equalsIgnoreCase(action))
-        {
         }
         else if (UPDATE_WIDGETS.equalsIgnoreCase(action))
         {
