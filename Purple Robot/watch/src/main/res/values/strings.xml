@@ -2,4 +2,6 @@
     <string name="app_name">Purple Robot</string>
     <string name="hello_round">Hello Round World!</string>
     <string name="hello_square">Hello Square World!</string>
+    <string name="digital_am">AM</string>
+    <string name="digital_pm">PM</string>
 </resources>

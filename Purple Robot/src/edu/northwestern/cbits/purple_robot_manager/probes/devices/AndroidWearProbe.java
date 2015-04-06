@@ -21,6 +21,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Date;
+import java.util.Map;
 
 import edu.northwestern.cbits.purple_robot_manager.AndroidWearService;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -279,6 +280,345 @@ public class AndroidWearProbe extends Probe implements DataApi.DataListener
         }
 
         return settings;
+    }
+
+    @Override
+    public Map<String, Object> configuration(Context context)
+    {
+        Map<String, Object> map = super.configuration(context);
+
+        SharedPreferences prefs = Probe.getPreferences(context);
+
+        double interval = Double.parseDouble(prefs.getString(AndroidWearProbe.INTERVAL, AndroidWearProbe.DEFAULT_INTERVAL));
+        map.put(AndroidWearProbe.INTERVAL, interval);
+
+        boolean accelEnabled = prefs.getBoolean(AndroidWearProbe.ACCELEROMETER_ENABLED, AndroidWearProbe.ACCELEROMETER_DEFAULT_ENABLED);
+        map.put(AndroidWearProbe.ACCELEROMETER_ENABLED, accelEnabled);
+
+        double accelFreq = Double.parseDouble(prefs.getString(AndroidWearProbe.ACCELEROMETER_FREQUENCY, ContinuousProbe.DEFAULT_FREQUENCY));
+        map.put(AndroidWearProbe.ACCELEROMETER_FREQUENCY, accelFreq);
+
+        boolean gyroEnabled = prefs.getBoolean(AndroidWearProbe.GYROSCOPE_ENABLED, AndroidWearProbe.GYROSCOPE_DEFAULT_ENABLED);
+        map.put(AndroidWearProbe.GYROSCOPE_ENABLED, gyroEnabled);
+
+        double gyroFreq = Double.parseDouble(prefs.getString(AndroidWearProbe.GYROSCOPE_FREQUENCY, ContinuousProbe.DEFAULT_FREQUENCY));
+        map.put(AndroidWearProbe.GYROSCOPE_FREQUENCY, gyroFreq);
+
+        boolean magnetEnabled = prefs.getBoolean(AndroidWearProbe.MAGNETOMETER_ENABLED, AndroidWearProbe.MAGNETOMETER_DEFAULT_ENABLED);
+        map.put(AndroidWearProbe.MAGNETOMETER_ENABLED, magnetEnabled);
+
+        double magnetFreq = Double.parseDouble(prefs.getString(AndroidWearProbe.MAGNETOMETER_FREQUENCY, ContinuousProbe.DEFAULT_FREQUENCY));
+        map.put(AndroidWearProbe.MAGNETOMETER_FREQUENCY, magnetFreq);
+
+        boolean lightEnabled = prefs.getBoolean(AndroidWearProbe.LIGHT_METER_ENABLED, AndroidWearProbe.LIGHT_METER_DEFAULT_ENABLED);
+        map.put(AndroidWearProbe.LIGHT_METER_ENABLED, lightEnabled);
+
+        double lightFreq = Double.parseDouble(prefs.getString(AndroidWearProbe.LIGHT_METER_FREQUENCY, ContinuousProbe.DEFAULT_FREQUENCY));
+        map.put(AndroidWearProbe.LIGHT_METER_FREQUENCY, lightFreq);
+
+        boolean heartEnabled = prefs.getBoolean(AndroidWearProbe.HEART_METER_ENABLED, AndroidWearProbe.HEART_METER_DEFAULT_ENABLED);
+        map.put(AndroidWearProbe.HEART_METER_ENABLED, heartEnabled);
+
+        double heartFreq = Double.parseDouble(prefs.getString(AndroidWearProbe.HEART_METER_FREQUENCY, ContinuousProbe.DEFAULT_FREQUENCY));
+        map.put(AndroidWearProbe.HEART_METER_FREQUENCY, heartFreq);
+
+        boolean livewellEnabled = prefs.getBoolean(AndroidWearProbe.LIVEWELL_COUNTS_ENABLED, AndroidWearProbe.LIVEWELL_COUNTS_DEFAULT_ENABLED);
+        map.put(AndroidWearProbe.LIVEWELL_COUNTS_ENABLED, livewellEnabled);
+
+        double livewellBinSize = Double.parseDouble(prefs.getString(AndroidWearProbe.LIVEWELL_BIN_SIZE, AndroidWearProbe.LIVEWELL_DEFAULT_BIN_SIZE));
+        map.put(AndroidWearProbe.LIVEWELL_BIN_SIZE, livewellBinSize);
+
+        return map;
+    }
+
+    @Override
+    public void updateFromMap(Context context, Map<String, Object> params)
+    {
+        super.updateFromMap(context, params);
+
+        if (params.containsKey(AndroidWearProbe.INTERVAL))
+        {
+            Object frequency = params.get(AndroidWearProbe.INTERVAL);
+
+            if (frequency instanceof Double)
+            {
+                frequency = Long.valueOf(((Double) frequency).longValue());
+            }
+
+            if (frequency instanceof Long)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString(AndroidWearProbe.INTERVAL, frequency.toString());
+                e.commit();
+            }
+        }
+
+        if (params.containsKey(AndroidWearProbe.ACCELEROMETER_ENABLED))
+        {
+            Object enabled = params.get(AndroidWearProbe.ACCELEROMETER_ENABLED);
+
+            if (enabled instanceof Boolean)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putBoolean(AndroidWearProbe.ACCELEROMETER_ENABLED, ((Boolean) enabled));
+                e.commit();
+            }
+        }
+
+        if (params.containsKey(AndroidWearProbe.GYROSCOPE_ENABLED))
+        {
+            Object enabled = params.get(AndroidWearProbe.GYROSCOPE_ENABLED);
+
+            if (enabled instanceof Boolean)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putBoolean(AndroidWearProbe.GYROSCOPE_ENABLED, ((Boolean) enabled));
+                e.commit();
+            }
+        }
+
+
+        if (params.containsKey(AndroidWearProbe.MAGNETOMETER_ENABLED))
+        {
+            Object enabled = params.get(AndroidWearProbe.MAGNETOMETER_ENABLED);
+
+            if (enabled instanceof Boolean)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putBoolean(AndroidWearProbe.MAGNETOMETER_ENABLED, ((Boolean) enabled));
+                e.commit();
+            }
+        }
+
+        if (params.containsKey(AndroidWearProbe.LIGHT_METER_ENABLED))
+        {
+            Object enabled = params.get(AndroidWearProbe.LIGHT_METER_ENABLED);
+
+            if (enabled instanceof Boolean)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putBoolean(AndroidWearProbe.LIGHT_METER_ENABLED, ((Boolean) enabled));
+                e.commit();
+            }
+        }
+
+        if (params.containsKey(AndroidWearProbe.HEART_METER_ENABLED))
+        {
+            Object enabled = params.get(AndroidWearProbe.HEART_METER_ENABLED);
+
+            if (enabled instanceof Boolean)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putBoolean(AndroidWearProbe.HEART_METER_ENABLED, ((Boolean) enabled));
+                e.commit();
+            }
+        }
+
+        if (params.containsKey(AndroidWearProbe.LIVEWELL_COUNTS_ENABLED))
+        {
+            Object enabled = params.get(AndroidWearProbe.LIVEWELL_COUNTS_ENABLED);
+
+            if (enabled instanceof Boolean)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putBoolean(AndroidWearProbe.LIVEWELL_COUNTS_ENABLED, ((Boolean) enabled));
+                e.commit();
+            }
+        }
+
+        if (params.containsKey(AndroidWearProbe.LIVEWELL_BIN_SIZE))
+        {
+            Object frequency = params.get(Probe.PROBE_FREQUENCY);
+
+            if (frequency instanceof Long || frequency instanceof Integer)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString(AndroidWearProbe.LIVEWELL_BIN_SIZE, frequency.toString());
+                e.commit();
+            }
+            if (frequency instanceof Double)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString(AndroidWearProbe.LIVEWELL_BIN_SIZE, "" + ((Double) frequency).intValue());
+                e.commit();
+            }
+            else if (frequency instanceof String)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString(AndroidWearProbe.LIVEWELL_BIN_SIZE, frequency.toString());
+                e.commit();
+            }
+        }
+
+        if (params.containsKey(AndroidWearProbe.HEART_METER_FREQUENCY))
+        {
+            Object frequency = params.get(AndroidWearProbe.HEART_METER_FREQUENCY);
+
+            if (frequency instanceof Long || frequency instanceof Integer)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString(AndroidWearProbe.HEART_METER_FREQUENCY, frequency.toString());
+                e.commit();
+            }
+            if (frequency instanceof Double)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString(AndroidWearProbe.HEART_METER_FREQUENCY, "" + ((Double) frequency).intValue());
+                e.commit();
+            }
+            else if (frequency instanceof String)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString(AndroidWearProbe.HEART_METER_FREQUENCY, frequency.toString());
+                e.commit();
+            }
+        }
+
+        if (params.containsKey(AndroidWearProbe.LIGHT_METER_FREQUENCY))
+        {
+            Object frequency = params.get(AndroidWearProbe.LIGHT_METER_FREQUENCY);
+
+            if (frequency instanceof Long || frequency instanceof Integer)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString(AndroidWearProbe.LIGHT_METER_FREQUENCY, frequency.toString());
+                e.commit();
+            }
+            if (frequency instanceof Double)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString(AndroidWearProbe.LIGHT_METER_FREQUENCY, "" + ((Double) frequency).intValue());
+                e.commit();
+            }
+            else if (frequency instanceof String)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString(AndroidWearProbe.LIGHT_METER_FREQUENCY, frequency.toString());
+                e.commit();
+            }
+        }
+
+        if (params.containsKey(AndroidWearProbe.MAGNETOMETER_FREQUENCY))
+        {
+            Object frequency = params.get(AndroidWearProbe.MAGNETOMETER_FREQUENCY);
+
+            if (frequency instanceof Long || frequency instanceof Integer)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString(AndroidWearProbe.MAGNETOMETER_FREQUENCY, frequency.toString());
+                e.commit();
+            }
+            if (frequency instanceof Double)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString(AndroidWearProbe.MAGNETOMETER_FREQUENCY, "" + ((Double) frequency).intValue());
+                e.commit();
+            }
+            else if (frequency instanceof String)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString(AndroidWearProbe.MAGNETOMETER_FREQUENCY, frequency.toString());
+                e.commit();
+            }
+        }
+
+        if (params.containsKey(AndroidWearProbe.GYROSCOPE_FREQUENCY))
+        {
+            Object frequency = params.get(AndroidWearProbe.GYROSCOPE_FREQUENCY);
+
+            if (frequency instanceof Long || frequency instanceof Integer)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString(AndroidWearProbe.GYROSCOPE_FREQUENCY, frequency.toString());
+                e.commit();
+            }
+            if (frequency instanceof Double)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString(AndroidWearProbe.GYROSCOPE_FREQUENCY, "" + ((Double) frequency).intValue());
+                e.commit();
+            }
+            else if (frequency instanceof String)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString(AndroidWearProbe.GYROSCOPE_FREQUENCY, frequency.toString());
+                e.commit();
+            }
+        }
+
+        if (params.containsKey(AndroidWearProbe.ACCELEROMETER_FREQUENCY))
+        {
+            Object frequency = params.get(AndroidWearProbe.ACCELEROMETER_FREQUENCY);
+
+            if (frequency instanceof Long || frequency instanceof Integer)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString(AndroidWearProbe.ACCELEROMETER_FREQUENCY, frequency.toString());
+                e.commit();
+            }
+            if (frequency instanceof Double)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString(AndroidWearProbe.ACCELEROMETER_FREQUENCY, "" + ((Double) frequency).intValue());
+                e.commit();
+            }
+            else if (frequency instanceof String)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString(AndroidWearProbe.ACCELEROMETER_FREQUENCY, frequency.toString());
+                e.commit();
+            }
+        }
     }
 
     @Override

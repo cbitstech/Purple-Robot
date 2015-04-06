@@ -1475,4 +1475,6 @@
     <string name="title_android_wear_probe_light_screen">Light Sensor Settings</string>
 
     <string name="title_sensor_enable_sensor">Enable Sensor</string>
+
+    <string name="summary_wear_heart_probe">%1$d beats per minute</string>
 </resources>

@@ -48,10 +48,10 @@ android {
 	    wearApp project(':watch')
         compile 'com.android.support:appcompat-v7:21.+'
         compile 'com.android.support:mediarouter-v7:21.+'
-        compile 'com.google.android.gms:play-services-cast:7.0.0'
-        compile 'com.google.android.gms:play-services-location:7.0.0'
-        compile 'com.google.android.gms:play-services-maps:7.0.0'
-        compile 'com.google.android.gms:play-services-wearable:7.0.0'
+        compile 'com.google.android.gms:play-services-cast:7.+'
+        compile 'com.google.android.gms:play-services-location:7.+'
+        compile 'com.google.android.gms:play-services-maps:7.+'
+        compile 'com.google.android.gms:play-services-wearable:7.+'
         compile 'com.getpebble:pebblekit:2.6.0'
         compile project(':anthracite-clients-android')
         compile project(':xsi-android')

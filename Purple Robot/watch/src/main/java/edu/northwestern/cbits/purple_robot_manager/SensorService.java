@@ -457,6 +457,8 @@ public class SensorService extends IntentService implements GoogleApiClient.Conn
         {
             IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
             this.registerReceiver(SensorService.batteryListener, filter);
+
+            SensorService._batteryInited = true;
         }
     }
 

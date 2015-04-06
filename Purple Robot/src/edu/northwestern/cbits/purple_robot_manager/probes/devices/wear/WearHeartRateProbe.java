@@ -10,7 +10,7 @@ public class WearHeartRateProbe extends WearSensorProbe
 {
     public String name(Context context)
     {
-        return "edu.northwestern.cbits.purple_robot_manager.WearHeartRateProbe";
+        return "edu.northwestern.cbits.purple_robot_manager.WearHeartProbe";
     }
 
     @Override
@@ -29,14 +29,8 @@ public class WearHeartRateProbe extends WearSensorProbe
     public String summarizeValue(Context context, Bundle bundle)
     {
         boolean charging = bundle.getBoolean("BATTERY_CHARGING", false);
-        int level = (int) bundle.getDouble("BATTERY_LEVEL", -1);
-
-        String status = context.getString(R.string.label_battery_discharging);
-
-        if (charging)
-            status = context.getString(R.string.label_battery_charging);
-
-        return String.format(context.getResources().getString(R.string.summary_battery_probe), level, status);
+        int beats = (int) bundle.getDoubleArray("BPM")[0];
+        return String.format(context.getResources().getString(R.string.summary_wear_heart_probe), beats);
     }
 
     @Override
