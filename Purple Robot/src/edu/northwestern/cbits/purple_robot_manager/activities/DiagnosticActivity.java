@@ -143,6 +143,12 @@ public class DiagnosticActivity extends ActionBarActivity
             }
         }
 
+        if (prefs.getBoolean("config_enable_log_server", false))
+        {
+            TextView pendingEventsCount = (TextView) this.findViewById(R.id.pending_log_events_value);
+            pendingEventsCount.setText(this.getString(R.string.pending_log_events_value, LogManager.getInstance(this).pendingEventsCount()));
+        }
+
         try
         {
             PackageInfo pInfo = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);

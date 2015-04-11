@@ -16,13 +16,22 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.preference.CheckBoxPreference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.RealTimeProbeViewActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("SimpleDateFormat")
@@ -39,6 +48,7 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
     private static final String FREQUENCY = "config_probe_accelerometer_built_in_frequency";
     private static final String ENABLED = "config_probe_accelerometer_built_in_enabled";
     private static final String THRESHOLD = "config_probe_accelerometer_built_in_threshold";
+    private static final String USE_HANDLER = "config_probe_accelerometer_built_in_handler";
 
     private long lastThresholdLookup = 0;
     private double lastThreshold = 0.5;
@@ -57,6 +67,8 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
     private int _lastFrequency = -1;
 
     private int bufferIndex = 0;
+
+    private static Handler _handler = null;
 
     @Override
     public String probeCategory(Context context)
@@ -162,8 +174,8 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
 
         this._context = context.getApplicationContext();
 
-        SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        final SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+        final Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         if (super.isEnabled(context))
         {
@@ -181,13 +193,37 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
                         frequency = SensorManager.SENSOR_DELAY_GAME;
                     }
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                    if (prefs.getBoolean(AccelerometerProbe.USE_HANDLER, ContinuousProbe.DEFAULT_USE_HANDLER))
                     {
-                        sensors.registerListener(this, sensor, frequency, 0);
+                        final AccelerometerProbe me = this;
+                        final int finalFrequency = frequency;
+
+                        Runnable r = new Runnable()
+                        {
+                            public void run()
+                            {
+                                Looper.prepare();
+
+                                AccelerometerProbe._handler = new Handler();
+
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                                    sensors.registerListener(me, sensor, finalFrequency, 0, AccelerometerProbe._handler);
+                                else
+                                    sensors.registerListener(me, sensor, finalFrequency, AccelerometerProbe._handler);
+
+                                Looper.loop();
+                            }
+                        };
+
+                        Thread t = new Thread(r, "accelerometer");
+                        t.start();
                     }
                     else
                     {
-                        sensors.registerListener(this, sensor, frequency, null);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                            sensors.registerListener(this, sensor, frequency, 0);
+                        else
+                            sensors.registerListener(this, sensor, frequency, null);
                     }
 
                     this._lastFrequency = frequency;
@@ -199,12 +235,25 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
             {
                 sensors.unregisterListener(this, sensor);
                 this._lastFrequency = -1;
+
+                if (AccelerometerProbe._handler != null)
+                {
+                    Looper loop = AccelerometerProbe._handler.getLooper();
+                    loop.quit();
+
+                    AccelerometerProbe._handler = null;
+                }
             }
         }
         else
         {
             sensors.unregisterListener(this, sensor);
             this._lastFrequency = -1;
+
+            Looper loop = AccelerometerProbe._handler.getLooper();
+            loop.quit();
+
+            AccelerometerProbe._handler = null;
         }
 
         return false;
@@ -262,6 +311,13 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
 
         screen.addPreference(threshold);
 
+        CheckBoxPreference handler = new CheckBoxPreference(context);
+        handler.setTitle(R.string.title_own_sensor_handler);
+        handler.setKey(AccelerometerProbe.USE_HANDLER);
+        handler.setDefaultValue(ContinuousProbe.DEFAULT_USE_HANDLER);
+
+        screen.addPreference(handler);
+
         return screen;
     }
 
@@ -316,8 +372,22 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
 
                     data.putBundle(ContinuousProbe.BUNDLE_SENSOR, sensorBundle);
 
+                    double[] normalBuffer = new double[sensorTimeBuffer.length];
+
+                    double start = sensorTimeBuffer[0];
+                    double end = sensorTimeBuffer[sensorTimeBuffer.length - 1];
+                    double tick = (end - start) / sensorTimeBuffer.length;
+
+                    start = timeBuffer[0] * (1000 * 1000);
+
+                    for (int i = 0; i < normalBuffer.length; i++)
+                    {
+                        normalBuffer[i] = (start + (tick * i)) / (1000 * 1000);
+                    }
+
                     data.putDoubleArray(ContinuousProbe.EVENT_TIMESTAMP, timeBuffer);
                     data.putDoubleArray(ContinuousProbe.SENSOR_TIMESTAMP, sensorTimeBuffer);
+                    data.putDoubleArray(ContinuousProbe.NORMALIZED_TIMESTAMP, normalBuffer);
                     data.putIntArray(ContinuousProbe.SENSOR_ACCURACY, accuracyBuffer);
 
                     for (int i = 0; i < fieldNames.length; i++)
@@ -411,5 +481,48 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
     protected int getResourceThresholdValues()
     {
         return R.array.probe_accelerometer_threshold;
+    }
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = super.fetchSettings(context);
+
+        try
+        {
+            JSONObject enabled = new JSONObject();
+            enabled.put(AccelerometerProbe.USE_HANDLER, Probe.PROBE_TYPE_BOOLEAN);
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
+    }
+
+    @Override
+    public void updateFromMap(Context context, Map<String, Object> params)
+    {
+        super.updateFromMap(context, params);
+
+        if (params.containsKey(AccelerometerProbe.USE_HANDLER))
+        {
+            Object handler = params.get(AccelerometerProbe.USE_HANDLER);
+
+            if (handler instanceof Boolean)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putBoolean(AccelerometerProbe.USE_HANDLER, ((Boolean) handler).booleanValue());
+                e.commit();
+            }
+        }
     }
 }

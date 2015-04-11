@@ -625,6 +625,7 @@
         <item>UploadProgressCheck</item>
         <item>GoogleServicesCheck</item>
         <item>ByMinuteTriggerCheck</item>
+        <item>LogEventCheck</item>
         <!-- <item>TestErrorCheck</item> -->
         <!-- <item>TestWarningCheck</item> -->
    	</array>

@@ -27,6 +27,7 @@ public abstract class ContinuousProbe extends Probe
 {
     public static final String EVENT_TIMESTAMP = "EVENT_TIMESTAMP";
     public static final String SENSOR_TIMESTAMP = "SENSOR_TIMESTAMP";
+    public static final String NORMALIZED_TIMESTAMP = "NORMALIZED_TIMESTAMP";
 
     public static final String SENSOR_MAXIMUM_RANGE = "MAXIMUM_RANGE";
     public static final String SENSOR_NAME = "NAME";
@@ -42,6 +43,7 @@ public abstract class ContinuousProbe extends Probe
 
     protected static final boolean DEFAULT_ENABLED = false;
     public static final String DEFAULT_FREQUENCY = "0";
+    public static final boolean DEFAULT_USE_HANDLER = false;
 
     private WakeLock _wakeLock = null;
     private int _wakeLockLevel = -1;

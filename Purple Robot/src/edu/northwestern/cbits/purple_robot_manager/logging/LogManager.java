@@ -158,4 +158,9 @@ public class LogManager
     {
         this._logger.setHeartbeat(heartbeat);
     }
+
+    public int pendingEventsCount()
+    {
+        return this._logger.pendingEventsCount();
+    }
 }

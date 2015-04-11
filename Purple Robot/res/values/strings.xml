@@ -889,6 +889,14 @@
     <string name="pr_errors_label">Problems &amp; Warnings</string>
     <string name="pr_errors_none_label">No problems or warnings. System operation is normal.</string>
 
+    <string name="name_sanity_log_count">Accumulated Log Events Check</string>
+    <string name="name_sanity_log_events_error">A very significant number of log events are awaiting transmission. Connect your device to the network as soon as possible.</string>
+    <string name="name_sanity_log_events_warning">A significant number of log events log events are awaiting transmission. Connect your device to the network soon.</string>
+
+    <string name="pending_log_events_label">Pending Log Event Count</string>
+    <string name="pending_log_events_placeholder">Event logging is currently disabled.</string>
+    <string name="pending_log_events_value">%1$d event(s)</string>
+
     <string name="name_sanity_warning">Warning</string>
     <string name="check_warning_message">Warning Test</string>
     
@@ -1477,4 +1485,6 @@
     <string name="title_sensor_enable_sensor">Enable Sensor</string>
 
     <string name="summary_wear_heart_probe">%1$d beats per minute</string>
+
+    <string name="title_own_sensor_handler">Enable Dedicated Thread</string>
 </resources>

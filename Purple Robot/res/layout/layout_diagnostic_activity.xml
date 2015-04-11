@@ -76,20 +76,34 @@
 	        android:textIsSelectable="true"
 	        android:text="@string/last_upload_placeholder"
 	        android:textAppearance="?android:attr/textAppearanceMedium" />
-   	    <TextView
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/pending_files_label"
-	        android:textIsSelectable="true"
-	        android:textAppearance="?android:attr/textAppearanceSmall" />
-	    <TextView
-	        android:id="@+id/pending_files_value"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:paddingBottom="10dp"
-	        android:textIsSelectable="true"
-	        android:text="@string/pending_files_placeholder"
-	        android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pending_files_label"
+            android:textIsSelectable="true"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+        <TextView
+            android:id="@+id/pending_files_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:textIsSelectable="true"
+            android:text="@string/pending_files_placeholder"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pending_log_events_label"
+            android:textIsSelectable="true"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+        <TextView
+            android:id="@+id/pending_log_events_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:textIsSelectable="true"
+            android:text="@string/pending_log_events_placeholder"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
    	    <TextView
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
