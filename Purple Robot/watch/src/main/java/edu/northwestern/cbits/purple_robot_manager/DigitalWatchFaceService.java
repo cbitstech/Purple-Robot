@@ -396,11 +396,9 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService
             long now = System.currentTimeMillis();
 
             double runtime = ((double) (now - mWatchStart)) / (60 * 1000);
+            int battery = SensorService.currentBatteryLevel();
 
-            String payloadsStatus = DigitalWatchFaceService.this.getString(R.string.label_payloads_single, runtime);
-
-            if (payloadsCount != 1)
-                payloadsStatus = DigitalWatchFaceService.this.getString(R.string.label_payloads, payloadsCount, runtime);
+            String payloadsStatus = DigitalWatchFaceService.this.getString(R.string.label_payloads, payloadsCount, runtime, battery);
 
             Resources resources = DigitalWatchFaceService.this.getResources();
 

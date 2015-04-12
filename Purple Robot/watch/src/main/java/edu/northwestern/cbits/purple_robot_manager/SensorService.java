@@ -462,6 +462,11 @@ public class SensorService extends IntentService implements GoogleApiClient.Conn
         }
     }
 
+    public static int currentBatteryLevel()
+    {
+        return SensorService._batteryLevel;
+    }
+
     public static int pendingPayloadsCount()
     {
         return SensorService._payloads.size();
@@ -469,8 +474,6 @@ public class SensorService extends IntentService implements GoogleApiClient.Conn
 
     public static void transmitData(String source, DataMap data)
     {
-        Log.e("PW", "TRANSMITTING DATA FROM " + source);
-
         synchronized (SensorService._payloads)
         {
             while (SensorService._payloads.size() > 512)
