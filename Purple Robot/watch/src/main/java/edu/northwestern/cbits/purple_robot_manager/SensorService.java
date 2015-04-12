@@ -462,6 +462,11 @@ public class SensorService extends IntentService implements GoogleApiClient.Conn
         }
     }
 
+    public static int pendingPayloadsCount()
+    {
+        return SensorService._payloads.size();
+    }
+
     public static void transmitData(String source, DataMap data)
     {
         Log.e("PW", "TRANSMITTING DATA FROM " + source);

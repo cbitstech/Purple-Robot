@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.CheckBoxPreference;
+import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 
@@ -89,7 +90,7 @@ public class AndroidWearProbe extends Probe implements DataApi.DataListener
 
     @Override
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
+    public PreferenceScreen preferenceScreen(final Context context, PreferenceManager manager)
     {
         PreferenceScreen screen = manager.createPreferenceScreen(context);
         screen.setTitle(this.title(context));
@@ -226,6 +227,22 @@ public class AndroidWearProbe extends Probe implements DataApi.DataListener
 
         studyScreen.addPreference(livewellScreen);
         screen.addPreference(studyScreen);
+
+        Preference fetchNow = new Preference(context);
+        fetchNow.setTitle(R.string.action_request_data);
+        fetchNow.setSummary(R.string.action_desc_request_data);
+
+        fetchNow.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+        {
+            public boolean onPreferenceClick(Preference preference)
+            {
+                AndroidWearService.requestDataFromDevices(context);
+
+                return true;
+            }
+        });
+
+        screen.addPreference(fetchNow);
 
         return screen;
     }

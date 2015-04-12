@@ -196,8 +196,10 @@ public class LivewellPebbleActivityCountsProbe extends Probe
 
     @Override
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
+    public PreferenceScreen preferenceScreen(final Context context, PreferenceManager manager)
     {
+        final LivewellPebbleActivityCountsProbe me = this;
+
         PreferenceScreen screen = manager.createPreferenceScreen(context);
         screen.setTitle(this.title(context));
         screen.setSummary(R.string.summary_livewell_pebble_probe_desc);
@@ -217,6 +219,27 @@ public class LivewellPebbleActivityCountsProbe extends Probe
         duration.setTitle(R.string.probe_frequency_label);
 
         screen.addPreference(duration);
+
+        Preference fetchNow = new Preference(context);
+        fetchNow.setTitle(R.string.action_request_data);
+        fetchNow.setSummary(R.string.action_desc_request_data);
+
+        fetchNow.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+        {
+            public boolean onPreferenceClick(Preference preference)
+            {
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+                Editor e = prefs.edit();
+                e.putLong(LivewellPebbleActivityCountsProbe.FREQUENCY, 0);
+                e.commit();
+
+                me.isEnabled(context);
+
+                return true;
+            }
+        });
+
+        screen.addPreference(fetchNow);
 
         Preference installWatchApp = new Preference(context);
         installWatchApp.setTitle(R.string.probe_livewell_pebble_install_label);
