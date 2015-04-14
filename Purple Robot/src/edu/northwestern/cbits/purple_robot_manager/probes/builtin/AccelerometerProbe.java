@@ -250,10 +250,13 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
             sensors.unregisterListener(this, sensor);
             this._lastFrequency = -1;
 
-            Looper loop = AccelerometerProbe._handler.getLooper();
-            loop.quit();
+            if (AccelerometerProbe._handler != null)
+            {
+                Looper loop = AccelerometerProbe._handler.getLooper();
+                loop.quit();
 
-            AccelerometerProbe._handler = null;
+                AccelerometerProbe._handler = null;
+            }
         }
 
         return false;
