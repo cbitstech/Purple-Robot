@@ -1490,4 +1490,7 @@
 
     <string name="action_request_data">Request Data Now</string>
     <string name="action_desc_request_data">Immediately sends a request to the mobile device for buffered data.</string>
+
+    <string name="probe_pebble_install_label">Install Purple Robot Watchface</string>
+    <string name="probe_pebble_install_url">http://www.aetherial.net/static/pr/purple-robot.pbw</string>
 </resources>

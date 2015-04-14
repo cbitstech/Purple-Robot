@@ -13,11 +13,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.hardware.SensorEvent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
+import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 
@@ -138,7 +141,7 @@ public class PebbleProbe extends Continuous3DProbe
 
     @Override
     @SuppressWarnings("deprecation")
-    public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
+    public PreferenceScreen preferenceScreen(final Context context, PreferenceManager manager)
     {
         PreferenceScreen screen = manager.createPreferenceScreen(context);
         screen.setTitle(this.title(context));
@@ -150,6 +153,13 @@ public class PebbleProbe extends Continuous3DProbe
         enabled.setDefaultValue(PebbleProbe.DEFAULT_ENABLED);
 
         screen.addPreference(enabled);
+
+        Preference installWatchApp = new Preference(context);
+        installWatchApp.setTitle(R.string.probe_pebble_install_label);
+        installWatchApp.setIntent(new Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.probe_pebble_install_url))));
+
+        screen.addPreference(installWatchApp);
+
 
         return screen;
     }

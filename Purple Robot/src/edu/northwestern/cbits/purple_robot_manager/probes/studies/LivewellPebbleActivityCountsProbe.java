@@ -218,6 +218,24 @@ public class LivewellPebbleActivityCountsProbe extends Probe
         duration.setEntries(R.array.probe_satellite_frequency_labels);
         duration.setTitle(R.string.probe_frequency_label);
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        if (prefs.contains(LivewellPebbleActivityCountsProbe.FREQUENCY))
+        {
+            try
+            {
+                prefs.getString(LivewellPebbleActivityCountsProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY);
+            }
+            catch (ClassCastException e)
+            {
+                long freq = prefs.getLong(LivewellPebbleActivityCountsProbe.FREQUENCY, 0);
+
+                Editor ed = prefs.edit();
+                ed.putString(LivewellPebbleActivityCountsProbe.FREQUENCY, "" + freq);
+                ed.commit();
+            }
+        }
+
         screen.addPreference(duration);
 
         Preference fetchNow = new Preference(context);
@@ -228,10 +246,7 @@ public class LivewellPebbleActivityCountsProbe extends Probe
         {
             public boolean onPreferenceClick(Preference preference)
             {
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-                Editor e = prefs.edit();
-                e.putLong(LivewellPebbleActivityCountsProbe.FREQUENCY, 0);
-                e.commit();
+                me._lastRefresh = 0;
 
                 me.isEnabled(context);
 
@@ -404,7 +419,16 @@ public class LivewellPebbleActivityCountsProbe extends Probe
 
                 long now = System.currentTimeMillis();
 
-                long freq = Long.parseLong(prefs.getString(LivewellPebbleActivityCountsProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
+                long freq = 0;
+
+                try
+                {
+                    freq = Long.parseLong(prefs.getString(LivewellPebbleActivityCountsProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
+                }
+                catch (ClassCastException e)
+                {
+                    freq = prefs.getLong(LivewellPebbleActivityCountsProbe.FREQUENCY, Long.parseLong(Probe.DEFAULT_FREQUENCY));
+                }
 
                 if (now - this._lastRefresh > freq)
                 {
