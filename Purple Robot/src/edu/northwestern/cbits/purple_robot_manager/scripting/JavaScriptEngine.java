@@ -159,11 +159,19 @@ public class JavaScriptEngine extends BaseScriptEngine
 
     public void emitReading(String name, Object value)
     {
+        this.emitReading(name, value, false);
+    }
+
+    public void emitReading(String name, Object value, boolean priority)
+    {
         double now = System.currentTimeMillis();
 
         Bundle bundle = new Bundle();
         bundle.putString("PROBE", name);
         bundle.putDouble("TIMESTAMP", now / 1000);
+
+        if (priority)
+            bundle.putBoolean("PRIORITY", true);
 
         if (value instanceof String)
             bundle.putString(Feature.FEATURE_VALUE, value.toString());

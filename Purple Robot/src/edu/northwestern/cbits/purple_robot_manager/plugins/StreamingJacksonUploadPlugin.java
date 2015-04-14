@@ -42,6 +42,7 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
     private final static String ERROR_EXTENSION = ".error";
     private final static String FILE_EXTENSION = ".jackson";
     private static final String TEMP_FILE_EXTENSION = ".jackson-temp";
+    private static final String PRIORITY_FILE_EXTENSION = ".priority";
 
     private static final String ENABLED = "config_enable_streaming_jackson_data_server";
     private static final String UPLOAD_SIZE = "config_streaming_jackson_upload_size";
@@ -51,14 +52,15 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
     private static final String UPLOAD_INTERVAL_DEFAULT = "300";
 
     private JsonGenerator _generator = null;
+    private boolean _priorityPayload = false;
 
     private long _lastAttempt = 0;
     private File _currentFile = null;
 
     public String[] respondsTo()
     {
-        String[] activeActions =
-        { Probe.PROBE_READING, OutputPlugin.FORCE_UPLOAD };
+        String[] activeActions = { Probe.PROBE_READING, OutputPlugin.FORCE_UPLOAD };
+
         return activeActions;
     }
 
@@ -88,16 +90,31 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
 
                         File pendingFolder = me.getPendingFolder();
 
-                        String[] filenames = pendingFolder.list(new FilenameFilter()
+                        String[] priorityFilenames = pendingFolder.list(new FilenameFilter()
                         {
                             public boolean accept(File dir, String filename)
                             {
-                                return filename.endsWith(StreamingJacksonUploadPlugin.FILE_EXTENSION);
+                                return filename.endsWith(StreamingJacksonUploadPlugin.PRIORITY_FILE_EXTENSION);
                             }
                         });
 
-                        if (filenames == null)
-                            filenames = new String[0];
+                        String[] filenames = null;
+
+                        if (priorityFilenames != null && priorityFilenames.length > 0)
+                            filenames = priorityFilenames;
+                        else
+                        {
+                            filenames = pendingFolder.list(new FilenameFilter()
+                            {
+                                public boolean accept(File dir, String filename)
+                                {
+                                    return filename.endsWith(StreamingJacksonUploadPlugin.FILE_EXTENSION);
+                                }
+                            });
+
+                            if (filenames == null)
+                                filenames = new String[0];
+                        }
 
                         if (filenames.length < 1)
                             return;
@@ -179,8 +196,7 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
             {
                 Bundle extras = intent.getExtras();
 
-                if (extras.containsKey(DataUploadPlugin.TRANSMIT_KEY)
-                        && extras.getBoolean(DataUploadPlugin.TRANSMIT_KEY) == false)
+                if (extras.containsKey(DataUploadPlugin.TRANSMIT_KEY) && extras.getBoolean(DataUploadPlugin.TRANSMIT_KEY) == false)
                 {
 
                 }
@@ -219,6 +235,9 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
                             this._generator.writeStartArray();
                         }
 
+                        if (extras.containsKey("PRIORITY") && extras.getBoolean("PRIORITY"))
+                            this._priorityPayload = true;
+
                         StreamingJacksonUploadPlugin.writeBundle(this.getContext(), this._generator, extras);
                         this._generator.flush();
                     }
@@ -247,7 +266,11 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
         String tempFile = this._currentFile.getAbsolutePath();
         String finalFile = tempFile.replace(TEMP_FILE_EXTENSION, FILE_EXTENSION);
 
+        if (this._priorityPayload)
+            finalFile = finalFile.replace(FILE_EXTENSION, PRIORITY_FILE_EXTENSION);
+
         this._currentFile = null;
+        this._priorityPayload = false;
 
         FileUtils.moveFile(new File(tempFile), new File(finalFile));
 

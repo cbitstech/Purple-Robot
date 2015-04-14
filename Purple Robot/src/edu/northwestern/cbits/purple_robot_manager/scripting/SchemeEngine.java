@@ -310,9 +310,17 @@ public class SchemeEngine extends BaseScriptEngine
 
     public void emitReading(String name, Object value)
     {
+        this.emitReading(name, value, false);
+    }
+
+    public void emitReading(String name, Object value, boolean priority)
+    {
         Bundle bundle = new Bundle();
         bundle.putString("PROBE", name);
         bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+
+        if (priority)
+            bundle.putBoolean("PRIORITY", true);
 
         if (value instanceof String)
             bundle.putString(Feature.FEATURE_VALUE, value.toString());
