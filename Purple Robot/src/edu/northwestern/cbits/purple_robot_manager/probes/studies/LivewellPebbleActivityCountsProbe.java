@@ -514,6 +514,8 @@ public class LivewellPebbleActivityCountsProbe extends Probe
             this._ackReceiver = null;
         }
 
+        PebbleCalibrationHelper.check(context, false);
+
         return false;
     }
 

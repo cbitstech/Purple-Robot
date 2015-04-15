@@ -197,6 +197,8 @@ public class PebbleProbe extends Continuous3DProbe
             {
                 PebbleCalibrationHelper.check(context, true);
 
+                PebbleKit.startAppOnPebble(context, PebbleProbe.WATCHAPP_UUID);
+
                 if (this._receiver == null)
                 {
                     final PebbleProbe me = this;
@@ -294,6 +296,8 @@ public class PebbleProbe extends Continuous3DProbe
 
             this._receiver = null;
         }
+
+        PebbleCalibrationHelper.check(context, false);
 
         return false;
     }

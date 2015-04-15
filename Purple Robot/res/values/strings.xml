@@ -1438,7 +1438,10 @@
     
     <string name="title_pebble_check">Pebble Software Missing</string>
     <string name="message_pebble_check">Please install the Pebble companion app to use the Pebble Watch probe.</string>
-    
+
+    <string name="title_android_wear_check">Android Wear Software Missing</string>
+    <string name="message_android_wear_check">Please install the Android Wear companion app to use the Android Wear probe.</string>
+
     <string name="title_log_heartbeat">Emit Heartbeats</string>
     <string name="summary_log_heartbeat">Generate heartbeat status events on regular intervals.</string>
     
