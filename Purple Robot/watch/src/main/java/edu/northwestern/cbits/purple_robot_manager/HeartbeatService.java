@@ -17,6 +17,8 @@ public class HeartbeatService extends IntentService
     private static final String LAST_FIRE = "HeartbeatService.LAST_FIRE";
     private static final long INTERVAL = 10000;
 
+    private static int index = 0;
+
     public HeartbeatService()
     {
         super("HeartbeatService");
@@ -31,7 +33,7 @@ public class HeartbeatService extends IntentService
 
         if (now - lastFire > HeartbeatService.INTERVAL)
         {
-            Log.e("PW", "HEARTBEAT "+ (new Date()));
+            Log.e("PW", "HEARTBEAT " + index + " " + (new Date()));
 
             SharedPreferences.Editor e = prefs.edit();
             e.putLong(HeartbeatService.LAST_FIRE, now);
@@ -48,6 +50,8 @@ public class HeartbeatService extends IntentService
 
             Intent sensorIntent = new Intent(this, SensorService.class);
             this.startService(sensorIntent);
+
+            index += 1;
         }
     }
 }

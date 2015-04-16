@@ -4,5 +4,5 @@
     <string name="hello_square">Hello Square World!</string>
     <string name="digital_am">AM</string>
     <string name="digital_pm">PM</string>
-    <string name="label_payloads" formatted="false">%d readings (%.1f/%d%%)</string>
+    <string name="label_payloads" formatted="false">%d readings (%.1f / %d%%)</string>
 </resources>

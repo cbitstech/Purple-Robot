@@ -25,8 +25,13 @@ import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Collections;
 
 public class SensorService extends IntentService implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
 {
@@ -82,6 +87,8 @@ public class SensorService extends IntentService implements GoogleApiClient.Conn
     private static final String BATTERY_SCALE = "BATTERY_SCALE";
     private static final String BATTERY_CHARGING = "BATTERY_CHARGING";
     private static final String BATTERY_CHARGE_SOURCE = "BATTERY_CHARGE_SOURCE";
+
+    private static final String URI_CRASH_REPORT = "/purple-robot-crash";
 
     private static SensorEventListener heartListener = new SensorEventListener()
     {
@@ -180,7 +187,9 @@ public class SensorService extends IntentService implements GoogleApiClient.Conn
     };
 
     private static GoogleApiClient _apiClient = null;
-    private static LongSparseArray<DataMap> _payloads = new LongSparseArray<DataMap>();
+    private final static LongSparseArray<DataMap> _payloads = new LongSparseArray<DataMap>();
+    private final static ArrayList<DataMap> _crashPayloads = new ArrayList<DataMap>();
+
     private static boolean _isTransmitting = false;
 
     private static boolean _accelEnabled = false;
@@ -230,6 +239,41 @@ public class SensorService extends IntentService implements GoogleApiClient.Conn
             SensorService._apiClient = builder.build();
 
             SensorService._apiClient.connect();
+        }
+
+        File f = new File(this.getFilesDir(), "crash.acra");
+
+        if (f.exists())
+        {
+            try
+            {
+                FileInputStream in = new FileInputStream(f);
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+                int read = 0;
+                byte[] buffer = new byte[4096];
+
+                while ((read = in.read(buffer, 0, buffer.length)) != -1)
+                {
+                    out.write(buffer, 0, read);
+                }
+
+                in.close();
+
+                DataMap map = DataMap.fromByteArray(out.toByteArray());
+
+                SensorService._crashPayloads.add(map);
+
+                f.delete();
+            }
+            catch (FileNotFoundException e)
+            {
+                e.printStackTrace();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -511,7 +555,7 @@ public class SensorService extends IntentService implements GoogleApiClient.Conn
         {
             public void onMessageReceived(MessageEvent event)
             {
-                Log.e("PW", "PATH: " + event.getPath() + " " + (new Date()));
+                Log.e("PW", "GOT PATH: " + event.getPath());
 
                 if (SensorService.PATH_REQUEST_DATA.equals(event.getPath()))
                 {
@@ -524,14 +568,11 @@ public class SensorService extends IntentService implements GoogleApiClient.Conn
 
                         synchronized (SensorService._payloads)
                         {
-                            for (int i = 0; i < SensorService._payloads.size(); i++)
-                            {
+                            for (int i = 0; i < SensorService._payloads.size(); i++) {
                                 Long timestamp = SensorService._payloads.keyAt(i);
 
-                                if (timestamp < now)
-                                {
-                                    if (SensorService._apiClient.isConnected())
-                                    {
+                                if (timestamp < now) {
+                                    if (SensorService._apiClient.isConnected()) {
                                         DataMap map = SensorService._payloads.valueAt(i);
 
                                         PutDataMapRequest putDataMapReq = PutDataMapRequest.create(SensorService.URI_READING_PREFIX + "/" + map.getString(SensorService.BUNDLE_SOURCE) + "/" + System.currentTimeMillis());
@@ -541,14 +582,47 @@ public class SensorService extends IntentService implements GoogleApiClient.Conn
 
                                         Wearable.DataApi.putDataItem(SensorService._apiClient, putDataReq);
 
+                                        Log.e("PW", "SENT PAYLOAD " + timestamp);
+
                                         transmitted.add(timestamp);
                                     }
                                 }
                             }
 
-                            for (Long timestamp : transmitted)
-                            {
+                            for (Long timestamp : transmitted) {
                                 SensorService._payloads.remove(timestamp);
+                            }
+                        }
+
+                        synchronized (SensorService._crashPayloads)
+                        {
+                            ArrayList<Integer> sent = new ArrayList<Integer>();
+
+                            for (int i = 0; i < SensorService._crashPayloads.size(); i++)
+                            {
+                                if (SensorService._apiClient.isConnected())
+                                {
+                                    DataMap crashReport = SensorService._crashPayloads.get(i);
+
+                                    PutDataMapRequest putDataMapReq = PutDataMapRequest.create(SensorService.URI_CRASH_REPORT + "/" + System.currentTimeMillis());
+                                    putDataMapReq.getDataMap().putAll(crashReport);
+
+                                    PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
+
+                                    Wearable.DataApi.putDataItem(SensorService._apiClient, putDataReq);
+
+                                    Log.e("PW", "SENT CRASH " + i);
+
+                                    sent.add(i);
+                                }
+                            }
+
+                            Collections.sort(sent);
+                            Collections.reverse(sent);
+
+                            for (Integer i : sent)
+                            {
+                                SensorService._crashPayloads.remove(i);
                             }
                         }
 
@@ -585,7 +659,6 @@ public class SensorService extends IntentService implements GoogleApiClient.Conn
             }
         });
     }
-
 
     public static String bytesToHex(byte[] bytes)
     {

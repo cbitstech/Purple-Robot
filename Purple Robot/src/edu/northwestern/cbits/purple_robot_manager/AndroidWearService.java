@@ -23,10 +23,12 @@ import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
@@ -37,6 +39,7 @@ public class AndroidWearService extends WearableListenerService
 {
     private static final String PATH_REQUEST_DATA = "/purple-robot/request-data";
     private static final String PATH_SEND_CONFIG = "/purple-robot/send-config";
+    private static final String URI_CRASH_REPORT = "/purple-robot-crash";
 
     private static GoogleApiClient _apiClient = null;
 
@@ -216,17 +219,31 @@ public class AndroidWearService extends WearableListenerService
 
                                     int level = dataMap.getInt("BATTERY_LEVEL", Integer.MAX_VALUE);
 
-                                    if (level < 48)
+                                    if (level < 30)
                                     {
                                         String message = me.getString(R.string.name_sanity_wear_battery_warning);
 
                                         sanity.addAlert(SanityCheck.WARNING, name, message, null);
                                     } else
                                         sanity.clearAlert(name);
-
-
-                                    Wearable.DataApi.deleteDataItems(me._apiClient, item.getUri());
                                 }
+
+                                Wearable.DataApi.deleteDataItems(me._apiClient, item.getUri());
+                            }
+                           else if (item.getUri().getPath().startsWith(AndroidWearService.URI_CRASH_REPORT))
+                            {
+                                DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
+
+                                HashMap<String, Object> payload = new HashMap<String, Object>();
+
+                                for (String key : dataMap.keySet())
+                                {
+                                    payload.put(key, dataMap.getString(key));
+                                }
+
+                                LogManager.getInstance(me).log("android_wear_crash", payload);
+
+                                Wearable.DataApi.deleteDataItems(me._apiClient, item.getUri());
                             }
 
                             try
