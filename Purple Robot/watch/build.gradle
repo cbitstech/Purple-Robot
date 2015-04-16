@@ -1,5 +1,9 @@
 apply plugin: 'com.android.application'
 
+repositories {
+    maven { url 'http://repo1.maven.org/maven2' }
+}
+
 android {
     compileSdkVersion 22
     buildToolsVersion "22.0.0"
@@ -31,4 +35,5 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.google.android.support:wearable:1.+'
     compile 'com.google.android.gms:play-services-wearable:6.+'
+    compile 'ch.acra:acra:4.5.0'
 }
