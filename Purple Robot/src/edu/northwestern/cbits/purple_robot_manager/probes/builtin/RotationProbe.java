@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -22,6 +23,9 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.preference.CheckBoxPreference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -52,6 +56,7 @@ public class RotationProbe extends ContinuousProbe implements SensorEventListene
     protected static final String THRESHOLD = "config_probe_rotation_built_in_threshold";
     private static final String FREQUENCY = "config_probe_rotation_built_in_frequency";
     private static final String ENABLED = "config_probe_rotation_built_in_enabled";
+    private static final String USE_HANDLER = "config_probe_rotation_built_in_handler";
 
     private long lastThresholdLookup = 0;
     private double lastThreshold = 0.5;
@@ -71,6 +76,8 @@ public class RotationProbe extends ContinuousProbe implements SensorEventListene
     protected int _lastFrequency = -1;
 
     protected int bufferIndex = 0;
+
+    private static Handler _handler = null;
 
     @Override
     public Intent viewIntent(Context context)
@@ -279,8 +286,8 @@ public class RotationProbe extends ContinuousProbe implements SensorEventListene
 
         this._context = context.getApplicationContext();
 
-        SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+        final SensorManager sensors = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+        final Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
 
         if (super.isEnabled(context))
         {
@@ -292,19 +299,51 @@ public class RotationProbe extends ContinuousProbe implements SensorEventListene
                 {
                     sensors.unregisterListener(this, sensor);
 
+                    if (RotationProbe._handler != null)
+                    {
+                        Looper loop = RotationProbe._handler.getLooper();
+                        loop.quit();
+
+                        RotationProbe._handler = null;
+                    }
+
                     if (frequency != SensorManager.SENSOR_DELAY_FASTEST && frequency != SensorManager.SENSOR_DELAY_UI &&
                             frequency != SensorManager.SENSOR_DELAY_NORMAL)
                     {
                         frequency = SensorManager.SENSOR_DELAY_GAME;
                     }
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                    if (prefs.getBoolean(RotationProbe.USE_HANDLER, ContinuousProbe.DEFAULT_USE_HANDLER))
                     {
-                        sensors.registerListener(this, sensor, frequency, 0);
+                        final RotationProbe me = this;
+                        final int finalFrequency = frequency;
+
+                        Runnable r = new Runnable()
+                        {
+                            public void run()
+                            {
+                                Looper.prepare();
+
+                                RotationProbe._handler = new Handler();
+
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                                    sensors.registerListener(me, sensor, finalFrequency, 0, RotationProbe._handler);
+                                else
+                                    sensors.registerListener(me, sensor, finalFrequency, RotationProbe._handler);
+
+                                Looper.loop();
+                            }
+                        };
+
+                        Thread t = new Thread(r, "rotation");
+                        t.start();
                     }
                     else
                     {
-                        sensors.registerListener(this, sensor, frequency, null);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                            sensors.registerListener(this, sensor, frequency, 0);
+                        else
+                            sensors.registerListener(this, sensor, frequency, null);
                     }
 
                     this._lastFrequency = frequency;
@@ -316,12 +355,28 @@ public class RotationProbe extends ContinuousProbe implements SensorEventListene
             {
                 sensors.unregisterListener(this, sensor);
                 this._lastFrequency = -1;
+
+                if (RotationProbe._handler != null)
+                {
+                    Looper loop = RotationProbe._handler.getLooper();
+                    loop.quit();
+
+                    RotationProbe._handler = null;
+                }
             }
         }
         else
         {
             sensors.unregisterListener(this, sensor);
             this._lastFrequency = -1;
+
+            if (RotationProbe._handler != null)
+            {
+                Looper loop = RotationProbe._handler.getLooper();
+                loop.quit();
+
+                RotationProbe._handler = null;
+            }
         }
 
         return false;
@@ -380,6 +435,13 @@ public class RotationProbe extends ContinuousProbe implements SensorEventListene
         threshold.setSummary(R.string.probe_noise_threshold_summary);
 
         screen.addPreference(threshold);
+
+        CheckBoxPreference handler = new CheckBoxPreference(context);
+        handler.setTitle(R.string.title_own_sensor_handler);
+        handler.setKey(RotationProbe.USE_HANDLER);
+        handler.setDefaultValue(ContinuousProbe.DEFAULT_USE_HANDLER);
+
+        screen.addPreference(handler);
 
         return screen;
     }
@@ -527,5 +589,50 @@ public class RotationProbe extends ContinuousProbe implements SensorEventListene
     protected int getResourceThresholdValues()
     {
         return R.array.probe_rotation_threshold;
+    }
+
+
+    @Override
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = super.fetchSettings(context);
+
+        try
+        {
+            JSONObject handler = new JSONObject();
+            handler.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+            handler.put(Probe.PROBE_VALUES, values);
+            settings.put(RotationProbe.USE_HANDLER, handler);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
+    }
+
+    @Override
+    public void updateFromMap(Context context, Map<String, Object> params)
+    {
+        super.updateFromMap(context, params);
+
+        if (params.containsKey(RotationProbe.USE_HANDLER))
+        {
+            Object handler = params.get(RotationProbe.USE_HANDLER);
+
+            if (handler instanceof Boolean)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                SharedPreferences.Editor e = prefs.edit();
+
+                e.putBoolean(RotationProbe.USE_HANDLER, ((Boolean) handler).booleanValue());
+                e.commit();
+            }
+        }
     }
 }

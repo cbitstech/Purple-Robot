@@ -21,7 +21,6 @@ import android.os.Looper;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -186,6 +185,14 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
                 if (this._lastFrequency != frequency)
                 {
                     sensors.unregisterListener(this, sensor);
+
+                    if (AccelerometerProbe._handler != null)
+                    {
+                        Looper loop = AccelerometerProbe._handler.getLooper();
+                        loop.quit();
+
+                        AccelerometerProbe._handler = null;
+                    }
 
                     if (frequency != SensorManager.SENSOR_DELAY_FASTEST && frequency != SensorManager.SENSOR_DELAY_UI &&
                         frequency != SensorManager.SENSOR_DELAY_NORMAL)
@@ -493,13 +500,14 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
 
         try
         {
-            JSONObject enabled = new JSONObject();
-            enabled.put(AccelerometerProbe.USE_HANDLER, Probe.PROBE_TYPE_BOOLEAN);
+            JSONObject handler = new JSONObject();
+            handler.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+
             JSONArray values = new JSONArray();
             values.put(true);
             values.put(false);
-            enabled.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_ENABLED, enabled);
+            handler.put(Probe.PROBE_VALUES, values);
+            settings.put(AccelerometerProbe.USE_HANDLER, handler);
         }
         catch (JSONException e)
         {

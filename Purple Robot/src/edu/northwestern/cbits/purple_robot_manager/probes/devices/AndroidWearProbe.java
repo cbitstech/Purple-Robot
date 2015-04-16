@@ -234,11 +234,13 @@ public class AndroidWearProbe extends Probe implements DataApi.DataListener
         fetchNow.setTitle(R.string.action_request_data);
         fetchNow.setSummary(R.string.action_desc_request_data);
 
+        final AndroidWearProbe me = this;
+
         fetchNow.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
         {
             public boolean onPreferenceClick(Preference preference)
             {
-                AndroidWearService.requestDataFromDevices(context);
+                me._lastRequest = 0;
 
                 return true;
             }
