@@ -88,20 +88,17 @@ public class LivewellPebbleActivityCountsProbe extends Probe
                 this.rmsCount |= (data[i + 14] & 0xff) << (i * 8);
             }
 
-            for (int i = 0; i < 1; i++)
-            {
-                this.battery = data[18];
-            }
+            this.battery = data[18];
         }
 
-        public double diffActivityCount()
+        public int diffActivityCount()
         {
-            return (double) this.diffCount;
+            return this.diffCount;
         }
 
-        public double rmsActivityCount()
+        public int rmsActivityCount()
         {
-            return (double) this.rmsCount;
+            return this.rmsCount;
         }
 
         @SuppressWarnings("unused")
@@ -135,7 +132,7 @@ public class LivewellPebbleActivityCountsProbe extends Probe
 
         public int batteryLevel()
         {
-            return this.battery & 0x7f;
+            return (int) this.battery & 0x7f;
         }
 
         public long start()
@@ -323,7 +320,8 @@ public class LivewellPebbleActivityCountsProbe extends Probe
 
                             byte[] payload = dictionary.getBytes(1);
 
-                            if (payload.length == 19) {
+                            if (payload.length <= 19)
+                            {
                                 ActivityCount count = new ActivityCount(payload);
 
                                 TimeZone here = Calendar.getInstance().getTimeZone();
@@ -335,10 +333,10 @@ public class LivewellPebbleActivityCountsProbe extends Probe
 
                                 PebbleKit.FirmwareVersionInfo info = PebbleKit.getWatchFWVersion(context);
 
-                                data.putString(LivewellPebbleActivityCountsProbe.FIRMWARE_VERSION, "" + info.getMajor() + "." + info.getMinor() + "." + info.getPoint() + " " + info.getTag());
+                                data.putString(LivewellPebbleActivityCountsProbe.FIRMWARE_VERSION, "" + info.getMajor() + "." + info.getMinor() + "." + info.getPoint());
                                 data.putInt(LivewellPebbleActivityCountsProbe.BUNDLE_NUM_SAMPLES, count.numSamples());
-                                data.putDouble(LivewellPebbleActivityCountsProbe.BUNDLE_RMS_COUNT, count.rmsActivityCount());
-                                data.putDouble(LivewellPebbleActivityCountsProbe.BUNDLE_DIFF_COUNT, count.diffActivityCount());
+                                data.putInt(LivewellPebbleActivityCountsProbe.BUNDLE_RMS_COUNT, count.rmsActivityCount());
+                                data.putInt(LivewellPebbleActivityCountsProbe.BUNDLE_DIFF_COUNT, count.diffActivityCount());
                                 data.putInt(LivewellPebbleActivityCountsProbe.BUNDLE_BATTERY_LEVEL, count.batteryLevel());
                                 data.putBoolean(LivewellPebbleActivityCountsProbe.BUNDLE_IS_CHARGING, count.isCharging());
 
