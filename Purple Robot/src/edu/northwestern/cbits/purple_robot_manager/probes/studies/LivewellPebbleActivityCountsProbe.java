@@ -321,66 +321,66 @@ public class LivewellPebbleActivityCountsProbe extends Probe
                         {
                             PebbleKit.sendAckToPebble(context, transactionId);
 
-                            ActivityCount count = new ActivityCount(dictionary.getBytes(1));
+                            byte[] payload = dictionary.getBytes(1);
 
-                            TimeZone here = Calendar.getInstance().getTimeZone();
-                            count.applyTimezone(here);
+                            if (payload.length == 19) {
+                                ActivityCount count = new ActivityCount(payload);
 
-                            Bundle data = new Bundle();
-                            data.putDouble(Probe.BUNDLE_TIMESTAMP, count.start() / 1000);
-                            data.putString(Probe.BUNDLE_PROBE, me.name(context));
+                                TimeZone here = Calendar.getInstance().getTimeZone();
+                                count.applyTimezone(here);
 
-                            PebbleKit.FirmwareVersionInfo info = PebbleKit.getWatchFWVersion(context);
+                                Bundle data = new Bundle();
+                                data.putDouble(Probe.BUNDLE_TIMESTAMP, count.start() / 1000);
+                                data.putString(Probe.BUNDLE_PROBE, me.name(context));
 
-                            data.putString(LivewellPebbleActivityCountsProbe.FIRMWARE_VERSION, "" + info.getMajor() + "." + info.getMinor() + "." + info.getPoint() + " " + info.getTag());
-                            data.putInt(LivewellPebbleActivityCountsProbe.BUNDLE_NUM_SAMPLES, count.numSamples());
-                            data.putDouble(LivewellPebbleActivityCountsProbe.BUNDLE_RMS_COUNT, count.rmsActivityCount());
-                            data.putDouble(LivewellPebbleActivityCountsProbe.BUNDLE_DIFF_COUNT, count.diffActivityCount());
-                            data.putInt(LivewellPebbleActivityCountsProbe.BUNDLE_BATTERY_LEVEL, count.batteryLevel());
-                            data.putBoolean(LivewellPebbleActivityCountsProbe.BUNDLE_IS_CHARGING, count.isCharging());
+                                PebbleKit.FirmwareVersionInfo info = PebbleKit.getWatchFWVersion(context);
 
-                            synchronized(me._pendingReadings)
-                            {
-                                me._pendingReadings.add(data);
-                            }
+                                data.putString(LivewellPebbleActivityCountsProbe.FIRMWARE_VERSION, "" + info.getMajor() + "." + info.getMinor() + "." + info.getPoint() + " " + info.getTag());
+                                data.putInt(LivewellPebbleActivityCountsProbe.BUNDLE_NUM_SAMPLES, count.numSamples());
+                                data.putDouble(LivewellPebbleActivityCountsProbe.BUNDLE_RMS_COUNT, count.rmsActivityCount());
+                                data.putDouble(LivewellPebbleActivityCountsProbe.BUNDLE_DIFF_COUNT, count.diffActivityCount());
+                                data.putInt(LivewellPebbleActivityCountsProbe.BUNDLE_BATTERY_LEVEL, count.batteryLevel());
+                                data.putBoolean(LivewellPebbleActivityCountsProbe.BUNDLE_IS_CHARGING, count.isCharging());
 
-                            Runnable r = new Runnable()
-                            {
-                                // Delay immediate transmission so display system can keep up - one reading per second.
-
-                                public void run()
-                                {
-                                    if (me._isTransmitting)
-                                        return;
-
-                                    me._isTransmitting = true;
-
-                                    while (me._pendingReadings.size() > 0)
-                                    {
-                                        synchronized(me._pendingReadings)
-                                        {
-                                            me.transmitData(context, me._pendingReadings.get(0));
-
-                                            me._pendingReadings.remove(0);
-                                        }
-
-                                        try
-                                        {
-
-                                            Thread.sleep(1000);
-                                        }
-                                        catch (InterruptedException e)
-                                        {
-                                            LogManager.getInstance(context).logException(e);
-                                        }
-                                    }
-
-                                    me._isTransmitting = false;
+                                synchronized (me._pendingReadings) {
+                                    me._pendingReadings.add(data);
                                 }
-                            };
 
-                            Thread t = new Thread(r);
-                            t.start();
+                                Runnable r = new Runnable() {
+                                    // Delay immediate transmission so display system can keep up - one reading per second.
+
+                                    public void run() {
+                                        if (me._isTransmitting)
+                                            return;
+
+                                        me._isTransmitting = true;
+
+                                        while (me._pendingReadings.size() > 0) {
+                                            synchronized (me._pendingReadings) {
+                                                me.transmitData(context, me._pendingReadings.get(0));
+
+                                                me._pendingReadings.remove(0);
+                                            }
+
+                                            try {
+
+                                                Thread.sleep(1000);
+                                            } catch (InterruptedException e) {
+                                                LogManager.getInstance(context).logException(e);
+                                            }
+                                        }
+
+                                        me._isTransmitting = false;
+                                    }
+                                };
+
+                                Thread t = new Thread(r);
+                                t.start();
+                            }
+                            else
+                            {
+                                // Transmit warning about old watchapp version
+                            }
                         }
                     };
 
