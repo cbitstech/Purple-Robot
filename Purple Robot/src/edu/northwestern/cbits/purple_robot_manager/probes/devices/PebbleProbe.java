@@ -226,7 +226,8 @@ public class PebbleProbe extends Continuous3DProbe
 
                                         FirmwareVersionInfo info = PebbleKit.getWatchFWVersion(context);
 
-                                        data.putString(PebbleProbe.FIRMWARE_VERSION, "" + info.getMajor() + "." + info.getMinor() + "." + info.getPoint() + " " + info.getTag());
+                                        if (info != null)
+                                            data.putString(PebbleProbe.FIRMWARE_VERSION, "" + info.getMajor() + "." + info.getMinor() + "." + info.getPoint());
 
                                         data.putDoubleArray(ContinuousProbe.SENSOR_TIMESTAMP, timeBuffer);
 
