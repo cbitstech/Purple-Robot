@@ -1496,4 +1496,8 @@
 
     <string name="probe_pebble_install_label">Install Purple Robot Watchface</string>
     <string name="probe_pebble_install_url">http://www.aetherial.net/static/pr/purple-robot.pbw</string>
+
+
+    <string name="name_sanity_pebble_probes_title">Simultaneous Pebble Probes Check</string>
+    <string name="name_sanity_pebble_probes_warning">Multiple Pebble probes are currently enabled. Please disable all but one.</string>
 </resources>
