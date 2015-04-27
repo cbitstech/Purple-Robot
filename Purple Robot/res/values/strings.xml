@@ -1500,4 +1500,7 @@
 
     <string name="name_sanity_pebble_probes_title">Simultaneous Pebble Probes Check</string>
     <string name="name_sanity_pebble_probes_warning">Multiple Pebble probes are currently enabled. Please disable all but one.</string>
+
+    <string name="title_clear_probe_display">Clear Reading?</string>
+    <string name="message_clear_probe_display">Would you like to remove the reading associated with "%1$s" from the main display?</string>
 </resources>
