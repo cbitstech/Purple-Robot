@@ -40,16 +40,113 @@ public class ProbeViewerActivity extends ActionBarActivity
     private static final String PREFERENCE_SCREEN_KEY = "PREFERENCE_SCREEN_KEY";
     private static HashMap<String, PreferenceScreen> _screens = new HashMap<String, PreferenceScreen>();
 
+    public static class ProbeViewerFragment extends PreferenceFragment
+    {
+        public ProbeViewerFragment()
+        {
+            super();
+        }
+
+        public void onCreate(Bundle savedInstanceState)
+        {
+            super.onCreate(savedInstanceState);
+
+            final ProbeViewerActivity activity = (ProbeViewerActivity) this.getActivity();
+
+            Bundle arguments = this.getArguments();
+
+            String key = arguments.getString(ProbeViewerActivity.PREFERENCE_SCREEN_KEY);
+
+            // If launched with no key, build out settings from the top...
+
+            if (key == null)
+            {
+                if (arguments.getBoolean("is_model", false))
+                {
+                    PreferenceScreen screen = ProbeViewerActivity.screenForBundle(activity, this.getPreferenceManager(), activity._probeName, activity._probeBundle);
+
+                    this.setPreferenceScreen(screen);
+                }
+                else
+                {
+                    activity._probe = ProbeManager.probeForName(activity._probeName, activity);
+
+                    activity.setTitle(activity._probe.title(activity));
+
+                    if (activity._probe != null)
+                    {
+                        Bundle formattedBundle = activity._probe.formattedBundle(activity, activity._probeBundle);
+
+                        if (formattedBundle != null)
+                        {
+                            PreferenceScreen screen = ProbeViewerActivity.screenForBundle(activity, this.getPreferenceManager(), activity._probe.title(activity), formattedBundle);
+
+                            screen.addPreference(ProbeViewerActivity.screenForBundle(activity, this.getPreferenceManager(), activity.getString(R.string.display_raw_data), activity._probeBundle));
+
+                            this.setPreferenceScreen(screen);
+                        }
+                        else
+                        {
+                            PreferenceScreen screen = ProbeViewerActivity.screenForBundle(activity, this.getPreferenceManager(), activity._probe.title(activity), activity._probeBundle);
+
+                            this.setPreferenceScreen(screen);
+                        }
+                    }
+                }
+
+                final PreferenceFragment meFragment = this;
+
+                // Delay for half a second so preferences can be completely constructed...
+
+                Runnable r = new Runnable()
+                {
+                    public void run()
+                    {
+                        try
+                        {
+                            Thread.sleep(500);
+                        }
+                        catch (InterruptedException e)
+                        {
+
+                        }
+
+                        activity.runOnUiThread(new Runnable()
+                        {
+                            public void run()
+                            {
+                                // After delay, build preference screen map...
+
+                                activity.mapScreens(meFragment.getPreferenceScreen());
+                            }
+                        });
+                    }
+                };
+
+                Thread t = new Thread(r);
+                t.start();
+
+                PurpleRobotApplication.fixPreferences(activity, true);
+            }
+            else
+            {
+                // If launched with a key, lookup the preference screen and go from there...
+
+                this.setPreferenceScreen(ProbeViewerActivity._screens.get(key));
+                activity.setTitle(ProbeViewerActivity._screens.get(key).getTitle());
+            }
+        }
+
+    }
+
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
 
-        final Bundle bundle = this.getIntent().getExtras();
+        Bundle bundle = this.getIntent().getExtras();
 
         this._probeName = bundle.getString("probe_name");
         this._probeBundle = bundle.getBundle("probe_bundle");
-
-        final String key = this.getIntent().getStringExtra(ProbeViewerActivity.PREFERENCE_SCREEN_KEY);
 
         this.setContentView(R.layout.layout_settings_activity);
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -63,92 +160,8 @@ public class ProbeViewerActivity extends ActionBarActivity
 
         FragmentTransaction transaction = fragment.beginTransaction();
 
-        final PreferenceFragment prefFragment = new PreferenceFragment()
-        {
-            public void onCreate(Bundle savedInstanceState)
-            {
-                super.onCreate(savedInstanceState);
-
-                // If launched with no key, build out settings from the top...
-
-                if (key == null)
-                {
-                    if (bundle.getBoolean("is_model", false))
-                    {
-                        PreferenceScreen screen = ProbeViewerActivity.screenForBundle(me, this.getPreferenceManager(), me._probeName, me._probeBundle);
-
-                        this.setPreferenceScreen(screen);
-                    }
-                    else
-                    {
-                        me._probe = ProbeManager.probeForName(me._probeName, me);
-
-                        me.setTitle(me._probe.title(me));
-
-                        if (me._probe != null)
-                        {
-                            Bundle formattedBundle = me._probe.formattedBundle(me, me._probeBundle);
-
-                            if (formattedBundle != null)
-                            {
-                                PreferenceScreen screen = ProbeViewerActivity.screenForBundle(me, this.getPreferenceManager(), me._probe.title(me), formattedBundle);
-
-                                screen.addPreference(ProbeViewerActivity.screenForBundle(me, this.getPreferenceManager(), me.getString(R.string.display_raw_data), me._probeBundle));
-
-                                this.setPreferenceScreen(screen);
-                            }
-                            else
-                            {
-                                PreferenceScreen screen = ProbeViewerActivity.screenForBundle(me, this.getPreferenceManager(), me._probe.title(me), me._probeBundle);
-
-                                this.setPreferenceScreen(screen);
-                            }
-                        }
-                    }
-
-                    final PreferenceFragment meFragment = this;
-
-                    // Delay for half a second so preferences can be completely constructed...
-
-                    Runnable r = new Runnable()
-                    {
-                        public void run()
-                        {
-                            try
-                            {
-                                Thread.sleep(500);
-                            }
-                            catch (InterruptedException e)
-                            {
-
-                            }
-
-                            me.runOnUiThread(new Runnable()
-                            {
-                                public void run()
-                                {
-                                    // After delay, build preference screen map...
-
-                                    me.mapScreens(meFragment.getPreferenceScreen());
-                                }
-                            });
-                        }
-                    };
-
-                    Thread t = new Thread(r);
-                    t.start();
-
-                    PurpleRobotApplication.fixPreferences(me, true);
-                }
-                else
-                {
-                    // If launched with a key, lookup the preference screen and go from there...
-
-                    this.setPreferenceScreen(ProbeViewerActivity._screens.get(key));
-                    me.setTitle(ProbeViewerActivity._screens.get(key).getTitle());
-                }
-            }
-        };
+        PreferenceFragment prefFragment = new ProbeViewerFragment();
+        prefFragment.setArguments(bundle);
 
         transaction.replace(R.id.content_frame, prefFragment);
         transaction.commit();
