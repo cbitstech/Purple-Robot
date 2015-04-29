@@ -14,7 +14,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,7 +32,7 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.tests.RobotTestCase;
 import edu.northwestern.cbits.purple_robot_manager.tests.RobotTestRunner;
 
-public class TestActivity extends ActionBarActivity
+public class TestActivity extends AppCompatActivity
 {
     public static final String PROGRESS_MESSAGE = "test_activity_progress_message";
     public static final String PROGRESS_DELAY = "test_activity_progress_delay";

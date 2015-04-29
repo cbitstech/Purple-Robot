@@ -2,80 +2,80 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-	<LinearLayout android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:orientation="vertical"
-	    android:padding="10dp" >
-	    <TextView
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:text="@string/user_id_label"
-	        android:textIsSelectable="true"
-	        android:textAppearance="?android:attr/textAppearanceSmall" />
-	    <TextView
-	        android:id="@+id/user_id_value"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:paddingBottom="10dp"
-	        android:text="@string/user_id_placeholder"
-	        android:textIsSelectable="true"
-	        android:textAppearance="?android:attr/textAppearanceMedium" />
-  	    <TextView
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:text="@string/ip_address_label"
-	        android:textIsSelectable="true"
-	        android:textAppearance="?android:attr/textAppearanceSmall" />
-	    <TextView
-	        android:id="@+id/ip_address_value"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:paddingBottom="10dp"
-	        android:text="@string/ip_address_placeholder"
-	        android:textIsSelectable="true"
-	        android:textAppearance="?android:attr/textAppearanceMedium" />
-  	    <TextView
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/probe_status_label"
-	        android:textIsSelectable="true"
-	        android:textAppearance="?android:attr/textAppearanceSmall" />
-	    <TextView
-	        android:id="@+id/probe_status_value"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:paddingBottom="10dp"
-	        android:text="@string/probe_status_placeholder"
-	        android:textIsSelectable="true"
-	        android:textAppearance="?android:attr/textAppearanceMedium" />
-	    <TextView
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/upload_status_label"
-	        android:textIsSelectable="true"
-	        android:textAppearance="?android:attr/textAppearanceSmall" />
-	    <TextView
-	        android:id="@+id/upload_status_value"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:paddingBottom="10dp"
-	        android:text="@string/upload_status_placeholder"
-	        android:textIsSelectable="true"
-	        android:textAppearance="?android:attr/textAppearanceMedium" />
-	    <TextView
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/last_upload_label"
-	        android:textIsSelectable="true"
-	        android:textAppearance="?android:attr/textAppearanceSmall" />
-	    <TextView
-	        android:id="@+id/last_upload_value"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:paddingBottom="10dp"
-	        android:textIsSelectable="true"
-	        android:text="@string/last_upload_placeholder"
-	        android:textAppearance="?android:attr/textAppearanceMedium" />
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp" >
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/user_id_label"
+            android:textIsSelectable="true"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+        <TextView
+            android:id="@+id/user_id_value"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="@string/user_id_placeholder"
+            android:textIsSelectable="true"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/ip_address_label"
+            android:textIsSelectable="true"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+        <TextView
+            android:id="@+id/ip_address_value"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="@string/ip_address_placeholder"
+            android:textIsSelectable="true"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/probe_status_label"
+            android:textIsSelectable="true"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+        <TextView
+            android:id="@+id/probe_status_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="@string/probe_status_placeholder"
+            android:textIsSelectable="true"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/upload_status_label"
+            android:textIsSelectable="true"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+        <TextView
+            android:id="@+id/upload_status_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="@string/upload_status_placeholder"
+            android:textIsSelectable="true"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/last_upload_label"
+            android:textIsSelectable="true"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+        <TextView
+            android:id="@+id/last_upload_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:textIsSelectable="true"
+            android:text="@string/last_upload_placeholder"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -86,7 +86,7 @@
             android:id="@+id/pending_files_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingBottom="10dp"
+            android:layout_marginBottom="16dp"
             android:textIsSelectable="true"
             android:text="@string/pending_files_placeholder"
             android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -100,75 +100,85 @@
             android:id="@+id/pending_log_events_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingBottom="10dp"
+            android:layout_marginBottom="16dp"
             android:textIsSelectable="true"
             android:text="@string/pending_log_events_placeholder"
             android:textAppearance="?android:attr/textAppearanceMedium" />
-   	    <TextView
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/pr_errors_label"
-	        android:textIsSelectable="true"
-	        android:textAppearance="?android:attr/textAppearanceSmall" />
-   	    <LinearLayout
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:orientation="vertical"
-	        android:id="@+id/pr_error_list" 
-	        android:visibility="gone" />
-	    <TextView
-	        android:id="@+id/pr_error_none_value"
-	        android:text="@string/pr_errors_none_label"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:visibility="visible"
-	        android:paddingBottom="0dp"
-	        android:textIsSelectable="true"
-	        android:textAppearance="?android:attr/textAppearanceMedium" />
-	    <TextView
-	        android:paddingTop="10dp"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/pr_version_label"
-	        android:textIsSelectable="true"
-	        android:textAppearance="?android:attr/textAppearanceSmall" />
-	    <TextView
-	        android:id="@+id/pr_version_value"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:paddingBottom="10dp"
-	        android:textIsSelectable="true"
-	        android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pr_errors_label"
+            android:textIsSelectable="true"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/pr_error_list"
+            android:visibility="gone" />
+        <TextView
+            android:id="@+id/pr_error_none_value"
+            android:text="@string/pr_errors_none_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            android:paddingBottom="0dp"
+            android:textIsSelectable="true"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:layout_marginTop="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pr_version_label"
+            android:textIsSelectable="true"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+        <TextView
+            android:id="@+id/pr_version_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="0dp"
+            android:textIsSelectable="true"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:layout_marginTop="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/play_services_version_label"
+            android:textIsSelectable="true"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+        <TextView
+            android:id="@+id/play_services_version_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:textIsSelectable="true"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
-   	    <TextView
-	        android:paddingTop="10dp"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/installed_triggers_label"
-	        android:textIsSelectable="true"
-	        android:textAppearance="?android:attr/textAppearanceSmall" />
-	    <TextView
-	        android:id="@+id/installed_triggers_value"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:paddingBottom="10dp"
-	        android:textIsSelectable="true"
-	        android:textAppearance="?android:attr/textAppearanceMedium" />
-	    
-	    
-   	    <TextView
-	        android:paddingTop="10dp"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/available_sensors_label"
-	        android:textIsSelectable="true"
-	        android:textAppearance="?android:attr/textAppearanceSmall" />
-	    <TextView
-	        android:id="@+id/available_sensors_value"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:paddingBottom="10dp"
-	        android:textIsSelectable="true"
-	        android:textAppearance="?android:attr/textAppearanceMedium" />
-   	</LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/installed_triggers_label"
+            android:textIsSelectable="true"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+        <TextView
+            android:id="@+id/installed_triggers_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:textIsSelectable="true"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/available_sensors_label"
+            android:textIsSelectable="true"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+        <TextView
+            android:id="@+id/available_sensors_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:textIsSelectable="true"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </LinearLayout>
 </ScrollView>

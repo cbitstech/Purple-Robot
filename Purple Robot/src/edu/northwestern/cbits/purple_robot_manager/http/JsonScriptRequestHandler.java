@@ -55,100 +55,116 @@ public class JsonScriptRequestHandler implements HttpRequestHandler
 
         if (request instanceof HttpEntityEnclosingRequest)
         {
-            HttpEntityEnclosingRequest enclosingRequest = (HttpEntityEnclosingRequest) request;
-
-            HttpEntity entity = enclosingRequest.getEntity();
-
-            String entityString = EntityUtils.toString(entity);
-
-            Uri u = Uri.parse("http://localhost/?" + entityString);
-
-            JSONObject arguments = null;
-
-            String jsonArg = URLDecoder.decode(entityString.substring(5)); // u.getQueryParameter("json");
-
             try
             {
+                HttpEntityEnclosingRequest enclosingRequest = (HttpEntityEnclosingRequest) request;
+
+                HttpEntity entity = enclosingRequest.getEntity();
+
+                String entityString = EntityUtils.toString(entity);
+
+                Uri u = Uri.parse("http://localhost/?" + entityString);
+
+                JSONObject arguments = null;
+
+                String jsonArg = URLDecoder.decode(entityString.substring(5)); // u.getQueryParameter("json");
+
                 try
-                {
-                    arguments = new JSONObject(jsonArg);
-                }
-                catch (JSONException e)
                 {
                     try
                     {
-                        jsonArg = URLDecoder.decode(u.getQueryParameter("json"), "UTF-16");
                         arguments = new JSONObject(jsonArg);
                     }
-                    catch (JSONException ex)
+                    catch (JSONException e)
                     {
-                        jsonArg = URLDecoder.decode(u.getQueryParameter("json"), "UTF-8");
-                        arguments = new JSONObject(jsonArg);
+                        try
+                        {
+                            jsonArg = URLDecoder.decode(u.getQueryParameter("json"), "UTF-16");
+                            arguments = new JSONObject(jsonArg);
+                        }
+                        catch (JSONException ex)
+                        {
+                            jsonArg = URLDecoder.decode(u.getQueryParameter("json"), "UTF-8");
+                            arguments = new JSONObject(jsonArg);
+                        }
                     }
-                }
-                catch (IllegalArgumentException e)
-                {
-                    try
+                    catch (IllegalArgumentException e)
                     {
-                        jsonArg = URLDecoder.decode(u.getQueryParameter("json"), "UTF-16");
-                        arguments = new JSONObject(jsonArg);
+                        try
+                        {
+                            jsonArg = URLDecoder.decode(u.getQueryParameter("json"), "UTF-16");
+                            arguments = new JSONObject(jsonArg);
+                        }
+                        catch (JSONException ex)
+                        {
+                            jsonArg = URLDecoder.decode(u.getQueryParameter("json"), "UTF-8");
+                            arguments = new JSONObject(jsonArg);
+                        }
                     }
-                    catch (JSONException ex)
-                    {
-                        jsonArg = URLDecoder.decode(u.getQueryParameter("json"), "UTF-8");
-                        arguments = new JSONObject(jsonArg);
-                    }
-                }
-            }
-            catch (JSONException e)
-            {
-                LogManager.getInstance(this._context).logException(e);
-
-                response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-
-                StringEntity body = new StringEntity(e.toString());
-                body.setContentType("text/plain");
-
-                response.setEntity(body);
-
-                return;
-            }
-            catch (NullPointerException e)
-            {
-                LogManager.getInstance(this._context).logException(e);
-
-                response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-
-                StringEntity body = new StringEntity(e.toString());
-                body.setContentType("text/plain");
-
-                response.setEntity(body);
-
-                return;
-            }
-
-            if (arguments != null)
-            {
-                try
-                {
-                    JSONCommand command = JsonScriptRequestHandler.commandForJson(arguments, this._context);
-
-                    JSONObject result = command.execute(this._context);
-
-                    StringEntity body = new StringEntity(result.toString(2));
-                    body.setContentType("application/json");
-
-                    response.setEntity(body);
                 }
                 catch (JSONException e)
                 {
+                    LogManager.getInstance(this._context).logException(e);
+
                     response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
 
                     StringEntity body = new StringEntity(e.toString());
                     body.setContentType("text/plain");
 
                     response.setEntity(body);
+
+                    return;
                 }
+                catch (NullPointerException e)
+                {
+                    LogManager.getInstance(this._context).logException(e);
+
+                    response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+
+                    StringEntity body = new StringEntity(e.toString());
+                    body.setContentType("text/plain");
+
+                    response.setEntity(body);
+
+                    return;
+                }
+
+                if (arguments != null)
+                {
+                    try
+                    {
+                        JSONCommand command = JsonScriptRequestHandler.commandForJson(arguments, this._context);
+
+                        JSONObject result = command.execute(this._context);
+
+                        StringEntity body = new StringEntity(result.toString(2));
+                        body.setContentType("application/json");
+
+                        response.setEntity(body);
+                    }
+                    catch (JSONException e)
+                    {
+                        response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+
+                        StringEntity body = new StringEntity(e.toString());
+                        body.setContentType("text/plain");
+
+                        response.setEntity(body);
+                    }
+                }
+            }
+            catch (StringIndexOutOfBoundsException e)
+            {
+                LogManager.getInstance(this._context).logException(e);
+
+                response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+
+                StringEntity body = new StringEntity(e.toString());
+                body.setContentType("text/plain");
+
+                response.setEntity(body);
+
+                return;
             }
         }
     }

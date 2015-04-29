@@ -12,7 +12,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
@@ -29,10 +29,179 @@ import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
 @TargetApi(11)
-public class SettingsActivity extends ActionBarActivity
+public class SettingsActivity extends AppCompatActivity
 {
     private static final String PREFERENCE_SCREEN_KEY = "PREFERENCE_SCREEN_KEY";
     private static HashMap<String, PreferenceScreen> _screens = new HashMap<String, PreferenceScreen>();
+
+    public static class SettingsPreferenceFragment extends PreferenceFragment
+    {
+        public SettingsPreferenceFragment()
+        {
+            super();
+        }
+
+        public void onCreate(Bundle savedInstanceState)
+        {
+            super.onCreate(savedInstanceState);
+
+            final SettingsActivity activity = (SettingsActivity) this.getActivity();
+
+            // If launched with no key, build out settings from the top...
+
+            String key = this.getArguments().getString("key");
+
+            if (key == null)
+            {
+                this.addPreferencesFromResource(R.xml.settings);
+
+                activity.setTitle(R.string.title_settings);
+
+                RobotPreferenceListener listener = new RobotPreferenceListener(activity);
+
+                PreferenceScreen prefs = this.getPreferenceScreen();
+
+                Preference refresh = prefs.findPreference(SettingsKeys.MANUAL_REFRESH_KEY);
+                refresh.setOnPreferenceClickListener(listener);
+
+                Preference logRefresh = prefs.findPreference(SettingsKeys.LOG_REFRESH_KEY);
+                logRefresh.setOnPreferenceClickListener(listener);
+
+                ListPreference haptic = (ListPreference) prefs.findPreference(SettingsKeys.HAPTIC_PATTERN_KEY);
+                haptic.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
+                {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue)
+                    {
+                        String pattern = (String) newValue;
+
+                        Intent intent = new Intent(ManagerService.HAPTIC_PATTERN_INTENT);
+                        intent.putExtra(ManagerService.HAPTIC_PATTERN_NAME, pattern);
+                        intent.setClass(activity, ManagerService.class);
+
+                        activity.startService(intent);
+
+                        return true;
+                    }
+                });
+
+                PreferenceScreen probesScreen = ProbeManager.buildPreferenceScreen(activity, this.getPreferenceManager());
+
+                PreferenceCategory category = (PreferenceCategory) prefs.findPreference("config_settings_probe_category");
+                category.addPreference(probesScreen);
+
+                PreferenceScreen triggersScreen = TriggerManager.getInstance(activity).buildPreferenceScreen(activity, this.getPreferenceManager());
+
+                PreferenceCategory triggerCategory = (PreferenceCategory) prefs.findPreference("config_settings_trigger_category");
+                triggerCategory.addPreference(triggersScreen);
+
+                PreferenceScreen modelsScreen = ModelManager.getInstance(activity).buildPreferenceScreen(activity, this.getPreferenceManager());
+
+                PreferenceCategory modelCategory = (PreferenceCategory) prefs.findPreference("config_settings_models_category");
+                modelCategory.addPreference(modelsScreen);
+
+                Preference archive = prefs.findPreference(SettingsKeys.ZIP_ARCHIVES_KEY);
+                archive.setOnPreferenceClickListener(listener);
+
+                Preference delete = prefs.findPreference(SettingsKeys.DELETE_ARCHIVES_KEY);
+                delete.setOnPreferenceClickListener(listener);
+
+                Preference test = prefs.findPreference(SettingsKeys.RUN_TESTS_KEY);
+                test.setOnPreferenceClickListener(listener);
+
+                CheckBoxPreference update = (CheckBoxPreference) prefs.findPreference(SettingsKeys.CHECK_UPDATES_KEY);
+                update.setOnPreferenceChangeListener(listener);
+
+                ListPreference listUpdate = (ListPreference) prefs.findPreference(SettingsKeys.RINGTONE_KEY);
+                listUpdate.setOnPreferenceChangeListener(listener);
+
+                Preference reset = prefs.findPreference(SettingsKeys.RESET_KEY);
+                reset.setOnPreferenceClickListener(listener);
+
+                Preference logEnabled = prefs.findPreference(LogManager.ENABLED);
+                logEnabled.setOnPreferenceChangeListener(listener);
+
+                Preference logUri = prefs.findPreference(LogManager.URI);
+                logUri.setOnPreferenceChangeListener(listener);
+
+                Preference logLocation = prefs.findPreference(LogManager.INCLUDE_LOCATION);
+                logLocation.setOnPreferenceChangeListener(listener);
+
+                Preference logWifi = prefs.findPreference(LogManager.WIFI_ONLY);
+                logWifi.setOnPreferenceChangeListener(listener);
+
+                Preference logHeartbeat = prefs.findPreference(LogManager.HEARTBEAT);
+                logHeartbeat.setOnPreferenceChangeListener(listener);
+
+                Preference logInterval = prefs.findPreference(LogManager.UPLOAD_INTERVAL);
+                logInterval.setOnPreferenceChangeListener(listener);
+
+                Preference enableHttpServer = prefs.findPreference(LocalHttpServer.BUILTIN_HTTP_SERVER_ENABLED);
+                enableHttpServer.setOnPreferenceChangeListener(listener);
+
+                final PreferenceFragment meFragment = this;
+
+                // Delay for half a second so preferences can be completely constructed...
+
+                Runnable r = new Runnable()
+                {
+                    public void run()
+                    {
+                        try
+                        {
+                            Thread.sleep(500);
+                        }
+                        catch (InterruptedException e)
+                        {
+
+                        }
+
+                        activity.runOnUiThread(new Runnable()
+                        {
+                            public void run()
+                            {
+                                // After delay, build preference screen map...
+
+                                activity.mapScreens(meFragment.getPreferenceScreen());
+                            }
+                        });
+                    }
+                };
+
+                Thread t = new Thread(r);
+                t.start();
+
+                PurpleRobotApplication.fixPreferences(activity, true);
+            }
+            else
+            {
+                // If launched with a key, lookup the preference screen and go from there...
+
+                PreferenceScreen screen = SettingsActivity._screens.get(key);
+
+                this.setPreferenceScreen(screen);
+                activity.setTitle(SettingsActivity._screens.get(key).getTitle());
+
+                for (int i = 0; i < screen.getPreferenceCount(); i++)
+                {
+                    Preference pref = screen.getPreference(i);
+
+                    if (pref instanceof FlexibleListPreference)
+                    {
+                        FlexibleListPreference flexible = (FlexibleListPreference) pref;
+
+                        flexible.setContext(activity);
+                    }
+                    else if (pref instanceof FlexibleEditTextPreference)
+                    {
+                        FlexibleEditTextPreference flexible = (FlexibleEditTextPreference) pref;
+
+                        flexible.setContext(activity);
+                    }
+                }
+            }
+        }
+    }
 
     public void onCreate(Bundle savedInstanceState)
     {
@@ -46,171 +215,16 @@ public class SettingsActivity extends ActionBarActivity
 
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        final SettingsActivity me = this;
-
         FragmentManager fragment = this.getFragmentManager();
 
         FragmentTransaction transaction = fragment.beginTransaction();
 
-        final PreferenceFragment prefFragment = new PreferenceFragment()
-        {
-            public void onCreate(Bundle savedInstanceState)
-            {
-                super.onCreate(savedInstanceState);
+        SettingsPreferenceFragment prefFragment = new SettingsPreferenceFragment();
 
-                // If launched with no key, build out settings from the top...
+        Bundle arguments = new Bundle();
+        arguments.putString("key", key);
 
-                if (key == null)
-                {
-                    this.addPreferencesFromResource(R.xml.settings);
-
-                    me.setTitle(R.string.title_settings);
-
-                    RobotPreferenceListener listener = new RobotPreferenceListener(me);
-
-                    PreferenceScreen prefs = this.getPreferenceScreen();
-
-                    Preference refresh = prefs.findPreference(SettingsKeys.MANUAL_REFRESH_KEY);
-                    refresh.setOnPreferenceClickListener(listener);
-
-                    Preference logRefresh = prefs.findPreference(SettingsKeys.LOG_REFRESH_KEY);
-                    logRefresh.setOnPreferenceClickListener(listener);
-
-                    ListPreference haptic = (ListPreference) prefs.findPreference(SettingsKeys.HAPTIC_PATTERN_KEY);
-                    haptic.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
-                    {
-                        @Override
-                        public boolean onPreferenceChange(Preference preference, Object newValue)
-                        {
-                            String pattern = (String) newValue;
-
-                            Intent intent = new Intent(ManagerService.HAPTIC_PATTERN_INTENT);
-                            intent.putExtra(ManagerService.HAPTIC_PATTERN_NAME, pattern);
-                            intent.setClass(me, ManagerService.class);
-
-                            me.startService(intent);
-
-                            return true;
-                        }
-                    });
-
-                    PreferenceScreen probesScreen = ProbeManager.buildPreferenceScreen(me, this.getPreferenceManager());
-
-                    PreferenceCategory category = (PreferenceCategory) prefs.findPreference("config_settings_probe_category");
-                    category.addPreference(probesScreen);
-
-                    PreferenceScreen triggersScreen = TriggerManager.getInstance(me).buildPreferenceScreen(me, this.getPreferenceManager());
-
-                    PreferenceCategory triggerCategory = (PreferenceCategory) prefs.findPreference("config_settings_trigger_category");
-                    triggerCategory.addPreference(triggersScreen);
-
-                    PreferenceScreen modelsScreen = ModelManager.getInstance(me).buildPreferenceScreen(me, this.getPreferenceManager());
-
-                    PreferenceCategory modelCategory = (PreferenceCategory) prefs.findPreference("config_settings_models_category");
-                    modelCategory.addPreference(modelsScreen);
-
-                    Preference archive = prefs.findPreference(SettingsKeys.ZIP_ARCHIVES_KEY);
-                    archive.setOnPreferenceClickListener(listener);
-
-                    Preference delete = prefs.findPreference(SettingsKeys.DELETE_ARCHIVES_KEY);
-                    delete.setOnPreferenceClickListener(listener);
-
-                    Preference test = prefs.findPreference(SettingsKeys.RUN_TESTS_KEY);
-                    test.setOnPreferenceClickListener(listener);
-
-                    CheckBoxPreference update = (CheckBoxPreference) prefs.findPreference(SettingsKeys.CHECK_UPDATES_KEY);
-                    update.setOnPreferenceChangeListener(listener);
-
-                    ListPreference listUpdate = (ListPreference) prefs.findPreference(SettingsKeys.RINGTONE_KEY);
-                    listUpdate.setOnPreferenceChangeListener(listener);
-
-                    Preference reset = prefs.findPreference(SettingsKeys.RESET_KEY);
-                    reset.setOnPreferenceClickListener(listener);
-
-                    Preference logEnabled = prefs.findPreference(LogManager.ENABLED);
-                    logEnabled.setOnPreferenceChangeListener(listener);
-
-                    Preference logUri = prefs.findPreference(LogManager.URI);
-                    logUri.setOnPreferenceChangeListener(listener);
-
-                    Preference logLocation = prefs.findPreference(LogManager.INCLUDE_LOCATION);
-                    logLocation.setOnPreferenceChangeListener(listener);
-
-                    Preference logWifi = prefs.findPreference(LogManager.WIFI_ONLY);
-                    logWifi.setOnPreferenceChangeListener(listener);
-
-                    Preference logHeartbeat = prefs.findPreference(LogManager.HEARTBEAT);
-                    logHeartbeat.setOnPreferenceChangeListener(listener);
-
-                    Preference logInterval = prefs.findPreference(LogManager.UPLOAD_INTERVAL);
-                    logInterval.setOnPreferenceChangeListener(listener);
-
-                    Preference enableHttpServer = prefs.findPreference(LocalHttpServer.BUILTIN_HTTP_SERVER_ENABLED);
-                    enableHttpServer.setOnPreferenceChangeListener(listener);
-
-                    final PreferenceFragment meFragment = this;
-
-                    // Delay for half a second so preferences can be completely constructed...
-
-                    Runnable r = new Runnable()
-                    {
-                        public void run()
-                        {
-                            try
-                            {
-                                Thread.sleep(500);
-                            }
-                            catch (InterruptedException e)
-                            {
-
-                            }
-
-                            me.runOnUiThread(new Runnable()
-                            {
-                                public void run()
-                                {
-                                    // After delay, build preference screen map...
-
-                                    me.mapScreens(meFragment.getPreferenceScreen());
-                                }
-                            });
-                        }
-                    };
-
-                    Thread t = new Thread(r);
-                    t.start();
-
-                    PurpleRobotApplication.fixPreferences(me, true);
-                }
-                else
-                {
-                    // If launched with a key, lookup the preference screen and go from there...
-
-                    PreferenceScreen screen = SettingsActivity._screens.get(key);
-
-                    this.setPreferenceScreen(screen);
-                    me.setTitle(SettingsActivity._screens.get(key).getTitle());
-
-                    for (int i = 0; i < screen.getPreferenceCount(); i++)
-                    {
-                        Preference pref = screen.getPreference(i);
-
-                        if (pref instanceof FlexibleListPreference)
-                        {
-                            FlexibleListPreference flexible = (FlexibleListPreference) pref;
-
-                            flexible.setContext(me);
-                        }
-                        else if (pref instanceof FlexibleEditTextPreference)
-                        {
-                            FlexibleEditTextPreference flexible = (FlexibleEditTextPreference) pref;
-
-                            flexible.setContext(me);
-                        }
-                    }
-                }
-            }
-        };
+        prefFragment.setArguments(arguments);
 
         transaction.replace(R.id.content_frame, prefFragment);
         transaction.commit();

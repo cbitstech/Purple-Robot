@@ -8,7 +8,7 @@ import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -27,7 +27,7 @@ import edu.northwestern.cbits.purple_robot_manager.calibration.ContactCalibratio
 import edu.northwestern.cbits.purple_robot_manager.calibration.ContactRecord;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 
-public class AddressBookLabelActivity extends ActionBarActivity
+public class AddressBookLabelActivity extends AppCompatActivity
 {
     private int _clickedIndex = -1;
     private List<ContactRecord> _contacts = null;

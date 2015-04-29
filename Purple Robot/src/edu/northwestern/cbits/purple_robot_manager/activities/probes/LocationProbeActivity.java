@@ -8,7 +8,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,7 +19,7 @@ import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
 
 @SuppressLint("SimpleDateFormat")
-public class LocationProbeActivity extends ActionBarActivity
+public class LocationProbeActivity extends AppCompatActivity
 {
     protected void onCreate(Bundle savedInstanceState)
     {

@@ -11,7 +11,7 @@ import android.os.Bundle;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.v4.util.LongSparseArray;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateFormat;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -46,7 +46,7 @@ import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 
-public class MarkTimeActivity extends ActionBarActivity
+public class MarkTimeActivity extends AppCompatActivity
 {
     private static final String SAVED_TIMESTAMPS = "edu.northwestern.cbits.purple_robot_manager.activitiesMarkTimeActivity.SAVED_TIMESTAMPS";
 

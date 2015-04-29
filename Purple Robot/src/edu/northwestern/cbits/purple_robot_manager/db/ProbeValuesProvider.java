@@ -315,41 +315,48 @@ public class ProbeValuesProvider
 
     private void cleanup(Context context)
     {
-        this._lastCleanup = System.currentTimeMillis();
-
-        String tableSelect = "select name from sqlite_master where type='table';";
-
-        Cursor c = this._database.rawQuery(tableSelect, null);
-
-        while (c.moveToNext())
+        try
         {
-            String tableName = c.getString(c.getColumnIndex("name"));
+            this._lastCleanup = System.currentTimeMillis();
 
-            try
+            String tableSelect = "select name from sqlite_master where type='table';";
+
+            Cursor c = this._database.rawQuery(tableSelect, null);
+
+            while (c.moveToNext())
             {
-                if (tableName.startsWith("table_"))
+                String tableName = c.getString(c.getColumnIndex("name"));
+
+                try
                 {
-                    Cursor cursor = this._database.query(tableName, null, null, null, null, null, null);
+                    if (tableName.startsWith("table_"))
+                    {
+                        Cursor cursor = this._database.query(tableName, null, null, null, null, null, null);
 
-                    cursor.close();
+                        cursor.close();
 
-                    SQLiteStatement delete = this._database.compileStatement("delete from " + tableName + " where "
-                            + ProbeValuesProvider.ID + " not in (select " + ProbeValuesProvider.ID + " from "
-                            + tableName + " order by " + ProbeValuesProvider.TIMESTAMP + " desc limit 2048);");
-                    delete.execute();
+                        SQLiteStatement delete = this._database.compileStatement("delete from " + tableName + " where "
+                                + ProbeValuesProvider.ID + " not in (select " + ProbeValuesProvider.ID + " from "
+                                + tableName + " order by " + ProbeValuesProvider.TIMESTAMP + " desc limit 2048);");
+                        delete.execute();
 
-                    cursor = this._database.query(tableName, null, null, null, null, null, null);
+                        cursor = this._database.query(tableName, null, null, null, null, null, null);
 
-                    cursor.close();
+                        cursor.close();
+                    }
+                }
+                catch (SQLException e)
+                {
+                    LogManager.getInstance(context).logException(e);
                 }
             }
-            catch (SQLException e)
-            {
-                LogManager.getInstance(context).logException(e);
-            }
-        }
 
-        c.close();
+            c.close();
+        }
+        catch (RuntimeException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
     }
 
     public void clear(Context context)

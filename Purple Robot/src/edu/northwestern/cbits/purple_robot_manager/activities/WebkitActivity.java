@@ -14,7 +14,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,7 +29,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 
 @SuppressLint("SimpleDateFormat")
-public class WebkitActivity extends ActionBarActivity
+public class WebkitActivity extends AppCompatActivity
 {
     private double _selectedTimestamp = 0;
     private boolean _inited = false;

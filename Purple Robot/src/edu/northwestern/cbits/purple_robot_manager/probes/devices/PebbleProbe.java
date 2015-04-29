@@ -27,6 +27,7 @@ import android.preference.PreferenceScreen;
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.PebbleKit.FirmwareVersionInfo;
 import com.getpebble.android.kit.PebbleKit.PebbleDataLogReceiver;
+import com.getpebble.android.kit.util.PebbleDictionary;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.RealTimeProbeViewActivity;
@@ -40,6 +41,9 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProb
 public class PebbleProbe extends Continuous3DProbe
 {
     private static final String FIRMWARE_VERSION = "FIRMWARE_VERSION";
+    private static final String BUNDLE_IS_CHARGING = "IS_CHARGING";
+    private static final String BUNDLE_CHARGE_LEVEL = "CHARGE_LEVEL";
+    private static final byte COMMAND_FETCH_BATTERY = 0x00;
 
     private static UUID WATCHAPP_UUID = UUID.fromString("3cab0453-ff04-4594-8223-fa357112c305");
 
@@ -53,10 +57,17 @@ public class PebbleProbe extends Continuous3DProbe
     private final double valueBuffer[][] = new double[3][BUFFER_SIZE];
     private final double timeBuffer[] = new double[BUFFER_SIZE];
 
-    private PebbleDataLogReceiver _receiver = null;
+    private PebbleDataLogReceiver _logReceiver = null;
     private int _index = 0;
 
     private Map<String, String> _schema = null;
+
+    private PebbleKit.PebbleDataReceiver _messageReceiver = null;
+    private PebbleKit.PebbleNackReceiver _nackReceiver = null;
+    private PebbleKit.PebbleAckReceiver _ackReceiver = null;
+    private boolean _isCharging = false;
+    private int _chargeLevel = -1;
+    private long _lastRefresh = 0;
 
     private static class AccelData
     {
@@ -199,11 +210,11 @@ public class PebbleProbe extends Continuous3DProbe
 
                 PebbleKit.startAppOnPebble(context, PebbleProbe.WATCHAPP_UUID);
 
-                if (this._receiver == null)
+                if (this._logReceiver == null)
                 {
                     final PebbleProbe me = this;
 
-                    this._receiver = new PebbleDataLogReceiver(WATCHAPP_UUID)
+                    this._logReceiver = new PebbleDataLogReceiver(WATCHAPP_UUID)
                     {
                         @Override
                         public void receiveData(final Context context, UUID logUuid, final Long timestamp, final Long tag, final byte[] payload)
@@ -224,9 +235,14 @@ public class PebbleProbe extends Continuous3DProbe
                                         data.putDouble(Probe.BUNDLE_TIMESTAMP, now / 1000);
                                         data.putString(Probe.BUNDLE_PROBE, me.name(me._context));
 
+                                        data.putBoolean(PebbleProbe.BUNDLE_IS_CHARGING, me._isCharging);
+                                        data.putInt(PebbleProbe.BUNDLE_CHARGE_LEVEL, (int) me._chargeLevel);
+
+
                                         FirmwareVersionInfo info = PebbleKit.getWatchFWVersion(context);
 
-                                        data.putString(PebbleProbe.FIRMWARE_VERSION, "" + info.getMajor() + "." + info.getMinor() + "." + info.getPoint() + " " + info.getTag());
+                                        if (info != null)
+                                            data.putString(PebbleProbe.FIRMWARE_VERSION, "" + info.getMajor() + "." + info.getMinor() + "." + info.getPoint());
 
                                         data.putDoubleArray(ContinuousProbe.SENSOR_TIMESTAMP, timeBuffer);
 
@@ -275,26 +291,81 @@ public class PebbleProbe extends Continuous3DProbe
                         }
                     };
 
-                    PebbleKit.registerDataLogReceiver(context, this._receiver);
+                    PebbleKit.registerDataLogReceiver(context, this._logReceiver);
+                }
+
+                if (this._logReceiver != null)
+                {
+                    try
+                    {
+                        context.unregisterReceiver(this._logReceiver);
+                    }
+                    catch (IllegalArgumentException e)
+                    {
+                        // Do nothing - receiver not registered...
+                    }
+
+                    this._logReceiver = null;
+                }
+
+                if (this._ackReceiver == null)
+                {
+                    this._ackReceiver = new PebbleKit.PebbleAckReceiver(PebbleProbe.WATCHAPP_UUID)
+                    {
+                        public void receiveAck(Context context, int i)
+                        {
+
+                        }
+                    };
+
+                    PebbleKit.registerReceivedAckHandler(context, this._ackReceiver);
+                }
+
+                if (this._nackReceiver == null)
+                {
+                    this._nackReceiver = new PebbleKit.PebbleNackReceiver(PebbleProbe.WATCHAPP_UUID)
+                    {
+                        public void receiveNack(Context context, int i)
+                        {
+
+                        }
+                    };
+
+                    PebbleKit.registerReceivedNackHandler(context, this._nackReceiver);
+                }
+
+                if (this._messageReceiver == null)
+                {
+                    final PebbleProbe me = this;
+
+                    this._messageReceiver =  new PebbleKit.PebbleDataReceiver(PebbleProbe.WATCHAPP_UUID)
+                    {
+                        public void receiveData(final Context context, final int transactionId, final PebbleDictionary dictionary)
+                        {
+                            PebbleKit.sendAckToPebble(context, transactionId);
+
+                            byte[] payload = dictionary.getBytes(1);
+
+                            me._isCharging = ((payload[0] & 0x80) == 0x80);
+                            me._chargeLevel = payload[0] & 0x7f;
+                        }
+                    };
+
+                    PebbleKit.registerReceivedDataHandler(context, this._messageReceiver);
+                }
+
+                long now = System.currentTimeMillis();
+
+                if (now - this._lastRefresh > 5 * 60 * 1000)
+                {
+                    PebbleDictionary data = new PebbleDictionary();
+                    data.addUint8(0, PebbleProbe.COMMAND_FETCH_BATTERY);
+
+                    PebbleKit.sendDataToPebble(context, PebbleProbe.WATCHAPP_UUID, data);
                 }
 
                 return true;
             }
-        }
-
-        PebbleCalibrationHelper.check(context, false);
-
-        if (this._receiver != null)
-        {
-            try {
-                context.unregisterReceiver(this._receiver);
-            }
-            catch (IllegalArgumentException e)
-            {
-                // Do nothing - receiver not registered...
-            }
-
-            this._receiver = null;
         }
 
         PebbleCalibrationHelper.check(context, false);

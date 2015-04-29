@@ -28,7 +28,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.format.Formatter;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,6 +39,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.google.android.gms.common.GoogleApiAvailability;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -54,7 +55,7 @@ import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
 @SuppressLint("SimpleDateFormat")
-public class DiagnosticActivity extends ActionBarActivity
+public class DiagnosticActivity extends AppCompatActivity
 {
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -77,6 +78,7 @@ public class DiagnosticActivity extends ActionBarActivity
         TextView uploadStatus = (TextView) this.findViewById(R.id.upload_status_value);
         TextView lastUpload = (TextView) this.findViewById(R.id.last_upload_value);
         TextView prVersion = (TextView) this.findViewById(R.id.pr_version_value);
+        TextView gpsVersion = (TextView) this.findViewById(R.id.play_services_version_value);
 
         userId.setText("\"" + EncryptionManager.getInstance().getUserId(this) + "\"");
 
@@ -158,6 +160,8 @@ public class DiagnosticActivity extends ActionBarActivity
         {
             LogManager.getInstance(this).logException(e);
         }
+
+        gpsVersion.setText("" + GoogleApiAvailability.GOOGLE_PLAY_SERVICES_VERSION_CODE);
 
         TextView okText = (TextView) this.findViewById(R.id.pr_error_none_value);
         LinearLayout errorList = (LinearLayout) this.findViewById(R.id.pr_error_list);
@@ -473,6 +477,8 @@ public class DiagnosticActivity extends ActionBarActivity
                 message.append(newline);
             }
 
+            message.append(newline);
+
             message.append(this.getString(R.string.pr_version_label));
             message.append(newline);
 
@@ -486,6 +492,12 @@ public class DiagnosticActivity extends ActionBarActivity
                 LogManager.getInstance(this).logException(e);
             }
 
+            message.append(newline);
+            message.append(newline);
+
+            message.append(this.getString(R.string.play_services_version_label));
+            message.append(newline);
+            message.append("" + GoogleApiAvailability.GOOGLE_PLAY_SERVICES_VERSION_CODE);
             message.append(newline);
             message.append(newline);
 

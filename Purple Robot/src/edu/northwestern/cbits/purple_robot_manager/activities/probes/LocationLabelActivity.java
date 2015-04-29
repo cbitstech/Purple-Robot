@@ -10,7 +10,7 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -40,7 +40,7 @@ import edu.northwestern.cbits.purple_robot_manager.util.DBSCAN;
 import edu.northwestern.cbits.purple_robot_manager.util.DBSCAN.Cluster;
 import edu.northwestern.cbits.purple_robot_manager.util.DBSCAN.Point;
 
-public class LocationLabelActivity extends ActionBarActivity
+public class LocationLabelActivity extends AppCompatActivity
 {
     private ArrayList<Cluster> _clusters = new ArrayList<Cluster>();
     private int _selectedCluster = -1;

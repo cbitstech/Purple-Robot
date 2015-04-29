@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.probes.LocationLabelActivity;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
@@ -34,30 +35,37 @@ public class LocationCalibrationHelper
             long lastCalibration = prefs.getLong("last_location_calibration", 0);
             long now = System.currentTimeMillis();
 
-            Cursor cursor = ProbeValuesProvider.getProvider(context).retrieveValues(context, LocationProbe.DB_TABLE, LocationProbe.databaseSchema());
-
-            int count = cursor.getCount();
-
-            cursor.close();
-
-            if (now - lastCalibration > (1000L * 60L * 60L * 24L * 30L) && count > 500)
+            try
             {
-                Runnable action = new Runnable()
+                Cursor cursor = ProbeValuesProvider.getProvider(context).retrieveValues(context, LocationProbe.DB_TABLE, LocationProbe.databaseSchema());
+
+                int count = cursor.getCount();
+
+                cursor.close();
+
+                if (now - lastCalibration > (1000L * 60L * 60L * 24L * 30L) && count > 500)
                 {
-                    public void run()
+                    Runnable action = new Runnable()
                     {
-                        Intent intent = new Intent(context, LocationLabelActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        public void run()
+                        {
+                            Intent intent = new Intent(context, LocationLabelActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                        context.startActivity(intent);
-                    }
-                };
+                            context.startActivity(intent);
+                        }
+                    };
 
-                sanity.addAlert(SanityCheck.WARNING, title, message, action);
+                    sanity.addAlert(SanityCheck.WARNING, title, message, action);
+                }
+                else
+                {
+                    sanity.clearAlert(title);
+                }
             }
-            else
+            catch (RuntimeException e)
             {
-                sanity.clearAlert(title);
+                LogManager.getInstance(context).logException(e);
             }
         }
     }

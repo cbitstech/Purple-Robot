@@ -18,6 +18,7 @@ import android.telephony.PhoneNumberUtils;
 import edu.emory.mathcs.backport.java.util.Collections;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.probes.AddressBookLabelActivity;
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CommunicationEventProbe;
@@ -127,91 +128,98 @@ public class ContactCalibrationHelper
     public static List<ContactRecord> fetchContactRecords(Context context)
     {
         ArrayList<ContactRecord> contacts = new ArrayList<ContactRecord>();
-
-        Cursor c = context.getContentResolver().query(CallLog.Calls.CONTENT_URI, null, null, null, null);
-
-        while (c.moveToNext())
-        {
-            String numberName = c.getString(c.getColumnIndex(Calls.CACHED_NAME));
-            String phoneNumber = PhoneNumberUtils.formatNumber(c.getString(c.getColumnIndex(Calls.NUMBER)));
-
-            boolean found = false;
-
-            if (numberName == null)
-                numberName = "";
-
-            for (ContactRecord contact : contacts)
-            {
-                if (contact.number.endsWith(phoneNumber) || phoneNumber.endsWith(contact.number))
-                {
-                    String largerNumber = contact.number;
-
-                    if (phoneNumber.length() > largerNumber.length())
-                        largerNumber = phoneNumber;
-
-                    contact.number = largerNumber;
-
-                    found = true;
-                    contact.count += 1;
-
-                    if ("".equals(numberName) == false && "".equals(contact.name))
-                        contact.name = numberName;
-                }
-            }
-
-            if (found == false)
-            {
-                ContactRecord contact = new ContactRecord();
-                contact.name = numberName;
-                contact.number = phoneNumber;
-
-                String key = contact.name;
-
-                boolean isPhone = false;
-
-                if ("".equals(key))
-                {
-                    key = contact.number;
-                    isPhone = true;
-                }
-
-                String group = ContactCalibrationHelper.getGroup(context, key, isPhone);
-
-                if (group != null)
-                    contact.group = group;
-
-                contacts.add(contact);
-            }
-        }
-
-        Collections.sort(contacts);
-
         ArrayList<ContactRecord> normalizedContacts = new ArrayList<ContactRecord>();
 
-        for (ContactRecord contact : contacts)
+        try
         {
-            if ("".equals(contact.name) == false)
+            Cursor c = context.getContentResolver().query(CallLog.Calls.CONTENT_URI, null, null, null, null);
+
+            while (c.moveToNext())
             {
+                String numberName = c.getString(c.getColumnIndex(Calls.CACHED_NAME));
+                String phoneNumber = PhoneNumberUtils.formatNumber(c.getString(c.getColumnIndex(Calls.NUMBER)));
+
                 boolean found = false;
 
-                for (ContactRecord normalized : normalizedContacts)
-                {
-                    if (contact.name.equals(normalized.name))
-                    {
-                        found = true;
+                if (numberName == null)
+                    numberName = "";
 
-                        normalized.count += contact.count;
+                for (ContactRecord contact : contacts)
+                {
+                    if (contact.number.endsWith(phoneNumber) || phoneNumber.endsWith(contact.number))
+                    {
+                        String largerNumber = contact.number;
+
+                        if (phoneNumber.length() > largerNumber.length())
+                            largerNumber = phoneNumber;
+
+                        contact.number = largerNumber;
+
+                        found = true;
+                        contact.count += 1;
+
+                        if ("".equals(numberName) == false && "".equals(contact.name))
+                            contact.name = numberName;
                     }
                 }
 
                 if (found == false)
+                {
+                    ContactRecord contact = new ContactRecord();
+                    contact.name = numberName;
+                    contact.number = phoneNumber;
+
+                    String key = contact.name;
+
+                    boolean isPhone = false;
+
+                    if ("".equals(key))
+                    {
+                        key = contact.number;
+                        isPhone = true;
+                    }
+
+                    String group = ContactCalibrationHelper.getGroup(context, key, isPhone);
+
+                    if (group != null)
+                        contact.group = group;
+
+                    contacts.add(contact);
+                }
+            }
+
+            Collections.sort(contacts);
+
+
+            for (ContactRecord contact : contacts)
+            {
+                if ("".equals(contact.name) == false)
+                {
+                    boolean found = false;
+
+                    for (ContactRecord normalized : normalizedContacts)
+                    {
+                        if (contact.name.equals(normalized.name))
+                        {
+                            found = true;
+
+                            normalized.count += contact.count;
+                        }
+                    }
+
+                    if (found == false)
+                        normalizedContacts.add(contact);
+                }
+                else
                     normalizedContacts.add(contact);
             }
-            else
-                normalizedContacts.add(contact);
-        }
 
-        Collections.sort(normalizedContacts);
+            Collections.sort(normalizedContacts);
+        }
+        catch (RuntimeException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
 
         return normalizedContacts;
     }

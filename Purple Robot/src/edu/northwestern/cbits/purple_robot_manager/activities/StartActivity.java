@@ -2,7 +2,6 @@ package edu.northwestern.cbits.purple_robot_manager.activities;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +29,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -68,7 +67,7 @@ import edu.northwestern.cbits.purple_robot_manager.snapshots.SnapshotsActivity;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
-public class StartActivity extends ActionBarActivity
+public class StartActivity extends AppCompatActivity
 {
     public static final String UPDATE_MESSAGE = "UPDATE_LIST_MESSAGE";
     public static final String DISPLAY_MESSAGE = "DISPLAY_MESSAGE";
@@ -113,8 +112,7 @@ public class StartActivity extends ActionBarActivity
 
     @Override
     @SuppressLint("SimpleDateFormat")
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         LogManager.getInstance(this);
@@ -122,8 +120,7 @@ public class StartActivity extends ActionBarActivity
 
         SharedPreferences sharedPrefs = this.getPreferences(this);
 
-        if (this.getPackageManager().getInstallerPackageName(this.getPackageName()) == null)
-        {
+        if (this.getPackageManager().getInstallerPackageName(this.getPackageName()) == null) {
             if (sharedPrefs.getBoolean(SettingsKeys.CHECK_UPDATES_KEY, false))
                 UpdateManager.register(this, "7550093e020b1a4a6df90f1e9dde68b6");
         }
@@ -135,34 +132,22 @@ public class StartActivity extends ActionBarActivity
 
         final StartActivity me = this;
 
-        final ListView listView = (ListView) this.findViewById(R.id.list_probes);
-
-        this._receiver = new BroadcastReceiver()
-        {
+        this._receiver = new BroadcastReceiver() {
             @Override
-            public void onReceive(Context context, final Intent intent)
-            {
-                me.runOnUiThread(new Runnable()
-                {
+            public void onReceive(Context context, final Intent intent) {
+                me.runOnUiThread(new Runnable() {
                     @Override
-                    public void run()
-                    {
-                        if (StartActivity.UPDATE_MESSAGE.equals(intent.getAction()))
-                        {
+                    public void run() {
+                        if (StartActivity.UPDATE_MESSAGE.equals(intent.getAction())) {
                             final String message = intent.getStringExtra(StartActivity.DISPLAY_MESSAGE);
 
-                            me.runOnUiThread(new Runnable()
-                            {
+                            me.runOnUiThread(new Runnable() {
                                 @Override
-                                public void run()
-                                {
+                                public void run() {
                                     if (me.getString(R.string.message_reading_complete).equals(message) &&
-                                        prefs.getBoolean("config_probes_enabled", false) == false)
-                                    {
+                                            prefs.getBoolean("config_probes_enabled", false) == false) {
                                         StartActivity._statusMessage = null;
-                                    }
-                                    else
-                                    {
+                                    } else {
                                         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
                                         StartActivity._statusMessage = sdf.format(new Date()) + ": " + message;
                                     }
@@ -184,6 +169,15 @@ public class StartActivity extends ActionBarActivity
         filter.addAction(StartActivity.UPDATE_MESSAGE);
 
         broadcastManager.registerReceiver(this._receiver, filter);
+
+        LegacyJSONConfigFile.getSharedFile(this.getApplicationContext());
+    }
+
+    private void refreshList()
+    {
+        final ListView listView = (ListView) this.findViewById(R.id.list_probes);
+
+        final StartActivity me = this;
 
         final SimpleDateFormat sdf = new SimpleDateFormat("MMM d, H:mm:ss");
 
@@ -405,7 +399,7 @@ public class StartActivity extends ActionBarActivity
 
                 if (c.moveToNext())
                 {
-                    String sensorName = c.getString(c.getColumnIndex("source"));
+                    final String sensorName = c.getString(c.getColumnIndex("source"));
 
                     final Probe probe = ProbeManager.probeForName(sensorName, me);
 
@@ -500,7 +494,29 @@ public class StartActivity extends ActionBarActivity
                             inited = true;
                         }
                         else
-                            Log.e("PR", "Looking for model named " + sensorName);
+                        {
+                            // Clear obsolete probe or user-provided label...
+
+                            builder = builder.setTitle(R.string.title_clear_probe_display);
+                            builder = builder.setMessage(me.getString(R.string.message_clear_probe_display, sensorName));
+
+                            builder.setPositiveButton(R.string.action_clear, new OnClickListener()
+                            {
+                                @Override
+                                public void onClick(DialogInterface arg0, int arg1)
+                                {
+                                    String where = "source = ?";
+                                    String[] args = { sensorName };
+                                    me.getContentResolver().delete(RobotContentProvider.RECENT_PROBE_VALUES, where, args);
+
+                                    me.refreshList();
+                                }
+                            });
+
+                            builder.setNegativeButton(R.string.action_cancel, null);
+
+                            inited = true;
+                        }
                     }
 
                     if (inited)
@@ -510,8 +526,6 @@ public class StartActivity extends ActionBarActivity
                 return true;
             }
         });
-
-        LegacyJSONConfigFile.getSharedFile(this.getApplicationContext());
     }
 
     @Override
@@ -707,6 +721,8 @@ public class StartActivity extends ActionBarActivity
 
         this.getContentResolver().registerContentObserver(RobotContentProvider.RECENT_PROBE_VALUES, true,
                 this._observer);
+
+        this.refreshList();
     }
 
     private void updateAlertIcon()

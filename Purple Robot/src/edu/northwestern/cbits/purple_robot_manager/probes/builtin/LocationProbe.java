@@ -302,7 +302,8 @@ public class LocationProbe extends Probe implements LocationListener
                         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
                             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
 
-                        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, this);
+                        if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
+                            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, this);
 
                         this._lastCheck = now;
                         this._listening = true;
