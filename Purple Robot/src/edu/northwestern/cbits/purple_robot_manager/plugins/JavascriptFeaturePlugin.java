@@ -13,8 +13,7 @@ public class JavascriptFeaturePlugin extends OutputPlugin
 {
     public String[] respondsTo()
     {
-        String[] activeActions =
-        { Probe.PROBE_READING };
+        String[] activeActions = { Probe.PROBE_READING };
 
         return activeActions;
     }

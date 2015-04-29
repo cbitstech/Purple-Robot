@@ -232,10 +232,17 @@ public class DateTrigger extends Trigger
                 current += hour;
             }
 
-            synchronized (this._upcomingFireDates)
+            try
             {
-                this._upcomingFireDates.clear();
-                this._upcomingFireDates.addAll(upcoming);
+                synchronized (this._upcomingFireDates)
+                {
+                    this._upcomingFireDates.clear();
+                    this._upcomingFireDates.addAll(upcoming);
+                }
+            }
+            catch (NullPointerException e)
+            {
+                LogManager.getInstance(context).logException(e);
             }
         }
     }
