@@ -926,11 +926,11 @@
     <string name="name_sanity_server_failure">Server Failures</string>
 
     <string name="name_sanity_google_play">Google Play Services</string>
-    <string name="name_sanity_google_play_missing">Google Play services is missing.</string>
-    <string name="name_sanity_google_play_update_required">Google Play services is out of date.</string>
-    <string name="name_sanity_google_play_update_disabled">Google Play services is disabled.</string>
-    <string name="name_sanity_google_play_update_invalid">Google Play services is invalid.</string>
-    <string name="name_sanity_google_play_update_ok">Google Play services is working properly.</string>
+    <string name="name_sanity_google_play_missing">Google Play Services are missing.</string>
+    <string name="name_sanity_google_play_update_required">Google Play Services are out of date.</string>
+    <string name="name_sanity_google_play_update_disabled">Google Play Services are disabled.</string>
+    <string name="name_sanity_google_play_update_invalid">Google Play Services are invalid.</string>
+    <string name="name_sanity_google_play_update_ok">Google Play Services are working properly.</string>
 
     <string name="name_sanity_trigger_byminute">Trigger BYMINUTE</string>
     <string name="name_sanity_trigger_byminute_warning">%1$s trigger defined using both FREQ=MINUTELY and BYMINUTE, introducing performance issues.</string>
@@ -1497,10 +1497,10 @@
     <string name="probe_pebble_install_label">Install Purple Robot Watchface</string>
     <string name="probe_pebble_install_url">http://www.aetherial.net/static/pr/purple-robot.pbw</string>
 
-
     <string name="name_sanity_pebble_probes_title">Simultaneous Pebble Probes Check</string>
     <string name="name_sanity_pebble_probes_warning">Multiple Pebble probes are currently enabled. Please disable all but one.</string>
 
     <string name="title_clear_probe_display">Clear Reading?</string>
     <string name="message_clear_probe_display">Would you like to remove the reading associated with "%1$s" from the main display?</string>
+    <string name="play_services_version_label">Google Play Services Version</string>
 </resources>

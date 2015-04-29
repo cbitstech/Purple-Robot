@@ -12,7 +12,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
@@ -29,7 +29,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
 @TargetApi(11)
-public class SettingsActivity extends ActionBarActivity
+public class SettingsActivity extends AppCompatActivity
 {
     private static final String PREFERENCE_SCREEN_KEY = "PREFERENCE_SCREEN_KEY";
     private static HashMap<String, PreferenceScreen> _screens = new HashMap<String, PreferenceScreen>();

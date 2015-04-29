@@ -2,7 +2,6 @@ package edu.northwestern.cbits.purple_robot_manager.activities;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +29,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -68,7 +67,7 @@ import edu.northwestern.cbits.purple_robot_manager.snapshots.SnapshotsActivity;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
-public class StartActivity extends ActionBarActivity
+public class StartActivity extends AppCompatActivity
 {
     public static final String UPDATE_MESSAGE = "UPDATE_LIST_MESSAGE";
     public static final String DISPLAY_MESSAGE = "DISPLAY_MESSAGE";

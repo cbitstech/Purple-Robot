@@ -23,7 +23,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
@@ -50,7 +50,7 @@ import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 
 @SuppressLint("SimpleDateFormat")
-public class LabelActivity extends ActionBarActivity
+public class LabelActivity extends AppCompatActivity
 {
     public static final String TIMESTAMP = "LABEL TIMESTAMP";
     public static final String LABEL_CONTEXT = "LABEL_CONTEXT";

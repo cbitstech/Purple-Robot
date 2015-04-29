@@ -12,13 +12,13 @@ import org.mozilla.javascript.ScriptableObject;
 
 import android.content.res.AssetManager;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.WindowManager.LayoutParams;
 import android.webkit.WebView;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
-public class CodeViewerActivity extends ActionBarActivity
+public class CodeViewerActivity extends AppCompatActivity
 {
     public static final String SOURCE_CODE = "SOURCE_CODE";
     public static final String TITLE = "TITLE";

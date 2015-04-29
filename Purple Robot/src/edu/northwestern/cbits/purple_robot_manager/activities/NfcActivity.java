@@ -14,7 +14,7 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,7 +27,7 @@ import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.NfcProbe;
 
-public class NfcActivity extends ActionBarActivity
+public class NfcActivity extends AppCompatActivity
 {
     private static boolean RUN = false;
     private NfcAdapter _adapter = null;
