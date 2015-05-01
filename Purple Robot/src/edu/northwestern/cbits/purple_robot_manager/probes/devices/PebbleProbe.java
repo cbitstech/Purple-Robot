@@ -294,20 +294,6 @@ public class PebbleProbe extends Continuous3DProbe
                     PebbleKit.registerDataLogReceiver(context, this._logReceiver);
                 }
 
-                if (this._logReceiver != null)
-                {
-                    try
-                    {
-                        context.unregisterReceiver(this._logReceiver);
-                    }
-                    catch (IllegalArgumentException e)
-                    {
-                        // Do nothing - receiver not registered...
-                    }
-
-                    this._logReceiver = null;
-                }
-
                 if (this._ackReceiver == null)
                 {
                     this._ackReceiver = new PebbleKit.PebbleAckReceiver(PebbleProbe.WATCHAPP_UUID)
@@ -365,6 +351,20 @@ public class PebbleProbe extends Continuous3DProbe
                 }
 
                 return true;
+            }
+
+            if (this._logReceiver != null)
+            {
+                try
+                {
+                    context.unregisterReceiver(this._logReceiver);
+                }
+                catch (IllegalArgumentException e)
+                {
+                    // Do nothing - receiver not registered...
+                }
+
+                this._logReceiver = null;
             }
         }
 
