@@ -414,11 +414,10 @@ public class StartActivity extends AppCompatActivity
                         if (savedPassword == null || savedPassword.trim().length() == 0)
                         {
                             if (probe.isEnabled(me))
-                                builder.setPositiveButton(R.string.button_disable, new OnClickListener()
-                                {
+                            {
+                                builder.setNegativeButton(R.string.button_disable, new OnClickListener() {
                                     @Override
-                                    public void onClick(DialogInterface arg0, int arg1)
-                                    {
+                                    public void onClick(DialogInterface arg0, int arg1) {
                                         probe.disable(me);
 
                                         me._enabledCache.clear();
@@ -426,12 +425,21 @@ public class StartActivity extends AppCompatActivity
                                         adapter.notifyDataSetChanged();
                                     }
                                 });
-                            else
-                                builder.setPositiveButton(R.string.button_enable, new OnClickListener()
-                                {
+
+                                String action = probe.getMainScreenAction(me);
+
+                                if (action != null) {
+                                    builder.setNeutralButton(action, new OnClickListener() {
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            probe.runMainScreenAction(me);
+                                        }
+                                    });
+                                }
+                            }
+                            else {
+                                builder.setNegativeButton(R.string.button_enable, new OnClickListener() {
                                     @Override
-                                    public void onClick(DialogInterface arg0, int arg1)
-                                    {
+                                    public void onClick(DialogInterface arg0, int arg1) {
                                         probe.enable(me);
 
                                         me._enabledCache.clear();
@@ -440,11 +448,10 @@ public class StartActivity extends AppCompatActivity
                                     }
                                 });
 
-                            builder.setNegativeButton(R.string.button_close, null);
+                            }
 
-                        }
-                        else
                             builder.setPositiveButton(R.string.button_close, null);
+                        }
 
                         inited = true;
                     }
@@ -459,12 +466,10 @@ public class StartActivity extends AppCompatActivity
 
                             if (savedPassword == null || savedPassword.trim().length() == 0)
                             {
-                                if (model.isEnabled(me))
-                                    builder.setPositiveButton(R.string.button_disable, new OnClickListener()
-                                    {
+                                if (model.isEnabled(me)) {
+                                    builder.setNegativeButton(R.string.button_disable, new OnClickListener() {
                                         @Override
-                                        public void onClick(DialogInterface arg0, int arg1)
-                                        {
+                                        public void onClick(DialogInterface arg0, int arg1) {
                                             model.disable(me);
 
                                             me._enabledCache.clear();
@@ -472,12 +477,11 @@ public class StartActivity extends AppCompatActivity
                                             adapter.notifyDataSetChanged();
                                         }
                                     });
-                                else
-                                    builder.setPositiveButton(R.string.button_enable, new OnClickListener()
-                                    {
+                                }
+                                else {
+                                    builder.setNegativeButton(R.string.button_enable, new OnClickListener() {
                                         @Override
-                                        public void onClick(DialogInterface arg0, int arg1)
-                                        {
+                                        public void onClick(DialogInterface arg0, int arg1) {
                                             model.enable(me);
 
                                             me._enabledCache.clear();
@@ -485,8 +489,9 @@ public class StartActivity extends AppCompatActivity
                                             adapter.notifyDataSetChanged();
                                         }
                                     });
+                                }
 
-                                builder.setNegativeButton(R.string.button_close, null);
+                                builder.setPositiveButton(R.string.button_close, null);
                             }
                             else
                                 builder.setPositiveButton(R.string.button_close, null);
@@ -500,20 +505,18 @@ public class StartActivity extends AppCompatActivity
                             builder = builder.setTitle(R.string.title_clear_probe_display);
                             builder = builder.setMessage(me.getString(R.string.message_clear_probe_display, sensorName));
 
-                            builder.setPositiveButton(R.string.action_clear, new OnClickListener()
-                            {
+                            builder.setNegativeButton(R.string.action_clear, new OnClickListener() {
                                 @Override
-                                public void onClick(DialogInterface arg0, int arg1)
-                                {
+                                public void onClick(DialogInterface arg0, int arg1) {
                                     String where = "source = ?";
-                                    String[] args = { sensorName };
+                                    String[] args = {sensorName};
                                     me.getContentResolver().delete(RobotContentProvider.RECENT_PROBE_VALUES, where, args);
 
                                     me.refreshList();
                                 }
                             });
 
-                            builder.setNegativeButton(R.string.action_cancel, null);
+                            builder.setPositiveButton(R.string.action_cancel, null);
 
                             inited = true;
                         }

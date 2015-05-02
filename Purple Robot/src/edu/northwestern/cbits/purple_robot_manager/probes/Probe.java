@@ -17,7 +17,10 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.StartActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
 public abstract class Probe
@@ -254,5 +257,15 @@ public abstract class Probe
         String[] components = name.split("\\.");
 
         return components[components.length - 1];
+    }
+
+    public String getMainScreenAction(Context context)
+    {
+        return null;
+    }
+
+    public void runMainScreenAction(Context context)
+    {
+        Log.e("PR", "Unimplemented main screen action for probe " + this.title(context) + "...");
     }
 }
