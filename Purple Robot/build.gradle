@@ -52,7 +52,7 @@ android {
         compile 'com.google.android.gms:play-services-location:7.3.0'
         compile 'com.google.android.gms:play-services-maps:7.3.0'
         compile 'com.google.android.gms:play-services-wearable:7.3.0'
-        compile 'com.getpebble:pebblekit:2.6.0'
+        compile 'com.getpebble:pebblekit:2.6.0@aar'
         compile project(':anthracite-clients-android')
         compile project(':xsi-android')
     }
