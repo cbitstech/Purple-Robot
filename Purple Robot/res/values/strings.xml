@@ -736,7 +736,7 @@
     <!-- Livewell Pebble Probe -->
     <string name="title_livewell_pebble_probe">Livewell Pebble Activity Counts</string>
     <string name="summary_livewell_pebble_probe_desc">Collects activity count data from a Pebble smartwatch running the Livewell watchface.</string>
-    <string name="summary_livewell_pebble_probe">%1$.2f seconds, %2$.0f samples: %3$.1f</string>
+    <string name="summary_livewell_pebble_probe">%1$.0f samples: %2$.1f Gouldings</string>
     <string name="probe_livewell_pebble_install_label">Install Livewell Watchface</string>
     <string name="probe_livewell_pebble_install_url">http://www.aetherial.net/static/pr/livewell.pbw</string>
 
@@ -1439,6 +1439,9 @@
     <string name="title_pebble_check">Pebble Software Missing</string>
     <string name="message_pebble_check">Please install the Pebble companion app to use the Pebble Watch probe.</string>
 
+    <string name="title_pebble_connected_check">Pebble Not Connected</string>
+    <string name="message_pebble_connected_check">Please connect your Pebble device to the Pebble companion app.</string>
+
     <string name="title_android_wear_check">Android Wear Software Missing</string>
     <string name="message_android_wear_check">Please install the Android Wear companion app to use the Android Wear probe.</string>
 
@@ -1503,4 +1506,7 @@
     <string name="title_clear_probe_display">Clear Reading?</string>
     <string name="message_clear_probe_display">Would you like to remove the reading associated with "%1$s" from the main display?</string>
     <string name="play_services_version_label">Google Play Services Version</string>
+
+    <string name="message_warning_obsolete_livewell_watchface">Received data from an obsolete Livewell Pebble watchface. Please upgrade your watchface.</string>
+    <string name="action_request_data_no_now">Request Data</string>
 </resources>
