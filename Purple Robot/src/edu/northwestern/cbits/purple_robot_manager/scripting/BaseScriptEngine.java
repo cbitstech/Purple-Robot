@@ -62,6 +62,7 @@ import edu.northwestern.cbits.purple_robot_manager.activities.NfcActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.TestActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.WebActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.SettingsKeys;
+import edu.northwestern.cbits.purple_robot_manager.annotation.ScriptingEngineMethod;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;
@@ -117,17 +118,19 @@ public abstract class BaseScriptEngine
     }
 
     @SuppressLint("SimpleDateFormat")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_log.html", category = R.string.docs_script_category_diagnostic, arguments = { "message" })
     public void log(Object message)
     {
         SimpleDateFormat sdf = new SimpleDateFormat(BaseScriptEngine.LOG_DATE_FORMAT);
 
-        Log.e("PRM." + this.language(), sdf.format(new Date()) + ": " + message.toString());
+        Log.e("PR." + this.language(), sdf.format(new Date()) + ": " + message.toString());
 
         HashMap<String, Object> payload = new HashMap<String, Object>();
         payload.put("message", message);
         LogManager.getInstance(this._context).log("pr_script_log_message", payload);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void testLog(Object message)
     {
         this.log(message);
@@ -140,6 +143,7 @@ public abstract class BaseScriptEngine
         bcast.sendBroadcastSync(intent);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void playDefaultTone(boolean loops)
     {
         LogManager.getInstance(this._context).log("pr_default_tone_played", null);
@@ -148,21 +152,25 @@ public abstract class BaseScriptEngine
 
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void playDefaultTone()
     {
         this.playDefaultTone(false);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void playTone(String tone)
     {
         this.playTone(tone, false);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void stopVibrate()
     {
         Log.e("PR", "TODO: Implement PurpleRobot.stopVibrate();");
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void stopPlayback()
     {
         Intent intent = new Intent(ManagerService.RINGTONE_STOP_INTENT);
@@ -174,6 +182,7 @@ public abstract class BaseScriptEngine
         this._context.startService(intent);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void playTone(String tone, boolean loops)
     {
         Intent intent = new Intent(ManagerService.RINGTONE_INTENT);
@@ -192,6 +201,7 @@ public abstract class BaseScriptEngine
         this._context.startService(intent);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public boolean persistEncryptedString(String key, String value)
     {
         key = SCRIPT_ENGINE_PERSISTENCE_PREFIX + key;
@@ -199,6 +209,7 @@ public abstract class BaseScriptEngine
         return EncryptionManager.getInstance().persistEncryptedString(this._context, key, value);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public boolean persistEncryptedString(String namespace, String key, String value)
     {
         key = SCRIPT_ENGINE_PERSISTENCE_PREFIX + key;
@@ -207,6 +218,7 @@ public abstract class BaseScriptEngine
         return EncryptionManager.getInstance().persistEncryptedString(this._context, key, value);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public String fetchEncryptedString(String key)
     {
         key = SCRIPT_ENGINE_PERSISTENCE_PREFIX + key;
@@ -214,6 +226,7 @@ public abstract class BaseScriptEngine
         return EncryptionManager.getInstance().fetchEncryptedString(this._context, key);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public String fetchEncryptedString(String namespace, String key)
     {
         key = SCRIPT_ENGINE_PERSISTENCE_PREFIX + key;
@@ -222,11 +235,13 @@ public abstract class BaseScriptEngine
         return EncryptionManager.getInstance().fetchEncryptedString(this._context, key);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void vibrate(String pattern)
     {
         this.vibrate(pattern, false);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void vibrate(String pattern, boolean repeats)
     {
         Intent intent = new Intent(ManagerService.HAPTIC_PATTERN_INTENT);
@@ -241,11 +256,13 @@ public abstract class BaseScriptEngine
         this._context.startService(intent);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public String readUrl(String urlString)
     {
         return this.readUrl(urlString, false);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public String readUrl(String urlString, boolean lenient)
     {
         try
@@ -316,11 +333,13 @@ public abstract class BaseScriptEngine
         return null;
     }
 
+    @ScriptingEngineMethod(language = "All")
     public boolean emitToast(final String message)
     {
         return this.emitToast(message, true);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public boolean emitToast(final String message, final boolean longDuration)
     {
         HashMap<String, Object> payload = new HashMap<String, Object>();
@@ -345,6 +364,7 @@ public abstract class BaseScriptEngine
         return false;
     }
 
+    @ScriptingEngineMethod(language = "All")
     public boolean launchUrl(String urlString)
     {
         try
@@ -369,6 +389,7 @@ public abstract class BaseScriptEngine
         return false;
     }
 
+    @ScriptingEngineMethod(language = "All")
     public boolean launchInternalUrl(String urlString)
     {
         Intent launchIntent = new Intent(this._context, WebActivity.class);
@@ -385,6 +406,7 @@ public abstract class BaseScriptEngine
     }
 
     @SuppressLint("DefaultLocale")
+    @ScriptingEngineMethod(language = "All")
     public String packageForApplicationName(String applicationName)
     {
         if (applicationName == null)
@@ -423,6 +445,7 @@ public abstract class BaseScriptEngine
         return packageName;
     }
 
+    @ScriptingEngineMethod(language = "All")
     public String version()
     {
         try
@@ -439,6 +462,7 @@ public abstract class BaseScriptEngine
         return null;
     }
 
+    @ScriptingEngineMethod(language = "All")
     public int versionCode()
     {
         try
@@ -455,6 +479,7 @@ public abstract class BaseScriptEngine
         return -1;
     }
 
+    @ScriptingEngineMethod(language = "All")
     public boolean persistString(String key, String value)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
@@ -470,6 +495,7 @@ public abstract class BaseScriptEngine
         return editor.commit();
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void addNamespace(String namespace)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
@@ -498,6 +524,7 @@ public abstract class BaseScriptEngine
         }
     }
 
+    @ScriptingEngineMethod(language = "All")
     public boolean persistString(String namespace, String key, String value)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
@@ -526,6 +553,7 @@ public abstract class BaseScriptEngine
         return prefs.getString(key, null);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void fetchLabel(String context, String key)
     {
         Intent labelIntent = new Intent(this._context, LabelActivity.class);
@@ -542,6 +570,7 @@ public abstract class BaseScriptEngine
         this._context.getApplicationContext().startActivity(labelIntent);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public String fetchString(String key)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
@@ -551,6 +580,7 @@ public abstract class BaseScriptEngine
         return prefs.getString(key, null);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public String fetchSetting(String key)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
@@ -563,6 +593,7 @@ public abstract class BaseScriptEngine
         return null;
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void resetTrigger(String triggerId)
     {
         for (Trigger trigger : TriggerManager.getInstance(this._context).triggersForId(triggerId))
@@ -571,6 +602,7 @@ public abstract class BaseScriptEngine
         }
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void enableTrigger(String triggerId)
     {
         for (Trigger trigger : TriggerManager.getInstance(this._context).triggersForId(triggerId))
@@ -579,6 +611,7 @@ public abstract class BaseScriptEngine
         }
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void fireTrigger(String triggerId)
     {
         for (Trigger trigger : TriggerManager.getInstance(this._context).triggersForId(triggerId))
@@ -587,6 +620,7 @@ public abstract class BaseScriptEngine
         }
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void disableTrigger(String triggerId)
     {
         for (Trigger trigger : TriggerManager.getInstance(this._context).triggersForId(triggerId))
@@ -605,21 +639,25 @@ public abstract class BaseScriptEngine
         // TODO
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void enableProbes()
     {
         ProbeManager.enableProbes(this._context);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void disableProbes()
     {
         ProbeManager.disableProbes(this._context);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void disableEachProbe()
     {
         ProbeManager.disableEachProbe(this._context);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public boolean probesState()
     {
         return ProbeManager.probesState(this._context);
@@ -637,11 +675,13 @@ public abstract class BaseScriptEngine
         localManager.sendBroadcast(intent);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void disableProbe(String probeName)
     {
         ProbeManager.disableProbe(this._context, probeName);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void updateConfigUrl(String newUrl)
     {
         if (newUrl != null && newUrl.trim().length() == 0)
@@ -652,6 +692,7 @@ public abstract class BaseScriptEngine
         LegacyJSONConfigFile.update(this._context, true);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void setPassword(String password)
     {
         if (password == null || password.trim().length() == 0)
@@ -666,6 +707,7 @@ public abstract class BaseScriptEngine
         }
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void clearPassword()
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
@@ -675,6 +717,7 @@ public abstract class BaseScriptEngine
         e.commit();
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void enableBackgroundImage()
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
@@ -684,6 +727,7 @@ public abstract class BaseScriptEngine
         e.commit();
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void disableBackgroundImage()
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
@@ -693,6 +737,7 @@ public abstract class BaseScriptEngine
         e.commit();
     }
 
+    @ScriptingEngineMethod(language = "All")
     private void refreshConfigUrl()
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
@@ -706,11 +751,13 @@ public abstract class BaseScriptEngine
         ProbeManager.nudgeProbes(this._context);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void setUserId(String userId)
     {
         this.setUserId(userId, true);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void setUserId(String userId, boolean refreshConfig)
     {
         HashMap<String, Object> payload = new HashMap<String, Object>();
@@ -736,6 +783,7 @@ public abstract class BaseScriptEngine
             this.refreshConfigUrl();
     }
 
+    @ScriptingEngineMethod(language = "All")
     public String fetchUserId()
     {
         HashMap<String, Object> payload = new HashMap<String, Object>();
@@ -746,6 +794,7 @@ public abstract class BaseScriptEngine
         return EncryptionManager.getInstance().getUserId(this._context);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public String fetchUserHash()
     {
         HashMap<String, Object> payload = new HashMap<String, Object>();
@@ -756,6 +805,7 @@ public abstract class BaseScriptEngine
         return EncryptionManager.getInstance().getUserHash(this._context);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void restoreDefaultId()
     {
         HashMap<String, Object> payload = new HashMap<String, Object>();
@@ -768,6 +818,7 @@ public abstract class BaseScriptEngine
         this.refreshConfigUrl();
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void enableUpdateChecks()
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
@@ -777,6 +828,7 @@ public abstract class BaseScriptEngine
         e.commit();
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void disableUpdateChecks()
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
@@ -786,6 +838,7 @@ public abstract class BaseScriptEngine
         e.commit();
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void enableProbe(String probeName)
     {
         ProbeManager.enableProbe(this._context, probeName);
@@ -969,6 +1022,7 @@ public abstract class BaseScriptEngine
         return false;
     }
 
+    @ScriptingEngineMethod(language = "All")
     public boolean launchApplication(String applicationName)
     {
         return this.launchApplication(applicationName, new HashMap<String, Object>(), null);
@@ -1060,11 +1114,13 @@ public abstract class BaseScriptEngine
         return false;
     }
 
+    @ScriptingEngineMethod(language = "All")
     public boolean showScriptNotification(String title, String message, boolean persistent, final String script)
     {
         return this.showScriptNotification(title, message, persistent, false, script);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public boolean showScriptNotification(String title, String message, boolean persistent, boolean sticky, final String script)
     {
         try
@@ -1131,6 +1187,7 @@ public abstract class BaseScriptEngine
         return false;
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void cancelScriptNotification()
     {
         NotificationManager noteManager = (NotificationManager) this._context.getSystemService(android.content.Context.NOTIFICATION_SERVICE);
@@ -1151,31 +1208,37 @@ public abstract class BaseScriptEngine
         return intent;
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void showNativeDialog(final String title, final String message, final String confirmTitle, final String cancelTitle, final String confirmScript, final String cancelScript)
     {
         DialogActivity.showNativeDialog(this._context, title, message, confirmTitle, cancelTitle, confirmScript, cancelScript, null, 0);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void showNativeDialog(final String title, final String message, final String confirmTitle, final String cancelTitle, final String confirmScript, final String cancelScript, String tag, long priority)
     {
         DialogActivity.showNativeDialog(this._context, title, message, confirmTitle, cancelTitle, confirmScript, cancelScript, tag, priority);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void clearNativeDialogs()
     {
         DialogActivity.clearNativeDialogs(this._context);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void clearNativeDialogs(String tag)
     {
         DialogActivity.clearNativeDialogs(this._context, tag, null);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen)
     {
         return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen, new HashMap<String, Object>(), null);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public boolean updateWidget(final String title, final String message, final String applicationName)
     {
         return this.updateWidget(title, message, applicationName, new HashMap<String, Object>(), null);
@@ -1270,6 +1333,7 @@ public abstract class BaseScriptEngine
         return widgets;
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void scheduleScript(String identifier, String dateString, String action)
     {
         ScheduleManager.updateScript(this._context, identifier, dateString, action);
@@ -1329,6 +1393,7 @@ public abstract class BaseScriptEngine
         return PurpleRobotApplication.updateFromMap(this._context, config);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public boolean updateConfig(String key, Object value)
     {
         Map<String, Object> values = new HashMap<String, Object>();
@@ -1420,7 +1485,7 @@ public abstract class BaseScriptEngine
         return list;
     }
 
-    public List<String> fetchNamespaces()
+    public List<String> fetchNamespaceList()
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
 
@@ -1481,6 +1546,7 @@ public abstract class BaseScriptEngine
         return times;
     }
 
+    @ScriptingEngineMethod(language = "All")
     public String takeSnapshot(String source)
     {
         try
@@ -1495,6 +1561,7 @@ public abstract class BaseScriptEngine
         return null;
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void deleteSnapshot(String id)
     {
         SnapshotManager.getInstance(this._context).deleteSnapshot(Long.parseLong(id));
@@ -1512,11 +1579,13 @@ public abstract class BaseScriptEngine
         return TriggerManager.getInstance(this._context).fetchTrigger(this._context, id);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public boolean deleteTrigger(String id)
     {
         return TriggerManager.getInstance(this._context).deleteTrigger(id);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void clearTriggers()
     {
         LogManager.getInstance(this._context).log("script_clear_triggers", null);
@@ -1580,26 +1649,31 @@ public abstract class BaseScriptEngine
         this._context.startActivity(labelIntent);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void addModel(String jsonUrl)
     {
         ModelManager.getInstance(this._context).addModel(jsonUrl);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void deleteModel(String jsonUrl)
     {
         ModelManager.getInstance(this._context).deleteModel(jsonUrl);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void enableModel(String jsonUrl)
     {
         ModelManager.getInstance(this._context).enableModel(jsonUrl);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void disableModel(String jsonUrl)
     {
         ModelManager.getInstance(this._context).disableModel(jsonUrl);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void setUploadUrl(String uploadUrl)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
@@ -1617,6 +1691,7 @@ public abstract class BaseScriptEngine
         e.commit();
     }
 
+    @ScriptingEngineMethod(language = "All")
     public String getUploadUrl()
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
@@ -1624,16 +1699,19 @@ public abstract class BaseScriptEngine
         return prefs.getString(DataUploadPlugin.UPLOAD_URI, null);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void scanNFC()
     {
         NfcActivity.startScan(this._context);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public boolean canScanNFC()
     {
         return NfcActivity.canScan(this._context);
     }
 
+    @ScriptingEngineMethod(language = "All")
     public void cancelNFCScan()
     {
         NfcActivity.cancelScan();

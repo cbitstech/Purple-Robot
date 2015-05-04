@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.annotation.ScriptingEngineMethod;
 import jscheme.JScheme;
 import jsint.Evaluator;
 import jsint.Pair;
@@ -58,6 +60,7 @@ public class SchemeEngine extends BaseScriptEngine
     }
 
     @SuppressLint("DefaultLocale")
+    @ScriptingEngineMethod(language = "Scheme")
     public Object evaluateSource(String source)
     {
         if (source.trim().toLowerCase().equals("(begin)"))
@@ -124,6 +127,7 @@ public class SchemeEngine extends BaseScriptEngine
         return "Scheme";
     }
 
+    @ScriptingEngineMethod(language = "Scheme")
     public boolean updateTrigger(String triggerId, Pair parameters)
     {
         Map<String, Object> paramsMap = SchemeEngine.parsePairList(parameters);
@@ -133,6 +137,7 @@ public class SchemeEngine extends BaseScriptEngine
         return super.updateTrigger(triggerId, paramsMap);
     }
 
+    @ScriptingEngineMethod(language = "Scheme")
     public boolean updateTrigger(Pair parameters)
     {
         Map<String, Object> paramsMap = SchemeEngine.parsePairList(parameters);
@@ -147,11 +152,13 @@ public class SchemeEngine extends BaseScriptEngine
         return false;
     }
 
+    @ScriptingEngineMethod(language = "Scheme")
     public void scheduleScript(String identifier, String dateString, Pair action)
     {
         super.scheduleScript(identifier, dateString, action.toString());
     }
 
+    @ScriptingEngineMethod(language = "Scheme")
     public boolean updateProbe(Pair params)
     {
         Map<String, Object> map = SchemeEngine.parsePairList(params);
@@ -279,6 +286,7 @@ public class SchemeEngine extends BaseScriptEngine
         return b;
     }
 
+    @ScriptingEngineMethod(language = "Scheme")
     public void showNativeDialog(String title, String message, String confirmTitle, String cancelTitle,
             Pair confirmAction, Pair cancelAction)
     {
@@ -286,6 +294,7 @@ public class SchemeEngine extends BaseScriptEngine
                 cancelAction.toString());
     }
 
+    @ScriptingEngineMethod(language = "Scheme")
     public boolean updateConfig(Pair parameters)
     {
         Map<String, Object> paramsMap = SchemeEngine.parsePairList(parameters);
@@ -293,6 +302,7 @@ public class SchemeEngine extends BaseScriptEngine
         return super.updateConfig(paramsMap);
     }
 
+    @ScriptingEngineMethod(language = "Scheme")
     public void updateWidget(Pair parameters)
     {
         Map<String, Object> paramsMap = SchemeEngine.parsePairList(parameters);
@@ -308,11 +318,13 @@ public class SchemeEngine extends BaseScriptEngine
         this._context.startService(intent);
     }
 
+    @ScriptingEngineMethod(language = "Scheme")
     public void emitReading(String name, Object value)
     {
         this.emitReading(name, value, false);
     }
 
+    @ScriptingEngineMethod(language = "Scheme")
     public void emitReading(String name, Object value, boolean priority)
     {
         Bundle bundle = new Bundle();
@@ -349,27 +361,32 @@ public class SchemeEngine extends BaseScriptEngine
         this.transmitData(bundle);
     }
 
+    @ScriptingEngineMethod(language = "Scheme")
     public boolean broadcastIntent(final String action, Pair extras)
     {
         return this.broadcastIntent(action, SchemeEngine.parsePairList(extras));
     }
 
+    @ScriptingEngineMethod(language = "Scheme")
     public boolean updateWidget(final String title, final String message, final String applicationName,
             final Pair launchParams, final String script)
     {
         return this.updateWidget(title, message, applicationName, SchemeEngine.parsePairList(launchParams), script);
     }
 
+    @ScriptingEngineMethod(language = "Scheme")
     public void fetchLabels(String appContext, String instructions, final Pair labels)
     {
         super.fetchLabels(appContext, instructions, SchemeEngine.parsePairList(labels));
     }
 
+    @ScriptingEngineMethod(language = "Scheme")
     public boolean launchApplication(String applicationName, final Pair launchParams, final String script)
     {
         return this.launchApplication(applicationName, SchemeEngine.parsePairList(launchParams), script);
     }
 
+    @ScriptingEngineMethod(language = "Scheme")
     public boolean showApplicationLaunchNotification(String title, String message, String applicationName,
             long displayWhen, boolean persistent, final Pair launchParams, final String script)
     {
@@ -377,6 +394,7 @@ public class SchemeEngine extends BaseScriptEngine
                 SchemeEngine.parsePairList(launchParams), script);
     }
 
+    @ScriptingEngineMethod(language = "Scheme")
     public boolean showApplicationLaunchNotification(String title, String message, String applicationName,
             long displayWhen, final Pair launchParams, final String script)
     {
@@ -384,6 +402,7 @@ public class SchemeEngine extends BaseScriptEngine
                 SchemeEngine.parsePairList(launchParams), script);
     }
 
+    @ScriptingEngineMethod(language = "Scheme")
     public String fetchConfig()
     {
         SchemeConfigFile config = new SchemeConfigFile(this._context);
@@ -420,6 +439,7 @@ public class SchemeEngine extends BaseScriptEngine
         return ScheduleManager.parseString(dateString);
     }
 
+    @ScriptingEngineMethod(language = "Scheme", assetPath = "scheme_nth.html", category = R.string.docs_script_category_language_enhancements, arguments = { "index", "list" })
     public Object nth(int index, Object obj)
     {
         if (obj == null)

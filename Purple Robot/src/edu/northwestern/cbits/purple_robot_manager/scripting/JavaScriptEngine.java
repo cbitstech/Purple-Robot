@@ -23,6 +23,9 @@ import org.mozilla.javascript.ScriptableObject;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.util.Log;
+
+import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.annotation.ScriptingEngineMethod;
 import edu.northwestern.cbits.purple_robot_manager.config.JSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;
@@ -39,12 +42,14 @@ public class JavaScriptEngine extends BaseScriptEngine
         super(context);
     }
 
+    @ScriptingEngineMethod(language = "JavaScript")
     public Object runScript(String script) throws EvaluatorException, EcmaError
     {
         return this.runScript(script, null, null);
     }
 
     @SuppressWarnings("unchecked")
+    @ScriptingEngineMethod(language = "JavaScript")
     public Object runScript(String script, String extrasName, Object extras) throws EvaluatorException, EcmaError
     {
         this._jsContext = Context.enter();
@@ -77,6 +82,7 @@ public class JavaScriptEngine extends BaseScriptEngine
         return this._jsContext.evaluateString(this._scope, script, "<engine>", 0, null);
     }
 
+    @ScriptingEngineMethod(language = "JavaScript")
     public boolean log(String event, NativeObject params)
     {
         if (params != null)
@@ -86,6 +92,7 @@ public class JavaScriptEngine extends BaseScriptEngine
     }
 
     @SuppressWarnings("resource")
+    @ScriptingEngineMethod(language = "JavaScript")
     public boolean loadLibrary(String libraryName)
     {
         if (this._jsContext != null && this._scope != null)
@@ -122,46 +129,55 @@ public class JavaScriptEngine extends BaseScriptEngine
         return false;
     }
 
+    @ScriptingEngineMethod(language = "JavaScript")
     public void updateWidget(final NativeObject parameters)
     {
         this.updateWidget(JavaScriptEngine.nativeToMap(parameters));
     }
 
+    @ScriptingEngineMethod(language = "JavaScript")
     public boolean broadcastIntent(final String action, final NativeObject extras)
     {
         return this.broadcastIntent(action, JavaScriptEngine.nativeToMap(extras));
     }
 
+    @ScriptingEngineMethod(language = "JavaScript")
     public boolean updateWidget(final String title, final String message, final String applicationName, final NativeObject launchParams, final String script)
     {
         return this.updateWidget(title, message, applicationName, JavaScriptEngine.nativeToMap(launchParams), script);
     }
 
+    @ScriptingEngineMethod(language = "JavaScript")
     public boolean launchApplication(String applicationName, final NativeObject launchParams, final String script)
     {
         return this.launchApplication(applicationName, JavaScriptEngine.nativeToMap(launchParams), script);
     }
 
+    @ScriptingEngineMethod(language = "JavaScript")
     public boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen, boolean persistent, final NativeObject launchParams, final String script)
     {
         return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen, persistent, JavaScriptEngine.nativeToMap(launchParams), script);
     }
 
+    @ScriptingEngineMethod(language = "JavaScript")
     public boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen, final NativeObject launchParams, final String script)
     {
         return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen, JavaScriptEngine.nativeToMap(launchParams), script);
     }
 
+    @ScriptingEngineMethod(language = "JavaScript")
     public boolean updateTrigger(String triggerId, NativeObject nativeJson)
     {
         return this.updateTrigger(triggerId, JavaScriptEngine.nativeToMap(nativeJson));
     }
 
+    @ScriptingEngineMethod(language = "JavaScript")
     public void emitReading(String name, Object value)
     {
         this.emitReading(name, value, false);
     }
 
+    @ScriptingEngineMethod(language = "JavaScript")
     public void emitReading(String name, Object value, boolean priority)
     {
         double now = System.currentTimeMillis();
@@ -310,6 +326,7 @@ public class JavaScriptEngine extends BaseScriptEngine
         return obj;
     }
 
+    @ScriptingEngineMethod(language = "JavaScript")
     public String fetchConfig()
     {
         JSONConfigFile config = new JSONConfigFile(this._context);
@@ -317,6 +334,7 @@ public class JavaScriptEngine extends BaseScriptEngine
         return config.toString();
     }
 
+    @ScriptingEngineMethod(language = "JavaScript")
     public boolean updateConfig(NativeObject nativeObj)
     {
         Map<String, Object> paramsMap = JavaScriptEngine.nativeToMap(nativeObj);
@@ -324,10 +342,10 @@ public class JavaScriptEngine extends BaseScriptEngine
         return super.updateConfig(paramsMap);
     }
 
-    @Override
+    @ScriptingEngineMethod(language = "JavaScript", assetPath = "js_fetch_namespaces.html", category = R.string.docs_script_category_persistence, arguments = { })
     public NativeArray fetchNamespaces()
     {
-        List<String> namespaces = super.fetchNamespaces();
+        List<String> namespaces = super.fetchNamespaceList();
 
         String[] values = new String[namespaces.size()];
 
@@ -340,6 +358,7 @@ public class JavaScriptEngine extends BaseScriptEngine
     }
 
     @Override
+    @ScriptingEngineMethod(language = "JavaScript")
     public NativeArray fetchTriggerIds()
     {
         List<String> triggerIds = super.fetchTriggerIds();
@@ -355,6 +374,7 @@ public class JavaScriptEngine extends BaseScriptEngine
     }
 
     @Override
+    @ScriptingEngineMethod(language = "JavaScript")
     public NativeArray fetchSnapshotIds()
     {
         List<String> snapshotIds = super.fetchSnapshotIds();
@@ -370,6 +390,7 @@ public class JavaScriptEngine extends BaseScriptEngine
     }
 
     @Override
+    @ScriptingEngineMethod(language = "JavaScript")
     public NativeObject fetchSnapshot(String timestamp)
     {
         Map<String, Object> snapshot = super.fetchSnapshot(timestamp);
@@ -380,6 +401,7 @@ public class JavaScriptEngine extends BaseScriptEngine
         return null;
     }
 
+    @ScriptingEngineMethod(language = "JavaScript")
     public NativeObject fetchNamespace(String namespace)
     {
         Map<String, Object> map = super.fetchNamespaceMap(namespace);
@@ -388,6 +410,7 @@ public class JavaScriptEngine extends BaseScriptEngine
     }
 
     @Override
+    @ScriptingEngineMethod(language = "JavaScript")
     public NativeObject fetchTrigger(String id)
     {
         Map<String, Object> trigger = super.fetchTrigger(id);
@@ -398,6 +421,7 @@ public class JavaScriptEngine extends BaseScriptEngine
         return null;
     }
 
+    @ScriptingEngineMethod(language = "JavaScript")
     public NativeObject models()
     {
         Map<String, Object> modelMap = ModelManager.getInstance(this._context).models(this._context);
@@ -405,6 +429,7 @@ public class JavaScriptEngine extends BaseScriptEngine
         return JavaScriptEngine.mapToNative(this._jsContext, this._scope, modelMap);
     }
 
+    @ScriptingEngineMethod(language = "JavaScript")
     public NativeObject readings()
     {
         Map<String, Object> readings = ModelManager.getInstance(this._context).readings(this._context);
@@ -412,6 +437,7 @@ public class JavaScriptEngine extends BaseScriptEngine
         return JavaScriptEngine.mapToNative(this._jsContext, this._scope, readings);
     }
 
+    @ScriptingEngineMethod(language = "JavaScript")
     public NativeObject predictions()
     {
         Map<String, Object> predictions = ModelManager.getInstance(this._context).predictions(this._context);
@@ -420,6 +446,7 @@ public class JavaScriptEngine extends BaseScriptEngine
     }
 
     @Override
+    @ScriptingEngineMethod(language = "JavaScript")
     public NativeObject fetchWidget(String identifier)
     {
         Map<String, Object> map = super.fetchWidget(identifier);
@@ -428,6 +455,7 @@ public class JavaScriptEngine extends BaseScriptEngine
     }
 
     @Override
+    @ScriptingEngineMethod(language = "JavaScript")
     public NativeArray widgets()
     {
         List<String> widgets = super.widgets();
@@ -442,6 +470,7 @@ public class JavaScriptEngine extends BaseScriptEngine
         return new NativeArray(values);
     }
 
+    @ScriptingEngineMethod(language = "JavaScript")
     public boolean updateProbe(NativeObject params)
     {
         Map<String, Object> values = JavaScriptEngine.nativeToMap(params);

@@ -1,0 +1,40 @@
+<html>
+    <head>
+        <title>{{ METHOD_NAME }} | Purple Robot</title>
+        <link rel="stylesheet" href="/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
+        <script src="/js/jquery-1.11.2.min.js"></script>
+        <script src="/js/bootstrap.min.js"></script>
+        <style>
+            h3.language_definition
+            {
+                margin-top: 30px;
+            }
+
+            h4.code_example_label,  h4.code_arguments_label
+            {
+                margin-top: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <span class="navbar-brand" href="#">Purple Robot &#187; {{ METHOD_NAME }}</span>
+                </div>
+                <div id="navbar" class="navbar-right navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <li><a href="/docs/scripting/JavaScript">JavaScript</a></li>
+                        <li><a href="/docs/scripting/Scheme">Scheme</a></li>
+                    </ul>
+                </div><!--/.nav-collapse -->
+            </div>
+        </nav>
+        <div class="container" style="margin-top: 50px;">
+            <h1 style="margin-bottom: 30px;">{{ METHOD_NAME }}</h1>
+
+            {{ METHOD_DOCUMENTATION }}
+        </div>
+    </body>
+</html>

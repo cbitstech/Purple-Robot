@@ -1,0 +1,80 @@
+<html>
+    <head>
+        <title>{{ LANGUAGE }} API | Purple Robot</title>
+        <link rel="stylesheet" href="/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
+        <script src="/js/jquery-1.11.2.min.js"></script>
+        <script src="/js/bootstrap.min.js"></script>
+        <script>
+            // From https://gist.github.com/mathewbyrne/1280286
+            function slugify(text)
+            {
+                return text.toString().toLowerCase()
+                    .replace(/\s+/g, '-')           // Replace spaces with -
+                    .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
+                    .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+                    .replace(/^-+/, '')             // Trim - from start of text
+                    .replace(/-+$/, '');            // Trim - from end of text
+            }
+
+            var methods = {{ METHOD_DEFINITIONS }};
+
+            $(document).ready(function()
+            {
+                for (var i = 0; i < methods.length; i++)
+                {
+                    var method = methods[i];
+
+                    var category = method["category"];
+
+                    var categorySlug = slugify(category);
+
+                    var path = method["path"];
+
+                    if (path != undefined)
+                    {
+                        if ($("ul#documented_methods_" + categorySlug).length == 0)
+                            $("div#documented_methods").append("<h4>" + category + "</h4><ul id='documented_methods_" + categorySlug + "'></ul>");
+
+                        $("ul#documented_methods_" + categorySlug).append("<li><a href='" + method["language"].toLowerCase() + "/" + path + "'>" + method["name"] + "</a></li>");
+                    }
+                    else
+                    {
+                        if ($("ul#undocumented_methods_" + categorySlug).length == 0)
+                            $("div#undocumented_methods").append("<h4>" + category + "</h4><ul id='undocumented_methods_" + categorySlug + "'></ul>");
+
+                        $("ul#undocumented_methods_" + categorySlug).append("<li>" + method["name"] + "</li>");
+                    }
+                }
+            });
+        </script>
+    </head>
+    <body>
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <span class="navbar-brand">Purple Robot &#187; {{ LANGUAGE }} API</span>
+                </div>
+                <div id="navbar" class="navbar-right navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <li><a href="/docs/scripting/JavaScript">JavaScript</a></li>
+                        <li><a href="/docs/scripting/Scheme">Scheme</a></li>
+                    </ul>
+                </div><!--/.nav-collapse -->
+            </div>
+        </nav>
+        <div class="container" style="margin-top: 50px;">
+            <h2>Documented Methods</h2>
+            <div id="documented_methods"></div>
+
+            <h2>Undocumented Methods</h2>
+            <div id="undocumented_methods"></div>
+        </div>
+    </body>
+</html>

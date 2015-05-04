@@ -63,8 +63,6 @@ public class StaticContentRequestHandler implements HttpRequestHandler
             {
                 HttpEntity entity = ((HttpEntityEnclosingRequest) request).getEntity();
                 byte[] entityContent = EntityUtils.toByteArray(entity);
-
-                System.out.println("Incoming entity content (bytes): " + entityContent.length);
             }
             catch (IOException e)
             {
@@ -95,6 +93,15 @@ public class StaticContentRequestHandler implements HttpRequestHandler
                     in.close();
                 }
             });
+
+            if (path.endsWith(".js"))
+                body.setContentType("application/javascript");
+            else if (path.endsWith(".html"))
+                body.setContentType("text/html");
+            else if (path.endsWith(".css"))
+                body.setContentType("text/css");
+            else
+                body.setContentType("text/plain");
 
             response.setEntity(body);
         }

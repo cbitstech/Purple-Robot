@@ -34,7 +34,7 @@ public class JsonVariablesRequestHandler implements HttpRequestHandler
 
         SchemeEngine engine = new SchemeEngine(context, null);
 
-        for (String ns : engine.fetchNamespaces())
+        for (String ns : engine.fetchNamespaceList())
         {
             JSONObject nsObject = new JSONObject();
 
