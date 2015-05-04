@@ -47,8 +47,8 @@ public class LivewellPebbleActivityCountsProbe extends Probe
 
     private static UUID WATCHAPP_UUID = UUID.fromString("09e5f53c-651e-408a-8b10-3b5b0e1b6b09");
 
-    private static final String ENABLED = "config_probe_livewell_pebble_enabled";
-    private static final boolean DEFAULT_ENABLED = false;
+    public static final String ENABLED = "config_probe_livewell_pebble_enabled";
+    public static final boolean DEFAULT_ENABLED = false;
 
     private PebbleKit.PebbleDataReceiver _receiver = null;
     private PebbleKit.PebbleNackReceiver _nackReceiver = null;

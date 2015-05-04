@@ -47,8 +47,8 @@ public class PebbleProbe extends Continuous3DProbe
 
     private static UUID WATCHAPP_UUID = UUID.fromString("3cab0453-ff04-4594-8223-fa357112c305");
 
-    private static final String ENABLED = "config_probe_pebble_enabled";
-    private static final boolean DEFAULT_ENABLED = false;
+    public static final String ENABLED = "config_probe_pebble_enabled";
+    public static final boolean DEFAULT_ENABLED = false;
 
     private static final int BUFFER_SIZE = 20;
 
