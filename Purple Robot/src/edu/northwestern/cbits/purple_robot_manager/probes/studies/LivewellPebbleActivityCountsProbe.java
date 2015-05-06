@@ -10,7 +10,6 @@ import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
@@ -43,7 +42,7 @@ public class LivewellPebbleActivityCountsProbe extends Probe
     private static final String BUNDLE_IS_CHARGING = "BUNDLE_IS_CHARGING";
     private static final String FREQUENCY = "config_probe_livewell_pebble_frequency";
     private static final String BUNDLE_DIFF_MEANS = "BUNDLE_DIFF_MEANS";
-    private static final int CURRENT_VERSION = 2;
+    private static final int CURRENT_VERSION = 0x03;
 
     private static UUID WATCHAPP_UUID = UUID.fromString("09e5f53c-651e-408a-8b10-3b5b0e1b6b09");
 
@@ -364,7 +363,6 @@ public class LivewellPebbleActivityCountsProbe extends Probe
                                             }
 
                                             try {
-
                                                 Thread.sleep(1000);
                                             } catch (InterruptedException e) {
                                                 LogManager.getInstance(context).logException(e);
