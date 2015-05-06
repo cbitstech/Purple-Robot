@@ -4,7 +4,6 @@
 (define pr-version (lambda () (.version PurpleRobot)))
 (define pr-version-code (lambda () (.versionCode PurpleRobot)))
 (define pr-play-default-tone (lambda () (.playDefaultTone PurpleRobot)))
-(define pr-play-default-tone (lambda () (.playDefaultTone PurpleRobot)))
 (define pr-emit-toast (lambda (message long-duration) (.emitToast PurpleRobot message long-duration)))
 (define pr-update-config (lambda (key value) (.updateConfig PurpleRobot key value)))
 (define pr-set-user-id (lambda (user-id) (.setUserId PurpleRobot user-id)))

@@ -1,0 +1,29 @@
+<p>Displays <a href="http://developer.android.com/guide/topics/ui/notifiers/toasts.html">a toast notification</a> containing the string in <code>message</code>.</p>
+
+<p>By default, the toast is visible only for a short period of time, unless a true Boolean argument is provided to specify a longer duration.</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><code>message</code> - String to appear in the toast notification.</p>
+
+<p><code>useLongDuration</code> - True if the toast should display for a longer period of time, false otherwise. (optional)</p>
+
+<h4>Return Values</h4>
+
+<p><em>None</em></p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre>PurpleRobot.emitToast("This is a short message...");
+
+PurpleRobot.emitToast("This is also a short message...", false);
+
+PurpleRobot.emitToast("This will be visible longer...", true);</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre>(pr-emit-toast "This is a short message...")
+
+(pr-emit-toast "This is also a short message..." #f)
+
+(pr-emit-toast "This will be visible longer..." #t)</pre>

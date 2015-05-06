@@ -1,0 +1,39 @@
+<p>Vibrates the device using the sequence named <code>pattern</code>.</p>
+
+<p><code>pattern</code> may be one several values:</p>
+
+<ul>
+    <li><code>Blip</code>: A single short vibration.</li>
+    <li><code>Buzz</code>: A single long vibration.</li>
+    <li><code>S.O.S.</code>: The <a href="http://en.wikipedia.org/wiki/SOS">international Morse code distress signal</a>.</li>
+</ul>
+
+<p>
+    In addition to <code>pattern</code>, an optional Boolean <code>repeats</code> may also be provided to specify if the pattern should loop repeatedly until <a href="all_stop_vibrate.html">stopVibrate</a> is called.
+</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><code>pattern</code> - Name of the vibration pattern to use.</p>
+
+<p><code>repeats</code> - True if the pattern should repeat indefinately, false otherwise. (optional)</p>
+
+<h4>Return Values</h4>
+
+<p><em>None</em></p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre>PurpleRobot.vibrate("Buzz");
+
+PurpleRobot.vibrate("Blip", false);
+
+PurpleRobot.vibrate("S.O.S.", true);</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre>(pr-vibrate "Buzz")
+
+(pr-vibrate "Blip" #f)
+
+(pr-vibrate "S.O.S." #t)</pre>

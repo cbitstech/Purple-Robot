@@ -19,31 +19,39 @@
 
             var methods = {{ METHOD_DEFINITIONS }};
 
+            var seen = [];
+
             $(document).ready(function()
             {
                 for (var i = 0; i < methods.length; i++)
                 {
                     var method = methods[i];
 
-                    var category = method["category"];
+                    var name = method["name"];
 
-                    var categorySlug = slugify(category);
-
-                    var path = method["path"];
-
-                    if (path != undefined)
+                    if (seen.indexOf(name) == -1)
                     {
-                        if ($("ul#documented_methods_" + categorySlug).length == 0)
-                            $("div#documented_methods").append("<h4>" + category + "</h4><ul id='documented_methods_" + categorySlug + "'></ul>");
+                        var category = method["category"];
+                        var categorySlug = slugify(category);
 
-                        $("ul#documented_methods_" + categorySlug).append("<li><a href='" + method["language"].toLowerCase() + "/" + path + "'>" + method["name"] + "</a></li>");
-                    }
-                    else
-                    {
-                        if ($("ul#undocumented_methods_" + categorySlug).length == 0)
-                            $("div#undocumented_methods").append("<h4>" + category + "</h4><ul id='undocumented_methods_" + categorySlug + "'></ul>");
+                        var path = method["path"];
 
-                        $("ul#undocumented_methods_" + categorySlug).append("<li>" + method["name"] + "</li>");
+                        if (path != undefined)
+                        {
+                            if ($("ul#documented_methods_" + categorySlug).length == 0)
+                                $("div#documented_methods").append("<h4>" + category + "</h4><ul id='documented_methods_" + categorySlug + "'></ul>");
+
+                            $("ul#documented_methods_" + categorySlug).append("<li><a href='" + method["language"].toLowerCase() + "/" + path + "'>" + method["name"] + "</a></li>");
+                        }
+                        else
+                        {
+                            if ($("ul#undocumented_methods_" + categorySlug).length == 0)
+                                $("div#undocumented_methods").append("<h4>" + category + "</h4><ul id='undocumented_methods_" + categorySlug + "'></ul>");
+
+                            $("ul#undocumented_methods_" + categorySlug).append("<li>" + method["name"] + "</li>");
+                        }
+
+                        seen.push(name);
                     }
                 }
             });

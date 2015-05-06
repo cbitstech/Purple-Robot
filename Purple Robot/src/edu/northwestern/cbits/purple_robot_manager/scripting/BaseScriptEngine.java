@@ -164,7 +164,7 @@ public abstract class BaseScriptEngine
         this.playTone(tone, false);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", category = R.string.docs_script_category_todo)
     public void stopVibrate()
     {
         Log.e("PR", "TODO: Implement PurpleRobot.stopVibrate();");
@@ -235,13 +235,13 @@ public abstract class BaseScriptEngine
         return EncryptionManager.getInstance().fetchEncryptedString(this._context, key);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_vibrate.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "pattern", "repeats" })
     public void vibrate(String pattern)
     {
         this.vibrate(pattern, false);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_vibrate.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "pattern", "repeats" })
     public void vibrate(String pattern, boolean repeats)
     {
         Intent intent = new Intent(ManagerService.HAPTIC_PATTERN_INTENT);
@@ -333,14 +333,14 @@ public abstract class BaseScriptEngine
         return null;
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_emit_toast.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "message", "useLongDuration" })
     public boolean emitToast(final String message)
     {
         return this.emitToast(message, true);
     }
 
-    @ScriptingEngineMethod(language = "All")
-    public boolean emitToast(final String message, final boolean longDuration)
+    @ScriptingEngineMethod(language = "All", assetPath = "all_emit_toast.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "message", "useLongDuration" })
+    public boolean emitToast(final String message, final boolean useLongDuration)
     {
         HashMap<String, Object> payload = new HashMap<String, Object>();
         payload.put("has_activity", (this._context instanceof Activity));
@@ -354,7 +354,7 @@ public abstract class BaseScriptEngine
             @Override
             public void run()
             {
-                if (longDuration)
+                if (useLongDuration)
                     Toast.makeText(me._context, message, Toast.LENGTH_LONG).show();
                 else
                     Toast.makeText(me._context, message, Toast.LENGTH_SHORT).show();
@@ -1054,6 +1054,7 @@ public abstract class BaseScriptEngine
         return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen, false, launchParams, script);
     }
 
+    // TODO: Does this actually schedule anything?
     protected boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen, boolean persistent, Map<String, Object> launchParams, final String script)
     {
         try
@@ -1232,7 +1233,7 @@ public abstract class BaseScriptEngine
         DialogActivity.clearNativeDialogs(this._context, tag, null);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_show_app_launch_note.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "title", "message", "applicationName", "displayWhen" })
     public boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen)
     {
         return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen, new HashMap<String, Object>(), null);
