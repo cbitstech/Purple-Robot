@@ -357,7 +357,8 @@ public class LivewellPebbleActivityCountsProbe extends Probe
 
                                         while (me._pendingReadings.size() > 0) {
                                             synchronized (me._pendingReadings) {
-                                                me.transmitData(context, me._pendingReadings.get(0));
+                                                if (me._pendingReadings.size() > 0)
+                                                    me.transmitData(context, me._pendingReadings.get(0));
 
                                                 me._pendingReadings.remove(0);
                                             }
