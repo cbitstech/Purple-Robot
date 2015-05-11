@@ -174,7 +174,7 @@ public class LivewellPebbleActivityCountsProbe extends Probe
         duration.setDefaultValue(Probe.DEFAULT_FREQUENCY);
         duration.setEntryValues(R.array.probe_satellite_frequency_values);
         duration.setEntries(R.array.probe_satellite_frequency_labels);
-        duration.setTitle(R.string.probe_frequency_label);
+        duration.setTitle(R.string.probe_fetch_rate_label);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -336,7 +336,9 @@ public class LivewellPebbleActivityCountsProbe extends Probe
 
                                 PebbleKit.FirmwareVersionInfo info = PebbleKit.getWatchFWVersion(context);
 
-                                data.putString(LivewellPebbleActivityCountsProbe.FIRMWARE_VERSION, "" + info.getMajor() + "." + info.getMinor() + "." + info.getPoint());
+                                if (info != null)
+                                    data.putString(LivewellPebbleActivityCountsProbe.FIRMWARE_VERSION, "" + info.getMajor() + "." + info.getMinor() + "." + info.getPoint());
+
                                 data.putInt(LivewellPebbleActivityCountsProbe.BUNDLE_NUM_SAMPLES, count.numSamples());
                                 data.putInt(LivewellPebbleActivityCountsProbe.BUNDLE_DIFF_MEANS, count.mean());
                                 data.putInt(LivewellPebbleActivityCountsProbe.BUNDLE_BATTERY_LEVEL, count.batteryLevel());

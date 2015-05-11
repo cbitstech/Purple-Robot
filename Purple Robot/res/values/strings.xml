@@ -1509,6 +1509,7 @@
 
     <string name="message_warning_obsolete_livewell_watchface">Received data from an obsolete Livewell Pebble watchface. Please upgrade your watchface.</string>
     <string name="action_request_data_no_now">Request Data</string>
+    <string name="probe_fetch_rate_label">Data Fetch Interval</string>
 
     <!-- Documentation Strings -->
     <string name="docs_script_category_unknown">Unknown</string>

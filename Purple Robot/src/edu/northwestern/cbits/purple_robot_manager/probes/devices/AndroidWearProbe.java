@@ -108,7 +108,7 @@ public class AndroidWearProbe extends Probe implements DataApi.DataListener
         interval.setKey(AndroidWearProbe.INTERVAL);
         interval.setEntryValues(R.array.probe_satellite_frequency_values);
         interval.setEntries(R.array.probe_satellite_frequency_labels);
-        interval.setTitle(R.string.probe_frequency_label);
+        interval.setTitle(R.string.probe_fetch_rate_label);
         interval.setDefaultValue(AndroidWearProbe.DEFAULT_INTERVAL);
         screen.addPreference(interval);
 
