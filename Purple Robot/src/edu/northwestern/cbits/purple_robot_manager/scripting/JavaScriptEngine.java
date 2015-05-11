@@ -154,15 +154,15 @@ public class JavaScriptEngine extends BaseScriptEngine
     }
 
     @ScriptingEngineMethod(language = "JavaScript")
-    public boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen, boolean persistent, final NativeObject launchParams, final String script)
+    public boolean showApplicationLaunchNotification(String title, String message, String applicationName, boolean persistent, final NativeObject launchParams, final String script)
     {
-        return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen, persistent, JavaScriptEngine.nativeToMap(launchParams), script);
+        return this.showApplicationLaunchNotification(title, message, applicationName, persistent, JavaScriptEngine.nativeToMap(launchParams), script);
     }
 
     @ScriptingEngineMethod(language = "JavaScript")
-    public boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen, final NativeObject launchParams, final String script)
+    public boolean showApplicationLaunchNotification(String title, String message, String applicationName, final NativeObject launchParams, final String script)
     {
-        return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen, JavaScriptEngine.nativeToMap(launchParams), script);
+        return this.showApplicationLaunchNotification(title, message, applicationName, JavaScriptEngine.nativeToMap(launchParams), script);
     }
 
     @ScriptingEngineMethod(language = "JavaScript")

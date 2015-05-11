@@ -164,12 +164,6 @@ public abstract class BaseScriptEngine
         this.playTone(tone, false);
     }
 
-    @ScriptingEngineMethod(language = "All", category = R.string.docs_script_category_todo)
-    public void stopVibrate()
-    {
-        Log.e("PR", "TODO: Implement PurpleRobot.stopVibrate();");
-    }
-
     @ScriptingEngineMethod(language = "All")
     public void stopPlayback()
     {
@@ -246,7 +240,7 @@ public abstract class BaseScriptEngine
     {
         Intent intent = new Intent(ManagerService.HAPTIC_PATTERN_INTENT);
         intent.putExtra(ManagerService.HAPTIC_PATTERN_NAME, pattern);
-        intent.putExtra(ManagerService.HAPTIC_PATTERN_VIBRATE, repeats);
+        intent.putExtra(ManagerService.HAPTIC_PATTERN_REPEATS, repeats);
         intent.setClass(this._context, ManagerService.class);
 
         HashMap<String, Object> payload = new HashMap<String, Object>();
@@ -254,6 +248,12 @@ public abstract class BaseScriptEngine
         LogManager.getInstance(this._context).log("pr_vibrate_device", payload);
 
         this._context.startService(intent);
+    }
+
+    @ScriptingEngineMethod(language = "All", category = R.string.docs_script_category_todo)
+    public void stopVibrate()
+    {
+        ManagerService.stopAllVibrations();
     }
 
     @ScriptingEngineMethod(language = "All")
@@ -336,7 +336,7 @@ public abstract class BaseScriptEngine
     @ScriptingEngineMethod(language = "All", assetPath = "all_emit_toast.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "message", "useLongDuration" })
     public boolean emitToast(final String message)
     {
-        return this.emitToast(message, true);
+        return this.emitToast(message, false);
     }
 
     @ScriptingEngineMethod(language = "All", assetPath = "all_emit_toast.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "message", "useLongDuration" })
@@ -361,7 +361,7 @@ public abstract class BaseScriptEngine
             }
         });
 
-        return false;
+        return true;
     }
 
     @ScriptingEngineMethod(language = "All")
@@ -1055,20 +1055,18 @@ public abstract class BaseScriptEngine
         return false;
     }
 
-    protected boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen, Map<String, Object> launchParams, final String script)
+    protected boolean showApplicationLaunchNotification(String title, String message, String applicationName, Map<String, Object> launchParams, final String script)
     {
-        return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen, false, launchParams, script);
+        return this.showApplicationLaunchNotification(title, message, applicationName, false, launchParams, script);
     }
 
-    // TODO: Does this actually schedule anything?
-    protected boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen, boolean persistent, Map<String, Object> launchParams, final String script)
+    protected boolean showApplicationLaunchNotification(String title, String message, String applicationName, boolean persistent, Map<String, Object> launchParams, final String script)
     {
         try
         {
-            long now = System.currentTimeMillis();
+            Log.e("PR", "1");
 
-            if (displayWhen < now)
-                displayWhen = now;
+            long now = System.currentTimeMillis();
 
             Intent intent = this.constructDirectLaunchIntent(applicationName, launchParams);
 
@@ -1077,8 +1075,12 @@ public abstract class BaseScriptEngine
             payload.put("application_name", applicationName);
             LogManager.getInstance(this._context).log("pr_application_launch_notification", payload);
 
+            Log.e("PR", "2 " + intent);
+
             if (intent != null)
             {
+                Log.e("PR", "3");
+
                 PendingIntent pendingIntent = PendingIntent.getActivity(this._context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
                 if (script != null)
@@ -1087,6 +1089,8 @@ public abstract class BaseScriptEngine
                     pendingIntent = PendingIntent.getService(this._context, 0, serviceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                 }
 
+                Log.e("PR", "4");
+
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(this._context);
                 builder.setContentIntent(pendingIntent);
                 builder.setAutoCancel(true);
@@ -1094,6 +1098,8 @@ public abstract class BaseScriptEngine
                 builder.setContentText(message);
                 builder.setTicker(message);
                 builder.setSmallIcon(R.drawable.ic_note_icon);
+
+                Log.e("PR", "5");
 
                 try
                 {
@@ -1109,9 +1115,15 @@ public abstract class BaseScriptEngine
                 {
                     // Added so that the mock test cases could still execute.
                 }
+
+                Log.e("PR", "6");
+
+                return true;
             }
 
-            return true;
+            Log.e("PR", "7");
+
+            return false;
         }
         catch (Exception e)
         {
@@ -1239,10 +1251,10 @@ public abstract class BaseScriptEngine
         DialogActivity.clearNativeDialogs(this._context, tag, null);
     }
 
-    @ScriptingEngineMethod(language = "All", assetPath = "all_show_app_launch_note.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "title", "message", "applicationName", "displayWhen" })
+    @ScriptingEngineMethod(language = "All", assetPath = "all_show_app_launch_note.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "title", "message", "packageName" })
     public boolean showApplicationLaunchNotification(String title, String message, String applicationName, long displayWhen)
     {
-        return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen, new HashMap<String, Object>(), null);
+        return this.showApplicationLaunchNotification(title, message, applicationName, new HashMap<String, Object>(), null);
     }
 
     @ScriptingEngineMethod(language = "All")

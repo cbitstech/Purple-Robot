@@ -56,7 +56,7 @@ public class ManagerService extends IntentService
 
     public static String HAPTIC_PATTERN_INTENT = "purple_robot_manager_haptic_pattern";
     public static String HAPTIC_PATTERN_NAME = "purple_robot_manager_haptic_pattern_name";
-    public static String HAPTIC_PATTERN_VIBRATE = "purple_robot_manager_haptic_pattern_vibrates";
+    public static String HAPTIC_PATTERN_REPEATS = "purple_robot_manager_haptic_pattern_repeats";
 
     public static String RINGTONE_STOP_INTENT = "purple_robot_manager_stop_ringtone";
     public static String RINGTONE_INTENT = "purple_robot_manager_ringtone";
@@ -76,6 +76,7 @@ public class ManagerService extends IntentService
 
     private static boolean _looping = false;
     protected static MediaPlayer _player = null;
+    private static boolean _vibrationRepeats = false;
 
     public ManagerService()
     {
@@ -121,6 +122,7 @@ public class ManagerService extends IntentService
         else if (HAPTIC_PATTERN_INTENT.equalsIgnoreCase(action))
         {
             String pattern = intent.getStringExtra(HAPTIC_PATTERN_NAME);
+            ManagerService._vibrationRepeats = intent.getBooleanExtra(ManagerService.HAPTIC_PATTERN_REPEATS, false);
 
             if (!pattern.startsWith("vibrator_"))
                 pattern = "vibrator_" + pattern;
@@ -132,18 +134,44 @@ public class ManagerService extends IntentService
             if ("vibrator_sos".equalsIgnoreCase(pattern))
                 patternSpec = this.getResources().getIntArray(R.array.vibrator_sos);
 
-            long[] longSpec = new long[patternSpec.length];
+            final long[] longSpec = new long[patternSpec.length];
 
             for (int i = 0; i < patternSpec.length; i++)
             {
                 longSpec[i] = (long) patternSpec[i];
             }
 
-            // TODO: Implement looping...
+            final Vibrator v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
 
-            Vibrator v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
-            v.cancel();
-            v.vibrate(longSpec, -1);
+            Runnable r = new Runnable()
+            {
+                public void run()
+                {
+                    do
+                    {
+                        long duration = 0;
+
+                        for (long length : longSpec)
+                            duration += length;
+
+                        v.cancel();
+                        v.vibrate(longSpec, -1);
+
+                        try
+                        {
+                            Thread.sleep(duration + 250);
+                        }
+                        catch (InterruptedException e)
+                        {
+
+                        }
+                    }
+                    while(ManagerService._vibrationRepeats);
+                }
+            };
+
+            Thread t = new Thread(r);
+            t.start();
         }
         else if (RINGTONE_STOP_INTENT.equalsIgnoreCase(action))
         {
@@ -508,5 +536,11 @@ public class ManagerService extends IntentService
     public static void resetTriggerNudgeDate()
     {
         ManagerService._lastTriggerNudge = 0;
+    }
+
+    public static void stopAllVibrations()
+    {
+        ManagerService._vibrationRepeats = false;
+
     }
 }

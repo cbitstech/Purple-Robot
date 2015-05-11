@@ -4,8 +4,7 @@
 
 <p><code>title</code> - Notification title.</p>
 <p><code>message</code> - Notification message.</p>
-<p><code>applicationName</code> - Name of the application to launch on tap.</p>
-<p><code>displayWhen</code> - Time expressed in <a href="http://en.wikipedia.org/wiki/Unix_time">Unix time milliseconds</a> specifying when the notification should appear.</p>
+<p><code>packageName</code> - Package name of the application to launch on tap.</p>
 
 <h4>Return Values</h4>
 
@@ -13,9 +12,7 @@
 
 <h3 class="language_definition">JavaScript Example</h3>
 
-<pre>var now = Date.now(); // Time in milliseconds...
-
-PurpleRobot.showLaunchNotification("Tap here to launch Facebook.", "If you tap this notification, Facebook will open on your device (if installed).", "Facebook", now);</pre>
+<pre>PurpleRobot.showApplicationLaunchNotification("Tap here to launch Facebook.", "If you tap this notification, Facebook will open on your device (if installed).", "com.facebook.katana");</pre>
 
 <h3 class="language_definition">Scheme Example</h3>
 

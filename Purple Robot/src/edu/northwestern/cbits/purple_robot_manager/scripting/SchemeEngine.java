@@ -388,17 +388,17 @@ public class SchemeEngine extends BaseScriptEngine
 
     @ScriptingEngineMethod(language = "Scheme")
     public boolean showApplicationLaunchNotification(String title, String message, String applicationName,
-            long displayWhen, boolean persistent, final Pair launchParams, final String script)
+            boolean persistent, final Pair launchParams, final String script)
     {
-        return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen, persistent,
+        return this.showApplicationLaunchNotification(title, message, applicationName, persistent,
                 SchemeEngine.parsePairList(launchParams), script);
     }
 
     @ScriptingEngineMethod(language = "Scheme")
     public boolean showApplicationLaunchNotification(String title, String message, String applicationName,
-            long displayWhen, final Pair launchParams, final String script)
+            final Pair launchParams, final String script)
     {
-        return this.showApplicationLaunchNotification(title, message, applicationName, displayWhen,
+        return this.showApplicationLaunchNotification(title, message, applicationName,
                 SchemeEngine.parsePairList(launchParams), script);
     }
 
