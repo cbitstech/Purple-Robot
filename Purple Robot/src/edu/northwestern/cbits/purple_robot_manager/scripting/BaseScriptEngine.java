@@ -728,6 +728,12 @@ public abstract class BaseScriptEngine
     }
 
     @ScriptingEngineMethod(language = "All")
+    public boolean isConfigurationReady()
+    {
+        return EncryptionManager.getInstance().getConfigurationReady();
+    }
+
+    @ScriptingEngineMethod(language = "All")
     public void disableBackgroundImage()
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);

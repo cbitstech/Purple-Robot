@@ -46,6 +46,7 @@ public class EncryptionManager
     private HashMap<String, String> _cachedHashes = new HashMap<String, String>();
 
     private static final EncryptionManager _instance = new EncryptionManager();
+    private boolean _configurationReady = false;
 
     private EncryptionManager()
     {
@@ -417,6 +418,8 @@ public class EncryptionManager
             e.remove(SettingsKeys.CONFIG_URL);
 
         e.commit();
+
+        this._configurationReady = false;
     }
 
     public Uri getConfigUri(Context context)
@@ -520,5 +523,15 @@ public class EncryptionManager
         }
 
         return this.createHash(context, name, algorithm);
+    }
+
+    public void setConfigurationReady(boolean isReady)
+    {
+        this._configurationReady = isReady;
+    }
+
+    public boolean getConfigurationReady()
+    {
+        return this._configurationReady;
     }
 }

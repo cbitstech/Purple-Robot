@@ -261,6 +261,8 @@ public class LegacyJSONConfigFile
                                     });
                                 }
                             }
+
+                            encryption.setConfigurationReady(true);
                         }
                         else
                         {
@@ -338,6 +340,8 @@ public class LegacyJSONConfigFile
                                     }
                                 };
                             }
+
+                            encryption.setConfigurationReady(true);
 
                             if (context instanceof Activity)
                             {
