@@ -70,10 +70,10 @@ public class ProbeViewerActivity extends AppCompatActivity
                 {
                     activity._probe = ProbeManager.probeForName(activity._probeName, activity);
 
-                    activity.setTitle(activity._probe.title(activity));
-
                     if (activity._probe != null)
                     {
+                        activity.setTitle(activity._probe.title(activity));
+
                         Bundle formattedBundle = activity._probe.formattedBundle(activity, activity._probeBundle);
 
                         if (formattedBundle != null)

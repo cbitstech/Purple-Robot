@@ -18,6 +18,8 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 
+// import com.squareup.leakcanary.LeakCanary;
+
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.SettingsKeys;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.xsi.XSI;
@@ -39,12 +41,13 @@ public class PurpleRobotApplication extends Application
             PackageInfo info = PurpleRobotApplication._context.getPackageManager().getPackageInfo(PurpleRobotApplication._context.getPackageName(), 0);
 
             XSI.setUserAgent(PurpleRobotApplication._context.getString(R.string.app_name) + " " + info.versionName);
-
         }
         catch (PackageManager.NameNotFoundException e)
         {
             LogManager.getInstance(PurpleRobotApplication._context).logException(e);
         }
+
+//        LeakCanary.install(this);
     }
 
     public static Context getAppContext()
