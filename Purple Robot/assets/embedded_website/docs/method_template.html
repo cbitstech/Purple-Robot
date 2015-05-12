@@ -6,7 +6,7 @@
         <script src="/js/jquery-1.11.2.min.js"></script>
         <script src="/js/bootstrap.min.js"></script>
         <style>
-            h3.language_definition
+            h3.language_definition, h3.test_method
             {
                 margin-top: 30px;
             }
@@ -16,6 +16,66 @@
                 margin-top: 20px;
             }
         </style>
+        <script>
+            $(document).ready(function()
+            {
+                var languages = ["JavaScript", "Scheme"];
+
+                $.each(languages, function(index, value)
+                {
+                    var language_id = "pre#" + value.toLowerCase() + "_example";
+
+                    if ($(language_id).length > 0)
+                    {
+                        $("select#test_language").append("<option value='" + value + "'>" + value + "</option>");
+                    }
+                });
+
+                $("select#test_language").change(function()
+                {
+                    var language = $("select#test_language").val();
+
+                    var payload = {};
+
+                    if (language != "---")
+                    {
+                        var script = $("pre#" + language.toLowerCase() + "_example").text();
+
+                        if (language == "JavaScript")
+                        {
+                            payload["command"] = "execute_script";
+                            payload["script"] = script;
+                        }
+                        else if (language == "Scheme")
+                        {
+                            payload["command"] = "execute_scheme";
+                            payload["source"] = script;
+                        }
+
+                    }
+                    else
+                    {
+                            payload["command"] = "execute_script";
+                            payload["script"] = "// Your script here...";
+                    }
+
+                    $("textarea#test_payload").val(JSON.stringify(payload, null, 2));
+                });
+
+                $("form#test_form").submit(function(event)
+                {
+                    event.preventDefault();
+
+                    var data = {};
+                    data["json"] = $("textarea#test_payload").val();
+
+                    $.post("/json/submit", data, function(data, textStatus, jqXHR)
+                    {
+                        alert("Received response:\n\n" + JSON.stringify(data, null, 2));
+                    }, "json");
+                })
+            });
+        </script>
     </head>
     <body>
         <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -35,6 +95,20 @@
             <h1 style="margin-bottom: 30px;">{{ METHOD_NAME }}</h1>
 
             {{ METHOD_DOCUMENTATION }}
+
+            <h3 class="test_script">Test Method</h3>
+
+            <span style="float: right;"><select id="test_language">
+                <option value="---">Select a language&#8230;</option>
+            </select></span>
+
+            <form id="test_form">
+                <div class="form-group">
+                    <label for="test_payload">HTTP POST Payload</label>
+                    <textarea class="form-control" rows="8" id="test_payload"></textarea>
+                </div>
+                <button type="submit" class="btn btn-default">Send Payload</button>
+            </form>
         </div>
     </body>
 </html>
