@@ -169,7 +169,7 @@ public class BluetoothReceiverProbe extends Probe
 
     protected void manageSocket(BluetoothSocket socket) throws IOException
     {
-        Log.e("PRM", "GOT BLUETOOTH CONNECTION: " + socket.getRemoteDevice().getName());
+        Log.e("PR", "GOT BLUETOOTH CONNECTION: " + socket.getRemoteDevice().getName());
 
         int read = 0;
         byte[] buffer = new byte[1024];
@@ -180,7 +180,7 @@ public class BluetoothReceiverProbe extends Probe
         {
             String s = new String(buffer, 0, read);
 
-            Log.e("PRM", "READ " + s + " BYTES!");
+            Log.e("PR", "READ " + s + " BYTES!");
         }
 
         socket.close();

@@ -369,7 +369,7 @@ public class StreamingJSONUploadPlugin extends DataUploadPlugin
                                 writer.endObject();
                             }
                             else
-                                Log.e("PRM", "LIST OBJ: " + o.getClass().getCanonicalName() + " IN " + key);
+                                Log.e("PR", "LIST OBJ: " + o.getClass().getCanonicalName() + " IN " + key);
                         }
 
                         writer.endArray();
@@ -423,7 +423,7 @@ public class StreamingJSONUploadPlugin extends DataUploadPlugin
                     else if (value instanceof Bundle)
                         StreamingJSONUploadPlugin.writeBundle(context, writer, (Bundle) value);
                     else
-                        Log.e("PRM", "GOT TYPE " + value.getClass().getCanonicalName() + " FOR " + key);
+                        Log.e("PR", "GOT TYPE " + value.getClass().getCanonicalName() + " FOR " + key);
                 }
             }
 

@@ -430,7 +430,7 @@ public abstract class OutputPlugin
                     else if (o instanceof String)
                         objectArray.put(o.toString());
                     else
-                        Log.e("PRM", "LIST OBJ: " + o.getClass().getCanonicalName() + " IN " + key);
+                        Log.e("PR", "LIST OBJ: " + o.getClass().getCanonicalName() + " IN " + key);
                 }
 
                 json.put(key, objectArray);

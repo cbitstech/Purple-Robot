@@ -33,7 +33,6 @@ import android.net.Uri;
 import android.net.Uri.Builder;
 import android.preference.PreferenceManager;
 import android.util.Base64;
-import android.util.Log;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.SettingsKeys;

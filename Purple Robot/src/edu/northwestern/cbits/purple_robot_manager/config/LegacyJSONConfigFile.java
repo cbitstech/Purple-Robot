@@ -47,7 +47,6 @@ import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.Looper;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;

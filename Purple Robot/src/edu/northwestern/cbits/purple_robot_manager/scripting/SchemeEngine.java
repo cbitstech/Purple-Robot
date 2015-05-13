@@ -352,10 +352,10 @@ public class SchemeEngine extends BaseScriptEngine
         }
         else
         {
-            Log.e("PRM", "SCHEME PLUGIN GOT UNKNOWN VALUE " + value);
+            Log.e("PR", "SCHEME PLUGIN GOT UNKNOWN VALUE " + value);
 
             if (value != null)
-                Log.e("PRM", "SCHEME PLUGIN GOT UNKNOWN CLASS " + value.getClass());
+                Log.e("PR", "SCHEME PLUGIN GOT UNKNOWN CLASS " + value.getClass());
         }
 
         this.transmitData(bundle);

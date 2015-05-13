@@ -474,7 +474,7 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
                                 generator.writeEndObject();
                             }
                             else
-                                Log.e("PRM", "LIST OBJ: " + o.getClass().getCanonicalName() + " IN " + key);
+                                Log.e("PR", "LIST OBJ: " + o.getClass().getCanonicalName() + " IN " + key);
                         }
 
                         generator.writeEndArray();
@@ -530,7 +530,7 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
                         StreamingJacksonUploadPlugin.writeBundle(context, generator, (Bundle) value);
                     }
                     else
-                        Log.e("PRM", "GOT TYPE " + value.getClass().getCanonicalName() + " FOR " + key);
+                        Log.e("PR", "GOT TYPE " + value.getClass().getCanonicalName() + " FOR " + key);
                 }
             }
 

@@ -3,7 +3,6 @@ package edu.northwestern.cbits.purple_robot_manager.http;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
@@ -47,8 +46,6 @@ public class BasicAuthHelper
 
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(BasicAuthHelper._sharedInstance._context);
             String password = prefs.getString(LocalHttpServer.BUILTIN_HTTP_SERVER_PASSWORD, LocalHttpServer.BUILTIN_HTTP_SERVER_PASSWORD_DEFAULT);
-
-            Log.e("PR", "CREDS: " + creds);
 
             if (password == null || password.trim().length() == 0 || (creds != null && creds.equals("purple_robot:" + password)))
                 return true;

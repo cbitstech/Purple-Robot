@@ -31,7 +31,6 @@ import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -584,8 +583,6 @@ public class StartActivity extends AppCompatActivity
 
         if (userId != null)
             EncryptionManager.getInstance().setUserId(this, userId);
-
-        Log.e("PR", "ACTIVITY SETTING URI: " + configUri);
 
         EncryptionManager.getInstance().setConfigUri(this, configUri);
 

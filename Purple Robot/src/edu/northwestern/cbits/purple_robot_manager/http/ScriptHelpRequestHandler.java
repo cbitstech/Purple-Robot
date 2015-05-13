@@ -2,10 +2,7 @@ package edu.northwestern.cbits.purple_robot_manager.http;
 
 import android.content.Context;
 import android.content.res.AssetManager;
-import android.util.Log;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
@@ -15,7 +12,6 @@ import org.apache.http.entity.ContentProducer;
 import org.apache.http.entity.EntityTemplate;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestHandler;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,14 +24,11 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Scanner;
 
 import edu.northwestern.cbits.purple_robot_manager.annotation.ScriptingEngineMethod;
-import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
-import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 import edu.northwestern.cbits.purple_robot_manager.scripting.JavaScriptEngine;
 import edu.northwestern.cbits.purple_robot_manager.scripting.SchemeEngine;
 

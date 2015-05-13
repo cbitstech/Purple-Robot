@@ -77,7 +77,7 @@ public class RealTimeProbeViewActivity extends WebkitActivity
             @Override
             public boolean onConsoleMessage(ConsoleMessage cm)
             {
-                Log.e("PRM", cm.message() + " -- From line " + cm.lineNumber() + " of " + cm.sourceId());
+                Log.e("PR", cm.message() + " -- From line " + cm.lineNumber() + " of " + cm.sourceId());
                 return true;
             }
         });
