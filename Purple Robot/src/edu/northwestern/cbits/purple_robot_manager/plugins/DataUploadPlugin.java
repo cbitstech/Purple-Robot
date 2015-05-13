@@ -445,4 +445,6 @@ public abstract class DataUploadPlugin extends OutputPlugin
 
         return DataUploadPlugin.RESULT_ERROR;
     }
+
+    public abstract boolean isEnabled(Context context);
 }

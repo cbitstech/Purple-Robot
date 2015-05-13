@@ -47,6 +47,7 @@ import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;
@@ -208,8 +209,6 @@ public class LegacyJSONConfigFile
 
                             if ("".equals(scriptString.trim()))
                                 scriptString = "(begin)";
-
-                            oldHash = "";
 
                             edit.putString("scheme_config_contents", scriptString);
 
@@ -473,6 +472,8 @@ public class LegacyJSONConfigFile
 
         if (LegacyJSONConfigFile._sharedFile == null)
         {
+            EncryptionManager.getInstance().setConfigurationReady(false);
+
             LegacyJSONConfigFile._sharedFile = new LegacyJSONConfigFile(context, null);
             LegacyJSONConfigFile.update(context, false);
         }
@@ -514,19 +515,25 @@ public class LegacyJSONConfigFile
             this.updateSharedPreferences(context);
             this.updateTriggers(context);
 
-            String script = this.parameters.getString(LegacyJSONConfigFile.JSON_INIT_SCRIPT);
-            JavaScriptEngine engine = new JavaScriptEngine(context);
-            engine.runScript(script);
+            if (this.parameters.has(LegacyJSONConfigFile.JSON_INIT_SCRIPT))
+            {
+                String script = this.parameters.getString(LegacyJSONConfigFile.JSON_INIT_SCRIPT);
+
+                JavaScriptEngine engine = new JavaScriptEngine(context);
+                engine.runScript(script);
+            }
 
             if (next != null)
                 next.run();
         }
         catch (JSONException e)
         {
+            e.printStackTrace();
             this.parameters = new JSONObject();
         }
         catch (RhinoException e)
         {
+            e.printStackTrace();
             LogManager.getInstance(context).logException(e);
 
             this.parameters = new JSONObject();
@@ -651,6 +658,8 @@ public class LegacyJSONConfigFile
                 {
                     Editor edit = prefs.edit();
 
+                    EncryptionManager.getInstance().setConfigurationReady(false);
+
                     LegacyJSONConfigFile.updateFromOnline(context);
 
                     edit.putLong(LegacyJSONConfigFile.JSON_LAST_UPDATE, now);
@@ -658,6 +667,13 @@ public class LegacyJSONConfigFile
 
                     if (LegacyJSONConfigFile._sharedFile != null)
                         LegacyJSONConfigFile._sharedFile.updateTriggers(context);
+                }
+                else if (lastUpdate != 0)
+                {
+                    String lastHash = prefs.getString(LegacyJSONConfigFile.JSON_LAST_HASH, null);
+
+                    if (lastHash != null && lastHash.trim().length() > 0)
+                        EncryptionManager.getInstance().setConfigurationReady(true);
                 }
             }
         };

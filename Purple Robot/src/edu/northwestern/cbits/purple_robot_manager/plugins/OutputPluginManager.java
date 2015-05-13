@@ -1,5 +1,6 @@
 package edu.northwestern.cbits.purple_robot_manager.plugins;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,6 +26,11 @@ public class OutputPluginManager extends BroadcastReceiver
         this.onReceive(context, null);
 
         return this._plugins.get(c);
+    }
+
+    public static OutputPluginManager getSharedInstance()
+    {
+        return OutputPluginManager.sharedInstance;
     }
 
     public void onReceive(Context context, Intent intent)
@@ -55,5 +61,10 @@ public class OutputPluginManager extends BroadcastReceiver
                 LogManager.getInstance(context).logException(e);
             }
         }
+    }
+
+    public Collection<OutputPlugin> getPlugins()
+    {
+        return this._plugins.values();
     }
 }

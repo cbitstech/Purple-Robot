@@ -37,6 +37,7 @@ import android.util.Log;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.SettingsKeys;
+import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
 public class EncryptionManager
@@ -412,14 +413,20 @@ public class EncryptionManager
 
             configUri = builder.build();
 
+            if (prefs.getString(SettingsKeys.CONFIG_URL, "---").equals(configUri.toString()) == false)
+            {
+                e.remove(LegacyJSONConfigFile.JSON_LAST_UPDATE);
+                e.remove(LegacyJSONConfigFile.JSON_LAST_HASH);
+
+                this.setConfigurationReady(false);
+            }
+
             e.putString(SettingsKeys.CONFIG_URL, configUri.toString());
         }
         else
             e.remove(SettingsKeys.CONFIG_URL);
 
         e.commit();
-
-        this._configurationReady = false;
     }
 
     public Uri getConfigUri(Context context)

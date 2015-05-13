@@ -1,0 +1,98 @@
+<p>Returns <code>true</code> when the system is fully initialized from a configuration document, <code>false</code> if the system has not yet successfully fetched and applied a configuration document.</p>
+
+<h4>Discussion</h4>
+
+<p>
+    Purple Robot is typically configured using a remote document that is fetched by the mobile app and settings contained within are applied to the local Purple Robot instance. (See the <code><a href="all_update_config_url.html">PurpleRobot.updateConfigUrl</a></code> documentation for more details.
+</p>
+
+<p>
+    When the system is instructed to fetch or update a configuration URL, that network request is made in a thread within the application that allows <code>PurpleRobot.updateConfigUrl</code> to return immediately so that the JavaScript execution context can be discarded and resources freed.
+</p>
+
+<p>
+    When contents of the configuration URL are fetched, there are three outcomes that affect the timeliness when the system will be ready for subsequent calls:
+</p>
+
+<ul>
+    <li>The network connection is reliable. The system is ready for commands almost immediately.</li>
+    <li>The network connection is unreliable. Due to delays in fetching the configuration document, the system may not be ready for a highly variable amount of time.</li>
+    <li>There is no network connection or another error. The system never fetches its configuration document and is never ready for subsequent commands.</li>
+</ul>
+
+<p>
+    To address the issue of variability in when the system will be ready for subsequent commands, Purple Robot keeps an internal <em>ready</em> variable that is set to <code>false</code> when a new configuration URL is provided, and that variable remains <code>false</code> until the successful retrieval of the configuration document, when it is set to <code>true</code>.
+    This method exposes that variable to external scripting contexts, so that third-party callers can implement their own strategies for dealing with this uncertainty.
+</p>
+
+<p>
+    In JavaScript, this might be dealt with using a loop that waits for the system to become ready before continuing:
+</p>
+
+<pre>PurpleRobot.updateConfigUrl("http://www.example.com/config.js");
+
+var whenReady = function()
+{
+	// System is ready, carry on...
+
+	PurpleRobot.enableProbes();
+
+	PurpleRobot.emitReading("foo", "bar");
+
+	// ...
+};
+
+var numTries = 0;
+
+window.setTimeout(function()
+{
+	if (PurpleRobot.isConfigurationReady())
+	{
+		whenReady();
+	}
+	else if (numTries > 30)
+	{
+		alert("Purple Robot is not configured properly. Bailing out...");
+
+		return;
+	}
+	else
+	{
+		// Purple Robot not ready, sleep and try again in a minute...
+
+		numTries += 1;
+
+		window.setTimeout(this, 1000);
+	}
+}, 1000);
+</pre>
+
+<p>
+    This JavaScript checks whether Purple Robot is ready once a second and executes the <code>whenReady</code> function when the system is configured.
+    If the system is not configured within 30 tries (giving Purple Robot effectively a 30 second timer to fetch its configuration), the method bails out with an <code>alert</code> message.
+</p>
+
+<p>
+    This is only meant as an example, and other apps should implement strategies that best match their own unique requirements.
+</p>
+
+<p>
+	<em>Note:</em> This method indicates whether Purple Robot successfully fetched and processed the last given configuration URL. In situations where a new invalid configuration is used, the older configuration will remain active, so operations like <code><a href="all_emit_reading.html">PurpleRobot.emitReading</a></code> may still be successful when this method returns <code>false</code>.
+	If you need to check whether sensor payloads are currently being persisted for later transmission, you may want to use the <code><a href="all_uploaders_enabled.html">PurpleRobot.uploadersEnabled</a></code> function instead.</p>
+</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><em>None</em></p>
+
+<h4>Return Values</h4>
+
+<p>Boolean value indicating whether the system is configured and ready for commands.</p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.isConfigurationReady();</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">;;; Coming soon...</pre>

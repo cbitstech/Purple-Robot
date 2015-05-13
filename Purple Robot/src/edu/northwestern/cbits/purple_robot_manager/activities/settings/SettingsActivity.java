@@ -136,6 +136,9 @@ public class SettingsActivity extends AppCompatActivity
                 Preference logInterval = prefs.findPreference(LogManager.UPLOAD_INTERVAL);
                 logInterval.setOnPreferenceChangeListener(listener);
 
+                Preference configUrl = prefs.findPreference(SettingsKeys.CONFIG_URL);
+                configUrl.setOnPreferenceChangeListener(listener);
+
                 Preference enableHttpServer = prefs.findPreference(LocalHttpServer.BUILTIN_HTTP_SERVER_ENABLED);
                 enableHttpServer.setOnPreferenceChangeListener(listener);
 

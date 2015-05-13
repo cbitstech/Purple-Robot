@@ -434,4 +434,9 @@ public class StreamingJSONUploadPlugin extends DataUploadPlugin
             LogManager.getInstance(context).logException(e);
         }
     }
+
+    public boolean isEnabled(Context context)
+    {
+        return false;
+    }
 }

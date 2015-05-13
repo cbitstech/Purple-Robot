@@ -105,6 +105,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
     private final static long MAX_UPLOAD_SIZE = 262144; // 256KB
     private final static long MIN_UPLOAD_SIZE = 16384; // 16KB
+    private static final String ENABLED = "config_enable_data_server";
 
     private List<String> _pendingSaves = new ArrayList<String>();
     private long _lastSave = 0;
@@ -1338,5 +1339,12 @@ public class HttpUploadPlugin extends OutputPlugin
         }
 
         return 2 * 1024 * 1024 * 1024;
+    }
+
+    public boolean isEnabled(Context context)
+    {
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        return prefs.getBoolean(HttpUploadPlugin.ENABLED, false);
     }
 }

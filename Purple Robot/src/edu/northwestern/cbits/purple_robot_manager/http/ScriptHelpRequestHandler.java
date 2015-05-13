@@ -204,7 +204,7 @@ public class ScriptHelpRequestHandler implements HttpRequestHandler
                 e.printStackTrace();
             }
 
-            return "ERROR".getBytes(Charset.forName("UTF-8"));
+            return "404 ERROR".getBytes(Charset.forName("UTF-8"));
         }
         else
         {
@@ -279,6 +279,6 @@ public class ScriptHelpRequestHandler implements HttpRequestHandler
             }
         }
 
-        return "ERROR".getBytes(Charset.forName("UTF-8"));
+        return "404 ERROR".getBytes(Charset.forName("UTF-8"));
     }
 }

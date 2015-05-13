@@ -22,6 +22,7 @@ import org.json.JSONObject;
 import java.util.Map;
 
 import edu.northwestern.cbits.anthracite.LogService;
+import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.PersistentService;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -73,7 +74,7 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
             SharedPreferences.Editor editor = prefs.edit();
 
             editor.putLong(LegacyJSONConfigFile.JSON_LAST_UPDATE, 0);
-            editor.putString(LegacyJSONConfigFile.JSON_LAST_HASH, "");
+            editor.remove(LegacyJSONConfigFile.JSON_LAST_HASH);
 
             editor.commit();
             LegacyJSONConfigFile.update(this._context, true);
@@ -279,6 +280,19 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
         if (SettingsKeys.CHECK_UPDATES_KEY.equals(pref.getKey()))
         {
             Toast.makeText(this._context, R.string.message_update_check, Toast.LENGTH_LONG).show();
+
+            return true;
+        }
+        else if (SettingsKeys.CONFIG_URL.equals(pref.getKey()))
+        {
+            EncryptionManager.getInstance().setConfigurationReady(false);
+
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(pref.getContext());
+            SharedPreferences.Editor e = prefs.edit();
+            e.remove(LegacyJSONConfigFile.JSON_LAST_UPDATE);
+            e.remove(LegacyJSONConfigFile.JSON_LAST_HASH);
+
+            e.commit();
 
             return true;
         }

@@ -593,4 +593,11 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
 
         return 2 * 1024 * 1024 * 1024;
     }
+
+    public boolean isEnabled(Context context)
+    {
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        return prefs.getBoolean(StreamingJacksonUploadPlugin.ENABLED, false);
+    }
 }

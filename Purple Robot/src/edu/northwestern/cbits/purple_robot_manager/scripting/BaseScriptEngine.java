@@ -67,6 +67,10 @@ import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;
 import edu.northwestern.cbits.purple_robot_manager.plugins.DataUploadPlugin;
+import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
+import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
+import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
+import edu.northwestern.cbits.purple_robot_manager.plugins.StreamingJacksonUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.snapshots.EmptySnapshotException;
 import edu.northwestern.cbits.purple_robot_manager.snapshots.SnapshotManager;
@@ -250,7 +254,7 @@ public abstract class BaseScriptEngine
         this._context.startService(intent);
     }
 
-    @ScriptingEngineMethod(language = "All", category = R.string.docs_script_category_todo)
+    @ScriptingEngineMethod(language = "All", assetPath = "all_stop_vibrate.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { })
     public void stopVibrate()
     {
         ManagerService.stopAllVibrations();
@@ -687,6 +691,8 @@ public abstract class BaseScriptEngine
         if (newUrl != null && newUrl.trim().length() == 0)
             newUrl = null;
 
+        EncryptionManager.getInstance().setConfigurationReady(false);
+
         EncryptionManager.getInstance().setConfigUri(this._context, Uri.parse(newUrl));
 
         LegacyJSONConfigFile.update(this._context, true);
@@ -727,10 +733,29 @@ public abstract class BaseScriptEngine
         e.commit();
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_is_configuration_ready.html", category = R.string.docs_script_category_diagnostic, arguments = { })
     public boolean isConfigurationReady()
     {
         return EncryptionManager.getInstance().getConfigurationReady();
+    }
+
+    @ScriptingEngineMethod(language = "All", assetPath = "all_uploaders_enabled.html", category = R.string.docs_script_category_diagnostic, arguments = { })
+    public boolean uploadersEnabled()
+    {
+        OutputPluginManager plugins = OutputPluginManager.getSharedInstance();
+
+        for (OutputPlugin plugin : plugins.getPlugins())
+        {
+            if (plugin instanceof DataUploadPlugin)
+            {
+                DataUploadPlugin uploadPlugin = (DataUploadPlugin) plugin;
+
+                if (uploadPlugin.isEnabled(this._context))
+                    return true;
+            }
+        }
+
+        return false;
     }
 
     @ScriptingEngineMethod(language = "All")

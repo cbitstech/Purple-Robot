@@ -471,10 +471,6 @@ public class ManagerService extends IntentService
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        Editor editor = prefs.edit();
-        editor.putString(LegacyJSONConfigFile.JSON_LAST_HASH, "");
-        editor.commit();
-
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         PendingIntent pi = PendingIntent.getService(context, 0, new Intent(ManagerService.REFRESH_CONFIGURATION), PendingIntent.FLAG_UPDATE_CURRENT);
