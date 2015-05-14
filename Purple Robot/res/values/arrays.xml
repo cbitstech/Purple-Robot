@@ -627,6 +627,7 @@
         <item>ByMinuteTriggerCheck</item>
         <item>LogEventCheck</item>
         <item>PebbleProbesCheck</item>
+        <item>Android50MemoryCheck</item>
         <!-- <item>TestErrorCheck</item> -->
         <!-- <item>TestWarningCheck</item> -->
    	</array>

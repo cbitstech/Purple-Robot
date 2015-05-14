@@ -23,9 +23,9 @@ public class WebActivity extends AppCompatActivity
 {
     protected void onCreate(Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
-
         this.getWindow().requestFeature(Window.FEATURE_PROGRESS);
+
+        super.onCreate(savedInstanceState);
 
         this.setContentView(R.layout.layout_web_activity);
     }
@@ -40,9 +40,9 @@ public class WebActivity extends AppCompatActivity
 
         WebView webView = (WebView) this.findViewById(R.id.webview);
 
-        Uri uri = this.getIntent().getData();
+        final Uri uri = this.getIntent().getData();
 
-        if (uri != null && uri.getScheme() != null && uri.getScheme().toLowerCase(Locale.ENGLISH).startsWith("http"))
+        if (uri != null && uri.getScheme() != null && (uri.getScheme().toLowerCase(Locale.ENGLISH).startsWith("http") || uri.getScheme().toLowerCase(Locale.ENGLISH).startsWith("file")))
         {
             final WebActivity me = this;
 
@@ -51,29 +51,34 @@ public class WebActivity extends AppCompatActivity
             settings.setJavaScriptEnabled(true);
             settings.setBuiltInZoomControls(true);
 
-            webView.setWebChromeClient(new WebChromeClient()
-            {
-                public void onProgressChanged(WebView view, int progress)
-                {
+            webView.setWebChromeClient(new WebChromeClient() {
+                public void onProgressChanged(WebView view, int progress) {
                     me.setProgress(progress * 1000);
                 }
 
-                public void onCloseWindow(WebView window)
-                {
+                public void onCloseWindow(WebView window) {
                     me.finish();
                 }
 
-                public void onReceivedTitle(WebView view, String title)
-                {
+                public void onReceivedTitle(WebView view, String title) {
                     me.getSupportActionBar().setTitle(title);
                 }
             });
 
-            webView.setWebViewClient(new WebViewClient()
-            {
-                public void onReceivedError(WebView view, int errorCode, String description, String failingUrl)
-                {
+            webView.setWebViewClient(new WebViewClient() {
+                public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
                     Toast.makeText(me, description, Toast.LENGTH_LONG).show();
+                }
+
+                public boolean shouldOverrideUrlLoading(WebView view, String url)
+                {
+                    if (uri.toString().startsWith("file:///android_asset/") && url.toLowerCase().startsWith("http")) {
+                        me.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+
+                        return true;
+                    }
+
+                    return false;
                 }
             });
 
@@ -97,6 +102,11 @@ public class WebActivity extends AppCompatActivity
     {
         MenuInflater inflater = this.getMenuInflater();
         inflater.inflate(R.menu.menu_web_activity, menu);
+
+        Uri uri = this.getIntent().getData();
+
+        if (uri == null || uri.toString().startsWith("file:///android_asset/"))
+            menu.removeItem(R.id.menu_open);
 
         return true;
     }

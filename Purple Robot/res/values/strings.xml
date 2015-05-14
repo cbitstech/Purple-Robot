@@ -1511,6 +1511,9 @@
     <string name="action_request_data_no_now">Request Data</string>
     <string name="probe_fetch_rate_label">Data Fetch Interval</string>
 
+    <string name="name_sanity_android_five_memory">Android 5.0 Runtime Check</string>
+    <string name="name_sanity_android_five_memory_warning">Your device is likely to experience widespread instability due to a system memory leak, causing Purple Robot and other apps to crash. Please restart your device to reclaim the leaked resources.</string>
+
     <!-- Documentation Strings -->
     <string name="docs_script_category_unknown">Unknown</string>
     <string name="docs_script_category_todo">TODO / Incomplete</string>
@@ -1518,4 +1521,5 @@
     <string name="docs_script_category_persistence">Storage &amp; Persistence</string>
     <string name="docs_script_category_language_enhancements">Language Enhancements</string>
     <string name="docs_script_category_dialogs_notifications">Dialogs &amp; Notifications</string>
+
 </resources>

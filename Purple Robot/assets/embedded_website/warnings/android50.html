@@ -1,0 +1,32 @@
+<html>
+    <meta>
+        <title>Android 5.0 Memory Leak</title>
+        <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
+        <link rel="stylesheet" href="/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
+        <script src="/js/jquery-1.11.2.min.js"></script>
+        <script src="/js/bootstrap.min.js"></script>
+    </head>
+    <body>
+        <div class="container" style="margin: 16px;">
+            <p>
+                Android 5.0 shipped with a serious memory leak that affects all applications on the system the longer the system runs:
+            </p>
+
+            <ul>
+                <li><p><a href="https://code.google.com/p/android/issues/detail?id=79729">Issue 79729:	Memory Leak on Lollipop crashing Apps</a></p></li>
+                <li><p><a href="http://www.dailytech.com/Nasty+Memory+Leak+in+Android+Lollipops+Rendering+Engine+is+Killing+Apps/article37037.htm">Nasty Memory Leak in Android Lollipop's Rendering Engine is Killing Apps</a></p></li>
+                <li><p><a href="http://www.techtimes.com/articles/23753/20141230/google-finally-fixes-android-5-0-1-lollipop-memory-leak-issue.htm">Google Finally Fixes Android 5.0.1 Lollipop Memory Leak Issue</a></p></li>
+            </ul>
+
+            <p>
+                <strong>If you are using a device that has not yet received an Android 5.1 (or higher) update that addresses this issue, please restart your device daily to reclaim the leaked resources.</strong>
+            </p>
+
+            <p>
+                If you do not restart your device, all apps on the system will begin to crash more frequently.
+                For Purple Robot, this will introduce gaps in data collection and prevent scheduled tasks from running on time.
+            </p>
+        </div>
+    </body>
+</html>
