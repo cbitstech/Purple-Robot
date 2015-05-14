@@ -685,15 +685,15 @@ public abstract class BaseScriptEngine
         ProbeManager.disableProbe(this._context, probeName);
     }
 
-    @ScriptingEngineMethod(language = "All")
-    public void updateConfigUrl(String newUrl)
+    @ScriptingEngineMethod(language = "All", assetPath = "all_update_config_url.html", category = R.string.docs_script_category_configuration, arguments = { "newConfigUrl" })
+    public void updateConfigUrl(String newConfigUrl)
     {
-        if (newUrl != null && newUrl.trim().length() == 0)
-            newUrl = null;
+        if (newConfigUrl != null && newConfigUrl.trim().length() == 0)
+            newConfigUrl = null;
 
         EncryptionManager.getInstance().setConfigurationReady(false);
 
-        EncryptionManager.getInstance().setConfigUri(this._context, Uri.parse(newUrl));
+        EncryptionManager.getInstance().setConfigUri(this._context, Uri.parse(newConfigUrl));
 
         LegacyJSONConfigFile.update(this._context, true);
     }

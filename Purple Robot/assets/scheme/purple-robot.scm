@@ -6,6 +6,7 @@
 (define pr-play-default-tone (lambda () (.playDefaultTone PurpleRobot)))
 (define pr-emit-toast (lambda args (apply .emitToast (cons PurpleRobot args))))
 (define pr-update-config (lambda (key value) (.updateConfig PurpleRobot key value)))
+(define pr-update-config-url (lambda (url) (.updateConfigUrl PurpleRobot url)))
 (define pr-set-user-id (lambda (user-id) (.setUserId PurpleRobot user-id)))
 (define pr-restore-default-id (lambda () (.restoreDefaultId PurpleRobot)))
 (define pr-disable-background-image (lambda () (.disableBackgroundImage PurpleRobot)))

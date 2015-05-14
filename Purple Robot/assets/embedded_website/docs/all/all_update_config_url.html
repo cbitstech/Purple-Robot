@@ -1,0 +1,111 @@
+<p>
+    Configures Purple Robot to fetch its configuration from a new URL.
+</p>
+
+<p>
+    Purple Robot is typically configured using a document on a remote server to setup the device for its intended purpose.
+    Configurations may be specified using JavaScript or Scheme and Purple Robot will attempt to determine the language of the configuration document if not specified by the <code>Content-Type</code> HTTP header.
+    This method will attempt to fetch and apply the configuration immediately.
+</p>
+
+<h4>JavaScript Configuration</h4>
+
+<em>Coming soon...</em>
+
+<h4>Scheme Configuration</h4>
+
+<pre>(begin (pr-update-config '(("config_data_server_uri" . "http://www.example.com/pr/") 
+                           ("config_enable_streaming_jackson_data_server" . #t) 
+                           ("config_enable_log_server" . #t) 
+                           ("config_json_refresh_interval" . "3600") 
+                           ("config_log_server_uri" . "http://www.example.com/pr/log") 
+                           ("config_restrict_data_charging" . #f) 
+                           ("config_restrict_data_wifi" . #t) 
+                           ("config_restrict_log_charging" . #f)
+                           ("config_restrict_log_wifi" . #t) 
+                           ("config_show_background" . #t) 
+                           ("config_streaming_jackson_upload_interval" . "300") 
+                           ("config_streaming_jackson_upload_size" . "262114")
+                           ("config_user_id" . "me@example.com"))) 
+       (begin (pr-update-probe '(("frequency" . 0L) 
+                                 ("enabled" . #f) 
+                                 ("threshold" . 5.0) 
+                                 ("name" . "edu.northwestern.cbits.purple_robot_manager.probes.builtin.AmbientHumidityProbe"))) 
+              (pr-update-probe '(("frequency" . 0L) 
+                                 ("enabled" . #f)
+                                 ("threshold" . 1.0) 
+                                 ("name" . "edu.northwestern.cbits.purple_robot_manager.probes.builtin.TemperatureProbe"))) 
+              (pr-update-probe '(("frequency" . 300000L) 
+                                 ("config_probe_robot_scheme_config" . #t) 
+                                 ("enabled" . #t) 
+                                 ("config_probe_robot_json_config" . #t) 
+                                 ("name" . "edu.northwestern.cbits.purple_robot_manager.probes.builtin.RobotHealthProbe"))) 
+              (pr-update-probe '(("frequency" . 0L) 
+                                 ("enabled" . #t) 
+                                 ("threshold" . 0.5) 
+                                 ("name" . "edu.northwestern.cbits.purple_robot_manager.probes.builtin.AccelerometerProbe")))))</pre>
+
+<p>
+    Scheme configurations do not have a pre-defined structure, but instead are full Scheme programs that call the Purple Robot scripting API to configure the app.
+    The example above consists of two major sections.
+</p>
+<p>
+    The first section calls the <code><a href="scheme_update_config.html">pr-update-config</a></code> function that takes a list of key-valure pairs.
+    The key in each pair corresponds to the key used by Purple Robot's internal <code>SharedPreferences</code> object and the value corresponds to the value of that setting.
+</p>
+
+<p>
+    For example, the pair
+</p>
+
+<pre>("config_data_server_uri" . "http://www.example.com/pr/")</pre>
+
+<p>
+    configures the URL where the Purple Robot <code>DataUploadPlugins</code> will transmit probe readings and values sent via the <code><a href="all_emit_reading.html">pr-emit-reading</a></code> function.
+</p>
+
+<pre>("config_restrict_data_wifi" . #t)</pre>
+
+<p>
+    specifies that the device should only transmit data to the server when connected to a WiFi network.
+</p>
+
+<p>
+    Documenting each of these pairs is beyond the scope of this document, but you can manually configure Purple Robot and send yourself an e-mail with the configuration attached to the diagnostic message from the Diagnostics screen.
+</p>
+
+<p>
+    The second interesting block of configuration consists of the multiple iterations of the <code><a href="all_update_probe.html">pr-update-probe</a></code> functions.
+    For example, to set up the <code><a href="/docs/probes/accelerometer_probe.html">AccelerometerProbe</a></code>:
+</p>
+
+<pre>(pr-update-probe '(("frequency" . 0L) 
+                   ("enabled" . #t) 
+                   ("threshold" . 0.5) 
+                   ("name" . "edu.northwestern.cbits.purple_robot_manager.probes.builtin.AccelerometerProbe")))</pre>
+
+<p>
+    Similar to the <code>pr-update-config</code> function call, the <code>pr-update-probe</code> takes a list of key-value pairs to setup a probe.
+    In the example above, the accelerometer probe is enabled to collect data, applies a filtering threshold of 0.5 meters per second<sup>2</sup>, and collects data at <a href="http://developer.android.com/reference/android/hardware/SensorManager.html#SENSOR_DELAY_FASTEST">the highest possible frequency</a>.
+    If the <code>enabled</code> value was <code>#f</code>, the probe would be disabled.
+</p>
+
+<p>
+    Note that if a call to <code>pr-update-probe</code> is not specified for a specific probe, that probe will retain the current configuration on the device that may be set by default, manually within the settings, or from a previous configuration.
+</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><code>newConfigUrl</code> - URL to the new configuration document.</p>
+
+<h4>Return Values</h4>
+
+<p><em>None</em></p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.updateConfigUrl("http://www.example.com/pr/config.json");</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-update-config-url "http://www.example.com/pr/config.scm")</pre>

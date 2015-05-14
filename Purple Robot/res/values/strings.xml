@@ -1518,6 +1518,7 @@
     <string name="docs_script_category_unknown">Unknown</string>
     <string name="docs_script_category_todo">TODO / Incomplete</string>
     <string name="docs_script_category_diagnostic">App Diagnostics</string>
+    <string name="docs_script_category_configuration">App Configuration</string>
     <string name="docs_script_category_persistence">Storage &amp; Persistence</string>
     <string name="docs_script_category_language_enhancements">Language Enhancements</string>
     <string name="docs_script_category_dialogs_notifications">Dialogs &amp; Notifications</string>
