@@ -54,7 +54,6 @@
         <item>services.GitHubProbe</item>
         <item>services.TwitterProbe</item>
         <item>services.InstagramProbe</item>
-        <item>services.LinkedInProbe</item>
         <item>services.FoursquareProbe</item>
         <item>services.FacebookProbe</item>
         <item>services.FacebookEventsProbe</item>

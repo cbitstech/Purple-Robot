@@ -86,7 +86,6 @@ import edu.northwestern.cbits.purple_robot_manager.probes.services.FoursquarePro
 import edu.northwestern.cbits.purple_robot_manager.probes.services.GitHubProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.services.InstagramProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.services.JawboneProbe;
-import edu.northwestern.cbits.purple_robot_manager.probes.services.LinkedInProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.services.TwitterProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.services.FacebookEventsProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.services.FacebookProbe;
@@ -534,13 +533,6 @@ public class ProbeManager
                 InstagramProbe instagram = (InstagramProbe) probe;
 
                 if (instagram.name(context).equalsIgnoreCase(name))
-                    found = true;
-            }
-            else if (probe instanceof LinkedInProbe)
-            {
-                LinkedInProbe linkedin = (LinkedInProbe) probe;
-
-                if (linkedin.name(context).equalsIgnoreCase(name))
                     found = true;
             }
             else if (probe instanceof FoursquareProbe)
