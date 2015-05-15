@@ -573,7 +573,7 @@ public class LinearAccelerationProbe extends Continuous3DProbe implements Sensor
             values.put(true);
             values.put(false);
             handler.put(Probe.PROBE_VALUES, values);
-            settings.put(LinearAccelerationProbe.USE_HANDLER, handler);
+            settings.put(ContinuousProbe.USE_THREAD, handler);
         }
         catch (JSONException e)
         {
@@ -588,9 +588,9 @@ public class LinearAccelerationProbe extends Continuous3DProbe implements Sensor
     {
         super.updateFromMap(context, params);
 
-        if (params.containsKey(LinearAccelerationProbe.USE_HANDLER))
+        if (params.containsKey(ContinuousProbe.USE_THREAD))
         {
-            Object handler = params.get(LinearAccelerationProbe.USE_HANDLER);
+            Object handler = params.get(ContinuousProbe.USE_THREAD);
 
             if (handler instanceof Boolean)
             {

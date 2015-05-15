@@ -480,7 +480,7 @@ public class MagneticFieldProbe extends Continuous3DProbe implements SensorEvent
             values.put(true);
             values.put(false);
             handler.put(Probe.PROBE_VALUES, values);
-            settings.put(MagneticFieldProbe.USE_HANDLER, handler);
+            settings.put(ContinuousProbe.USE_THREAD, handler);
         }
         catch (JSONException e)
         {
@@ -495,7 +495,7 @@ public class MagneticFieldProbe extends Continuous3DProbe implements SensorEvent
     {
         super.updateFromMap(context, params);
 
-        if (params.containsKey(MagneticFieldProbe.USE_HANDLER))
+        if (params.containsKey(ContinuousProbe.USE_THREAD))
         {
             Object handler = params.get(MagneticFieldProbe.USE_HANDLER);
 
@@ -504,7 +504,7 @@ public class MagneticFieldProbe extends Continuous3DProbe implements SensorEvent
                 SharedPreferences prefs = Probe.getPreferences(context);
                 SharedPreferences.Editor e = prefs.edit();
 
-                e.putBoolean(MagneticFieldProbe.USE_HANDLER, ((Boolean) handler).booleanValue());
+                e.putBoolean(ContinuousProbe.USE_THREAD, ((Boolean) handler).booleanValue());
                 e.commit();
             }
         }

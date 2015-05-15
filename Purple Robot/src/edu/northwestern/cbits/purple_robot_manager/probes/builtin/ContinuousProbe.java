@@ -43,7 +43,9 @@ public abstract class ContinuousProbe extends Probe
 
     protected static final boolean DEFAULT_ENABLED = false;
     public static final String DEFAULT_FREQUENCY = "0";
-    public static final boolean DEFAULT_USE_HANDLER = false;
+    public static final boolean DEFAULT_USE_HANDLER = true;
+
+    public static final String USE_THREAD = "use_thread";
 
     private WakeLock _wakeLock = null;
     private int _wakeLockLevel = -1;

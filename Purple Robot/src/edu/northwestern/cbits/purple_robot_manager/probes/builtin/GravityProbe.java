@@ -580,7 +580,7 @@ public class GravityProbe extends Continuous3DProbe implements SensorEventListen
             values.put(true);
             values.put(false);
             handler.put(Probe.PROBE_VALUES, values);
-            settings.put(GravityProbe.USE_HANDLER, handler);
+            settings.put(ContinuousProbe.USE_THREAD, handler);
         }
         catch (JSONException e)
         {
@@ -595,9 +595,9 @@ public class GravityProbe extends Continuous3DProbe implements SensorEventListen
     {
         super.updateFromMap(context, params);
 
-        if (params.containsKey(GravityProbe.USE_HANDLER))
+        if (params.containsKey(ContinuousProbe.USE_THREAD))
         {
-            Object handler = params.get(GravityProbe.USE_HANDLER);
+            Object handler = params.get(ContinuousProbe.USE_THREAD);
 
             if (handler instanceof Boolean)
             {

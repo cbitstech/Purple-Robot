@@ -507,7 +507,7 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
             values.put(true);
             values.put(false);
             handler.put(Probe.PROBE_VALUES, values);
-            settings.put(AccelerometerProbe.USE_HANDLER, handler);
+            settings.put(ContinuousProbe.USE_THREAD, handler);
         }
         catch (JSONException e)
         {
@@ -522,9 +522,9 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
     {
         super.updateFromMap(context, params);
 
-        if (params.containsKey(AccelerometerProbe.USE_HANDLER))
+        if (params.containsKey(ContinuousProbe.USE_THREAD))
         {
-            Object handler = params.get(AccelerometerProbe.USE_HANDLER);
+            Object handler = params.get(ContinuousProbe.USE_THREAD);
 
             if (handler instanceof Boolean)
             {

@@ -480,7 +480,7 @@ public class GyroscopeProbe extends Continuous3DProbe implements SensorEventList
             values.put(true);
             values.put(false);
             handler.put(Probe.PROBE_VALUES, values);
-            settings.put(GyroscopeProbe.USE_HANDLER, handler);
+            settings.put(ContinuousProbe.USE_THREAD, handler);
         }
         catch (JSONException e)
         {
@@ -495,9 +495,9 @@ public class GyroscopeProbe extends Continuous3DProbe implements SensorEventList
     {
         super.updateFromMap(context, params);
 
-        if (params.containsKey(GyroscopeProbe.USE_HANDLER))
+        if (params.containsKey(ContinuousProbe.USE_THREAD))
         {
-            Object handler = params.get(GyroscopeProbe.USE_HANDLER);
+            Object handler = params.get(ContinuousProbe.USE_THREAD);
 
             if (handler instanceof Boolean)
             {
