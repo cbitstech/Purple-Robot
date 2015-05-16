@@ -1522,5 +1522,5 @@
     <string name="docs_script_category_persistence">Storage &amp; Persistence</string>
     <string name="docs_script_category_language_enhancements">Language Enhancements</string>
     <string name="docs_script_category_dialogs_notifications">Dialogs &amp; Notifications</string>
-
+    <string name="docs_script_category_data_collection">Data Collection</string>
 </resources>

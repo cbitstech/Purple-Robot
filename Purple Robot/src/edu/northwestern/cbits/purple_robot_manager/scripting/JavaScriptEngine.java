@@ -167,13 +167,13 @@ public class JavaScriptEngine extends BaseScriptEngine
         return this.updateTrigger(triggerId, JavaScriptEngine.nativeToMap(nativeJson));
     }
 
-    @ScriptingEngineMethod(language = "JavaScript")
+    @ScriptingEngineMethod(language = "JavaScript", assetPath = "js_emit_reading.html", category = R.string.docs_script_category_data_collection, arguments = { "name", "value", "priority" })
     public void emitReading(String name, Object value)
     {
         this.emitReading(name, value, false);
     }
 
-    @ScriptingEngineMethod(language = "JavaScript")
+    @ScriptingEngineMethod(language = "JavaScript", assetPath = "js_emit_reading.html", category = R.string.docs_script_category_data_collection, arguments = { "name", "value", "priority" })
     public void emitReading(String name, Object value, boolean priority)
     {
         double now = System.currentTimeMillis();
