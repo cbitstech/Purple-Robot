@@ -138,12 +138,16 @@ public class SanityManager
 
             NotificationManager noteManager = (NotificationManager) this._context.getSystemService(Context.NOTIFICATION_SERVICE);
 
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this._context);
+            builder = builder.setContentIntent(contentIntent);
+            builder = builder.setContentTitle(this._context.getString(R.string.notify_running_title));
+            builder.setOngoing(true);
+
+            builder = builder.setSmallIcon(R.drawable.ic_note_normal);
+            builder = builder.setContentText(this._context.getString(R.string.pr_errors_none_label));
+
             if (this._lastStatus != SanityCheck.OK)
             {
-                NotificationCompat.Builder builder = new NotificationCompat.Builder(this._context);
-                builder = builder.setContentIntent(contentIntent);
-                builder = builder.setContentTitle(this._context.getString(R.string.notify_running_title));
-
                 if (issueCount == 1)
                 {
                     builder = builder.setContentText(this._context.getString(R.string.note_purple_robot_message_single));
@@ -178,25 +182,12 @@ public class SanityManager
                         style = style.addLine(this._warnings.get(key));
 
                     builder = builder.setStyle(style);
-
-                    Notification note = builder.build();
-                    note.flags = Notification.FLAG_ONGOING_EVENT;
-
-                    noteManager.notify(SanityManager.NOTE_ID, note);
                 }
             }
-            else
-            {
-                NotificationCompat.Builder builder = new NotificationCompat.Builder(this._context);
 
-                builder = builder.setContentTitle(this._context.getString(R.string.notify_running_title));
-                builder = builder.setContentIntent(contentIntent);
+            Notification note = builder.build();
 
-                Notification note = builder.build();
-                note.flags = Notification.FLAG_ONGOING_EVENT;
-
-                noteManager.notify(SanityManager.NOTE_ID, note);
-            }
+            noteManager.notify(SanityManager.NOTE_ID, note);
         }
     }
 
