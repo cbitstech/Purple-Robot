@@ -131,35 +131,28 @@ public class SanityManager
             this._lastStatus = this.getErrorLevel();
             int issueCount = this._errors.size() + this._warnings.size();
 
-            PendingIntent contentIntent = PendingIntent.getActivity(this._context, SanityManager.NOTE_ID, new Intent(
-                    this._context, StartActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent contentIntent = PendingIntent.getActivity(this._context, SanityManager.NOTE_ID, new Intent(this._context, StartActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
             if (this._lastStatus != SanityCheck.OK)
-                contentIntent = PendingIntent.getActivity(this._context, SanityManager.NOTE_ID, new Intent(
-                        this._context, DiagnosticActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+                contentIntent = PendingIntent.getActivity(this._context, SanityManager.NOTE_ID, new Intent(this._context, DiagnosticActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
-            NotificationManager noteManager = (NotificationManager) this._context
-                    .getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationManager noteManager = (NotificationManager) this._context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH && this._lastStatus != SanityCheck.OK)
+            if (this._lastStatus != SanityCheck.OK)
             {
-                Notification.Builder builder = new Notification.Builder(this._context);
-
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(this._context);
                 builder = builder.setContentIntent(contentIntent);
                 builder = builder.setContentTitle(this._context.getString(R.string.notify_running_title));
 
                 if (issueCount == 1)
                 {
-                    builder = builder
-                            .setContentText(this._context.getString(R.string.note_purple_robot_message_single));
+                    builder = builder.setContentText(this._context.getString(R.string.note_purple_robot_message_single));
                     builder = builder.setTicker(this._context.getString(R.string.note_purple_robot_message_single));
                 }
                 else
                 {
-                    builder = builder.setContentText(this._context.getString(
-                            R.string.note_purple_robot_message_multiple, issueCount));
-                    builder = builder.setTicker(this._context.getString(R.string.note_purple_robot_message_multiple,
-                            issueCount));
+                    builder = builder.setContentText(this._context.getString(R.string.note_purple_robot_message_multiple, issueCount));
+                    builder = builder.setTicker(this._context.getString(R.string.note_purple_robot_message_multiple, issueCount));
                 }
 
                 if (this._lastStatus == SanityCheck.ERROR)
@@ -169,16 +162,14 @@ public class SanityManager
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
                 {
-                    Notification.InboxStyle style = new Notification.InboxStyle();
+                    NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle();
 
                     style = style.setBigContentTitle(this._context.getString(R.string.note_purple_robot_status));
 
                     if (issueCount == 1)
-                        style = style
-                                .setSummaryText(this._context.getString(R.string.note_purple_robot_message_single));
+                        style = style.setSummaryText(this._context.getString(R.string.note_purple_robot_message_single));
                     else
-                        style = style.setSummaryText(this._context.getString(
-                                R.string.note_purple_robot_message_multiple, issueCount));
+                        style = style.setSummaryText(this._context.getString(R.string.note_purple_robot_message_multiple, issueCount));
 
                     for (String key : this._errors.keySet())
                         style = style.addLine(this._errors.get(key));
@@ -199,37 +190,6 @@ public class SanityManager
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(this._context);
 
                 builder = builder.setContentTitle(this._context.getString(R.string.notify_running_title));
-
-                if (this._lastStatus != SanityCheck.OK)
-                {
-                    contentIntent = PendingIntent.getActivity(this._context, 0, new Intent(this._context,
-                            DiagnosticActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
-
-                    if (issueCount == 1)
-                    {
-                        builder = builder.setContentText(this._context
-                                .getString(R.string.note_purple_robot_message_single));
-                        builder = builder.setTicker(this._context.getString(R.string.note_purple_robot_message_single));
-                    }
-                    else
-                    {
-                        builder = builder.setContentText(this._context.getString(
-                                R.string.note_purple_robot_message_multiple, issueCount));
-                        builder = builder.setTicker(this._context.getString(
-                                R.string.note_purple_robot_message_multiple, issueCount));
-                    }
-
-                    if (this._lastStatus != SanityCheck.WARNING)
-                        builder = builder.setSmallIcon(R.drawable.ic_note_error);
-                    else
-                        builder = builder.setSmallIcon(R.drawable.ic_note_warning);
-                }
-                else
-                {
-                    builder = builder.setContentText(this._context.getString(R.string.pr_errors_none_label));
-                    builder = builder.setSmallIcon(R.drawable.ic_note_normal);
-                }
-
                 builder = builder.setContentIntent(contentIntent);
 
                 Notification note = builder.build();
