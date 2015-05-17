@@ -52,25 +52,25 @@ public class SchemeConfigFile
 
         for (Map<String, Object> config : configs)
         {
-            rest = new Pair(new Pair(Symbol.intern("pr-update-trigger"), this.pairsList(config)), rest);
+            rest = new Pair(new Pair(Symbol.intern("pr-update-trigger"), SchemeConfigFile.pairsList(config)), rest);
         }
 
         return new Pair(new Pair(Symbol.BEGIN, rest), Pair.EMPTY);
     }
 
-    private Pair probesList(List<Map<String, Object>> configs)
+    private static Pair probesList(List<Map<String, Object>> configs)
     {
         Pair rest = Pair.EMPTY;
 
         for (Map<String, Object> config : configs)
         {
-            rest = new Pair(new Pair(Symbol.intern("pr-update-probe"), this.pairsList(config)), rest);
+            rest = new Pair(new Pair(Symbol.intern("pr-update-probe"), SchemeConfigFile.pairsList(config)), rest);
         }
 
         return new Pair(Symbol.BEGIN, rest);
     }
 
-    private Pair pairsList(Map<String, Object> config)
+    private static Pair pairsList(Map<String, Object> config)
     {
         Pair list = Pair.EMPTY;
 
@@ -80,5 +80,10 @@ public class SchemeConfigFile
         }
 
         return new Pair(new Pair(Symbol.QUOTE, new Pair(list, Pair.EMPTY)), Pair.EMPTY);
+    }
+
+    public static Pair probeConfig(Map<String, Object> config)
+    {
+        return new Pair(Symbol.intern("pr-update-probe"), SchemeConfigFile.pairsList(config));
     }
 }

@@ -100,6 +100,7 @@ public class LocalHttpServer
             reqistry.register("/snapshot/audio.html", new SnapshotAudioRequestHandler(context));
             reqistry.register("/log", new LogServerEmulatorRequestHandler(context));
             reqistry.register("/docs/scripting/*", new ScriptHelpRequestHandler(context));
+            reqistry.register("/docs/probes/*", new ProbesHelpRequestHandler(context));
             reqistry.register("*", new StaticContentRequestHandler(context));
 
             this.httpService = new HttpService(httpproc, new DefaultConnectionReuseStrategy(),

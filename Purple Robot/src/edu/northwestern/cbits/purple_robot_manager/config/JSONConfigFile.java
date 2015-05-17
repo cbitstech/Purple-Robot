@@ -43,7 +43,7 @@ public class JSONConfigFile
     }
 
     @SuppressWarnings("unchecked")
-    private static JSONObject jsonFromMap(Map<String, Object> map) throws JSONException
+    public static JSONObject jsonFromMap(Map<String, Object> map) throws JSONException
     {
         JSONObject json = new JSONObject();
 

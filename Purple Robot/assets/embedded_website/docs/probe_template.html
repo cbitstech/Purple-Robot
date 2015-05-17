@@ -1,0 +1,103 @@
+<html>
+    <head>
+        <title>{{ PROBE_NAME }} | Purple Robot</title>
+        <link rel="stylesheet" href="/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
+        <script src="/js/jquery-1.11.2.min.js"></script>
+        <script src="/js/bootstrap.min.js"></script>
+        <style>
+            h3.language_definition, h3.test_script
+            {
+                margin-top: 30px;
+            }
+
+            h4.code_example_label,  h4.code_arguments_label
+            {
+                margin-top: 20px;
+            }
+        </style>
+        <script>
+            var parameters = {{ PROBE_PARAMETERS }};
+
+            $(document).ready(function()
+            {
+                for (var key in parameters)
+                {
+                    if (parameters.hasOwnProperty(key))
+                    {
+                        var parameter = parameters[key];
+
+                        var paramDef = "<code>" + key + "</code> (" + parameter["type"] + ")";
+
+                        if ("values" in parameter)
+                        {
+                            paramDef += "<br />Valid Values: ";
+
+                            var valuesList = "";
+
+                            for (var i = 0; i < parameter["values"].length; i++)
+                            {
+                                var value = parameter["values"][i];
+
+                                if (valuesList.length > 0)
+                                    valuesList += ", "
+
+                                valuesList += ("<code>" + value + "</code>");
+                            }
+
+                            paramDef += valuesList;
+                        }
+
+                        $("div#probe_parameter_defs").append("<p>" + paramDef + "</p>");
+                    }
+                }
+            });
+        </script>
+    </head>
+    <body>
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <span class="navbar-brand" href="#">Purple Robot &#187; Probes &#187; {{ PROBE_NAME }}</span>
+                </div>
+                <div id="navbar" class="navbar-right navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <li><a href="/docs/probes/" style="font-weight: bold;">Probes</a></li>
+                        <li><a href="/docs/scripting/all">Scripts</a></li>
+                        <li><a href="#">Triggers</a></li>
+                        <li><a href="#">Models</a></li>
+                    </ul>
+                </div><!--/.nav-collapse -->
+            </div>
+        </nav>
+        <div class="container" style="margin-top: 50px;">
+            <h1 style="margin-bottom: 30px;">{{ PROBE_NAME }}</h1>
+
+            <p>{{ PROBE_SUMMARY }}</p>
+
+            <h3 class="probe_parameters">Configuration Parameters</h3>
+            <div id="probe_parameter_defs"></div>
+
+            {{ PROBE_DOCUMENTATION }}
+
+            <h3>Current Configuration (Scheme)</h3>
+            <pre>{{ SCHEME_CONFIG }}</pre>
+
+            <h3>Current Configuration (JSON)</h3>
+            <pre>{{ JAVASCRIPT_CONFIG }}</pre>
+
+            <h3>Latest Reading (JSON)</h3>
+            <pre>{{ LATEST_READING }}</pre>
+        </div>
+        <div class="container">
+            <div class="row" style="margin-top: 30px; margin-bottom: 30px; border-top: thin solid #CCCCCC;">
+                <div class="col-md-6" style="padding: 10px;">
+                    Purple Robot is licensed under the <a href="http://www.gnu.org/copyleft/gpl.html">GPLv3</a>.
+                </div>
+                <div class="col-md-6 text-right" style="padding: 10px;">
+                    Questions or comments? <a href="mailto:c-karr@northwestern.edu">Send us an e-mail.</a>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

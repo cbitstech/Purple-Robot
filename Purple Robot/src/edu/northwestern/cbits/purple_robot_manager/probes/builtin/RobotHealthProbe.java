@@ -595,4 +595,9 @@ public class RobotHealthProbe extends Probe
 
         return settings;
     }
+
+    public String assetPath(Context context)
+    {
+        return "robot-health-probe.html";
+    }
 }

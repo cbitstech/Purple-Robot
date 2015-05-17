@@ -268,4 +268,11 @@ public abstract class Probe
     {
         Log.e("PR", "Unimplemented main screen action for probe " + this.title(context) + "...");
     }
+
+    // Override in subclasses as documentation is completed...
+
+    public String assetPath(Context context)
+    {
+        return null;
+    }
 }

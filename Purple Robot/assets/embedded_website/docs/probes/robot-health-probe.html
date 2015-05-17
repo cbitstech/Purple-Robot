@@ -1,0 +1,18 @@
+<h3>Discussion</h3>
+
+<p>
+    The Purple Robot Health probe is primarily intended for diagnostic purposes to determine how well Purple Robot is running in its current context.
+</p>
+
+<p>
+    This probe reports on free space available on the device, the amount of data awaiting transmission, and the cumulative runtime of both the app and device.
+</p>
+
+<p>
+    In order to track changes in configurations, the probe may be configured to echo its current settings using JSON or Scheme representations by setting the <code>config_probe_robot_json_config</code> and <code>config_probe_robot_scheme_config</code> parameters to <code>true</code>.
+</p>
+
+<p>
+    To adjust the amount of time between health reports, adjust the <code>frequency</code> parameter for your context.
+    Values of this parameter are expressed in milliseconds between reports, so a setting of <code>60000</code> will configure the device to generate a health report once every sixty seconds.
+</p>
