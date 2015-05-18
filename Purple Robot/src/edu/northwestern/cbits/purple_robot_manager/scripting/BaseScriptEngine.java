@@ -147,28 +147,7 @@ public abstract class BaseScriptEngine
         bcast.sendBroadcastSync(intent);
     }
 
-    @ScriptingEngineMethod(language = "All")
-    public void playDefaultTone(boolean loops)
-    {
-        LogManager.getInstance(this._context).log("pr_default_tone_played", null);
-
-        this.playTone(null, loops);
-
-    }
-
-    @ScriptingEngineMethod(language = "All")
-    public void playDefaultTone()
-    {
-        this.playDefaultTone(false);
-    }
-
-    @ScriptingEngineMethod(language = "All")
-    public void playTone(String tone)
-    {
-        this.playTone(tone, false);
-    }
-
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_stop_playback.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { })
     public void stopPlayback()
     {
         Intent intent = new Intent(ManagerService.RINGTONE_STOP_INTENT);
@@ -180,7 +159,28 @@ public abstract class BaseScriptEngine
         this._context.startService(intent);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_play_default_tone.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "loops" })
+    public void playDefaultTone(boolean loops)
+    {
+        LogManager.getInstance(this._context).log("pr_default_tone_played", null);
+
+        this.playTone(null, loops);
+
+    }
+
+    @ScriptingEngineMethod(language = "All", assetPath = "all_play_default_tone.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "loops" })
+    public void playDefaultTone()
+    {
+        this.playDefaultTone(false);
+    }
+
+    @ScriptingEngineMethod(language = "All", assetPath = "all_play_tone.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "tone", "loops" })
+    public void playTone(String tone)
+    {
+        this.playTone(tone, false);
+    }
+
+    @ScriptingEngineMethod(language = "All", assetPath = "all_play_tone.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "tone", "loops" })
     public void playTone(String tone, boolean loops)
     {
         Intent intent = new Intent(ManagerService.RINGTONE_INTENT);
@@ -260,13 +260,13 @@ public abstract class BaseScriptEngine
         ManagerService.stopAllVibrations();
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_read_url.html", category = R.string.docs_script_category_data_collection, arguments = { "url", "lenient" })
     public String readUrl(String urlString)
     {
         return this.readUrl(urlString, false);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_read_url.html", category = R.string.docs_script_category_data_collection, arguments = { "url", "lenient" })
     public String readUrl(String urlString, boolean lenient)
     {
         try
@@ -449,7 +449,7 @@ public abstract class BaseScriptEngine
         return packageName;
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_version.html", category = R.string.docs_script_category_diagnostic, arguments = { })
     public String version()
     {
         try
@@ -466,7 +466,7 @@ public abstract class BaseScriptEngine
         return null;
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_version_code.html", category = R.string.docs_script_category_diagnostic, arguments = { })
     public int versionCode()
     {
         try
@@ -483,7 +483,7 @@ public abstract class BaseScriptEngine
         return -1;
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_persist_string.html", category = R.string.docs_script_category_persistence, arguments = { "key", "value" })
     public boolean persistString(String key, String value)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
@@ -528,7 +528,7 @@ public abstract class BaseScriptEngine
         }
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_persist_string.html", category = R.string.docs_script_category_persistence, arguments = { "key", "value" })
     public boolean persistString(String namespace, String key, String value)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
@@ -547,6 +547,7 @@ public abstract class BaseScriptEngine
         return editor.commit();
     }
 
+    @ScriptingEngineMethod(language = "All", assetPath = "all_fetch_string.html", category = R.string.docs_script_category_persistence, arguments = { "key" })
     public String fetchString(String namespace, String key)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
@@ -574,7 +575,7 @@ public abstract class BaseScriptEngine
         this._context.getApplicationContext().startActivity(labelIntent);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_fetch_string.html", category = R.string.docs_script_category_persistence, arguments = { "key" })
     public String fetchString(String key)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
@@ -1717,7 +1718,7 @@ public abstract class BaseScriptEngine
         ModelManager.getInstance(this._context).disableModel(jsonUrl);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_set_upload_url.html", category = R.string.docs_script_category_configuration, arguments = { "url" })
     public void setUploadUrl(String uploadUrl)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
@@ -1735,7 +1736,7 @@ public abstract class BaseScriptEngine
         e.commit();
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_get_upload_url.html", category = R.string.docs_script_category_configuration, arguments = { })
     public String getUploadUrl()
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);

@@ -1,0 +1,27 @@
+<p>
+    Returns the string content located at <code>url</code>.
+    An optional <code>lenient</code> parameter may be passed to relax SSL verification requirements for servers with self-signed certificates.
+    (By default, full verification is enabled.)
+</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><code>url</code> - URL containing the string content to retrieve.</p>
+
+<p><code>lenient</code> (Optional) - Boolean value specifying whether strict SSL checks should be bypassed.</p>
+
+<h4>Return Values</h4>
+
+<p>String containing the content of <code>url</code>, <code>null</code> if binary content is retrieved or an error occurs.</p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.readUrl("http://www.example.com/");
+
+PurpleRobot.readUrl("https://example.com", true);</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-read-url "http://www.example.com/")
+
+(pr-read-url "https://www.example.com/" #t)</pre>

@@ -1,0 +1,86 @@
+<p>
+    Plays the audio notification specified by <code>tone</code> on the device.
+</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p>
+    <code>tone</code> - Name of the notification tone to play.
+</p>
+
+<p>
+    <code>loops</code> (Optional) - Boolean value specifying whether to repeat playing the tone in a loop. Default is <code>false</code>.
+</p>
+<p>
+    See <code><a href="all_stop_playback.html">PurpleRobot.stopPlayback</a></code> for details about canceling a looping tone.
+</p>
+
+<h4>Return Values</h4>
+
+<p><em>None</em></p>
+
+<h4 class="code_arguments_label">Discussion</h4>
+
+<p>The names and availability of specific tones will vary by device and manufacturer.</p>
+
+<p>Tones available on vanilla Android 4.x devices:</p>
+
+<ul>
+    <li>Hydra</li>
+    <li>Machina</li>
+    <li>Orion</li>
+    <li>Pegasus</li>
+    <li>Perseus</li>
+    <li>Pyxis</li>
+    <li>Radiation</li>
+    <li>Robots for Everyone</li>
+    <li>Scarabaeus</li>
+    <li>Sceptrum</li>
+    <li>Solarium</li>
+    <li>Themos</li>
+    <li>UrsaMinor</li>
+    <li>Zeta</li>
+</ul>
+
+<p>Tones available on vanilla Android 5.x devices:</p>
+
+<ul>
+    <li>Callisto</li>
+    <li>Dione</li>
+    <li>Ganymede</li>
+    <li>Luna</li>
+    <li>Oberon</li>
+    <li>Phobos</li>
+    <li>Robots for Everyone</li>
+    <li>Sedna</li>
+    <li>Spagnola Orchestration</li>
+    <li>Titania</li>
+    <li>Triton</li>
+    <li>Umbriel</li>
+    <li>Zeta</li>
+</ul>
+
+<p>Tones bundled with Purple Robot:</p>
+
+<ul>
+    <li>CRcv</li>
+    <li>Csnd</li>
+    <li>Error</li>
+    <li>New</li>
+    <li>Off</li>
+    <li>On</li>
+</ul>
+
+<p>These tones originated as part of the <a href="http://www.adiumxtras.com/index.php?a=xtras&xtra_id=602">Tokyo Train Station</a> Adium plugin.</p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.playTone('CRcv');
+
+PurpleRobot.playTone('CSnd', true);</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-play-tone "CRcv")
+
+(pr-play-tone "CSnd" #t)</pre>

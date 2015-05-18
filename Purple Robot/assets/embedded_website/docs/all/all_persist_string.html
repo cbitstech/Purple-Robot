@@ -1,0 +1,37 @@
+<p>
+    Saves <code>value</code> to the local persistence store. <
+    code>value</code> can be retrieved by calling <code><a href="all_fetch_string.html">PurpleRobot.fetchString</a></code> with <code>key</code>.</p>
+
+<p>
+    If collections of <code>values</code> should be aggregated into separate collections - to support multiple simultaneous Purple Robot clients - the scripting API provides an alternative function where a namespace may be specified:
+</p>
+
+<code>PurpleRobot.persistString(namespace, key, value)</code>
+
+<p style="margin-top: 1em;">
+    <code>values</code> saved with a <code>namespace</code> parameter may be retrieved with other <code>key</code>/<code>value</code> pairs persisted in the same namespace using the <code><a href="all_fetch_namespace.html">PurpleRobot.fetchNamespace</a></code> function.
+</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><code>key</code> - Key used for later retrieval.</p>
+
+<p><code>value</code> - String to be persisted.</p>
+
+<p><code>namespace</code> (Optional) - Namespace to contain the <code>key</code>/<code>value</code> pair.</p>
+
+<h4>Return Values</h4>
+
+<p>Boolean value indicating whether <code>value</code> was persisted successfully.</p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.persistString("foo", "bar");
+
+PurpleRobot.persistString("my-namespace", "foo", "bar");</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-persist-string "foo" "bar")
+
+;;; TODO: Scheme equivalent w/ namespace...</pre>

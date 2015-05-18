@@ -1,0 +1,28 @@
+<p>
+    Plays the default audio notification tone on the device.
+</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p>
+    <code>loops</code> (Optional) - Boolean value specifying whether to repeat playing the tone in a loop. Default is <code>false</code>.
+</p>
+<p>
+    See <code><a href="all_stop_playback.html">PurpleRobot.stopPlayback</a></code> for details about canceling a looping tone.
+</p>
+
+<h4>Return Values</h4>
+
+<p><em>None</em></p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.playDefaultTone();
+
+PurpleRobot.playDefaultTone(true);</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-play-default-tone)
+
+(pr-play-default-tone #t)</pre>
