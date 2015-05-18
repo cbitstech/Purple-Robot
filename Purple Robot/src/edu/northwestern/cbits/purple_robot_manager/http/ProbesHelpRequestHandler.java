@@ -1,8 +1,10 @@
 package edu.northwestern.cbits.purple_robot_manager.http;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.database.Cursor;
+import android.preference.PreferenceManager;
 import android.support.v4.widget.CursorAdapter;
 import android.view.View;
 
@@ -193,18 +195,27 @@ public class ProbesHelpRequestHandler implements HttpRequestHandler
                     String where = "source = ?";
                     String[] args = { probe.name(context)};
 
-                    Cursor c = context.getContentResolver().query(RobotContentProvider.RECENT_PROBE_VALUES, null, where, args, "recorded DESC");
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
 
-                    if (c.moveToNext())
+                    boolean isAuthed = prefs.getString(LocalHttpServer.BUILTIN_HTTP_SERVER_PASSWORD, LocalHttpServer.BUILTIN_HTTP_SERVER_PASSWORD_DEFAULT).length() > 0;
+
+                    if (isAuthed)
                     {
-                        JSONObject reading = new JSONObject(c.getString(c.getColumnIndex("value")));
+                        Cursor c = context.getContentResolver().query(RobotContentProvider.RECENT_PROBE_VALUES, null, where, args, "recorded DESC");
 
-                        content = content.replace("{{ LATEST_READING }}", reading.toString(2));
+                        if (c.moveToNext())
+                        {
+                            JSONObject reading = new JSONObject(c.getString(c.getColumnIndex("value")));
+
+                            content = content.replace("{{ LATEST_READING }}", reading.toString(2));
+                        }
+                        else
+                            content = content.replace("{{ LATEST_READING }}", context.getString(R.string.error_no_latest_probe_value));
+
+                        c.close();
                     }
                     else
-                        content = content.replace("{{ LATEST_READING }}", context.getString(R.string.error_no_latest_probe_value));
-
-                    c.close();
+                        content = content.replace("{{ LATEST_READING }}", context.getString(R.string.error_auth_required));
 
                     return content.getBytes(Charset.forName("UTF-8"));
                 }

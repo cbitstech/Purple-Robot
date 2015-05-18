@@ -1525,4 +1525,5 @@
     <string name="docs_script_category_data_collection">Data Collection</string>
 
     <string name="error_no_latest_probe_value">No readings recorded yet. Enable the probe to continue.</string>
+    <string name="error_auth_required">Authenticated connection required for inspecting probe readings.</string>
 </resources>
