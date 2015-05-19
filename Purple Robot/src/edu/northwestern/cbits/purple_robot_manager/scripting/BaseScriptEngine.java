@@ -200,7 +200,7 @@ public abstract class BaseScriptEngine
         this._context.startService(intent);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_persist_encrypted_string.html", category = R.string.docs_script_category_persistence, arguments = { "key", "value" })
     public boolean persistEncryptedString(String key, String value)
     {
         key = SCRIPT_ENGINE_PERSISTENCE_PREFIX + key;
@@ -208,7 +208,7 @@ public abstract class BaseScriptEngine
         return EncryptionManager.getInstance().persistEncryptedString(this._context, key, value);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_persist_encrypted_string.html", category = R.string.docs_script_category_persistence, arguments = { "key", "value" })
     public boolean persistEncryptedString(String namespace, String key, String value)
     {
         key = SCRIPT_ENGINE_PERSISTENCE_PREFIX + key;
@@ -217,7 +217,7 @@ public abstract class BaseScriptEngine
         return EncryptionManager.getInstance().persistEncryptedString(this._context, key, value);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_fetch_encrypted_string.html", category = R.string.docs_script_category_persistence, arguments = { "key" })
     public String fetchEncryptedString(String key)
     {
         key = SCRIPT_ENGINE_PERSISTENCE_PREFIX + key;
@@ -225,7 +225,7 @@ public abstract class BaseScriptEngine
         return EncryptionManager.getInstance().fetchEncryptedString(this._context, key);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_fetch_encrypted_string.html", category = R.string.docs_script_category_persistence, arguments = { "key" })
     public String fetchEncryptedString(String namespace, String key)
     {
         key = SCRIPT_ENGINE_PERSISTENCE_PREFIX + key;

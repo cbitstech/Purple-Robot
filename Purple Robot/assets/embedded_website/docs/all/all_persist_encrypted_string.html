@@ -1,0 +1,51 @@
+<p>
+    Encrypts and saves<code>value</code> to the local persistence store.
+    <code>value</code> can be retrieved by calling <code><a href="all_fetch_encrypted_string.html">PurpleRobot.fetchEncryptedString</a></code> with <code>key</code>.</p>
+
+<p>
+    If collections of <code>values</code> should be aggregated into separate collections - to support multiple simultaneous Purple Robot clients - the scripting API provides an alternative function where a namespace may be specified:
+</p>
+
+<code>PurpleRobot.persistEncryptedString(namespace, key, value)</code>
+
+<p style="margin-top: 1em;">
+    Values saved with a <code>namespace</code> will not be included in the output of the <code><a href="all_fetch_namespace.html">PurpleRobot.fetchNamespace</a></code> function.
+</p>
+
+<h4>Encryption Algorithm</h4>
+
+<p>
+    Values persisted in this fashion are converted to a UTF-8 byte stream and encrypted using <a href="http://en.wikipedia.org/wiki/Advanced_Encryption_Standard">the AES algorithm</a> provided by the Android runtime.
+    The key used to encrypt the value is a reversed hash of the current user identifier.
+    (See <code><a href="all_fetch_user_hash.html">PurpleRobot.fetchUserHash</a></code> to retrieve the hash used.)
+    Consequently, if the local user identifier is changed after values were persisted, those values will be irretrievable until the user identifer is reset to former value.
+</p>
+
+<p>
+    Once <code>value</code> has been converted to an encrypted bytestream, it is converted back to <a href="http://en.wikipedia.org/wiki/Base64">a Base64 string</a> and persisted using the normal mechanisms, with the hash of <code>key</code> serving as its key.
+    The hash function is <a href="http://en.wikipedia.org/wiki/MD5">MD5</a> by default, but <a href="http://en.wikipedia.org/wiki/SHA-2">SHA-2</a> may be selected in the settings.
+</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><code>key</code> - Key used for later retrieval.</p>
+
+<p><code>value</code> - String to be persisted.</p>
+
+<p><code>namespace</code> (Optional) - Namespace to contain the <code>key</code>/<code>value</code> pair.</p>
+
+<h4>Return Values</h4>
+
+<p>Boolean value indicating whether <code>value</code> was persisted successfully.</p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.persistEncryptedString("foo", "bar");
+
+PurpleRobot.persistEncryptedString("my-namespace", "foo", "bar");</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-persist-encrypted-string "foo" "bar")
+
+(pr-persist-encrypted-string "my-namespace" "foo" "bar")</pre>

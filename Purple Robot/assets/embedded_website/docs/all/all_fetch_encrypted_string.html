@@ -1,0 +1,39 @@
+<p>
+    Retrieves and decodes the encrypted value saved to the local persistence store using <code>key</code> previously persisted with <code><a href="all_persist_string.html">PurpleRobot.persistEncryptedString</a></code>.
+</p>
+
+<p>
+    If collections of <code>values</code> should be aggregated into separate collections - to support multiple simultaneous Purple Robot clients - the scripting API provides an alternative function where a namespace may be specified:
+</p>
+
+<code>PurpleRobot.fetchEncryptedString(namespace, key)</code>
+
+<p style="margin-top: 1em;">
+    Values saved with a <code>namespace</code> will not be included in the output of the <code><a href="all_fetch_namespace.html">PurpleRobot.fetchNamespace</a></code> function.
+</p>
+
+<p>
+    See <code><a href="all_persist_encrypted_string.html">PurpleRobot.persistEncryptedString</a></code> for more details about the encryption and keys used to encode the persisted value.
+</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><code>key</code> - Key used to retrieve previously persisted value.</p>
+
+<p><code>namespace</code> (Optional) - Namespace containing the <code>key</code>/<code>value</code> pair.</p>
+
+<h4>Return Values</h4>
+
+<p>String containing the previously persisted value, <code>null</code> if entry exists under <code>key</code>.</p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.fetchEncryptedString("foo");
+
+PurpleRobot.fetchEncryptedString("my-namespace", "foo",);</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-fetch-encrypted-string "foo")
+
+(pr-fetch-encrypted-string "my-namespace" "foo")</pre>
