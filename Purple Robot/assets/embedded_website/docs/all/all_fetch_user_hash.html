@@ -1,0 +1,40 @@
+<p>
+    Retrieves the hash user identifier currently in use.
+    If no user identifer has been configured, Purple Robot will use the device's default Google account.
+    This hash is used to identify the source of sensor data and other probe readings uploaded to a remote Purple Robot endpoint.
+</p>
+
+<p>
+    The user identifier may be hashed using either the <a href="http://en.wikipedia.org/wiki/MD5">MD5</a> or <a href="http://en.wikipedia.org/wiki/SHA-2">SHA-2</a> hashing algorithms.
+    MD5 is the default algorithm for legacy compatibility, but SHA-2 may be selected in the Purple Robot settings, under the <em>Preferred Hash Function</em> option on the main settings screen.
+</p>
+
+<p>
+    To configure the selected algorithm, simply set the configuration value of <code>config_preferred_hash_function</code> to the preferred algorithm:
+</p>
+
+<pre>PurpleRobot.updateConfig("config_preferred_hash_function", "SHA-2");
+
+// or...
+
+PurpleRobot.updateConfig("config_preferred_hash_function", "MD5");</pre>
+
+<p style="margin-top: 1em;">
+    If the generated hash contains less than 32 characters, the hash will be zero-padded until it reaches a 32-character length.
+</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><em>None</em></p>
+
+<h4>Return Values</h4>
+
+<p>String containing the hash of the active user identifier.</p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.fetchUserHash();</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-fetch-user-hash)</pre>

@@ -783,13 +783,13 @@ public abstract class BaseScriptEngine
         ProbeManager.nudgeProbes(this._context);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_set_user_id.html", category = R.string.docs_script_category_configuration, arguments = { "userId", "refresh" })
     public void setUserId(String userId)
     {
         this.setUserId(userId, true);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_set_user_id.html", category = R.string.docs_script_category_configuration, arguments = { "userId", "refresh" })
     public void setUserId(String userId, boolean refreshConfig)
     {
         HashMap<String, Object> payload = new HashMap<String, Object>();
@@ -815,7 +815,7 @@ public abstract class BaseScriptEngine
             this.refreshConfigUrl();
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_fetch_user_id.html", category = R.string.docs_script_category_configuration, arguments = { })
     public String fetchUserId()
     {
         HashMap<String, Object> payload = new HashMap<String, Object>();
@@ -826,7 +826,7 @@ public abstract class BaseScriptEngine
         return EncryptionManager.getInstance().getUserId(this._context);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_fetch_user_hash.html", category = R.string.docs_script_category_configuration, arguments = { })
     public String fetchUserHash()
     {
         HashMap<String, Object> payload = new HashMap<String, Object>();
@@ -1438,7 +1438,7 @@ public abstract class BaseScriptEngine
         return PurpleRobotApplication.updateFromMap(this._context, config);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_update_config.html", category = R.string.docs_script_category_configuration, arguments = { "key", "value" })
     public boolean updateConfig(String key, Object value)
     {
         Map<String, Object> values = new HashMap<String, Object>();

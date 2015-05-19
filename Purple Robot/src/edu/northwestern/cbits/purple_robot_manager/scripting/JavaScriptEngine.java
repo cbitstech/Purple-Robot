@@ -330,7 +330,7 @@ public class JavaScriptEngine extends BaseScriptEngine
         return config.toString();
     }
 
-    @ScriptingEngineMethod(language = "JavaScript")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_update_config_map.html", category = R.string.docs_script_category_configuration, arguments = { "configMap" })
     public boolean updateConfig(NativeObject nativeObj)
     {
         Map<String, Object> paramsMap = JavaScriptEngine.nativeToMap(nativeObj);

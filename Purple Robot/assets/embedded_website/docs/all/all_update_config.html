@@ -1,0 +1,41 @@
+<p>
+    Updates a single setting value of the Purple Robot instance.
+</p>
+<p>
+    Note that a batch version of this function exists to update multiple settings at once: <code><a href="all_update_config_map.html">PurpleRobot.updateConfig(mapObject)</a></code>.
+</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><code>key</code> - Key used by the internal <code><a href="http://developer.android.com/reference/android/content/SharedPreferences.html">SharedPreferences</a></code> object.</p>
+
+<p>
+    <code>value</code> - String or Boolean value of the updated setting.
+    Note that numeric values (such as upload intervals) are persisted internally as strings to work with <a href="http://developer.android.com/guide/topics/ui/settings.html">the Android settings UI infrastructure</a>.
+</p>
+
+<h4>Return Values</h4>
+
+<p>Boolean value indicating whether the setting was updated successfully.</p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">// Mute sanity check warnings...
+PurpleRobot.updateConfig("config_mute_warnings", true);
+
+// Set a password on the embedded HTTP server...
+PurpleRobot.updateConfig("config_builtin_http_server_password", "cant-guess-this");
+
+// Configure the logging system to attempt an upload once every 60 seconds...
+PurpleRobot.updateConfig("config_log_upload_interval", "60000");</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">;;; Mute sanity check warnings...
+(pr-update-config "config_mute_warnings" #t)
+
+;;; Set a password on the embedded HTTP server...
+(pr-update-config "config_builtin_http_server_password" "cant-guess-this")
+
+;;; Configure the logging system to attempt an upload once every 60 seconds...
+(pr-update-config "config_log_upload_interval" "60000")</pre>

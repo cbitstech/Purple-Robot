@@ -1,0 +1,28 @@
+<p>
+    Batch updates a variety of setting values of the Purple Robot instance.
+</p>
+<p>
+    Note that a version of this function exists to update a single setting at once: <code><a href="all_update_config.html">PurpleRobot.updateConfig(key, value)</a></code>.
+</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><code>configMap</code> - Dictionary or dictionary-like structure containing the setting names and values to apply to the Purple Robot instance.
+
+<h4>Return Values</h4>
+
+<p>Boolean value indicating whether the settings were updated successfully.</p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.updateConfig({ 
+    "config_mute_warnings": true, 
+    "config_builtin_http_server_password": "cant-guess-this",
+    "config_log_upload_interval": "60000"
+});</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-update-config '(("config_mute_warnings" . #t)
+                    ("config_builtin_http_server_password" . "cant-guess-this")
+                    ("config_log_upload_interval" . "60000")))</pre>

@@ -294,7 +294,7 @@ public class SchemeEngine extends BaseScriptEngine
                 cancelAction.toString());
     }
 
-    @ScriptingEngineMethod(language = "Scheme")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_update_config_map.html", category = R.string.docs_script_category_configuration, arguments = { "configMap" })
     public boolean updateConfig(Pair parameters)
     {
         Map<String, Object> paramsMap = SchemeEngine.parsePairList(parameters);

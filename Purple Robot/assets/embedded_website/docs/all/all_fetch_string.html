@@ -1,86 +1,35 @@
 <p>
-    Plays the audio notification specified by <code>tone</code> on the device.
+    Retrieves the value saved to the local persistence store using <code>key</code> previously persisted with <code><a href="all_persist_string.html">PurpleRobot.persistString</a></code>.
+</p>
+
+<p>
+    If collections of <code>values</code> should be aggregated into separate collections - to support multiple simultaneous Purple Robot clients - the scripting API provides an alternative function where a namespace may be specified:
+</p>
+
+<code>PurpleRobot.fetchString(namespace, key)</code>
+
+<p style="margin-top: 1em;">
+    Values saved with a <code>namespace</code> parameter may be retrieved with other <code>key</code>/<code>value</code> pairs persisted in the same namespace using the <code><a href="all_fetch_namespace.html">PurpleRobot.fetchNamespace</a></code> function.
 </p>
 
 <h4 class="code_arguments_label">Arguments</h4>
 
-<p>
-    <code>tone</code> - Name of the notification tone to play.
-</p>
+<p><code>key</code> - Key used to retrieve previously persisted value.</p>
 
-<p>
-    <code>loops</code> (Optional) - Boolean value specifying whether to repeat playing the tone in a loop. Default is <code>false</code>.
-</p>
-<p>
-    See <code><a href="all_stop_playback.html">PurpleRobot.stopPlayback</a></code> for details about canceling a looping tone.
-</p>
+<p><code>namespace</code> (Optional) - Namespace containing the <code>key</code>/<code>value</code> pair.</p>
 
 <h4>Return Values</h4>
 
-<p><em>None</em></p>
-
-<h4 class="code_arguments_label">Discussion</h4>
-
-<p>The names and availability of specific tones will vary by device and manufacturer.</p>
-
-<p>Tones available on vanilla Android 4.x devices:</p>
-
-<ul>
-    <li>Hydra</li>
-    <li>Machina</li>
-    <li>Orion</li>
-    <li>Pegasus</li>
-    <li>Perseus</li>
-    <li>Pyxis</li>
-    <li>Radiation</li>
-    <li>Robots for Everyone</li>
-    <li>Scarabaeus</li>
-    <li>Sceptrum</li>
-    <li>Solarium</li>
-    <li>Themos</li>
-    <li>UrsaMinor</li>
-    <li>Zeta</li>
-</ul>
-
-<p>Tones available on vanilla Android 5.x devices:</p>
-
-<ul>
-    <li>Callisto</li>
-    <li>Dione</li>
-    <li>Ganymede</li>
-    <li>Luna</li>
-    <li>Oberon</li>
-    <li>Phobos</li>
-    <li>Robots for Everyone</li>
-    <li>Sedna</li>
-    <li>Spagnola Orchestration</li>
-    <li>Titania</li>
-    <li>Triton</li>
-    <li>Umbriel</li>
-    <li>Zeta</li>
-</ul>
-
-<p>Tones bundled with Purple Robot:</p>
-
-<ul>
-    <li>CRcv</li>
-    <li>Csnd</li>
-    <li>Error</li>
-    <li>New</li>
-    <li>Off</li>
-    <li>On</li>
-</ul>
-
-<p>These tones originated as part of the <a href="http://www.adiumxtras.com/index.php?a=xtras&xtra_id=602">Tokyo Train Station</a> Adium plugin.</p>
+<p>String containing the previously persisted value, <code>null</code> if entry exists under <code>key</code>.</p>
 
 <h3 class="language_definition">JavaScript Example</h3>
 
-<pre id="javascript_example">PurpleRobot.playTone('CRcv');
+<pre id="javascript_example">PurpleRobot.fetchString("foo");
 
-PurpleRobot.playTone('CSnd', true);</pre>
+PurpleRobot.fetchString("my-namespace", "foo",);</pre>
 
 <h3 class="language_definition">Scheme Example</h3>
 
-<pre id="scheme_example">(pr-play-tone "CRcv")
+<pre id="scheme_example">(pr-fetch-string "foo")
 
-(pr-play-tone "CSnd" #t)</pre>
+;;; TODO: Scheme equivalent w/ namespace...</pre>

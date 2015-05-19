@@ -1,0 +1,30 @@
+<p>
+    Sets the user identifier for the Purple Robot instance.
+</p>
+
+<p>
+    User identifiers are primarily used to determine the ownership of transmitted data.
+    Uploaded payloads are tagged with a one-way hash of the user identifer to specify the source of the data.
+    See <code><a href="all_fetch_user_hash.html">PurpleRobot.fetchUserHash</a></code> for more specifics about the hash generation.
+</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><code>userId</code>: String containing the new user identifier.</p>
+<p><code>refresh</code> (Optional): Boolean value specifying whether the device configuration should be refreshed with the new identifier. Default is <code>true</code>.</p>
+
+<h4>Return Values</h4>
+
+<p><em>None</em></p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.setUserId("foo@bar.com");
+
+PurpleRobot.setUserId("foo@bar.com", false);</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-set-user-id "foo@bar.com")
+
+(pr-set-user-id "foo@bar.com" #f)</pre>
