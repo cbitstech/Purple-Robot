@@ -1,0 +1,27 @@
+<p>
+    Launches a local Android app with human-readable name or package name matching <code>applicationName</code>.
+</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><code>applicationName</code> - Name of the specified app.</p>
+
+<p><code>options</code> (Optional) - Dictionary or dictionary-like object containing key-value pairs to pass to the application's launch <code>Intent</code>.</p>
+
+<p><code>script</code> (Optional) - Script to run after the successful launch of the specified app.</p>
+
+<h4>Return Values</h4>
+
+<p>Boolean <code>true</code> if the app was found and launched, <code>false</code> otherwise.</p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.launchApplication("Gmail");
+
+PurpleRobot.launchApplication("Maps", { "foo": "bar" }, "PurpleRobot.playDefaultTone()");</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-launch-application "Gmail")
+
+(pr-launch-application "Maps" '(("foo" . "bar")) "(pr-play-default-tone)")</pre>

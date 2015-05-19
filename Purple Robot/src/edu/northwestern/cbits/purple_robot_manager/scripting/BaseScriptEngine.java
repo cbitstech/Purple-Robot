@@ -37,6 +37,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -368,7 +369,7 @@ public abstract class BaseScriptEngine
         return true;
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_launch_url.html", category = R.string.docs_script_category_system_integration, arguments = { "url" })
     public boolean launchUrl(String urlString)
     {
         try
@@ -393,24 +394,29 @@ public abstract class BaseScriptEngine
         return false;
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_launch_internal_url.html", category = R.string.docs_script_category_system_integration, arguments = { "url" })
     public boolean launchInternalUrl(String urlString)
     {
-        Intent launchIntent = new Intent(this._context, WebActivity.class);
-        launchIntent.setData(Uri.parse(urlString));
-        launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        if (urlString.startsWith("file:///android_asset/") || urlString.startsWith("https://") || urlString.startsWith("http://"))
+        {
+            Intent launchIntent = new Intent(this._context, WebActivity.class);
+            launchIntent.setData(Uri.parse(urlString));
+            launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-        this._context.startActivity(launchIntent);
+            this._context.startActivity(launchIntent);
 
-        HashMap<String, Object> payload = new HashMap<String, Object>();
-        payload.put("url", urlString);
-        LogManager.getInstance(this._context).log("pr_launch_internal_url", payload);
+            HashMap<String, Object> payload = new HashMap<String, Object>();
+            payload.put("url", urlString);
+            LogManager.getInstance(this._context).log("pr_launch_internal_url", payload);
 
-        return true;
+            return true;
+        }
+
+        return false;
     }
 
     @SuppressLint("DefaultLocale")
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_package_for_application_name.html", category = R.string.docs_script_category_system_integration, arguments = { "applicationName" })
     public String packageForApplicationName(String applicationName)
     {
         if (applicationName == null)
@@ -446,7 +452,30 @@ public abstract class BaseScriptEngine
 
             packageName = null;
 
-        return packageName;
+        if (packageName == null)
+        {
+            List<ApplicationInfo> apps = this._context.getPackageManager().getInstalledApplications(PackageManager.GET_META_DATA);
+
+            for (ApplicationInfo app : apps)
+            {
+                String thisAppName = app.loadLabel(this._context.getPackageManager()).toString();
+
+                if (applicationName.toLowerCase().equals(thisAppName.toLowerCase()))
+                    return app.packageName;
+            }
+        }
+
+        try
+        {
+            if (this._context.getPackageManager().getPackageInfo(applicationName, 0) != null)
+                return applicationName;
+        }
+        catch (NameNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     @ScriptingEngineMethod(language = "All", assetPath = "all_version.html", category = R.string.docs_script_category_diagnostic, arguments = { })
@@ -1054,7 +1083,7 @@ public abstract class BaseScriptEngine
         return false;
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_launch_application.html", category = R.string.docs_script_category_system_integration, arguments = { "applicationName", "options", "script" })
     public boolean launchApplication(String applicationName)
     {
         return this.launchApplication(applicationName, new HashMap<String, Object>(), null);

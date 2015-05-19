@@ -1,0 +1,24 @@
+<p>
+    Launches a local Android activity configured to open <code>url</code>.
+    Note that not all URLs point to web pages this function can open app-specific locations.
+</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><code>url</code> - URL to open locally.</p>
+
+<h4>Return Values</h4>
+
+<p>Boolean <code>true</code> if the app was found to launch <code>url</code>, <code>false</code> otherwise.</p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.launchUrl("http://cbits.northwestern.edu");
+
+PurpleRobot.launchUrl("geo:0,0?q=1600+Amphitheatre+Parkway%2C+CA");</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-launch-url "http://cbits.northwestern.edu")
+
+(pr-launch-url "geo:0,0?q=1600+Amphitheatre+Parkway%2C+CA")</pre>

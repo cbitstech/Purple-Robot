@@ -380,7 +380,7 @@ public class SchemeEngine extends BaseScriptEngine
         super.fetchLabels(appContext, instructions, SchemeEngine.parsePairList(labels));
     }
 
-    @ScriptingEngineMethod(language = "Scheme")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_launch_application.html", category = R.string.docs_script_category_system_integration, arguments = { "applicationName", "options", "script" })
     public boolean launchApplication(String applicationName, final Pair launchParams, final String script)
     {
         return this.launchApplication(applicationName, SchemeEngine.parsePairList(launchParams), script);

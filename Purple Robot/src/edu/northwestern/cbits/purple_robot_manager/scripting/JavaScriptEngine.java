@@ -143,7 +143,7 @@ public class JavaScriptEngine extends BaseScriptEngine
         return this.updateWidget(title, message, applicationName, JavaScriptEngine.nativeToMap(launchParams), script);
     }
 
-    @ScriptingEngineMethod(language = "JavaScript")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_launch_application.html", category = R.string.docs_script_category_system_integration, arguments = { "applicationName", "options", "script" })
     public boolean launchApplication(String applicationName, final NativeObject launchParams, final String script)
     {
         return this.launchApplication(applicationName, JavaScriptEngine.nativeToMap(launchParams), script);

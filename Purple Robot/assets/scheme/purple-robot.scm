@@ -8,8 +8,10 @@
 (define pr-set-user-id (lambda args (apply .setUserId (cons PurpleRobot args))))
 (define pr-fetch-user-hash (lambda () (.fetchUserHash PurpleRobot)))
 (define pr-update-config (lambda args (apply .updateConfig (cons PurpleRobot args))))
-
+(define pr-package-name (lambda (applicationName) (.packageForApplicationName PurpleRobot applicationName)))
+(define pr-launch-application (lambda args (apply .launchApplication (cons PurpleRobot args))))
 (define pr-launch-url (lambda (url)  (.launchUrl PurpleRobot url)))
+
 (define pr-launch-internal-url (lambda (url)  (.launchInternalUrl PurpleRobot url)))
 (define pr-emit-toast (lambda args (apply .emitToast (cons PurpleRobot args))))
 (define pr-update-config-url (lambda (url) (.updateConfigUrl PurpleRobot url)))
@@ -28,7 +30,6 @@
 (define pr-delete-trigger (lambda (trigger-id) (.deleteTrigger PurpleRobot trigger-id)))
 (define pr-clear-triggers (lambda () (.clearTriggers PurpleRobot)))
 (define pr-log (lambda (message) (.log PurpleRobot message)))
-(define pr-launch-application (lambda (app-name) (.launchApplication PurpleRobot app-name)))
 (define pr-vibrate (lambda args (apply .vibrate (cons PurpleRobot args))))
 (define pr-persist-string (lambda (key value) (.persistString PurpleRobot key value)))
 (define pr-fetch-string (lambda (key) (.fetchString PurpleRobot key)))
