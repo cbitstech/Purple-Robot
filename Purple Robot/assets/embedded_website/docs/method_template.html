@@ -39,7 +39,21 @@
 
                     if (language != "---")
                     {
-                        var script = $("pre#" + language.toLowerCase() + "_example").text();
+                        var original = $("pre#" + language.toLowerCase() + "_example").text();
+                        var script = null;
+
+                        // Only use highlighted text...
+                        if (window.getSelection)
+                            script = window.getSelection().toString().trim();
+                        else if (document.selection && document.selection.type != "Control")
+                            script = document.selection.createRange().text.trim();
+
+                        if (script != null && original.indexOf(script) != -1)
+                        {
+                            // Looks good...
+                        }
+                        else
+                            script = original;
 
                         if (language == "JavaScript")
                         {
@@ -59,6 +73,13 @@
                     }
 
                     $("textarea#test_payload").val(JSON.stringify(payload, null, 2));
+                });
+
+                $("button#code_refresh").click(function(event)
+                {
+                    event.preventDefault();
+
+                    $("select#test_language").change();
                 });
 
                 $("form#test_form").submit(function(event)
@@ -97,13 +118,19 @@
 
             <h3 class="test_script">Test Method</h3>
 
-            <span style="float: right;"><select id="test_language">
-                <option value="---">Select a language&#8230;</option>
-            </select></span>
-
+            <div class="row" style="margin-bottom: 10px;">
+                <div class="col-xs-4">
+                    <label for="test_payload">HTTP POST Payload</label>
+                </div>
+                <div class="col-xs-8">
+                    <button id="code_refresh" class="btn btn-default pull-right" style="height: 33px;"><span class="glyphicon glyphicon-refresh"></span></button>
+                    <select id="test_language" class="form-control pull-right" style="margin-right: 10px; width: 160px;">
+                        <option value="---">Select a language&#8230;</option>
+                    </select>
+                </div>
+            </div>
             <form id="test_form">
                 <div class="form-group">
-                    <label for="test_payload">HTTP POST Payload</label>
                     <textarea class="form-control" rows="8" id="test_payload"></textarea>
                 </div>
                 <button type="submit" class="btn btn-default">Send Payload</button>

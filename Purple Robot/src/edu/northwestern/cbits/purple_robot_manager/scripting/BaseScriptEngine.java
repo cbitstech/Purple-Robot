@@ -1282,16 +1282,16 @@ public abstract class BaseScriptEngine
         return intent;
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_show_native_dialog.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "title", "message", "confirmLabel", "cancelLabel", "confirmScript", "cancelScript", "tag", "priority" })
     public void showNativeDialog(final String title, final String message, final String confirmTitle, final String cancelTitle, final String confirmScript, final String cancelScript)
     {
         DialogActivity.showNativeDialog(this._context, title, message, confirmTitle, cancelTitle, confirmScript, cancelScript, null, 0);
     }
 
-    @ScriptingEngineMethod(language = "All")
-    public void showNativeDialog(final String title, final String message, final String confirmTitle, final String cancelTitle, final String confirmScript, final String cancelScript, String tag, long priority)
+    @ScriptingEngineMethod(language = "All", assetPath = "all_show_native_dialog.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "title", "message", "confirmLabel", "cancelLabel", "confirmScript", "cancelScript", "tag", "priority" })
+    public void showNativeDialog(final String title, final String message, final String confirmLabel, final String cancelLabel, final String confirmScript, final String cancelScript, String tag, int priority)
     {
-        DialogActivity.showNativeDialog(this._context, title, message, confirmTitle, cancelTitle, confirmScript, cancelScript, tag, priority);
+        DialogActivity.showNativeDialog(this._context, title, message, confirmLabel, cancelLabel, confirmScript, cancelScript, tag, priority);
     }
 
     @ScriptingEngineMethod(language = "All")

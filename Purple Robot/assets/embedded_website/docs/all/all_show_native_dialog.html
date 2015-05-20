@@ -1,0 +1,72 @@
+<p>Displays a Purple Robot native dialog with the provided values.</p>
+<p>
+    <code>confirmLabel</code> and <code>cancelLabel</code> provide the label for the dialog's buttons.
+    If either of those values are empty strings, the corresponding buttons will be omitted from the dialog.
+</p>
+
+<p>
+    <code>confirmScript</code> and <code>cancelScript</code> are variables containing a Purple Robot script that will be run when the corresponding button is pressed.
+    If an empty script is provided, the corresponding button press will only dismiss the dialog and not execute any further actions.
+</p>
+
+<p>
+    The optional string parameter <code>tag</code> is used to group related dialogs.
+    This is primarily used in the <code><a href="all_clear_native_dialogs.html">PurpleRobot.clearNativeDialogs</a></code> function where all dialogs with the same <code>tag</code> will be dismissed and removed from the display queue when that function is invoked with a matching <code>tag</code> parameter.
+</p>
+
+<p>
+    The order of dialogs can be manipulated by using the optional <code>priority</code> parameter.
+    Priorities are specified as integers and dialogs with higher priorities will take display precendece over lower priority dialogs.
+    Dialogs dismissed because of prioritization will reappear immediately after the higher priority dialogs close.
+</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><code>title</code> - Dialog title.</p>
+<p><code>message</code> - Dialog message.</p>
+<p><code>confirmLabel</code> - Label for the positive action button. May be an empty string to omit the positive button.</p>
+<p><code>cancelLabel</code> - Label for the negative action button. May be an empty string to omit the negative button.</p>
+<p><code>confirmScript</code> - Script to be executed when the positive action button is pressed. May be an empty string for no action.</p>
+<p><code>cancelScript</code> - Script to be executed when the negative action button is pressed. May be an empty string for no action.</p>
+<p><code>tag</code> (optional) - String associating the dialog to a group of dialogs with the same <code>tag</code>.</p>
+<p><code>priority</code> (optional) - Disply priority of the dialog. Higher priority dialogs will appear above and before lower priority dialogs.</p>
+
+<h4>Return Values</h4>
+
+<p><em>None</em></p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.showNativeDialog("My Native Dialog", "This is my native dialog.\n\nWhat do you think about it?", "Groovy", "Meh", "PurpleRobot.emitToast(\"Thanks!\");", "PurpleRobot.emitToast(\"We'll try harder next time.\");");
+
+PurpleRobot.showNativeDialog("Low Priority Dialog", "I'm not so important.", "Ok", "", "", "", "low-priority", 1);
+
+PurpleRobot.showNativeDialog("High Priority Dialog", "I'm super important!", "Ok", "", "", "", "high-priority", 10);</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-show-native-dialog "My Native Dialog"
+                       "This is my native dialog.\n\nWhat do you think about it?"
+                       "Groovy"
+                       "Meh"
+                       '(pr-emit-toast "Thanks!")
+                       '(pr-emit-toast "We'll try harder next time."))
+
+(pr-show-native-dialog "Low Priority Dialog"
+                       "I'm not so important."
+                       "Ok"
+                       ""
+                       ""
+                       ""
+                       "low-priority"
+                       1)
+
+(pr-show-native-dialog "High Priority Dialog"
+                       "I'm super important!"
+                       "Ok"
+                       ""
+                       ""
+                       ""
+                       "high-priority"
+                       10)</pre>
+

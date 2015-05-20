@@ -286,12 +286,20 @@ public class SchemeEngine extends BaseScriptEngine
         return b;
     }
 
-    @ScriptingEngineMethod(language = "Scheme")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_show_native_dialog.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "title", "message", "confirmLabel", "cancelLabel", "confirmScript", "cancelScript", "tag", "priority" })
     public void showNativeDialog(String title, String message, String confirmTitle, String cancelTitle,
             Pair confirmAction, Pair cancelAction)
     {
         this.showNativeDialog(title, message, confirmTitle, cancelTitle, confirmAction.toString(),
                 cancelAction.toString());
+    }
+
+    @ScriptingEngineMethod(language = "All", assetPath = "all_show_native_dialog.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "title", "message", "confirmLabel", "cancelLabel", "confirmScript", "cancelScript", "tag", "priority" })
+    public void showNativeDialog(String title, String message, String confirmTitle, String cancelTitle,
+                                 Pair confirmAction, Pair cancelAction, String tag, int priority)
+    {
+        this.showNativeDialog(title, message, confirmTitle, cancelTitle, confirmAction.toString(),
+                cancelAction.toString(), tag, priority);
     }
 
     @ScriptingEngineMethod(language = "All", assetPath = "all_update_config_map.html", category = R.string.docs_script_category_configuration, arguments = { "configMap" })
