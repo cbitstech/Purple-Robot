@@ -1,0 +1,30 @@
+<p>Removes from the screen and the display queue all dialogs previously created by <code><a href="all_snow_native_dialog.html">PurpleRobot.showNativeDialog</a></code> with <code>tag</code>.</p>
+
+<p>If the <code>tag</code> parameter is omitted <em>all</em> dialogs are cleared.</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p>
+    <code>tag</code> (optional)- Identifier for one or a group of dialogs.
+    If omitted, Purple Robot clears all dialogs.
+</p>
+
+<h4>Return Values</h4>
+
+<p><em>None</em></p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.showNativeDialog("My Native Dialog", "This is my native dialog.\n\nWhat do you think about it?", "Groovy", "Meh", "PurpleRobot.emitToast(\"Thanks!\");", "PurpleRobot.emitToast(\"We'll try harder next time.\");", "my-tag", 1);
+PurpleRobot.clearNativeDialogs("my-tag");
+
+PurpleRobot.showNativeDialog("Another Dialog", "This is another dialog.\n\nWhat do you think about it?", "Groovy", "Meh", "PurpleRobot.emitToast(\"Thanks!\");", "PurpleRobot.emitToast(\"We'll try harder next time.\");", "another-tag", 2);
+PurpleRobot.clearNativeDialogs();</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-show-native-dialog "My Native Dialog" "This is my native dialog.\n\nWhat do you think about it?" "Groovy" "Meh" "PurpleRobot.emitToast(\"Thanks!\");" "PurpleRobot.emitToast(\"We'll try harder next time.\");" "my-tag" 1)
+(pr-clear-native-dialogs "my-tag")
+
+(pr-show-native-dialog "Another Dialog" "This is another dialog.\n\nWhat do you think about it?" "Groovy" "Meh" "PurpleRobot.emitToast(\"Thanks!\");" "PurpleRobot.emitToast(\"We'll try harder next time.\");" "another-tag" 0)
+(pr-clear-native-dialogs)</pre>

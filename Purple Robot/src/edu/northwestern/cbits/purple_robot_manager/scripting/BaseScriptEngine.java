@@ -1294,13 +1294,13 @@ public abstract class BaseScriptEngine
         DialogActivity.showNativeDialog(this._context, title, message, confirmLabel, cancelLabel, confirmScript, cancelScript, tag, priority);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_clear_native_dialogs.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "tag" })
     public void clearNativeDialogs()
     {
         DialogActivity.clearNativeDialogs(this._context);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_clear_native_dialogs.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "tag" })
     public void clearNativeDialogs(String tag)
     {
         DialogActivity.clearNativeDialogs(this._context, tag, null);

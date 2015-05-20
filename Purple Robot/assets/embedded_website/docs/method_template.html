@@ -48,7 +48,7 @@
                         else if (document.selection && document.selection.type != "Control")
                             script = document.selection.createRange().text.trim();
 
-                        if (script != null && original.indexOf(script) != -1)
+                        if (script != null && script.length > 0 && original.indexOf(script) != -1)
                         {
                             // Looks good...
                         }

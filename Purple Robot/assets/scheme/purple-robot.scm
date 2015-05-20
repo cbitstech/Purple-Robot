@@ -18,6 +18,7 @@
 (define pr-launch-internal-url (lambda (url)  (.launchInternalUrl PurpleRobot url)))
 (define pr-show-application-launch-notification (lambda args (apply .showApplicationLaunchNotification (cons PurpleRobot args))))
 (define pr-show-native-dialog (lambda args (apply .showNativeDialog (cons PurpleRobot args))))
+(define pr-clear-native-dialogs (lambda args (apply .clearNativeDialogs (cons PurpleRobot args))))
 
 (define pr-emit-toast (lambda args (apply .emitToast (cons PurpleRobot args))))
 (define pr-update-config-url (lambda (url) (.updateConfigUrl PurpleRobot url)))
