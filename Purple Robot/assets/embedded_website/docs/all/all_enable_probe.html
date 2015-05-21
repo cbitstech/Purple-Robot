@@ -1,0 +1,24 @@
+<p>Enables a single Purple Robot probe named <code>probeName</code>.</p>
+
+<p>
+    Note that if probe data collection is disabled (via the settings or <code><a href="all_disable_probes.html">PurpleRobot.disableProbes</a></code>, calling this function will not automatically reenable probe data collection.
+    Call <code><a href="all_enable_probes.html">PurpleRobot.enableProbes</a></code> to enable probe data collection.
+</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p>
+    <code>probeName</code>: Name of the probe to enable. See <a href="/docs/probes/">the probe documentation</a> for a full list of probes and their names.
+</p>
+
+<h4>Return Values</h4>
+
+<p><em>None</em></p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.enableProbe("edu.northwestern.cbits.purple_robot_manager.probes.builtin.RobotHealthProbe");</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-enable-probe "edu.northwestern.cbits.purple_robot_manager.probes.builtin.RobotHealthProbe")</pre>

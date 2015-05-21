@@ -1,0 +1,20 @@
+<p>Returns <code>true</code> if the local device is equipped with <a href="http://en.wikipedia.org/wiki/Near_field_communication">an NFC scanning initiator</a>, <code>false</code> if the system cannot read NFC tags.</p>
+
+<p>
+	See <code><a href="all_scan_nfc.html">PurpleRobot.scanNFC</a></code> for details about initiating an NFC scan, and <code><a href="all_cancel_nfc_scan.html">PurpleRobot.cancelNFCScan</a></code> to dismiss an active scan.
+</p>
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><em>None</em></p>
+
+<h4>Return Values</h4>
+
+<p>Boolean value indicating whether the system is equipped with NFC hardware.</p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.canScanNFC();</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-can-scan-nfc?)</pre>

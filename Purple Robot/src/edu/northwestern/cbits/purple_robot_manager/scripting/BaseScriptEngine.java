@@ -135,7 +135,6 @@ public abstract class BaseScriptEngine
         LogManager.getInstance(this._context).log("pr_script_log_message", payload);
     }
 
-    @ScriptingEngineMethod(language = "All")
     public void testLog(Object message)
     {
         this.log(message);
@@ -673,28 +672,34 @@ public abstract class BaseScriptEngine
         // TODO
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_enable_probes.html", category = R.string.docs_script_category_data_collection, arguments = { })
     public void enableProbes()
     {
         ProbeManager.enableProbes(this._context);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_disable_probes.html", category = R.string.docs_script_category_data_collection, arguments = { })
     public void disableProbes()
     {
         ProbeManager.disableProbes(this._context);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_disable_each_probe.html", category = R.string.docs_script_category_data_collection, arguments = { })
     public void disableEachProbe()
     {
         ProbeManager.disableEachProbe(this._context);
     }
 
-    @ScriptingEngineMethod(language = "All")
-    public boolean probesState()
+    @ScriptingEngineMethod(language = "All", assetPath = "all_probes_enabled.html", category = R.string.docs_script_category_data_collection, arguments = { })
+    public boolean probesEnabled()
     {
         return ProbeManager.probesState(this._context);
+    }
+
+    public boolean probesState()
+    {
+        // Left for script compatibility
+        return this.probesEnabled();
     }
 
     protected void transmitData(Bundle data)
@@ -709,7 +714,7 @@ public abstract class BaseScriptEngine
         localManager.sendBroadcast(intent);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_disable_probe.html", category = R.string.docs_script_category_data_collection, arguments = {"probeName" })
     public void disableProbe(String probeName)
     {
         ProbeManager.disableProbe(this._context, probeName);
@@ -728,7 +733,7 @@ public abstract class BaseScriptEngine
         LegacyJSONConfigFile.update(this._context, true);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_set_password.html", category = R.string.docs_script_category_configuration, arguments = { "password" })
     public void setPassword(String password)
     {
         if (password == null || password.trim().length() == 0)
@@ -743,7 +748,7 @@ public abstract class BaseScriptEngine
         }
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_clear_password.html", category = R.string.docs_script_category_configuration, arguments = { })
     public void clearPassword()
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
@@ -753,7 +758,7 @@ public abstract class BaseScriptEngine
         e.commit();
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_enable_background_image.html", category = R.string.docs_script_category_configuration, arguments = { })
     public void enableBackgroundImage()
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
@@ -788,7 +793,7 @@ public abstract class BaseScriptEngine
         return false;
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_disable_background_image.html", category = R.string.docs_script_category_configuration, arguments = { })
     public void disableBackgroundImage()
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
@@ -866,7 +871,7 @@ public abstract class BaseScriptEngine
         return EncryptionManager.getInstance().getUserHash(this._context);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_restore_default_id.html", category = R.string.docs_script_category_configuration, arguments = { })
     public void restoreDefaultId()
     {
         HashMap<String, Object> payload = new HashMap<String, Object>();
@@ -899,7 +904,7 @@ public abstract class BaseScriptEngine
         e.commit();
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_enable_probe.html", category = R.string.docs_script_category_data_collection, arguments = {"probeName" })
     public void enableProbe(String probeName)
     {
         ProbeManager.enableProbe(this._context, probeName);
@@ -1188,13 +1193,19 @@ public abstract class BaseScriptEngine
         return false;
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_show_script_note.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "title", "message", "persistent", "script", "sticky" })
     public boolean showScriptNotification(String title, String message, boolean persistent, final String script)
     {
         return this.showScriptNotification(title, message, persistent, false, script);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_show_script_note.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "title", "message", "persistent", "script", "sticky" })
+    public boolean showScriptNotification(String title, String message, boolean persistent, final String script, boolean sticky)
+    {
+        return this.showScriptNotification(title, message, persistent, sticky, script);
+    }
+
+    @ScriptingEngineMethod(language = "All", assetPath = "all_show_script_note.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "title", "message", "persistent", "script", "sticky" })
     public boolean showScriptNotification(String title, String message, boolean persistent, boolean sticky, final String script)
     {
         try
@@ -1261,7 +1272,7 @@ public abstract class BaseScriptEngine
         return false;
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_cancel_script_note.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { })
     public void cancelScriptNotification()
     {
         NotificationManager noteManager = (NotificationManager) this._context.getSystemService(android.content.Context.NOTIFICATION_SERVICE);
@@ -1773,19 +1784,19 @@ public abstract class BaseScriptEngine
         return prefs.getString(DataUploadPlugin.UPLOAD_URI, null);
     }
 
-    @ScriptingEngineMethod(language = "All")
-    public void scanNFC()
+    @ScriptingEngineMethod(language = "All", assetPath = "all_scan_nfc.html", category = R.string.docs_script_category_data_collection, arguments = { })
+    public boolean scanNFC()
     {
-        NfcActivity.startScan(this._context);
+        return NfcActivity.startScan(this._context);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_can_scan_nfc.html", category = R.string.docs_script_category_data_collection, arguments = { })
     public boolean canScanNFC()
     {
         return NfcActivity.canScan(this._context);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_cancel_nfc_scan.html", category = R.string.docs_script_category_data_collection, arguments = { })
     public void cancelNFCScan()
     {
         NfcActivity.cancelScan();

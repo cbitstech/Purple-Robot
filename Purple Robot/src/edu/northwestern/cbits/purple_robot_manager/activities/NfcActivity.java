@@ -51,11 +51,21 @@ public class NfcActivity extends AppCompatActivity
         NfcActivity.RUN = false;
     }
 
-    public static void startScan(Context context)
+    public static boolean startScan(Context context)
     {
-        Intent intent = new Intent(context, NfcActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
+        if (NfcActivity.canScan(context))
+        {
+            if (NfcActivity.RUN == false)
+            {
+                Intent intent = new Intent(context, NfcActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     public static boolean canScan(Context context)
@@ -145,6 +155,9 @@ public class NfcActivity extends AppCompatActivity
     public void onNewIntent(Intent intent)
     {
         Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+
+        if (tag == null)
+            tag = this.getIntent().getParcelableExtra(NfcAdapter.EXTRA_TAG);
 
         final NfcActivity me = this;
 

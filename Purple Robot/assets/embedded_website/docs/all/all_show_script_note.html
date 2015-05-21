@@ -1,0 +1,23 @@
+<p>Displays a notification in the status bar that runs <code>script</code> when tapped.</p>
+
+<p>See <code><a href="all_cancel_script_note.html">PurpleRobot.cancelScriptNotification</a></code> for a mechanism for dismissing these notifications.
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><code>title</code> - Notification title string.</p>
+<p><code>message</code> - Notification message string.</p>
+<p><code>persistent</code> - Boolean specifying if the notification must be tapped to be dismissed (no swipe to clear).</p>
+<p><code>script</code> - Purple Robot script to run when a user taps the notification.</p>
+<p><code>sticky</code> (optional) - Boolean specifying if the notification should not disappear when tapped.</p>
+
+<h4>Return Values</h4>
+
+<p><em>None</em></p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.showScriptNotification("My Notification", "Tap here for magic!", true, "PurpleRobot.playDefaultTone();", true);</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-show-script-notification "My Notification" "Tap here for magic!" #t "(pr-play-default-tone)" #t)</pre>

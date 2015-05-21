@@ -1,0 +1,27 @@
+<p>Activates passive data collection using Purple Robot probes.</p>
+
+<p>
+    Note that this function enables overall probe data collection, it <em>does not</em> enable any individual probe.
+    Thus, any probes that were previously enabled before calling <code><a href="all_disable_probes.html">PurpleRobot.disableProbes</a></code> would resume data collection.
+    Any probes that were disabled would remain disabled.
+</p>
+
+<p>
+    To toggle the state of any individual probe, see <code><a href="all_enable_probe.html">PurpleRobot.enableProbe</a></code> and <code><a href="all_disable_probe.html">PurpleRobot.disableProbe</a></code>.
+</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><em>None</em></p>
+
+<h4>Return Values</h4>
+
+<p><em>None</em></p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.enableProbes();</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-enable-probes)</pre>

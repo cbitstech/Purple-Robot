@@ -1,0 +1,19 @@
+<p>Dismisses a notification created with <code><a href="all_show_script_note.html">PurpleRobot.showScriptNotification</a></code>.</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><em>None</em></p>
+
+<h4>Return Values</h4>
+
+<p><em>None</em></p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.showScriptNotification("My Notification", "Tap here for magic!", true, "PurpleRobot.playDefaultTone();", true);
+PurpleRobot.cancelScriptNotification();</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-show-script-notification "My Notification" "Tap here for magic!" #t "(pr-play-default-tone)" #t)
+(pr-cancel-script-notification)</pre>

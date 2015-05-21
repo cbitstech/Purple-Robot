@@ -1,0 +1,28 @@
+<p>Deactivates passive data collection using Purple Robot probes.</p>
+
+<p>
+    Note that this function disables overall probe data collection, it <em>does not</em> disable any individual probe.
+    Thus, any probes that were previously enabled before calling this function would resume data collection when <code><a href="all_enable_probes.html">PurpleRobot.enableProbes</a></code> is called.
+    Any probes that were disabled would remain disabled.
+</p>
+
+<p>
+    To toggle the state of any individual probe, see <code><a href="all_enable_probe.html">PurpleRobot.enableProbe</a></code> and <code><a href="all_disable_probe.html">PurpleRobot.disableProbe</a></code>.
+    To disable each individual probe <code><a href="all_disable_each_probe.html">PurpleRobot.disableEachProbe</a></code>.
+</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><em>None</em></p>
+
+<h4>Return Values</h4>
+
+<p><em>None</em></p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.disableProbes();</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-disable-probes)</pre>

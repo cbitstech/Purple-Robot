@@ -1,0 +1,20 @@
+<p>Launches an an iterface to scan <a href="http://en.wikipedia.org/wiki/Near_field_communication">NFC tags</a>on the local device. Returns <code>true</code> if the device can read NFC tags, <code>false</code> if the device lacks the necessary hardware and software.</p>
+
+<p>
+	See <code><a href="all_can_scan_nfc.html">PurpleRobot.canScanNFC</a></code> for details about testing for NFC features, and <code><a href="all_cancel_nfc_scan.html">PurpleRobot.cancelNFCScan</a></code> to dismiss an active scan.
+</p>
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><em>None</em></p>
+
+<h4>Return Values</h4>
+
+<p>Boolean value indicating whether the system is equipped with NFC hardware.</p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.scanNFC();</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-scan-nfc)</pre>
