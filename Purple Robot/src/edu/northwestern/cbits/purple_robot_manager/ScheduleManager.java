@@ -150,36 +150,53 @@ public class ScheduleManager
     {
         List<Map<String, String>> scripts = ScheduleManager.fetchScripts(context);
 
-        boolean found = false;
-
-        for (Map<String, String> script : scripts)
+        if (dateString == null || action == null)
         {
-            if (identifier.equals(script.get("identifier")))
+            Map<String, String> found = null;
+
+            for (Map<String, String> script : scripts)
             {
+                if (script.get("identifier").equals(identifier))
+                    found = script;
+            }
+
+            scripts.remove(found);
+
+            LogManager.getInstance(context).log("pr_cancel_scheduled_script", null);
+        }
+        else
+        {
+            boolean found = false;
+
+            for (Map<String, String> script : scripts)
+            {
+                if (identifier.equals(script.get("identifier")))
+                {
+                    script.put("date", dateString);
+                    script.put("action", action);
+
+                    found = true;
+                }
+            }
+
+            if (found == false)
+            {
+                HashMap<String, String> script = new HashMap<String, String>();
+
                 script.put("date", dateString);
                 script.put("action", action);
+                script.put("identifier", identifier);
 
-                found = true;
+                scripts.add(script);
             }
+
+            HashMap<String, Object> payload = new HashMap<String, Object>();
+            payload.put("scheduled_date", dateString);
+            payload.put("action", action);
+            payload.put("identifier", identifier);
+
+            LogManager.getInstance(context).log("pr_scheduled_script", null);
         }
-
-        if (found == false)
-        {
-            HashMap<String, String> script = new HashMap<String, String>();
-
-            script.put("date", dateString);
-            script.put("action", action);
-            script.put("identifier", identifier);
-
-            scripts.add(script);
-        }
-
-        HashMap<String, Object> payload = new HashMap<String, Object>();
-        payload.put("scheduled_date", dateString);
-        payload.put("action", action);
-        payload.put("identifier", identifier);
-
-        LogManager.getInstance(context).log("pr_scheduled_script", null);
 
         ScheduleManager.persistScripts(context, scripts);
     }
@@ -216,5 +233,10 @@ public class ScheduleManager
 
             return null;
         }
+    }
+
+    public static List<Map<String, String>> allScripts(Context context)
+    {
+        return ScheduleManager.fetchScripts(context);
     }
 }

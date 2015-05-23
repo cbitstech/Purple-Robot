@@ -23,7 +23,7 @@ public class PebbleProbesCheck extends SanityCheck
         this._errorMessage = null;
         this._errorLevel = SanityCheck.OK;
 
-        if (pebble.isEnabled(context) && livewell.isEnabled(context))
+        if (pebble != null && livewell != null && pebble.isEnabled(context) && livewell.isEnabled(context))
         {
             this._errorLevel = SanityCheck.WARNING;
             this._errorMessage = context.getString(R.string.name_sanity_pebble_probes_warning);

@@ -50,11 +50,11 @@
    		    android:summary="@string/summary_show_background"
         	android:key="config_show_background"
 			android:defaultValue="true"/>
-    	<CheckBoxPreference
+    	<!-- <CheckBoxPreference
 	   	    android:title="@string/config_hockey_update"
    		    android:summary="@string/summary_hockey_update"
         	android:key="config_hockey_update"
-      		android:defaultValue="false"/>
+      		android:defaultValue="false"/> -->
    		</PreferenceCategory>
     <PreferenceCategory android:title="@string/config_network_category">
     	<PreferenceScreen android:title="@string/title_shared_upload_section"

@@ -1,0 +1,238 @@
+<p>
+    Shows the Purple Robot labelling interface where users may self-report data.
+</p>
+
+<h4>Dynamic Labelling Interface</h4>
+
+<p>
+    This function allows for the creation of a dynamic labelling interface where the composition of the interface is specified using the <code>labels</code> parameter.
+    <code>labels</code> is a dictionary where the keys correspond to one the label and its value is another dictionary that specifies the parameters for the field.
+    Several attributes are supported on all label types:
+</p>
+
+<ul>
+    <li><code>name</code>: String value that will be used to identify the label's value in an emitted reading.</li>
+    <li><code>weight</code>: Numeric value that specifies the order of the label. Higher-weighted labels appear beneathe lower-weighted ones.</li>
+    <li><code>prompt</code>: Human readable prompt for the label's value.</li>
+    <li><code>type</code>: The type of value requested. May be one of <code>real</code>, <code>nominal</code>, and <code>text</code>.</li>
+</ul>
+
+<h5><code>text</code> Labels</h5>
+
+<p>
+    The <code>text</code> input type provides a free-text entry field where the user can provide a textual response.
+    Additional parameters:
+</p>
+
+<ul>
+    <li><code>placeholder</code>: Placeholder or "hint" text that suggests what to submit.</li>
+</ul>
+
+<p>Example:</p>
+
+<pre>var labels = {
+    "favorite_color": {
+        "name": "favorite_color",
+        "type": "text",
+        "weight": 1.0,
+        "prompt": "Please enter your favorite color below.",
+        "placeholder": "red, yellow, blue, etc."
+    }
+}
+
+PurpleRobot.fetchLabels("We'd like to learn more about colors.", labels);</pre>
+
+<h5><code>nominal</code> Labels</h5>
+
+<p>
+    The <code>nominal</code> input type provides "select one" interface where the user may choose one of several options as their response to the prompt.
+    Addition parameters:</p>
+</p>
+
+<ul>
+    <li><code>values</code>: Array or list containing a collection of string options for the user to choose from.</li>
+</ul>
+
+<p>Example:</p>
+
+<pre>var labels = {
+    "favorite_recent_president": {
+        "name": "favorite_recent_president",
+        "type": "nominal",
+        "weight": 1.0,
+        "prompt": "Please pick your favorite recent U.S. President.",
+        "values": [ "Jimmy Carter", "Ronald Reagan", "George H. Bush", "Bill Clinton", "George W. Bush", "Barack Obama" ]
+    }
+}
+
+PurpleRobot.fetchLabels("Now we'd like to know about your politics.", labels);</pre>
+
+<h5><code>real</code> Labels</h5>
+
+<p>
+    The <code>real</code> input type provides a slider interface that allows the user to select a numeric value from a possible range
+    Addition parameters:</p>
+</p>
+
+<ul>
+    <li><code>min</code>: Minimum value in the range.</li>
+    <li><code>max</code>: Maximum value in the range.</li>
+    <li>
+        <code>step</code>: Size of steps from <code>min</code> to <code>max</code> that may be selected.
+        For example, to only allow a user to select whole numbers, <code>step</code> would be <code>1.0</code>.
+    </li>
+</ul>
+
+<p>Example:</p>
+
+<pre>var labels = {
+    "favorite_number": {
+        "name": "favorite_number",
+        "type": "real",
+        "weight": 1.0,
+        "prompt": "What is your favorite number under 10?",
+        "min": 2,
+        "max": 8,
+        "step": 2
+    }
+}
+
+PurpleRobot.fetchLabels("Tell us about numbers.", labels);</pre>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p>
+    <code>context</code>: String describing the source or context of the labels.
+    This value is appended to the emitted readings.
+</p>
+
+<p><code>instructions</code>: String of directions presented before the labelling interface.</p>
+
+<p><code>labels</code>: Dictionary or dictionary-like object defining the parameters of the labels to collect.</p>
+
+<h4>Return Values</h4>
+
+<p><em>None</em></p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">var colorLabels = {
+    "favorite_color": {
+        "name": "favorite_color",
+        "type": "text",
+        "weight": 1.0,
+        "prompt": "Please enter your favorite color below.",
+        "placeholder": "red, yellow, blue, etc."
+    }
+}
+
+PurpleRobot.fetchLabels("colors", "We'd like to learn more about colors.", colorLabels);
+
+var presidentLabels = {
+    "favorite_recent_president": {
+        "name": "favorite_recent_president",
+        "type": "nominal",
+        "weight": 1.0,
+        "prompt": "Please pick your favorite recent U.S. President.",
+        "values": [ "Jimmy Carter", "Ronald Reagan", "George H. Bush", "Bill Clinton", "George W. Bush", "Barack Obama" ]
+    }
+}
+
+PurpleRobot.fetchLabels("presidents", "Now we'd like to know about your politics.", presidentLabels);
+
+var numberLabels = {
+    "favorite_number": {
+        "name": "favorite_number",
+        "type": "real",
+        "weight": 1.0,
+        "prompt": "What is your favorite number under 10?.",
+        "min": 2,
+        "max": 8,
+        "step": 2.0
+    }
+}
+
+PurpleRobot.fetchLabels("numbers", "Tell us about numbers.", numberLabels);
+
+var allLabels = {
+    "favorite_number": {
+        "name": "favorite_number",
+        "type": "real",
+        "weight": 3.0,
+        "prompt": "What is your favorite number under 10?",
+        "min": 2,
+        "max": 8,
+        "step": 2
+    },
+    "favorite_recent_president": {
+        "name": "favorite_recent_president",
+        "type": "nominal",
+        "weight": 2.0,
+        "prompt": "Please pick your favorite recent U.S. President.",
+        "values": [ "Jimmy Carter", "Ronald Reagan", "George H. Bush", "Bill Clinton", "George W. Bush", "Barack Obama" ]
+    },
+    "favorite_color": {
+        "name": "favorite_color",
+        "type": "text",
+        "weight": 1.0,
+        "prompt": "Please enter your favorite color below.",
+        "placeholder": "red, yellow, blue, etc."
+    }
+}
+
+PurpleRobot.fetchLabels("all", "Tell us about everything.", allLabels);</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(let ((labels '(("favorite_color" . (("name" . "favorite_color")
+                                     ("type" . "text")
+                                     ("weight" . 1.0)
+                                     ("prompt" . "Please enter your favorite color below.")
+                                     ("placeholder" . "red, yellow, blue, etc."))))))
+     (pr-fetch-labels "all" "We'd like to learn more about colors" labels))
+
+(let ((labels '(("favorite_recent_president" . (("name" . "favorite_recent_president")
+                                                ("type" . "nominal")
+                                                ("weight" . 1.0)
+                                                ("prompt" . "Please pick your favorite recent U.S. President.")
+                                                ("values" . ("Jimmy Carter"
+                                                             "Ronald Reagan"
+                                                             "George H. Bush"
+                                                             "Bill Clinton"
+                                                             "George W. Bush"
+                                                             "Barack Obama")))))))
+     (pr-fetch-labels "presidents" "Now we'd like to know about your politics" labels))
+
+(let ((labels '(("favorite_number" . (("name" . "favorite_number")
+                                      ("type" . "real")
+                                      ("weight" . 1.0)
+                                      ("prompt" . "What is your favorite number under 10?")
+                                      ("min" . 2)
+                                      ("max" . 8)
+                                      ("step" . 2))))))
+     (pr-fetch-labels "numbers" "Tell us about numbers." labels))
+
+;;; All at once...
+(let ((labels '(("favorite_color" . (("name" . "favorite_color")
+                                     ("type" . "text")
+                                     ("weight" . 1.0)
+                                     ("prompt" . "Please enter your favorite color below.")
+                                     ("placeholder" . "red, yellow, blue, etc.")))
+                ("favorite_recent_president" . (("name" . "favorite_recent_president")
+                                                ("type" . "nominal")
+                                                ("weight" . 1.0)
+                                                ("prompt" . "Please pick your favorite recent U.S. President.")
+                                                ("values" . ("Jimmy Carter"
+                                                             "Ronald Reagan"
+                                                             "George H. Bush"
+                                                             "Bill Clinton"
+                                                             "George W. Bush"
+                                                             "Barack Obama"))))
+                ("favorite_number" . (("name" . "favorite_number")
+                                      ("type" . "real")
+                                      ("weight" . 1.0)
+                                      ("prompt" . "What is your favorite number under 10?")
+                                      ("min" . 2)
+                                      ("max" . 8)
+                                      ("step" . 2))))))
+     (pr-fetch-labels "all" "Tell us about everything." labels))</pre>

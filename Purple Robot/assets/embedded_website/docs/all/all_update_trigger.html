@@ -1,0 +1,219 @@
+<p>Creates or updates a trigger.</p>
+
+<h4 style="margin-top: 2em;">Overview</h4>
+
+<p>
+    Purple Robot triggers are mechanisms by which the app can respond to changes in its environment.
+    All triggers include a human-readable name, a unique identifier, and a script action runs when the trigger's environmental conditions are met.
+</p>
+
+<p>
+    Currently, Purple Robot makes available two kinds of triggers: date-time triggers and probe triggers.
+</p>
+
+<p>
+    Date-time triggers fire when the wall-clock time matches a condition specified by <a href="http://en.wikipedia.org/wiki/ICalendar">the iCalendar specification</a>.
+    This allows triggers to be fired only once or multiple times if <a href="http://www.kanzaki.com/docs/ical/rrule.html">a recurrence rule</a> is provided.
+<p>
+
+<p>
+    Instead of a date-time specification, probe triggers include a small test script and probe name that identifies the specific probe that the trigger is monitoring.
+    When a probe generates a new reading, all monitoring triggers' test scripts are provided the probe data and run.
+    If the test script returns a <code>true</code> value, the trigger fires, and its action script runs.
+</p>
+
+<p>
+    As an aside, the functionality of the date-time trigger can be reproduced as a probe trigger that monitors the <code>DateCalendarProbe</code>.
+    It remains included in its current form because of its frequency of use and the advantages of encoding time-matching logic as an iCalendar recurrence rule.
+</p>
+
+<h4 style="margin-top: 2em;">Date-Time Triggers</h4>
+
+<p>
+    This is a trigger that plays the phone's default ringtone every hour encoded in JSON for use with the JavaScript API:
+</p>
+
+<pre>{ 
+    "identifier": "hourly-chime",
+    "name": "Hourly Chime",
+    "type": "datetime",
+    "action": "PurpleRobot.playDefaultTone();",
+    "datetime_start": "20150327T130000",
+    "datetime_end": "20150327T130100",
+    "datetime_random": false,
+    "datetime_repeat": "FREQ=HOURLY;INTERVAL=1;",
+    "fire_on_boot": true
+}</pre>
+
+<p>
+    The <code>identifier</code>, <code>name</code>, and <code>action</code> are all standard fields present on all triggers.
+    Also required on every trigger is the <code>type</code> parameter, which specifies that this trigger is a <code>datetime</code> trigger.
+</p>
+
+<p>
+    The other fields are specific to date-time triggers:
+</p>
+
+<ul>
+    <li>
+        <p>
+            <code>datetime_start</code> & <code>datetime_end</code>: Specifies the time range to use for matching when the trigger should fire using the format <code><a href="http://developer.android.com/reference/java/text/SimpleDateFormat.html">yyyyMMdd'T'HHmmss</a></code>
+            Note that trigger time intervals are not specified as single points in time, but instead as a period for when the trigger may fire.
+            <code>datetime_start</code> specifies the beginning of the period and <code>datetime_end</code> specifies the end.
+        </p>
+
+        <p>
+            <em>When</em> <code>datetime_random</code> <em>is not set to</em> <code>true</code>, the trigger will fire the first time the clock time falls within the period and it won't fire again until the current period has elapsed and a new period has begun (see <code>datetime_repeat</code> below.)
+        </p>
+
+        <p>
+            <em>If</em> <code>datetime_random</code> <em>is set to</em> <code>true</code>, the trigger will fire once at a random time between <code>datetime_start</code> and <code>datetime_random</code>.
+        </p>
+    </li>
+    <li>
+        <p>
+            <code>datetime_random</code>: Boolean that toggles the random firing mechanism.
+            Note that triggers are evaluated every minute, so a minute is the smallest quanta of time that can be used for scheduling trigger actions.
+            If a trigger should be fired once within a four hour period, <code>datetime_start</code> should specify the start of the period and <code>datetime_end</code> would specify the time four hours later.
+        </p>
+    </li>
+    <li>
+        <p>
+            <code>datetime_repeat</code>: If present, specifies how often the trigger time period should repeat.
+            In the example above, the time period is repeated hourly, so the <code>action</code> would be run once an hour during the first minute.
+            See <a href="http://www.kanzaki.com/docs/ical/rrule.html">the iCalendar recurrence rule documentation</a> for additional examples.
+        </p>
+    </li>
+    <li>
+        <p>
+            <code>fire_on_boot</code>: Boolean that specifies if the trigger should be fired when the device boots, <em>if</em> the device was not running during a time when the trigger should have fired.
+        </p>
+    </li>
+</ul>
+
+<p>
+    In Scheme, the trigger above would be specified in the following manner using a list of pairs:
+</p>
+
+<pre>'(("identifier" . "hourly-chime")
+  ("name" . "Hourly Chime")
+  ("type" . "datetime")
+  ("action" . "(pr-play-default-tone)")
+  ("datetime_start" . "20150327T130000")
+  ("datetime_end" . "20150327T130100")
+  ("datetime_random" . #f)
+  ("datetime_repeat" . "FREQ=HOURLY;INTERVAL=1;")
+  ("fire_on_boot" . #t))</pre>
+
+<h4 style="margin-top: 2em;">Probe Triggers</h4>
+
+<p>
+    Probe triggers are the second major component of the Purple Robot system in that they provide the mechanism by which Purple Robot can autonomously react to a changing world represented by the stream of readings from probes and other passive data sources.
+</p>
+
+<p>
+    A probe trigger that reacts to changes in the device's battery state may look like this:
+</p>
+
+<pre>{ 
+    "identifier": "low-battery",
+    "name": "Low Battery Warning",
+    "type": "probe",
+    "probe": "edu.northwestern.cbits.purple_robot_manager.probes.builtin.BatteryProbe",
+    "action": "PurpleRobot.playDefaultTone(); PurpleRobot.showNativeDialog('Battery Warning', 'Your battery is running low.\n\Please plug it in!', 'Sure', 'Maybe Later', '', '');",
+    "test": "var level = extras['level']; var lastLevel = PurpleRobot.fetchString('battery-probe', 'level');  if (lastLevel == null) lastLevel = 101.0; else lastLevel = parseFloat(lastLevel); var threshold = 30; var fire = false; PurpleRobot.log('Reading level: ' + level); PurpleRobot.log('Last level: ' + lastLevel); if (level < threshold && lastLevel >= threshold) fire = true; PurpleRobot.persistString('battery-probe', 'level', level.toString()); fire;"
+}</pre>
+
+<p>
+    The <code>test</code> script is a bit lengthy, so here it is formatted and commented:
+</p>
+
+<pre>// Pull levels out of extras dictionary containing probe data...
+var level = extras['level'];
+
+// Set the low battery threshold to be 30%...
+var threshold = 30; 
+
+// Fetch the last saved level so we know how we're going through the threshold (up or down)...
+var lastLevel = PurpleRobot.fetchString('battery-probe', 'level');  
+
+// Set a default value if none has been persisted yet...
+if (lastLevel == null) 
+    lastLevel = 101.0; 
+else 
+    lastLevel = parseFloat(lastLevel); 
+
+// Don't fire by default...
+var fire = false; 
+
+// Log levels for diagnostic purposes...
+PurpleRobot.log('Reading level: ' + level); 
+PurpleRobot.log('Last level: ' + lastLevel); 
+
+// If we're passing the threshold in a downward direction, fire this trigger...
+if (level < threshold && lastLevel >= threshold)
+    fire = true; 
+
+// Persist level for subsequent tests in the future...
+PurpleRobot.persistString('battery-probe', 'level', level.toString());
+
+// Return whether or not to fire this trigger... (Omit return keyword because of Rhino oddness.)
+fire;</pre>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><code>identifier</code>: Unique identifier for the trigger.</p>
+
+<p><code>definition</code>: Dictionary or dictionary-like object that defines the trigger parameters.</p>
+
+<h4>Return Values</h4>
+
+<p>Boolean value indicating the trigger was created or updated successfully.</p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">var dateTrigger = { 
+    "identifier": "hourly-chime",
+    "name": "Hourly Chime",
+    "type": "datetime",
+    "action": "PurpleRobot.playDefaultTone();",
+    "datetime_start": "20150327T130000",
+    "datetime_end": "20150327T130100",
+    "datetime_random": false,
+    "datetime_repeat": "FREQ=HOURLY;INTERVAL=1;",
+    "fire_on_boot": true
+};
+
+PurpleRobot.updateTrigger('hourly-chime', dateTrigger);
+
+var batteryTrigger = { 
+    "identifier": "low-battery",
+    "name": "Low Battery Warning",
+    "type": "probe",
+    "probe": "edu.northwestern.cbits.purple_robot_manager.probes.builtin.BatteryProbe",
+    "action": "PurpleRobot.playDefaultTone(); PurpleRobot.showNativeDialog('Battery Warning', 'Your battery is running low.\n\Please plug it in!', 'Sure', 'Maybe Later', '', '');",
+    "test": "var level = extras['level']; var threshold = 30; var lastLevel = PurpleRobot.fetchString('battery-probe', 'level');  if (lastLevel == null) lastLevel = 101.0; else lastLevel = parseFloat(lastLevel); var fire = false; PurpleRobot.log('Reading level: ' + level); PurpleRobot.log('Last level: ' + lastLevel); if (level < threshold && lastLevel >= threshold) fire = true; PurpleRobot.persistString('battery-probe', 'level', level.toString()); fire;"
+};
+
+PurpleRobot.updateTrigger('low-battery', batteryTrigger);</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">;;; Note the lack of the initial identifier parameter in the Scheme call...
+(pr-update-trigger '(("identifier" . "hourly-chime")
+                     ("name" . "Hourly Chime")
+                     ("type" . "datetime")
+                     ("action" . "(pr-play-default-tone)")
+                     ("datetime_start" . "20150327T130000")
+                     ("datetime_end" . "20150327T130100")
+                     ("datetime_random" . #f)
+                     ("datetime_repeat" . "FREQ=HOURLY;INTERVAL=1;")
+                     ("fire_on_boot" . #t)))
+
+;;; Scheme test function coming soon...
+(pr-update-trigger '(("identifier" . "low-battery")
+                     ("name" . "Low Battery Warning")
+                     ("type" . "probe")
+                     ("probe" . "edu.northwestern.cbits.purple_robot_manager.probes.builtin.BatteryProbe")
+                     ("action" . "(begin (pr-play-default-tone) (pr-show-native-dialog \"Battery Warning\" \"Your battery is running low.\n\Please plug it in!\" \"Sure\" \"Maybe Later\" \"\" \"\"))")
+                     ("test" . "var level = extras['level']; var lastLevel = PurpleRobot.fetchString('battery-probe', 'level');  if (lastLevel == null) lastLevel = 101.0; else lastLevel = parseFloat(lastLevel); var threshold = 30; var fire = false; PurpleRobot.log('Reading level: ' + level); PurpleRobot.log('Last level: ' + lastLevel); if (level < threshold && lastLevel >= threshold) fire = true; PurpleRobot.persistString('battery-probe', 'level', level.toString()); fire;")))</pre>

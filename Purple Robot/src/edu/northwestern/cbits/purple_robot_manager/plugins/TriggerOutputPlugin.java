@@ -7,6 +7,8 @@ import org.json.JSONException;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
+
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.triggers.ProbeTrigger;
@@ -17,8 +19,7 @@ public class TriggerOutputPlugin extends OutputPlugin
 {
     public String[] respondsTo()
     {
-        String[] activeActions =
-        { Probe.PROBE_READING };
+        String[] activeActions = { Probe.PROBE_READING };
 
         return activeActions;
     }
@@ -38,11 +39,19 @@ public class TriggerOutputPlugin extends OutputPlugin
                 {
                     ProbeTrigger probeTrigger = (ProbeTrigger) trigger;
 
+                    Log.e("PR", "GOT " + probeTrigger.identifier());
+
                     try
                     {
-                        if (probeTrigger.matchesProbe(intent.getExtras().getString("PROBE"))
-                                && probeTrigger.matches(context, OutputPlugin.jsonForBundle(intent.getExtras())))
-                            trigger.execute(context, false);
+                        Log.e("PR", intent.getExtras().getString("PROBE") + " MATCHES: " + probeTrigger.matchesProbe(intent.getExtras().getString("PROBE")));
+
+                        if (probeTrigger.matchesProbe(intent.getExtras().getString("PROBE")))
+                        {
+                            Log.e("PR", "JSON BUNDLE: " + OutputPlugin.jsonForBundle(intent.getExtras()).toString(2));
+
+                            if (probeTrigger.matches(context, OutputPlugin.jsonForBundle(intent.getExtras())))
+                                trigger.execute(context, false);
+                        }
                     }
                     catch (JSONException e)
                     {

@@ -1,0 +1,43 @@
+<p>
+    Removes all triggers on the local device
+</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><em>None</em></p>
+
+<h4>Return Values</h4>
+
+<p><em>None</em></p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">var dateTrigger = {
+    "identifier": "hourly-chime",
+    "name": "Hourly Chime",
+    "type": "datetime",
+    "action": "PurpleRobot.playDefaultTone();",
+    "datetime_start": "20150327T130000",
+    "datetime_end": "20150327T130100",
+    "datetime_random": false,
+    "datetime_repeat": "FREQ=HOURLY;INTERVAL=1;",
+    "fire_on_boot": true
+};
+
+PurpleRobot.updateTrigger('hourly-chime', dateTrigger);
+
+PurpleRobot.clearTriggers();</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-update-trigger '(("identifier" . "hourly-chime")
+                     ("name" . "Hourly Chime")
+                     ("type" . "datetime")
+                     ("action" . "(pr-play-default-tone)")
+                     ("datetime_start" . "20150327T130000")
+                     ("datetime_end" . "20150327T130100")
+                     ("datetime_random" . #f)
+                     ("datetime_repeat" . "FREQ=HOURLY;INTERVAL=1;")
+                     ("fire_on_boot" . #t)))
+
+(pr-clear-triggers)</pre>

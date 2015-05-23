@@ -26,6 +26,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -282,12 +284,12 @@ public class LabelActivity extends AppCompatActivity
 
                         final double min = fieldDef.getDouble("min", 1.0);
                         final double max = fieldDef.getDouble("max", 10.0);
-                        double step = fieldDef.getDouble("step", 1.0);
+                        final int step = (int) fieldDef.getDouble("step", 1.0);
 
-                        float lastValue = prefs.getFloat("label_field_" + field, (float) (((min + max) / 2) - min));
+                        double defaultValue = (((min + max) / 2) - min);
+                        float lastValue = prefs.getFloat("label_field_" + field, (float) (defaultValue - (defaultValue % step)));
 
                         seekBar.setMax((int) (max - min));
-                        seekBar.setKeyProgressIncrement((int) step);
 
                         seekBar.setProgress((int) lastValue);
 
@@ -298,9 +300,16 @@ public class LabelActivity extends AppCompatActivity
                             @Override
                             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
                             {
-                                fieldName.setText(fieldPrompt + ": " + ((int) (min + progress)));
+                                if (fromUser)
+                                {
+                                    progress = progress - (progress % step);
 
-                                me._values.put(fieldLabel, Float.valueOf((float) (min + progress)));
+                                    seekBar.setProgress(progress);
+
+                                    fieldName.setText(fieldPrompt + ": " + ((int) (min + progress)));
+
+                                    me._values.put(fieldLabel, Float.valueOf((float) (min + progress)));
+                                }
                             }
 
                             @Override
@@ -330,9 +339,11 @@ public class LabelActivity extends AppCompatActivity
 
                             RadioGroup radios = new RadioGroup(this);
 
+                            LayoutInflater inflater = this.getLayoutInflater();
+
                             for (String nominalValue : fieldDef.getStringArrayList("values"))
                             {
-                                RadioButton radio = new RadioButton(this);
+                                RadioButton radio = (RadioButton) inflater.inflate(R.layout.layout_radio_button, null);
                                 radio.setText(nominalValue);
 
                                 radios.addView(radio);
@@ -423,11 +434,9 @@ public class LabelActivity extends AppCompatActivity
 
             boolean rememberLabel = prefs.getBoolean(LabelActivity.REMEMBER_LABEL, LabelActivity.REMEMBER_LABEL_DEFAULT);
 
-            remember.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
-            {
+            remember.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
-                public void onCheckedChanged(CompoundButton button, boolean checked)
-                {
+                public void onCheckedChanged(CompoundButton button, boolean checked) {
 
                 }
             });
@@ -532,6 +541,9 @@ public class LabelActivity extends AppCompatActivity
                     Object value = this._values.get(key);
 
                     JavaScriptEngine js = new JavaScriptEngine(this);
+
+                    Log.e("PR", "EMITTING " + key + " -- " + value.toString());
+
                     js.emitReading(key, value.toString());
 
                     HashMap<String, Object> payload = new HashMap<String, Object>();

@@ -382,10 +382,10 @@ public class SchemeEngine extends BaseScriptEngine
         return this.updateWidget(title, message, applicationName, SchemeEngine.parsePairList(launchParams), script);
     }
 
-    @ScriptingEngineMethod(language = "Scheme")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_fetch_labels.html", category = R.string.docs_script_category_data_collection, arguments = { "instructions", "labels" })
     public void fetchLabels(String appContext, String instructions, final Pair labels)
     {
-        super.fetchLabels(appContext, instructions, SchemeEngine.parsePairList(labels));
+        super.fetchLabelsInterface(appContext, instructions, SchemeEngine.parsePairList(labels));
     }
 
     @ScriptingEngineMethod(language = "All", assetPath = "all_launch_application.html", category = R.string.docs_script_category_system_integration, arguments = { "applicationName", "options", "script" })
@@ -394,7 +394,7 @@ public class SchemeEngine extends BaseScriptEngine
         return this.launchApplication(applicationName, SchemeEngine.parsePairList(launchParams), script);
     }
 
-    @ScriptingEngineMethod(language = "Scheme")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_show_app_launch_note.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "title", "message", "packageName" })
     public boolean showApplicationLaunchNotification(String title, String message, String applicationName,
             boolean persistent, final Pair launchParams, final String script)
     {
@@ -402,7 +402,7 @@ public class SchemeEngine extends BaseScriptEngine
                 SchemeEngine.parsePairList(launchParams), script);
     }
 
-    @ScriptingEngineMethod(language = "Scheme")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_show_app_launch_note.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "title", "message", "packageName" })
     public boolean showApplicationLaunchNotification(String title, String message, String applicationName,
             final Pair launchParams, final String script)
     {
@@ -511,5 +511,21 @@ public class SchemeEngine extends BaseScriptEngine
         }
 
         return new Pair(Symbol.QUOTE, new Pair(pairs, Pair.EMPTY));
+    }
+
+    @ScriptingEngineMethod(language = "All", assetPath = "all_scheduled_scripts.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { })
+    public Pair scheduledScripts()
+    {
+        List<Map<String, String>> scripts = ScheduleManager.allScripts(this._context);
+
+        return this.pairForList(scripts);
+    }
+
+    @ScriptingEngineMethod(language = "All", assetPath = "all_namespaces.html", category = R.string.docs_script_category_persistence, arguments = { })
+    public Pair namespaces()
+    {
+        List<String> namespaces = super.namespaceList();
+
+        return this.pairForList(namespaces);
     }
 }

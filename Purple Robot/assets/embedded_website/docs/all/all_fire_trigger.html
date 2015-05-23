@@ -1,0 +1,48 @@
+<p>
+    Overrides any tests and fires the trigger identified by <code>triggerId</code>.
+</p>
+
+<p>
+    Note that if this function is called for a date-time trigger using the <code>detetime_random</code> parameter <em>and</em> the trigger is <em>in an active period</em> and <em>has not yet fired</em>, firing the trigger manually will prevent the trigger for firing again during the current active period automatically.
+    See <code><a href="all_update_trigger.html">PurpleRobot.updateTrigger</a></code> for more details.
+</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><code>identifier</code> - Unique identifier of the trigger to fire.</p>
+
+<h4>Return Values</h4>
+
+<p><em>None</em></p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">var dateTrigger = {
+    "identifier": "hourly-chime",
+    "name": "Hourly Chime",
+    "type": "datetime",
+    "action": "PurpleRobot.playDefaultTone();",
+    "datetime_start": "20150327T130000",
+    "datetime_end": "20150327T130100",
+    "datetime_random": false,
+    "datetime_repeat": "FREQ=HOURLY;INTERVAL=1;",
+    "fire_on_boot": true
+};
+
+PurpleRobot.updateTrigger('hourly-chime', dateTrigger);
+
+PurpleRobot.fireTrigger("hourly-chime");</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-update-trigger '(("identifier" . "hourly-chime")
+                     ("name" . "Hourly Chime")
+                     ("type" . "datetime")
+                     ("action" . "(pr-play-default-tone)")
+                     ("datetime_start" . "20150327T130000")
+                     ("datetime_end" . "20150327T130100")
+                     ("datetime_random" . #f)
+                     ("datetime_repeat" . "FREQ=HOURLY;INTERVAL=1;")
+                     ("fire_on_boot" . #t)))
+
+(pr-fire-trigger "hourly-chime")</pre>

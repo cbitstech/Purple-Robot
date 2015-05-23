@@ -2,6 +2,7 @@ package edu.northwestern.cbits.purple_robot_manager.scripting;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.ScheduleManager;
 import edu.northwestern.cbits.purple_robot_manager.annotation.ScriptingEngineMethod;
 import edu.northwestern.cbits.purple_robot_manager.config.JSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -78,7 +80,7 @@ public class JavaScriptEngine extends BaseScriptEngine
         return this._jsContext.evaluateString(this._scope, script, "<engine>", 0, null);
     }
 
-    @ScriptingEngineMethod(language = "JavaScript")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_log.html", category = R.string.docs_script_category_diagnostic, arguments = { "message" })
     public boolean log(String event, NativeObject params)
     {
         if (params != null)
@@ -131,6 +133,54 @@ public class JavaScriptEngine extends BaseScriptEngine
         this.updateWidget(JavaScriptEngine.nativeToMap(parameters));
     }
 
+    @ScriptingEngineMethod(language = "All", assetPath = "all_namespaces.html", category = R.string.docs_script_category_persistence, arguments = { })
+    public NativeArray namespaces()
+    {
+        List<String> namespaces = super.namespaceList();
+
+        NativeArray allNamespaces = new NativeArray(namespaces.size());
+
+        for (int i = 0; i < namespaces.size(); i++)
+        {
+            allNamespaces.put(i, allNamespaces, namespaces.get(i));
+        }
+
+        return allNamespaces;
+    }
+
+    @ScriptingEngineMethod(language = "All", assetPath = "all_scheduled_scripts.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { })
+    public NativeArray scheduledScripts()
+    {
+        List<Map<String, String>> scripts = ScheduleManager.allScripts(this._context);
+
+        NativeArray allScripts = new NativeArray(scripts.size());
+
+        for (int i = 0; i < scripts.size(); i++)
+        {
+            Map<String, String> script = scripts.get(i);
+
+            Map<String, Object> scriptObj = new HashMap<String, Object>();
+
+            for (String key : script.keySet())
+                scriptObj.put(key, script.get(key));
+
+            NativeObject nativeObj = JavaScriptEngine.mapToNative(this._jsContext, this._scope, scriptObj);
+
+            try
+            {
+                Log.e("PR", "NATIVE OBJ: " + JavaScriptEngine.nativeToJson(nativeObj).toString(2));
+            }
+            catch (JSONException e)
+            {
+                e.printStackTrace();
+            }
+
+            allScripts.put(i, allScripts, nativeObj);
+        }
+
+        return allScripts;
+    }
+
     @ScriptingEngineMethod(language = "JavaScript")
     public boolean broadcastIntent(final String action, final NativeObject extras)
     {
@@ -149,19 +199,19 @@ public class JavaScriptEngine extends BaseScriptEngine
         return this.launchApplication(applicationName, JavaScriptEngine.nativeToMap(launchParams), script);
     }
 
-    @ScriptingEngineMethod(language = "JavaScript")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_show_app_launch_note.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "title", "message", "packageName" })
     public boolean showApplicationLaunchNotification(String title, String message, String applicationName, boolean persistent, final NativeObject launchParams, final String script)
     {
         return this.showApplicationLaunchNotification(title, message, applicationName, persistent, JavaScriptEngine.nativeToMap(launchParams), script);
     }
 
-    @ScriptingEngineMethod(language = "JavaScript")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_show_app_launch_note.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "title", "message", "packageName" })
     public boolean showApplicationLaunchNotification(String title, String message, String applicationName, final NativeObject launchParams, final String script)
     {
         return this.showApplicationLaunchNotification(title, message, applicationName, JavaScriptEngine.nativeToMap(launchParams), script);
     }
 
-    @ScriptingEngineMethod(language = "JavaScript")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_update_trigger.html", category = R.string.docs_script_category_triggers_automation, arguments = { "identifier", "definition" })
     public boolean updateTrigger(String triggerId, NativeObject nativeJson)
     {
         return this.updateTrigger(triggerId, JavaScriptEngine.nativeToMap(nativeJson));
@@ -297,11 +347,32 @@ public class JavaScriptEngine extends BaseScriptEngine
 
             if (value instanceof NativeObject)
                 value = JavaScriptEngine.nativeToMap((NativeObject) value);
+            else if (value instanceof NativeArray)
+                value = JavaScriptEngine.nativeToArrayList((NativeArray) value);
 
             params.put(e.getKey().toString(), value);
         }
 
         return params;
+    }
+
+    private static ArrayList<Object> nativeToArrayList(NativeArray array)
+    {
+        ArrayList<Object> list = new ArrayList<Object>();
+
+        for (int i = 0; i < array.size(); i++)
+        {
+            Object value = array.get(i);
+
+            if (value instanceof NativeObject)
+                value = JavaScriptEngine.nativeToMap((NativeObject) value);
+            else if (value instanceof NativeArray)
+                value = JavaScriptEngine.nativeToArrayList((NativeArray) value);
+
+            list.add(value);
+        }
+
+        return list;
     }
 
     @SuppressWarnings("unchecked")
@@ -417,7 +488,7 @@ public class JavaScriptEngine extends BaseScriptEngine
         return null;
     }
 
-    @ScriptingEngineMethod(language = "JavaScript")
+    // TODO: Document API...
     public NativeObject models()
     {
         Map<String, Object> modelMap = ModelManager.getInstance(this._context).models(this._context);
@@ -433,12 +504,18 @@ public class JavaScriptEngine extends BaseScriptEngine
         return JavaScriptEngine.mapToNative(this._jsContext, this._scope, readings);
     }
 
-    @ScriptingEngineMethod(language = "JavaScript")
+    // TODO: Document API...
     public NativeObject predictions()
     {
         Map<String, Object> predictions = ModelManager.getInstance(this._context).predictions(this._context);
 
         return JavaScriptEngine.mapToNative(this._jsContext, this._scope, predictions);
+    }
+
+    @ScriptingEngineMethod(language = "All", assetPath = "all_fetch_labels.html", category = R.string.docs_script_category_data_collection, arguments = { "instructions", "labels" })
+    public void fetchLabels(String appContext, String instructions, final NativeObject labels)
+    {
+        this.fetchLabelsInterface(appContext, instructions, JavaScriptEngine.nativeToMap(labels));
     }
 
     @Override

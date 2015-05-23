@@ -1,0 +1,23 @@
+<p>Registers a new empty namespace for value persistence if a namespace identified by <code>namespace</code> does not already exist.</p>
+
+<p>If a namespace does not already exist when calling <code><a href="all_persist_string.html">PurpleRobot.persistString</a></code>, a new one will automatically be registered, thus this method is only necessary for creating empty namespaces.</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><code>namespace</code>: Identifier of the new namespace.</p>
+
+<h4>Return Values</h4>
+
+<p><em>None</em></p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.addNamespace('my-new-namespace');
+
+PurpleRobot.namespaces();</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-add-namespace "my-new-namespace")
+
+(pr-namespaces)</pre>

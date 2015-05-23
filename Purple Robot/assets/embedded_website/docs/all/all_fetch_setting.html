@@ -1,0 +1,19 @@
+<p>
+    Retrieves the value saved to the settings for <code>key</code> previously set with <code><a href="all_update_config.html">PurpleRobot.updateConfig</a></code>.
+</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><code>key</code> - Settings key.</p>
+
+<h4>Return Values</h4>
+
+<p>Setting value, <code>null</code> if none exists under <code>key</code>.</p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.fetchSetting("config_log_server_uri");</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-fetch-setting "config_log_server_uri")</pre>

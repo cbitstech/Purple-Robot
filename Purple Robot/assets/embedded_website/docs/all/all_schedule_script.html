@@ -1,0 +1,29 @@
+<p>
+    Schedules a <code>script</code> to run at predefined time in the future.
+    If a time in the past is specified, the script runs immediately.
+</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p>
+    <code>identifier</code> - Unique string identifying the script.
+    Subsequent calls to this function with the same <code>identifier</code> parameter will update any previously scheduled script with the same <code>identifier</code>.
+</p>
+<p>
+    <code>dateString</code> - String encoding the scheduled run time in the format <code><a href="http://developer.android.com/reference/java/text/SimpleDateFormat.html">yyyyMMdd'T'HHmmss</a></code>.
+    For example, noon on Christmas Day 2015 is encoded as <code>20151225T120000</code>.
+
+</p>
+<p><code>script</code> - Script to run at the scheduled time.</p>
+
+<h4>Return Values</h4>
+
+<p><em>None</em></p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.scheduleScript("my-script", "20151225T120000", "PurpleRobot.playDefaultTone();");</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-schedule-script "my-script" "20151225T120000" "(pr-play-default-tone)")</pre>

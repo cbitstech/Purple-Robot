@@ -353,11 +353,9 @@ public abstract class BaseScriptEngine
 
         final BaseScriptEngine me = this;
 
-        this._handler.post(new Runnable()
-        {
+        this._handler.post(new Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 if (useLongDuration)
                     Toast.makeText(me._context, message, Toast.LENGTH_LONG).show();
                 else
@@ -527,7 +525,7 @@ public abstract class BaseScriptEngine
         return editor.commit();
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_add_namespace.html", category = R.string.docs_script_category_persistence, arguments = { "namespace" })
     public void addNamespace(String namespace)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
@@ -554,6 +552,29 @@ public abstract class BaseScriptEngine
         {
             LogManager.getInstance(this._context).logException(e);
         }
+    }
+
+    public List<String> namespaceList()
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+
+        ArrayList<String> namespaceList = new ArrayList<String>();
+
+        try
+        {
+            JSONArray namespaces = new JSONArray(prefs.getString(BaseScriptEngine.SCRIPT_ENGINE_NAMESPACES, "[]"));
+
+            for (int i = 0; i < namespaces.length(); i++)
+            {
+                namespaceList.add(namespaces.getString(i));
+            }
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(this._context).logException(e);
+        }
+
+        return namespaceList;
     }
 
     @ScriptingEngineMethod(language = "All", assetPath = "all_persist_string.html", category = R.string.docs_script_category_persistence, arguments = { "key", "value" })
@@ -586,7 +607,7 @@ public abstract class BaseScriptEngine
         return prefs.getString(key, null);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    // Not documented in favor of fetchLabels...
     public void fetchLabel(String context, String key)
     {
         Intent labelIntent = new Intent(this._context, LabelActivity.class);
@@ -613,7 +634,7 @@ public abstract class BaseScriptEngine
         return prefs.getString(key, null);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_fetch_setting.html", category = R.string.docs_script_category_configuration, arguments = { "key" })
     public String fetchSetting(String key)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
@@ -626,7 +647,7 @@ public abstract class BaseScriptEngine
         return null;
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_reset_trigger.html", category = R.string.docs_script_category_triggers_automation, arguments = { "triggerId" })
     public void resetTrigger(String triggerId)
     {
         for (Trigger trigger : TriggerManager.getInstance(this._context).triggersForId(triggerId))
@@ -635,7 +656,7 @@ public abstract class BaseScriptEngine
         }
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_enable_trigger.html", category = R.string.docs_script_category_triggers_automation, arguments = { "triggerId" })
     public void enableTrigger(String triggerId)
     {
         for (Trigger trigger : TriggerManager.getInstance(this._context).triggersForId(triggerId))
@@ -644,7 +665,7 @@ public abstract class BaseScriptEngine
         }
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_fire_trigger.html", category = R.string.docs_script_category_triggers_automation, arguments = { "triggerId" })
     public void fireTrigger(String triggerId)
     {
         for (Trigger trigger : TriggerManager.getInstance(this._context).triggersForId(triggerId))
@@ -653,7 +674,7 @@ public abstract class BaseScriptEngine
         }
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_disable_trigger.html", category = R.string.docs_script_category_triggers_automation, arguments = { "triggerId" })
     public void disableTrigger(String triggerId)
     {
         for (Trigger trigger : TriggerManager.getInstance(this._context).triggersForId(triggerId))
@@ -884,7 +905,7 @@ public abstract class BaseScriptEngine
         this.refreshConfigUrl();
     }
 
-    @ScriptingEngineMethod(language = "All")
+    // Left for legacy compatibility purposes...
     public void enableUpdateChecks()
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
@@ -894,7 +915,7 @@ public abstract class BaseScriptEngine
         e.commit();
     }
 
-    @ScriptingEngineMethod(language = "All")
+    // Left for legacy compatibility purposes...
     public void disableUpdateChecks()
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
@@ -1418,10 +1439,16 @@ public abstract class BaseScriptEngine
         return widgets;
     }
 
-    @ScriptingEngineMethod(language = "All")
-    public void scheduleScript(String identifier, String dateString, String action)
+    @ScriptingEngineMethod(language = "All", assetPath = "all_schedule_script.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "identifier", "dateString", "script" })
+    public void scheduleScript(String identifier, String dateString, String script)
     {
-        ScheduleManager.updateScript(this._context, identifier, dateString, action);
+        ScheduleManager.updateScript(this._context, identifier, dateString, script);
+    }
+
+    @ScriptingEngineMethod(language = "All", assetPath = "all_cancel_scheduled_script.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "identifier" })
+    public void cancelScheduledScript(String identifier)
+    {
+        ScheduleManager.updateScript(this._context, identifier, null, null);
     }
 
     protected boolean broadcastIntent(final String action, final Map<String, Object> extras)
@@ -1664,13 +1691,13 @@ public abstract class BaseScriptEngine
         return TriggerManager.getInstance(this._context).fetchTrigger(this._context, id);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_delete_trigger.html", category = R.string.docs_script_category_triggers_automation, arguments = { "triggerId" })
     public boolean deleteTrigger(String id)
     {
         return TriggerManager.getInstance(this._context).deleteTrigger(id);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_clear_triggers.html", category = R.string.docs_script_category_triggers_automation, arguments = { })
     public void clearTriggers()
     {
         LogManager.getInstance(this._context).log("script_clear_triggers", null);
@@ -1681,10 +1708,8 @@ public abstract class BaseScriptEngine
         }
     }
 
-    // TODO: Eventually add to documentation...
-    @SuppressWarnings(
-    { "unchecked", "rawtypes" })
-    public void fetchLabels(String appContext, String instructions, Map<String, Object> labels)
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public void fetchLabelsInterface(String appContext, String instructions, Map<String, Object> labels)
     {
         Intent labelIntent = new Intent();
         labelIntent.setClass(this._context, LabelActivity.class);
@@ -1724,6 +1749,8 @@ public abstract class BaseScriptEngine
 
                     labelBundle.putStringArrayList(labelKey, listItems);
                 }
+                else
+                    Log.e("PR", "UNKNOWN OBJECT: " + o.getClass().getCanonicalName() + " -- " + labelKey);
             }
 
             labelsBundle.putParcelable(key, labelBundle);
@@ -1734,25 +1761,25 @@ public abstract class BaseScriptEngine
         this._context.startActivity(labelIntent);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    // TODO: Document API call
     public void addModel(String jsonUrl)
     {
         ModelManager.getInstance(this._context).addModel(jsonUrl);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    // TODO: Document API call
     public void deleteModel(String jsonUrl)
     {
         ModelManager.getInstance(this._context).deleteModel(jsonUrl);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    // TODO: Document API call
     public void enableModel(String jsonUrl)
     {
         ModelManager.getInstance(this._context).enableModel(jsonUrl);
     }
 
-    @ScriptingEngineMethod(language = "All")
+    // TODO: Document API call
     public void disableModel(String jsonUrl)
     {
         ModelManager.getInstance(this._context).disableModel(jsonUrl);

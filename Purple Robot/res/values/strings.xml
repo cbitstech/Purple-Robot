@@ -1524,6 +1524,7 @@
     <string name="docs_script_category_dialogs_notifications">Dialogs &amp; Notifications</string>
     <string name="docs_script_category_data_collection">Data Collection</string>
     <string name="docs_script_category_system_integration">System Integration</string>
+    <string name="docs_script_category_triggers_automation">Triggers &amp; Automation</string>
 
     <string name="error_no_latest_probe_value">No readings recorded yet. Enable the probe to continue.</string>
     <string name="error_auth_required">Authenticated connection required for inspecting probe readings.</string>

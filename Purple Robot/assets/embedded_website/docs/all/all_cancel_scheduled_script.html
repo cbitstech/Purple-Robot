@@ -1,0 +1,29 @@
+<p>
+    Cancels a script with <code>identifier</code> previously scheduled by <code><a href="all_schedule_script.html">PurpleRobot.scheduleScript</a></code>.
+</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p>
+    <code>identifier</code> - Unique identifier of the script to remove.
+</p>
+
+<h4>Return Values</h4>
+
+<p><em>None</em></p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.scheduleScript("my-script", "20151225T120000", "PurpleRobot.playDefaultTone();");
+PurpleRobot.scheduledScripts();
+
+PurpleRobot.cancelScheduledScript("my-script");
+PurpleRobot.scheduledScripts();</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-schedule-script "my-script" "20151225T120000" "(pr-play-default-tone)")
+(pr-scheduled-scripts)
+
+(pr-cancel-scheduled-script "my-script")
+(pr-scheduled-scripts)</pre>
