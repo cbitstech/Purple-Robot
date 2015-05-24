@@ -1,0 +1,31 @@
+<p>
+    Updates a probe's configuration.
+</p>
+
+<p>
+    See <a href="/docs/probes/">the probe documentation for probe names and configuration parameters.</a>
+</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><code>parameters</code> - Dictionary or dictionary-like structure containing the configuration names and values to apply to the specified probe.
+
+<h4>Return Values</h4>
+
+<p>Boolean value indicating whether the probe was updated successfully.</p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.probeConfig("edu.northwestern.cbits.purple_robot_manager.probes.builtin.RobotHealthProbe");
+
+PurpleRobot.updateProbe({
+  "name": "edu.northwestern.cbits.purple_robot_manager.probes.builtin.RobotHealthProbe",
+  "frequency": 300000
+});</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-probe-config "edu.northwestern.cbits.purple_robot_manager.probes.builtin.RobotHealthProbe")
+
+(pr-update-probe '(("name" . "edu.northwestern.cbits.purple_robot_manager.probes.builtin.RobotHealthProbe")
+                   ("frequency" . 300000L)))</pre>

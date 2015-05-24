@@ -1,0 +1,19 @@
+<p>Runs <code>script</code> using the local JavaScript engine.</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><code>script</code> - JavaScript program to run.</p>
+
+<p><code>extras</code> (Optional) - Name of the custom object to inject into the JavaScript runtime.</p>
+
+<p><code>extraValues</code> (Optional) - Values for the custom object to inject into the JavaScript runtime.</p>
+
+<h4>Return Values</h4>
+
+<p>Boolean <code>true</code> if the library was imported successfully, <code>false</code> otherwise.</p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.runScript("PurpleRobot.playDefaultTone();");
+
+PurpleRobot.runScript("PurpleRobot.vibrate(pattern['name']);", "pattern", { "name": "Buzz" });</pre>

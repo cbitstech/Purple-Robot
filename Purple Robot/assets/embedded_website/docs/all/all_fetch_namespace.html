@@ -1,0 +1,23 @@
+<p>
+    Retrieves the value saved to the settings using the namespace <code>namespaceId</code>.
+</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><code>namespaceId</code> - Namespace to retrieve.</p>
+
+<h4>Return Values</h4>
+
+<p>Dictionary or dictionary-like object containing the values in the specified namespace.</p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.persistString("my-new-namespace", "FOO", "BAR");
+
+PurpleRobot.fetchNamespace("my-new-namespace");</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-persist-string "my-new-namespace" "FOO" "BAR")
+
+(pr-fetch-namespace "my-new-namespace")</pre>

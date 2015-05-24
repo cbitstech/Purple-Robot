@@ -10,7 +10,9 @@ import java.util.Map;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.annotation.ScriptingEngineMethod;
+import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;
 import jscheme.JScheme;
+import jscheme.SchemeException;
 import jsint.Evaluator;
 import jsint.Pair;
 import jsint.Symbol;
@@ -127,7 +129,7 @@ public class SchemeEngine extends BaseScriptEngine
         return "Scheme";
     }
 
-    @ScriptingEngineMethod(language = "Scheme")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_update_trigger.html", category = R.string.docs_script_category_triggers_automation, arguments = { "identifier", "definition" })
     public boolean updateTrigger(String triggerId, Pair parameters)
     {
         Map<String, Object> paramsMap = SchemeEngine.parsePairList(parameters);
@@ -137,7 +139,7 @@ public class SchemeEngine extends BaseScriptEngine
         return super.updateTrigger(triggerId, paramsMap);
     }
 
-    @ScriptingEngineMethod(language = "Scheme")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_update_trigger.html", category = R.string.docs_script_category_triggers_automation, arguments = { "identifier", "definition" })
     public boolean updateTrigger(Pair parameters)
     {
         Map<String, Object> paramsMap = SchemeEngine.parsePairList(parameters);
@@ -152,18 +154,18 @@ public class SchemeEngine extends BaseScriptEngine
         return false;
     }
 
-    @ScriptingEngineMethod(language = "Scheme")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_schedule_script.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "identifier", "dateString", "script" })
     public void scheduleScript(String identifier, String dateString, Pair action)
     {
         super.scheduleScript(identifier, dateString, action.toString());
     }
 
-    @ScriptingEngineMethod(language = "Scheme")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_update_probe.html", category = R.string.docs_script_category_data_collection, arguments = { "parameters" })
     public boolean updateProbe(Pair params)
     {
         Map<String, Object> map = SchemeEngine.parsePairList(params);
 
-        return this.updateProbe(map);
+        return this.updateProbeConfig(map);
     }
 
     public static Map<String, Object> parsePairList(Pair pair)
@@ -254,7 +256,7 @@ public class SchemeEngine extends BaseScriptEngine
                 {
                     String key = (String) firstFirst;
 
-                    Object second = firstPair.second();
+                    Object second = firstPair.rest();
 
                     if (second instanceof String)
                         b.putString(key, second.toString());
@@ -326,13 +328,21 @@ public class SchemeEngine extends BaseScriptEngine
         this._context.startService(intent);
     }
 
-    @ScriptingEngineMethod(language = "Scheme")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_readings.html", category = R.string.docs_script_category_data_collection, arguments = { })
+    public Pair readings()
+    {
+        Map<String, Object> readings = ModelManager.getInstance(this._context).readings(this._context);
+
+        return this.pairForMap(readings);
+    }
+
+    @ScriptingEngineMethod(language = "All", assetPath = "all_emit_reading.html", category = R.string.docs_script_category_data_collection, arguments = { "name", "value", "priority" })
     public void emitReading(String name, Object value)
     {
         this.emitReading(name, value, false);
     }
 
-    @ScriptingEngineMethod(language = "Scheme")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_emit_reading.html", category = R.string.docs_script_category_data_collection, arguments = { "name", "value", "priority" })
     public void emitReading(String name, Object value, boolean priority)
     {
         Bundle bundle = new Bundle();
@@ -350,13 +360,28 @@ public class SchemeEngine extends BaseScriptEngine
 
             bundle.putDouble(Feature.FEATURE_VALUE, d.doubleValue());
         }
+        else if (value instanceof Integer)
+        {
+            Integer i = (Integer) value;
+
+            bundle.putDouble(Feature.FEATURE_VALUE, i.doubleValue());
+        }
         else if (value instanceof Pair)
         {
             Pair pair = (Pair) value;
 
-            Bundle b = SchemeEngine.bundleForPair(pair);
+            Log.e("PR", "PARSE PAIR: " + pair);
 
-            bundle.putParcelable(Feature.FEATURE_VALUE, b);
+            try
+            {
+                Bundle b = SchemeEngine.bundleForPair(pair);
+
+                bundle.putParcelable(Feature.FEATURE_VALUE, b);
+            }
+            catch (SchemeException e)
+            {
+                e.printStackTrace();
+            }
         }
         else
         {
@@ -369,7 +394,7 @@ public class SchemeEngine extends BaseScriptEngine
         this.transmitData(bundle);
     }
 
-    @ScriptingEngineMethod(language = "Scheme")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_broadcast_intent.html", category = R.string.docs_script_category_system_integration, arguments = { "action", "extras" })
     public boolean broadcastIntent(final String action, Pair extras)
     {
         return this.broadcastIntent(action, SchemeEngine.parsePairList(extras));
@@ -410,7 +435,7 @@ public class SchemeEngine extends BaseScriptEngine
                 SchemeEngine.parsePairList(launchParams), script);
     }
 
-    @ScriptingEngineMethod(language = "Scheme")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_fetch_config.html", category = R.string.docs_script_category_configuration, arguments = { })
     public String fetchConfig()
     {
         SchemeConfigFile config = new SchemeConfigFile(this._context);
@@ -527,5 +552,62 @@ public class SchemeEngine extends BaseScriptEngine
         List<String> namespaces = super.namespaceList();
 
         return this.pairForList(namespaces);
+    }
+
+    @ScriptingEngineMethod(language = "All", assetPath = "all_fetch_namespace.html", category = R.string.docs_script_category_persistence, arguments = { "namespaceId" })
+    public Pair fetchNamespace(String namespace)
+    {
+        Map<String, Object> map = super.fetchNamespaceMap(namespace);
+
+        return this.pairForMap(map);
+    }
+
+    @ScriptingEngineMethod(language = "All", assetPath = "all_fetch_trigger.html", category = R.string.docs_script_category_triggers_automation, arguments = { "triggerId" })
+    public Pair fetchTrigger(String id)
+    {
+        Map<String, Object> trigger = super.fetchTriggerMap(id);
+
+        if (trigger != null)
+            return this.pairForMap(trigger);
+
+        return null;
+    }
+
+    @ScriptingEngineMethod(language = "All", assetPath = "all_fetch_trigger_ids.html", category = R.string.docs_script_category_triggers_automation, arguments = { })
+    public Pair fetchTriggerIds()
+    {
+        List<String> triggerIds = super.fetchTriggerIdList();
+
+        return this.pairForList(triggerIds);
+    }
+
+    @ScriptingEngineMethod(language = "All", assetPath = "all_fetch_snapshot_ids.html", category = R.string.docs_script_category_data_collection, arguments = { })
+    public Pair fetchSnapshotIds()
+    {
+        List<String> snapshotIds = super.fetchSnapshotIdList();
+
+        return (Pair) this.pairForList(snapshotIds).second();
+    }
+
+    @ScriptingEngineMethod(language = "All", assetPath = "all_fetch_snapshot.html", category = R.string.docs_script_category_data_collection, arguments = { "snapshotId" })
+    public Pair fetchSnapshot(String timestamp)
+    {
+        Map<String, Object> snapshot = super.fetchSnapshotMap(timestamp);
+
+        if (snapshot != null)
+            return this.pairForMap(snapshot);
+
+        return null;
+    }
+
+    @ScriptingEngineMethod(language = "All", assetPath = "all_probe_config.html", category = R.string.docs_script_category_data_collection, arguments = { "probeName" })
+    public Pair probeConfig(String name)
+    {
+        Map<String, Object> map = this.probeConfigMap(name);
+
+        if (map != null)
+            return this.pairForMap(map);
+
+        return null;
     }
 }

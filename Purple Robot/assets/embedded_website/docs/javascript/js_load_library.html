@@ -1,0 +1,23 @@
+<p>Loads an included JavaScript library into the current execution context.</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><code>library</code> - Library name. Included with Purple Robot:</p>
+
+<ul>
+    <li><code><a href="http://www.astrojs.org/">astro.js</a></code></li>
+    <li><code><a href="https://github.com/datejs/Datejs">date.js</a></code></li>
+    <li><code><a href="https://github.com/jstat/jstat">jstat.js</a></code></li>
+    <li><code><a href="http://momentjs.com/">moment.js</a></code></li>
+    <li><code><a href="http://underscorejs.org/">underscore.js</a></code></li>
+</ul>
+
+<h4>Return Values</h4>
+
+<p>Any results returned from <code>script</code>.</p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.loadLibrary("moment.js");
+
+moment().format('MMMM Do YYYY, h:mm:ss a');</pre>

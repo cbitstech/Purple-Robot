@@ -1097,7 +1097,7 @@ public abstract class BaseScriptEngine
         return found;
     }
 
-    protected boolean updateProbe(Map<String, Object> params)
+    protected boolean updateProbeConfig(Map<String, Object> params)
     {
         if (params.containsKey("name"))
         {
@@ -1107,6 +1107,11 @@ public abstract class BaseScriptEngine
         }
 
         return false;
+    }
+
+    protected Map<String, Object> probeConfigMap(String name)
+    {
+        return ProbeManager.probeConfiguration(this._context, name);
     }
 
     @ScriptingEngineMethod(language = "All", assetPath = "all_launch_application.html", category = R.string.docs_script_category_system_integration, arguments = { "applicationName", "options", "script" })
@@ -1643,12 +1648,12 @@ public abstract class BaseScriptEngine
         return map;
     }
 
-    public List<String> fetchTriggerIds()
+    public List<String> fetchTriggerIdList()
     {
         return TriggerManager.getInstance(this._context).triggerIds();
     }
 
-    public List<String> fetchSnapshotIds()
+    public List<String> fetchSnapshotIdList()
     {
         ArrayList<String> times = new ArrayList<String>();
 
@@ -1658,7 +1663,7 @@ public abstract class BaseScriptEngine
         return times;
     }
 
-    @ScriptingEngineMethod(language = "All")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_take_snapshot.html", category = R.string.docs_script_category_data_collection, arguments = {"source" })
     public String takeSnapshot(String source)
     {
         try
@@ -1673,20 +1678,20 @@ public abstract class BaseScriptEngine
         return null;
     }
 
-    @ScriptingEngineMethod(language = "All")
-    public void deleteSnapshot(String id)
+    @ScriptingEngineMethod(language = "All", assetPath = "all_delete_snapshot.html", category = R.string.docs_script_category_data_collection, arguments = { "snapshotId" })
+    public void deleteSnapshot(String snapshotId)
     {
-        SnapshotManager.getInstance(this._context).deleteSnapshot(Long.parseLong(id));
+        SnapshotManager.getInstance(this._context).deleteSnapshot(Long.parseLong(snapshotId));
     }
 
-    public Map<String, Object> fetchSnapshot(String timestamp)
+    public Map<String, Object> fetchSnapshotMap(String timestamp)
     {
         JSONObject json = SnapshotManager.getInstance(this._context).jsonForTime(Long.parseLong(timestamp), true);
 
         return this.jsonToMap(json);
     }
 
-    public Map<String, Object> fetchTrigger(String id)
+    public Map<String, Object> fetchTriggerMap(String id)
     {
         return TriggerManager.getInstance(this._context).fetchTrigger(this._context, id);
     }
@@ -1702,7 +1707,7 @@ public abstract class BaseScriptEngine
     {
         LogManager.getInstance(this._context).log("script_clear_triggers", null);
 
-        for (String id : this.fetchTriggerIds())
+        for (String id : this.fetchTriggerIdList())
         {
             this.deleteTrigger(id);
         }

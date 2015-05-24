@@ -1,0 +1,22 @@
+<p>
+    Retrieves the details for the snapshot with identifier <code>snapshotId</code>.
+</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><code>snapshotId</code>: Unique identifier for the desired snapshot.</p>
+
+<h4>Return Values</h4>
+
+<p>Dictionary or dictionary-like object containing details and probe readings at the time the snapshot was taken.</p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.takeSnapshot("test-context");
+
+PurpleRobot.fetchSnapshot(PurpleRobot.fetchSnapshotIds()[0]);</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(begin (pr-take-snapshot "test-context")
+       (pr-fetch-snapshot (first (pr-fetch-snapshot-ids))))</pre>

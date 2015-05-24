@@ -109,8 +109,8 @@ public class SettingsActivity extends AppCompatActivity
                 Preference test = prefs.findPreference(SettingsKeys.RUN_TESTS_KEY);
                 test.setOnPreferenceClickListener(listener);
 
-                CheckBoxPreference update = (CheckBoxPreference) prefs.findPreference(SettingsKeys.CHECK_UPDATES_KEY);
-                update.setOnPreferenceChangeListener(listener);
+//                CheckBoxPreference update = (CheckBoxPreference) prefs.findPreference(SettingsKeys.CHECK_UPDATES_KEY);
+//                update.setOnPreferenceChangeListener(listener);
 
                 ListPreference listUpdate = (ListPreference) prefs.findPreference(SettingsKeys.RINGTONE_KEY);
                 listUpdate.setOnPreferenceChangeListener(listener);

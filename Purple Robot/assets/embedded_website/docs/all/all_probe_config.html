@@ -1,0 +1,25 @@
+<p>
+    Retrieves a probe's configuration.
+</p>
+
+<p>
+    See <a href="/docs/probes/">the probe documentation</a> for probe names.
+</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><code>probeName</code> - Name of the probe with configuration to retrieve.
+
+<h4>Return Values</h4>
+
+<p>Dictionary or dictionary-like object containing the probe's current configuration.</p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.probeConfig("edu.northwestern.cbits.purple_robot_manager.probes.builtin.RobotHealthProbe");</pre>
+
+<p>Note that due to an issue with the underlying Rhino JavaScript library, Boolean configuration values are omitted. To determine the values (and existence) of these parameters, please use the Scheme scripting API instead.</p>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-probe-config "edu.northwestern.cbits.purple_robot_manager.probes.builtin.RobotHealthProbe")</pre>

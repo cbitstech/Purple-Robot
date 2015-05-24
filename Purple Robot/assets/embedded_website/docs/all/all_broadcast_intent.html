@@ -1,0 +1,19 @@
+<p>Broadcasts an intent to other apps on the device.</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><code>action</code> - Intent <a href="http://developer.android.com/reference/android/content/Intent.html">action</a>a>.</p>
+
+<p><code>extras</code> - Dictionary of extras to include with the intent</p>
+
+<h4>Return Values</h4>
+
+<p>Boolean value indicating the success of the broadcast.</p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.broadcastIntent("my-custom-action", { "foo": "bar" });</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-broadcast-intent "my-custom-action" '(("foo" . "bar")))</pre>

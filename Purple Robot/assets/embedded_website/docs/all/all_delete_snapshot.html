@@ -1,0 +1,20 @@
+<p>Deletes the snapshot with identifier <code>snapshotId</code></p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><code>snapshotId</code>: Identifier of the snapshot to delete.</p>
+
+<h4>Return Values</h4>
+
+<p><em>None</em></p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">var newSnap = PurpleRobot.takeSnapshot('my-js-code');
+
+PurpleRobot.deleteSnapshot(newSnap);</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(let ((snapId (pr-take-snapshot "my-scheme-code")))
+     (pr-delete-snapshot snapId))</pre>

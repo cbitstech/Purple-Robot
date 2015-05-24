@@ -7,11 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Scanner;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.EvaluatorException;
@@ -44,14 +46,13 @@ public class JavaScriptEngine extends BaseScriptEngine
         super(context);
     }
 
-    @ScriptingEngineMethod(language = "JavaScript")
+    @ScriptingEngineMethod(language = "JavaScript", assetPath = "js_run_script.html", category = R.string.docs_script_category_system_integration, arguments = { "script", "extras", "extraValues" })
     public Object runScript(String script) throws EvaluatorException, EcmaError
     {
         return this.runScript(script, null, null);
     }
 
-    @SuppressWarnings("unchecked")
-    @ScriptingEngineMethod(language = "JavaScript")
+    @ScriptingEngineMethod(language = "JavaScript", assetPath = "js_run_script.html", category = R.string.docs_script_category_system_integration, arguments = { "script", "extras", "extraValues" })
     public Object runScript(String script, String extrasName, Object extras) throws EvaluatorException, EcmaError
     {
         this._jsContext = Context.enter();
@@ -72,11 +73,6 @@ public class JavaScriptEngine extends BaseScriptEngine
         if (extras != null && extrasName != null)
             script = "var " + extrasName + " = " + extras.toString() + "; " + script;
 
-        int end = script.length() - 512;
-
-        if (end < 0)
-            end = 0;
-
         return this._jsContext.evaluateString(this._scope, script, "<engine>", 0, null);
     }
 
@@ -90,7 +86,7 @@ public class JavaScriptEngine extends BaseScriptEngine
     }
 
     @SuppressWarnings("resource")
-    @ScriptingEngineMethod(language = "JavaScript")
+    @ScriptingEngineMethod(language = "JavaScript", assetPath = "js_load_library.html", category = R.string.docs_script_category_system_integration, arguments = { "libraryName" })
     public boolean loadLibrary(String libraryName)
     {
         if (this._jsContext != null && this._scope != null)
@@ -181,7 +177,7 @@ public class JavaScriptEngine extends BaseScriptEngine
         return allScripts;
     }
 
-    @ScriptingEngineMethod(language = "JavaScript")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_broadcast_intent.html", category = R.string.docs_script_category_system_integration, arguments = { "action", "extras" })
     public boolean broadcastIntent(final String action, final NativeObject extras)
     {
         return this.broadcastIntent(action, JavaScriptEngine.nativeToMap(extras));
@@ -217,13 +213,13 @@ public class JavaScriptEngine extends BaseScriptEngine
         return this.updateTrigger(triggerId, JavaScriptEngine.nativeToMap(nativeJson));
     }
 
-    @ScriptingEngineMethod(language = "JavaScript", assetPath = "js_emit_reading.html", category = R.string.docs_script_category_data_collection, arguments = { "name", "value", "priority" })
+    @ScriptingEngineMethod(language = "All", assetPath = "all_emit_reading.html", category = R.string.docs_script_category_data_collection, arguments = { "name", "value", "priority" })
     public void emitReading(String name, Object value)
     {
         this.emitReading(name, value, false);
     }
 
-    @ScriptingEngineMethod(language = "JavaScript", assetPath = "js_emit_reading.html", category = R.string.docs_script_category_data_collection, arguments = { "name", "value", "priority" })
+    @ScriptingEngineMethod(language = "All", assetPath = "all_emit_reading.html", category = R.string.docs_script_category_data_collection, arguments = { "name", "value", "priority" })
     public void emitReading(String name, Object value, boolean priority)
     {
         double now = System.currentTimeMillis();
@@ -384,16 +380,42 @@ public class JavaScriptEngine extends BaseScriptEngine
         {
             Object value = map.get(key);
 
+            Log.e("PR", "MAP KEY " + key + " -- " + value.toString() + " -- " + value.getClass().getCanonicalName());
+
             if (value instanceof Map)
                 value = JavaScriptEngine.mapToNative(context, scope, (Map<String, Object>) value);
+            else if (value instanceof Long)
+            {
+                Long l = (Long) value;
 
-            obj.put(key, obj, value);
+                value = l.doubleValue();
+            }
+            else if (value instanceof List)
+            {
+                List list = (List) value;
+
+                NativeArray array = new NativeArray(list.size());
+
+                for (int i = 0; i < list.size(); i++)
+                {
+                    Object item = list.get(i);
+
+                    if (item instanceof Map)
+                        item = JavaScriptEngine.mapToNative(context, scope, (Map<String, Object>) item);
+
+                    array.put(i, array, item);
+                }
+
+                value = array;
+            }
+
+            NativeObject.putProperty(obj, key, value);
         }
 
         return obj;
     }
 
-    @ScriptingEngineMethod(language = "JavaScript")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_fetch_config.html", category = R.string.docs_script_category_configuration, arguments = { })
     public String fetchConfig()
     {
         JSONConfigFile config = new JSONConfigFile(this._context);
@@ -409,26 +431,15 @@ public class JavaScriptEngine extends BaseScriptEngine
         return super.updateConfig(paramsMap);
     }
 
-    @ScriptingEngineMethod(language = "JavaScript", assetPath = "js_fetch_namespaces.html", category = R.string.docs_script_category_persistence, arguments = { })
     public NativeArray fetchNamespaces()
     {
-        List<String> namespaces = super.fetchNamespaceList();
-
-        String[] values = new String[namespaces.size()];
-
-        for (int i = 0; i < namespaces.size(); i++)
-        {
-            values[i] = namespaces.get(i);
-        }
-
-        return new NativeArray(values);
+        return this.namespaces();
     }
 
-    @Override
-    @ScriptingEngineMethod(language = "JavaScript")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_fetch_trigger_ids.html", category = R.string.docs_script_category_triggers_automation, arguments = { })
     public NativeArray fetchTriggerIds()
     {
-        List<String> triggerIds = super.fetchTriggerIds();
+        List<String> triggerIds = super.fetchTriggerIdList();
 
         String[] values = new String[triggerIds.size()];
 
@@ -440,11 +451,10 @@ public class JavaScriptEngine extends BaseScriptEngine
         return new NativeArray(values);
     }
 
-    @Override
-    @ScriptingEngineMethod(language = "JavaScript")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_fetch_snapshot_ids.html", category = R.string.docs_script_category_data_collection, arguments = { })
     public NativeArray fetchSnapshotIds()
     {
-        List<String> snapshotIds = super.fetchSnapshotIds();
+        List<String> snapshotIds = super.fetchSnapshotIdList();
 
         String[] values = new String[snapshotIds.size()];
 
@@ -456,11 +466,10 @@ public class JavaScriptEngine extends BaseScriptEngine
         return new NativeArray(values);
     }
 
-    @Override
-    @ScriptingEngineMethod(language = "JavaScript")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_fetch_snapshot.html", category = R.string.docs_script_category_data_collection, arguments = { "snapshotId" })
     public NativeObject fetchSnapshot(String timestamp)
     {
-        Map<String, Object> snapshot = super.fetchSnapshot(timestamp);
+        Map<String, Object> snapshot = super.fetchSnapshotMap(timestamp);
 
         if (snapshot != null)
             return JavaScriptEngine.mapToNative(this._jsContext, this._scope, snapshot);
@@ -468,7 +477,7 @@ public class JavaScriptEngine extends BaseScriptEngine
         return null;
     }
 
-    @ScriptingEngineMethod(language = "JavaScript")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_fetch_namespace.html", category = R.string.docs_script_category_persistence, arguments = { "namespaceId" })
     public NativeObject fetchNamespace(String namespace)
     {
         Map<String, Object> map = super.fetchNamespaceMap(namespace);
@@ -476,11 +485,10 @@ public class JavaScriptEngine extends BaseScriptEngine
         return JavaScriptEngine.mapToNative(this._jsContext, this._scope, map);
     }
 
-    @Override
-    @ScriptingEngineMethod(language = "JavaScript")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_fetch_trigger.html", category = R.string.docs_script_category_triggers_automation, arguments = { "triggerId" })
     public NativeObject fetchTrigger(String id)
     {
-        Map<String, Object> trigger = super.fetchTrigger(id);
+        Map<String, Object> trigger = super.fetchTriggerMap(id);
 
         if (trigger != null)
             return JavaScriptEngine.mapToNative(this._jsContext, this._scope, trigger);
@@ -496,7 +504,7 @@ public class JavaScriptEngine extends BaseScriptEngine
         return JavaScriptEngine.mapToNative(this._jsContext, this._scope, modelMap);
     }
 
-    @ScriptingEngineMethod(language = "JavaScript")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_readings.html", category = R.string.docs_script_category_data_collection, arguments = { })
     public NativeObject readings()
     {
         Map<String, Object> readings = ModelManager.getInstance(this._context).readings(this._context);
@@ -543,11 +551,19 @@ public class JavaScriptEngine extends BaseScriptEngine
         return new NativeArray(values);
     }
 
-    @ScriptingEngineMethod(language = "JavaScript")
+    @ScriptingEngineMethod(language = "All", assetPath = "all_update_probe.html", category = R.string.docs_script_category_data_collection, arguments = { "parameters" })
     public boolean updateProbe(NativeObject params)
     {
         Map<String, Object> values = JavaScriptEngine.nativeToMap(params);
 
-        return super.updateProbe(values);
+        return super.updateProbeConfig(values);
+    }
+
+    @ScriptingEngineMethod(language = "All", assetPath = "all_probe_config.html", category = R.string.docs_script_category_data_collection, arguments = { "probeName" })
+    public NativeObject probeConfig(String name)
+    {
+        Map<String, Object> map = this.probeConfigMap(name);
+
+        return JavaScriptEngine.mapToNative(this._jsContext, this._scope, map);
     }
 }

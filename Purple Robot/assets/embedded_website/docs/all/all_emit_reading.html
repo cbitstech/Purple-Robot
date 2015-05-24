@@ -1,0 +1,36 @@
+<p>Generates a synthetic probe reading and transmits it through the Purple Robot data processing facilities.</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><code>name</code> - String identifying the reading.</p>
+
+<p><code>value</code> - Value of the reading. <code>value</code> may consist of a string, number, or dictionary-like object that can be expressed with JSON-compatible or Scheme-compatible types.</p>
+
+<p>
+    <code>priority</code> (Optional) - Boolean specifying if this is a high-priority reading.
+    For example, readings with high-priorities will be transmitted earlier by some <code>DataUploadPlugins</code> than readings with no priority specified.
+</p>
+
+<h4>Return Values</h4>
+
+<p><em>None</em></p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">PurpleRobot.emitReading("myFavoriteNumber", 7);
+
+PurpleRobot.emitReading("myFavoriteColor", "blue", true);
+
+PurpleRobot.emitReading("myFavoriteFoods", [ "pizza", "pancakes", "cheese" ]);
+
+PurpleRobot.emitReading("myFavoriteCar", { "mfgr": "Ford", "model": "Mustang", "engine": "5.0L V8" }, true);</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(pr-emit-reading "myFavoriteNumber" 7)
+
+(pr-emit-reading "myFavoriteColor" "blue" #t)
+
+(pr-emit-reading "myFavoriteCar" '(("mfgr" . "Ford")
+                                   ("model" . "Mustang")
+                                   ("engine" . "5.0L V8")) #t)</pre>

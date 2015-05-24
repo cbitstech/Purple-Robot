@@ -900,4 +900,15 @@ public class ProbeManager
             }
         }
     }
+
+    public static Map<String, Object> probeConfiguration(Context context, String name)
+    {
+        for (Map<String, Object> map : ProbeManager.probeConfigurations(context))
+        {
+            if (map.get("name").equals(name))
+                return map;
+        }
+
+        return null;
+    }
 }
