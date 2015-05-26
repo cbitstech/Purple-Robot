@@ -59,6 +59,7 @@
 (define pr-show-native-dialog (lambda args (apply .showNativeDialog (cons PurpleRobot args))))
 (define pr-show-script-notification (lambda args (apply .showScriptNotification (cons PurpleRobot args))))
 (define pr-stop-playback (lambda () (.stopPlayback PurpleRobot)))
+(define pr-stop-vibrate (lambda () (.stopVibrate PurpleRobot)))
 (define pr-take-snapshot (lambda (source) (.takeSnapshot PurpleRobot source)))
 (define pr-update-config (lambda args (apply .updateConfig (cons PurpleRobot args))))
 (define pr-update-config-url (lambda (url) (.updateConfigUrl PurpleRobot url)))
