@@ -14,7 +14,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.media.MediaPlayer;
@@ -26,7 +25,6 @@ import android.os.Build;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 
-import edu.northwestern.cbits.anthracite.LogService;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.SettingsKeys;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -301,15 +299,7 @@ public class ManagerService extends IntentService
 
                                 ManagerService._player.start();
                             }
-                            catch (IllegalArgumentException e)
-                            {
-                                LogManager.getInstance(me).logException(e);
-                            }
-                            catch (IllegalStateException e)
-                            {
-                                LogManager.getInstance(me).logException(e);
-                            }
-                            catch (IOException e)
+                            catch (IllegalArgumentException | IOException | IllegalStateException e)
                             {
                                 LogManager.getInstance(me).logException(e);
                             }
@@ -431,7 +421,7 @@ public class ManagerService extends IntentService
                     {
                         Long fire = times.get(index);
 
-                        if (Math.abs(ManagerService._lastTriggerNudge - fire.longValue()) >= 60000)
+                        if (Math.abs(ManagerService._lastTriggerNudge - fire) >= 60000)
                         {
                             AlarmManager alarmManager = (AlarmManager) me.getSystemService(Context.ALARM_SERVICE);
 
@@ -439,12 +429,12 @@ public class ManagerService extends IntentService
 
                             alarmManager.cancel(pi);
 
-                            ManagerService._lastTriggerNudge = fire.longValue();
+                            ManagerService._lastTriggerNudge = fire;
 
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-                                alarmManager.setExact(AlarmManager.RTC_WAKEUP, fire.longValue(), pi);
+                                alarmManager.setExact(AlarmManager.RTC_WAKEUP, fire, pi);
                             else
-                                alarmManager.set(AlarmManager.RTC_WAKEUP, fire.longValue(), pi);
+                                alarmManager.set(AlarmManager.RTC_WAKEUP, fire, pi);
 
                             break;
                         }

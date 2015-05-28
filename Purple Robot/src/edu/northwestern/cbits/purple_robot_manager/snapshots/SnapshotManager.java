@@ -15,7 +15,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.media.MediaRecorder;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.RobotContentProvider;
@@ -267,8 +266,6 @@ public class SnapshotManager
                 {
                     JSONArray values = new JSONArray(jsonString);
 
-                    Log.e("PR", "SNAPSHOT JSON: " + values.toString(2));
-
                     for (int i = 0; i < values.length(); i++)
                     {
                         JSONObject value = values.getJSONObject(i);
@@ -283,8 +280,6 @@ public class SnapshotManager
 
                     object.put("values", values);
                 }
-
-                Log.e("PR", "RETURN JSON: " + object.toString(2));
             }
             catch (JSONException e)
             {

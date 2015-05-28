@@ -70,7 +70,7 @@ public abstract class UnivariateContinuousProbeFeature extends ContinuousProbeFe
                     data.putInt("BUFFER_SIZE", UnivariateContinuousProbeFeature.BUFFER_SIZE);
                     data.putDouble("FREQUENCY", ((double) UnivariateContinuousProbeFeature.BUFFER_SIZE)
                             / ((maxTime - minTime) / 1000));
-                    data.putDouble("DURATION", ((double) ((maxTime - minTime) / 1000.0)));
+                    data.putDouble("DURATION", ((maxTime - minTime) / 1000.0));
 
                     me.transmitData(context, data);
 

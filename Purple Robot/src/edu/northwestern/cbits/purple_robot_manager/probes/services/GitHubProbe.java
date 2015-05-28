@@ -161,7 +161,7 @@ public class GitHubProbe extends Probe
                                     String lastRepo = null;
                                     String lastCommitMessage = null;
 
-                                    HashSet<String> repositories = new HashSet<String>();
+                                    HashSet<String> repositories = new HashSet<>();
 
                                     JSONObject user = GitHubApi.fetch(Uri.parse("https://api.github.com/user"));
 
@@ -186,10 +186,10 @@ public class GitHubProbe extends Probe
 
                                     long now = System.currentTimeMillis();
 
-                                    HashMap<String, Integer> todayCommits = new HashMap<String, Integer>();
-                                    HashMap<String, Integer> weekCommits = new HashMap<String, Integer>();
-                                    HashMap<String, Integer> monthCommits = new HashMap<String, Integer>();
-                                    HashMap<String, Integer> totalCommits = new HashMap<String, Integer>();
+                                    HashMap<String, Integer> todayCommits = new HashMap<>();
+                                    HashMap<String, Integer> weekCommits = new HashMap<>();
+                                    HashMap<String, Integer> monthCommits = new HashMap<>();
+                                    HashMap<String, Integer> totalCommits = new HashMap<>();
 
                                     for (int i = 0; i < allEvents.length(); i++)
                                     {

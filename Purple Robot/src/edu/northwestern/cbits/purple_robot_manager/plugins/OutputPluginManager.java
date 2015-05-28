@@ -14,9 +14,9 @@ public class OutputPluginManager extends BroadcastReceiver
 {
     public static OutputPluginManager sharedInstance = new OutputPluginManager();
 
-    private Map<Class<OutputPlugin>, OutputPlugin> _plugins = new HashMap<Class<OutputPlugin>, OutputPlugin>();
+    private Map<Class<OutputPlugin>, OutputPlugin> _plugins = new HashMap<>();
 
-    public OutputPlugin pluginForClass(Context context, Class<?> c)
+    public OutputPlugin pluginForClass(Context context, Class c)
     {
         OutputPlugin plugin = this._plugins.get(c);
 
@@ -52,11 +52,7 @@ public class OutputPluginManager extends BroadcastReceiver
                 if (intent != null)
                     plugin.process(intent);
             }
-            catch (InstantiationException e)
-            {
-                LogManager.getInstance(context).logException(e);
-            }
-            catch (IllegalAccessException e)
+            catch (InstantiationException | IllegalAccessException e)
             {
                 LogManager.getInstance(context).logException(e);
             }

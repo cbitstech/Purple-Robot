@@ -11,7 +11,6 @@ import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.os.Looper;
 import android.preference.CheckBoxPreference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.view.Gravity;
@@ -32,7 +31,7 @@ public class TouchEventsProbe extends Probe
 
     private Context _context = null;
     private View _overlay = null;
-    private final ArrayList<Long> _timestamps = new ArrayList<Long>();
+    private final ArrayList<Long> _timestamps = new ArrayList<>();
     private long _lastTouch = 0;
 
     @Override

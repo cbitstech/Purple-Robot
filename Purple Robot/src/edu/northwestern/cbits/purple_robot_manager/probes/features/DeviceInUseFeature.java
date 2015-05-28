@@ -94,7 +94,7 @@ public class DeviceInUseFeature extends Feature
                 @Override
                 public void onReceive(Context context, Intent intent)
                 {
-                    if (me._isEnabled == false)
+                    if (!me._isEnabled)
                         return;
 
                     Bundle extras = intent.getExtras();

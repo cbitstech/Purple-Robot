@@ -73,20 +73,7 @@ public class LogServerEmulatorRequestHandler implements HttpRequestHandler
                     arguments = new JSONObject(jsonArg);
                 }
             }
-            catch (JSONException e)
-            {
-                LogManager.getInstance(this._context).logException(e);
-
-                response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-
-                StringEntity body = new StringEntity(e.toString());
-                body.setContentType("text/plain");
-
-                response.setEntity(body);
-
-                return;
-            }
-            catch (NullPointerException e)
+            catch (JSONException | NullPointerException e)
             {
                 LogManager.getInstance(this._context).logException(e);
 

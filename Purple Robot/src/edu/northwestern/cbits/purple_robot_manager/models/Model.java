@@ -22,7 +22,6 @@ import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
@@ -57,7 +56,7 @@ public abstract class Model
     private static long _lastEnabledCheck = 0;
     private static boolean _lastEnabled = false;
 
-    protected HashMap<String, String> _featureMap = new HashMap<String, String>();
+    protected HashMap<String, String> _featureMap = new HashMap<>();
 
     // Cached values used to determine when the model state has changed.
     private Object _latestPrediction = null;
@@ -113,7 +112,7 @@ public abstract class Model
      *         appropriate {@link Model} class can be determined.
      */
 
-    public final static Model modelForUrl(Context context, String jsonUrl)
+    public static Model modelForUrl(Context context, String jsonUrl)
     {
         String hash = EncryptionManager.getInstance().createHash(context, jsonUrl, "MD5");
 
@@ -169,7 +168,7 @@ public abstract class Model
                 in = new BufferedReader(new InputStreamReader(u.openStream()));
             }
 
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
 
             String inputLine = null;
 
@@ -179,12 +178,7 @@ public abstract class Model
             in.close();
 
             contents = sb.toString();
-        }
-        catch (MalformedURLException e)
-        {
-            LogManager.getInstance(context).logException(e);
-        }
-        catch (IOException e)
+        } catch (IOException e)
         {
             LogManager.getInstance(context).logException(e);
         }
@@ -391,7 +385,7 @@ public abstract class Model
 
         this.transmitData(context, bundle);
 
-        this._latestPrediction = Double.valueOf(prediction);
+        this._latestPrediction = prediction;
         this._latestAccuracy = accuracy;
     }
 
@@ -404,7 +398,7 @@ public abstract class Model
 
     public Map<String, Object> latestPrediction(Context context)
     {
-        HashMap<String, Object> prediction = new HashMap<String, Object>();
+        HashMap<String, Object> prediction = new HashMap<>();
 
         prediction.put("prediction", this._latestPrediction);
         prediction.put("accuracy", this._latestAccuracy);

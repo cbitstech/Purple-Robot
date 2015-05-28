@@ -141,7 +141,7 @@ public class LocationProbe extends Probe implements LocationListener
 
             if (frequency instanceof Double)
             {
-                frequency = Long.valueOf(((Double) frequency).longValue());
+                frequency = ((Double) frequency).longValue();
             }
 
             if (frequency instanceof Long)
@@ -394,11 +394,11 @@ public class LocationProbe extends Probe implements LocationListener
 
                 if (include)
                 {
-                    Map<String, Object> values = new HashMap<String, Object>();
+                    Map<String, Object> values = new HashMap<>();
 
-                    values.put(LocationProbe.LONGITUDE_KEY, Double.valueOf(location.getLongitude()));
-                    values.put(LocationProbe.LATITUDE_KEY, Double.valueOf(location.getLatitude()));
-                    values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(location.getTime() / 1000));
+                    values.put(LocationProbe.LONGITUDE_KEY, location.getLongitude());
+                    values.put(LocationProbe.LATITUDE_KEY, location.getLatitude());
+                    values.put(ProbeValuesProvider.TIMESTAMP, (double) (location.getTime() / 1000));
 
                     ProbeValuesProvider.getProvider(this._context).insertValue(this._context, LocationProbe.DB_TABLE, LocationProbe.databaseSchema(), values);
 
@@ -438,11 +438,11 @@ public class LocationProbe extends Probe implements LocationListener
         formatted.putFloat(context.getString(R.string.display_location_speed_label), bundle.getFloat(LocationProbe.SPEED));
 
         return formatted;
-    };
+    }
 
     public static Map<String, String> databaseSchema()
     {
-        HashMap<String, String> schema = new HashMap<String, String>();
+        HashMap<String, String> schema = new HashMap<>();
 
         schema.put(LocationProbe.LATITUDE_KEY, ProbeValuesProvider.REAL_TYPE);
         schema.put(LocationProbe.LONGITUDE_KEY, ProbeValuesProvider.REAL_TYPE);

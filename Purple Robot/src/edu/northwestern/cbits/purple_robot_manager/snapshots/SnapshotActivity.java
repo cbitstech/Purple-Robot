@@ -76,7 +76,7 @@ public class SnapshotActivity extends ActionBarActivity
 
         ListView listView = (ListView) this.findViewById(R.id.list_probes);
 
-        final ArrayList<JSONObject> jsonObjects = new ArrayList<JSONObject>();
+        final ArrayList<JSONObject> jsonObjects = new ArrayList<>();
 
         Uri queryUri = ContentUris.withAppendedId(RobotContentProvider.SNAPSHOTS, this.getIntent()
                 .getLongExtra("id", 0));

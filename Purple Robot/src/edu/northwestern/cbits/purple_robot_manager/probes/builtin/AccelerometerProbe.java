@@ -80,7 +80,7 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
     {
         if (this._schema == null)
         {
-            this._schema = new HashMap<String, String>();
+            this._schema = new HashMap<>();
 
             this._schema.put(Continuous3DProbe.X_KEY, ProbeValuesProvider.REAL_TYPE);
             this._schema.put(Continuous3DProbe.Y_KEY, ProbeValuesProvider.REAL_TYPE);
@@ -100,7 +100,7 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
         double[] y = bundle.getDoubleArray(Continuous3DProbe.Y_KEY);
         double[] z = bundle.getDoubleArray(Continuous3DProbe.Z_KEY);
 
-        ArrayList<String> keys = new ArrayList<String>();
+        ArrayList<String> keys = new ArrayList<>();
 
         SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.display_date_format));
 
@@ -144,7 +144,7 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
         }
 
         return formatted;
-    };
+    }
 
     @Override
     public long getFrequency()
@@ -336,7 +336,7 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
     {
         final double now = (double) System.currentTimeMillis();
 
-        if (this.shouldProcessEvent(event) == false)
+        if (!this.shouldProcessEvent(event))
             return;
 
         if (this.passesThreshold(event))
@@ -423,15 +423,15 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
                                 z = valueBuffer[i][0];
                         }
 
-                        if (Double.isNaN(x) == false && Double.isNaN(y) == false && Double.isNaN(z) == false)
+                        if (!Double.isNaN(x) && !Double.isNaN(y) && !Double.isNaN(z))
                         {
-                            Map<String, Object> values = new HashMap<String, Object>(4);
+                            Map<String, Object> values = new HashMap<>(4);
 
                             values.put(Continuous3DProbe.X_KEY, x);
                             values.put(Continuous3DProbe.Y_KEY, y);
                             values.put(Continuous3DProbe.Z_KEY, z);
 
-                            values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[0] / 1000));
+                            values.put(ProbeValuesProvider.TIMESTAMP, timeBuffer[0] / 1000);
 
                             ProbeValuesProvider.getProvider(this._context).insertValue(this._context, AccelerometerProbe.DB_TABLE, this.databaseSchema(), values);
                         }
@@ -531,7 +531,7 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putBoolean(AccelerometerProbe.USE_HANDLER, ((Boolean) handler).booleanValue());
+                e.putBoolean(AccelerometerProbe.USE_HANDLER, (Boolean) handler);
                 e.commit();
             }
         }

@@ -34,7 +34,7 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 
     protected Context _context = null;
 
-    private final ArrayList<Bundle> _satellites = new ArrayList<Bundle>();
+    private final ArrayList<Bundle> _satellites = new ArrayList<>();
     private long _lastCheck = 0;
     private long _startCheck = 0;
     private long _lastTransmit = 0;
@@ -72,7 +72,7 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 
             if (frequency instanceof Double)
             {
-                frequency = Long.valueOf(((Double) frequency).longValue());
+                frequency = ((Double) frequency).longValue();
             }
 
             if (frequency instanceof Long)
@@ -406,7 +406,7 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
 
         for (Bundle value : objects)
         {
-            ArrayList<String> keys = new ArrayList<String>();
+            ArrayList<String> keys = new ArrayList<>();
 
             String key = String.format(context.getString(R.string.display_satellite_label), value.getInt("RANDOM_NUMBER"));
 
@@ -458,6 +458,6 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
         formatted.putFloat(context.getString(R.string.display_satellites_signal_ratio), bundle.getFloat("AVERAGE_SIGNAL_RATIO"));
 
         return formatted;
-    };
+    }
 
 }

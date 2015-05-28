@@ -72,9 +72,9 @@ public class DateTrigger extends Trigger
     private String _icalString = null;
 
     private long _lastFireCalcDate = 0;
-    private final List<Date> _upcomingFireDates = new ArrayList<Date>();
+    private final List<Date> _upcomingFireDates = new ArrayList<>();
 
-    private static List<Runnable> pendingRefreshes = new ArrayList<Runnable>();
+    private static List<Runnable> pendingRefreshes = new ArrayList<>();
     private static boolean isRefreshing = false;
 
     public String getCalendarString()
@@ -178,7 +178,7 @@ public class DateTrigger extends Trigger
             if (this._calendar == null)
                 return;
 
-            ArrayList<Date> upcoming = new ArrayList<Date>();
+            ArrayList<Date> upcoming = new ArrayList<>();
 
             long current = now;
 
@@ -288,15 +288,7 @@ public class DateTrigger extends Trigger
 
             this._calendar = builder.build(sin);
         }
-        catch (NullPointerException e)
-        {
-            LogManager.getInstance(context).logException(e);
-        }
-        catch (IOException e)
-        {
-            LogManager.getInstance(context).logException(e);
-        }
-        catch (ParserException e)
+        catch (NullPointerException | ParserException | IOException e)
         {
             LogManager.getInstance(context).logException(e);
         }
@@ -308,7 +300,7 @@ public class DateTrigger extends Trigger
         {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
 
-            StringBuffer newCalendar = new StringBuffer();
+            StringBuilder newCalendar = new StringBuilder();
 
             long day = (24 * 60 * 60 * 1000);
 
@@ -453,10 +445,10 @@ public class DateTrigger extends Trigger
                 this._repeats = map.get(DateTrigger.DATETIME_REPEATS).toString();
 
             if (map.containsKey(DateTrigger.DATETIME_RANDOM))
-                this._random = ((Boolean) map.get(DateTrigger.DATETIME_RANDOM)).booleanValue();
+                this._random = (Boolean) map.get(DateTrigger.DATETIME_RANDOM);
 
             if (map.containsKey(DateTrigger.FIRE_ON_BOOT))
-                this._fireOnBoot = ((Boolean) map.get(DateTrigger.FIRE_ON_BOOT)).booleanValue();
+                this._fireOnBoot = (Boolean) map.get(DateTrigger.FIRE_ON_BOOT);
 
             if ("null".equals(this._repeats))
                 this._repeats = null;
@@ -832,7 +824,7 @@ public class DateTrigger extends Trigger
 
     public List<Long> fireTimes(Context context, long start, long end)
     {
-        ArrayList<Long> times = new ArrayList<Long>();
+        ArrayList<Long> times = new ArrayList<>();
 
         long offset = 0;
 
@@ -842,7 +834,7 @@ public class DateTrigger extends Trigger
 
             if (p != null)
             {
-                long fireTime = Long.valueOf(start + offset + 5000);
+                long fireTime = start + offset + 5000;
 
                 times.add(fireTime);
             }
@@ -873,7 +865,7 @@ public class DateTrigger extends Trigger
             Collections.sort(missedFires);
             Collections.reverse(missedFires);
 
-            return missedFires.get(0).longValue();
+            return missedFires.get(0);
         }
 
         return 0;

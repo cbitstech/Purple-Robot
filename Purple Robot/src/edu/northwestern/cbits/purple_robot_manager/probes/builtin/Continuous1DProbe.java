@@ -39,11 +39,7 @@ public abstract class Continuous1DProbe extends ContinuousProbe
 
             return template;
         }
-        catch (IOException e)
-        {
-            LogManager.getInstance(activity).logException(e);
-        }
-        catch (JSONException e)
+        catch (IOException | JSONException e)
         {
             LogManager.getInstance(activity).logException(e);
         }

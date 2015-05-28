@@ -97,7 +97,7 @@ public class LightProbe extends Continuous1DProbe implements SensorEventListener
     {
         if (this._schema == null)
         {
-            this._schema = new HashMap<String, String>();
+            this._schema = new HashMap<>();
 
             this._schema.put(LightProbe.LIGHT_KEY, ProbeValuesProvider.REAL_TYPE);
         }
@@ -113,7 +113,7 @@ public class LightProbe extends Continuous1DProbe implements SensorEventListener
         double[] eventTimes = bundle.getDoubleArray(ContinuousProbe.EVENT_TIMESTAMP);
         float[] lux = bundle.getFloatArray(LightProbe.LIGHT_KEY);
 
-        ArrayList<String> keys = new ArrayList<String>();
+        ArrayList<String> keys = new ArrayList<>();
 
         if (lux != null && eventTimes != null)
         {
@@ -156,7 +156,7 @@ public class LightProbe extends Continuous1DProbe implements SensorEventListener
         }
 
         return formatted;
-    };
+    }
 
     @Override
     public long getFrequency()
@@ -334,7 +334,7 @@ public class LightProbe extends Continuous1DProbe implements SensorEventListener
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putBoolean(LightProbe.USE_HANDLER, ((Boolean) handler).booleanValue());
+                e.putBoolean(LightProbe.USE_HANDLER, (Boolean) handler);
                 e.commit();
             }
         }
@@ -432,16 +432,16 @@ public class LightProbe extends Continuous1DProbe implements SensorEventListener
                         for (int i = 0; i < fieldNames.length; i++)
                         {
                             if (fieldNames[i].equals(LightProbe.LIGHT_KEY))
-                                light = Double.valueOf(valueBuffer[i][j]);
+                                light = (double) valueBuffer[i][j];
                         }
 
                         if (light != null)
                         {
-                            Map<String, Object> values = new HashMap<String, Object>();
+                            Map<String, Object> values = new HashMap<>();
 
                             values.put(LightProbe.LIGHT_KEY, light);
 
-                            values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[j] / 1000));
+                            values.put(ProbeValuesProvider.TIMESTAMP, timeBuffer[j] / 1000);
 
                             ProbeValuesProvider.getProvider(this._context).insertValue(this._context, LightProbe.DB_TABLE, this.databaseSchema(), values);
                         }

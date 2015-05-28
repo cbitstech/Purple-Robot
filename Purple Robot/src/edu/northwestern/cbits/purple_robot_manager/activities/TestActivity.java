@@ -269,7 +269,7 @@ public class TestActivity extends AppCompatActivity
                                     else
                                         title = me.getString(R.string.title_test_failed);
 
-                                    StringBuffer sb = new StringBuffer();
+                                    StringBuilder sb = new StringBuilder();
 
                                     Enumeration<TestFailure> errors = result.errors();
 

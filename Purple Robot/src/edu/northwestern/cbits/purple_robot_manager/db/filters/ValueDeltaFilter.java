@@ -10,9 +10,9 @@ import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 
 public class ValueDeltaFilter extends Filter
 {
-    private Set<String> _check = new HashSet<String>();
+    private Set<String> _check = new HashSet<>();
 
-    private Map<String, Map<String, Double>> _priorValues = new HashMap<String, Map<String, Double>>();
+    private Map<String, Map<String, Double>> _priorValues = new HashMap<>();
 
     private double _minDelta = 0;
 
@@ -34,7 +34,7 @@ public class ValueDeltaFilter extends Filter
         Map<String, Double> lastValues = this._priorValues.get(name);
 
         if (lastValues == null)
-            lastValues = new HashMap<String, Double>();
+            lastValues = new HashMap<>();
 
         for (String key : values.keySet())
         {
@@ -50,14 +50,14 @@ public class ValueDeltaFilter extends Filter
                     {
                         Double d = (Double) o;
 
-                        if (Math.abs(lastValue.doubleValue() - d.doubleValue()) < this._minDelta)
+                        if (Math.abs(lastValue - d) < this._minDelta)
                             allow = false;
                     }
                     else if (o instanceof Long)
                     {
                         Long l = (Long) o;
 
-                        if (Math.abs(lastValue.doubleValue() - l.doubleValue()) < this._minDelta)
+                        if (Math.abs(lastValue - l.doubleValue()) < this._minDelta)
                             allow = false;
                     }
                 }
@@ -76,13 +76,13 @@ public class ValueDeltaFilter extends Filter
                     {
                         Double d = (Double) o;
 
-                        lastValues.put(key, Double.valueOf(d.doubleValue()));
+                        lastValues.put(key, d.doubleValue());
                     }
                     else if (o instanceof Long)
                     {
                         Long l = (Long) o;
 
-                        lastValues.put(key, Double.valueOf(l.doubleValue()));
+                        lastValues.put(key, l.doubleValue());
                     }
                 }
             }

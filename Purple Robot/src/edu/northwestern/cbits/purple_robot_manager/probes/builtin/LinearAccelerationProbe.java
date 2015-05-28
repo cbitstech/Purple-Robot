@@ -115,7 +115,7 @@ public class LinearAccelerationProbe extends Continuous3DProbe implements Sensor
     {
         if (this._schema == null)
         {
-            this._schema = new HashMap<String, String>();
+            this._schema = new HashMap<>();
 
             this._schema.put(Continuous3DProbe.X_KEY, ProbeValuesProvider.REAL_TYPE);
             this._schema.put(Continuous3DProbe.Y_KEY, ProbeValuesProvider.REAL_TYPE);
@@ -132,10 +132,10 @@ public class LinearAccelerationProbe extends Continuous3DProbe implements Sensor
         {
             String template = WebkitActivity.stringForAsset(activity, "webkit/chart_spline_full.html");
 
-            ArrayList<Double> x = new ArrayList<Double>();
-            ArrayList<Double> y = new ArrayList<Double>();
-            ArrayList<Double> z = new ArrayList<Double>();
-            ArrayList<Double> time = new ArrayList<Double>();
+            ArrayList<Double> x = new ArrayList<>();
+            ArrayList<Double> y = new ArrayList<>();
+            ArrayList<Double> z = new ArrayList<>();
+            ArrayList<Double> time = new ArrayList<>();
 
             Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(activity, LinearAccelerationProbe.DB_TABLE, this.databaseSchema());
 
@@ -176,11 +176,7 @@ public class LinearAccelerationProbe extends Continuous3DProbe implements Sensor
 
             return template;
         }
-        catch (IOException e)
-        {
-            LogManager.getInstance(activity).logException(e);
-        }
-        catch (JSONException e)
+        catch (IOException | JSONException e)
         {
             LogManager.getInstance(activity).logException(e);
         }
@@ -198,7 +194,7 @@ public class LinearAccelerationProbe extends Continuous3DProbe implements Sensor
         double[] y = bundle.getDoubleArray(Continuous3DProbe.Y_KEY);
         double[] z = bundle.getDoubleArray(Continuous3DProbe.Z_KEY);
 
-        ArrayList<String> keys = new ArrayList<String>();
+        ArrayList<String> keys = new ArrayList<>();
 
         SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.display_date_format));
 
@@ -242,7 +238,7 @@ public class LinearAccelerationProbe extends Continuous3DProbe implements Sensor
         }
 
         return formatted;
-    };
+    }
 
     @Override
     public long getFrequency()
@@ -495,22 +491,22 @@ public class LinearAccelerationProbe extends Continuous3DProbe implements Sensor
                         for (int i = 0; i < fieldNames.length; i++)
                         {
                             if (fieldNames[i].equals(Continuous3DProbe.X_KEY))
-                                x = Double.valueOf(valueBuffer[i][j]);
+                                x = (double) valueBuffer[i][j];
                             else if (fieldNames[i].equals(Continuous3DProbe.Y_KEY))
-                                y = Double.valueOf(valueBuffer[i][j]);
+                                y = (double) valueBuffer[i][j];
                             else if (fieldNames[i].equals(Continuous3DProbe.Z_KEY))
-                                z = Double.valueOf(valueBuffer[i][j]);
+                                z = (double) valueBuffer[i][j];
                         }
 
                         if (x != null && y != null && z != null)
                         {
-                            Map<String, Object> values = new HashMap<String, Object>();
+                            Map<String, Object> values = new HashMap<>();
 
                             values.put(Continuous3DProbe.X_KEY, x);
                             values.put(Continuous3DProbe.Y_KEY, y);
                             values.put(Continuous3DProbe.Z_KEY, z);
 
-                            values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[j] / 1000));
+                            values.put(ProbeValuesProvider.TIMESTAMP, timeBuffer[j] / 1000);
 
                             ProbeValuesProvider.getProvider(this._context).insertValue(this._context, LinearAccelerationProbe.DB_TABLE, this.databaseSchema(), values);
                         }
@@ -597,7 +593,7 @@ public class LinearAccelerationProbe extends Continuous3DProbe implements Sensor
                 SharedPreferences prefs = Probe.getPreferences(context);
                 SharedPreferences.Editor e = prefs.edit();
 
-                e.putBoolean(LinearAccelerationProbe.USE_HANDLER, ((Boolean) handler).booleanValue());
+                e.putBoolean(LinearAccelerationProbe.USE_HANDLER, (Boolean) handler);
                 e.commit();
             }
         }

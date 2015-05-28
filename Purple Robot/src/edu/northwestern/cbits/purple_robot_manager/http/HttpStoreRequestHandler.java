@@ -62,7 +62,7 @@ public class HttpStoreRequestHandler implements HttpRequestHandler
 
             Uri u = Uri.parse("http://localhost/?" + entityString);
 
-            HashMap<String, String> arguments = new HashMap<String, String>();
+            HashMap<String, String> arguments = new HashMap<>();
 
             try
             {

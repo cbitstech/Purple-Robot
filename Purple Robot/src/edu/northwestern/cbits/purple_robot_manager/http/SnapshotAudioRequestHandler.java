@@ -76,23 +76,7 @@ public class SnapshotAudioRequestHandler implements HttpRequestHandler
 
                     return;
                 }
-                catch (IllegalArgumentException e)
-                {
-                    LogManager.getInstance(this._context).logException(e);
-                }
-                catch (SecurityException e)
-                {
-                    LogManager.getInstance(this._context).logException(e);
-                }
-                catch (IllegalStateException e)
-                {
-                    LogManager.getInstance(this._context).logException(e);
-                }
-                catch (JSONException e)
-                {
-                    LogManager.getInstance(this._context).logException(e);
-                }
-                catch (InterruptedException e)
+                catch (IllegalArgumentException | InterruptedException | JSONException | IllegalStateException | SecurityException e)
                 {
                     LogManager.getInstance(this._context).logException(e);
                 }

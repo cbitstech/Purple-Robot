@@ -38,11 +38,11 @@ public class ModelManager extends BroadcastReceiver
     private static ModelManager _instance = null;
 
     private Context _context = null;
-    private List<Model> _models = new ArrayList<Model>();
-    private HashMap<String, Object> _milieu = new HashMap<String, Object>();
-    private HashMap<String, String> _keyCache = new HashMap<String, String>();
+    private List<Model> _models = new ArrayList<>();
+    private final HashMap<String, Object> _milieu = new HashMap<>();
+    private final HashMap<String, String> _keyCache = new HashMap<>();
 
-    private HashSet<String> _modelUrls = new HashSet<String>();
+    private HashSet<String> _modelUrls = new HashSet<>();
 
     private ModelManager(Context context)
     {
@@ -110,7 +110,7 @@ public class ModelManager extends BroadcastReceiver
 
     private List<Model> allModels(Context context)
     {
-        ArrayList<Model> models = new ArrayList<Model>();
+        ArrayList<Model> models = new ArrayList<>();
         models.addAll(this._models);
 
         return models;
@@ -154,7 +154,7 @@ public class ModelManager extends BroadcastReceiver
 
         for (Model model : this.allModels(context))
         {
-            HashMap<String, Object> snapshot = new HashMap<String, Object>();
+            HashMap<String, Object> snapshot = new HashMap<>();
 
             synchronized (this._milieu)
             {
@@ -231,7 +231,7 @@ public class ModelManager extends BroadcastReceiver
     {
         synchronized (this._models)
         {
-            List<Model> toRemove = new ArrayList<Model>();
+            List<Model> toRemove = new ArrayList<>();
 
             for (Model model : this._models)
             {
@@ -280,7 +280,7 @@ public class ModelManager extends BroadcastReceiver
 
     public Map<String, Object> models(Context context)
     {
-        HashMap<String, Object> modelMap = new HashMap<String, Object>();
+        HashMap<String, Object> modelMap = new HashMap<>();
 
         for (Model m : this._models)
         {
@@ -311,7 +311,7 @@ public class ModelManager extends BroadcastReceiver
 
     public Map<String, Object> predictions(Context context)
     {
-        HashMap<String, Object> predictions = new HashMap<String, Object>();
+        HashMap<String, Object> predictions = new HashMap<>();
 
         for (Model m : this._models)
         {

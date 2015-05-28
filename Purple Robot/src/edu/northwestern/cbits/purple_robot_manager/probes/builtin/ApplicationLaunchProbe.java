@@ -233,7 +233,7 @@ public class ApplicationLaunchProbe extends Probe
 
             if (frequency instanceof Double)
             {
-                frequency = Long.valueOf(((Double) frequency).longValue());
+                frequency = ((Double) frequency).longValue();
             }
 
             if (frequency instanceof Long)

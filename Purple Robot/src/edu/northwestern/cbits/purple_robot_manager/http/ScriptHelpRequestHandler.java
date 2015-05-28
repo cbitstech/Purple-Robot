@@ -108,7 +108,7 @@ public class ScriptHelpRequestHandler implements HttpRequestHandler
     {
         Class[] scriptingClasses = { JavaScriptEngine.class, SchemeEngine.class };
 
-        ArrayList<String> languages = new ArrayList<String>();
+        ArrayList<String> languages = new ArrayList<>();
         languages.add(ScriptHelpRequestHandler.LANGUAGE_ALL.toLowerCase());
 
         if (languages.contains(language) == false)
@@ -116,7 +116,7 @@ public class ScriptHelpRequestHandler implements HttpRequestHandler
 
         if (page == null || page.trim().length() == 0)
         {
-            HashSet<String> included = new HashSet<String>();
+            HashSet<String> included = new HashSet<>();
 
             try
             {
@@ -143,7 +143,7 @@ public class ScriptHelpRequestHandler implements HttpRequestHandler
 
                                 if (languages.contains(scriptLanguage.toLowerCase()) && included.contains(method.toGenericString()) == false)
                                 {
-                                    StringBuffer args = new StringBuffer();
+                                    StringBuilder args = new StringBuilder();
 
                                     for (String argument : ((ScriptingEngineMethod) annotation).arguments())
                                     {
@@ -188,11 +188,7 @@ public class ScriptHelpRequestHandler implements HttpRequestHandler
 
                 return content.getBytes(Charset.forName("UTF-8"));
             }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-            catch (JSONException e)
+            catch (IOException | JSONException e)
             {
                 e.printStackTrace();
             }
@@ -244,7 +240,7 @@ public class ScriptHelpRequestHandler implements HttpRequestHandler
 
                                 if (page.equals(scriptAnnotation.assetPath()))
                                 {
-                                    StringBuffer args = new StringBuffer();
+                                    StringBuilder args = new StringBuilder();
 
                                     for (String argument : ((ScriptingEngineMethod) annotation).arguments())
                                     {

@@ -37,7 +37,7 @@ public class ProbeViewerActivity extends AppCompatActivity
     private Probe _probe = null;
 
     private static final String PREFERENCE_SCREEN_KEY = "PREFERENCE_SCREEN_KEY";
-    private static HashMap<String, PreferenceScreen> _screens = new HashMap<String, PreferenceScreen>();
+    private static HashMap<String, PreferenceScreen> _screens = new HashMap<>();
 
     public static class ProbeViewerFragment extends PreferenceFragment
     {
@@ -308,7 +308,7 @@ public class ProbeViewerActivity extends AppCompatActivity
 
         screen.setTitle(title);
 
-        ArrayList<String> keys = new ArrayList<String>();
+        ArrayList<String> keys = new ArrayList<>();
 
         if (bundle.containsKey("KEY_ORDER"))
             keys.addAll(bundle.getStringArrayList("KEY_ORDER"));

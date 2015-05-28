@@ -30,7 +30,7 @@ public class WidgetReceiver extends BroadcastReceiver
         else if ("tap_five".equals(action))
             script = intent.getStringExtra("action_five");
 
-        HashMap<String, Object> payload = new HashMap<String, Object>();
+        HashMap<String, Object> payload = new HashMap<>();
         payload.put("widget_action", action);
         LogManager.getInstance(context).log("pr_widget_tapped", payload);
 

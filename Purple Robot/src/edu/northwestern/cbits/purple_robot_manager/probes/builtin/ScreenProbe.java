@@ -12,7 +12,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -150,7 +149,7 @@ public class ScreenProbe extends Probe
             formatted.putString(context.getString(R.string.display_screen_label), context.getString(R.string.display_screen_inactive_label));
 
         return formatted;
-    };
+    }
 
     @Override
     public String summary(Context context)

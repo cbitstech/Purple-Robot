@@ -63,7 +63,7 @@ public class UserIdTestCase extends RobotTestCase
             command.put("command", "execute_script");
             command.put("script", "PurpleRobot.setUserId('" + UserIdTestCase.TEST_ID_1 + "', false);");
 
-            HashMap<String, String> payload = new HashMap<String, String>();
+            HashMap<String, String> payload = new HashMap<>();
             payload.put("json", command.toString(2));
 
             String response = this.syncHttpPost("http://127.0.0.1:12345/json/submit", payload);

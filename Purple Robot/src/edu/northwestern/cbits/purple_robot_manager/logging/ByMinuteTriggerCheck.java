@@ -7,9 +7,6 @@ import edu.northwestern.cbits.purple_robot_manager.triggers.DateTrigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
-/**
- * Created by Administrator on 3/29/15.
- */
 public class ByMinuteTriggerCheck extends SanityCheck
 {
     public void runCheck(Context context)

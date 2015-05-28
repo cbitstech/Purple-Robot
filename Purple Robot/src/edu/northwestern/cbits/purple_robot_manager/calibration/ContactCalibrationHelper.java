@@ -26,7 +26,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CommunicationL
 
 public class ContactCalibrationHelper
 {
-    private static Map<String, String> _cache = new HashMap<String, String>();
+    private static Map<String, String> _cache = new HashMap<>();
     private static SharedPreferences _cachedPrefs = null;
 
     public static void check(final Context context)
@@ -127,8 +127,8 @@ public class ContactCalibrationHelper
     @SuppressWarnings("deprecation")
     public static List<ContactRecord> fetchContactRecords(Context context)
     {
-        ArrayList<ContactRecord> contacts = new ArrayList<ContactRecord>();
-        ArrayList<ContactRecord> normalizedContacts = new ArrayList<ContactRecord>();
+        ArrayList<ContactRecord> contacts = new ArrayList<>();
+        ArrayList<ContactRecord> normalizedContacts = new ArrayList<>();
 
         try
         {
@@ -190,6 +190,7 @@ public class ContactCalibrationHelper
 
             Collections.sort(contacts);
 
+            c.close();
 
             for (ContactRecord contact : contacts)
             {

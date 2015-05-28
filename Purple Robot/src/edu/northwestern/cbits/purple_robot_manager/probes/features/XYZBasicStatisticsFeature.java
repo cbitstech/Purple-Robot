@@ -73,7 +73,7 @@ public abstract class XYZBasicStatisticsFeature extends XYZContinuousProbeFeatur
                     data.putInt("BUFFER_SIZE", XYZContinuousProbeFeature.BUFFER_SIZE);
                     data.putDouble("FREQUENCY", ((double) XYZContinuousProbeFeature.BUFFER_SIZE)
                             / ((maxTime - minTime) / 1000));
-                    data.putDouble("DURATION", ((double) ((maxTime - minTime) / 1000.0)));
+                    data.putDouble("DURATION", ((maxTime - minTime) / 1000.0));
 
                     me.transmitData(context, data);
 

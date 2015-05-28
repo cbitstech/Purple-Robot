@@ -40,13 +40,13 @@ public class ProbeValuesProvider
     private SQLiteDatabase _database = null;
     private ProbeValuesSqlHelper _dbHelper = null;
 
-    private ArrayList<Filter> _filters = new ArrayList<Filter>();
+    private ArrayList<Filter> _filters = new ArrayList<>();
 
     private long _lastCleanup = 0;
 
     private static ProbeValuesProvider _instance = null;
 
-    private HashMap<String, Long> _lastUpdates = new HashMap<String, Long>();
+    private HashMap<String, Long> _lastUpdates = new HashMap<>();
 
     public static ProbeValuesProvider getProvider(Context context)
     {
@@ -69,7 +69,7 @@ public class ProbeValuesProvider
             LogManager.getInstance(context).logException(e);
         }
 
-        HashSet<String> highFreq = new HashSet<String>();
+        HashSet<String> highFreq = new HashSet<>();
         highFreq.add(AccelerometerProbe.DB_TABLE);
         highFreq.add(GyroscopeProbe.DB_TABLE);
         highFreq.add(MagneticFieldProbe.DB_TABLE);
@@ -98,19 +98,19 @@ public class ProbeValuesProvider
 
         // Proximity: Identical values
 
-        HashSet<String> quarterDelta = new HashSet<String>();
+        HashSet<String> quarterDelta = new HashSet<>();
         quarterDelta.add(AccelerometerProbe.DB_TABLE);
         quarterDelta.add(PressureProbe.DB_TABLE);
         quarterDelta.add(GyroscopeProbe.DB_TABLE);
 
         this._filters.add(new ValueDeltaFilter(0.25, quarterDelta));
 
-        HashSet<String> fullDelta = new HashSet<String>();
+        HashSet<String> fullDelta = new HashSet<>();
         fullDelta.add(MagneticFieldProbe.DB_TABLE);
 
         this._filters.add(new ValueDeltaFilter(1.0, fullDelta));
 
-        HashSet<String> fiveDelta = new HashSet<String>();
+        HashSet<String> fiveDelta = new HashSet<>();
         fiveDelta.add(LightProbe.DB_TABLE);
 
         this._filters.add(new ValueDeltaFilter(5.0, fiveDelta));
@@ -125,7 +125,7 @@ public class ProbeValuesProvider
     {
         String tableName = name;
 
-        ArrayList<String> columns = new ArrayList<String>(schema.keySet());
+        ArrayList<String> columns = new ArrayList<>(schema.keySet());
         Collections.sort(columns);
 
         for (String key : columns)
@@ -140,11 +140,7 @@ public class ProbeValuesProvider
 
             tableName = "table_" + (new BigInteger(1, digest)).toString(16);
         }
-        catch (NoSuchAlgorithmException e)
-        {
-            LogManager.getInstance(context).logException(e);
-        }
-        catch (UnsupportedEncodingException e)
+        catch (NoSuchAlgorithmException | UnsupportedEncodingException e)
         {
             LogManager.getInstance(context).logException(e);
         }
@@ -365,7 +361,7 @@ public class ProbeValuesProvider
 
         Cursor c = this._database.rawQuery(tableSelect, null);
 
-        ArrayList<String> names = new ArrayList<String>();
+        ArrayList<String> names = new ArrayList<>();
 
         while (c.moveToNext())
             names.add(c.getString(c.getColumnIndex("name")));

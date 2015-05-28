@@ -30,7 +30,6 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.Places;
-import com.google.android.gms.maps.model.LatLng;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
@@ -154,13 +153,13 @@ public class GooglePlacesProbe extends Probe implements GoogleApiClient.Connecti
                                  String mostLikelyPlaceName = null;
                                  String mostLikelyPlaceId = null;
 
-                                 HashMap<String, Integer> places = new HashMap<String, Integer>();
+                                 HashMap<String, Integer> places = new HashMap<>();
 
                                  for (PlaceLikelihood placeLikelihood : likelyPlaces)
                                  {
                                      Place place = placeLikelihood.getPlace();
 
-                                     Location placeLocation = new Location(locations.PASSIVE_PROVIDER);
+                                     Location placeLocation = new Location(LocationManager.PASSIVE_PROVIDER);
                                      placeLocation.setLatitude(place.getLatLng().latitude);
                                      placeLocation.setLongitude(place.getLatLng().longitude);
 
@@ -207,13 +206,13 @@ public class GooglePlacesProbe extends Probe implements GoogleApiClient.Connecti
                                 for (String key : places.keySet())
                                 {
                                     if (Arrays.asList(GooglePlacesProbe.EXCLUDED_TYPES).contains(key) == false)
-                                        bundle.putInt(key, places.get(key).intValue());
+                                        bundle.putInt(key, places.get(key));
                                 }
 
                                 me.transmitData(context, bundle);
                             }
                         });
-                    };
+                    }
                 }
 
                 return true;
@@ -242,13 +241,13 @@ public class GooglePlacesProbe extends Probe implements GoogleApiClient.Connecti
 
         JSONArray results = json.getJSONArray("results");
 
-        HashMap<String, Integer> place = new HashMap<String, Integer>();
+        HashMap<String, Integer> place = new HashMap<>();
 
         String[] availableTypes = context.getResources().getStringArray(R.array.google_places_types);
 
         for (String type : availableTypes)
         {
-            place.put(type, Integer.valueOf(0));
+            place.put(type, 0);
         }
 
         for (int i = 0; i < results.length(); i++)
@@ -264,9 +263,9 @@ public class GooglePlacesProbe extends Probe implements GoogleApiClient.Connecti
                 Integer count = place.get(type);
 
                 if (count == null)
-                    count = Integer.valueOf(0);
+                    count = 0;
 
-                count = Integer.valueOf(count.intValue() + 1);
+                count = count.intValue() + 1;
 
                 place.put(type, count);
             }
@@ -293,10 +292,10 @@ public class GooglePlacesProbe extends Probe implements GoogleApiClient.Connecti
             {
                 Integer count = (Integer) o;
 
-                if (count.intValue() > maxCount)
+                if (count > maxCount)
                 {
                     frequentPlace = key;
-                    maxCount = count.intValue();
+                    maxCount = count;
                 }
             }
             else if (o instanceof Double)

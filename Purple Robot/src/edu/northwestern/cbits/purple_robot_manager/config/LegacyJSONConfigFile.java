@@ -3,15 +3,11 @@ package edu.northwestern.cbits.purple_robot_manager.config;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -355,32 +351,14 @@ public class LegacyJSONConfigFile
                                 });
                             }
                         }
-                    }
-                    catch (UnknownHostException e)
-                    {
-                        LogManager.getInstance(context).logException(e);
-                    }
-                    catch (MalformedURLException e)
-                    {
-                        LogManager.getInstance(context).logException(e);
-                    }
-                    catch (ConnectException e)
-                    {
-                        LogManager.getInstance(context).logException(e);
-                    }
-                    catch (IOException e)
+                    } catch (IOException e)
                     {
                         LogManager.getInstance(context).logException(e);
                     }
                     catch (JSONException e)
                     {
                         LogManager.getInstance(context).logException(e);
-                    }
-                    catch (NullPointerException e)
-                    {
-                        LogManager.getInstance(context).logException(e);
-                    }
-                    catch (Exception e)
+                    } catch (Exception e)
                     {
                         LogManager.getInstance(context).logException(e);
                     }
@@ -418,7 +396,7 @@ public class LegacyJSONConfigFile
 
     protected void updateTriggers(Context context)
     {
-        List<Trigger> triggerList = new ArrayList<Trigger>();
+        List<Trigger> triggerList = new ArrayList<>();
 
         try
         {
@@ -428,7 +406,7 @@ public class LegacyJSONConfigFile
             {
                 JSONObject json = triggers.getJSONObject(i);
 
-                Map<String, Object> map = new HashMap<String, Object>();
+                Map<String, Object> map = new HashMap<>();
 
                 Iterator<String> keys = json.keys();
 
@@ -601,7 +579,7 @@ public class LegacyJSONConfigFile
                     if (feature.has("formatter"))
                         formatter = feature.getString("formatter");
 
-                    ArrayList<String> sources = new ArrayList<String>();
+                    ArrayList<String> sources = new ArrayList<>();
 
                     if (feature.has("sources"))
                     {

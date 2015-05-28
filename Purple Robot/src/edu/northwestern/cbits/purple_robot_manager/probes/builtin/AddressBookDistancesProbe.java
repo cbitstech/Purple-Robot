@@ -103,7 +103,7 @@ public class AddressBookDistancesProbe extends Probe
             if (prefs.getBoolean(AddressBookDistancesProbe.ENABLED, AddressBookDistancesProbe.DEFAULT_ENABLED))
             {
 
-                HashMap<String, String> addresses = new HashMap<String, String>();
+                HashMap<String, String> addresses = new HashMap<>();
 
                 long freq = Long.parseLong(prefs.getString(AddressBookDistancesProbe.FREQUENCY, AddressBookDistancesProbe.DEFAULT_FREQUENCY));
                 boolean doHash = prefs.getBoolean(AddressBookDistancesProbe.HASH_DATA, Probe.DEFAULT_HASH_DATA);
@@ -269,7 +269,7 @@ public class AddressBookDistancesProbe extends Probe
             {
                 String address = addresses.get(label).trim().toLowerCase().replace("\n", " ").replace("\r", " ");
 
-                while (address.indexOf("  ") != -1)
+                while (address.contains("  "))
                     address = address.replace("  ", " ");
 
                 String key = "Geocoded Location: " + address;
@@ -454,7 +454,7 @@ public class AddressBookDistancesProbe extends Probe
 
             if (frequency instanceof Double)
             {
-                frequency = Long.valueOf(((Double) frequency).longValue());
+                frequency = ((Double) frequency).longValue();
             }
 
             if (frequency instanceof Long)
@@ -476,7 +476,7 @@ public class AddressBookDistancesProbe extends Probe
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putBoolean(AddressBookDistancesProbe.HASH_DATA, ((Boolean) hash).booleanValue());
+                e.putBoolean(AddressBookDistancesProbe.HASH_DATA, (Boolean) hash);
                 e.commit();
             }
         }

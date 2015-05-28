@@ -170,7 +170,7 @@ public class HardwareInformationProbe extends Probe
                 bundle.getString(HardwareInformationProbe.WIFI_MAC));
 
         return formatted;
-    };
+    }
 
     @Override
     public String summarizeValue(Context context, Bundle bundle)

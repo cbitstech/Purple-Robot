@@ -118,7 +118,7 @@ public class PebbleProbe extends Continuous3DProbe
 
         public static List<AccelData> fromDataArray(byte[] data)
         {
-            List<AccelData> accels = new ArrayList<AccelData>();
+            List<AccelData> accels = new ArrayList<>();
 
             for (int i = 0; i < data.length; i += 15)
             {
@@ -236,8 +236,7 @@ public class PebbleProbe extends Continuous3DProbe
                                         data.putString(Probe.BUNDLE_PROBE, me.name(me._context));
 
                                         data.putBoolean(PebbleProbe.BUNDLE_IS_CHARGING, me._isCharging);
-                                        data.putInt(PebbleProbe.BUNDLE_CHARGE_LEVEL, (int) me._chargeLevel);
-
+                                        data.putInt(PebbleProbe.BUNDLE_CHARGE_LEVEL, me._chargeLevel);
 
                                         FirmwareVersionInfo info = PebbleKit.getWatchFWVersion(context);
 
@@ -270,13 +269,13 @@ public class PebbleProbe extends Continuous3DProbe
 
                                     if (me._index % 10 == 0)
                                     {
-                                        Map<String, Object> values = new HashMap<String, Object>(4);
+                                        Map<String, Object> values = new HashMap<>(4);
 
                                         values.put(Continuous3DProbe.X_KEY, x);
                                         values.put(Continuous3DProbe.Y_KEY, y);
                                         values.put(Continuous3DProbe.Z_KEY, z);
 
-                                        values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(accel.getTimestamp() / 1000));
+                                        values.put(ProbeValuesProvider.TIMESTAMP, (double) (accel.getTimestamp() / 1000));
 
                                         ProbeValuesProvider.getProvider(context).insertValue(context, PebbleProbe.DB_TABLE, me.databaseSchema(), values);
 
@@ -384,7 +383,7 @@ public class PebbleProbe extends Continuous3DProbe
     {
         if (this._schema == null)
         {
-            this._schema = new HashMap<String, String>();
+            this._schema = new HashMap<>();
 
             this._schema.put(Continuous3DProbe.X_KEY, ProbeValuesProvider.REAL_TYPE);
             this._schema.put(Continuous3DProbe.Y_KEY, ProbeValuesProvider.REAL_TYPE);

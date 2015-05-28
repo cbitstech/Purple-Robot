@@ -21,14 +21,14 @@ public class BranchNode extends TreeNode
         private static final long serialVersionUID = 7858585916379498941L;
     }
 
-    private ArrayList<Condition> _conditions = new ArrayList<Condition>();
+    private ArrayList<Condition> _conditions = new ArrayList<>();
 
     /**
      * Different kinds of tests and comparisons. (Not all are currently
      * implemented.
      */
 
-    public static enum Operation
+    public enum Operation
     {
         LESS_THAN, LESS_THAN_OR_EQUAL_TO, MORE_THAN, MORE_THAN_OR_EQUAL_TO, EQUALS, EQUALS_CASE_INSENSITIVE, CONTAINS, CONTAINED_BY, STARTS_WITH, ENDS_WITH, DEFAULT // Always
                                                                                                                                                                      // passes.
@@ -98,18 +98,8 @@ public class BranchNode extends TreeNode
 
         public String toString()
         {
-            StringBuffer sb = new StringBuffer();
-
-            sb.append(this._feature);
-            sb.append(" ");
-            sb.append(this._operation.name());
-            sb.append(" ");
-            sb.append(this._value);
-            sb.append(" (");
-            sb.append(this._priority);
-            sb.append(")");
-
-            return sb.toString();
+            return this._feature + " " + this._operation.name() + " " + this._value +
+                    " (" + this._priority + ")";
         }
 
         /**
@@ -401,7 +391,7 @@ public class BranchNode extends TreeNode
 
     public String toString(int indent) throws TreeNodeException
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         String newline = System.getProperty("line.separator");
 

@@ -40,7 +40,7 @@ public class ScheduleManager
         long now = System.currentTimeMillis();
         SimpleDateFormat sdf = new SimpleDateFormat(ScheduleManager.DATE_FORMAT);
 
-        List<Map<String, String>> executed = new ArrayList<Map<String, String>>();
+        List<Map<String, String>> executed = new ArrayList<>();
 
         for (Map<String, String> script : scripts)
         {
@@ -58,7 +58,7 @@ public class ScheduleManager
 
                     BaseScriptEngine.runScript(context, action);
 
-                    HashMap<String, Object> payload = new HashMap<String, Object>();
+                    HashMap<String, Object> payload = new HashMap<>();
                     payload.put("run_timestamp", now);
                     payload.put("scheduled_timestamp", d.getTime());
                     payload.put("action", action);
@@ -116,7 +116,7 @@ public class ScheduleManager
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        ArrayList<Map<String, String>> scripts = new ArrayList<Map<String, String>>();
+        ArrayList<Map<String, String>> scripts = new ArrayList<>();
 
         try
         {
@@ -126,7 +126,7 @@ public class ScheduleManager
             {
                 JSONObject json = (JSONObject) array.get(i);
 
-                HashMap<String, String> script = new HashMap<String, String>();
+                HashMap<String, String> script = new HashMap<>();
 
                 if (json.has("identifier") && json.has("date") && json.has("action"))
                 {
@@ -181,7 +181,7 @@ public class ScheduleManager
 
             if (found == false)
             {
-                HashMap<String, String> script = new HashMap<String, String>();
+                HashMap<String, String> script = new HashMap<>();
 
                 script.put("date", dateString);
                 script.put("action", action);
@@ -190,12 +190,12 @@ public class ScheduleManager
                 scripts.add(script);
             }
 
-            HashMap<String, Object> payload = new HashMap<String, Object>();
+            HashMap<String, Object> payload = new HashMap<>();
             payload.put("scheduled_date", dateString);
             payload.put("action", action);
             payload.put("identifier", identifier);
 
-            LogManager.getInstance(context).log("pr_scheduled_script", null);
+            LogManager.getInstance(context).log("pr_scheduled_script", payload);
         }
 
         ScheduleManager.persistScripts(context, scripts);

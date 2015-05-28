@@ -381,12 +381,7 @@ public class FitbitProbe extends Probe
                                     }
 
                                     me.transmitData(context, bundle);
-                                }
-                                catch (JSONException e)
-                                {
-                                    e.printStackTrace();
-                                }
-                                catch (Exception e)
+                                } catch (Exception e)
                                 {
                                     e.printStackTrace();
                                 }
@@ -477,7 +472,7 @@ public class FitbitProbe extends Probe
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putBoolean(FitbitProbe.SLEEP_ENABLED, ((Boolean) value).booleanValue());
+                e.putBoolean(FitbitProbe.SLEEP_ENABLED, (Boolean) value);
                 e.commit();
             }
         }
@@ -491,7 +486,7 @@ public class FitbitProbe extends Probe
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putBoolean(FitbitProbe.BODY_ENABLED, ((Boolean) value).booleanValue());
+                e.putBoolean(FitbitProbe.BODY_ENABLED, (Boolean) value);
                 e.commit();
             }
         }
@@ -505,7 +500,7 @@ public class FitbitProbe extends Probe
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putBoolean(FitbitProbe.FOOD_ENABLED, ((Boolean) value).booleanValue());
+                e.putBoolean(FitbitProbe.FOOD_ENABLED, (Boolean) value);
                 e.commit();
             }
         }

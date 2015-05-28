@@ -213,7 +213,7 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
 
     public static List<Bundle> parseActivities(List<DetectedActivity> activities)
     {
-        ArrayList<Bundle> bundles = new ArrayList<Bundle>();
+        ArrayList<Bundle> bundles = new ArrayList<>();
 
         for (DetectedActivity activity : activities)
         {
@@ -260,7 +260,7 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
 
             if (frequency instanceof Double)
             {
-                frequency = Long.valueOf(((Double) frequency).longValue());
+                frequency = ((Double) frequency).longValue();
             }
 
             if (frequency instanceof Long)

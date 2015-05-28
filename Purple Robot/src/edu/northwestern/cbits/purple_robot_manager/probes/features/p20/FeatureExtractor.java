@@ -28,7 +28,7 @@ public class FeatureExtractor
     private double[] _binEdges = new double[]
     { -3, -2, -1, 0, 1, 2, 3 };
 
-    public static enum Feature
+    public enum Feature
     {
         ACC_NUM_SAMPLES, ACC_MEAN, ACCX_MEAN, ACCY_MEAN, ACCZ_MEAN, ACC_MEAN_ABS, ACCX_MEAN_ABS, ACCY_MEAN_ABS, ACCZ_MEAN_ABS, ACCX_STD, ACCY_STD, ACCZ_STD, ACCX_SKEW, ACCY_SKEW, ACCZ_SKEW, ACCX_KURT, ACCY_KURT, ACCZ_KURT, ACCX_DIFF_MEAN, ACCY_DIFF_MEAN, ACCZ_DIFF_MEAN, ACCX_DIFF_STD, ACCY_DIFF_STD, ACCZ_DIFF_STD, ACCX_DIFF_SKEW, ACCY_DIFF_SKEW, ACCZ_DIFF_SKEW, ACCX_DIFF_KURT, ACCY_DIFF_KURT, ACCZ_DIFF_KURT, ACCX_MAX, ACCY_MAX, ACCZ_MAX, ACCX_MIN, ACCY_MIN, ACCZ_MIN, ACCX_MAX_ABS, ACCY_MAX_ABS, ACCZ_MAX_ABS, ACCX_MIN_ABS, ACCY_MIN_ABS, ACCZ_MIN_ABS, ACCX_RMS, ACCY_RMS, ACCZ_RMS, ACC_CROSS_XY, ACC_CROSS_YZ, ACC_CROSS_ZX, ACC_CROSS_XY_ABS, ACC_CROSS_YZ_ABS, ACC_CROSS_ZX_ABS, ACC_CROSS_XY_NORM, ACC_CROSS_YZ_NORM, ACC_CROSS_ZX_NORM, ACC_CROSS_XY_NORM_ABS, ACC_CROSS_YZ_NORM_ABS, ACC_CROSS_ZX_NORM_ABS, ACCX_FFT1, ACCX_FFT2, ACCX_FFT3, ACCX_FFT4, ACCX_FFT5, ACCX_FFT6, ACCX_FFT7, ACCX_FFT8, ACCX_FFT9, ACCX_FFT10, ACCY_FFT1, ACCY_FFT2, ACCY_FFT3, ACCY_FFT4, ACCY_FFT5, ACCY_FFT6, ACCY_FFT7, ACCY_FFT8, ACCY_FFT9, ACCY_FFT10, ACCZ_FFT1, ACCZ_FFT2, ACCZ_FFT3, ACCZ_FFT4, ACCZ_FFT5, ACCZ_FFT6, ACCZ_FFT7, ACCZ_FFT8, ACCZ_FFT9, ACCZ_FFT10, ACCX_HIST1, ACCX_HIST2, ACCX_HIST3, ACCX_HIST4, ACCX_HIST5, ACCX_HIST6, ACCY_HIST1, ACCY_HIST2, ACCY_HIST3, ACCY_HIST4, ACCY_HIST5, ACCY_HIST6, ACCZ_HIST1, ACCZ_HIST2, ACCZ_HIST3, ACCZ_HIST4, ACCZ_HIST5, ACCZ_HIST6, GYR_NUM_SAMPLES, GYR_MEAN, GYRX_MEAN, GYRY_MEAN, GYRZ_MEAN, GYR_MEAN_ABS, GYRX_MEAN_ABS, GYRY_MEAN_ABS, GYRZ_MEAN_ABS, GYRX_STD, GYRY_STD, GYRZ_STD, GYRX_SKEW, GYRY_SKEW, GYRZ_SKEW, GYRX_KURT, GYRY_KURT, GYRZ_KURT, GYRX_DIFF_MEAN, GYRY_DIFF_MEAN, GYRZ_DIFF_MEAN, GYRX_DIFF_STD, GYRY_DIFF_STD, GYRZ_DIFF_STD, GYRX_DIFF_SKEW, GYRY_DIFF_SKEW, GYRZ_DIFF_SKEW, GYRX_DIFF_KURT, GYRY_DIFF_KURT, GYRZ_DIFF_KURT, GYRX_MAX, GYRY_MAX, GYRZ_MAX, GYRX_MIN, GYRY_MIN, GYRZ_MIN, GYRX_MAX_ABS, GYRY_MAX_ABS, GYRZ_MAX_ABS, GYRX_MIN_ABS, GYRY_MIN_ABS, GYRZ_MIN_ABS, GYRX_RMS, GYRY_RMS, GYRZ_RMS, GYR_CROSS_XY, GYR_CROSS_YZ, GYR_CROSS_ZX, GYR_CROSS_XY_ABS, GYR_CROSS_YZ_ABS, GYR_CROSS_ZX_ABS, GYR_CROSS_XY_NORM, GYR_CROSS_YZ_NORM, GYR_CROSS_ZX_NORM, GYR_CROSS_XY_NORM_ABS, GYR_CROSS_YZ_NORM_ABS, GYR_CROSS_ZX_NORM_ABS, GYRX_FFT1, GYRX_FFT2, GYRX_FFT3, GYRX_FFT4, GYRX_FFT5, GYRX_FFT6, GYRX_FFT7, GYRX_FFT8, GYRX_FFT9, GYRX_FFT10, GYRY_FFT1, GYRY_FFT2, GYRY_FFT3, GYRY_FFT4, GYRY_FFT5, GYRY_FFT6, GYRY_FFT7, GYRY_FFT8, GYRY_FFT9, GYRY_FFT10, GYRZ_FFT1, GYRZ_FFT2, GYRZ_FFT3, GYRZ_FFT4, GYRZ_FFT5, GYRZ_FFT6, GYRZ_FFT7, GYRZ_FFT8, GYRZ_FFT9, GYRZ_FFT10, GYRX_HIST1, GYRX_HIST2, GYRX_HIST3, GYRX_HIST4, GYRX_HIST5, GYRX_HIST6, GYRY_HIST1, GYRY_HIST2, GYRY_HIST3, GYRY_HIST4, GYRY_HIST5, GYRY_HIST6, GYRZ_HIST1, GYRZ_HIST2, GYRZ_HIST3, GYRZ_HIST4, GYRZ_HIST5, GYRZ_HIST6, PROCESSING_TIME
     }
@@ -69,7 +69,7 @@ public class FeatureExtractor
 
     public Map<Feature, Double> extractFeatures(Clip clp)
     {
-        HashMap<Feature, Double> features = new HashMap<Feature, Double>();
+        HashMap<Feature, Double> features = new HashMap<>();
 
         // build a copy of the clip. because it sometimes crashes suspiciously.
         Clip clip = new Clip(clp);
@@ -194,7 +194,7 @@ public class FeatureExtractor
             double[] diffSkewness = new double[this._dimensions];
             double[] diffKurtosis = new double[this._dimensions];
 
-            List<double[]> signalDiff = new ArrayList<double[]>();
+            List<double[]> signalDiff = new ArrayList<>();
 
             signalDiff = this.getDiff(signal);
 
@@ -508,19 +508,19 @@ public class FeatureExtractor
 
     private List<double[]> interpolate(List<double[]> signal, List<Long> ts, int freq)
     {
-        List<double[]> signalOut = new ArrayList<double[]>();
+        List<double[]> signalOut = new ArrayList<>();
 
         if (ts.size() < 2) // CJK TODO: Ok returning uninitialized signalOut?
             return signalOut;
 
-        double stepSize = (double) 1e9 / (double) freq; // step size in nanosec
+        double stepSize = 1e9 / (double) freq; // step size in nanosec
 
         // checking if the timestamps are incremental - if not, the datapoint is
         // removed
 
-        List<Long> t2 = new ArrayList<Long>();
+        List<Long> t2 = new ArrayList<>();
 
-        List<double[]> signal2 = new ArrayList<double[]>();
+        List<double[]> signal2 = new ArrayList<>();
 
         t2.add(ts.get(0));
 
@@ -599,7 +599,7 @@ public class FeatureExtractor
 
     private List<double[]> getDiff(List<double[]> signal)
     {
-        List<double[]> signalDiff = new ArrayList<double[]>();
+        List<double[]> signalDiff = new ArrayList<>();
 
         // TODO: Pull out into own variable: signal.size()
 
@@ -621,7 +621,7 @@ public class FeatureExtractor
 
     private List<double[]> getZScore(List<double[]> signal, double[] mean, double[] std)
     {
-        List<double[]> signalZScore = new ArrayList<double[]>();
+        List<double[]> signalZScore = new ArrayList<>();
 
         // TODO: Pull out into own variable: signal.size()
 
@@ -670,8 +670,7 @@ public class FeatureExtractor
         // sum += value[axis];
         // CJK TODO: Solve mystery ^
 
-        for (int i = 0; i < signalArray.length; i++)
-            sum += signalArray[i][axis];
+        for (double[] aSignalArray : signalArray) sum += aSignalArray[axis];
 
         double mean = sum / signalArray.length;
 
@@ -683,19 +682,18 @@ public class FeatureExtractor
         double t3 = 0.0;
         double t4 = 0.0;
 
-        for (int i = 0; i < signalArray.length; i++)
-        {
-            t2 = (signalArray[i][axis] - mean) * (signalArray[i][axis] - mean);
+        for (double[] aSignalArray : signalArray) {
+            t2 = (aSignalArray[axis] - mean) * (aSignalArray[axis] - mean);
             m2 += t2;
 
-            t3 = t2 * (signalArray[i][axis] - mean);
+            t3 = t2 * (aSignalArray[axis] - mean);
             m3 += t3;
 
-            t4 = t3 * (signalArray[i][axis] - mean);
+            t4 = t3 * (aSignalArray[axis] - mean);
             m4 += t4;
         }
 
-        double std = (double) Math.sqrt(m2 / (signalArray.length - 1)); // unbiased
+        double std = Math.sqrt(m2 / (signalArray.length - 1)); // unbiased
 
         m2 /= signalArray.length;
         m3 /= signalArray.length;
@@ -730,10 +728,9 @@ public class FeatureExtractor
          * this._dimensions; }
          */
 
-        for (int i = 0; i < signalArray.length; i++)
-        {
+        for (double[] aSignalArray : signalArray) {
             for (int j = 0; j < this._dimensions; j++)
-                ms += signalArray[i][j] * signalArray[i][j] / this._dimensions;
+                ms += aSignalArray[j] * aSignalArray[j] / this._dimensions;
         }
 
         ms /= signalArray.length;

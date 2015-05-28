@@ -62,6 +62,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.devices.wear.WearHeart
 import edu.northwestern.cbits.purple_robot_manager.probes.devices.wear.WearLightProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.devices.wear.WearLivewellActivityCountProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.devices.wear.WearMagneticFieldProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.services.FitbitBetaProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.studies.LivewellActivityCountsProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.studies.LivewellPebbleActivityCountsProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.devices.PebbleProbe;
@@ -93,8 +94,8 @@ import edu.northwestern.cbits.purple_robot_manager.probes.services.iHealthProbe;
 
 public class ProbeManager
 {
-    private static Map<String, Probe> _cachedProbes = new HashMap<String, Probe>();
-    private static List<Probe> _probeInstances = new ArrayList<Probe>();
+    private static Map<String, Probe> _cachedProbes = new HashMap<>();
+    private static List<Probe> _probeInstances = new ArrayList<>();
 
     private static boolean _initing = false;
     private static boolean _inited = false;
@@ -113,15 +114,11 @@ public class ProbeManager
             {
                 try
                 {
-                    Probe probe = (Probe) probeClass.newInstance();
+                    Probe probe = probeClass.newInstance();
 
                     ProbeManager._probeInstances.add(probe);
                 }
-                catch (InstantiationException e)
-                {
-                    LogManager.getInstance(context).logException(e);
-                }
-                catch (IllegalAccessException e)
+                catch (InstantiationException | IllegalAccessException e)
                 {
                     LogManager.getInstance(context).logException(e);
                 }
@@ -130,7 +127,7 @@ public class ProbeManager
             ProbeManager._inited = true;
             ProbeManager._initing = false;
 
-            ProbeManager._allProbes = new ArrayList<Probe>(ProbeManager._probeInstances);
+            ProbeManager._allProbes = new ArrayList<>(ProbeManager._probeInstances);
         }
 
         return ProbeManager._allProbes;
@@ -430,6 +427,13 @@ public class ProbeManager
                 if (fitbit.name(context).equalsIgnoreCase(name))
                     found = true;
             }
+            else if (probe instanceof FitbitBetaProbe)
+            {
+                FitbitBetaProbe fitbit = (FitbitBetaProbe) probe;
+
+                if (fitbit.name(context).equalsIgnoreCase(name))
+                    found = true;
+            }
             else if (probe instanceof JawboneProbe)
             {
                 JawboneProbe jawbone = (JawboneProbe) probe;
@@ -693,7 +697,7 @@ public class ProbeManager
         screen.setTitle(R.string.title_preference_probes_screen);
         screen.setKey(SettingsKeys.PROBES_SCREEN_KEY);
 
-        HashMap<String, ArrayList<PreferenceScreen>> probeMap = new HashMap<String, ArrayList<PreferenceScreen>>();
+        HashMap<String, ArrayList<PreferenceScreen>> probeMap = new HashMap<>();
 
         for (Probe probe : ProbeManager.allProbes(context))
         {
@@ -703,7 +707,7 @@ public class ProbeManager
             {
                 String key = probe.probeCategory(context);
 
-                ArrayList<PreferenceScreen> screens = new ArrayList<PreferenceScreen>();
+                ArrayList<PreferenceScreen> screens = new ArrayList<>();
 
                 if (probeMap.containsKey(key))
                     screens = probeMap.get(key);
@@ -741,7 +745,7 @@ public class ProbeManager
 
         screen.addPreference(probesCategory);
 
-        ArrayList<String> probeCategories = new ArrayList<String>();
+        ArrayList<String> probeCategories = new ArrayList<>();
         probeCategories.add(context.getString(R.string.probe_sensor_category));
         probeCategories.add(context.getString(R.string.probe_device_info_category));
         probeCategories.add(context.getString(R.string.probe_other_devices_category));
@@ -776,7 +780,7 @@ public class ProbeManager
         if (ProbeManager._inited == false)
             return;
 
-        ArrayList<Probe> toRemove = new ArrayList<Probe>();
+        ArrayList<Probe> toRemove = new ArrayList<>();
 
         for (Probe p : ProbeManager._probeInstances)
         {
@@ -859,7 +863,7 @@ public class ProbeManager
 
     public static List<Map<String, Object>> probeConfigurations(Context context)
     {
-        List<Map<String, Object>> configs = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> configs = new ArrayList<>();
 
         for (Probe p : ProbeManager.allProbes(context))
         {

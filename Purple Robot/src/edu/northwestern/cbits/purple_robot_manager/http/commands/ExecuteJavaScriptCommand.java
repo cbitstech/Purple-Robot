@@ -50,7 +50,7 @@ public class ExecuteJavaScriptCommand extends JSONCommand
                     o = engine.runScript(script);
                 }
 
-                if ((o instanceof Undefined) == false)
+                if (!(o instanceof Undefined))
                 {
                     if (o instanceof NativeJavaObject)
                     {

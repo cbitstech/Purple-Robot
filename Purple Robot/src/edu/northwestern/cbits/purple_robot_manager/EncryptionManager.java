@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
@@ -43,7 +42,7 @@ public class EncryptionManager
 {
     private static final String CRYPTO_ALGORITHM = "AES/CBC/PKCS5Padding";
 
-    private HashMap<String, String> _cachedHashes = new HashMap<String, String>();
+    private HashMap<String, String> _cachedHashes = new HashMap<>();
 
     private static final EncryptionManager _instance = new EncryptionManager();
     private boolean _configurationReady = false;
@@ -79,23 +78,7 @@ public class EncryptionManager
                 cipher = Cipher.getInstance(EncryptionManager.CRYPTO_ALGORITHM);
                 cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec);
             }
-            catch (UnsupportedEncodingException e)
-            {
-                throw new RuntimeException(e);
-            }
-            catch (NoSuchAlgorithmException e)
-            {
-                throw new RuntimeException(e);
-            }
-            catch (NoSuchPaddingException e)
-            {
-                throw new RuntimeException(e);
-            }
-            catch (InvalidKeyException e)
-            {
-                throw new RuntimeException(e);
-            }
-            catch (InvalidAlgorithmParameterException e)
+            catch (UnsupportedEncodingException | InvalidAlgorithmParameterException | InvalidKeyException | NoSuchPaddingException | NoSuchAlgorithmException e)
             {
                 throw new RuntimeException(e);
             }
@@ -119,23 +102,7 @@ public class EncryptionManager
                 cipher = Cipher.getInstance(EncryptionManager.CRYPTO_ALGORITHM);
                 cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec);
             }
-            catch (UnsupportedEncodingException e)
-            {
-                throw new RuntimeException(e);
-            }
-            catch (NoSuchAlgorithmException e)
-            {
-                throw new RuntimeException(e);
-            }
-            catch (NoSuchPaddingException e)
-            {
-                throw new RuntimeException(e);
-            }
-            catch (InvalidKeyException e)
-            {
-                throw new RuntimeException(e);
-            }
-            catch (InvalidAlgorithmParameterException e)
+            catch (UnsupportedEncodingException | InvalidAlgorithmParameterException | InvalidKeyException | NoSuchPaddingException | NoSuchAlgorithmException e)
             {
                 throw new RuntimeException(e);
             }
@@ -163,11 +130,7 @@ public class EncryptionManager
                 hash = "0" + hash;
             }
         }
-        catch (NoSuchAlgorithmException e)
-        {
-            LogManager.getInstance(context).logException(e);
-        }
-        catch (UnsupportedEncodingException e)
+        catch (NoSuchAlgorithmException | UnsupportedEncodingException e)
         {
             LogManager.getInstance(context).logException(e);
         }
@@ -299,15 +262,7 @@ public class EncryptionManager
 
                 return new String(decoded, "UTF-8");
             }
-            catch (IllegalBlockSizeException e)
-            {
-                LogManager.getInstance(context).logException(e);
-            }
-            catch (BadPaddingException e)
-            {
-                LogManager.getInstance(context).logException(e);
-            }
-            catch (UnsupportedEncodingException e)
+            catch (IllegalBlockSizeException | UnsupportedEncodingException | BadPaddingException e)
             {
                 LogManager.getInstance(context).logException(e);
             }
@@ -348,15 +303,7 @@ public class EncryptionManager
 
             return edit.commit();
         }
-        catch (IllegalBlockSizeException e)
-        {
-            LogManager.getInstance(context).logException(e);
-        }
-        catch (BadPaddingException e)
-        {
-            LogManager.getInstance(context).logException(e);
-        }
-        catch (UnsupportedEncodingException e)
+        catch (IllegalBlockSizeException | UnsupportedEncodingException | BadPaddingException e)
         {
             LogManager.getInstance(context).logException(e);
         }
@@ -384,7 +331,7 @@ public class EncryptionManager
 
             String query = configUri.getQuery();
 
-            ArrayList<String> keys = new ArrayList<String>();
+            ArrayList<String> keys = new ArrayList<>();
 
             if (query != null)
             {
@@ -412,7 +359,7 @@ public class EncryptionManager
 
             configUri = builder.build();
 
-            if (prefs.getString(SettingsKeys.CONFIG_URL, "---").equals(configUri.toString()) == false)
+            if (!prefs.getString(SettingsKeys.CONFIG_URL, "---").equals(configUri.toString()))
             {
                 e.remove(LegacyJSONConfigFile.JSON_LAST_UPDATE);
                 e.remove(LegacyJSONConfigFile.JSON_LAST_HASH);
@@ -451,7 +398,7 @@ public class EncryptionManager
 
             String query = uri.getQuery();
 
-            ArrayList<String> keys = new ArrayList<String>();
+            ArrayList<String> keys = new ArrayList<>();
 
             if (query != null)
             {
@@ -497,7 +444,7 @@ public class EncryptionManager
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        HashMap<String, Object> payload = new HashMap<String, Object>();
+        HashMap<String, Object> payload = new HashMap<>();
         payload.put("source", "EncryptionManager");
         payload.put("new_id", userId);
         payload.put("old_id", prefs.getString(SettingsKeys.USER_ID_KEY, ""));

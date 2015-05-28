@@ -7,7 +7,6 @@ import org.json.JSONException;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -30,7 +29,7 @@ public class TriggerOutputPlugin extends OutputPlugin
 
         synchronized (this)
         {
-            List<Trigger> triggers = new ArrayList<Trigger>();
+            List<Trigger> triggers = new ArrayList<>();
             triggers.addAll(TriggerManager.getInstance(context).allTriggers());
 
             for (Trigger trigger : triggers)
@@ -39,16 +38,10 @@ public class TriggerOutputPlugin extends OutputPlugin
                 {
                     ProbeTrigger probeTrigger = (ProbeTrigger) trigger;
 
-                    Log.e("PR", "GOT " + probeTrigger.identifier());
-
                     try
                     {
-                        Log.e("PR", intent.getExtras().getString("PROBE") + " MATCHES: " + probeTrigger.matchesProbe(intent.getExtras().getString("PROBE")));
-
                         if (probeTrigger.matchesProbe(intent.getExtras().getString("PROBE")))
                         {
-                            Log.e("PR", "JSON BUNDLE: " + OutputPlugin.jsonForBundle(intent.getExtras()).toString(2));
-
                             if (probeTrigger.matches(context, OutputPlugin.jsonForBundle(intent.getExtras())))
                                 trigger.execute(context, false);
                         }

@@ -64,11 +64,7 @@ public class SchemeConfigCheck extends SanityCheck
             {
                 scheme.load(new InputStreamReader(context.getAssets().open("scheme/json.scm")));
             }
-            catch (IOException e)
-            {
-                LogManager.getInstance(context).logException(e);
-            }
-            catch (StackOverflowError e)
+            catch (IOException | StackOverflowError e)
             {
                 LogManager.getInstance(context).logException(e);
             }
@@ -77,11 +73,7 @@ public class SchemeConfigCheck extends SanityCheck
             {
                 scheme.load(new InputStreamReader(context.getAssets().open("scheme/purple-robot.scm")));
             }
-            catch (IOException e)
-            {
-                LogManager.getInstance(context).logException(e);
-            }
-            catch (StackOverflowError e)
+            catch (IOException | StackOverflowError e)
             {
                 LogManager.getInstance(context).logException(e);
             }
@@ -165,7 +157,7 @@ public class SchemeConfigCheck extends SanityCheck
 
     private static List<Map<String, Object>> parseConfigMaps(Pair pair)
     {
-        ArrayList<Map<String, Object>> maps = new ArrayList<Map<String, Object>>();
+        ArrayList<Map<String, Object>> maps = new ArrayList<>();
 
         Object first = pair.first;
         Object rest = pair.rest;

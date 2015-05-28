@@ -6,13 +6,7 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.devices.PebbleProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.studies.LivewellPebbleActivityCountsProbe;
-import edu.northwestern.cbits.purple_robot_manager.triggers.DateTrigger;
-import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
-import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
-/**
- * Created by Administrator on 3/29/15.
- */
 public class PebbleProbesCheck extends SanityCheck
 {
     public void runCheck(Context context)

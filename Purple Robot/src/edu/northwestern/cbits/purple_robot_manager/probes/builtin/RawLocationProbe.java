@@ -62,8 +62,8 @@ public class RawLocationProbe extends Probe implements LocationListener
     private long _lastFrequency = 0;
     private boolean _listening = false;
 
-    private final HashMap<String, Boolean> _lastEnabled = new HashMap<String, Boolean>();
-    private final HashMap<String, Integer> _lastStatus = new HashMap<String, Integer>();
+    private final HashMap<String, Boolean> _lastEnabled = new HashMap<>();
+    private final HashMap<String, Integer> _lastStatus = new HashMap<>();
 
     @Override
     public String probeCategory(Context context)
@@ -118,7 +118,7 @@ public class RawLocationProbe extends Probe implements LocationListener
 
             if (frequency instanceof Double)
             {
-                frequency = Long.valueOf(((Double) frequency).longValue());
+                frequency = ((Double) frequency).longValue();
             }
 
             if (frequency instanceof Long)
@@ -310,7 +310,7 @@ public class RawLocationProbe extends Probe implements LocationListener
     @Override
     public void onProviderDisabled(String provider)
     {
-        if (this._lastEnabled.containsKey(provider) && this._lastEnabled.get(provider).booleanValue() == false)
+        if (this._lastEnabled.containsKey(provider) && this._lastEnabled.get(provider) == false)
             return;
 
         this._lastFrequency = 0;
@@ -335,7 +335,7 @@ public class RawLocationProbe extends Probe implements LocationListener
     @Override
     public void onProviderEnabled(String provider)
     {
-        if (this._lastEnabled.containsKey(provider) && this._lastEnabled.get(provider).booleanValue() == true)
+        if (this._lastEnabled.containsKey(provider) && this._lastEnabled.get(provider) == true)
             return;
 
         this._lastFrequency = 0;
@@ -355,7 +355,7 @@ public class RawLocationProbe extends Probe implements LocationListener
     @Override
     public void onStatusChanged(String provider, int status, Bundle bundle)
     {
-        if (this._lastStatus.containsKey(provider) && this._lastStatus.get(provider).intValue() == status)
+        if (this._lastStatus.containsKey(provider) && this._lastStatus.get(provider) == status)
             return;
 
         this._lastFrequency = 0;

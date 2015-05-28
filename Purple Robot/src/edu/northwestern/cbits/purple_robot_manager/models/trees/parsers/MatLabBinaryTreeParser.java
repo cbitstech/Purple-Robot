@@ -10,7 +10,7 @@ import edu.northwestern.cbits.purple_robot_manager.models.trees.TreeNode.TreeNod
 
 public class MatLabBinaryTreeParser extends TreeNodeParser
 {
-    private ArrayList<String> _lines = new ArrayList<String>();
+    private ArrayList<String> _lines = new ArrayList<>();
 
     @Override
     public TreeNode parse(String content) throws TreeNodeException
@@ -37,7 +37,7 @@ public class MatLabBinaryTreeParser extends TreeNodeParser
         {
             // leaf[1] = prediction, using "1.0" since no accuracy is available.
 
-            HashMap<String, Object> prediction = new HashMap<String, Object>();
+            HashMap<String, Object> prediction = new HashMap<>();
             prediction.put(LeafNode.ACCURACY, 1.0);
             prediction.put(LeafNode.PREDICTION, leaf[1]);
 

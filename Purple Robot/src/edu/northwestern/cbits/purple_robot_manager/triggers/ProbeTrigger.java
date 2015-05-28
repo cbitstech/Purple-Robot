@@ -13,7 +13,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -55,18 +54,12 @@ public class ProbeTrigger extends Trigger
     {
         long now = System.currentTimeMillis();
 
-        Log.e("PR-PROBE-MATCH", "1");
-
         if (this._test == null || now - this._lastUpdate < 5000)
             return false;
 
-        Log.e("PR-PROBE-MATCH", "2");
-
         this._lastUpdate = now;
 
-        HashMap<String, Object> objects = new HashMap<String, Object>();
-
-        Log.e("PR-PROBE-MATCH", "3");
+        HashMap<String, Object> objects = new HashMap<>();
 
         if (object instanceof JSONObject)
         {
@@ -80,8 +73,6 @@ public class ProbeTrigger extends Trigger
                 {
                     String name = names.getString(i);
                     objects.put(name, json.get(name));
-
-                    Log.e("PR", "SETTING VALUE " + name + " -- " + json.get(name));
                 }
                 catch (JSONException e)
                 {
@@ -90,31 +81,21 @@ public class ProbeTrigger extends Trigger
             }
         }
 
-        Log.e("PR-PROBE-MATCH", "4");
-
         try
         {
-            Log.e("PR-PROBE-MATCH", "4.1");
-
             Object result = BaseScriptEngine.runScript(context, this._test, objects);
-
-            Log.e("PR-PROBE-MATCH", "4.2 " + result + " - " + result.getClass().getCanonicalName());
 
             if (result instanceof Boolean)
             {
                 Boolean boolResult = (Boolean) result;
 
-                return boolResult.booleanValue();
+                return boolResult;
             }
-
-            Log.e("PR-PROBE-MATCH", "4.3 " + result);
         }
         catch (Throwable e)
         {
             LogManager.getInstance(context).logException(e);
         }
-
-        Log.e("PR-PROBE-MATCH", "5");
 
         return false;
     }

@@ -4,7 +4,6 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;

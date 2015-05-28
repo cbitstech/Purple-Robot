@@ -81,7 +81,7 @@ public class GyroscopeProbe extends Continuous3DProbe implements SensorEventList
     {
         if (this._schema == null)
         {
-            this._schema = new HashMap<String, String>();
+            this._schema = new HashMap<>();
 
             this._schema.put(Continuous3DProbe.X_KEY, ProbeValuesProvider.REAL_TYPE);
             this._schema.put(Continuous3DProbe.Y_KEY, ProbeValuesProvider.REAL_TYPE);
@@ -101,7 +101,7 @@ public class GyroscopeProbe extends Continuous3DProbe implements SensorEventList
         double[] y = bundle.getDoubleArray(Continuous3DProbe.Y_KEY);
         double[] z = bundle.getDoubleArray(Continuous3DProbe.Z_KEY);
 
-        ArrayList<String> keys = new ArrayList<String>();
+        ArrayList<String> keys = new ArrayList<>();
 
         SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.display_date_format));
 
@@ -141,7 +141,7 @@ public class GyroscopeProbe extends Continuous3DProbe implements SensorEventList
         }
 
         return formatted;
-    };
+    }
 
     @Override
     public long getFrequency()
@@ -382,13 +382,13 @@ public class GyroscopeProbe extends Continuous3DProbe implements SensorEventList
 
                         if (Double.isNaN(x) == false && Double.isNaN(y) == false && Double.isNaN(z) == false)
                         {
-                            Map<String, Object> values = new HashMap<String, Object>(4);
+                            Map<String, Object> values = new HashMap<>(4);
 
                             values.put(Continuous3DProbe.X_KEY, x);
                             values.put(Continuous3DProbe.Y_KEY, y);
                             values.put(Continuous3DProbe.Z_KEY, z);
 
-                            values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[0] / 1000));
+                            values.put(ProbeValuesProvider.TIMESTAMP, timeBuffer[0] / 1000);
 
                             ProbeValuesProvider.getProvider(this._context).insertValue(this._context, GyroscopeProbe.DB_TABLE, this.databaseSchema(), values);
                         }
@@ -504,7 +504,7 @@ public class GyroscopeProbe extends Continuous3DProbe implements SensorEventList
                 SharedPreferences prefs = Probe.getPreferences(context);
                 SharedPreferences.Editor e = prefs.edit();
 
-                e.putBoolean(GyroscopeProbe.USE_HANDLER, ((Boolean) handler).booleanValue());
+                e.putBoolean(GyroscopeProbe.USE_HANDLER, (Boolean) handler);
                 e.commit();
             }
         }

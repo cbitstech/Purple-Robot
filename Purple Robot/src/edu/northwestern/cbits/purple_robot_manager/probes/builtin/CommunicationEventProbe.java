@@ -392,7 +392,7 @@ public class CommunicationEventProbe extends Probe
 
             if (frequency instanceof Double)
             {
-                frequency = Long.valueOf(((Double) frequency).longValue());
+                frequency = ((Double) frequency).longValue();
             }
 
             if (frequency instanceof Long)
@@ -414,7 +414,7 @@ public class CommunicationEventProbe extends Probe
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putBoolean(CommunicationEventProbe.HASH_DATA, ((Boolean) hash).booleanValue());
+                e.putBoolean(CommunicationEventProbe.HASH_DATA, (Boolean) hash);
                 e.commit();
             }
         }
@@ -428,7 +428,7 @@ public class CommunicationEventProbe extends Probe
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putBoolean(CommunicationEventProbe.RETRIEVE_DATA, ((Boolean) retrieve).booleanValue());
+                e.putBoolean(CommunicationEventProbe.RETRIEVE_DATA, (Boolean) retrieve);
                 e.commit();
             }
         }
@@ -442,7 +442,7 @@ public class CommunicationEventProbe extends Probe
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putBoolean(CommunicationEventProbe.ENCRYPT_DATA, ((Boolean) encrypt).booleanValue());
+                e.putBoolean(CommunicationEventProbe.ENCRYPT_DATA, (Boolean) encrypt);
                 e.commit();
             }
         }

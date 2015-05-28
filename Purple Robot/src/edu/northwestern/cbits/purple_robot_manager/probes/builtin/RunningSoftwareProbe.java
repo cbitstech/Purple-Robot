@@ -120,7 +120,7 @@ public class RunningSoftwareProbe extends Probe
 
                                 if (tasks != null)
                                 {
-                                    ArrayList<Bundle> running = new ArrayList<Bundle>();
+                                    ArrayList<Bundle> running = new ArrayList<>();
 
                                     for (int i = 0; i < tasks.size(); i++)
                                     {
@@ -225,11 +225,7 @@ public class RunningSoftwareProbe extends Probe
             else
                 LogManager.getInstance(context).logException(ex);
         }
-        catch (IOException ex)
-        {
-            LogManager.getInstance(context).logException(ex);
-        }
-        catch (NullPointerException ex)
+        catch (IOException | NullPointerException ex)
         {
             LogManager.getInstance(context).logException(ex);
         }
@@ -258,7 +254,7 @@ public class RunningSoftwareProbe extends Probe
     {
         Bundle bundle = new Bundle();
 
-        ArrayList<String> keys = new ArrayList<String>();
+        ArrayList<String> keys = new ArrayList<>();
 
         for (int i = 0; i < objects.size(); i++)
         {
@@ -291,7 +287,7 @@ public class RunningSoftwareProbe extends Probe
         formatted.putBundle(String.format(context.getString(R.string.display_running_tasks_title), count), tasksBundle);
 
         return formatted;
-    };
+    }
 
     @Override
     public Map<String, Object> configuration(Context context)

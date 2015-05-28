@@ -80,9 +80,7 @@ public class WekaTreeModel extends TrainedModel
      * Parses Graph object from the string provided in model to generate the
      * data structure that evaluates data to generate predictions.
      * 
-     * @see http 
-     *      ://www.alexander-merz.com/graphviz/doc/com/alexmerz/graphviz/objects
-     *      /Graph.html
+     * @see http://www.alexander-merz.com/graphviz/doc/com/alexmerz/graphviz/objects/Graph.html
      * @see edu.northwestern.cbits.purple_robot_manager.models.TrainedModel#generateModel(android.content.Context,
      *      java.lang.Object)
      */
@@ -158,7 +156,7 @@ public class WekaTreeModel extends TrainedModel
 
             nodeLabel = tokens[tokens.length - 1];
 
-            List<Edge> testEdges = new ArrayList<Edge>();
+            List<Edge> testEdges = new ArrayList<>();
 
             for (Edge edge : edges)
             {
@@ -195,7 +193,7 @@ public class WekaTreeModel extends TrainedModel
                     if (value instanceof Integer)
                         testValue = ((Integer) value).doubleValue();
                     else if (value instanceof Double)
-                        testValue = ((Double) value).doubleValue();
+                        testValue = (Double) value;
                     else if (value instanceof Float)
                         testValue = ((Float) value).doubleValue();
                     else if (value instanceof Long)

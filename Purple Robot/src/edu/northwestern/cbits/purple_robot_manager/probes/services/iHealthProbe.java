@@ -104,7 +104,7 @@ public class iHealthProbe extends Probe
         double diastolic = bundle.getDouble(iHealthProbe.PRESSURE_DIASTOLIC, -1);
         double glucose = bundle.getDouble(iHealthProbe.GLUCOSE_BG, -1);
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         if (steps != -1)
             sb.append(context.getString(R.string.summary_ihealth_steps, steps));
@@ -410,7 +410,7 @@ public class iHealthProbe extends Probe
 
                     sanity.clearAlert(title);
 
-                    if (now - this._lastUpdate > 1000 * 60 * 1)
+                    if (now - this._lastUpdate > 900000)
                     {
                         this._lastUpdate = now;
 

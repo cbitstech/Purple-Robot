@@ -284,7 +284,7 @@ public class GeomagneticRotationProbe extends RotationProbe
                 SharedPreferences prefs = Probe.getPreferences(context);
                 SharedPreferences.Editor e = prefs.edit();
 
-                e.putBoolean(GeomagneticRotationProbe.USE_HANDLER, ((Boolean) handler).booleanValue());
+                e.putBoolean(GeomagneticRotationProbe.USE_HANDLER, (Boolean) handler);
                 e.commit();
             }
         }

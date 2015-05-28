@@ -113,7 +113,7 @@ public class SoftwareInformationProbe extends Probe
 
                             List<ApplicationInfo> infos = pm.getInstalledApplications(0);
 
-                            ArrayList<Bundle> installed = new ArrayList<Bundle>();
+                            ArrayList<Bundle> installed = new ArrayList<>();
 
                             for (ApplicationInfo info : infos)
                             {
@@ -166,7 +166,7 @@ public class SoftwareInformationProbe extends Probe
     {
         Bundle bundle = new Bundle();
 
-        ArrayList<String> keys = new ArrayList<String>();
+        ArrayList<String> keys = new ArrayList<>();
 
         for (int i = 0; i < objects.size(); i++)
         {
@@ -198,7 +198,7 @@ public class SoftwareInformationProbe extends Probe
         formatted.putString(context.getString(R.string.display_android_version_title), bundle.getString(SoftwareInformationProbe.RELEASE));
 
         return formatted;
-    };
+    }
 
     @Override
     public Map<String, Object> configuration(Context context)
@@ -225,7 +225,7 @@ public class SoftwareInformationProbe extends Probe
 
             if (frequency instanceof Double)
             {
-                frequency = Long.valueOf(((Double) frequency).longValue());
+                frequency = ((Double) frequency).longValue();
             }
 
             if (frequency instanceof Long)

@@ -55,7 +55,7 @@ public class WekaJ48TreeParser extends TreeNodeParser
     private static final String NUM_INSTANCES = "num_instances";
     private static final String NUM_INCORRECT = "num_incorrect";
 
-    ArrayList<String> _lines = new ArrayList<String>();
+    ArrayList<String> _lines = new ArrayList<>();
 
     /**
      * Traditional Main method for testing the classes from the desktop
@@ -73,13 +73,13 @@ public class WekaJ48TreeParser extends TreeNodeParser
                     .parseString("digraph J48Tree {\nN0 [label=\"wifiaccesspointsprobe_current_ssid\" ]\nN0->N1 [label=\"= ?\"]\nN1 [label=\"alone (0.0)\" shape=box style=filled ]\nN0->N2 [label=\"= home\"]\nN2 [label=\"alone (8.41/2.0)\" shape=box style=filled ]\nN0->N3 [label=\"= 0x\"]\nN3 [label=\"robothealthprobe_cpu_usage\" ]\nN3->N4 [label=\"<= 0.142857\"]\nN4 [label=\"wifiaccesspointsprobe_access_point_count\" ]\nN4->N5 [label=\"<= 17\"]\nN5 [label=\"acquaintances (2.1/1.1)\" shape=box style=filled ]\nN4->N6 [label=\"> 17\"]\nN6 [label=\"strangers (2.1/0.1)\" shape=box style=filled ]\nN3->N7 [label=\"> 0.142857\"]\nN7 [label=\"alone (5.26/2.0)\" shape=box style=filled ]\nN0->N8 [label=\"= blerg\"]\nN8 [label=\"partner (1.05/0.05)\" shape=box style=filled ]\nN0->N9 [label=\"= northwestern\"]\nN9 [label=\"runningsoftwareproberunning_tasks_running_tasks_package_name\" ]\nN9->N10 [label=\"= ?\"]\nN10 [label=\"acquaintances (0.0)\" shape=box style=filled ]\nN9->N11 [label=\"= comcbitsmobilyze_pro\"]\nN11 [label=\"acquaintances (2.1/0.1)\" shape=box style=filled ]\nN9->N12 [label=\"= comandroidlauncher\"]\nN12 [label=\"alone (3.15/1.0)\" shape=box style=filled ]\nN9->N13 [label=\"= edunorthwesterncbitspurple_robot_manager\"]\nN13 [label=\"acquaintances (16.82/7.82)\" shape=box style=filled ]\n}\n");
             System.out.println(node.toString(0));
 
-            HashMap<String, Object> world = new HashMap<String, Object>();
+            HashMap<String, Object> world = new HashMap<>();
 
             Map<String, Object> prediction = node.fetchPrediction(world);
             System.out.println("Expect alone. Got " + prediction.get(LeafNode.PREDICTION) + " // "
                     + prediction.get(LeafNode.ACCURACY) + ".");
 
-            world.put("robothealthprobe_cpu_usage", Double.valueOf(0.1));
+            world.put("robothealthprobe_cpu_usage", 0.1);
 
             prediction = node.fetchPrediction(world);
             System.out.println("Expect alone. Got " + prediction.get(LeafNode.PREDICTION) + " // "
@@ -91,7 +91,7 @@ public class WekaJ48TreeParser extends TreeNodeParser
                     + prediction.get(LeafNode.ACCURACY) + ".");
 
             world.put("wifiaccesspointsprobe_current_ssid", "0x");
-            world.put("wifiaccesspointsprobe_access_point_count", Double.valueOf(20));
+            world.put("wifiaccesspointsprobe_access_point_count", (double) 20);
             prediction = node.fetchPrediction(world);
             System.out.println("Expect strangers. Got " + prediction.get(LeafNode.PREDICTION) + " // "
                     + prediction.get(LeafNode.ACCURACY) + ".");
@@ -107,11 +107,7 @@ public class WekaJ48TreeParser extends TreeNodeParser
                     + prediction.get(LeafNode.ACCURACY) + ".");
 
         }
-        catch (ParserNotFound e)
-        {
-            e.printStackTrace();
-        }
-        catch (TreeNodeException e)
+        catch (ParserNotFound | TreeNodeException e)
         {
             e.printStackTrace();
         }
@@ -286,7 +282,7 @@ public class WekaJ48TreeParser extends TreeNodeParser
         String label = tokens[1];
         String[] labelTokens = label.split(" \\(");
 
-        HashMap<String, Object> prediction = new HashMap<String, Object>();
+        HashMap<String, Object> prediction = new HashMap<>();
         prediction.put(LeafNode.PREDICTION, labelTokens[0]);
 
         // Calculate the accuracy information.
@@ -320,12 +316,12 @@ public class WekaJ48TreeParser extends TreeNodeParser
         // Add mandatory key and values.
 
         prediction.put(LeafNode.PREDICTION, labelTokens[0]);
-        prediction.put(LeafNode.ACCURACY, Double.valueOf(accuracy));
+        prediction.put(LeafNode.ACCURACY, accuracy);
 
         // Add additional format-specific metadata.
 
-        prediction.put(WekaJ48TreeParser.NUM_INSTANCES, Double.valueOf(coverage));
-        prediction.put(WekaJ48TreeParser.NUM_INCORRECT, Double.valueOf(incorrect));
+        prediction.put(WekaJ48TreeParser.NUM_INSTANCES, coverage);
+        prediction.put(WekaJ48TreeParser.NUM_INCORRECT, incorrect);
 
         return new LeafNode(prediction);
     }

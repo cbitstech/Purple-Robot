@@ -114,7 +114,7 @@ public class CallHistoryFeature extends Feature
                             bundle.putString("PROBE", this.name(context));
                             bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
 
-                            ArrayList<Bundle> analyses = new ArrayList<Bundle>();
+                            ArrayList<Bundle> analyses = new ArrayList<>();
 
                             double[] periods =
                             { 0.25, 0.5, 1.0, 4.0, 12.0, 24.0, 168.0 };
@@ -123,7 +123,7 @@ public class CallHistoryFeature extends Feature
                             {
                                 Bundle analysis = new Bundle();
 
-                                HashMap<String, ArrayList<ContentValues>> contacts = new HashMap<String, ArrayList<ContentValues>>();
+                                HashMap<String, ArrayList<ContentValues>> contacts = new HashMap<>();
 
                                 long start = now - ((long) Math.floor(period * 1000 * 60 * 60));
 
@@ -132,7 +132,7 @@ public class CallHistoryFeature extends Feature
                                 double acquaintanceCount = 0;
                                 double ackCount = 0;
 
-                                ArrayList<Double> durations = new ArrayList<Double>();
+                                ArrayList<Double> durations = new ArrayList<>();
 
                                 String selection = "date > ?";
                                 String[] selectionArgs =
@@ -188,7 +188,7 @@ public class CallHistoryFeature extends Feature
 
                                     if (calls == null)
                                     {
-                                        calls = new ArrayList<ContentValues>();
+                                        calls = new ArrayList<>();
                                         contacts.put(number, calls);
                                     }
 
@@ -224,7 +224,7 @@ public class CallHistoryFeature extends Feature
                                     {
                                         Double duration = durations.get(k);
 
-                                        primitives[k] = duration.doubleValue();
+                                        primitives[k] = duration;
 
                                         totalDuration += duration;
 
@@ -244,7 +244,7 @@ public class CallHistoryFeature extends Feature
                                     analysis.putDouble(CallHistoryFeature.MAX_DURATION, maxDuration);
                                     analysis.putDouble(CallHistoryFeature.STD_DEVIATION, stdDev);
 
-                                    ArrayList<Bundle> contactBundles = new ArrayList<Bundle>();
+                                    ArrayList<Bundle> contactBundles = new ArrayList<>();
 
                                     for (String key : contacts.keySet())
                                     {
@@ -260,7 +260,7 @@ public class CallHistoryFeature extends Feature
                                         totalDuration = 0;
                                         double incoming = 0.0;
                                         double acked = 0.0;
-                                        durations = new ArrayList<Double>();
+                                        durations = new ArrayList<>();
 
                                         for (ContentValues call : calls)
                                         {
@@ -303,7 +303,7 @@ public class CallHistoryFeature extends Feature
                                         {
                                             Double duration = durations.get(k);
 
-                                            primitives[k] = duration.doubleValue();
+                                            primitives[k] = duration;
 
                                             totalDuration += duration;
 

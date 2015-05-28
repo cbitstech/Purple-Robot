@@ -113,7 +113,7 @@ public class RotationProbe extends ContinuousProbe implements SensorEventListene
     {
         if (this._schema == null)
         {
-            this._schema = new HashMap<String, String>();
+            this._schema = new HashMap<>();
 
             this._schema.put(Continuous3DProbe.X_KEY, ProbeValuesProvider.REAL_TYPE);
             this._schema.put(Continuous3DProbe.Y_KEY, ProbeValuesProvider.REAL_TYPE);
@@ -132,12 +132,12 @@ public class RotationProbe extends ContinuousProbe implements SensorEventListene
         {
             String template = WebkitActivity.stringForAsset(activity, "webkit/chart_spline_full.html");
 
-            ArrayList<Double> x = new ArrayList<Double>();
-            ArrayList<Double> y = new ArrayList<Double>();
-            ArrayList<Double> z = new ArrayList<Double>();
-            ArrayList<Double> c = new ArrayList<Double>();
-            ArrayList<Double> a = new ArrayList<Double>();
-            ArrayList<Double> time = new ArrayList<Double>();
+            ArrayList<Double> x = new ArrayList<>();
+            ArrayList<Double> y = new ArrayList<>();
+            ArrayList<Double> z = new ArrayList<>();
+            ArrayList<Double> c = new ArrayList<>();
+            ArrayList<Double> a = new ArrayList<>();
+            ArrayList<Double> time = new ArrayList<>();
 
             Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(activity, RotationProbe.DB_TABLE, this.databaseSchema());
 
@@ -185,11 +185,7 @@ public class RotationProbe extends ContinuousProbe implements SensorEventListene
 
             return template;
         }
-        catch (IOException e)
-        {
-            LogManager.getInstance(activity).logException(e);
-        }
-        catch (JSONException e)
+        catch (IOException | JSONException e)
         {
             LogManager.getInstance(activity).logException(e);
         }
@@ -209,7 +205,7 @@ public class RotationProbe extends ContinuousProbe implements SensorEventListene
         double[] c = bundle.getDoubleArray(RotationProbe.COSINE);
         double[] a = bundle.getDoubleArray(RotationProbe.ACCURACY);
 
-        ArrayList<String> keys = new ArrayList<String>();
+        ArrayList<String> keys = new ArrayList<>();
 
         SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.display_date_format));
 
@@ -253,7 +249,7 @@ public class RotationProbe extends ContinuousProbe implements SensorEventListene
         }
 
         return formatted;
-    };
+    }
 
     @Override
     public long getFrequency()
@@ -511,20 +507,20 @@ public class RotationProbe extends ContinuousProbe implements SensorEventListene
                         for (int i = 0; i < fieldNames.length; i++)
                         {
                             if (fieldNames[i].equals(Continuous3DProbe.X_KEY))
-                                x = Double.valueOf(valueBuffer[i][j]);
+                                x = (double) valueBuffer[i][j];
                             else if (fieldNames[i].equals(Continuous3DProbe.Y_KEY))
-                                y = Double.valueOf(valueBuffer[i][j]);
+                                y = (double) valueBuffer[i][j];
                             else if (fieldNames[i].equals(Continuous3DProbe.Z_KEY))
-                                z = Double.valueOf(valueBuffer[i][j]);
+                                z = (double) valueBuffer[i][j];
                             else if (fieldNames[i].equals(RotationProbe.COSINE))
-                                c = Double.valueOf(valueBuffer[i][j]);
+                                c = (double) valueBuffer[i][j];
                             else if (fieldNames[i].equals(RotationProbe.ACCURACY))
-                                a = Double.valueOf(valueBuffer[i][j]);
+                                a = (double) valueBuffer[i][j];
                         }
 
                         if (x != null && y != null && z != null)
                         {
-                            Map<String, Object> values = new HashMap<String, Object>();
+                            Map<String, Object> values = new HashMap<>();
 
                             values.put(Continuous3DProbe.X_KEY, x);
                             values.put(Continuous3DProbe.Y_KEY, y);
@@ -532,7 +528,7 @@ public class RotationProbe extends ContinuousProbe implements SensorEventListene
                             values.put(RotationProbe.COSINE, c);
                             values.put(RotationProbe.ACCURACY, a);
 
-                            values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[j] / 1000));
+                            values.put(ProbeValuesProvider.TIMESTAMP, timeBuffer[j] / 1000);
 
                             ProbeValuesProvider.getProvider(this._context).insertValue(this._context, this.dbTable(), this.databaseSchema(), values);
                         }
@@ -630,7 +626,7 @@ public class RotationProbe extends ContinuousProbe implements SensorEventListene
                 SharedPreferences prefs = Probe.getPreferences(context);
                 SharedPreferences.Editor e = prefs.edit();
 
-                e.putBoolean(RotationProbe.USE_HANDLER, ((Boolean) handler).booleanValue());
+                e.putBoolean(RotationProbe.USE_HANDLER, (Boolean) handler);
                 e.commit();
             }
         }

@@ -110,7 +110,7 @@ public abstract class TrainedModel extends Model
                         in = new BufferedReader(new InputStreamReader(u.openStream()));
                     }
 
-                    StringBuffer sb = new StringBuffer();
+                    StringBuilder sb = new StringBuilder();
 
                     String inputLine = null;
 
@@ -120,13 +120,7 @@ public abstract class TrainedModel extends Model
                     in.close();
 
                     contents = sb.toString();
-                }
-                catch (MalformedURLException e)
-                {
-                    e.printStackTrace();
-                    LogManager.getInstance(context).logException(e);
-                }
-                catch (IOException e)
+                } catch (IOException e)
                 {
                     e.printStackTrace();
                     LogManager.getInstance(context).logException(e);
@@ -303,7 +297,7 @@ public abstract class TrainedModel extends Model
                 {
                     Double doubleValue = (Double) value;
 
-                    me.transmitPrediction(context, doubleValue.doubleValue(), me._accuracy);
+                    me.transmitPrediction(context, doubleValue, me._accuracy);
                 }
                 else
                     me.transmitPrediction(context, value.toString(), me._accuracy);

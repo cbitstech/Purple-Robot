@@ -128,7 +128,7 @@ public class FacebookProbe extends Probe
                             bundle.putString("PROBE", me.name(context));
                             bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
 
-                            final ArrayList<GraphObject> items = new ArrayList<GraphObject>();
+                            final ArrayList<GraphObject> items = new ArrayList<>();
                             final EncryptionManager em = EncryptionManager.getInstance();
 
                             FacebookApi.fetchRequest(context, token, "/me/statuses", new FacebookApi.OnRequestCallback()
@@ -221,15 +221,7 @@ public class FacebookProbe extends Probe
 
                                                                             eventBundle.putString("MESSAGE", message);
                                                                         }
-                                                                        catch (IllegalBlockSizeException e)
-                                                                        {
-                                                                            LogManager.getInstance(context).logException(e);
-                                                                        }
-                                                                        catch (BadPaddingException e)
-                                                                        {
-                                                                            LogManager.getInstance(context).logException(e);
-                                                                        }
-                                                                        catch (UnsupportedEncodingException e)
+                                                                        catch (IllegalBlockSizeException | UnsupportedEncodingException | BadPaddingException e)
                                                                         {
                                                                             LogManager.getInstance(context).logException(e);
                                                                         }
@@ -255,11 +247,7 @@ public class FacebookProbe extends Probe
                                                                 }
                                                             }
                                                         }
-                                                        catch (ParseException e)
-                                                        {
-                                                            LogManager.getInstance(context).logException(e);
-                                                        }
-                                                        catch (NullPointerException e)
+                                                        catch (ParseException | NullPointerException e)
                                                         {
                                                             LogManager.getInstance(context).logException(e);
                                                         }
@@ -352,7 +340,7 @@ public class FacebookProbe extends Probe
 
             if (frequency instanceof Double)
             {
-                frequency = Long.valueOf(((Double) frequency).longValue());
+                frequency = ((Double) frequency).longValue();
             }
 
             if (frequency instanceof Long)
@@ -376,7 +364,7 @@ public class FacebookProbe extends Probe
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putBoolean(FacebookProbe.ENCRYPT_DATA, encryptBoolean.booleanValue());
+                e.putBoolean(FacebookProbe.ENCRYPT_DATA, encryptBoolean);
                 e.commit();
             }
         }

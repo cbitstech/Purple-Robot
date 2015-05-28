@@ -225,7 +225,7 @@ public class LivewellActivityCountsProbe extends Probe implements SensorEventLis
         double numSamples = bundle.getDouble(LivewellActivityCountsProbe.BUNDLE_NUM_SAMPLES);
         double duration = bundle.getDouble(LivewellActivityCountsProbe.BUNDLE_DURATION);
 
-        return String.format(context.getResources().getString(R.string.summary_livewell_pebble_probe), (duration / 1000), numSamples, count);
+        return String.format(context.getResources().getString(R.string.summary_livewell_pebble_probe), (duration / 1000), numSamples);
     }
 
     @Override

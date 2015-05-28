@@ -103,7 +103,7 @@ public class PressureProbe extends Continuous1DProbe implements SensorEventListe
         double[] altitudes = bundle.getDoubleArray(ALTITUDE_KEY);
         double[] pressures = bundle.getDoubleArray(PRESSURE_KEY);
 
-        ArrayList<String> keys = new ArrayList<String>();
+        ArrayList<String> keys = new ArrayList<>();
 
         if (altitudes != null && pressures != null && eventTimes != null)
         {
@@ -146,7 +146,7 @@ public class PressureProbe extends Continuous1DProbe implements SensorEventListe
         }
 
         return formatted;
-    };
+    }
 
     @Override
     public long getFrequency()
@@ -394,19 +394,19 @@ public class PressureProbe extends Continuous1DProbe implements SensorEventListe
                         for (int i = 0; i < fieldNames.length; i++)
                         {
                             if (fieldNames[i].equals(PressureProbe.PRESSURE_KEY))
-                                pressure = Double.valueOf(valueBuffer[i][j]);
+                                pressure = (double) valueBuffer[i][j];
                             else if (fieldNames[i].equals(PressureProbe.ALTITUDE_KEY))
-                                altitude = Double.valueOf(valueBuffer[i][j]);
+                                altitude = (double) valueBuffer[i][j];
                         }
 
                         if (pressure != null && altitude != null)
                         {
-                            Map<String, Object> values = new HashMap<String, Object>();
+                            Map<String, Object> values = new HashMap<>();
 
                             values.put(PressureProbe.PRESSURE_KEY, pressure);
                             values.put(PressureProbe.ALTITUDE_KEY, altitude);
 
-                            values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[j] / 1000));
+                            values.put(ProbeValuesProvider.TIMESTAMP, timeBuffer[j] / 1000);
 
                             ProbeValuesProvider.getProvider(this._context).insertValue(this._context, PressureProbe.DB_TABLE, this.databaseSchema(), values);
                         }
@@ -423,7 +423,7 @@ public class PressureProbe extends Continuous1DProbe implements SensorEventListe
     {
         if (this._schema == null)
         {
-            this._schema = new HashMap<String, String>();
+            this._schema = new HashMap<>();
 
             this._schema.put(PressureProbe.PRESSURE_KEY, ProbeValuesProvider.REAL_TYPE);
             this._schema.put(PressureProbe.ALTITUDE_KEY, ProbeValuesProvider.REAL_TYPE);
@@ -511,7 +511,7 @@ public class PressureProbe extends Continuous1DProbe implements SensorEventListe
                 SharedPreferences prefs = Probe.getPreferences(context);
                 SharedPreferences.Editor e = prefs.edit();
 
-                e.putBoolean(PressureProbe.USE_HANDLER, ((Boolean) handler).booleanValue());
+                e.putBoolean(PressureProbe.USE_HANDLER, (Boolean) handler);
                 e.commit();
             }
         }

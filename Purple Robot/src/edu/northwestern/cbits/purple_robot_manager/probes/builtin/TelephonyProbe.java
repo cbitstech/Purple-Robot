@@ -291,7 +291,7 @@ public class TelephonyProbe extends Probe
         formatted.putString(context.getString(R.string.display_telephony_network_title), bundle.getString(TelephonyProbe.PHONE_TYPE));
 
         return formatted;
-    };
+    }
 
     @Override
     public String summarizeValue(Context context, Bundle bundle)
@@ -431,7 +431,7 @@ public class TelephonyProbe extends Probe
 
             if (frequency instanceof Double)
             {
-                frequency = Long.valueOf(((Double) frequency).longValue());
+                frequency = ((Double) frequency).longValue();
             }
 
             if (frequency instanceof Long)

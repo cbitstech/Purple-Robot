@@ -16,8 +16,8 @@ import edu.northwestern.cbits.purple_robot_manager.activities.WebkitActivity;
 
 public class LineChart extends Chart
 {
-    protected Map<String, List<Double>> _series = new HashMap<String, List<Double>>();
-    protected List<Double> _times = new ArrayList<Double>();
+    protected Map<String, List<Double>> _series = new HashMap<>();
+    protected List<Double> _times = new ArrayList<>();
 
     public void addSeries(String key, List<Double> series)
     {

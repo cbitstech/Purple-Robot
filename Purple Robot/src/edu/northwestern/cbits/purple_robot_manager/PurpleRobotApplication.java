@@ -74,7 +74,7 @@ public class PurpleRobotApplication extends Application
                     e.putString(key, value.toString());
             }
             else if (value instanceof Boolean)
-                e.putBoolean(key, ((Boolean) value).booleanValue());
+                e.putBoolean(key, (Boolean) value);
         }
 
         boolean success = e.commit();
@@ -84,7 +84,7 @@ public class PurpleRobotApplication extends Application
 
     public static Map<String, Object> configuration(Context context)
     {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -121,9 +121,9 @@ public class PurpleRobotApplication extends Application
                                 String value = prefs.getString(key, null);
 
                                 if (value != null && "true".equals(value.toLowerCase(Locale.ENGLISH)))
-                                    map.put(key, Boolean.valueOf(true));
+                                    map.put(key, true);
                                 else
-                                    map.put(key, Boolean.valueOf(false));
+                                    map.put(key, false);
                             }
                         }
                         else if ("Preference".equals(name))
@@ -134,16 +134,12 @@ public class PurpleRobotApplication extends Application
                 eventType = xpp.next();
             }
         }
-        catch (XmlPullParserException e)
-        {
-            LogManager.getInstance(context).logException(e);
-        }
-        catch (IOException e)
+        catch (XmlPullParserException | IOException e)
         {
             LogManager.getInstance(context).logException(e);
         }
 
-        map.put("config_probes_enabled", Boolean.valueOf(prefs.getBoolean("config_probes_enabled", false)));
+        map.put("config_probes_enabled", prefs.getBoolean("config_probes_enabled", false));
 
         return map;
     }
@@ -170,7 +166,7 @@ public class PurpleRobotApplication extends Application
                 {
                     Boolean boolValue = (Boolean) value;
 
-                    e.putBoolean(key, boolValue.booleanValue());
+                    e.putBoolean(key, boolValue);
                 }
             }
 

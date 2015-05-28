@@ -43,7 +43,7 @@ public class BatteryProbe extends Probe
     private boolean _isInited = false;
     private boolean _isEnabled = false;
 
-    private BroadcastReceiver _receiver = null;;
+    private BroadcastReceiver _receiver = null;
 
     @Override
     public Intent viewIntent(Context context)
@@ -78,7 +78,7 @@ public class BatteryProbe extends Probe
 
     public Map<String, String> databaseSchema()
     {
-        HashMap<String, String> schema = new HashMap<String, String>();
+        HashMap<String, String> schema = new HashMap<>();
 
         schema.put(BatteryProbe.BATTERY_KEY, ProbeValuesProvider.REAL_TYPE);
 
@@ -94,8 +94,8 @@ public class BatteryProbe extends Probe
 
             SplineChart c = new SplineChart();
 
-            ArrayList<Double> battery = new ArrayList<Double>();
-            ArrayList<Double> time = new ArrayList<Double>();
+            ArrayList<Double> battery = new ArrayList<>();
+            ArrayList<Double> time = new ArrayList<>();
 
             Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(activity, BatteryProbe.DB_TABLE,
                     this.databaseSchema());
@@ -128,11 +128,7 @@ public class BatteryProbe extends Probe
 
             return template;
         }
-        catch (IOException e)
-        {
-            LogManager.getInstance(activity).logException(e);
-        }
-        catch (JSONException e)
+        catch (IOException | JSONException e)
         {
             LogManager.getInstance(activity).logException(e);
         }
@@ -244,7 +240,7 @@ public class BatteryProbe extends Probe
         }
 
         return formatted;
-    };
+    }
 
     @Override
     public boolean isEnabled(Context context)
@@ -270,10 +266,10 @@ public class BatteryProbe extends Probe
 
                         me.transmitData(context, bundle);
 
-                        Map<String, Object> values = new HashMap<String, Object>();
+                        Map<String, Object> values = new HashMap<>();
 
                         values.put(BatteryProbe.BATTERY_KEY, bundle.getInt(BatteryManager.EXTRA_LEVEL));
-                        values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(bundle.getLong("TIMESTAMP")));
+                        values.put(ProbeValuesProvider.TIMESTAMP, (double) bundle.getLong("TIMESTAMP"));
 
                         ProbeValuesProvider.getProvider(context).insertValue(context, BatteryProbe.DB_TABLE,
                                 me.databaseSchema(), values);

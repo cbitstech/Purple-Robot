@@ -127,7 +127,7 @@ public class CommunicationLogProbe extends Probe
                         bundle.putString("PROBE", this.name(context));
                         bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
 
-                        ArrayList<Bundle> calls = new ArrayList<Bundle>();
+                        ArrayList<Bundle> calls = new ArrayList<>();
 
                         int sentCount = 0;
                         int receivedCount = 0;
@@ -307,7 +307,7 @@ public class CommunicationLogProbe extends Probe
 
             if (frequency instanceof Double)
             {
-                frequency = Long.valueOf(((Double) frequency).longValue());
+                frequency = ((Double) frequency).longValue();
             }
 
             if (frequency instanceof Long)
@@ -329,7 +329,7 @@ public class CommunicationLogProbe extends Probe
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putBoolean(CommunicationLogProbe.HASH_DATA, ((Boolean) hash).booleanValue());
+                e.putBoolean(CommunicationLogProbe.HASH_DATA, (Boolean) hash);
                 e.commit();
             }
         }
@@ -463,7 +463,7 @@ public class CommunicationLogProbe extends Probe
     {
         Bundle bundle = new Bundle();
 
-        ArrayList<String> keys = new ArrayList<String>();
+        ArrayList<String> keys = new ArrayList<>();
 
         for (int i = 0; i < objects.size(); i++)
         {
@@ -489,7 +489,7 @@ public class CommunicationLogProbe extends Probe
         ArrayList<Bundle> array = (ArrayList<Bundle>) bundle.get(CommunicationLogProbe.PHONE_CALLS);
 
         if (array == null)
-            array = new ArrayList<Bundle>();
+            array = new ArrayList<>();
 
         int count = array.size();
 
@@ -510,7 +510,7 @@ public class CommunicationLogProbe extends Probe
         formatted.putInt(context.getString(R.string.display_sms_incoming_count_title), (int) bundle.getDouble(CommunicationLogProbe.SMS_INCOMING_COUNT));
         formatted.putInt(context.getString(R.string.display_sms_outgoing_count_title), (int) bundle.getDouble(CommunicationLogProbe.SMS_OUTGOING_COUNT));
 
-        ArrayList<String> keys = new ArrayList<String>();
+        ArrayList<String> keys = new ArrayList<>();
         keys.add(String.format(context.getString(R.string.display_calls_list_title), count));
         keys.add(context.getString(R.string.display_calls_recent_caller_title));
         keys.add(context.getString(R.string.display_calls_recent_number_title));

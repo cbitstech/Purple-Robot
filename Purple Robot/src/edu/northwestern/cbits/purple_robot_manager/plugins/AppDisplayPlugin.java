@@ -30,8 +30,8 @@ public class AppDisplayPlugin extends OutputPlugin
 {
     private long _lastUpdate = 0;
 
-    private ArrayList<ContentValues> _valuesQueue = new ArrayList<ContentValues>();
-    private HashMap<String, Long> _lastUpdates = new HashMap<String, Long>();
+    private final ArrayList<ContentValues> _valuesQueue = new ArrayList<>();
+    private final HashMap<String, Long> _lastUpdates = new HashMap<>();
 
     public String[] respondsTo()
     {
@@ -76,7 +76,7 @@ public class AppDisplayPlugin extends OutputPlugin
             Object ts = extras.get("TIMESTAMP");
 
             if (ts instanceof Long)
-                values.put("recorded", ((Long) ts).longValue());
+                values.put("recorded", (Long) ts);
             else if (ts instanceof Double)
                 values.put("recorded", ((Double) ts).longValue());
 
@@ -132,7 +132,7 @@ public class AppDisplayPlugin extends OutputPlugin
             {
                 this._lastUpdate = System.currentTimeMillis();
 
-                final ArrayList<ContentValues> toUpdate = new ArrayList<ContentValues>();
+                final ArrayList<ContentValues> toUpdate = new ArrayList<>();
 
                 synchronized (this._valuesQueue)
                 {
@@ -150,7 +150,7 @@ public class AppDisplayPlugin extends OutputPlugin
                     {
                         String where = "source = ?";
 
-                        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
+                        ArrayList<ContentProviderOperation> ops = new ArrayList<>();
 
                         for (ContentValues value : toUpdate)
                         {
@@ -168,11 +168,7 @@ public class AppDisplayPlugin extends OutputPlugin
                         {
                             context.getContentResolver().applyBatch(RobotContentProvider.AUTHORITY, ops);
                         }
-                        catch (RemoteException e)
-                        {
-                            LogManager.getInstance(context).logException(e);
-                        }
-                        catch (OperationApplicationException e)
+                        catch (RemoteException | OperationApplicationException e)
                         {
                             LogManager.getInstance(context).logException(e);
                         }

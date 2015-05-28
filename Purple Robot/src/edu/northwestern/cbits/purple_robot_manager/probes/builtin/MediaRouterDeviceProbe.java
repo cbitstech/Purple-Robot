@@ -158,7 +158,7 @@ public class MediaRouterDeviceProbe extends Probe
                                     router.addCallback(builder.build(), me._callback, MediaRouter.CALLBACK_FLAG_PERFORM_ACTIVE_SCAN);
                                 }
 
-                                ArrayList<Bundle> routes = new ArrayList<Bundle>();
+                                ArrayList<Bundle> routes = new ArrayList<>();
 
                                 for (MediaRouter.ProviderInfo info : router.getProviders())
                                 {
@@ -280,7 +280,7 @@ public class MediaRouterDeviceProbe extends Probe
 
             if (frequency instanceof Double)
             {
-                frequency = Long.valueOf(((Double) frequency).longValue());
+                frequency = ((Double) frequency).longValue();
             }
 
             if (frequency instanceof Long)

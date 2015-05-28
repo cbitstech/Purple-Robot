@@ -159,7 +159,7 @@ public class PersistentService extends Service
         {
             public void uncaughtException(Thread thread, Throwable ex)
             {
-                HashMap<String, Object> payload = new HashMap<String, Object>();
+                HashMap<String, Object> payload = new HashMap<>();
                 payload.put("message", ex.getMessage());
                 LogManager.getInstance(me).log("pr_app_crashed", payload);
 

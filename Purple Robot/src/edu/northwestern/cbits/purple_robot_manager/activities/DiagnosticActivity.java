@@ -246,7 +246,7 @@ public class DiagnosticActivity extends AppCompatActivity
 
         TextView triggerList = (TextView) this.findViewById(R.id.installed_triggers_value);
 
-        StringBuffer triggerSb = new StringBuffer();
+        StringBuilder triggerSb = new StringBuilder();
 
         List<Trigger> triggers = TriggerManager.getInstance(this).allTriggers();
 
@@ -266,7 +266,7 @@ public class DiagnosticActivity extends AppCompatActivity
             triggerList.setText(R.string.no_installed_triggers_label);
 
         TextView sensorsList = (TextView) this.findViewById(R.id.available_sensors_value);
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         SensorManager sensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
 
@@ -301,7 +301,7 @@ public class DiagnosticActivity extends AppCompatActivity
 
                 while (ifaces.hasMoreElements() && (iface = ifaces.nextElement()) != null && ipAddress == null)
                 {
-                    if (iface.getName().equals("lo") == false)
+                    if (!iface.getName().equals("lo"))
                     {
                         Enumeration<InetAddress> ips = iface.getInetAddresses();
                         InetAddress ipAddr = null;
@@ -356,7 +356,7 @@ public class DiagnosticActivity extends AppCompatActivity
         }
         if (itemId == R.id.menu_email_item)
         {
-            StringBuffer message = new StringBuffer();
+            StringBuilder message = new StringBuilder();
 
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -504,7 +504,7 @@ public class DiagnosticActivity extends AppCompatActivity
             message.append(this.getString(R.string.available_sensors_label));
             message.append(newline);
 
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
 
             SensorManager sensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
 
@@ -556,12 +556,7 @@ public class DiagnosticActivity extends AppCompatActivity
                 {
                     Toast.makeText(this, R.string.toast_mail_not_found, Toast.LENGTH_LONG).show();
                 }
-            }
-            catch (FileNotFoundException e)
-            {
-                LogManager.getInstance(this).logException(e);
-            }
-            catch (IOException e)
+            } catch (IOException e)
             {
                 LogManager.getInstance(this).logException(e);
             }

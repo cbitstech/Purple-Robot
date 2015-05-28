@@ -170,11 +170,7 @@ public class NetworkProbe extends Probe
                                     bundle.putString(NetworkProbe.IFACE_NAME, iface.getName());
                                     bundle.putString(NetworkProbe.IFACE_DISPLAY_NAME, iface.getDisplayName());
                                 }
-                                catch (SocketException e)
-                                {
-                                    LogManager.getInstance(context).logException(e);
-                                }
-                                catch (UnknownHostException e)
+                                catch (SocketException | UnknownHostException e)
                                 {
                                     LogManager.getInstance(context).logException(e);
                                 }

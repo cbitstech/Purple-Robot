@@ -11,7 +11,6 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.app.ActivityManager.RunningTaskInfo;
@@ -151,7 +150,7 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
 
                                 LogManager.getInstance(context).logException(e);
 
-                                HashMap<String, Object> details = new HashMap<String, Object>();
+                                HashMap<String, Object> details = new HashMap<>();
                                 payloadFile.renameTo(new File(payloadFile.getAbsolutePath() + StreamingJacksonUploadPlugin.ERROR_EXTENSION));
 
                                 details.put("name", payloadFile.getAbsolutePath());
@@ -591,7 +590,7 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
             }
         }
 
-        return 2 * 1024 * 1024 * 1024;
+        return 2L * 1024 * 1024 * 1024;
     }
 
     public boolean isEnabled(Context context)

@@ -30,7 +30,7 @@ import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
 public abstract class OutputPlugin
 {
-    private ArrayList<Intent> _pendingIntents = new ArrayList<Intent>();
+    private final ArrayList<Intent> _pendingIntents = new ArrayList<>();
 
     private boolean _isProcessing = false;
 
@@ -41,6 +41,8 @@ public abstract class OutputPlugin
     public static final String DISPLAY_MESSAGE = "edu.northwestern.cbits.purple_robot.DISPLAY_MESSAGE";
 
     public static final String USE_EXTERNAL_STORAGE = "config_external_storage";
+
+    private static List<Class<OutputPlugin>> _pluginClasses = new ArrayList<>();
 
     public abstract String[] respondsTo();
 
@@ -68,7 +70,7 @@ public abstract class OutputPlugin
 
         if (log)
         {
-            HashMap<String, Object> payload = new HashMap<String, Object>();
+            HashMap<String, Object> payload = new HashMap<>();
             payload.put("message", message);
 
             LogManager.getInstance(this.getContext()).log("broadcast_message", payload);
@@ -88,8 +90,6 @@ public abstract class OutputPlugin
         return false;
     }
 
-    @SuppressWarnings("rawtypes")
-    private static List<Class> _pluginClasses = new ArrayList<Class>();
 
     @SuppressWarnings("unchecked")
     public static void loadPluginClasses(Context context)
@@ -113,7 +113,7 @@ public abstract class OutputPlugin
 
                 Method method = pluginClass.getDeclaredMethod("respondsTo");
 
-                String[] actions = (String[]) method.invoke(plugin, new Object[0]);
+                String[] actions = (String[]) method.invoke(plugin);
 
                 for (String action : actions)
                 {
@@ -121,27 +121,7 @@ public abstract class OutputPlugin
                         intentFilter.addAction(action);
                 }
             }
-            catch (ClassNotFoundException e)
-            {
-                LogManager.getInstance(context).logException(e);
-            }
-            catch (NoSuchMethodException e)
-            {
-                LogManager.getInstance(context).logException(e);
-            }
-            catch (IllegalArgumentException e)
-            {
-                LogManager.getInstance(context).logException(e);
-            }
-            catch (IllegalAccessException e)
-            {
-                LogManager.getInstance(context).logException(e);
-            }
-            catch (InvocationTargetException e)
-            {
-                LogManager.getInstance(context).logException(e);
-            }
-            catch (InstantiationException e)
+            catch (ClassNotFoundException | InstantiationException | InvocationTargetException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException e)
             {
                 LogManager.getInstance(context).logException(e);
             }
@@ -154,14 +134,14 @@ public abstract class OutputPlugin
     }
 
     @SuppressWarnings("rawtypes")
-    public static void registerPluginClass(Class pluginClass)
+    public static void registerPluginClass(Class<OutputPlugin> pluginClass)
     {
         if (!OutputPlugin._pluginClasses.contains(pluginClass))
             OutputPlugin._pluginClasses.add(pluginClass);
     }
 
     @SuppressWarnings("rawtypes")
-    public static List<Class> availablePluginClasses()
+    public static List<Class<OutputPlugin>> availablePluginClasses()
     {
         return OutputPlugin._pluginClasses;
     }
@@ -218,7 +198,7 @@ public abstract class OutputPlugin
 
     public static Map<String, Object> getValues(final Bundle bundle)
     {
-        HashMap<String, Object> values = new HashMap<String, Object>();
+        HashMap<String, Object> values = new HashMap<>();
 
         if (bundle == null)
             return values;
@@ -508,7 +488,7 @@ public abstract class OutputPlugin
                 Object o = json.get(key);
 
                 if (o instanceof Double)
-                    bundle.putDouble(key, ((Double) o).doubleValue());
+                    bundle.putDouble(key, (Double) o);
                 else if (o instanceof Float)
                     bundle.putDouble(key, ((Float) o).doubleValue());
                 else if (o instanceof Long)
@@ -516,7 +496,7 @@ public abstract class OutputPlugin
                 else if (o instanceof Integer)
                     bundle.putDouble(key, ((Integer) o).doubleValue());
                 else if (o instanceof Boolean)
-                    bundle.putBoolean(key, ((Boolean) o).booleanValue());
+                    bundle.putBoolean(key, (Boolean) o);
                 else if (o instanceof String)
                     bundle.putString(key, o.toString());
                 else if (o instanceof JSONArray)
@@ -556,7 +536,7 @@ public abstract class OutputPlugin
                         }
                         else if (nextChild instanceof JSONObject)
                         {
-                            ArrayList<Bundle> bundles = new ArrayList<Bundle>();
+                            ArrayList<Bundle> bundles = new ArrayList<>();
 
                             for (int i = 0; i < child.length(); i++)
                                 bundles.add(OutputPlugin.bundleForJson(context, child.getJSONObject(i).toString()));

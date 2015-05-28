@@ -27,7 +27,7 @@ public class LocationProbeFragment extends SupportMapFragment
 
         MapsInitializer.initialize(this.getActivity());
 
-        List<Location> locations = new ArrayList<Location>();
+        List<Location> locations = new ArrayList<>();
 
         Cursor cursor = ProbeValuesProvider.getProvider(this.getActivity()).retrieveValues(this.getActivity(),
                 LocationProbe.DB_TABLE, LocationProbe.databaseSchema());

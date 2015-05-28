@@ -7,7 +7,7 @@ public class Value extends SExpression
     public static Value fromDouble(double d)
     {
         Value v = new Value();
-        v._value = Double.valueOf(d);
+        v._value = d;
 
         return v;
     }
@@ -23,7 +23,7 @@ public class Value extends SExpression
     public static Value fromInteger(int i)
     {
         Value v = new Value();
-        v._value = Integer.valueOf(i);
+        v._value = i;
 
         return v;
     }
@@ -31,7 +31,7 @@ public class Value extends SExpression
     public static Value fromBoolean(boolean b)
     {
         Value v = new Value();
-        v._value = Boolean.valueOf(b);
+        v._value = b;
 
         return v;
     }

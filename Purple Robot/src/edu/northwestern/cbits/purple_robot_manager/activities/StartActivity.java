@@ -85,7 +85,7 @@ public class StartActivity extends AppCompatActivity
     private Menu _menu = null;
 
     private ContentObserver _observer = null;
-    protected HashMap<String, Boolean> _enabledCache = new HashMap<String, Boolean>();
+    protected HashMap<String, Boolean> _enabledCache = new HashMap<>();
 
     private SharedPreferences getPreferences(Context context)
     {
@@ -216,12 +216,12 @@ public class StartActivity extends AppCompatActivity
 
                             if (probeEnabled == null)
                             {
-                                probeEnabled = Boolean.valueOf(probe.isEnabled(me));
+                                probeEnabled = probe.isEnabled(me);
 
                                 me._enabledCache.put(sensorName, probeEnabled);
                             }
 
-                            enabled = probeEnabled.booleanValue();
+                            enabled = probeEnabled;
                         }
 
                         if (probe != null && value != null)
@@ -548,7 +548,7 @@ public class StartActivity extends AppCompatActivity
 
         boolean probesEnabled = (listView.getVisibility() == View.VISIBLE);
 
-        HashMap<String, Object> payload = new HashMap<String, Object>();
+        HashMap<String, Object> payload = new HashMap<>();
         payload.put("probes_enabled", probesEnabled);
         LogManager.getInstance(this).log("pr_main_ui_dismissed", payload);
 
@@ -677,7 +677,7 @@ public class StartActivity extends AppCompatActivity
         if (showBackground == false)
             logoView.setVisibility(View.GONE);
 
-        HashMap<String, Object> payload = new HashMap<String, Object>();
+        HashMap<String, Object> payload = new HashMap<>();
         payload.put("probes_enabled", probesEnabled);
         LogManager.getInstance(this).log("pr_main_ui_shown", payload);
 
@@ -709,7 +709,7 @@ public class StartActivity extends AppCompatActivity
                         me.getSupportActionBar().setTitle(R.string.app_name);
 
                     me.updateAlertIcon();
-                };
+                }
 
                 @Override
                 public void onChange(boolean selfChange)
@@ -779,7 +779,7 @@ public class StartActivity extends AppCompatActivity
 
                 if (triggers.size() > 0)
                 {
-                    ArrayAdapter<Trigger> adapter = new ArrayAdapter<Trigger>(this,
+                    ArrayAdapter<Trigger> adapter = new ArrayAdapter<>(this,
                             android.R.layout.simple_list_item_1, triggers);
 
                     builder.setAdapter(adapter, new OnClickListener()

@@ -50,7 +50,7 @@ public class WekaTreeModelTestCase extends RobotTestCase
             TreeNode node = TreeNodeParser.parseString(sb.toString());
             System.out.println(node.toString(0));
 
-            HashMap<String, Object> world = new HashMap<String, Object>();
+            HashMap<String, Object> world = new HashMap<>();
 
             Map<String, Object> prediction = node.fetchPrediction(world);
             // System.out.println("Expect alone. Got " +
@@ -58,7 +58,7 @@ public class WekaTreeModelTestCase extends RobotTestCase
             // prediction.get(LeafNode.ACCURACY) + ".");
             Assert.assertEquals("WTT001", "alone", prediction.get(LeafNode.PREDICTION));
 
-            world.put("robothealthprobe_cpu_usage", Double.valueOf(0.1));
+            world.put("robothealthprobe_cpu_usage", 0.1);
 
             prediction = node.fetchPrediction(world);
             // System.out.println("Expect alone. Got " +
@@ -74,7 +74,7 @@ public class WekaTreeModelTestCase extends RobotTestCase
             Assert.assertEquals("WTT003", "partner", prediction.get(LeafNode.PREDICTION));
 
             world.put("wifiaccesspointsprobe_current_ssid", "0x");
-            world.put("wifiaccesspointsprobe_access_point_count", Double.valueOf(20));
+            world.put("wifiaccesspointsprobe_access_point_count", (double) 20);
             prediction = node.fetchPrediction(world);
             // System.out.println("Expect strangers. Got " +
             // prediction.get(LeafNode.PREDICTION) + " // " +

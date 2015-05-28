@@ -222,27 +222,7 @@ public class InstagramProbe extends Probe
                                         e.putLong(InstagramProbe.MOST_RECENT_CHECK, System.currentTimeMillis());
                                         e.commit();
                                     }
-                                    catch (JSONException e)
-                                    {
-                                        LogManager.getInstance(context).logException(e);
-                                    }
-                                    catch (NullPointerException e)
-                                    {
-                                        LogManager.getInstance(context).logException(e);
-                                    }
-                                    catch (IllegalStateException e)
-                                    {
-                                        LogManager.getInstance(context).logException(e);
-                                    }
-                                    catch (BadPaddingException e)
-                                    {
-                                        LogManager.getInstance(context).logException(e);
-                                    }
-                                    catch (IllegalBlockSizeException e)
-                                    {
-                                        LogManager.getInstance(context).logException(e);
-                                    }
-                                    catch (UnsupportedEncodingException e)
+                                    catch (JSONException | UnsupportedEncodingException | IllegalBlockSizeException | BadPaddingException | IllegalStateException | NullPointerException e)
                                     {
                                         LogManager.getInstance(context).logException(e);
                                     }
@@ -308,7 +288,7 @@ public class InstagramProbe extends Probe
 
             if (frequency instanceof Double)
             {
-                frequency = Long.valueOf(((Double) frequency).longValue());
+                frequency = ((Double) frequency).longValue();
             }
 
             if (frequency instanceof Long)
@@ -332,7 +312,7 @@ public class InstagramProbe extends Probe
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putBoolean(InstagramProbe.ENCRYPT_DATA, encryptBoolean.booleanValue());
+                e.putBoolean(InstagramProbe.ENCRYPT_DATA, encryptBoolean);
                 e.commit();
             }
         }

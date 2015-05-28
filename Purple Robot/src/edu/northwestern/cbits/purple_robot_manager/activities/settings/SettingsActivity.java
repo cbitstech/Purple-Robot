@@ -5,7 +5,6 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
@@ -32,7 +31,7 @@ import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 public class SettingsActivity extends AppCompatActivity
 {
     private static final String PREFERENCE_SCREEN_KEY = "PREFERENCE_SCREEN_KEY";
-    private static HashMap<String, PreferenceScreen> _screens = new HashMap<String, PreferenceScreen>();
+    private static HashMap<String, PreferenceScreen> _screens = new HashMap<>();
 
     public static class SettingsPreferenceFragment extends PreferenceFragment
     {

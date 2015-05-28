@@ -29,7 +29,7 @@ public class DBSCAN
     private double _minDistance = 0;
     private int _minPopulation = 0;
 
-    private HashSet<Point> _points = new HashSet<Point>();
+    private HashSet<Point> _points = new HashSet<>();
 
     public static class Point
     {
@@ -122,7 +122,7 @@ public class DBSCAN
 
     public static class Cluster
     {
-        private HashSet<Point> _points = new HashSet<Point>();
+        private HashSet<Point> _points = new HashSet<>();
         private String _name = null;
 
         public void addPoint(Point p)
@@ -147,7 +147,7 @@ public class DBSCAN
 
         public void assimilate(Cluster c)
         {
-            ArrayList<Point> points = new ArrayList<Point>();
+            ArrayList<Point> points = new ArrayList<>();
             points.addAll(c.getPoints());
 
             for (Point p : points)
@@ -228,7 +228,7 @@ public class DBSCAN
             if (this._points.size() <= count)
                 return this._points;
 
-            ArrayList<Point> shuffled = new ArrayList<Point>();
+            ArrayList<Point> shuffled = new ArrayList<>();
             shuffled.addAll(this._points);
 
             Collections.shuffle(shuffled, new SecureRandom());
@@ -258,7 +258,7 @@ public class DBSCAN
 
     public Collection<Cluster> calculate(Context context)
     {
-        HashSet<Cluster> clusters = new HashSet<Cluster>();
+        HashSet<Cluster> clusters = new HashSet<>();
 
         Point[] xPoints = this._points.toArray(new Point[0]);
         Point[] yPoints = this._points.toArray(new Point[0]);
@@ -339,7 +339,7 @@ public class DBSCAN
             }
         }
 
-        HashSet<Cluster> toReturn = new HashSet<Cluster>();
+        HashSet<Cluster> toReturn = new HashSet<>();
 
         for (Cluster c : clusters)
         {
@@ -396,12 +396,7 @@ public class DBSCAN
         catch (JSONException e)
         {
             LogManager.getInstance(context).logException(e);
-        }
-        catch (FileNotFoundException e)
-        {
-            LogManager.getInstance(context).logException(e);
-        }
-        catch (IOException e)
+        } catch (IOException e)
         {
             LogManager.getInstance(context).logException(e);
         }
@@ -430,7 +425,7 @@ public class DBSCAN
 
     private static Collection<Cluster> fetchClusters(Context context)
     {
-        HashSet<Cluster> clusters = new HashSet<Cluster>();
+        HashSet<Cluster> clusters = new HashSet<>();
 
         File clusterFile = DBSCAN.getClusterFile(context);
 
@@ -463,15 +458,7 @@ public class DBSCAN
                     clusters.add(new Cluster(clusterList.getJSONObject(i)));
                 }
             }
-            catch (FileNotFoundException e)
-            {
-                LogManager.getInstance(context).logException(e);
-            }
-            catch (IOException e)
-            {
-                LogManager.getInstance(context).logException(e);
-            }
-            catch (JSONException e)
+            catch (JSONException | IOException e)
             {
                 LogManager.getInstance(context).logException(e);
             }

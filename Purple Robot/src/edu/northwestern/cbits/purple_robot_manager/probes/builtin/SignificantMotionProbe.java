@@ -20,7 +20,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.CheckBoxPreference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -47,7 +46,7 @@ public class SignificantMotionProbe extends Probe
 
     public Map<String, String> databaseSchema()
     {
-        HashMap<String, String> schema = new HashMap<String, String>();
+        HashMap<String, String> schema = new HashMap<>();
 
         schema.put(SignificantMotionProbe.EVENT_TIME, ProbeValuesProvider.INTEGER_TYPE);
 

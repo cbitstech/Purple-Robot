@@ -10,9 +10,9 @@ import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 
 public class FrequencyThrottleFilter extends Filter
 {
-    private Map<String, Double> _lastSaves = new HashMap<String, Double>();
-    private Set<String> _exclude = new HashSet<String>();
-    private Set<String> _include = new HashSet<String>();
+    private Map<String, Double> _lastSaves = new HashMap<>();
+    private Set<String> _exclude = new HashSet<>();
+    private Set<String> _include = new HashSet<>();
 
     private long _minInterval = 1000;
 
@@ -39,13 +39,13 @@ public class FrequencyThrottleFilter extends Filter
             Double lastSave = this._lastSaves.get(name);
 
             if (lastSave == null)
-                lastSave = Double.valueOf(0);
+                lastSave = (double) 0;
 
-            if (lastSave.doubleValue() > timestamp.doubleValue()
-                    || Math.abs(timestamp.doubleValue() - lastSave.doubleValue()) < this._minInterval)
+            if (lastSave > timestamp
+                    || Math.abs(timestamp - lastSave) < this._minInterval)
                 return false;
 
-            this._lastSaves.put(name, Double.valueOf(timestamp.doubleValue()));
+            this._lastSaves.put(name, timestamp.doubleValue());
 
             return true;
         }

@@ -202,15 +202,7 @@ public class TwitterProbe extends Probe
 
                                                     eventBundle.putString(TwitterProbe.CONTENT, message);
                                                 }
-                                                catch (IllegalBlockSizeException e)
-                                                {
-                                                    LogManager.getInstance(context).logException(e);
-                                                }
-                                                catch (BadPaddingException e)
-                                                {
-                                                    LogManager.getInstance(context).logException(e);
-                                                }
-                                                catch (UnsupportedEncodingException e)
+                                                catch (IllegalBlockSizeException | UnsupportedEncodingException | BadPaddingException e)
                                                 {
                                                     LogManager.getInstance(context).logException(e);
                                                 }
@@ -236,19 +228,7 @@ public class TwitterProbe extends Probe
                                         e.putLong("config_twitter_most_recent", System.currentTimeMillis());
                                         e.commit();
                                     }
-                                    catch (JSONException e)
-                                    {
-                                        LogManager.getInstance(context).logException(e);
-                                    }
-                                    catch (ParseException e)
-                                    {
-                                        LogManager.getInstance(context).logException(e);
-                                    }
-                                    catch (NullPointerException e)
-                                    {
-                                        LogManager.getInstance(context).logException(e);
-                                    }
-                                    catch (IllegalStateException e)
+                                    catch (JSONException | IllegalStateException | NullPointerException | ParseException e)
                                     {
                                         LogManager.getInstance(context).logException(e);
                                     }
@@ -314,7 +294,7 @@ public class TwitterProbe extends Probe
 
             if (frequency instanceof Double)
             {
-                frequency = Long.valueOf(((Double) frequency).longValue());
+                frequency = ((Double) frequency).longValue();
             }
 
             if (frequency instanceof Long)
@@ -338,7 +318,7 @@ public class TwitterProbe extends Probe
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putBoolean(TwitterProbe.ENCRYPT_DATA, encryptBoolean.booleanValue());
+                e.putBoolean(TwitterProbe.ENCRYPT_DATA, encryptBoolean);
                 e.commit();
             }
         }

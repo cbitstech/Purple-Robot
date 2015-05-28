@@ -15,7 +15,7 @@ public class EncryptionTestCase extends RobotTestCase
     @Override
     public void test()
     {
-        if (this.isSelected(this._context) == false)
+        if (!this.isSelected(this._context))
             return;
 
         Assert.assertEquals("55502f40dc8b7c769880b10874abc9d0",

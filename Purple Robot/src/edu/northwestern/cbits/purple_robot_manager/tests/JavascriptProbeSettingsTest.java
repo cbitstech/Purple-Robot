@@ -33,7 +33,7 @@ public class JavascriptProbeSettingsTest extends RobotTestCase
         if (this.isSelected(this._context) == false)
             return;
 
-        HashMap<String, JSONObject> probeDefs = new HashMap<String, JSONObject>();
+        HashMap<String, JSONObject> probeDefs = new HashMap<>();
 
         for (Probe probe : ProbeManager.allProbes(this._context))
         {
@@ -45,7 +45,7 @@ public class JavascriptProbeSettingsTest extends RobotTestCase
 
         try
         {
-            ArrayList<String> names = new ArrayList<String>();
+            ArrayList<String> names = new ArrayList<>();
 
             for (String name : probeDefs.keySet())
             {
@@ -104,11 +104,7 @@ public class JavascriptProbeSettingsTest extends RobotTestCase
                     Assert.fail("JSPS 9000: " + name);
             }
         }
-        catch (JSONException e)
-        {
-            LogManager.getInstance(this._context).logException(e);
-        }
-        catch (InterruptedException e)
+        catch (JSONException | InterruptedException e)
         {
             LogManager.getInstance(this._context).logException(e);
         }
@@ -117,7 +113,7 @@ public class JavascriptProbeSettingsTest extends RobotTestCase
     @Override
     public int estimatedMinutes()
     {
-        HashMap<String, JSONObject> probeDefs = new HashMap<String, JSONObject>();
+        HashMap<String, JSONObject> probeDefs = new HashMap<>();
 
         for (Probe probe : ProbeManager.allProbes(this._context))
         {

@@ -75,7 +75,7 @@ public abstract class Trigger
                     {
                         LogManager.getInstance(context).logException(e);
 
-                        HashMap<String, Object> payload = new HashMap<String, Object>();
+                        HashMap<String, Object> payload = new HashMap<>();
                         payload.put("script", me._action);
 
                         LogManager.getInstance(context).log("failed_trigger_script", payload);
@@ -86,7 +86,7 @@ public abstract class Trigger
             Thread t = new Thread(new ThreadGroup("Triggers"), r, this.name(), 32768);
             t.start();
 
-            HashMap<String, Object> payload = new HashMap<String, Object>();
+            HashMap<String, Object> payload = new HashMap<>();
             payload.put("name", this.name());
             payload.put("identifier", this.identifier());
             payload.put("action", this._action);
@@ -236,7 +236,7 @@ public abstract class Trigger
 
     public Map<String, Object> configuration(Context context)
     {
-        Map<String, Object> config = new HashMap<String, Object>();
+        Map<String, Object> config = new HashMap<>();
 
         config.put("name", this._name);
 

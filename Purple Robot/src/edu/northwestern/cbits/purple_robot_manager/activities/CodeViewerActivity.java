@@ -72,11 +72,7 @@ public class CodeViewerActivity extends AppCompatActivity
                             "<engine>", 1, null).toString();
                 }
             }
-            catch (IOException e)
-            {
-                LogManager.getInstance(this).logException(e);
-            }
-            catch (StackOverflowError e)
+            catch (IOException | StackOverflowError e)
             {
                 LogManager.getInstance(this).logException(e);
             }

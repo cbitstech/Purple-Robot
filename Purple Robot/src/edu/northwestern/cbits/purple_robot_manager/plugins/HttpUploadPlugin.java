@@ -107,7 +107,7 @@ public class HttpUploadPlugin extends OutputPlugin
     private final static long MIN_UPLOAD_SIZE = 16384; // 16KB
     private static final String ENABLED = "config_enable_data_server";
 
-    private List<String> _pendingSaves = new ArrayList<String>();
+    private final List<String> _pendingSaves = new ArrayList<>();
     private long _lastSave = 0;
     private long _lastUpload = 0;
 
@@ -374,7 +374,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
                     Collections.shuffle(Arrays.asList(filenames));
 
-                    ArrayList<JSONObject> pendingObjects = new ArrayList<JSONObject>();
+                    ArrayList<JSONObject> pendingObjects = new ArrayList<>();
 
                     int totalRead = 0;
 
@@ -400,15 +400,7 @@ public class HttpUploadPlugin extends OutputPlugin
                                     pendingObjects.add(jsonObject);
                                 }
                             }
-                            catch (FileNotFoundException e)
-                            {
-                                LogManager.getInstance(me.getContext()).logException(e);
-                            }
-                            catch (IOException e)
-                            {
-                                LogManager.getInstance(me.getContext()).logException(e);
-                            }
-                            catch (JSONException e)
+                            catch (JSONException | IOException e)
                             {
                                 LogManager.getInstance(me.getContext()).logException(e);
                             }
@@ -432,7 +424,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
                         long tally = 0;
 
-                        List<JSONObject> toUpload = new ArrayList<JSONObject>();
+                        List<JSONObject> toUpload = new ArrayList<>();
 
                         for (int i = 0; i < pendingObjects.size() && tally < maxUploadSize; i++)
                         {
@@ -479,7 +471,7 @@ public class HttpUploadPlugin extends OutputPlugin
                                 {
                                     JSONArray toSave = new JSONArray();
 
-                                    List<JSONObject> toRemove = new ArrayList<JSONObject>();
+                                    List<JSONObject> toRemove = new ArrayList<>();
 
                                     for (int i = 0; i < pendingObjects.size() && i < 100; i++)
                                     {
@@ -604,7 +596,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
                                 String jsonString = jsonMessage.toString();
 
-                                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+                                List<NameValuePair> nameValuePairs = new ArrayList<>();
                                 nameValuePairs.add(new BasicNameValuePair("json", jsonString));
                                 HttpEntity entity = new UrlEncodedFormEntity(nameValuePairs, HTTP.UTF_8);
 
@@ -774,7 +766,7 @@ public class HttpUploadPlugin extends OutputPlugin
                             {
                                 JSONArray toSave = new JSONArray();
 
-                                List<JSONObject> toRemove = new ArrayList<JSONObject>();
+                                List<JSONObject> toRemove = new ArrayList<>();
 
                                 for (int i = 0; i < pendingObjects.size() && i < 100; i++)
                                 {
@@ -815,23 +807,7 @@ public class HttpUploadPlugin extends OutputPlugin
                             String messageTitle = me.getContext().getString(R.string.notify_running_title);
                             note.setLatestEventInfo(me.getContext(), messageTitle, message, contentIntent);
                             // noteManager.notify(12345, note);
-                        }
-                        catch (JSONException e)
-                        {
-                            LogManager.getInstance(me.getContext()).logException(e);
-                        }
-                        catch (NoSuchAlgorithmException e)
-                        {
-                            throw new RuntimeException(e);
-                        }
-                        catch (UnsupportedEncodingException e)
-                        {
-                            throw new RuntimeException(e);
-                        }
-                        catch (FileNotFoundException e)
-                        {
-                        }
-                        catch (IOException e)
+                        } catch (IOException e)
                         {
                             LogManager.getInstance(me.getContext()).logException(e);
                         }
@@ -846,12 +822,7 @@ public class HttpUploadPlugin extends OutputPlugin
                         catch (KeyManagementException e)
                         {
                             LogManager.getInstance(me.getContext()).logException(e);
-                        }
-                        catch (UnrecoverableKeyException e)
-                        {
-                            LogManager.getInstance(me.getContext()).logException(e);
-                        }
-                        catch (Exception e)
+                        } catch (Exception e)
                         {
                             LogManager.getInstance(me.getContext()).logException(e);
                         }
@@ -997,8 +968,8 @@ public class HttpUploadPlugin extends OutputPlugin
 
         File f = new File(pendingFolder, filename);
 
-        HashSet<String> toRemove = new HashSet<String>();
-        HashSet<String> invalidRemove = new HashSet<String>();
+        HashSet<String> toRemove = new HashSet<>();
+        HashSet<String> invalidRemove = new HashSet<>();
 
         JSONArray saveArray = new JSONArray();
 
@@ -1017,12 +988,7 @@ public class HttpUploadPlugin extends OutputPlugin
                         toRemove.add(jsonString);
                     }
                 }
-                catch (JSONException e)
-                {
-                    LogManager.getInstance(this.getContext()).logException(e);
-                    invalidRemove.add(jsonString);
-                }
-                catch (OutOfMemoryError e)
+                catch (JSONException | OutOfMemoryError e)
                 {
                     LogManager.getInstance(this.getContext()).logException(e);
                     invalidRemove.add(jsonString);
@@ -1047,7 +1013,7 @@ public class HttpUploadPlugin extends OutputPlugin
             {
                 long duration = (now - this._lastAccumulationMeasure) / 1000;
 
-                this._accumulation = ((double) this._accumulationSum) / duration;
+                this._accumulation = this._accumulationSum / duration;
 
                 this._accumulationSum = 0;
                 this._lastAccumulationMeasure = now;
@@ -1057,20 +1023,11 @@ public class HttpUploadPlugin extends OutputPlugin
             {
                 this._pendingSaves.removeAll(toRemove);
             }
-        }
-        catch (FileNotFoundException e)
-        {
-            LogManager.getInstance(this.getContext()).logException(e);
-        }
-        catch (UnsupportedEncodingException e)
+        } catch (UnsupportedEncodingException e)
         {
             throw new RuntimeException(e);
         }
-        catch (OutOfMemoryError e)
-        {
-            LogManager.getInstance(this.getContext()).logException(e);
-        }
-        catch (IOException e)
+        catch (OutOfMemoryError | IOException e)
         {
             LogManager.getInstance(this.getContext()).logException(e);
         }
@@ -1128,16 +1085,13 @@ public class HttpUploadPlugin extends OutputPlugin
                 {
                     public boolean accept(File file)
                     {
-                        if (file.getName().toLowerCase(Locale.getDefault()).endsWith(".archive"))
-                            return true;
-
-                        return false;
+                        return file.getName().toLowerCase(Locale.getDefault()).endsWith(".archive");
                     }
                 });
 
                 final File zipfile = new File(storage, "archives.zip");
 
-                final ArrayList<File> toDelete = new ArrayList<File>();
+                final ArrayList<File> toDelete = new ArrayList<>();
 
                 try
                 {
@@ -1172,12 +1126,7 @@ public class HttpUploadPlugin extends OutputPlugin
                     }
 
                     zout.close();
-                }
-                catch (FileNotFoundException e)
-                {
-                    LogManager.getInstance(me.getContext()).logException(e);
-                }
-                catch (IOException e)
+                } catch (IOException e)
                 {
                     LogManager.getInstance(me.getContext()).logException(e);
                 }
@@ -1338,7 +1287,7 @@ public class HttpUploadPlugin extends OutputPlugin
             }
         }
 
-        return 2 * 1024 * 1024 * 1024;
+        return 2L * 1024 * 1024 * 1024;
     }
 
     public boolean isEnabled(Context context)

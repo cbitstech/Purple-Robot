@@ -20,7 +20,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
-import edu.northwestern.cbits.purple_robot_manager.activities.StartActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
 public abstract class Probe
@@ -47,6 +46,8 @@ public abstract class Probe
     public static final Object PROBE_TYPE_DOUBLE = "double";
     public static final String PROBE_TYPE = "type";
     public static final String PROBE_VALUES = "values";
+
+    private static List<Class<Probe>> _probeClasses = new ArrayList<>();
 
     public abstract String name(Context context);
 
@@ -77,9 +78,6 @@ public abstract class Probe
     }
 
     @SuppressWarnings("rawtypes")
-    private static List<Class> _probeClasses = new ArrayList<Class>();
-
-    @SuppressWarnings("rawtypes")
     public static void registerProbeClass(Class probeClass)
     {
         if (!Probe._probeClasses.contains(probeClass))
@@ -87,7 +85,7 @@ public abstract class Probe
     }
 
     @SuppressWarnings("rawtypes")
-    public static List<Class> availableProbeClasses()
+    public static List<Class<Probe>> availableProbeClasses()
     {
         return Probe._probeClasses;
     }
@@ -179,7 +177,7 @@ public abstract class Probe
         }
 
         return formatted;
-    };
+    }
 
     protected void transmitData(Context context, Bundle data)
     {
@@ -217,7 +215,7 @@ public abstract class Probe
 
     public Map<String, Object> configuration(Context context)
     {
-        HashMap<String, Object> map = new HashMap<String, Object>();
+        HashMap<String, Object> map = new HashMap<>();
 
         map.put("name", this.name(context));
         map.put("enabled", this.isEnabled(context));
@@ -233,7 +231,7 @@ public abstract class Probe
 
             if (enabled instanceof Boolean)
             {
-                if (((Boolean) enabled).booleanValue())
+                if ((Boolean) enabled)
                     this.enable(context);
                 else
                     this.disable(context);

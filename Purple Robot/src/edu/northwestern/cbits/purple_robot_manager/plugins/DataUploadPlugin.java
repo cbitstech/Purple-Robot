@@ -50,7 +50,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.net.http.AndroidHttpClient;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.PowerHelper;
@@ -299,7 +298,7 @@ public abstract class DataUploadPlugin extends OutputPlugin
 
                 String jsonString = jsonMessage.toString();
 
-                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+                List<NameValuePair> nameValuePairs = new ArrayList<>();
                 nameValuePairs.add(new BasicNameValuePair("json", jsonString));
                 HttpEntity entity = new UrlEncodedFormEntity(nameValuePairs, HTTP.UTF_8);
 
@@ -369,7 +368,7 @@ public abstract class DataUploadPlugin extends OutputPlugin
                     }
                     else
                     {
-                        HashMap<String, Object> logPayload = new HashMap<String, Object>();
+                        HashMap<String, Object> logPayload = new HashMap<>();
                         logPayload.put("remote_checksum", json.getString(CHECKSUM_KEY));
                         logPayload.put("local_checksum", responseChecksum);
 
@@ -386,17 +385,11 @@ public abstract class DataUploadPlugin extends OutputPlugin
                     me.broadcastMessage(errorMessage, true);
                 }
             }
-            catch (HttpHostConnectException e)
+            catch (HttpHostConnectException | ConnectTimeoutException e)
             {
                 me.broadcastMessage(context.getString(R.string.message_http_connection_error), true);
                 LogManager.getInstance(context).logException(e);
-            }
-            catch (ConnectTimeoutException e)
-            {
-                me.broadcastMessage(context.getString(R.string.message_http_connection_error), true);
-                LogManager.getInstance(context).logException(e);
-            }
-            catch (SocketTimeoutException e)
+            } catch (SocketTimeoutException e)
             {
                 me.broadcastMessage(context.getString(R.string.message_socket_timeout_error), true);
                 LogManager.getInstance(me.getContext()).logException(e);

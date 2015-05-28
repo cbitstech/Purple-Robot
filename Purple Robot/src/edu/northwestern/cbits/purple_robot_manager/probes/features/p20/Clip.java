@@ -21,8 +21,8 @@ public class Clip
 
     public Clip(int dimension, long windowSize, int clipType)
     {
-        this._values = new ArrayList<double[]>();
-        this._timestamps = new ArrayList<Long>();
+        this._values = new ArrayList<>();
+        this._timestamps = new ArrayList<>();
         this._dimensions = dimension;
         this._windowSize = windowSize;
         this._clipType = clipType;
@@ -31,8 +31,8 @@ public class Clip
     // Copy Constructor
     public Clip(Clip another)
     {
-        this._values = new ArrayList<double[]>(another._values);
-        this._timestamps = new ArrayList<Long>(another._timestamps);
+        this._values = new ArrayList<>(another._values);
+        this._timestamps = new ArrayList<>(another._timestamps);
         this._dimensions = another._dimensions;
         this._windowSize = another._windowSize;
         this._clipType = another._clipType;
@@ -103,7 +103,7 @@ public class Clip
 
     public List<double[]> getValues()
     {
-        List<double[]> values = new ArrayList<double[]>();
+        List<double[]> values = new ArrayList<>();
 
         synchronized (this)
         {
@@ -115,7 +115,7 @@ public class Clip
 
     public List<Long> getTimestamps()
     {
-        List<Long> timestamps = new ArrayList<Long>();
+        List<Long> timestamps = new ArrayList<>();
 
         synchronized (this)
         {

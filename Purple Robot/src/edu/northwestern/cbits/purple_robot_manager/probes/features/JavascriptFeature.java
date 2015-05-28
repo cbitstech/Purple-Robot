@@ -35,7 +35,7 @@ public class JavascriptFeature extends Feature
     private String _formatter = null;
 
     private boolean _embedded = false;
-    private final List<String> _sources = new ArrayList<String>();
+    private final List<String> _sources = new ArrayList<>();
 
     public JavascriptFeature()
     {
@@ -219,7 +219,7 @@ public class JavascriptFeature extends Feature
                     {
                         Double d = (Double) o;
 
-                        bundle.putDouble(Feature.FEATURE_VALUE, d.doubleValue());
+                        bundle.putDouble(Feature.FEATURE_VALUE, d);
                     }
                     else if (o instanceof NativeObject)
                     {
@@ -266,7 +266,7 @@ public class JavascriptFeature extends Feature
             {
                 NativeArray array = (NativeArray) value;
 
-                ArrayList<Bundle> items = new ArrayList<Bundle>();
+                ArrayList<Bundle> items = new ArrayList<>();
 
                 for (Object o : array.getIds())
                 {
@@ -281,9 +281,9 @@ public class JavascriptFeature extends Feature
                 b.putParcelableArrayList(keyString, items);
             }
             else if (value instanceof Double)
-                b.putDouble(keyString, ((Double) value).doubleValue());
+                b.putDouble(keyString, (Double) value);
             else if (value instanceof Integer)
-                b.putInt(keyString, ((Integer) value).intValue());
+                b.putInt(keyString, (Integer) value);
             else if (value == null)
                 b.putString(keyString, "(null)");
             else

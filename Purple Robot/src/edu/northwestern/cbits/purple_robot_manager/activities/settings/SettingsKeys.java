@@ -1,7 +1,5 @@
 package edu.northwestern.cbits.purple_robot_manager.activities.settings;
 
-import android.app.Activity;
-
 public class SettingsKeys
 {
     public static final String PROBES_SCREEN_KEY = "config_probes_screen";

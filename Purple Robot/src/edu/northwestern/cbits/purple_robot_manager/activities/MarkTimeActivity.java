@@ -50,7 +50,7 @@ public class MarkTimeActivity extends AppCompatActivity
 {
     private static final String SAVED_TIMESTAMPS = "edu.northwestern.cbits.purple_robot_manager.activitiesMarkTimeActivity.SAVED_TIMESTAMPS";
 
-    private LongSparseArray<String> _timestamps = new LongSparseArray<String>();
+    private LongSparseArray<String> _timestamps = new LongSparseArray<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -149,8 +149,8 @@ public class MarkTimeActivity extends AppCompatActivity
         list.setTranscriptMode(AbsListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
         list.setStackFromBottom(true);
 
-        final ArrayList<Long> indices = new ArrayList<Long>();
-        final ArrayList<String> names = new ArrayList<String>();
+        final ArrayList<Long> indices = new ArrayList<>();
+        final ArrayList<String> names = new ArrayList<>();
 
         for (int i = 0; i < this._timestamps.size(); i++)
         {
@@ -243,7 +243,7 @@ public class MarkTimeActivity extends AppCompatActivity
 
         final AutoCompleteTextView name = (AutoCompleteTextView) this.findViewById(R.id.text_label_text);
 
-        ArrayAdapter<String> namesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, names);
+        ArrayAdapter<String> namesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, names);
         name.setAdapter(namesAdapter);
         name.setThreshold(1);
     }
@@ -297,7 +297,7 @@ public class MarkTimeActivity extends AppCompatActivity
         }
         else if (itemId == R.id.menu_mail)
         {
-            StringBuffer message = new StringBuffer();
+            StringBuilder message = new StringBuilder();
             String newline = System.getProperty("line.separator");
             message.append("Time Point\tTimestamp");
             message.append(newline);
@@ -333,12 +333,7 @@ public class MarkTimeActivity extends AppCompatActivity
             catch (ActivityNotFoundException e)
             {
                 Toast.makeText(this, R.string.toast_mail_not_found, Toast.LENGTH_LONG).show();
-            }
-            catch (FileNotFoundException e)
-            {
-                LogManager.getInstance(this).logException(e);
-            }
-            catch (IOException e)
+            } catch (IOException e)
             {
                 LogManager.getInstance(this).logException(e);
             }

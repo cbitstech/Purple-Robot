@@ -54,7 +54,7 @@ public class LivewellPebbleActivityCountsProbe extends Probe
     private PebbleKit.PebbleAckReceiver _ackReceiver = null;
 
     private long _lastRefresh = 0;
-    private ArrayList<Bundle> _pendingReadings = new ArrayList<Bundle>();
+    private final ArrayList<Bundle> _pendingReadings = new ArrayList<>();
     private boolean _isTransmitting = false;
 
     private static class ActivityCount
@@ -543,7 +543,7 @@ public class LivewellPebbleActivityCountsProbe extends Probe
 
             if (frequency instanceof Double)
             {
-                frequency = Long.valueOf(((Double) frequency).longValue());
+                frequency = ((Double) frequency).longValue();
             }
 
             if (frequency instanceof Long)

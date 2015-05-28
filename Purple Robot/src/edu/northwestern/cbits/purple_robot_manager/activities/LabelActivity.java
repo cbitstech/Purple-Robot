@@ -26,7 +26,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -67,7 +66,7 @@ public class LabelActivity extends AppCompatActivity
     private double _timestamp = 0;
     private String _labelContext = null;
 
-    private final HashMap<String, Object> _values = new HashMap<String, Object>();
+    private final HashMap<String, Object> _values = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -204,7 +203,7 @@ public class LabelActivity extends AppCompatActivity
 
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss, MMM d");
 
-        HashMap<String, Object> payload = new HashMap<String, Object>();
+        HashMap<String, Object> payload = new HashMap<>();
 
         final AutoCompleteTextView value = (AutoCompleteTextView) this.findViewById(R.id.text_value_text);
         final AutoCompleteTextView label = (AutoCompleteTextView) this.findViewById(R.id.text_label_text);
@@ -224,7 +223,7 @@ public class LabelActivity extends AppCompatActivity
 
             Bundle definitions = extras.getBundle(LabelActivity.LABEL_DEFINITIONS);
 
-            HashMap<String, String> sortedMap = new HashMap<String, String>();
+            HashMap<String, String> sortedMap = new HashMap<>();
 
             for (String key : definitions.keySet())
             {
@@ -236,7 +235,7 @@ public class LabelActivity extends AppCompatActivity
                 sortedMap.put(weight + "_" + fieldName, fieldName);
             }
 
-            ArrayList<String> keyList = new ArrayList<String>();
+            ArrayList<String> keyList = new ArrayList<>();
 
             for (String key : sortedMap.keySet())
             {
@@ -293,7 +292,7 @@ public class LabelActivity extends AppCompatActivity
 
                         seekBar.setProgress((int) lastValue);
 
-                        me._values.put(fieldLabel, Float.valueOf(lastValue));
+                        me._values.put(fieldLabel, lastValue);
 
                         seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
                         {
@@ -308,7 +307,7 @@ public class LabelActivity extends AppCompatActivity
 
                                     fieldName.setText(fieldPrompt + ": " + ((int) (min + progress)));
 
-                                    me._values.put(fieldLabel, Float.valueOf((float) (min + progress)));
+                                    me._values.put(fieldLabel, (float) (min + progress));
                                 }
                             }
 
@@ -387,12 +386,12 @@ public class LabelActivity extends AppCompatActivity
 
                         String valuesList = prefs.getString("label_field_" + field + "_saved_values", "");
 
-                        ArrayList<String> savedValues = new ArrayList<String>();
+                        ArrayList<String> savedValues = new ArrayList<>();
 
                         for (String saved : valuesList.split(";"))
                             savedValues.add(saved);
 
-                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, savedValues);
+                        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, savedValues);
                         textField.setAdapter(adapter);
                         textField.setThreshold(1);
 
@@ -466,7 +465,7 @@ public class LabelActivity extends AppCompatActivity
                     value.setText(labelValue);
             }
 
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, this.savedLabels());
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, this.savedLabels());
 
             label.setAdapter(adapter);
 
@@ -476,7 +475,7 @@ public class LabelActivity extends AppCompatActivity
                 payload.put("label", extras.getString(LabelActivity.LABEL_KEY));
             }
 
-            ArrayAdapter<String> valueAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, this.savedValues());
+            ArrayAdapter<String> valueAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, this.savedValues());
             value.setAdapter(valueAdapter);
 
             value.requestFocus();
@@ -498,7 +497,7 @@ public class LabelActivity extends AppCompatActivity
 
         Bundle extras = this.getIntent().getExtras();
 
-        HashMap<String, Object> payload = new HashMap<String, Object>();
+        HashMap<String, Object> payload = new HashMap<>();
 
         if (extras.containsKey(LabelActivity.LABEL_KEY))
             payload.put("label", extras.getString(LabelActivity.LABEL_KEY));
@@ -542,11 +541,9 @@ public class LabelActivity extends AppCompatActivity
 
                     JavaScriptEngine js = new JavaScriptEngine(this);
 
-                    Log.e("PR", "EMITTING " + key + " -- " + value.toString());
-
                     js.emitReading(key, value.toString());
 
-                    HashMap<String, Object> payload = new HashMap<String, Object>();
+                    HashMap<String, Object> payload = new HashMap<>();
 
                     payload.put("label_time", this._timestamp);
                     payload.put("label", key);
@@ -555,14 +552,14 @@ public class LabelActivity extends AppCompatActivity
                     LogManager.getInstance(this).log("pr_label_submit", payload);
 
                     if (value instanceof Float)
-                        e.putFloat("label_field_" + key, ((Float) value).floatValue());
+                        e.putFloat("label_field_" + key, (Float) value);
                     else
                     {
                         e.putString("label_field_" + key, value.toString());
 
                         String valuesList = prefs.getString("label_field_" + key + "_saved_values", "");
 
-                        ArrayList<String> savedValues = new ArrayList<String>();
+                        ArrayList<String> savedValues = new ArrayList<>();
 
                         for (String saved : valuesList.split(";"))
                             savedValues.add(saved);
@@ -570,7 +567,7 @@ public class LabelActivity extends AppCompatActivity
                         savedValues.remove(value.toString());
                         savedValues.add(0, value.toString());
 
-                        StringBuffer sb = new StringBuffer();
+                        StringBuilder sb = new StringBuilder();
 
                         for (String savedValue : savedValues)
                         {
@@ -613,19 +610,19 @@ public class LabelActivity extends AppCompatActivity
                     JavaScriptEngine js = new JavaScriptEngine(this);
                     js.emitReading(key, value);
 
-                    List<String> labels = new ArrayList<String>(Arrays.asList(this.savedLabels()));
+                    List<String> labels = new ArrayList<>(Arrays.asList(this.savedLabels()));
                     labels.remove(key);
                     labels.add(0, key);
                     String[] labelsArray = labels.toArray(new String[0]);
                     this.saveLabels(labelsArray);
 
-                    List<String> values = new ArrayList<String>(Arrays.asList(this.savedValues()));
+                    List<String> values = new ArrayList<>(Arrays.asList(this.savedValues()));
                     values.remove(value);
                     values.add(0, value);
                     String[] valuesArray = values.toArray(new String[0]);
                     this.saveValues(valuesArray);
 
-                    HashMap<String, Object> payload = new HashMap<String, Object>();
+                    HashMap<String, Object> payload = new HashMap<>();
 
                     payload.put("label_time", this._timestamp);
                     payload.put("label", key);

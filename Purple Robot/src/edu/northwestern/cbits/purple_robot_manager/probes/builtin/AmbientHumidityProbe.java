@@ -74,7 +74,7 @@ public class AmbientHumidityProbe extends ContinuousProbe implements SensorEvent
         double[] eventTimes = bundle.getDoubleArray(ContinuousProbe.EVENT_TIMESTAMP);
         double[] humidity = bundle.getDoubleArray(AmbientHumidityProbe.HUMIDITY);
 
-        ArrayList<String> keys = new ArrayList<String>();
+        ArrayList<String> keys = new ArrayList<>();
 
         if (humidity != null && eventTimes != null)
         {
@@ -117,7 +117,7 @@ public class AmbientHumidityProbe extends ContinuousProbe implements SensorEvent
         }
 
         return formatted;
-    };
+    }
 
     @Override
     public long getFrequency()
@@ -301,7 +301,7 @@ public class AmbientHumidityProbe extends ContinuousProbe implements SensorEvent
     {
         double now = System.currentTimeMillis();
 
-        if (this.shouldProcessEvent(event) == false)
+        if (!this.shouldProcessEvent(event))
             return;
 
         if (this.passesThreshold(event))
@@ -427,7 +427,7 @@ public class AmbientHumidityProbe extends ContinuousProbe implements SensorEvent
                 SharedPreferences prefs = Probe.getPreferences(context);
                 SharedPreferences.Editor e = prefs.edit();
 
-                e.putBoolean(AmbientHumidityProbe.USE_HANDLER, ((Boolean) handler).booleanValue());
+                e.putBoolean(AmbientHumidityProbe.USE_HANDLER, (Boolean) handler);
                 e.commit();
             }
         }

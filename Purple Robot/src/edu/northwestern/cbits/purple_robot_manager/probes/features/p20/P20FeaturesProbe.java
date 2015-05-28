@@ -18,7 +18,6 @@ import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.util.Log;
@@ -43,7 +42,7 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
     private FeatureExtractor _gyroscopeExtractor = null;
     private FeatureExtractor _barometerExtractor = null;
 
-    private final HashMap<Feature, Double> _featureValues = new HashMap<Feature, Double>();
+    private final HashMap<Feature, Double> _featureValues = new HashMap<>();
 
     private Clip _accelerometerClip = null;
     private Clip _gyroscopeClip = null;
@@ -85,9 +84,9 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
         this._barometerClip = new Clip(1, P20FeaturesProbe.WINDOW_SIZE, Clip.BAROMETER);
 
         // lists to be passed to FeatureExtractor
-        ArrayList<Feature> accelerometerFeatures = new ArrayList<Feature>();
-        ArrayList<Feature> gyroscopeFeatures = new ArrayList<Feature>();
-        ArrayList<Feature> barometerFeatures = new ArrayList<Feature>();
+        ArrayList<Feature> accelerometerFeatures = new ArrayList<>();
+        ArrayList<Feature> gyroscopeFeatures = new ArrayList<>();
+        ArrayList<Feature> barometerFeatures = new ArrayList<>();
 
         for (Feature f : this._featureList)
         {

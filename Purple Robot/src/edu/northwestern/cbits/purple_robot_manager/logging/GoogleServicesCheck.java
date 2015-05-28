@@ -1,6 +1,5 @@
 package edu.northwestern.cbits.purple_robot_manager.logging;
 
-import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
 

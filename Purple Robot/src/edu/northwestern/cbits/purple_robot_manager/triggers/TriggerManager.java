@@ -31,7 +31,7 @@ public class TriggerManager
 {
     private static TriggerManager _instance = null;
 
-    private final List<Trigger> _triggers = new ArrayList<Trigger>();
+    private final List<Trigger> _triggers = new ArrayList<>();
     private Timer _timer = null;
 
     private boolean _triggersInited = false;
@@ -86,7 +86,7 @@ public class TriggerManager
 
     public void updateTriggers(Context context, List<Trigger> triggerList)
     {
-        ArrayList<Trigger> toAdd = new ArrayList<Trigger>();
+        ArrayList<Trigger> toAdd = new ArrayList<>();
 
         synchronized (this._triggers)
         {
@@ -178,7 +178,7 @@ public class TriggerManager
 
     public List<Trigger> triggersForId(String triggerId)
     {
-        ArrayList<Trigger> matches = new ArrayList<Trigger>();
+        ArrayList<Trigger> matches = new ArrayList<>();
 
         synchronized (this._triggers)
         {
@@ -198,7 +198,7 @@ public class TriggerManager
 
     public void addTrigger(Context context, Trigger t)
     {
-        ArrayList<Trigger> ts = new ArrayList<Trigger>();
+        ArrayList<Trigger> ts = new ArrayList<>();
 
         ts.add(t);
 
@@ -243,7 +243,7 @@ public class TriggerManager
 
     public List<Map<String, Object>> triggerConfigurations(Context context)
     {
-        List<Map<String, Object>> configs = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> configs = new ArrayList<>();
 
         synchronized (this._triggers)
         {
@@ -269,7 +269,7 @@ public class TriggerManager
 
     public List<String> triggerIds()
     {
-        ArrayList<String> triggerIds = new ArrayList<String>();
+        ArrayList<String> triggerIds = new ArrayList<>();
 
         synchronized (this._triggers)
         {
@@ -309,7 +309,7 @@ public class TriggerManager
 
     public ArrayList<Bundle> allTriggersBundles(Context context)
     {
-        ArrayList<Bundle> triggers = new ArrayList<Bundle>();
+        ArrayList<Bundle> triggers = new ArrayList<>();
 
         synchronized (this._triggers)
         {
@@ -324,7 +324,7 @@ public class TriggerManager
 
     public void fireMissedTriggers(final Context context, long now)
     {
-        final LongSparseArray<String> fireDates = new LongSparseArray<String>();
+        final LongSparseArray<String> fireDates = new LongSparseArray<>();
 
         for (Trigger trigger : this._triggers)
         {
@@ -336,7 +336,7 @@ public class TriggerManager
                 {
                     long lastFired = dateTrig.lastMissedFireTime(context);
 
-                    fireDates.put(Long.valueOf(lastFired), dateTrig.identifier());
+                    fireDates.put(lastFired, dateTrig.identifier());
                 }
             }
         }
@@ -380,7 +380,7 @@ public class TriggerManager
     @SuppressLint("Wakelock")
     public List<Long> upcomingFireTimes(Context context)
     {
-        ArrayList<Long> upcoming = new ArrayList<Long>();
+        ArrayList<Long> upcoming = new ArrayList<>();
 
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         WakeLock wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, "trigger_wakelock");

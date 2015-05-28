@@ -19,8 +19,8 @@ import edu.northwestern.cbits.purple_robot_manager.tests.ui.NotificationTestCase
 
 public class RobotTestRunner extends AndroidTestRunner
 {
-    private final List<TestCase> _cases = new ArrayList<TestCase>();
-    private final RobotTestSuite _suite = new RobotTestSuite();;
+    private final List<TestCase> _cases = new ArrayList<>();
+    private final RobotTestSuite _suite = new RobotTestSuite();
 
     private Thread _thread = null;
 

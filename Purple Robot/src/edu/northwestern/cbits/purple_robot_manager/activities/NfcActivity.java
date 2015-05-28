@@ -180,7 +180,7 @@ public class NfcActivity extends AppCompatActivity
             }
         }
 
-        ArrayList<String> techList = new ArrayList<String>();
+        ArrayList<String> techList = new ArrayList<>();
 
         StringBuffer techs = new StringBuffer();
 

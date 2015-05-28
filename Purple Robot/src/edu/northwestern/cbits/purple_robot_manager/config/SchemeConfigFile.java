@@ -28,7 +28,7 @@ public class SchemeConfigFile
     public String toString()
     {
         Pair rest = this.triggersList(TriggerManager.getInstance(this._context).triggerConfigurations(this._context));
-        rest = new Pair(this.probesList(ProbeManager.probeConfigurations(this._context)), rest);
+        rest = new Pair(SchemeConfigFile.probesList(ProbeManager.probeConfigurations(this._context)), rest);
         rest = new Pair(this.configuration(this._context), rest);
 
         Pair root = new Pair(Symbol.BEGIN, rest);
@@ -40,7 +40,7 @@ public class SchemeConfigFile
     {
         Map<String, Object> configMap = PurpleRobotApplication.configuration(context);
 
-        return new Pair(Symbol.intern("pr-update-config"), this.pairsList(configMap));
+        return new Pair(Symbol.intern("pr-update-config"), SchemeConfigFile.pairsList(configMap));
     }
 
     private Pair triggersList(List<Map<String, Object>> configs)

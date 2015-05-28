@@ -191,15 +191,10 @@ public class LocalHttpServer
             {
                 // e.printStackTrace();
             }
-            catch (IOException e)
+            catch (IOException | HttpException e)
             {
                 e.printStackTrace();
-            }
-            catch (HttpException e)
-            {
-                e.printStackTrace();
-            }
-            finally
+            } finally
             {
                 try
                 {

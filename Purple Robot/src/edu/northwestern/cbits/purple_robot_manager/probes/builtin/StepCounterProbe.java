@@ -23,7 +23,6 @@ import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -82,7 +81,7 @@ public class StepCounterProbe extends Probe implements SensorEventListener
 
     public Map<String, String> databaseSchema()
     {
-        HashMap<String, String> schema = new HashMap<String, String>();
+        HashMap<String, String> schema = new HashMap<>();
 
         schema.put(StepCounterProbe.STEPS_KEY, ProbeValuesProvider.REAL_TYPE);
 
@@ -98,8 +97,8 @@ public class StepCounterProbe extends Probe implements SensorEventListener
 
             SplineChart c = new SplineChart();
 
-            ArrayList<Double> battery = new ArrayList<Double>();
-            ArrayList<Double> time = new ArrayList<Double>();
+            ArrayList<Double> battery = new ArrayList<>();
+            ArrayList<Double> time = new ArrayList<>();
 
             Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(activity, StepCounterProbe.DB_TABLE, this.databaseSchema());
 
@@ -131,11 +130,7 @@ public class StepCounterProbe extends Probe implements SensorEventListener
 
             return template;
         }
-        catch (IOException e)
-        {
-            LogManager.getInstance(activity).logException(e);
-        }
-        catch (JSONException e)
+        catch (IOException | JSONException e)
         {
             LogManager.getInstance(activity).logException(e);
         }
@@ -258,10 +253,10 @@ public class StepCounterProbe extends Probe implements SensorEventListener
             bundle.putFloat(StepCounterProbe.STEP_COUNT, steps);
             this.transmitData(this._context, bundle);
 
-            Map<String, Object> values = new HashMap<String, Object>();
+            Map<String, Object> values = new HashMap<>();
 
             values.put(StepCounterProbe.STEPS_KEY, bundle.getFloat("STEPS"));
-            values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(bundle.getLong("TIMESTAMP")));
+            values.put(ProbeValuesProvider.TIMESTAMP, (double) bundle.getLong("TIMESTAMP"));
 
             ProbeValuesProvider.getProvider(this._context).insertValue(this._context, StepCounterProbe.DB_TABLE, this.databaseSchema(), values);
 

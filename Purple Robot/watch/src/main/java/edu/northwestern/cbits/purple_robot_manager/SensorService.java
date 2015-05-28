@@ -187,8 +187,8 @@ public class SensorService extends IntentService implements GoogleApiClient.Conn
     };
 
     private static GoogleApiClient _apiClient = null;
-    private final static LongSparseArray<DataMap> _payloads = new LongSparseArray<DataMap>();
-    private final static ArrayList<DataMap> _crashPayloads = new ArrayList<DataMap>();
+    private final static LongSparseArray<DataMap> _payloads = new LongSparseArray<>();
+    private final static ArrayList<DataMap> _crashPayloads = new ArrayList<>();
 
     private static boolean _isTransmitting = false;
 
@@ -265,12 +265,7 @@ public class SensorService extends IntentService implements GoogleApiClient.Conn
                 SensorService._crashPayloads.add(map);
 
                 f.delete();
-            }
-            catch (FileNotFoundException e)
-            {
-                e.printStackTrace();
-            }
-            catch (IOException e)
+            } catch (IOException e)
             {
                 e.printStackTrace();
             }
@@ -564,7 +559,7 @@ public class SensorService extends IntentService implements GoogleApiClient.Conn
                         SensorService._isTransmitting = true;
 
                         long now = System.currentTimeMillis();
-                        ArrayList<Long> transmitted = new ArrayList<Long>();
+                        ArrayList<Long> transmitted = new ArrayList<>();
 
                         synchronized (SensorService._payloads)
                         {
@@ -596,7 +591,7 @@ public class SensorService extends IntentService implements GoogleApiClient.Conn
 
                         synchronized (SensorService._crashPayloads)
                         {
-                            ArrayList<Integer> sent = new ArrayList<Integer>();
+                            ArrayList<Integer> sent = new ArrayList<>();
 
                             for (int i = 0; i < SensorService._crashPayloads.size(); i++)
                             {
@@ -622,7 +617,7 @@ public class SensorService extends IntentService implements GoogleApiClient.Conn
 
                             for (Integer i : sent)
                             {
-                                SensorService._crashPayloads.remove(i);
+                                SensorService._crashPayloads.remove(i.intValue());
                             }
                         }
 

@@ -5,8 +5,6 @@ import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.preference.PreferenceManager;
-import android.support.v4.widget.CursorAdapter;
-import android.view.View;
 
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
@@ -135,11 +133,7 @@ public class ProbesHelpRequestHandler implements HttpRequestHandler
 
                 return content.getBytes(Charset.forName("UTF-8"));
             }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-            catch (JSONException e)
+            catch (IOException | JSONException e)
             {
                 e.printStackTrace();
             }
@@ -219,11 +213,7 @@ public class ProbesHelpRequestHandler implements HttpRequestHandler
 
                     return content.getBytes(Charset.forName("UTF-8"));
                 }
-                catch (IOException e)
-                {
-                    e.printStackTrace();
-                }
-                catch (JSONException e)
+                catch (IOException | JSONException e)
                 {
                     e.printStackTrace();
                 }

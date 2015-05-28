@@ -42,7 +42,7 @@ import edu.northwestern.cbits.purple_robot_manager.util.DBSCAN.Point;
 
 public class LocationLabelActivity extends AppCompatActivity
 {
-    private ArrayList<Cluster> _clusters = new ArrayList<Cluster>();
+    private ArrayList<Cluster> _clusters = new ArrayList<>();
     private int _selectedCluster = -1;
 
     protected void onCreate(Bundle savedInstanceState)

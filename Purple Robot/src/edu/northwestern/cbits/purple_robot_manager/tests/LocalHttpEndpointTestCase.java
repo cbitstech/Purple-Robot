@@ -40,7 +40,7 @@ public class LocalHttpEndpointTestCase extends RobotTestCase
             command.put("script", "PurpleRobot.persistString('plus-test', '" + LocalHttpEndpointTestCase.PLUS_STRING
                     + "');");
 
-            HashMap<String, String> payload = new HashMap<String, String>();
+            HashMap<String, String> payload = new HashMap<>();
             payload.put("json", command.toString(2));
 
             String response = this.syncHttpPost("http://127.0.0.1:12345/json/submit", payload);

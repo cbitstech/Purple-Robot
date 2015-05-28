@@ -380,12 +380,7 @@ public class FitbitBetaProbe extends Probe
                                     }
 
                                     me.transmitData(context, bundle);
-                                }
-                                catch (JSONException e)
-                                {
-                                    e.printStackTrace();
-                                }
-                                catch (Exception e)
+                                } catch (Exception e)
                                 {
                                     e.printStackTrace();
                                 }

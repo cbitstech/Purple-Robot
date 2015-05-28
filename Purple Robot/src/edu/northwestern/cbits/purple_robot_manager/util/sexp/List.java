@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class List extends SExpression
 {
-    private ArrayList<SExpression> _elements = new ArrayList<SExpression>();
+    private ArrayList<SExpression> _elements = new ArrayList<>();
 
     public List()
     {
@@ -20,7 +20,7 @@ public class List extends SExpression
     {
         // TODO: Obey pretty...
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         sb.append("(");
 

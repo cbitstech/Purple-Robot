@@ -237,7 +237,7 @@ public abstract class ContinuousProbe extends Probe
         Bundle formatted = super.formattedBundle(context, bundle);
 
         return formatted;
-    };
+    }
 
     public int getResourceFrequencyLabels()
     {

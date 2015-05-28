@@ -3,8 +3,6 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.InetAddress;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -285,11 +283,7 @@ public class RobotHealthProbe extends Probe
                                         bundle.putString(RobotHealthProbe.APP_VERSION_NAME, info.versionName);
                                         bundle.putInt(RobotHealthProbe.APP_VERSION_CODE, info.versionCode);
                                     }
-                                    catch (NameNotFoundException e)
-                                    {
-                                        LogManager.getInstance(context).logException(e);
-                                    }
-                                    catch (RuntimeException e)
+                                    catch (NameNotFoundException | RuntimeException e)
                                     {
                                         LogManager.getInstance(context).logException(e);
                                     }
@@ -310,7 +304,7 @@ public class RobotHealthProbe extends Probe
                                                 info.computeDetails();
 
                                                 if (info.getOffset() != null)
-                                                    me._lastOffset = info.getOffset().longValue();
+                                                    me._lastOffset = info.getOffset();
 
                                             }
                                         }
@@ -376,7 +370,7 @@ public class RobotHealthProbe extends Probe
                                     bundle.putLong(RobotHealthProbe.LAST_BOOT, prefs.getLong(BootUpReceiver.BOOT_KEY, 0));
                                     bundle.putLong(RobotHealthProbe.LAST_HALT, prefs.getLong(ShutdownReceiver.SHUTDOWN_KEY, 0));
 
-                                    ArrayList<String> errors = new ArrayList<String>();
+                                    ArrayList<String> errors = new ArrayList<>();
 
                                     for (String check : SanityManager.getInstance(context).errors().values())
                                         errors.add(check);
@@ -384,7 +378,7 @@ public class RobotHealthProbe extends Probe
                                     if (errors.size() > 0)
                                         bundle.putStringArrayList("CHECK_ERRORS", errors);
 
-                                    ArrayList<String> warnings = new ArrayList<String>();
+                                    ArrayList<String> warnings = new ArrayList<>();
 
                                     for (String check : SanityManager.getInstance(context).warnings().values())
                                         warnings.add(check);
@@ -434,7 +428,7 @@ public class RobotHealthProbe extends Probe
         formatted.putString(context.getString(R.string.robot_version_label), bundle.getString(RobotHealthProbe.APP_VERSION_NAME));
 
         return formatted;
-    };
+    }
 
     @Override
     public String summarizeValue(Context context, Bundle bundle)
@@ -485,7 +479,7 @@ public class RobotHealthProbe extends Probe
 
             if (frequency instanceof Double)
             {
-                frequency = Long.valueOf(((Double) frequency).longValue());
+                frequency = ((Double) frequency).longValue();
             }
 
             if (frequency instanceof Long)
@@ -497,7 +491,7 @@ public class RobotHealthProbe extends Probe
             Object include = params.get(RobotHealthProbe.INCLUDE_SCHEME_CONFIG);
 
             if (include instanceof Boolean)
-                e.putBoolean(RobotHealthProbe.INCLUDE_SCHEME_CONFIG, ((Boolean) include).booleanValue());
+                e.putBoolean(RobotHealthProbe.INCLUDE_SCHEME_CONFIG, (Boolean) include);
         }
 
         if (params.containsKey(RobotHealthProbe.INCLUDE_JSON_CONFIG))
@@ -505,7 +499,7 @@ public class RobotHealthProbe extends Probe
             Object include = params.get(RobotHealthProbe.INCLUDE_JSON_CONFIG);
 
             if (include instanceof Boolean)
-                e.putBoolean(RobotHealthProbe.INCLUDE_JSON_CONFIG, ((Boolean) include).booleanValue());
+                e.putBoolean(RobotHealthProbe.INCLUDE_JSON_CONFIG, (Boolean) include);
         }
 
         e.commit();

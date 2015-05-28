@@ -177,7 +177,7 @@ public abstract class RobotTestCase extends AndroidTestCase
         HttpPost httpPost = new HttpPost(siteUri);
         httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
 
-        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+        List<NameValuePair> nameValuePairs = new ArrayList<>();
 
         for (String key : payload.keySet())
             nameValuePairs.add(new BasicNameValuePair(key, payload.get(key)));

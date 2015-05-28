@@ -77,11 +77,7 @@ public class SchemeEngine extends BaseScriptEngine
         {
             scheme.load(new InputStreamReader(this._context.getAssets().open("scheme/pregexp.scm")));
         }
-        catch (IOException e)
-        {
-            LogManager.getInstance(this._context).logException(e);
-        }
-        catch (StackOverflowError e)
+        catch (IOException | StackOverflowError e)
         {
             LogManager.getInstance(this._context).logException(e);
         }
@@ -90,11 +86,7 @@ public class SchemeEngine extends BaseScriptEngine
         {
             scheme.load(new InputStreamReader(this._context.getAssets().open("scheme/json.scm")));
         }
-        catch (IOException e)
-        {
-            LogManager.getInstance(this._context).logException(e);
-        }
-        catch (StackOverflowError e)
+        catch (IOException | StackOverflowError e)
         {
             LogManager.getInstance(this._context).logException(e);
         }
@@ -103,11 +95,7 @@ public class SchemeEngine extends BaseScriptEngine
         {
             scheme.load(new InputStreamReader(this._context.getAssets().open("scheme/purple-robot.scm")));
         }
-        catch (IOException e)
-        {
-            LogManager.getInstance(this._context).logException(e);
-        }
-        catch (StackOverflowError e)
+        catch (IOException | StackOverflowError e)
         {
             LogManager.getInstance(this._context).logException(e);
         }
@@ -121,7 +109,7 @@ public class SchemeEngine extends BaseScriptEngine
             LogManager.getInstance(this._context).logException(e);
         }
 
-        return Boolean.valueOf(false);
+        return false;
     }
 
     protected String language()
@@ -170,7 +158,7 @@ public class SchemeEngine extends BaseScriptEngine
 
     public static Map<String, Object> parsePairList(Pair pair)
     {
-        HashMap<String, Object> map = new HashMap<String, Object>();
+        HashMap<String, Object> map = new HashMap<>();
 
         if (pair.isEmpty() == false)
         {
@@ -198,7 +186,7 @@ public class SchemeEngine extends BaseScriptEngine
 
                     if (valuePair.first() instanceof String && valuePair.rest() instanceof Pair)
                     {
-                        ArrayList<Object> list = new ArrayList<Object>();
+                        ArrayList<Object> list = new ArrayList<>();
 
                         list.add(valuePair.first());
 
@@ -358,7 +346,7 @@ public class SchemeEngine extends BaseScriptEngine
         {
             Double d = (Double) value;
 
-            bundle.putDouble(Feature.FEATURE_VALUE, d.doubleValue());
+            bundle.putDouble(Feature.FEATURE_VALUE, d);
         }
         else if (value instanceof Integer)
         {
@@ -369,8 +357,6 @@ public class SchemeEngine extends BaseScriptEngine
         else if (value instanceof Pair)
         {
             Pair pair = (Pair) value;
-
-            Log.e("PR", "PARSE PAIR: " + pair);
 
             try
             {
@@ -385,10 +371,10 @@ public class SchemeEngine extends BaseScriptEngine
         }
         else
         {
-            Log.e("PR", "SCHEME PLUGIN GOT UNKNOWN VALUE " + value);
+            Log.e("PR", "SCHEME ENGINE GOT UNKNOWN VALUE " + value);
 
             if (value != null)
-                Log.e("PR", "SCHEME PLUGIN GOT UNKNOWN CLASS " + value.getClass());
+                Log.e("PR", "SCHEME ENGINE GOT UNKNOWN CLASS " + value.getClass());
         }
 
         this.transmitData(bundle);

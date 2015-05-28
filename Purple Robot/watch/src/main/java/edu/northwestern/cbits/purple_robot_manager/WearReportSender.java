@@ -1,6 +1,5 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
-import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.google.android.gms.wearable.DataMap;
@@ -34,11 +33,7 @@ public class WearReportSender implements ReportSender
         {
             Log.e("PW", "LOGGING CRASH: " + errorContent.toJSON().toString(2));
         }
-        catch (JSONException e)
-        {
-            e.printStackTrace();
-        }
-        catch (JSONReportBuilder.JSONReportException e)
+        catch (JSONException | JSONReportBuilder.JSONReportException e)
         {
             e.printStackTrace();
         }

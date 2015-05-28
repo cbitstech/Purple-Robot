@@ -68,10 +68,8 @@ import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.models.ModelManager;
 import edu.northwestern.cbits.purple_robot_manager.plugins.DataUploadPlugin;
-import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
-import edu.northwestern.cbits.purple_robot_manager.plugins.StreamingJacksonUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
 import edu.northwestern.cbits.purple_robot_manager.snapshots.EmptySnapshotException;
 import edu.northwestern.cbits.purple_robot_manager.snapshots.SnapshotManager;
@@ -130,7 +128,7 @@ public abstract class BaseScriptEngine
 
         Log.e("PR." + this.language(), sdf.format(new Date()) + ": " + message.toString());
 
-        HashMap<String, Object> payload = new HashMap<String, Object>();
+        HashMap<String, Object> payload = new HashMap<>();
         payload.put("message", message);
         LogManager.getInstance(this._context).log("pr_script_log_message", payload);
     }
@@ -153,7 +151,7 @@ public abstract class BaseScriptEngine
         Intent intent = new Intent(ManagerService.RINGTONE_STOP_INTENT);
         intent.setClass(this._context, ManagerService.class);
 
-        HashMap<String, Object> payload = new HashMap<String, Object>();
+        HashMap<String, Object> payload = new HashMap<>();
         LogManager.getInstance(this._context).log("pr_tone_stopped", payload);
 
         this._context.startService(intent);
@@ -192,7 +190,7 @@ public abstract class BaseScriptEngine
         if (loops)
             intent.putExtra(ManagerService.RINGTONE_LOOPS, loops);
 
-        HashMap<String, Object> payload = new HashMap<String, Object>();
+        HashMap<String, Object> payload = new HashMap<>();
         payload.put("tone", tone);
         LogManager.getInstance(this._context).log("pr_tone_played", payload);
 
@@ -247,7 +245,7 @@ public abstract class BaseScriptEngine
         intent.putExtra(ManagerService.HAPTIC_PATTERN_REPEATS, repeats);
         intent.setClass(this._context, ManagerService.class);
 
-        HashMap<String, Object> payload = new HashMap<String, Object>();
+        HashMap<String, Object> payload = new HashMap<>();
         payload.put("pattern", pattern);
         LogManager.getInstance(this._context).log("pr_vibrate_device", payload);
 
@@ -346,7 +344,7 @@ public abstract class BaseScriptEngine
     @ScriptingEngineMethod(language = "All", assetPath = "all_emit_toast.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "message", "useLongDuration" })
     public boolean emitToast(final String message, final boolean useLongDuration)
     {
-        HashMap<String, Object> payload = new HashMap<String, Object>();
+        HashMap<String, Object> payload = new HashMap<>();
         payload.put("has_activity", (this._context instanceof Activity));
         payload.put("message", message);
         LogManager.getInstance(this._context).log("pr_toast_message", payload);
@@ -377,7 +375,7 @@ public abstract class BaseScriptEngine
 
             this._context.startActivity(launchIntent);
 
-            HashMap<String, Object> payload = new HashMap<String, Object>();
+            HashMap<String, Object> payload = new HashMap<>();
             payload.put("url", urlString);
             LogManager.getInstance(this._context).log("pr_launch_url", payload);
 
@@ -402,7 +400,7 @@ public abstract class BaseScriptEngine
 
             this._context.startActivity(launchIntent);
 
-            HashMap<String, Object> payload = new HashMap<String, Object>();
+            HashMap<String, Object> payload = new HashMap<>();
             payload.put("url", urlString);
             LogManager.getInstance(this._context).log("pr_launch_internal_url", payload);
 
@@ -421,7 +419,7 @@ public abstract class BaseScriptEngine
 
         if (BaseScriptEngine.packageMap == null)
         {
-            BaseScriptEngine.packageMap = new HashMap<String, String>();
+            BaseScriptEngine.packageMap = new HashMap<>();
 
             String[] keyArray = this._context.getResources().getStringArray(R.array.app_package_keys);
             String[] valueArray = this._context.getResources().getStringArray(R.array.app_package_values);
@@ -558,7 +556,7 @@ public abstract class BaseScriptEngine
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
 
-        ArrayList<String> namespaceList = new ArrayList<String>();
+        ArrayList<String> namespaceList = new ArrayList<>();
 
         try
         {
@@ -847,7 +845,7 @@ public abstract class BaseScriptEngine
     @ScriptingEngineMethod(language = "All", assetPath = "all_set_user_id.html", category = R.string.docs_script_category_configuration, arguments = { "userId", "refresh" })
     public void setUserId(String userId, boolean refreshConfig)
     {
-        HashMap<String, Object> payload = new HashMap<String, Object>();
+        HashMap<String, Object> payload = new HashMap<>();
         payload.put("source", "BaseScriptEngine");
         payload.put("old_id", EncryptionManager.getInstance().getUserId(this._context));
         payload.put("new_id", userId);
@@ -873,7 +871,7 @@ public abstract class BaseScriptEngine
     @ScriptingEngineMethod(language = "All", assetPath = "all_fetch_user_id.html", category = R.string.docs_script_category_configuration, arguments = { })
     public String fetchUserId()
     {
-        HashMap<String, Object> payload = new HashMap<String, Object>();
+        HashMap<String, Object> payload = new HashMap<>();
         payload.put("source", "BaseScriptEngine");
 
         LogManager.getInstance(this._context).log("fetch_user_id", payload);
@@ -884,7 +882,7 @@ public abstract class BaseScriptEngine
     @ScriptingEngineMethod(language = "All", assetPath = "all_fetch_user_hash.html", category = R.string.docs_script_category_configuration, arguments = { })
     public String fetchUserHash()
     {
-        HashMap<String, Object> payload = new HashMap<String, Object>();
+        HashMap<String, Object> payload = new HashMap<>();
         payload.put("source", "BaseScriptEngine");
 
         LogManager.getInstance(this._context).log("fetch_user_hash", payload);
@@ -895,7 +893,7 @@ public abstract class BaseScriptEngine
     @ScriptingEngineMethod(language = "All", assetPath = "all_restore_default_id.html", category = R.string.docs_script_category_configuration, arguments = { })
     public void restoreDefaultId()
     {
-        HashMap<String, Object> payload = new HashMap<String, Object>();
+        HashMap<String, Object> payload = new HashMap<>();
         payload.put("source", "BaseScriptEngine");
 
         LogManager.getInstance(this._context).log("restore_default_id", payload);
@@ -999,7 +997,7 @@ public abstract class BaseScriptEngine
 
             if (launchParams != null)
             {
-                HashMap<String, String> launchMap = new HashMap<String, String>();
+                HashMap<String, String> launchMap = new HashMap<>();
 
                 for (Entry<String, Object> e : launchParams.entrySet())
                 {
@@ -1026,7 +1024,7 @@ public abstract class BaseScriptEngine
 
             if (launchParams != null)
             {
-                HashMap<String, String> launchMap = new HashMap<String, String>();
+                HashMap<String, String> launchMap = new HashMap<>();
 
                 for (Entry<String, Object> e : launchParams.entrySet())
                 {
@@ -1085,7 +1083,7 @@ public abstract class BaseScriptEngine
             found = true;
         }
 
-        if (found == false)
+        if (!found)
         {
             Trigger t = Trigger.parse(this._context, params);
 
@@ -1124,7 +1122,7 @@ public abstract class BaseScriptEngine
     {
         Intent intent = this.constructLaunchIntent(applicationName, launchParams, script);
 
-        HashMap<String, Object> payload = new HashMap<String, Object>();
+        HashMap<String, Object> payload = new HashMap<>();
         payload.put("application_present", (intent != null));
         payload.put("application_name", applicationName);
         LogManager.getInstance(this._context).log("pr_application_launch", payload);
@@ -1150,23 +1148,17 @@ public abstract class BaseScriptEngine
     {
         try
         {
-            Log.e("PR", "1");
-
             long now = System.currentTimeMillis();
 
             Intent intent = this.constructDirectLaunchIntent(applicationName, launchParams);
 
-            HashMap<String, Object> payload = new HashMap<String, Object>();
+            HashMap<String, Object> payload = new HashMap<>();
             payload.put("application_present", (intent != null));
             payload.put("application_name", applicationName);
             LogManager.getInstance(this._context).log("pr_application_launch_notification", payload);
 
-            Log.e("PR", "2 " + intent);
-
             if (intent != null)
             {
-                Log.e("PR", "3");
-
                 PendingIntent pendingIntent = PendingIntent.getActivity(this._context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
                 if (script != null)
@@ -1175,8 +1167,6 @@ public abstract class BaseScriptEngine
                     pendingIntent = PendingIntent.getService(this._context, 0, serviceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                 }
 
-                Log.e("PR", "4");
-
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(this._context);
                 builder.setContentIntent(pendingIntent);
                 builder.setAutoCancel(true);
@@ -1184,8 +1174,6 @@ public abstract class BaseScriptEngine
                 builder.setContentText(message);
                 builder.setTicker(message);
                 builder.setSmallIcon(R.drawable.ic_note_icon);
-
-                Log.e("PR", "5");
 
                 try
                 {
@@ -1202,12 +1190,8 @@ public abstract class BaseScriptEngine
                     // Added so that the mock test cases could still execute.
                 }
 
-                Log.e("PR", "6");
-
                 return true;
             }
-
-            Log.e("PR", "7");
 
             return false;
         }
@@ -1236,7 +1220,7 @@ public abstract class BaseScriptEngine
     {
         try
         {
-            HashMap<String, Object> payload = new HashMap<String, Object>();
+            HashMap<String, Object> payload = new HashMap<>();
             LogManager.getInstance(this._context).log("pr_script_run_notification", payload);
 
             Intent serviceIntent = this.constructScriptIntent(script);
@@ -1246,7 +1230,7 @@ public abstract class BaseScriptEngine
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this._context);
             builder = builder.setContentIntent(pendingIntent);
 
-            if (sticky == false)
+            if (!sticky)
                 builder = builder.setAutoCancel(true);
 
             builder = builder.setContentTitle(title);
@@ -1395,13 +1379,13 @@ public abstract class BaseScriptEngine
         }
     }
 
-    protected Map<String, Object> fetchWidget(String identifier)
+    protected Map<String, Object> fetchWidgetMap(String identifier)
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
 
         String key = "WIDGET_UPDATE_" + identifier;
 
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
 
         if (prefs.contains(key))
         {
@@ -1427,13 +1411,13 @@ public abstract class BaseScriptEngine
         return params;
     }
 
-    protected List<String> widgets()
+    protected List<String> widgetsList()
     {
         String prefix = "WIDGET_UPDATE_";
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
 
-        ArrayList<String> widgets = new ArrayList<String>();
+        ArrayList<String> widgets = new ArrayList<>();
 
         for (String key : prefs.getAll().keySet())
         {
@@ -1513,9 +1497,9 @@ public abstract class BaseScriptEngine
     @ScriptingEngineMethod(language = "All", assetPath = "all_update_config.html", category = R.string.docs_script_category_configuration, arguments = { "key", "value" })
     public boolean updateConfig(String key, Object value)
     {
-        Map<String, Object> values = new HashMap<String, Object>();
+        Map<String, Object> values = new HashMap<>();
 
-        values.put(key, values);
+        values.put(key, value);
 
         return PurpleRobotApplication.updateFromMap(this._context, values);
     }
@@ -1548,7 +1532,7 @@ public abstract class BaseScriptEngine
 
     private Map<String, Object> jsonToMap(JSONObject object)
     {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
 
         Iterator<String> keys = object.keys();
 
@@ -1578,7 +1562,7 @@ public abstract class BaseScriptEngine
 
     private List<Object> jsonToList(JSONArray array)
     {
-        List<Object> list = new ArrayList<Object>();
+        List<Object> list = new ArrayList<>();
 
         for (int i = 0; i < array.length(); i++)
         {
@@ -1606,7 +1590,7 @@ public abstract class BaseScriptEngine
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
 
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> list = new ArrayList<>();
         list.add("");
 
         try
@@ -1628,7 +1612,7 @@ public abstract class BaseScriptEngine
 
     public Map<String, Object> fetchNamespaceMap(String namespace)
     {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
 
@@ -1655,7 +1639,7 @@ public abstract class BaseScriptEngine
 
     public List<String> fetchSnapshotIdList()
     {
-        ArrayList<String> times = new ArrayList<String>();
+        ArrayList<String> times = new ArrayList<>();
 
         for (long time : SnapshotManager.getInstance(this._context).snapshotTimes())
             times.add("" + time);
@@ -1742,10 +1726,10 @@ public abstract class BaseScriptEngine
                 if (o instanceof String)
                     labelBundle.putString(labelKey, o.toString());
                 else if (o instanceof Double)
-                    labelBundle.putDouble(labelKey, ((Double) o).doubleValue());
+                    labelBundle.putDouble(labelKey, (Double) o);
                 else if (o instanceof ArrayList)
                 {
-                    ArrayList<String> listItems = new ArrayList<String>();
+                    ArrayList<String> listItems = new ArrayList<>();
 
                     for (Object item : ((ArrayList) o))
                     {

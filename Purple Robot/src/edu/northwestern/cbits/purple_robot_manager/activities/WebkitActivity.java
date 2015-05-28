@@ -40,7 +40,7 @@ public class WebkitActivity extends AppCompatActivity
 
         BufferedReader br = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         String line = null;
 
         while ((line = br.readLine()) != null)
@@ -117,7 +117,7 @@ public class WebkitActivity extends AppCompatActivity
         this.refresh();
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
+    @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
     private void refresh()
     {
         WebView webview = (WebView) this.findViewById(R.id.webview);

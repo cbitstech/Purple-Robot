@@ -35,7 +35,7 @@ public class DialogActivity extends Activity
     public static String DIALOG_CONFIRM_SCRIPT = "dialog_confirm_script";
     public static String DIALOG_CANCEL_SCRIPT = "dialog_cancel_script";
 
-    private static ArrayList<HashMap<String, Object>> _pendingDialogs = new ArrayList<HashMap<String, Object>>();
+    private static ArrayList<HashMap<String, Object>> _pendingDialogs = new ArrayList<>();
     private static boolean _visible = false;
     private static AlertDialog _currentDialog = null;
     private static DialogActivity _currentActivity = null;
@@ -125,7 +125,7 @@ public class DialogActivity extends Activity
             return;
         }
 
-        if (DialogActivity._visible == false)
+        if (!DialogActivity._visible)
         {
             DialogActivity._visible = true;
 
@@ -165,7 +165,7 @@ public class DialogActivity extends Activity
 
                     if (intent.getLongExtra(DialogActivity.DIALOG_PRIORITY, 0) < priority)
                     {
-                        HashMap<String, Object> dialog = new HashMap<String, Object>();
+                        HashMap<String, Object> dialog = new HashMap<>();
                         dialog.put(DialogActivity.DIALOG_TITLE, intent.getStringExtra(DialogActivity.DIALOG_TITLE));
                         dialog.put(DialogActivity.DIALOG_MESSAGE, intent.getStringExtra(DialogActivity.DIALOG_MESSAGE));
                         dialog.put(DialogActivity.DIALOG_CONFIRM_BUTTON,
@@ -191,7 +191,7 @@ public class DialogActivity extends Activity
                         intent.putExtra(DialogActivity.DIALOG_TAG, tag);
                     }
 
-                    HashMap<String, Object> dialog = new HashMap<String, Object>();
+                    HashMap<String, Object> dialog = new HashMap<>();
                     dialog.put(DialogActivity.DIALOG_TITLE, title);
                     dialog.put(DialogActivity.DIALOG_MESSAGE, message);
                     dialog.put(DialogActivity.DIALOG_CONFIRM_BUTTON, confirmTitle);
@@ -399,7 +399,7 @@ public class DialogActivity extends Activity
 
     public static void clearNativeDialogs(final Context context, String tag, HashMap<String, Object> replacement)
     {
-        ArrayList<HashMap<String, Object>> toRemove = new ArrayList<HashMap<String, Object>>();
+        ArrayList<HashMap<String, Object>> toRemove = new ArrayList<>();
 
         for (HashMap<String, Object> dialog : DialogActivity._pendingDialogs)
         {

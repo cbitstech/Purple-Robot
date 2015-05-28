@@ -77,7 +77,7 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
         double[] eventTimes = bundle.getDoubleArray(ContinuousProbe.EVENT_TIMESTAMP);
         double[] temp = bundle.getDoubleArray(TemperatureProbe.TEMPERATURE_KEY);
 
-        ArrayList<String> keys = new ArrayList<String>();
+        ArrayList<String> keys = new ArrayList<>();
 
         if (temp != null && eventTimes != null)
         {
@@ -120,7 +120,7 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
         }
 
         return formatted;
-    };
+    }
 
     @Override
     public long getFrequency()
@@ -437,7 +437,7 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
                 SharedPreferences prefs = Probe.getPreferences(context);
                 SharedPreferences.Editor e = prefs.edit();
 
-                e.putBoolean(TemperatureProbe.USE_HANDLER, ((Boolean) handler).booleanValue());
+                e.putBoolean(TemperatureProbe.USE_HANDLER, (Boolean) handler);
                 e.commit();
             }
         }

@@ -63,7 +63,7 @@ public class RealTimeProbeViewActivity extends WebkitActivity
     }
 
     @Override
-    @SuppressLint("SetJavaScriptEnabled")
+    @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
     protected void onResume()
     {
         super.onResume();

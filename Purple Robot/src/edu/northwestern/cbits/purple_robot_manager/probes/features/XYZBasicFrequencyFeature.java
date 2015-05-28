@@ -114,7 +114,7 @@ public abstract class XYZBasicFrequencyFeature extends ContinuousProbeFeature
 
         // Log.e("PR", "Raw Timestamp: " + ts[ts.length-1]);
 
-        ArrayList<Reading> readings = new ArrayList<Reading>();
+        ArrayList<Reading> readings = new ArrayList<>();
 
         for (int i = 0; i < this._currentIndex; i++)
         {

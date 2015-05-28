@@ -48,8 +48,6 @@ public class WifiAccessPointsProbe extends Probe
 
     private BroadcastReceiver _receiver = null;
 
-    private final ArrayList<Bundle> _foundNetworks = new ArrayList<Bundle>();
-
     @Override
     public String name(Context context)
     {
@@ -100,7 +98,7 @@ public class WifiAccessPointsProbe extends Probe
                                 bundle.putString("PROBE", me.name(context));
                                 bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
 
-                                ArrayList<Bundle> accessPoints = new ArrayList<Bundle>();
+                                ArrayList<Bundle> accessPoints = new ArrayList<>();
 
                                 if (results != null)
                                 {
@@ -157,7 +155,6 @@ public class WifiAccessPointsProbe extends Probe
                         if (wifi.isWifiEnabled())
                         {
                             this._lastCheck = now;
-                            this._foundNetworks.clear();
 
                             wifi.startScan();
                         }
@@ -207,11 +204,11 @@ public class WifiAccessPointsProbe extends Probe
         Bundle bundle = new Bundle();
 
         if (objects == null)
-            objects = new ArrayList<Bundle>();
+            objects = new ArrayList<>();
 
         for (Bundle value : objects)
         {
-            ArrayList<String> keys = new ArrayList<String>();
+            ArrayList<String> keys = new ArrayList<>();
 
             String key = String.format(context.getString(R.string.display_wifi_network_title), value.getString(WifiAccessPointsProbe.SSID), value.getString(WifiAccessPointsProbe.BSSID));
 
@@ -311,7 +308,7 @@ public class WifiAccessPointsProbe extends Probe
 
             if (frequency instanceof Double)
             {
-                frequency = Long.valueOf(((Double) frequency).longValue());
+                frequency = ((Double) frequency).longValue();
             }
 
             if (frequency instanceof Long)

@@ -15,7 +15,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -191,7 +190,7 @@ public class RandomNoiseProbe extends Probe
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putBoolean(RandomNoiseProbe.PERSIST, ((Boolean) retain).booleanValue());
+                e.putBoolean(RandomNoiseProbe.PERSIST, (Boolean) retain);
                 e.commit();
             }
         }

@@ -18,8 +18,8 @@ public class RegressionModel extends TrainedModel
 
     private double _intercept = 0.0;
 
-    private Map<String, Double> _coefficients = new HashMap<String, Double>();
-    private Set<String> _variables = new HashSet<String>();
+    private Map<String, Double> _coefficients = new HashMap<>();
+    private Set<String> _variables = new HashSet<>();
 
     public RegressionModel(Context context, Uri uri)
     {
@@ -79,11 +79,11 @@ public class RegressionModel extends TrainedModel
                         String probe = argToks[0].trim();
                         this._variables.add(probe);
 
-                        ArrayList<String> values = new ArrayList<String>();
+                        ArrayList<String> values = new ArrayList<>();
 
                         String probeValues = argToks[1].trim();
 
-                        if (probeValues.indexOf(",") == -1)
+                        if (probeValues.contains(",") == false)
                             values.add(probeValues);
                         else
                         {
@@ -111,7 +111,7 @@ public class RegressionModel extends TrainedModel
 
     protected Object evaluateModel(Context context, Map<String, Object> snapshot)
     {
-        ArrayList<String> requiredKeys = new ArrayList<String>();
+        ArrayList<String> requiredKeys = new ArrayList<>();
         requiredKeys.addAll(this._variables);
 
         double prediction = this._intercept;
@@ -139,7 +139,7 @@ public class RegressionModel extends TrainedModel
                         coef = this._coefficients.get(key + "_?");
 
                         if (coef == null)
-                            coef = Double.valueOf(0.0);
+                            coef = 0.0;
                     }
                 }
 
@@ -149,7 +149,7 @@ public class RegressionModel extends TrainedModel
             }
         }
 
-        return Double.valueOf(prediction);
+        return prediction;
     }
 
     public String modelType()

@@ -49,7 +49,7 @@ public class BluetoothDevicesProbe extends Probe
 
     private BluetoothAdapter _adapter = null;
 
-    private final ArrayList<Bundle> _foundDevices = new ArrayList<Bundle>();
+    private final ArrayList<Bundle> _foundDevices = new ArrayList<>();
 
     @Override
     public String name(Context context)
@@ -470,7 +470,7 @@ public class BluetoothDevicesProbe extends Probe
 
         for (Bundle value : objects)
         {
-            ArrayList<String> keys = new ArrayList<String>();
+            ArrayList<String> keys = new ArrayList<>();
 
             String key = String.format(context.getString(R.string.display_bluetooth_device_title), value.getString(BluetoothDevicesProbe.NAME), value.getString(BluetoothDevicesProbe.ADDRESS));
 
@@ -510,7 +510,7 @@ public class BluetoothDevicesProbe extends Probe
         formatted.putBundle(String.format(context.getString(R.string.display_bluetooth_devices_title), count), devicesBundle);
 
         return formatted;
-    };
+    }
 
     @Override
     public Map<String, Object> configuration(Context context)
@@ -539,7 +539,7 @@ public class BluetoothDevicesProbe extends Probe
 
             if (frequency instanceof Double)
             {
-                frequency = Long.valueOf(((Double) frequency).longValue());
+                frequency = ((Double) frequency).longValue();
             }
 
             if (frequency instanceof Long)
@@ -561,7 +561,7 @@ public class BluetoothDevicesProbe extends Probe
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putBoolean(BluetoothDevicesProbe.HASH_DATA, ((Boolean) hash).booleanValue());
+                e.putBoolean(BluetoothDevicesProbe.HASH_DATA, (Boolean) hash);
                 e.commit();
             }
         }

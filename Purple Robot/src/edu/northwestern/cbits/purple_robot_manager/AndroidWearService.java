@@ -228,13 +228,13 @@ public class AndroidWearService extends WearableListenerService
                                         sanity.clearAlert(name);
                                 }
 
-                                Wearable.DataApi.deleteDataItems(me._apiClient, item.getUri());
+                                Wearable.DataApi.deleteDataItems(AndroidWearService._apiClient, item.getUri());
                             }
                            else if (item.getUri().getPath().startsWith(AndroidWearService.URI_CRASH_REPORT))
                             {
                                 DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
 
-                                HashMap<String, Object> payload = new HashMap<String, Object>();
+                                HashMap<String, Object> payload = new HashMap<>();
 
                                 for (String key : dataMap.keySet())
                                 {
@@ -243,7 +243,7 @@ public class AndroidWearService extends WearableListenerService
 
                                 LogManager.getInstance(me).log("android_wear_crash", payload);
 
-                                Wearable.DataApi.deleteDataItems(me._apiClient, item.getUri());
+                                Wearable.DataApi.deleteDataItems(AndroidWearService._apiClient, item.getUri());
                             }
 
                             try

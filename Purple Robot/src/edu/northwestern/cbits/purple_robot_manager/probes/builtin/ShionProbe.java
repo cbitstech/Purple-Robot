@@ -87,7 +87,7 @@ public class ShionProbe extends Probe
 
                             Bundle controller = null;
 
-                            ArrayList<Bundle> bundleDevices = new ArrayList<Bundle>();
+                            ArrayList<Bundle> bundleDevices = new ArrayList<>();
 
                             for (Parcelable parcelable : devices)
                             {
@@ -226,7 +226,7 @@ public class ShionProbe extends Probe
 
             if (frequency instanceof Double)
             {
-                frequency = Long.valueOf(((Double) frequency).longValue());
+                frequency = ((Double) frequency).longValue();
             }
 
             if (frequency instanceof Long)

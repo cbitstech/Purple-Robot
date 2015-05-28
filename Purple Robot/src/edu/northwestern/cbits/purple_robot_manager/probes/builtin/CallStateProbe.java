@@ -12,7 +12,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.telephony.TelephonyManager;
@@ -140,7 +139,7 @@ public class CallStateProbe extends Probe
         formatted.putString(context.getString(R.string.call_state_label), bundle.getString(CallStateProbe.CALL_STATE));
 
         return formatted;
-    };
+    }
 
     protected String getCallState(int callState)
     {

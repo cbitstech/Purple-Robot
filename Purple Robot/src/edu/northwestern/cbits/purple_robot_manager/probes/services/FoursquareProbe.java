@@ -245,15 +245,7 @@ public class FoursquareProbe extends Probe
                                             }
                                         }
                                     }
-                                    catch (NullPointerException e)
-                                    {
-                                        LogManager.getInstance(context).logException(e);
-                                    }
-                                    catch (IllegalStateException e)
-                                    {
-                                        LogManager.getInstance(context).logException(e);
-                                    }
-                                    catch (JSONException e)
+                                    catch (NullPointerException | JSONException | IllegalStateException e)
                                     {
                                         LogManager.getInstance(context).logException(e);
                                     }
@@ -319,7 +311,7 @@ public class FoursquareProbe extends Probe
 
             if (frequency instanceof Double)
             {
-                frequency = Long.valueOf(((Double) frequency).longValue());
+                frequency = ((Double) frequency).longValue();
             }
 
             if (frequency instanceof Long)
@@ -343,7 +335,7 @@ public class FoursquareProbe extends Probe
                 SharedPreferences prefs = Probe.getPreferences(context);
                 Editor e = prefs.edit();
 
-                e.putBoolean(FoursquareProbe.PULL_ACTIVITY, pullBoolean.booleanValue());
+                e.putBoolean(FoursquareProbe.PULL_ACTIVITY, pullBoolean);
                 e.commit();
             }
         }
@@ -565,15 +557,7 @@ public class FoursquareProbe extends Probe
                     bundle.putStringArray("FOURSQUARE_VENUE_CATEGORIES", venueCategories);
                 }
             }
-            catch (MalformedURLException e)
-            {
-                LogManager.getInstance(context).logException(e);
-            }
-            catch (IOException e)
-            {
-                LogManager.getInstance(context).logException(e);
-            }
-            catch (JSONException e)
+            catch (JSONException | IOException e)
             {
                 LogManager.getInstance(context).logException(e);
             }

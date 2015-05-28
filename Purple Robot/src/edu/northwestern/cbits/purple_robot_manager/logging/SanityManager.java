@@ -31,9 +31,9 @@ public class SanityManager
 
     private Context _context = null;
 
-    private HashMap<String, String> _errors = new HashMap<String, String>();
-    private HashMap<String, String> _warnings = new HashMap<String, String>();
-    private HashMap<String, Runnable> _actions = new HashMap<String, Runnable>();
+    private HashMap<String, String> _errors = new HashMap<>();
+    private HashMap<String, String> _warnings = new HashMap<>();
+    private HashMap<String, Runnable> _actions = new HashMap<>();
 
     private int _lastStatus = -1;
 
@@ -109,15 +109,7 @@ public class SanityManager
                     else
                         this.clearAlert(check.name(this._context));
                 }
-                catch (InstantiationException e)
-                {
-                    LogManager.getInstance(this._context).logException(e);
-                }
-                catch (IllegalAccessException e)
-                {
-                    LogManager.getInstance(this._context).logException(e);
-                }
-                catch (ClassCastException e)
+                catch (InstantiationException | ClassCastException | IllegalAccessException e)
                 {
                     LogManager.getInstance(this._context).logException(e);
                 }
@@ -242,7 +234,7 @@ public class SanityManager
             {
                 Intent pebbleIntent = new Intent("com.getpebble.action.SEND_NOTIFICATION");
 
-                HashMap<String, String> data = new HashMap<String, String>();
+                HashMap<String, String> data = new HashMap<>();
                 data.put("title", name);
                 data.put("body", message);
 

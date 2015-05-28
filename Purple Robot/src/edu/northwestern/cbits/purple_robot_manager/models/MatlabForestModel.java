@@ -25,7 +25,7 @@ public class MatlabForestModel extends WekaTreeModel
     private static final String VOTES = "VOTES";
     private static final String TREE_COUNT = "TOTAL_VOTERS";
 
-    private ArrayList<TreeNode> _trees = new ArrayList<TreeNode>();
+    private ArrayList<TreeNode> _trees = new ArrayList<>();
 
     public MatlabForestModel(Context context, Uri uri)
     {
@@ -53,11 +53,7 @@ public class MatlabForestModel extends WekaTreeModel
                                 TreeNode tree = TreeNodeParser.parseString(modelItem.toString());
                                 this._trees.add(tree);
                             }
-                            catch (ParserNotFound e)
-                            {
-                                LogManager.getInstance(context).logException(e);
-                            }
-                            catch (TreeNodeException e)
+                            catch (ParserNotFound | TreeNodeException e)
                             {
                                 LogManager.getInstance(context).logException(e);
                             }
@@ -79,7 +75,7 @@ public class MatlabForestModel extends WekaTreeModel
 
         synchronized (this)
         {
-            Map<String, Integer> counts = new HashMap<String, Integer>();
+            Map<String, Integer> counts = new HashMap<>();
 
             for (TreeNode tree : this._trees)
             {
@@ -94,7 +90,7 @@ public class MatlabForestModel extends WekaTreeModel
                     if (counts.containsKey(treePrediction))
                         count = counts.get(treePrediction);
 
-                    count = Integer.valueOf(count.intValue() + 1);
+                    count = count.intValue() + 1;
                     counts.put(treePrediction.toString(), count);
                 }
                 catch (TreeNode.TreeNodeException e)
@@ -111,15 +107,15 @@ public class MatlabForestModel extends WekaTreeModel
             {
                 Integer count = counts.get(prediction);
 
-                if (count.intValue() > maxCount)
+                if (count > maxCount)
                 {
-                    maxCount = count.intValue();
+                    maxCount = count;
                     maxPrediction = prediction;
                 }
             }
         }
 
-        HashMap<String, Object> prediction = new HashMap<String, Object>();
+        HashMap<String, Object> prediction = new HashMap<>();
         prediction.put(LeafNode.PREDICTION, maxPrediction);
         prediction.put(LeafNode.ACCURACY, (double) maxCount / (double) this._trees.size());
         prediction.put(MatlabForestModel.VOTES, maxCount);

@@ -7,13 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Scanner;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.EvaluatorException;
@@ -52,6 +50,7 @@ public class JavaScriptEngine extends BaseScriptEngine
         return this.runScript(script, null, null);
     }
 
+    @SuppressWarnings("unchecked")
     @ScriptingEngineMethod(language = "JavaScript", assetPath = "js_run_script.html", category = R.string.docs_script_category_system_integration, arguments = { "script", "extras", "extraValues" })
     public Object runScript(String script, String extrasName, Object extras) throws EvaluatorException, EcmaError
     {
@@ -138,7 +137,7 @@ public class JavaScriptEngine extends BaseScriptEngine
 
         for (int i = 0; i < namespaces.size(); i++)
         {
-            allNamespaces.put(i, allNamespaces, namespaces.get(i));
+            NativeArray.putProperty(allNamespaces, i, namespaces.get(i));
         }
 
         return allNamespaces;
@@ -155,23 +154,14 @@ public class JavaScriptEngine extends BaseScriptEngine
         {
             Map<String, String> script = scripts.get(i);
 
-            Map<String, Object> scriptObj = new HashMap<String, Object>();
+            Map<String, Object> scriptObj = new HashMap<>();
 
             for (String key : script.keySet())
                 scriptObj.put(key, script.get(key));
 
             NativeObject nativeObj = JavaScriptEngine.mapToNative(this._jsContext, this._scope, scriptObj);
 
-            try
-            {
-                Log.e("PR", "NATIVE OBJ: " + JavaScriptEngine.nativeToJson(nativeObj).toString(2));
-            }
-            catch (JSONException e)
-            {
-                e.printStackTrace();
-            }
-
-            allScripts.put(i, allScripts, nativeObj);
+            NativeArray.putProperty(allScripts, i, nativeObj);
         }
 
         return allScripts;
@@ -237,7 +227,7 @@ public class JavaScriptEngine extends BaseScriptEngine
         {
             Double d = (Double) value;
 
-            bundle.putDouble(Feature.FEATURE_VALUE, d.doubleValue());
+            bundle.putDouble(Feature.FEATURE_VALUE, d);
         }
         else if (value instanceof NativeObject)
         {
@@ -335,7 +325,7 @@ public class JavaScriptEngine extends BaseScriptEngine
 
     public static Map<String, Object> nativeToMap(NativeObject nativeObj)
     {
-        HashMap<String, Object> params = new HashMap<String, Object>();
+        HashMap<String, Object> params = new HashMap<>();
 
         for (Entry<Object, Object> e : nativeObj.entrySet())
         {
@@ -354,7 +344,7 @@ public class JavaScriptEngine extends BaseScriptEngine
 
     private static ArrayList<Object> nativeToArrayList(NativeArray array)
     {
-        ArrayList<Object> list = new ArrayList<Object>();
+        ArrayList<Object> list = new ArrayList<>();
 
         for (int i = 0; i < array.size(); i++)
         {
@@ -380,8 +370,6 @@ public class JavaScriptEngine extends BaseScriptEngine
         {
             Object value = map.get(key);
 
-            Log.e("PR", "MAP KEY " + key + " -- " + value.toString() + " -- " + value.getClass().getCanonicalName());
-
             if (value instanceof Map)
                 value = JavaScriptEngine.mapToNative(context, scope, (Map<String, Object>) value);
             else if (value instanceof Long)
@@ -403,7 +391,7 @@ public class JavaScriptEngine extends BaseScriptEngine
                     if (item instanceof Map)
                         item = JavaScriptEngine.mapToNative(context, scope, (Map<String, Object>) item);
 
-                    array.put(i, array, item);
+                    NativeArray.putProperty(array, i, item);
                 }
 
                 value = array;
@@ -526,20 +514,18 @@ public class JavaScriptEngine extends BaseScriptEngine
         this.fetchLabelsInterface(appContext, instructions, JavaScriptEngine.nativeToMap(labels));
     }
 
-    @Override
     @ScriptingEngineMethod(language = "JavaScript")
     public NativeObject fetchWidget(String identifier)
     {
-        Map<String, Object> map = super.fetchWidget(identifier);
+        Map<String, Object> map = super.fetchWidgetMap(identifier);
 
         return JavaScriptEngine.mapToNative(this._jsContext, this._scope, map);
     }
 
-    @Override
     @ScriptingEngineMethod(language = "JavaScript")
     public NativeArray widgets()
     {
-        List<String> widgets = super.widgets();
+        List<String> widgets = super.widgetsList();
 
         String[] values = new String[widgets.size()];
 

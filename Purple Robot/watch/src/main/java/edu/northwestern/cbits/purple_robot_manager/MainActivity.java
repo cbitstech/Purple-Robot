@@ -30,7 +30,7 @@ public class MainActivity extends Activity
 
                 TextView sensorsList = (TextView) stub.findViewById(R.id.sensors_list);
 
-                StringBuffer buffer = new StringBuffer();
+                StringBuilder buffer = new StringBuilder();
 
                 for (Sensor s : sensors.getSensorList(Sensor.TYPE_ALL))
                 {

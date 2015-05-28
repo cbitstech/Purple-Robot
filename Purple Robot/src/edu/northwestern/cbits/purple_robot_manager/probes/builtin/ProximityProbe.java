@@ -106,7 +106,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 
     public Map<String, String> databaseSchema()
     {
-        HashMap<String, String> schema = new HashMap<String, String>();
+        HashMap<String, String> schema = new HashMap<>();
 
         schema.put(ProximityProbe.DISTANCE_KEY, ProbeValuesProvider.REAL_TYPE);
 
@@ -120,8 +120,8 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
         {
             String template = WebkitActivity.stringForAsset(activity, "webkit/chart_spline_full.html");
 
-            ArrayList<Double> distance = new ArrayList<Double>();
-            ArrayList<Double> time = new ArrayList<Double>();
+            ArrayList<Double> distance = new ArrayList<>();
+            ArrayList<Double> time = new ArrayList<>();
 
             Cursor cursor = ProbeValuesProvider.getProvider(activity).retrieveValues(activity, ProximityProbe.DB_TABLE, this.databaseSchema());
 
@@ -155,11 +155,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
 
             return template;
         }
-        catch (IOException e)
-        {
-            LogManager.getInstance(activity).logException(e);
-        }
-        catch (JSONException e)
+        catch (IOException | JSONException e)
         {
             LogManager.getInstance(activity).logException(e);
         }
@@ -175,7 +171,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
         double[] eventTimes = bundle.getDoubleArray(ContinuousProbe.EVENT_TIMESTAMP);
         double[] distance = bundle.getDoubleArray(ProximityProbe.DISTANCE_KEY);
 
-        ArrayList<String> keys = new ArrayList<String>();
+        ArrayList<String> keys = new ArrayList<>();
 
         if (distance != null && eventTimes != null)
         {
@@ -185,11 +181,10 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
             {
                 Bundle readings = new Bundle();
 
-                for (int i = 0; i < eventTimes.length; i++)
-                {
+                for (double eventTime : eventTimes) {
                     String formatString = context.getString(R.string.proximity_formatted);
 
-                    double time = eventTimes[i];
+                    double time = eventTime;
 
                     Date d = new Date((long) time);
 
@@ -218,7 +213,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
         }
 
         return formatted;
-    };
+    }
 
     @Override
     public long getFrequency()
@@ -452,16 +447,16 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
                         for (int i = 0; i < fieldNames.length; i++)
                         {
                             if (fieldNames[i].equals(ProximityProbe.DISTANCE_KEY))
-                                distance = Double.valueOf(valueBuffer[i][j]);
+                                distance = (double) valueBuffer[i][j];
                         }
 
                         if (distance != null)
                         {
-                            Map<String, Object> values = new HashMap<String, Object>();
+                            Map<String, Object> values = new HashMap<>();
 
                             values.put(ProximityProbe.DISTANCE_KEY, distance);
 
-                            values.put(ProbeValuesProvider.TIMESTAMP, Double.valueOf(timeBuffer[j] / 1000));
+                            values.put(ProbeValuesProvider.TIMESTAMP, timeBuffer[j] / 1000);
 
                             ProbeValuesProvider.getProvider(this._context).insertValue(this._context, ProximityProbe.DB_TABLE, this.databaseSchema(), values);
                         }
@@ -545,7 +540,7 @@ public class ProximityProbe extends ContinuousProbe implements SensorEventListen
                 SharedPreferences prefs = Probe.getPreferences(context);
                 SharedPreferences.Editor e = prefs.edit();
 
-                e.putBoolean(ProximityProbe.USE_HANDLER, ((Boolean) handler).booleanValue());
+                e.putBoolean(ProximityProbe.USE_HANDLER, (Boolean) handler);
                 e.commit();
             }
         }
