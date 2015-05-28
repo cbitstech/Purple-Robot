@@ -996,8 +996,10 @@
 	<string name="toast_fitbit_logout">Logged out of Fitbit.</string>	
     <string name="summary_fitbit">Steps: %1$.0f, Goal Progress: %2$.2f%% Complete</string>
 	<string name="title_fitbit_check">Fitbit requires authorization</string>
-	<string name="message_fitbit_check">Please login to the Fitbit website from the settings to grant Purple Robot access to your Fitbit account.</string>	
+	<string name="message_fitbit_check">Please login to the Fitbit website from the settings to grant Purple Robot access to your Fitbit account.</string>
 
+    <string name="title_fitbit_beta_probe">Fitbit (Beta)</string>
+    <string name="summary_fitbit_beta_probe_desc">Retrieves information from the your online Fitbit profile. This is a beta probe and should not be used in production capacities.</string>
     <!-- Jawbone Probe -->
     <string name="title_jawbone_probe">Jawbone</string>
     <string name="summary_jawbone_probe_desc">Retrieves information from the your online Jawbone profile.</string>
@@ -1059,6 +1061,7 @@
     <string name="probe_personal_info_category">Personal Information Probes</string>
     <string name="probe_sensor_category">Hardware Sensor Probes</string>
     <string name="probe_studies_category">Study-Specific Probes</string>
+    <string name="probe_beta_category">Beta &amp; Testing Probes</string>
 
     <!-- Audio features probe -->
     <string name="title_audio_features_probe">Audio Features Probe</string>
