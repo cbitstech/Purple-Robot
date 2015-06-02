@@ -41,12 +41,16 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.Bitmap;
+import android.media.Image;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.provider.Browser;
+import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -75,6 +79,7 @@ import edu.northwestern.cbits.purple_robot_manager.snapshots.EmptySnapshotExcept
 import edu.northwestern.cbits.purple_robot_manager.snapshots.SnapshotManager;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
+import edu.northwestern.cbits.purple_robot_manager.util.ImageUtils;
 import edu.northwestern.cbits.purple_robot_manager.widget.PurpleRobotAppWideWidgetProvider;
 import edu.northwestern.cbits.purple_robot_manager.widget.PurpleRobotAppWidgetProvider;
 
@@ -1204,19 +1209,49 @@ public abstract class BaseScriptEngine
     }
 
     @ScriptingEngineMethod(language = "All", assetPath = "all_show_script_note.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "title", "message", "persistent", "script", "sticky" })
-    public boolean showScriptNotification(String title, String message, boolean persistent, final String script)
+    public boolean showScriptNotification(String title, String message, boolean persistent, Object... args)
     {
-        return this.showScriptNotification(title, message, persistent, false, script);
+        boolean sticky = false;
+        String script = null;
+        String iconUrl = null;
+
+        for (Object item : args)
+        {
+            if (item instanceof Boolean)
+                sticky = (Boolean) item;
+            else if (item instanceof String)
+            {
+                String value = (String) item;
+
+                String lowerValue = value.toLowerCase();
+
+                if (lowerValue.startsWith("https://") || lowerValue.startsWith("http://") || lowerValue.startsWith("file://")) {
+                    iconUrl = value;
+                }
+                else
+                {
+                    // Two scripts provided - bail...
+
+                    if (script != null)
+                    {
+                        HashMap<String, Object> payload = new HashMap<>();
+                        payload.put("message", "Tried to define two script parameters in showScriptNotification.");
+
+                        LogManager.getInstance(this._context).log("script_error", payload);
+
+                        return false;
+                    }
+
+                    script = value;
+                }
+            }
+        }
+
+        return this.showScriptNotification(title, message, persistent, sticky, script, iconUrl);
     }
 
     @ScriptingEngineMethod(language = "All", assetPath = "all_show_script_note.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "title", "message", "persistent", "script", "sticky" })
-    public boolean showScriptNotification(String title, String message, boolean persistent, final String script, boolean sticky)
-    {
-        return this.showScriptNotification(title, message, persistent, sticky, script);
-    }
-
-    @ScriptingEngineMethod(language = "All", assetPath = "all_show_script_note.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "title", "message", "persistent", "script", "sticky" })
-    public boolean showScriptNotification(String title, String message, boolean persistent, boolean sticky, final String script)
+    public boolean showScriptNotification(final String title, final String message, final boolean persistent, final boolean sticky, final String script, final String iconUrl)
     {
         try
         {
@@ -1237,6 +1272,21 @@ public abstract class BaseScriptEngine
             builder = builder.setContentText(message);
             builder = builder.setTicker(message);
             builder = builder.setSmallIcon(R.drawable.ic_note_icon);
+
+            if (iconUrl != null)
+            {
+                final int side = (int) (64 * this._context.getResources().getDisplayMetrics().density);
+
+                Uri resized = ImageUtils.fetchResizedImageSync(this._context, Uri.parse(iconUrl), side, side, true);
+
+                Log.e("PR", "RESIZED URL (SHOULD NOT BE NULL): " + resized);
+
+                if (resized == null)
+                    return false;
+
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(this._context.getContentResolver(), resized);
+                builder = builder.setLargeIcon(bitmap);
+            }
 
             try
             {
