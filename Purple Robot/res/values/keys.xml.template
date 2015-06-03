@@ -1,18 +1,44 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="google_places_browser_key"></string>
-    <string name="fitbit_consumer_key"></string>
-    <string name="fitbit_consumer_secret"></string>
-    <string name="instagram_consumer_key"></string>
-    <string name="instagram_consumer_secret"></string>
-    <string name="twitter_consumer_key"></string>
-    <string name="twitter_consumer_secret"></string>
-    <string name="linkedin_consumer_key"></string>
-    <string name="linkedin_consumer_secret"></string>
+    <string name="google_maps_browser_key"></string>
+
+    <string name="facebook_app_id"></string>
+
     <string name="foursquare_consumer_key"></string>
     <string name="foursquare_consumer_secret"></string>
+
+    <string name="fitbit_consumer_key"></string>
+    <string name="fitbit_consumer_secret"></string>
+    <string name="fitbit_client_id"></string>
+
+    <string name="instagram_consumer_key"></string>
+    <string name="instagram_consumer_secret"></string>
+    
+    <string name="twitter_consumer_key"></string>
+    <string name="twitter_consumer_secret"></string>
+
+    <string name="linkedin_consumer_key"></string>
+    <string name="linkedin_consumer_secret"></string>
+
     <string name="jawbone_consumer_key"></string>
     <string name="jawbone_consumer_secret"></string>
+
+    <string name="github_client_id"></string>
+    <string name="github_client_secret"></string>
+
     <string name="ihealth_client_id"></string>
     <string name="ihealth_client_secret"></string>
+
+    <string name="ihealth_activity_sc"></string>
+    <string name="ihealth_activity_sv"></string>
+    <string name="ihealth_glucose_sc"></string>
+    <string name="ihealth_glucose_sv"></string>
+    <string name="ihealth_pressure_sc"></string>
+    <string name="ihealth_pressure_sv"></string>
+    <string name="ihealth_sleep_sc"></string>
+    <string name="ihealth_sleep_sv"></string>
+    <string name="ihealth_oxygen_sc"></string>
+    <string name="ihealth_oxygen_sv"></string>
+    <string name="ihealth_weight_sc"></string>
+    <string name="ihealth_weight_sv"></string>
 </resources>
