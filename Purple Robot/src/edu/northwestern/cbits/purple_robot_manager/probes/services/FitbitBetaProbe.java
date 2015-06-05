@@ -12,14 +12,14 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.Map;
 
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
@@ -34,78 +34,43 @@ import edu.northwestern.cbits.xsi.oauth.OAuthActivity;
 
 public class FitbitBetaProbe extends Probe
 {
-    protected static final String VERY_ACTIVE_MINUTES = "VERY_ACTIVE_MINUTES";
-    protected static final String LIGHTLY_ACTIVE_MINUTES = "LIGHTLY_ACTIVE_MINUTES";
     protected static final String STEPS = "STEPS";
-    protected static final String MARGINAL_CALORIES = "MARGINAL_CALORIES";
-    protected static final String CALORIES_OUT = "CALORIES_OUT";
-    protected static final String ACTIVE_SCORE = "ACTIVE_SCORE";
-    protected static final String CALORIES_BMR = "CALORIES_BMR";
-    protected static final String FAIRLY_ACTIVE_MINUTES = "FAIRLY_ACTIVE_MINUTES";
-    protected static final String SEDENTARY_MINUTES = "SEDENTARY_MINUTES";
-    protected static final String ACTIVITY_CALORIES = "ACTIVITY_CALORIES";
+    public static final String STEP_TIMESTAMPS = "STEP_TIMESTAMPS";
+    protected static final String CALORIES = "CALORIES";
+    public static final String CALORIES_TIMESTAMPS = "CALORIES_TIMESTAMPS";
+    // protected static final String ELEVATION = "ELEVATION";
+    // public static final String ELEVATION_TIMESTAMPS = "ELEVATION_TIMESTAMPS";
+    protected static final String DISTANCE = "DISTANCE";
+    public static final String DISTANCE_TIMESTAMPS = "DISTANCE_TIMESTAMPS";
+    // protected static final String FLOORS = "FLOORS";
+    // public static final String FLOORS_TIMESTAMPS = "FLOORS_TIMESTAMPS";
+    protected static final String HEART = "HEART";
+    public static final String HEART_TIMESTAMPS = "HEART_TIMESTAMPS";
 
-    protected static final String VERY_ACTIVE_RATIO = "VERY_ACTIVE_RATIO";
-    protected static final String LIGHTLY_ACTIVE_RATIO = "LIGHTLY_ACTIVE_RATIO";
-    protected static final String SEDENTARY_RATIO = "SEDENTARY_RATIO";
-    protected static final String FAIRLY_ACTIVE_RATIO = "FAIRLY_ACTIVE_RATIO";
-
-    protected static final String TOTAL_DISTANCE = "TOTAL_DISTANCE";
-    protected static final String GOAL_STEPS = "GOAL_STEPS";
-    protected static final String GOAL_SCORE = "GOAL_SCORE";
-    protected static final String GOAL_DISTANCE = "GOAL_DISTANCE";
-    protected static final String GOAL_CALORIES = "GOAL_CALORIES";
-    protected static final String GOAL_DISTANCE_RATIO = "GOAL_DISTANCE_RATIO";
-    protected static final String GOAL_STEPS_RATIO = "GOAL_STEPS_RATIO";
-    protected static final String GOAL_CALORIES_RATIO = "GOAL_CALORIES_RATIO";
-    protected static final String GOAL_SCORE_RATIO = "GOAL_SCORE_RATIO";
-
-    private static final boolean SLEEP_DEFAULT = false;
-    private static final boolean FOOD_DEFAULT = false;
-    private static final boolean BODY_DEFAULT = false;
-
-    protected static final String MEASUREMENT_BICEP = "BICEP";
-    protected static final String MEASUREMENT_CALF = "CALF";
-    protected static final String MEASUREMENT_FAT = "FAT";
-    protected static final String MEASUREMENT_HIPS = "HIPS";
-    protected static final String MEASUREMENT_THIGH = "THIGH";
-    protected static final String MEASUREMENT_WEIGHT = "WEIGHT";
-    protected static final String MEASUREMENT_BMI = "BMI";
-    protected static final String MEASUREMENT_FOREARM = "FOREARM";
-    protected static final String MEASUREMENT_WAIST = "WAIST";
-    protected static final String MEASUREMENT_CHEST = "CHEST";
-    protected static final String MEASUREMENT_NECK = "NECK";
-
-    protected static final String MEASUREMENT_WATER = "WATER";
-    protected static final String MEASUREMENT_SODIUM = "SODIUM";
-    protected static final String MEASUREMENT_CARBS = "CARBOHYDRATES";
-    protected static final String MEASUREMENT_FAT_FOOD = "FATS";
-    protected static final String MEASUREMENT_CALORIES = "CALORIES";
-    protected static final String MEASUREMENT_PROTEIN = "PROTIEN";
-    protected static final String MEASUREMENT_FIBER = "FIBER";
-    protected static final String MEASUREMENT_BODY = "BODY_MEASUREMENTS";
-    protected static final String MEASUREMENT_FOOD = "FOOD_MEASUREMENTS";
-
-    protected static final String MEASUREMENT_RESTLESS_COUNT = "RESTLESS_COUNT";
-    protected static final String MEASUREMENT_AWAKE_COUNT = "AWAKE_COUNT";
-    protected static final String MEASUREMENT_AWAKENINGS_COUNT = "AWAKENINGS_COUNT";
-    protected static final String MEASUREMENT_MINUTES_ASLEEP = "MINUTES_ASLEEP";
-    protected static final String MEASUREMENT_MINUTES_IN_BED_AFTER = "MINUTES_IN_BED_BEFORE";
-    protected static final String MEASUREMENT_DURATION = "DURATION";
-    protected static final String MEASUREMENT_SLEEP = "SLEEP_MEASUREMENTS";
-    protected static final String MEASUREMENT_RESTLESS_DURATION = "DURATION";
-    protected static final String MEASUREMENT_MINUTES_IN_BED_BEFORE = "MINUTES_IN_BED_AFTER";
-    protected static final String MEASUREMENT_TIME_IN_BED = "TIME_IN_BED";
-    protected static final String MEASUREMENT_AWAKE_DURATION = "DURATION";
-    protected static final String MEASUREMENT_MINUTES_AWAKE = "MINUTES_AWAKE";
-
-    private static final String SLEEP_ENABLED = "config_feature_fitbit_probe_sleep_enabled";
-    private static final String FOOD_ENABLED = "config_feature_fitbit_probe_food_enabled";
-    private static final String BODY_ENABLED = "config_feature_fitbit_probe_body_enabled";
-    private static final String ENABLED = "config_feature_fitbit_probe_enabled";
+    private static final String ENABLED = "config_feature_fitbit_beta_probe_enabled";
     private static final boolean DEFAULT_ENABLED = false;
-    private static final String OAUTH_TOKEN = "oauth_fitbit_token";
-    private static final String OAUTH_SECRET = "oauth_fitbit_secret";
+    private static final String OAUTH_ACCESS_TOKEN = "oauth_fitbit-beta_access_token";
+    private static final String OAUTH_REFRESH_TOKEN = "oauth_fitbit-beta_refresh_token";
+    private static final String OAUTH_TOKEN_EXPIRES = "oauth_fitbit-beta_expires";
+
+    private static final String ENABLE_STEPS = "config_fitbit-beta_enable_distance";
+    private static final boolean DEFAULT_ENABLE_STEPS = true;
+
+    private static final String ENABLE_CALORIES = "config_fitbit-beta_enable_calories";
+    private static final boolean DEFAULT_ENABLE_CALORIES = false;
+
+    private static final String ENABLE_DISTANCE = "config_fitbit-beta_enable_distance";
+    private static final boolean DEFAULT_ENABLE_DISTANCE = true;
+
+//    private static final String ENABLE_FLOORS = "config_fitbit-beta_enable_floors";
+//    private static final boolean DEFAULT_ENABLE_FLOORS = true;
+
+    private static final String ENABLE_HEART = "config_fitbit-beta_enable_heart";
+    private static final boolean DEFAULT_ENABLE_HEART = false;
+
+//    private static final String ENABLE_ELEVATION = "config_fitbit-beta_enable_elevation";
+//    private static final boolean DEFAULT_ENABLE_ELEVATION = false;
+
 
     private long _lastUpdate = 0;
 
@@ -156,6 +121,9 @@ public class FitbitBetaProbe extends Probe
     private void initKeystore(Context context)
     {
         Keystore.put(FitbitBetaApi.OAUTH2_CLIENT_ID, context.getString(R.string.fitbit_client_id));
+        Keystore.put(FitbitBetaApi.CONSUMER_KEY, context.getString(R.string.fitbit_consumer_key));
+        Keystore.put(FitbitBetaApi.CONSUMER_SECRET, context.getString(R.string.fitbit_consumer_secret));
+        Keystore.put(FitbitBetaApi.CALLBACK_URL, "http://purple.robot.com/oauth/fitbit-beta");
     }
 
     @Override
@@ -169,12 +137,8 @@ public class FitbitBetaProbe extends Probe
             {
                 this.initKeystore(context);
 
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-
-                final String dateString = sdf.format(new Date());
-
-                String token = prefs.getString(FitbitBetaProbe.OAUTH_TOKEN, "");
-                String secret = prefs.getString(FitbitBetaProbe.OAUTH_SECRET, "");
+                String token = prefs.getString(FitbitBetaProbe.OAUTH_ACCESS_TOKEN, "");
+                String refresh = prefs.getString(FitbitBetaProbe.OAUTH_REFRESH_TOKEN, "");
 
                 final String title = context.getString(R.string.title_fitbit_check);
                 final SanityManager sanity = SanityManager.getInstance(context);
@@ -182,7 +146,7 @@ public class FitbitBetaProbe extends Probe
                 final FitbitBetaProbe me = this;
                 final long now = System.currentTimeMillis();
 
-                if (token == null || secret == null || token.trim().length() == 0 || secret.trim().length() == 0)
+                if (token == null || refresh == null || token.trim().length() == 0 || refresh.trim().length() == 0)
                 {
                     String message = context.getString(R.string.message_fitbit_check);
 
@@ -199,8 +163,10 @@ public class FitbitBetaProbe extends Probe
                 }
                 else
                 {
-                    Keystore.put(FitbitBetaApi.USER_TOKEN, token);
-                    Keystore.put(FitbitBetaApi.USER_SECRET, secret);
+                    final long expires =  prefs.getLong(FitbitBetaProbe.OAUTH_TOKEN_EXPIRES, 0);
+                    Keystore.put(FitbitBetaApi.USER_ACCESS_TOKEN, prefs.getString(FitbitBetaProbe.OAUTH_ACCESS_TOKEN, null));
+                    Keystore.put(FitbitBetaApi.USER_REFRESH_TOKEN, prefs.getString(FitbitBetaProbe.OAUTH_REFRESH_TOKEN, null));
+                    Keystore.put(FitbitBetaApi.USER_TOKEN_EXPIRES, "" + expires);
 
                     sanity.clearAlert(title);
 
@@ -214,170 +180,233 @@ public class FitbitBetaProbe extends Probe
                             {
                                 try
                                 {
-                                    JSONObject body = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/date/" + dateString + ".json"));
+                                    if (System.currentTimeMillis() > expires) {
+                                        FitbitBetaApi.refreshTokens(context, FitbitBetaProbe.OAUTH_ACCESS_TOKEN, FitbitBetaProbe.OAUTH_REFRESH_TOKEN, FitbitBetaProbe.OAUTH_TOKEN_EXPIRES);
 
-                                    JSONObject summary = body.getJSONObject("summary");
+                                        long expires = prefs.getLong(FitbitBetaProbe.OAUTH_TOKEN_EXPIRES, 0);
+                                        Keystore.put(FitbitBetaApi.USER_ACCESS_TOKEN, prefs.getString(FitbitBetaProbe.OAUTH_ACCESS_TOKEN, null));
+                                        Keystore.put(FitbitBetaApi.USER_REFRESH_TOKEN, prefs.getString(FitbitBetaProbe.OAUTH_REFRESH_TOKEN, null));
+                                        Keystore.put(FitbitBetaApi.USER_TOKEN_EXPIRES, "" + expires);
+                                    }
 
                                     Bundle bundle = new Bundle();
                                     bundle.putString(Probe.BUNDLE_PROBE, me.name(context));
                                     bundle.putLong(Probe.BUNDLE_TIMESTAMP, System.currentTimeMillis() / 1000);
 
-                                    long veryActive = summary.getLong("veryActiveMinutes");
-                                    long fairlyActive = summary.getLong("fairlyActiveMinutes");
-                                    long lightlyActive = summary.getLong("lightlyActiveMinutes");
-                                    long sedentary = summary.getLong("sedentaryMinutes");
-
-                                    long total = veryActive + fairlyActive + lightlyActive + sedentary;
-
-                                    bundle.putLong(FitbitBetaProbe.VERY_ACTIVE_MINUTES, veryActive);
-                                    bundle.putLong(FitbitBetaProbe.FAIRLY_ACTIVE_MINUTES, fairlyActive);
-                                    bundle.putLong(FitbitBetaProbe.LIGHTLY_ACTIVE_MINUTES, lightlyActive);
-                                    bundle.putLong(FitbitBetaProbe.SEDENTARY_MINUTES, sedentary);
-
-                                    bundle.putDouble(FitbitBetaProbe.VERY_ACTIVE_RATIO, (double) veryActive / (double) total);
-                                    bundle.putDouble(FitbitBetaProbe.FAIRLY_ACTIVE_RATIO, (double) fairlyActive / (double) total);
-                                    bundle.putDouble(FitbitBetaProbe.LIGHTLY_ACTIVE_RATIO, (double) lightlyActive / (double) total);
-                                    bundle.putDouble(FitbitBetaProbe.SEDENTARY_RATIO, (double) sedentary / (double) total);
-
-                                    long steps = summary.getLong("steps");
-                                    bundle.putLong(FitbitBetaProbe.STEPS, steps);
-
-                                    long caloriesOut = summary.getLong("caloriesOut");
-                                    bundle.putLong(FitbitBetaProbe.CALORIES_OUT, caloriesOut);
-                                    bundle.putLong(FitbitBetaProbe.CALORIES_BMR, summary.getLong("caloriesBMR"));
-                                    bundle.putLong(FitbitBetaProbe.MARGINAL_CALORIES, summary.getLong("marginalCalories"));
-                                    bundle.putLong(FitbitBetaProbe.ACTIVITY_CALORIES, summary.getLong("activityCalories"));
-
-                                    long score = summary.getLong("activeScore");
-                                    bundle.putLong(FitbitBetaProbe.ACTIVE_SCORE, score);
-
-                                    JSONArray activities = summary.getJSONArray("distances");
-
-                                    long distance = 0;
-
-                                    for (int i = 0; i < activities.length(); i++)
+                                    if (prefs.getBoolean(FitbitBetaProbe.ENABLE_STEPS, FitbitBetaProbe.DEFAULT_ENABLE_STEPS))
                                     {
-                                        JSONObject activity = activities.getJSONObject(i);
+                                        JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/steps/date/today/1d/1min.json"));
 
-                                        if ("total".equals(activity.getString("activity")))
-                                            distance = activity.getLong("distance");
-                                    }
+                                        JSONObject stepsIntraday = stepsObj.getJSONObject("activities-steps-intraday");
+                                        JSONArray stepsValues = stepsIntraday.getJSONArray("dataset");
 
-                                    bundle.putLong(FitbitBetaProbe.TOTAL_DISTANCE, distance);
+                                        long[] steps = new long[stepsValues.length()];
+                                        long[] stepTimestamps = new long[stepsValues.length()];
 
-                                    JSONObject goals = body.getJSONObject("goals");
+                                        Calendar c = Calendar.getInstance();
 
-                                    long goalDistance = goals.getLong("distance");
-                                    long goalSteps = goals.getLong("steps");
-                                    long goalCalories = goals.getLong("caloriesOut");
-
-                                    bundle.putLong(FitbitBetaProbe.GOAL_DISTANCE, goalDistance);
-                                    bundle.putLong(FitbitBetaProbe.GOAL_STEPS, goalSteps);
-                                    bundle.putLong(FitbitBetaProbe.GOAL_CALORIES, goalCalories);
-
-                                    bundle.putDouble(FitbitBetaProbe.GOAL_DISTANCE_RATIO, (double) distance / (double) goalDistance);
-                                    bundle.putDouble(FitbitBetaProbe.GOAL_STEPS_RATIO, (double) steps / (double) goalSteps);
-                                    bundle.putDouble(FitbitBetaProbe.GOAL_CALORIES_RATIO, (double) caloriesOut / (double) goalCalories);
-
-                                    if (prefs.getBoolean(FitbitBetaProbe.SLEEP_ENABLED, FitbitBetaProbe.SLEEP_DEFAULT))
-                                    {
-                                        body = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/sleep/date/" + dateString + ".json"));
-
-                                        JSONArray sleeps = body.getJSONArray("sleep");
-
-                                        int restlessCount = 0;
-                                        int restlessDuration = 0;
-
-                                        int awakeCount = 0;
-                                        int awakeDuration = 0;
-                                        int awakeningsCount = 0;
-
-                                        int minutesInBedBefore = 0;
-                                        int minutesAsleep = 0;
-                                        int minutesAwake = 0;
-                                        int minutesInBedAfter = 0;
-
-                                        int timeInBed = 0;
-                                        int duration = 0;
-
-                                        for (int j = 0; j < sleeps.length(); j++)
+                                        for (int i = 0; i < stepsValues.length(); i++)
                                         {
-                                            JSONObject sleep = sleeps.getJSONObject(j);
+                                            JSONObject value = stepsValues.getJSONObject(i);
 
-                                            restlessCount += sleep.getInt("restlessCount");
-                                            restlessDuration += sleep.getInt("restlessDuration");
+                                            steps[i] = value.getLong("value");
 
-                                            awakeCount += sleep.getInt("awakeCount");
-                                            awakeDuration += sleep.getInt("awakeDuration");
-                                            awakeningsCount += sleep.getInt("awakeningsCount");
+                                            String time = value.getString("time");
 
-                                            minutesInBedBefore += sleep.getInt("minutesToFallAsleep");
-                                            minutesAsleep += sleep.getInt("minutesAsleep");
-                                            minutesAwake += sleep.getInt("minutesAwake");
-                                            minutesInBedAfter += sleep.getInt("minutesAfterWakeup");
+                                            String[] tokens = time.split(":");
 
-                                            timeInBed += sleep.getInt("timeInBed");
-                                            duration += sleep.getInt("duration");
+                                            c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tokens[0]));
+                                            c.set(Calendar.MINUTE, Integer.parseInt(tokens[1]));
+                                            c.set(Calendar.SECOND, Integer.parseInt(tokens[2]));
+                                            c.set(Calendar.MILLISECOND, 0);
+
+                                            stepTimestamps[i] = c.getTimeInMillis();
                                         }
 
-                                        Bundle sleepBundle = new Bundle();
-
-                                        sleepBundle.putDouble(FitbitBetaProbe.MEASUREMENT_RESTLESS_COUNT, restlessCount);
-                                        sleepBundle.putDouble(FitbitBetaProbe.MEASUREMENT_RESTLESS_DURATION, restlessDuration);
-                                        sleepBundle.putDouble(FitbitBetaProbe.MEASUREMENT_AWAKE_COUNT, awakeCount);
-                                        sleepBundle.putDouble(FitbitBetaProbe.MEASUREMENT_AWAKE_DURATION, awakeDuration);
-                                        sleepBundle.putDouble(FitbitBetaProbe.MEASUREMENT_AWAKENINGS_COUNT, awakeningsCount);
-                                        sleepBundle.putDouble(FitbitBetaProbe.MEASUREMENT_MINUTES_IN_BED_BEFORE, minutesInBedBefore);
-                                        sleepBundle.putDouble(FitbitBetaProbe.MEASUREMENT_MINUTES_ASLEEP, minutesAsleep);
-                                        sleepBundle.putDouble(FitbitBetaProbe.MEASUREMENT_MINUTES_AWAKE, minutesAwake);
-                                        sleepBundle.putDouble(FitbitBetaProbe.MEASUREMENT_MINUTES_IN_BED_AFTER, minutesInBedAfter);
-                                        sleepBundle.putDouble(FitbitBetaProbe.MEASUREMENT_TIME_IN_BED, timeInBed);
-                                        sleepBundle.putDouble(FitbitBetaProbe.MEASUREMENT_DURATION, duration);
-
-                                        bundle.putBundle(FitbitBetaProbe.MEASUREMENT_SLEEP, sleepBundle);
+                                        bundle.putLongArray(FitbitBetaProbe.STEP_TIMESTAMPS, stepTimestamps);
+                                        bundle.putLongArray(FitbitBetaProbe.STEPS, steps);
                                     }
 
-                                    if (prefs.getBoolean(FitbitBetaProbe.FOOD_ENABLED, FitbitBetaProbe.FOOD_DEFAULT))
+                                    Log.e("PR", "FBB CALORIES: " +  prefs.getBoolean(FitbitBetaProbe.ENABLE_CALORIES, FitbitBetaProbe.DEFAULT_ENABLE_CALORIES));
+
+                                    if (prefs.getBoolean(FitbitBetaProbe.ENABLE_CALORIES, FitbitBetaProbe.DEFAULT_ENABLE_CALORIES))
                                     {
-                                        body = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/foods/log/date/" + dateString + ".json"));
+                                        JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/calories/date/today/1d/1min.json"));
 
-                                        body = body.getJSONObject("summary");
+                                        JSONObject intraday = stepsObj.getJSONObject("activities-calories-intraday");
+                                        JSONArray valuesArray = intraday.getJSONArray("dataset");
 
-                                        Bundle foodBundle = new Bundle();
+                                        long[] values = new long[valuesArray.length()];
+                                        long[] valueTimestamps = new long[valuesArray.length()];
 
-                                        foodBundle.putDouble(FitbitBetaProbe.MEASUREMENT_WATER, (double) body.getInt("water"));
-                                        foodBundle.putDouble(FitbitBetaProbe.MEASUREMENT_CALORIES, (double) body.getInt("calories"));
-                                        foodBundle.putDouble(FitbitBetaProbe.MEASUREMENT_SODIUM, (double) body.getInt("sodium"));
-                                        foodBundle.putDouble(FitbitBetaProbe.MEASUREMENT_FIBER, (double) body.getInt("fiber"));
-                                        foodBundle.putDouble(FitbitBetaProbe.MEASUREMENT_CARBS, (double) body.getInt("carbs"));
-                                        foodBundle.putDouble(FitbitBetaProbe.MEASUREMENT_PROTEIN, (double) body.getInt("protein"));
-                                        foodBundle.putDouble(FitbitBetaProbe.MEASUREMENT_FAT_FOOD, (double) body.getInt("fat"));
+                                        Calendar c = Calendar.getInstance();
 
-                                        bundle.putBundle(FitbitBetaProbe.MEASUREMENT_FOOD, foodBundle);
+                                        for (int i = 0; i < valuesArray.length(); i++)
+                                        {
+                                            JSONObject value = valuesArray.getJSONObject(i);
+
+                                            values[i] = value.getLong("value");
+
+                                            String time = value.getString("time");
+
+                                            String[] tokens = time.split(":");
+
+                                            c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tokens[0]));
+                                            c.set(Calendar.MINUTE, Integer.parseInt(tokens[1]));
+                                            c.set(Calendar.SECOND, Integer.parseInt(tokens[2]));
+                                            c.set(Calendar.MILLISECOND, 0);
+
+                                            valueTimestamps[i] = c.getTimeInMillis();
+                                        }
+
+                                        bundle.putLongArray(FitbitBetaProbe.CALORIES_TIMESTAMPS, valueTimestamps);
+                                        bundle.putLongArray(FitbitBetaProbe.CALORIES, values);
                                     }
 
-                                    if (prefs.getBoolean(FitbitBetaProbe.BODY_ENABLED, FitbitBetaProbe.BODY_DEFAULT))
+                                    if (prefs.getBoolean(FitbitBetaProbe.ENABLE_DISTANCE, FitbitBetaProbe.DEFAULT_ENABLE_DISTANCE))
                                     {
-                                        body = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/body/date/" + dateString + ".json"));
+                                        JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/distance/date/today/1d/1min.json"));
 
-                                        body = body.getJSONObject("body");
+                                        JSONObject intraday = stepsObj.getJSONObject("activities-distance-intraday");
+                                        JSONArray valuesArray = intraday.getJSONArray("dataset");
 
-                                        Bundle bodyBundle = new Bundle();
+                                        long[] values = new long[valuesArray.length()];
+                                        long[] valueTimestamps = new long[valuesArray.length()];
 
-                                        bodyBundle.putDouble(FitbitBetaProbe.MEASUREMENT_BICEP, (double) body.getInt("bicep"));
-                                        bodyBundle.putDouble(FitbitBetaProbe.MEASUREMENT_BMI, (double) body.getInt("bmi"));
-                                        bodyBundle.putDouble(FitbitBetaProbe.MEASUREMENT_CALF, (double) body.getInt("calf"));
-                                        bodyBundle.putDouble(FitbitBetaProbe.MEASUREMENT_CHEST, (double) body.getInt("chest"));
-                                        bodyBundle.putDouble(FitbitBetaProbe.MEASUREMENT_FAT, (double) body.getInt("fat"));
-                                        bodyBundle.putDouble(FitbitBetaProbe.MEASUREMENT_FOREARM, (double) body.getInt("forearm"));
-                                        bodyBundle.putDouble(FitbitBetaProbe.MEASUREMENT_HIPS, (double) body.getInt("hips"));
-                                        bodyBundle.putDouble(FitbitBetaProbe.MEASUREMENT_NECK, (double) body.getInt("neck"));
-                                        bodyBundle.putDouble(FitbitBetaProbe.MEASUREMENT_THIGH, (double) body.getInt("thigh"));
-                                        bodyBundle.putDouble(FitbitBetaProbe.MEASUREMENT_WAIST, (double) body.getInt("waist"));
-                                        bodyBundle.putDouble(FitbitBetaProbe.MEASUREMENT_WEIGHT, (double) body.getInt("weight"));
+                                        Calendar c = Calendar.getInstance();
 
-                                        bundle.putBundle(FitbitBetaProbe.MEASUREMENT_BODY, bodyBundle);
+                                        for (int i = 0; i < valuesArray.length(); i++)
+                                        {
+                                            JSONObject value = valuesArray.getJSONObject(i);
+
+                                            values[i] = value.getLong("value");
+
+                                            String time = value.getString("time");
+
+                                            String[] tokens = time.split(":");
+
+                                            c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tokens[0]));
+                                            c.set(Calendar.MINUTE, Integer.parseInt(tokens[1]));
+                                            c.set(Calendar.SECOND, Integer.parseInt(tokens[2]));
+                                            c.set(Calendar.MILLISECOND, 0);
+
+                                            valueTimestamps[i] = c.getTimeInMillis();
+                                        }
+
+                                        bundle.putLongArray(FitbitBetaProbe.DISTANCE_TIMESTAMPS, valueTimestamps);
+                                        bundle.putLongArray(FitbitBetaProbe.DISTANCE, values);
                                     }
+
+                                    /*
+                                    if (prefs.getBoolean(FitbitBetaProbe.ENABLE_FLOORS, FitbitBetaProbe.DEFAULT_ENABLE_FLOORS))
+                                    {
+                                        JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/floors/date/today/1d/1min.json"));
+
+                                        JSONObject intraday = stepsObj.getJSONObject("activities-floors-intraday");
+                                        JSONArray valuesArray = intraday.getJSONArray("dataset");
+
+                                        long[] values = new long[valuesArray.length()];
+                                        long[] valueTimestamps = new long[valuesArray.length()];
+
+                                        Calendar c = Calendar.getInstance();
+
+                                        for (int i = 0; i < valuesArray.length(); i++)
+                                        {
+                                            JSONObject value = valuesArray.getJSONObject(i);
+
+                                            values[i] = value.getLong("value");
+
+                                            String time = value.getString("time");
+
+                                            String[] tokens = time.split(":");
+
+                                            c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tokens[0]));
+                                            c.set(Calendar.MINUTE, Integer.parseInt(tokens[1]));
+                                            c.set(Calendar.SECOND, Integer.parseInt(tokens[2]));
+                                            c.set(Calendar.MILLISECOND, 0);
+
+                                            valueTimestamps[i] = c.getTimeInMillis();
+                                        }
+
+                                        bundle.putLongArray(FitbitBetaProbe.FLOORS_TIMESTAMPS, valueTimestamps);
+                                        bundle.putLongArray(FitbitBetaProbe.FLOORS, values);
+                                    }
+                                    */
+
+                                    Log.e("PR", "FBB HEART: " +  prefs.getBoolean(FitbitBetaProbe.ENABLE_HEART, FitbitBetaProbe.DEFAULT_ENABLE_HEART));
+
+                                    if (prefs.getBoolean(FitbitBetaProbe.ENABLE_HEART, FitbitBetaProbe.DEFAULT_ENABLE_HEART))
+                                    {
+                                        JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/heart/date/today/1d/1min.json"));
+
+                                        JSONObject intraday = stepsObj.getJSONObject("activities-heart-intraday");
+                                        JSONArray valuesArray = intraday.getJSONArray("dataset");
+
+                                        long[] values = new long[valuesArray.length()];
+                                        long[] valueTimestamps = new long[valuesArray.length()];
+
+                                        Calendar c = Calendar.getInstance();
+
+                                        for (int i = 0; i < valuesArray.length(); i++)
+                                        {
+                                            JSONObject value = valuesArray.getJSONObject(i);
+
+                                            values[i] = value.getLong("value");
+
+                                            String time = value.getString("time");
+
+                                            String[] tokens = time.split(":");
+
+                                            c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tokens[0]));
+                                            c.set(Calendar.MINUTE, Integer.parseInt(tokens[1]));
+                                            c.set(Calendar.SECOND, Integer.parseInt(tokens[2]));
+                                            c.set(Calendar.MILLISECOND, 0);
+
+                                            valueTimestamps[i] = c.getTimeInMillis();
+                                        }
+
+                                        bundle.putLongArray(FitbitBetaProbe.HEART_TIMESTAMPS, valueTimestamps);
+                                        bundle.putLongArray(FitbitBetaProbe.HEART, values);
+                                    }
+
+                                    /*
+
+                                    Log.e("PR", "FBB ELEVATION: " +  prefs.getBoolean(FitbitBetaProbe.ENABLE_ELEVATION, FitbitBetaProbe.DEFAULT_ENABLE_ELEVATION));
+
+                                    if (prefs.getBoolean(FitbitBetaProbe.ENABLE_ELEVATION, FitbitBetaProbe.DEFAULT_ENABLE_ELEVATION))
+                                    {
+                                        JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/elevation/date/today/1d/1min.json"));
+
+                                        JSONObject intraday = stepsObj.getJSONObject("activities-elevation-intraday");
+                                        JSONArray valuesArray = intraday.getJSONArray("dataset");
+
+                                        long[] values = new long[valuesArray.length()];
+                                        long[] valueTimestamps = new long[valuesArray.length()];
+
+                                        Calendar c = Calendar.getInstance();
+
+                                        for (int i = 0; i < valuesArray.length(); i++)
+                                        {
+                                            JSONObject value = valuesArray.getJSONObject(i);
+
+                                            values[i] = value.getLong("value");
+
+                                            String time = value.getString("time");
+
+                                            String[] tokens = time.split(":");
+
+                                            c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tokens[0]));
+                                            c.set(Calendar.MINUTE, Integer.parseInt(tokens[1]));
+                                            c.set(Calendar.SECOND, Integer.parseInt(tokens[2]));
+                                            c.set(Calendar.MILLISECOND, 0);
+
+                                            valueTimestamps[i] = c.getTimeInMillis();
+                                        }
+
+                                        bundle.putLongArray(FitbitBetaProbe.ELEVATION_TIMESTAMPS, valueTimestamps);
+                                        bundle.putLongArray(FitbitBetaProbe.ELEVATION, values);
+                                    }
+                                    */
 
                                     me.transmitData(context, bundle);
                                 } catch (Exception e)
@@ -401,6 +430,8 @@ public class FitbitBetaProbe extends Probe
 
     private void fetchAuth(Context context)
     {
+        this.initKeystore(context);
+
         String userId = EncryptionManager.getInstance().getUserHash(context);
 
         Intent intent = new Intent(context, OAuthActivity.class);
@@ -409,7 +440,7 @@ public class FitbitBetaProbe extends Probe
         intent.putExtra(OAuthActivity.CONSUMER_KEY, context.getString(R.string.fitbit_consumer_key));
         intent.putExtra(OAuthActivity.CONSUMER_SECRET, context.getString(R.string.fitbit_consumer_secret));
         intent.putExtra(OAuthActivity.REQUESTER, "fitbit-beta");
-        intent.putExtra(OAuthActivity.CALLBACK_URL, "http://tech.cbits.northwestern.edu/oauth/fitbit-beta");
+        intent.putExtra(OAuthActivity.CALLBACK_URL, "http://purple.robot.com/oauth/fitbit-beta");
         intent.putExtra(OAuthActivity.LOG_URL, LogManager.getInstance(context).getLogUrl(context));
         intent.putExtra(OAuthActivity.HASH_SECRET, userId);
 
@@ -431,9 +462,12 @@ public class FitbitBetaProbe extends Probe
             enabled.put(Probe.PROBE_VALUES, values);
             settings.put(Probe.PROBE_ENABLED, enabled);
 
-            settings.put(FitbitBetaProbe.SLEEP_ENABLED, enabled);
-            settings.put(FitbitBetaProbe.FOOD_ENABLED, enabled);
-            settings.put(FitbitBetaProbe.BODY_ENABLED, enabled);
+            settings.put(FitbitBetaProbe.ENABLE_STEPS, enabled);
+            settings.put(FitbitBetaProbe.ENABLE_DISTANCE, enabled);
+            settings.put(FitbitBetaProbe.ENABLE_CALORIES, enabled);
+//            settings.put(FitbitBetaProbe.ENABLE_ELEVATION, enabled);
+            settings.put(FitbitBetaProbe.ENABLE_HEART, enabled);
+//            settings.put(FitbitBetaProbe.ENABLE_FLOORS, enabled);
         }
         catch (JSONException e)
         {
@@ -450,9 +484,12 @@ public class FitbitBetaProbe extends Probe
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        map.put(FitbitBetaProbe.SLEEP_ENABLED, prefs.getBoolean(FitbitBetaProbe.SLEEP_ENABLED, FitbitBetaProbe.SLEEP_DEFAULT));
-        map.put(FitbitBetaProbe.FOOD_ENABLED, prefs.getBoolean(FitbitBetaProbe.FOOD_ENABLED, FitbitBetaProbe.FOOD_DEFAULT));
-        map.put(FitbitBetaProbe.BODY_ENABLED, prefs.getBoolean(FitbitBetaProbe.BODY_ENABLED, FitbitBetaProbe.BODY_DEFAULT));
+        map.put(FitbitBetaProbe.ENABLE_CALORIES, prefs.getBoolean(FitbitBetaProbe.ENABLE_CALORIES, FitbitBetaProbe.DEFAULT_ENABLE_CALORIES));
+        map.put(FitbitBetaProbe.ENABLE_STEPS, prefs.getBoolean(FitbitBetaProbe.ENABLE_STEPS, FitbitBetaProbe.DEFAULT_ENABLE_STEPS));
+        map.put(FitbitBetaProbe.ENABLE_HEART, prefs.getBoolean(FitbitBetaProbe.ENABLE_HEART, FitbitBetaProbe.DEFAULT_ENABLE_HEART));
+        map.put(FitbitBetaProbe.ENABLE_DISTANCE, prefs.getBoolean(FitbitBetaProbe.ENABLE_DISTANCE, FitbitBetaProbe.DEFAULT_ENABLE_DISTANCE));
+        // map.put(FitbitBetaProbe.ENABLE_ELEVATION, prefs.getBoolean(FitbitBetaProbe.ENABLE_ELEVATION, FitbitBetaProbe.DEFAULT_ENABLE_ELEVATION));
+        // map.put(FitbitBetaProbe.FLOORS, prefs.getBoolean(FitbitBetaProbe.FLOORS, FitbitBetaProbe.DEFAULT_ENABLE_FLOORS));
 
         return map;
     }
@@ -462,45 +499,19 @@ public class FitbitBetaProbe extends Probe
     {
         super.updateFromMap(context, params);
 
-        if (params.containsKey(FitbitBetaProbe.SLEEP_ENABLED))
-        {
-            Object value = params.get(FitbitBetaProbe.SLEEP_ENABLED);
+        String[] keys = { FitbitBetaProbe.ENABLE_CALORIES, FitbitBetaProbe.ENABLE_STEPS, FitbitBetaProbe.ENABLE_DISTANCE, FitbitBetaProbe.ENABLE_HEART };
 
-            if (value instanceof Boolean)
-            {
-                SharedPreferences prefs = Probe.getPreferences(context);
-                Editor e = prefs.edit();
+        for (String key: keys) {
+            if (params.containsKey(key)) {
+                Object value = params.get(key);
 
-                e.putBoolean(FitbitBetaProbe.SLEEP_ENABLED, ((Boolean) value));
-                e.commit();
-            }
-        }
+                if (value instanceof Boolean) {
+                    SharedPreferences prefs = Probe.getPreferences(context);
+                    Editor e = prefs.edit();
 
-        if (params.containsKey(FitbitBetaProbe.BODY_ENABLED))
-        {
-            Object value = params.get(FitbitBetaProbe.BODY_ENABLED);
-
-            if (value instanceof Boolean)
-            {
-                SharedPreferences prefs = Probe.getPreferences(context);
-                Editor e = prefs.edit();
-
-                e.putBoolean(FitbitBetaProbe.BODY_ENABLED, ((Boolean) value));
-                e.commit();
-            }
-        }
-
-        if (params.containsKey(FitbitBetaProbe.FOOD_ENABLED))
-        {
-            Object value = params.get(FitbitBetaProbe.FOOD_ENABLED);
-
-            if (value instanceof Boolean)
-            {
-                SharedPreferences prefs = Probe.getPreferences(context);
-                Editor e = prefs.edit();
-
-                e.putBoolean(FitbitBetaProbe.FOOD_ENABLED, ((Boolean) value));
-                e.commit();
+                    e.putBoolean(key, ((Boolean) value));
+                    e.commit();
+                }
             }
         }
     }
@@ -519,30 +530,48 @@ public class FitbitBetaProbe extends Probe
 
         screen.addPreference(enabled);
 
-        CheckBoxPreference sleepPref = new CheckBoxPreference(context);
-        sleepPref.setKey(FitbitBetaProbe.SLEEP_ENABLED);
-        sleepPref.setDefaultValue(FitbitBetaProbe.SLEEP_DEFAULT);
-        sleepPref.setTitle(R.string.config_fitbit_sleep_title);
-        screen.addPreference(sleepPref);
+        CheckBoxPreference stepsPref = new CheckBoxPreference(context);
+        stepsPref.setKey(FitbitBetaProbe.ENABLE_STEPS);
+        stepsPref.setDefaultValue(FitbitBetaProbe.DEFAULT_ENABLE_STEPS);
+        stepsPref.setTitle(R.string.config_fitbit_steps_title);
+        screen.addPreference(stepsPref);
 
-        CheckBoxPreference foodPref = new CheckBoxPreference(context);
-        foodPref.setKey(FitbitBetaProbe.FOOD_ENABLED);
-        foodPref.setDefaultValue(FitbitBetaProbe.FOOD_DEFAULT);
-        foodPref.setTitle(R.string.config_fitbit_food_title);
-        screen.addPreference(foodPref);
+        CheckBoxPreference distancePref = new CheckBoxPreference(context);
+        distancePref.setKey(FitbitBetaProbe.ENABLE_DISTANCE);
+        distancePref.setDefaultValue(FitbitBetaProbe.DEFAULT_ENABLE_DISTANCE);
+        distancePref.setTitle(R.string.config_fitbit_distance_title);
+        screen.addPreference(distancePref);
 
-        CheckBoxPreference bodyPref = new CheckBoxPreference(context);
-        bodyPref.setKey(FitbitBetaProbe.BODY_ENABLED);
-        bodyPref.setDefaultValue(FitbitBetaProbe.BODY_DEFAULT);
-        bodyPref.setTitle(R.string.config_fitbit_body_title);
-        screen.addPreference(bodyPref);
+        /*
+        CheckBoxPreference floorsPref = new CheckBoxPreference(context);
+        floorsPref.setKey(FitbitBetaProbe.FLOORS);
+        floorsPref.setDefaultValue(FitbitBetaProbe.DEFAULT_ENABLE_FLOORS);
+        floorsPref.setTitle(R.string.config_fitbit_floors_title);
+        screen.addPreference(floorsPref);
 
-        // TODO: Should activity have a boolean switch as well?
+        CheckBoxPreference elevationPref = new CheckBoxPreference(context);
+        elevationPref.setKey(FitbitBetaProbe.ENABLE_ELEVATION);
+        elevationPref.setDefaultValue(FitbitBetaProbe.DEFAULT_ENABLE_ELEVATION);
+        elevationPref.setTitle(R.string.config_fitbit_elevation_title);
+        screen.addPreference(elevationPref);
+        */
+
+        CheckBoxPreference caloriesPref = new CheckBoxPreference(context);
+        caloriesPref.setKey(FitbitBetaProbe.ENABLE_CALORIES);
+        caloriesPref.setDefaultValue(FitbitBetaProbe.DEFAULT_ENABLE_CALORIES);
+        caloriesPref.setTitle(R.string.config_fitbit_calories_title);
+        screen.addPreference(caloriesPref);
+
+        CheckBoxPreference heartPref = new CheckBoxPreference(context);
+        heartPref.setKey(FitbitBetaProbe.ENABLE_HEART);
+        heartPref.setDefaultValue(FitbitBetaProbe.DEFAULT_ENABLE_HEART);
+        heartPref.setTitle(R.string.config_fitbit_heart_title);
+        screen.addPreference(heartPref);
 
         final SharedPreferences prefs = Probe.getPreferences(context);
 
-        String token = prefs.getString(FitbitBetaProbe.OAUTH_TOKEN, null);
-        String secret = prefs.getString(FitbitBetaProbe.OAUTH_SECRET, null);
+        String token = prefs.getString(FitbitBetaProbe.OAUTH_ACCESS_TOKEN, null);
+        String refresh = prefs.getString(FitbitBetaProbe.OAUTH_REFRESH_TOKEN, null);
 
         final Preference authPreference = new Preference(context);
         authPreference.setTitle(R.string.title_authenticate_fitbit_probe);
@@ -574,8 +603,9 @@ public class FitbitBetaProbe extends Probe
             public boolean onPreferenceClick(Preference preference)
             {
                 Editor e = prefs.edit();
-                e.remove(FitbitBetaProbe.OAUTH_TOKEN);
-                e.remove(FitbitBetaProbe.OAUTH_SECRET);
+                e.remove(FitbitBetaProbe.OAUTH_ACCESS_TOKEN);
+                e.remove(FitbitBetaProbe.OAUTH_REFRESH_TOKEN);
+                e.remove(FitbitBetaProbe.OAUTH_TOKEN_EXPIRES);
                 e.commit();
 
                 me._lastUpdate = 0;
@@ -600,7 +630,7 @@ public class FitbitBetaProbe extends Probe
             }
         });
 
-        if (token == null || secret == null)
+        if (token == null || refresh == null)
             screen.addPreference(authPreference);
         else
             screen.addPreference(logoutPreference);
@@ -611,9 +641,8 @@ public class FitbitBetaProbe extends Probe
     @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
-        double steps = bundle.getDouble(FitbitBetaProbe.STEPS);
-        double progress = bundle.getDouble(FitbitBetaProbe.GOAL_STEPS_RATIO) * 100;
+        double[] steps = bundle.getDoubleArray(FitbitBetaProbe.STEP_TIMESTAMPS);
 
-        return String.format(context.getResources().getString(R.string.summary_fitbit), steps, progress);
+        return String.format(context.getResources().getString(R.string.summary_fitbit_beta), steps.length);
     }
 }

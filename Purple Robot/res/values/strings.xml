@@ -1398,6 +1398,7 @@
 	<string name="subtitle_minutes_test">Test time: %2$d minutes (%1$d tests)</string>
 	<string name="subtitle_minutes_test_single">Test time: %1$d minutes (1 test)</string>
 
+    <string name="summary_fitbit_beta">Fitbit Intervals: %1$d samples</string>
 	<string name="description_minutes_test">Test time: %1$d minutes</string>
 	<string name="description_minute_or_less_test">Test time: 1 minute or less</string>
 	<string name="subtitle_no_tests">Please select one or more tests</string>
@@ -1531,4 +1532,11 @@
 
     <string name="error_no_latest_probe_value">No readings recorded yet. Enable the probe to continue.</string>
     <string name="error_auth_required">Authenticated connection required for inspecting probe readings.</string>
+
+    <string name="config_fitbit_steps_title">Steps</string>
+    <string name="config_fitbit_distance_title">Distance</string>
+    <string name="config_fitbit_floors_title">Floors</string>
+    <string name="config_fitbit_elevation_title">Elevation</string>
+    <string name="config_fitbit_calories_title">Calories</string>
+    <string name="config_fitbit_heart_title">Heart Rate</string>
 </resources>

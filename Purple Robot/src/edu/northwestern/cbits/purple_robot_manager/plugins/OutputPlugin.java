@@ -534,6 +534,16 @@ public abstract class OutputPlugin
 
                             bundle.putDoubleArray(key, doubles);
                         }
+                        else if (nextChild instanceof Long)
+                        {
+                            double[] doubles = new double[child.length()];
+
+                            for (int i = 0; i < doubles.length; i++)
+                                doubles[i] = child.getDouble(i);
+
+                            bundle.putDoubleArray(key, doubles);
+                        }
+
                         else if (nextChild instanceof JSONObject)
                         {
                             ArrayList<Bundle> bundles = new ArrayList<>();
