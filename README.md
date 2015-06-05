@@ -19,7 +19,7 @@ Purple Robot depends upon the following packages for compilation and installatio
 
 After installing these prerequisites, open the Android SDK Manager and verify that the following packages are installed:
 
-* Android 5.0.1 (API 21) SDK Platform
+* Android 5.1.1 (API 22) SDK Platform
 * Android SDK Build-tools 21.1.2
 * Android Support Repository
 * Google Repository
