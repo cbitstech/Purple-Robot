@@ -143,7 +143,8 @@
 	            android:title="@string/config_streaming_jackson_upload_size_label"
 	            android:defaultValue="@string/value_256k" />
 		</PreferenceScreen>
-        <PreferenceScreen android:title="@string/title_builtin_http_server_section">
+        <PreferenceScreen android:title="@string/title_builtin_http_server_section"
+			android:key="screen_builtin_http_server">
             <CheckBoxPreference
                 android:title="@string/title_builtin_http_server_enabled"
                 android:summary="@string/summary_builtin_http_server_enabled"
@@ -157,6 +158,19 @@
                 android:dialogMessage="@string/summary_builtin_http_server_password"
                 android:summary="@string/summary_builtin_http_server_password"
                 android:defaultValue="" />
+
+			<CheckBoxPreference
+				android:title="@string/title_builtin_http_server_zeroconf_enabled"
+				android:summary="@string/summary_builtin_http_server_zeroconf_enabled"
+				android:key="config_builtin_http_server_zeroconf"
+				android:defaultValue="false"/>
+			<edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleEditTextPreference
+				android:key="config_builtin_http_server_zeroconf_name"
+				android:inputType="text"
+				android:title="@string/title_builtin_http_server_zeroconf_name"
+				android:dialogTitle="@string/title_builtin_http_server_zeroconf_name"
+				android:dialogMessage="@string/summary_builtin_http_server_zeroconf_name"
+				android:summary="@string/summary_builtin_http_server_zeroconf_name" />
         </PreferenceScreen>
 		<PreferenceScreen android:title="@string/title_log_upload_section">
 			<CheckBoxPreference

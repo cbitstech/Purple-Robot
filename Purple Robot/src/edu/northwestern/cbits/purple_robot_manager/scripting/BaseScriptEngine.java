@@ -42,9 +42,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
-import android.media.Image;
+import android.graphics.Matrix;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -1208,7 +1207,7 @@ public abstract class BaseScriptEngine
         return false;
     }
 
-    @ScriptingEngineMethod(language = "All", assetPath = "all_show_script_note.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "title", "message", "persistent", "script", "sticky" })
+    @ScriptingEngineMethod(language = "All", assetPath = "all_show_script_note.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "title", "message", "persistent", "script", "sticky", "imageUrl" })
     public boolean showScriptNotification(String title, String message, boolean persistent, Object... args)
     {
         boolean sticky = false;
@@ -1250,7 +1249,7 @@ public abstract class BaseScriptEngine
         return this.showScriptNotification(title, message, persistent, sticky, script, iconUrl);
     }
 
-    @ScriptingEngineMethod(language = "All", assetPath = "all_show_script_note.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "title", "message", "persistent", "script", "sticky" })
+    @ScriptingEngineMethod(language = "All", assetPath = "all_show_script_note.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "title", "message", "persistent", "script", "sticky", "imageUrl" })
     public boolean showScriptNotification(final String title, final String message, final boolean persistent, final boolean sticky, final String script, final String iconUrl)
     {
         try
@@ -1275,16 +1274,27 @@ public abstract class BaseScriptEngine
 
             if (iconUrl != null)
             {
-                final int side = (int) (64 * this._context.getResources().getDisplayMetrics().density);
+                final int side = (int) (40 * this._context.getResources().getDisplayMetrics().density);
 
                 Uri resized = ImageUtils.fetchResizedImageSync(this._context, Uri.parse(iconUrl), side, side, true);
-
-                Log.e("PR", "RESIZED URL (SHOULD NOT BE NULL): " + resized);
 
                 if (resized == null)
                     return false;
 
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(this._context.getContentResolver(), resized);
+
+                float multiplier = 1.0f;
+
+                while (bitmap.getWidth() * multiplier < side && bitmap.getHeight() * multiplier < side)
+                {
+                    multiplier += 1;
+                }
+
+                Matrix matrix = new Matrix();
+                matrix.postScale(multiplier, multiplier);
+
+                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+
                 builder = builder.setLargeIcon(bitmap);
             }
 
