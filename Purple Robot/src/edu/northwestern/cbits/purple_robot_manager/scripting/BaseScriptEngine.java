@@ -1208,7 +1208,7 @@ public abstract class BaseScriptEngine
         return false;
     }
 
-    @ScriptingEngineMethod(language = "All", assetPath = "all_show_script_note.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "title", "message", "persistent", "script", "sticky" })
+    @ScriptingEngineMethod(language = "All", assetPath = "all_show_script_note.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "title", "message", "persistent", "script", "sticky", "imageUrl" })
     public boolean showScriptNotification(String title, String message, boolean persistent, Object... args)
     {
         boolean sticky = false;
@@ -1250,7 +1250,7 @@ public abstract class BaseScriptEngine
         return this.showScriptNotification(title, message, persistent, sticky, script, iconUrl);
     }
 
-    @ScriptingEngineMethod(language = "All", assetPath = "all_show_script_note.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "title", "message", "persistent", "script", "sticky" })
+    @ScriptingEngineMethod(language = "All", assetPath = "all_show_script_note.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { "title", "message", "persistent", "script", "sticky", "imageUrl" })
     public boolean showScriptNotification(final String title, final String message, final boolean persistent, final boolean sticky, final String script, final String iconUrl)
     {
         try
@@ -1278,8 +1278,6 @@ public abstract class BaseScriptEngine
                 final int side = (int) (64 * this._context.getResources().getDisplayMetrics().density);
 
                 Uri resized = ImageUtils.fetchResizedImageSync(this._context, Uri.parse(iconUrl), side, side, true);
-
-                Log.e("PR", "RESIZED URL (SHOULD NOT BE NULL): " + resized);
 
                 if (resized == null)
                     return false;

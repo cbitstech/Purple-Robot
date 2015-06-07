@@ -1539,4 +1539,10 @@
     <string name="config_fitbit_elevation_title">Elevation</string>
     <string name="config_fitbit_calories_title">Calories</string>
     <string name="config_fitbit_heart_title">Heart Rate</string>
+
+    <string name="title_builtin_http_server_zeroconf_enabled">Enable Zeroconf Discovery</string>
+    <string name="summary_builtin_http_server_zeroconf_enabled">Allow devices on the local network to discover embedded website.</string>
+
+    <string name="title_builtin_http_server_zeroconf_name">Device Identifier</string>
+    <string name="summary_builtin_http_server_zeroconf_name">Unique identifier for this device to be used in discovery name.</string>
 </resources>
