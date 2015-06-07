@@ -277,6 +277,8 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
     @Override
     public boolean onPreferenceChange(Preference pref, Object value)
     {
+        final RobotPreferenceListener me = this;
+
         if (SettingsKeys.CHECK_UPDATES_KEY.equals(pref.getKey()))
         {
             Toast.makeText(this._context, R.string.message_update_check, Toast.LENGTH_LONG).show();
@@ -374,7 +376,40 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
 
             return true;
         }
+        else if (LocalHttpServer.BUILTIN_ZEROCONF_ENABLED.equals(pref.getKey()) ||  LocalHttpServer.BUILTIN_ZEROCONF_NAME.equals(pref.getKey()))
+        {
+            Runnable r = new Runnable()
+            {
+                @Override
+                public void run() {
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(me._context);
 
+                    if (prefs.getBoolean(LocalHttpServer.BUILTIN_HTTP_SERVER_ENABLED, LocalHttpServer.BUILTIN_HTTP_SERVER_ENABLED_DEFAULT)) {
+                        Intent stopIntent = new Intent(PersistentService.STOP_HTTP_SERVICE);
+                        stopIntent.setClass(me._context, PersistentService.class);
+
+                        me._context.startService(stopIntent);
+
+                        try {
+                            Thread.sleep(1000);
+                        }
+                        catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                        Intent startIntent = new Intent(PersistentService.START_HTTP_SERVICE);
+                        startIntent.setClass(me._context, PersistentService.class);
+
+                        me._context.startService(startIntent);
+                    }
+                }
+            };
+
+            Thread t = new Thread(r);
+            t.start();
+
+            return true;
+        }
 
         return false;
     }

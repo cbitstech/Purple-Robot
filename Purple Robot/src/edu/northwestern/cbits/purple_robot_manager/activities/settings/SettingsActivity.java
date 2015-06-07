@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -140,6 +141,20 @@ public class SettingsActivity extends AppCompatActivity
 
                 Preference enableHttpServer = prefs.findPreference(LocalHttpServer.BUILTIN_HTTP_SERVER_ENABLED);
                 enableHttpServer.setOnPreferenceChangeListener(listener);
+
+                Preference enableZeroconf = prefs.findPreference(LocalHttpServer.BUILTIN_ZEROCONF_ENABLED);
+                enableZeroconf.setOnPreferenceChangeListener(listener);
+
+                Preference enableZeroconfName = prefs.findPreference(LocalHttpServer.BUILTIN_ZEROCONF_NAME);
+                enableZeroconfName.setOnPreferenceChangeListener(listener);
+
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN)
+                {
+                    PreferenceScreen screen = (PreferenceScreen) this.findPreference("screen_builtin_http_server");
+
+                    screen.removePreference(enableZeroconf);
+                    screen.removePreference(enableZeroconfName);
+                }
 
                 final PreferenceFragment meFragment = this;
 
