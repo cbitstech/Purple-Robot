@@ -12,7 +12,6 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -227,8 +226,6 @@ public class FitbitBetaProbe extends Probe
                                         bundle.putLongArray(FitbitBetaProbe.STEPS, steps);
                                     }
 
-                                    Log.e("PR", "FBB CALORIES: " +  prefs.getBoolean(FitbitBetaProbe.ENABLE_CALORIES, FitbitBetaProbe.DEFAULT_ENABLE_CALORIES));
-
                                     if (prefs.getBoolean(FitbitBetaProbe.ENABLE_CALORIES, FitbitBetaProbe.DEFAULT_ENABLE_CALORIES))
                                     {
                                         JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/calories/date/today/1d/1min.json"));
@@ -332,8 +329,6 @@ public class FitbitBetaProbe extends Probe
                                         bundle.putLongArray(FitbitBetaProbe.FLOORS, values);
                                     }
                                     */
-
-                                    Log.e("PR", "FBB HEART: " +  prefs.getBoolean(FitbitBetaProbe.ENABLE_HEART, FitbitBetaProbe.DEFAULT_ENABLE_HEART));
 
                                     if (prefs.getBoolean(FitbitBetaProbe.ENABLE_HEART, FitbitBetaProbe.DEFAULT_ENABLE_HEART))
                                     {
