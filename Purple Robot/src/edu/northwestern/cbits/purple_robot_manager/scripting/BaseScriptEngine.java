@@ -42,9 +42,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
-import android.media.Image;
+import android.graphics.Matrix;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -1275,7 +1274,7 @@ public abstract class BaseScriptEngine
 
             if (iconUrl != null)
             {
-                final int side = (int) (64 * this._context.getResources().getDisplayMetrics().density);
+                final int side = (int) (40 * this._context.getResources().getDisplayMetrics().density);
 
                 Uri resized = ImageUtils.fetchResizedImageSync(this._context, Uri.parse(iconUrl), side, side, true);
 
@@ -1283,6 +1282,19 @@ public abstract class BaseScriptEngine
                     return false;
 
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(this._context.getContentResolver(), resized);
+
+                float multiplier = 1.0f;
+
+                while (bitmap.getWidth() * multiplier < side && bitmap.getHeight() * multiplier < side)
+                {
+                    multiplier += 1;
+                }
+
+                Matrix matrix = new Matrix();
+                matrix.postScale(multiplier, multiplier);
+
+                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+
                 builder = builder.setLargeIcon(bitmap);
             }
 
