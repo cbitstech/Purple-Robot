@@ -133,6 +133,9 @@ public class LegacySettingsActivity extends PreferenceActivity
             screen.removePreference(enableZeroconfName);
         }
 
+        Preference exportBootstrap = prefs.findPreference("config_export_bootstrap");
+        exportBootstrap.setOnPreferenceClickListener(listener);
+
         LogManager.getInstance(me).log("pr_settings_visited", null);
     }
 
