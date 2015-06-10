@@ -1,12 +1,14 @@
 package edu.northwestern.cbits.purple_robot_manager.activities.settings;
 
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
@@ -19,6 +21,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.Map;
 
 import edu.northwestern.cbits.anthracite.LogService;
@@ -33,6 +36,7 @@ import edu.northwestern.cbits.purple_robot_manager.db.DistancesProvider;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.http.LocalHttpServer;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.output.BootstrapSiteExporter;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
@@ -190,11 +194,37 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
 
             builder.create().show();
         }
-        else if (SettingsKeys.PROBES_DISABLE_EACH_KEY.equals(preference.getKey()))
+        else if ("config_export_bootstrap".equals(preference.getKey()))
         {
-            ProbeManager.disableEachProbe(this._context);
+            final RobotPreferenceListener me = this;
 
-            Toast.makeText(this._context, R.string.message_disable_each_probe, Toast.LENGTH_LONG).show();
+            Toast.makeText(this._context, R.string.toast_compiling_export, Toast.LENGTH_LONG).show();
+
+            Runnable r = new Runnable() {
+                @Override
+                public void run() {
+                    Uri path = BootstrapSiteExporter.exportSite(me._context);
+
+                    try
+                    {
+                        Intent intent = new Intent(Intent.ACTION_SEND);
+
+                        intent.setType("message/rfc822");
+                        intent.putExtra(Intent.EXTRA_SUBJECT, me._context.getString(R.string.email_export_bootstrap_subject));
+                        intent.putExtra(Intent.EXTRA_TEXT, me._context.getString(R.string.message_export_bootstrap_subject));
+                        intent.putExtra(Intent.EXTRA_STREAM, path);
+
+                        me._context.startActivity(intent);
+                    }
+                    catch (ActivityNotFoundException e)
+                    {
+                        Toast.makeText(me._context, R.string.toast_mail_not_found, Toast.LENGTH_LONG).show();
+                    }
+                }
+            };
+
+            Thread t = new Thread(r);
+            t.start();
         }
 
         return false;

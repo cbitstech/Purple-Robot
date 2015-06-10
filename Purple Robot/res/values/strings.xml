@@ -159,7 +159,7 @@
 
     <string name="config_refresh_json_label">Refresh Configuration</string>
     <string name="config_reset_label">Reset Configuration</string>
-    <string name="config_reset_summary">Clears ALL configuration settings and returns Purple Robot to it\'s original state.</string>
+    <string name="config_reset_summary">Clears ALL configuration settings and returns Purple Robot to its original state.</string>
 
     <string name="title_clear_configuration">Clear configuration?</string>
     <string name="message_clear_configuration">Are you sure you want to clear the configuration? This will remove ALL settings, triggers, snapshots, and device readings.</string>
@@ -1545,4 +1545,12 @@
 
     <string name="title_builtin_http_server_zeroconf_name">Device Identifier</string>
     <string name="summary_builtin_http_server_zeroconf_name">Unique identifier for this device to be used in discovery name.</string>
+
+    <string name="title_export_content">Export Documentation</string>
+    <string name="title_export_bootstrap_site">Export Bootstrap Site</string>
+
+    <string name="email_export_bootstrap_subject">Purple Robot Bootstrap Site</string>
+    <string name="message_export_bootstrap_subject">The attached ZIP file contains a static Bootstrap site.\n\nEnjoy!\n\n-Purple Robot\n\n</string>
+
+    <string name="toast_compiling_export">Compiling export&#8230;</string>
 </resources>

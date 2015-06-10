@@ -377,7 +377,9 @@
 		<!-- <Preference android:title="@string/title_mail_app_schema"
 	    	android:key="config_dump_json">
         </Preference> -->
-		<Preference android:title="@string/title_run_tests"	android:key="config_run_tests">
-        </Preference>
+		<Preference android:title="@string/title_run_tests"	android:key="config_run_tests" />
+		<PreferenceScreen android:title="@string/title_export_content">
+			<Preference android:title="@string/title_export_bootstrap_site" android:key="config_export_bootstrap" />
+		</PreferenceScreen>
 	</PreferenceCategory>
 </PreferenceScreen>

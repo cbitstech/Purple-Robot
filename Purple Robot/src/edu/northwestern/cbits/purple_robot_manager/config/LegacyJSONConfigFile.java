@@ -40,6 +40,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageInfo;
 import android.net.Uri;
 import android.os.Looper;
 import android.preference.PreferenceManager;
@@ -195,7 +196,7 @@ public class LegacyJSONConfigFile
 
                         PurpleRobotApplication.fixPreferences(context, true);
 
-                        if (scriptString.toLowerCase().startsWith("(begin ")
+                        if (scriptString.toLowerCase().startsWith("(begin")
                                 || (conn.getContentType() != null && conn.getContentType().toLowerCase()
                                         .startsWith("text/x-scheme")))
                         {
