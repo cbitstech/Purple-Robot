@@ -39,6 +39,16 @@ public class PurpleRobotApplication extends Application
         try
         {
             PackageInfo info = PurpleRobotApplication._context.getPackageManager().getPackageInfo(PurpleRobotApplication._context.getPackageName(), 0);
+            System.setProperty("http.agent", "Purple Robot " + info.versionName);
+        }
+        catch (PackageManager.NameNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            PackageInfo info = PurpleRobotApplication._context.getPackageManager().getPackageInfo(PurpleRobotApplication._context.getPackageName(), 0);
 
             XSI.setUserAgent(PurpleRobotApplication._context.getString(R.string.app_name) + " " + info.versionName);
         }
