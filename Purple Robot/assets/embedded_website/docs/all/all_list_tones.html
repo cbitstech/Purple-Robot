@@ -1,0 +1,22 @@
+<p>
+    Retrieves a list of notification tones on the device.
+</p>
+
+<h4 class="code_arguments_label">Arguments</h4>
+
+<p><em>None</em></p>
+
+<h4>Return Values</h4>
+
+<p>A list of the notification tones available on the local devices, suitable for use in <code><a href="all_play_tone">PurpleRobot.playTone</a></code>.</p>
+
+<h3 class="language_definition">JavaScript Example</h3>
+
+<pre id="javascript_example">var tones = PurpleRobot.listTones();
+
+PurpleRobot.playTone(tones[0]);</pre>
+
+<h3 class="language_definition">Scheme Example</h3>
+
+<pre id="scheme_example">(let ((tones (pr-list-tones)))
+     (pr-play-tone (pr-nth 0 tones)))</pre>

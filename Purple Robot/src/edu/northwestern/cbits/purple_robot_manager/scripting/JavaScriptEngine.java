@@ -439,6 +439,21 @@ public class JavaScriptEngine extends BaseScriptEngine
         return new NativeArray(values);
     }
 
+    @ScriptingEngineMethod(language = "All", assetPath = "all_list_tones.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { })
+    public NativeArray listTones()
+    {
+        List<String> tones = super.fetchToneList();
+
+        String[] values = new String[tones.size()];
+
+        for (int i = 0; i < tones.size(); i++)
+        {
+            values[i] = tones.get(i);
+        }
+
+        return new NativeArray(values);
+    }
+
     @ScriptingEngineMethod(language = "All", assetPath = "all_fetch_snapshot_ids.html", category = R.string.docs_script_category_data_collection, arguments = { })
     public NativeArray fetchSnapshotIds()
     {

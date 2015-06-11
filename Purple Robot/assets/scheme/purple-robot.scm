@@ -37,6 +37,7 @@
 (define pr-launch-application (lambda args (apply .launchApplication (cons PurpleRobot args))))
 (define pr-launch-internal-url (lambda (url) (.launchInternalUrl PurpleRobot url)))
 (define pr-launch-url (lambda (url) (.launchUrl PurpleRobot url)))
+(define pr-list-tones (lambda () (.listTones PurpleRobot)))
 (define pr-log (lambda (message) (.log PurpleRobot message)))
 (define pr-namespaces (lambda () (.namespaces PurpleRobot)))
 (define pr-package-name (lambda (applicationName) (.packageForApplicationName PurpleRobot applicationName)))

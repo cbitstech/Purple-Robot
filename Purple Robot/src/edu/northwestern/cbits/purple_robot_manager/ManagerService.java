@@ -190,8 +190,11 @@ public class ManagerService extends IntentService
 
             String name = null;
 
-            if (intent.hasExtra(ManagerService.RINGTONE_NAME))
+            if (intent.hasExtra(ManagerService.RINGTONE_NAME)) {
                 name = intent.getStringExtra(ManagerService.RINGTONE_NAME);
+                toneString = null;
+                toneUri = null;
+            }
 
             try
             {
@@ -228,6 +231,7 @@ public class ManagerService extends IntentService
             }
             catch (Exception e)
             {
+                e.printStackTrace();
                 LogManager.getInstance(this).logException(e);
             }
 
@@ -272,7 +276,9 @@ public class ManagerService extends IntentService
             {
                 try
                 {
-                    final AssetFileDescriptor afd = this.getAssets().openFd(ManagerService.pathForSound(this, toneString));
+                    String path = ManagerService.pathForSound(this, name);
+
+                    final AssetFileDescriptor afd = this.getAssets().openFd(path);
 
                     Runnable r = new Runnable()
                     {
@@ -311,7 +317,11 @@ public class ManagerService extends IntentService
                 }
                 catch (IOException e)
                 {
+                    e.printStackTrace();
                     LogManager.getInstance(this).logException(e);
+
+                    Intent defaultIntent = new Intent(ManagerService.RINGTONE_INTENT);
+                    this.startService(defaultIntent);
                 }
             }
         }
@@ -513,6 +523,12 @@ public class ManagerService extends IntentService
         for (int i = 0; i < labels.length && i < values.length; i++)
         {
             if (labels[i].toLowerCase(Locale.getDefault()).equals(name.toLowerCase(Locale.getDefault())))
+                return values[i];
+        }
+
+        for (int i = 0; i < labels.length && i < values.length; i++)
+        {
+            if (labels[i].toLowerCase(Locale.getDefault()).endsWith(name.toLowerCase(Locale.getDefault())))
                 return values[i];
         }
 
