@@ -460,4 +460,9 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
         return formatted;
     }
 
+    public String assetPath(Context context)
+    {
+        return "visible-satellites-probe.html";
+    }
 }
+

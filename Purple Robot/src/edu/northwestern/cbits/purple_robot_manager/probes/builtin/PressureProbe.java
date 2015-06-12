@@ -73,6 +73,14 @@ public class PressureProbe extends Continuous1DProbe implements SensorEventListe
     private static Handler _handler = null;
 
     @Override
+    public boolean getUsesThread()
+    {
+        SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
+
+        return prefs.getBoolean(PressureProbe.USE_HANDLER, PressureProbe.DEFAULT_USE_HANDLER);
+    }
+
+    @Override
     public String probeCategory(Context context)
     {
         return context.getString(R.string.probe_sensor_category);

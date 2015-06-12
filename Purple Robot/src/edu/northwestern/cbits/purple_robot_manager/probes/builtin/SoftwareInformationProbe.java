@@ -307,4 +307,9 @@ public class SoftwareInformationProbe extends Probe
 
         return settings;
     }
+
+    public String assetPath(Context context)
+    {
+        return "software-information-probe.html";
+    }
 }

@@ -407,4 +407,9 @@ public class BatteryProbe extends Probe
 
         return settings;
     }
+
+    public String assetPath(Context context)
+    {
+        return "battery-probe.html";
+    }
 }

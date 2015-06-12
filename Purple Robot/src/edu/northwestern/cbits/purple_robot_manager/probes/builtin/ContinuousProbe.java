@@ -43,9 +43,11 @@ public abstract class ContinuousProbe extends Probe
 
     protected static final boolean DEFAULT_ENABLED = false;
     public static final String DEFAULT_FREQUENCY = "0";
-    public static final boolean DEFAULT_USE_HANDLER = true;
 
     public static final String USE_THREAD = "use_thread";
+    public static final boolean DEFAULT_USE_HANDLER = true;
+
+    private static final String PROBE_WAKELOCK = "wakelock";
 
     private WakeLock _wakeLock = null;
     private int _wakeLockLevel = -1;
@@ -148,8 +150,26 @@ public abstract class ContinuousProbe extends Probe
         map.put(Probe.PROBE_FREQUENCY, this.getFrequency());
         map.put(ContinuousProbe.PROBE_THRESHOLD, this.getThreshold());
 
+        JSONObject settings = this.fetchSettings(context);
+
+        if (settings.has(ContinuousProbe.USE_THREAD))
+            map.put(ContinuousProbe.USE_THREAD, this.getUsesThread());
+
+        map.put(ContinuousProbe.PROBE_WAKELOCK, this.getWakelock());
+
         return map;
     }
+
+    private int getWakelock()
+    {
+        String key = this.getPreferenceKey();
+
+        SharedPreferences prefs = Probe.getPreferences(this._context);;
+
+        return Integer.parseInt(prefs.getString("config_probe_" + key + "_wakelock", "-1"));
+    }
+
+    protected abstract boolean getUsesThread();
 
     protected abstract double getThreshold();
 
@@ -226,6 +246,42 @@ public abstract class ContinuousProbe extends Probe
                 Editor e = prefs.edit();
 
                 e.putString(key, "" + threshold);
+                e.commit();
+            }
+        }
+
+        if (params.containsKey(ContinuousProbe.PROBE_WAKELOCK))
+        {
+            Object wakelock = params.get(ContinuousProbe.PROBE_WAKELOCK);
+
+            if (wakelock instanceof Long || wakelock instanceof Integer)
+            {
+                String key = "config_probe_" + this.getPreferenceKey() + "_wakelock";
+
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString(key, "" + wakelock);
+                e.commit();
+            }
+            if (wakelock instanceof Double)
+            {
+                String key = "config_probe_" + this.getPreferenceKey() + "_wakelock";
+
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString(key, "" + wakelock);
+                e.commit();
+            }
+            else if (wakelock instanceof String)
+            {
+                String key = "config_probe_" + this.getPreferenceKey() + "_wakelock";
+
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString(key, "" + wakelock);
                 e.commit();
             }
         }
@@ -374,6 +430,20 @@ public abstract class ContinuousProbe extends Probe
                 threshold.put(Probe.PROBE_VALUES, values);
                 settings.put(ContinuousProbe.PROBE_THRESHOLD, threshold);
             }
+
+            JSONObject wakelock = new JSONObject();
+            wakelock.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
+            values = new JSONArray();
+
+            String[] options = context.getResources().getStringArray(R.array.wakelock_values);
+
+            for (String option : options)
+            {
+                values.put(Double.parseDouble(option));
+            }
+
+            wakelock.put(Probe.PROBE_VALUES, values);
+            settings.put(ContinuousProbe.PROBE_WAKELOCK, wakelock);
         }
         catch (JSONException e)
         {

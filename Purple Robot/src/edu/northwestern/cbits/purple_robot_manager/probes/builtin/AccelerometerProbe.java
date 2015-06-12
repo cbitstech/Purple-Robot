@@ -155,6 +155,14 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
     }
 
     @Override
+    public boolean getUsesThread()
+    {
+        SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
+
+        return prefs.getBoolean(AccelerometerProbe.USE_HANDLER, AccelerometerProbe.DEFAULT_USE_HANDLER);
+    }
+
+    @Override
     public String name(Context context)
     {
         return AccelerometerProbe.NAME;
@@ -536,4 +544,10 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
             }
         }
     }
+
+    public String assetPath(Context context)
+    {
+        return "accelerometer-probe.html";
+    }
+
 }

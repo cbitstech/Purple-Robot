@@ -41,4 +41,9 @@ public class AccelerometerBasicStatisticsFeature extends XYZBasicStatisticsFeatu
     {
         return context.getString(R.string.title_accelerator_statistics_feature);
     }
+
+    public String assetPath(Context context)
+    {
+        return "accelerometer-statistics-probe.html";
+    }
 }
