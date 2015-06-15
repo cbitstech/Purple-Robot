@@ -549,5 +549,4 @@ public class AccelerometerProbe extends Continuous3DProbe implements SensorEvent
     {
         return "accelerometer-probe.html";
     }
-
 }

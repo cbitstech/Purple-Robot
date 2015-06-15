@@ -228,4 +228,9 @@ public class SunriseSunsetFeature extends Feature
 
         return settings;
     }
+
+    public String assetPath(Context context)
+    {
+        return "sunrise-probe.html";
+    }
 }

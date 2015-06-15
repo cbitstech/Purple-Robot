@@ -317,4 +317,9 @@ public class ApplicationLaunchProbe extends Probe
         return settings;
     }
 
+    public String assetPath(Context context)
+    {
+        return "app-launch-probe.html";
+    }
+
 }

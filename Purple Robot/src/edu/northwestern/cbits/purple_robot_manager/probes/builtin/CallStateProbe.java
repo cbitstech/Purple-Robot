@@ -147,15 +147,15 @@ public class CallStateProbe extends Probe
 
         switch (callState)
         {
-        case TelephonyManager.CALL_STATE_IDLE:
-            state = CallStateProbe.STATE_IDLE;
-            break;
-        case TelephonyManager.CALL_STATE_OFFHOOK:
-            state = CallStateProbe.STATE_OFF_HOOK;
-            break;
-        case TelephonyManager.CALL_STATE_RINGING:
-            state = CallStateProbe.STATE_RINGING;
-            break;
+            case TelephonyManager.CALL_STATE_IDLE:
+                state = CallStateProbe.STATE_IDLE;
+                break;
+            case TelephonyManager.CALL_STATE_OFFHOOK:
+                state = CallStateProbe.STATE_OFF_HOOK;
+                break;
+            case TelephonyManager.CALL_STATE_RINGING:
+                state = CallStateProbe.STATE_RINGING;
+                break;
         }
 
         return state;
@@ -235,5 +235,10 @@ public class CallStateProbe extends Probe
         }
 
         return settings;
+    }
+
+    public String assetPath(Context context)
+    {
+        return "call-state-probe.html";
     }
 }

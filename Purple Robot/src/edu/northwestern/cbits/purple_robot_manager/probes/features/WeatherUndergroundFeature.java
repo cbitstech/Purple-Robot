@@ -280,4 +280,9 @@ public class WeatherUndergroundFeature extends Feature
 
         return settings;
     }
+
+    public String assetPath(Context context)
+    {
+        return "current-weather-probe.html";
+    }
 }
