@@ -55,6 +55,7 @@ import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.PowerHelper;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.WiFiHelper;
+import edu.northwestern.cbits.purple_robot_manager.activities.DiagnosticActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.StartActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.LiberalSSLSocketFactory;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -107,7 +108,7 @@ public abstract class DataUploadPlugin extends OutputPlugin
         return pendingFolder;
     }
 
-    private boolean restrictToWifi(SharedPreferences prefs)
+    public static boolean restrictToWifi(SharedPreferences prefs)
     {
         try
         {
@@ -128,7 +129,7 @@ public abstract class DataUploadPlugin extends OutputPlugin
         }
     }
 
-    private boolean restrictToCharging(SharedPreferences prefs)
+    public static boolean restrictToCharging(SharedPreferences prefs)
     {
         try
         {
@@ -154,7 +155,7 @@ public abstract class DataUploadPlugin extends OutputPlugin
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         final DataUploadPlugin me = this;
 
-        if (this.restrictToWifi(prefs))
+        if (DataUploadPlugin.restrictToWifi(prefs))
         {
             if (WiFiHelper.wifiAvailable(context) == false)
             {
@@ -164,7 +165,7 @@ public abstract class DataUploadPlugin extends OutputPlugin
             }
         }
 
-        if (this.restrictToCharging(prefs))
+        if (DataUploadPlugin.restrictToCharging(prefs))
         {
             if (PowerHelper.isPluggedIn(context) == false)
             {
@@ -441,4 +442,61 @@ public abstract class DataUploadPlugin extends OutputPlugin
     }
 
     public abstract boolean isEnabled(Context context);
+
+    public static boolean uploadEnabled(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        if (prefs.getBoolean(HttpUploadPlugin.ENABLED, HttpUploadPlugin.ENABLED_DEFAULT))
+            return true;
+
+        if (prefs.getBoolean(StreamingJacksonUploadPlugin.ENABLED, StreamingJacksonUploadPlugin.ENABLED_DEFAULT))
+            return true;
+
+        return false;
+    }
+
+    public static long lastUploadTime(SharedPreferences prefs)
+    {
+        long lastUpload = -1;
+
+        if (prefs.contains(HttpUploadPlugin.LAST_UPLOAD_TIME))
+            lastUpload = prefs.getLong(HttpUploadPlugin.LAST_UPLOAD_TIME, -1);
+
+        if (prefs.contains(StreamingJacksonUploadPlugin.LAST_UPLOAD_TIME))
+        {
+            long streamingUpload = prefs.getLong(StreamingJacksonUploadPlugin.LAST_UPLOAD_TIME, -1);
+
+            if (streamingUpload > lastUpload)
+                lastUpload = streamingUpload;
+        }
+
+        return lastUpload;
+    }
+
+    public static long lastUploadSize(SharedPreferences prefs)
+    {
+        long lastSize = -1;
+
+        if (prefs.contains(HttpUploadPlugin.LAST_UPLOAD_SIZE))
+            lastSize = prefs.getLong(HttpUploadPlugin.LAST_UPLOAD_SIZE, -1);
+
+        if (prefs.contains(StreamingJacksonUploadPlugin.LAST_UPLOAD_SIZE))
+        {
+            long lastUpload = -1;
+
+            if (prefs.contains(HttpUploadPlugin.LAST_UPLOAD_TIME))
+                lastUpload = prefs.getLong(HttpUploadPlugin.LAST_UPLOAD_TIME, -1);
+
+            if (prefs.contains(StreamingJacksonUploadPlugin.LAST_UPLOAD_TIME))
+            {
+                long streamingUpload = prefs.getLong(StreamingJacksonUploadPlugin.LAST_UPLOAD_TIME, -1);
+
+                if (streamingUpload > lastUpload)
+                    lastSize = prefs.getLong(StreamingJacksonUploadPlugin.LAST_UPLOAD_SIZE, -1);
+            }
+        }
+
+        return lastSize;
+    }
 }

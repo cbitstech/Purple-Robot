@@ -93,6 +93,8 @@
     <string name="probe_status_enabled">Sensors &amp; probes enabled and collecting readings&#8230;</string>
     <string name="probe_status_disabled">Sensors &amp; probes disabled.</string>
     <string name="upload_status_enabled_wifi_only">Transmissions enabled when Wi-Fi is present.</string>
+    <string name="upload_status_enabled_wifi_charging_only">Transmissions enabled when Wi-Fi is present and the device is plugged-in.</string>
+    <string name="upload_status_enabled_charging_only">Transmissions enabled when the device is pluggged-in.</string>
     <string name="upload_status_enabled">Transmissions enabled.</string>
     <string name="upload_status_disabled">Transmissions disabled.</string>
     <string name="last_upload_format">%1$s (%2$d KB)</string>
