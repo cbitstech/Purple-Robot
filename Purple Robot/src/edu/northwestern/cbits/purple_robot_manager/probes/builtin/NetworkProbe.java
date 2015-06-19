@@ -128,11 +128,10 @@ public class NetworkProbe extends Probe
 
                                         bundle.putString(NetworkProbe.HOSTNAME, InetAddress.getByName(ipString).getHostName());
                                     }
-                                    catch (UnknownHostException e)
+                                    catch (UnknownHostException | NullPointerException e)
                                     {
                                         bundle.putString(NetworkProbe.HOSTNAME, ipString);
-                                    }
-                                    catch (SocketException e)
+                                    } catch (SocketException e)
                                     {
                                         e.printStackTrace();
                                     }

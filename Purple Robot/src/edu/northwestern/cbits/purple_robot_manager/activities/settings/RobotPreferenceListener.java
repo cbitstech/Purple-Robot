@@ -229,7 +229,6 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
         }
         else if ("config_export_jekyll".equals(preference.getKey()))
         {
-            Log.e("PR", "EXPORTING JEKYLL");
             final RobotPreferenceListener me = this;
 
             Toast.makeText(this._context, R.string.toast_compiling_export, Toast.LENGTH_LONG).show();
@@ -237,10 +236,7 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
             Runnable r = new Runnable() {
                 @Override
                 public void run() {
-                    Log.e("PR", "STARTING JEKYLL");
                     Uri path = BootstrapSiteExporter.exportJekyllPages(me._context);
-
-                    Log.e("PR", "PATH: " + path);
 
                     try
                     {
