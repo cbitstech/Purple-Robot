@@ -227,7 +227,8 @@ public class RawLocationProbe extends Probe implements LocationListener
                     if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
                         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, freq, 1, this);
 
-                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, freq, 1, this);
+                    if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
+                        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, freq, 1, this);
 
                     this._listening = true;
 
