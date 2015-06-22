@@ -261,6 +261,7 @@ public class BatteryProbe extends Probe
                         Bundle bundle = new Bundle();
                         bundle.putString("PROBE", me.name(context));
                         bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+                        bundle.putBoolean("PRIORITY", true);
 
                         bundle.putAll(intent.getExtras());
 
