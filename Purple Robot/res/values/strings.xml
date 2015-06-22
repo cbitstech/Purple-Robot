@@ -93,6 +93,8 @@
     <string name="probe_status_enabled">Sensors &amp; probes enabled and collecting readings&#8230;</string>
     <string name="probe_status_disabled">Sensors &amp; probes disabled.</string>
     <string name="upload_status_enabled_wifi_only">Transmissions enabled when Wi-Fi is present.</string>
+    <string name="upload_status_enabled_wifi_charging_only">Transmissions enabled when Wi-Fi is present and the device is plugged-in.</string>
+    <string name="upload_status_enabled_charging_only">Transmissions enabled when the device is pluggged-in.</string>
     <string name="upload_status_enabled">Transmissions enabled.</string>
     <string name="upload_status_disabled">Transmissions disabled.</string>
     <string name="last_upload_format">%1$s (%2$d KB)</string>
@@ -1548,9 +1550,13 @@
 
     <string name="title_export_content">Export Documentation</string>
     <string name="title_export_bootstrap_site">Export Bootstrap Site</string>
+    <string name="title_export_jekyll_site">Export Jekyll Documentation Pages</string>
 
     <string name="email_export_bootstrap_subject">Purple Robot Bootstrap Site</string>
     <string name="message_export_bootstrap_subject">The attached ZIP file contains a static Bootstrap site.\n\nEnjoy!\n\n-Purple Robot\n\n</string>
+
+    <string name="email_export_jekyll_subject">Purple Robot Jekyll Pages</string>
+    <string name="message_export_jekyll_subject">The attached ZIP file contains a collection of static Jekyll pages.\n\nEnjoy!\n\n-Purple Robot\n\n</string>
 
     <string name="toast_compiling_export">Compiling export&#8230;</string>
 </resources>

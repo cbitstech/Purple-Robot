@@ -43,12 +43,15 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
     private static final String TEMP_FILE_EXTENSION = ".jackson-temp";
     private static final String PRIORITY_FILE_EXTENSION = ".priority";
 
-    private static final String ENABLED = "config_enable_streaming_jackson_data_server";
+    public static final String ENABLED = "config_enable_streaming_jackson_data_server";
     private static final String UPLOAD_SIZE = "config_streaming_jackson_upload_size";
     private static final String UPLOAD_INTERVAL = "config_streaming_jackson_upload_interval";
 
     private static final String UPLOAD_SIZE_DEFAULT = "262114";
     private static final String UPLOAD_INTERVAL_DEFAULT = "300";
+    public static final boolean ENABLED_DEFAULT = false;
+    public static final String LAST_UPLOAD_TIME = "streaming_json_last_upload";
+    public static final String LAST_UPLOAD_SIZE = "streaming_json_last_upload_size";
 
     private JsonGenerator _generator = null;
     private boolean _priorityPayload = false;
@@ -129,12 +132,27 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
 
                         String payload = FileUtils.readFileToString(payloadFile, "UTF-8");
 
-                        if (me.transmitPayload(prefs, payload) == DataUploadPlugin.RESULT_SUCCESS)
+                        int result = me.transmitPayload(prefs, payload);
+
+                        if (result == DataUploadPlugin.RESULT_SUCCESS)
                         {
+                            SharedPreferences.Editor e = prefs.edit();
+                            e.putLong(StreamingJacksonUploadPlugin.LAST_UPLOAD_TIME, System.currentTimeMillis());
+                            e.putLong(StreamingJacksonUploadPlugin.LAST_UPLOAD_SIZE, payloadFile.length());
+                            e.commit();
+
                             payloadFile.delete();
 
                             me._lastAttempt = 0;
                             me.uploadFiles(context, prefs);
+                        }
+                        else if (result == DataUploadPlugin.RESULT_NO_CONNECTION)
+                        {
+                            // WiFi only or no connection...
+                        }
+                        else if (result == DataUploadPlugin.RESULT_NO_POWER)
+                        {
+                            // Device isn't charging...
                         }
                         else
                         {
@@ -178,7 +196,7 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
         final Context context = this.getContext().getApplicationContext();
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        if (prefs.getBoolean(StreamingJacksonUploadPlugin.ENABLED, false) == false)
+        if (prefs.getBoolean(StreamingJacksonUploadPlugin.ENABLED, StreamingJacksonUploadPlugin.ENABLED_DEFAULT) == false)
             return;
 
         synchronized (this)
@@ -249,7 +267,7 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
         }
     }
 
-    private void closeOpenSession() throws JsonGenerationException, IOException
+    private void closeOpenSession() throws IOException
     {
         if (this._generator == null || this._currentFile == null)
             return;
@@ -597,6 +615,6 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
     {
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        return prefs.getBoolean(StreamingJacksonUploadPlugin.ENABLED, false);
+        return prefs.getBoolean(StreamingJacksonUploadPlugin.ENABLED, StreamingJacksonUploadPlugin.ENABLED_DEFAULT);
     }
 }

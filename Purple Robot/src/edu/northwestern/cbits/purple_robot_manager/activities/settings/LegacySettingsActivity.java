@@ -136,6 +136,9 @@ public class LegacySettingsActivity extends PreferenceActivity
         Preference exportBootstrap = prefs.findPreference("config_export_bootstrap");
         exportBootstrap.setOnPreferenceClickListener(listener);
 
+        Preference exportJekyll = prefs.findPreference("config_export_jekyll");
+        exportJekyll.setOnPreferenceClickListener(listener);
+
         LogManager.getInstance(me).log("pr_settings_visited", null);
     }
 

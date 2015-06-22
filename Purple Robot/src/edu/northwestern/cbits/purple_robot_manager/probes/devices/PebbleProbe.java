@@ -69,6 +69,12 @@ public class PebbleProbe extends Continuous3DProbe
     private int _chargeLevel = -1;
     private long _lastRefresh = 0;
 
+    @Override
+    public boolean getUsesThread()
+    {
+        return false;
+    }
+
     private static class AccelData
     {
         // TODO: Credit https://github.com/kramimus/pebble-accel-analyzer

@@ -567,6 +567,14 @@ public class SchemeEngine extends BaseScriptEngine
         return this.pairForList(triggerIds);
     }
 
+    @ScriptingEngineMethod(language = "All", assetPath = "all_list_tones.html", category = R.string.docs_script_category_dialogs_notifications, arguments = { })
+    public Pair listTones()
+    {
+        List<String> tones = super.fetchToneList();
+
+        return (Pair) (((Pair) this.pairForList(tones).getRest()).getFirst());
+    }
+
     @ScriptingEngineMethod(language = "All", assetPath = "all_fetch_snapshot_ids.html", category = R.string.docs_script_category_data_collection, arguments = { })
     public Pair fetchSnapshotIds()
     {

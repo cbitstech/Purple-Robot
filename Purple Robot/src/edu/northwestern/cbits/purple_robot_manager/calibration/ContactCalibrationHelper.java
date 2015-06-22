@@ -70,7 +70,6 @@ public class ContactCalibrationHelper
                 }
             };
 
-
             sanity.addAlert(SanityCheck.WARNING, title, message, action);
         }
     }

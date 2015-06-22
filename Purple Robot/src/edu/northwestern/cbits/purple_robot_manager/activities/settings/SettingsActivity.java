@@ -159,6 +159,9 @@ public class SettingsActivity extends AppCompatActivity
                 Preference exportBootstrap = prefs.findPreference("config_export_bootstrap");
                 exportBootstrap.setOnPreferenceClickListener(listener);
 
+                Preference exportJekyll = prefs.findPreference("config_export_jekyll");
+                exportJekyll.setOnPreferenceClickListener(listener);
+
                 final PreferenceFragment meFragment = this;
 
                 // Delay for half a second so preferences can be completely constructed...

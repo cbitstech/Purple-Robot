@@ -34,7 +34,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.calibration.LocationCalibrationHelper;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
 import edu.northwestern.cbits.purple_robot_manager.util.DBSCAN;
 import edu.northwestern.cbits.purple_robot_manager.util.DBSCAN.Cluster;
@@ -83,6 +85,7 @@ public class LocationLabelActivity extends AppCompatActivity
 
         this.getSupportActionBar().setTitle(R.string.title_location_label);
         this.getSupportActionBar().setSubtitle(R.string.title_location_desc);
+        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Editor e = PreferenceManager.getDefaultSharedPreferences(this).edit();
         e.putLong("last_location_calibration", System.currentTimeMillis());
@@ -262,10 +265,8 @@ public class LocationLabelActivity extends AppCompatActivity
 
         list.setAdapter(adapter);
 
-        list.setOnItemClickListener(new OnItemClickListener()
-        {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-            {
+        list.setOnItemClickListener(new OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 me._selectedCluster = position;
 
                 parent.showContextMenu();
@@ -303,8 +304,19 @@ public class LocationLabelActivity extends AppCompatActivity
         return true;
     }
 
-    protected boolean isRouteDisplayed()
+    protected void onPause()
     {
-        return false;
+        super.onPause();
+
+        LocationCalibrationHelper.check(this);
+        SanityManager.getInstance(this).refreshState();
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        if (item.getItemId() == android.R.id.home)
+            this.finish();
+
+        return true;
     }
 }

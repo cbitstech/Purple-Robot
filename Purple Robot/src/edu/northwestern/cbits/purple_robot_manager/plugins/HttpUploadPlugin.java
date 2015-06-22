@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -19,8 +18,6 @@ import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -105,7 +102,10 @@ public class HttpUploadPlugin extends OutputPlugin
 
     private final static long MAX_UPLOAD_SIZE = 262144; // 256KB
     private final static long MIN_UPLOAD_SIZE = 16384; // 16KB
-    private static final String ENABLED = "config_enable_data_server";
+    public static final String ENABLED = "config_enable_data_server";
+    public static final boolean ENABLED_DEFAULT = false;
+    public static final String LAST_UPLOAD_TIME = "http_last_upload";
+    public static final String LAST_UPLOAD_SIZE = "http_last_upload_size";
 
     private final List<String> _pendingSaves = new ArrayList<>();
     private long _lastSave = 0;
@@ -325,6 +325,8 @@ public class HttpUploadPlugin extends OutputPlugin
                 this._uploading = false;
                 return;
             }
+
+            // TODO: Refactor out wifi/power restriction code to be handled solely by superclass...
 
             if (this.restrictToWifi(prefs))
             {
@@ -798,8 +800,8 @@ public class HttpUploadPlugin extends OutputPlugin
                             else
                             {
                                 Editor e = prefs.edit();
-                                e.putLong("http_last_upload", System.currentTimeMillis());
-                                e.putLong("http_last_payload_size", payloadSize);
+                                e.putLong(HttpUploadPlugin.LAST_UPLOAD_TIME, System.currentTimeMillis());
+                                e.putLong(HttpUploadPlugin.LAST_UPLOAD_SIZE, payloadSize);
                                 e.commit();
                             }
 
@@ -911,7 +913,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
     private boolean enableDataServer(SharedPreferences prefs)
     {
-        return this.coerceBoolean(prefs, "config_enable_data_server", false);
+        return this.coerceBoolean(prefs, HttpUploadPlugin.ENABLED, HttpUploadPlugin.ENABLED_DEFAULT);
     }
 
     protected void broadcastMessage(int stringId, boolean log)
@@ -1294,6 +1296,6 @@ public class HttpUploadPlugin extends OutputPlugin
     {
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        return prefs.getBoolean(HttpUploadPlugin.ENABLED, false);
+        return prefs.getBoolean(HttpUploadPlugin.ENABLED, HttpUploadPlugin.ENABLED_DEFAULT);
     }
 }

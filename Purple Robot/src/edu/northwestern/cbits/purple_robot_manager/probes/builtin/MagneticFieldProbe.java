@@ -71,6 +71,14 @@ public class MagneticFieldProbe extends Continuous3DProbe implements SensorEvent
     private static Handler _handler = null;
 
     @Override
+    public boolean getUsesThread()
+    {
+        SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
+
+        return prefs.getBoolean(MagneticFieldProbe.USE_HANDLER, MagneticFieldProbe.DEFAULT_USE_HANDLER);
+    }
+
+    @Override
     public String probeCategory(Context context)
     {
         return context.getString(R.string.probe_sensor_category);

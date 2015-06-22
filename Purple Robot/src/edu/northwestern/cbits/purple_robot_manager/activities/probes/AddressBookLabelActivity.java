@@ -40,6 +40,8 @@ public class AddressBookLabelActivity extends AppCompatActivity
 
         this.setContentView(R.layout.layout_address_label_activity);
         this.getSupportActionBar().setTitle(R.string.title_address_book_label);
+
+        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     public boolean onCreateOptionsMenu(Menu menu)
@@ -53,7 +55,9 @@ public class AddressBookLabelActivity extends AppCompatActivity
     @SuppressLint("ValidFragment")
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        if (item.getItemId() == R.id.menu_accept_label)
+        if (item.getItemId() == android.R.id.home)
+            this.finish();
+        else if (item.getItemId() == R.id.menu_accept_label)
         {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
 
@@ -101,12 +105,9 @@ public class AddressBookLabelActivity extends AppCompatActivity
 
         final AddressBookLabelActivity me = this;
 
-        list.setAdapter(new ArrayAdapter<ContactRecord>(this, R.layout.layout_contact_count_row, this._contacts)
-        {
-            public View getView(int position, View convertView, ViewGroup parent)
-            {
-                if (convertView == null)
-                {
+        list.setAdapter(new ArrayAdapter<ContactRecord>(this, R.layout.layout_contact_count_row, this._contacts) {
+            public View getView(int position, View convertView, ViewGroup parent) {
+                if (convertView == null) {
                     LayoutInflater inflater = LayoutInflater.from(me);
                     convertView = inflater.inflate(R.layout.layout_contact_count_row, parent, false);
                 }
@@ -149,15 +150,21 @@ public class AddressBookLabelActivity extends AppCompatActivity
 
         this.refresh();
 
-        list.setOnItemClickListener(new OnItemClickListener()
-        {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-            {
+        list.setOnItemClickListener(new OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 me._clickedIndex = position;
 
                 parent.showContextMenu();
             }
         });
+    }
+
+    protected void onPause()
+    {
+        super.onPause();
+
+        ContactCalibrationHelper.check(this);
+        SanityManager.getInstance(this).refreshState();
     }
 
     public boolean onContextItemSelected(MenuItem item)

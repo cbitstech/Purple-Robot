@@ -58,28 +58,33 @@ public class ScriptHelpRequestHandler implements HttpRequestHandler
         if (components.length > 4)
             page = components[4];
 
-        response.setStatusCode(HttpStatus.SC_OK);
-        response.setHeader("Access-Control-Allow-Origin", "*");
-
-        final byte[] content = BootstrapSiteExporter.fetchContent(this._context, language, page, false);
-
-        EntityTemplate body = new EntityTemplate(new ContentProducer()
+        if (page == null && target.endsWith("/") == false)
         {
-            public void writeTo(OutputStream out) throws IOException
-            {
-                ByteArrayInputStream in = new ByteArrayInputStream(content);
+            response.setStatusCode(HttpStatus.SC_MOVED_PERMANENTLY);
+            response.setHeader("Location", target + "/");
+        }
+        else {
+            response.setStatusCode(HttpStatus.SC_OK);
+            response.setHeader("Access-Control-Allow-Origin", "*");
 
-                byte[] b = new byte[1024];
-                int read = 0;
+            final byte[] content = BootstrapSiteExporter.fetchContent(this._context, language, page, false, BootstrapSiteExporter.TEMPLATE_TYPE_BOOTSTRAP);
 
-                while ((read = in.read(b, 0, b.length)) != -1)
-                    out.write(b, 0, read);
+            EntityTemplate body = new EntityTemplate(new ContentProducer() {
+                public void writeTo(OutputStream out) throws IOException {
+                    ByteArrayInputStream in = new ByteArrayInputStream(content);
 
-                out.close();
-                in.close();
-            }
-        });
+                    byte[] b = new byte[1024];
+                    int read = 0;
 
-        response.setEntity(body);
+                    while ((read = in.read(b, 0, b.length)) != -1)
+                        out.write(b, 0, read);
+
+                    out.close();
+                    in.close();
+                }
+            });
+
+            response.setEntity(body);
+        }
     }
 }

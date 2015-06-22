@@ -197,4 +197,9 @@ public class ScreenProbe extends Probe
 
         return settings;
     }
+
+    public String assetPath(Context context)
+    {
+        return "screen-probe.html";
+    }
 }

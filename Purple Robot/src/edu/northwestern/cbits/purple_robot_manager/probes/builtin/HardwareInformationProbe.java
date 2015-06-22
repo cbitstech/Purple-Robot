@@ -302,4 +302,9 @@ public class HardwareInformationProbe extends Probe
 
         return settings;
     }
+
+    public String assetPath(Context context)
+    {
+        return "hardware-info-probe.html";
+    }
 }

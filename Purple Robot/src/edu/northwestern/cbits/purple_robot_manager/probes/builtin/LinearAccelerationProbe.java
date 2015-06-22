@@ -76,6 +76,14 @@ public class LinearAccelerationProbe extends Continuous3DProbe implements Sensor
     private static Handler _handler = null;
 
     @Override
+    public boolean getUsesThread()
+    {
+        SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
+
+        return prefs.getBoolean(LinearAccelerationProbe.USE_HANDLER, LinearAccelerationProbe.DEFAULT_USE_HANDLER);
+    }
+
+    @Override
     public Intent viewIntent(Context context)
     {
         Intent i = new Intent(context, WebkitLandscapeActivity.class);

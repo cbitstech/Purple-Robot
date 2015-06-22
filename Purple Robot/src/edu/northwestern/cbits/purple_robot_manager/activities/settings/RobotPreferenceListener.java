@@ -15,6 +15,7 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -212,6 +213,38 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
                         intent.setType("message/rfc822");
                         intent.putExtra(Intent.EXTRA_SUBJECT, me._context.getString(R.string.email_export_bootstrap_subject));
                         intent.putExtra(Intent.EXTRA_TEXT, me._context.getString(R.string.message_export_bootstrap_subject));
+                        intent.putExtra(Intent.EXTRA_STREAM, path);
+
+                        me._context.startActivity(intent);
+                    }
+                    catch (ActivityNotFoundException e)
+                    {
+                        Toast.makeText(me._context, R.string.toast_mail_not_found, Toast.LENGTH_LONG).show();
+                    }
+                }
+            };
+
+            Thread t = new Thread(r);
+            t.start();
+        }
+        else if ("config_export_jekyll".equals(preference.getKey()))
+        {
+            final RobotPreferenceListener me = this;
+
+            Toast.makeText(this._context, R.string.toast_compiling_export, Toast.LENGTH_LONG).show();
+
+            Runnable r = new Runnable() {
+                @Override
+                public void run() {
+                    Uri path = BootstrapSiteExporter.exportJekyllPages(me._context);
+
+                    try
+                    {
+                        Intent intent = new Intent(Intent.ACTION_SEND);
+
+                        intent.setType("message/rfc822");
+                        intent.putExtra(Intent.EXTRA_SUBJECT, me._context.getString(R.string.email_export_jekyll_subject));
+                        intent.putExtra(Intent.EXTRA_TEXT, me._context.getString(R.string.message_export_jekyll_subject));
                         intent.putExtra(Intent.EXTRA_STREAM, path);
 
                         me._context.startActivity(intent);

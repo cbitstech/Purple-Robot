@@ -121,11 +121,19 @@ public class NetworkProbe extends Probe
 
                                     try
                                     {
+                                        NetworkInterface iface = NetworkInterface.getByInetAddress(InetAddress.getByName(ipString));
+
+                                        bundle.putString(NetworkProbe.IFACE_NAME, iface.getName());
+                                        bundle.putString(NetworkProbe.IFACE_DISPLAY_NAME, iface.getDisplayName());
+
                                         bundle.putString(NetworkProbe.HOSTNAME, InetAddress.getByName(ipString).getHostName());
                                     }
-                                    catch (UnknownHostException e)
+                                    catch (UnknownHostException | NullPointerException e)
                                     {
                                         bundle.putString(NetworkProbe.HOSTNAME, ipString);
+                                    } catch (SocketException e)
+                                    {
+                                        e.printStackTrace();
                                     }
                                 }
                                 else
@@ -147,6 +155,9 @@ public class NetworkProbe extends Probe
                                                 {
                                                     bundle.putString(NetworkProbe.IP_ADDRESS, ipAddr.getHostAddress());
                                                     bundle.putString(NetworkProbe.HOSTNAME, ipAddr.getHostName());
+
+                                                    bundle.putString(NetworkProbe.IFACE_NAME, iface.getName());
+                                                    bundle.putString(NetworkProbe.IFACE_DISPLAY_NAME, iface.getDisplayName());
                                                 }
                                             }
                                         }
@@ -161,18 +172,15 @@ public class NetworkProbe extends Probe
                                 {
                                     bundle.putString(NetworkProbe.IP_ADDRESS, "127.0.0.1");
                                     bundle.putString(NetworkProbe.HOSTNAME, "localhost");
-                                }
 
-                                try
-                                {
-                                    NetworkInterface iface = NetworkInterface.getByInetAddress(InetAddress.getByName("127.0.0.1"));
+                                    try {
+                                        NetworkInterface iface = NetworkInterface.getByInetAddress(InetAddress.getByName("127.0.0.1"));
 
-                                    bundle.putString(NetworkProbe.IFACE_NAME, iface.getName());
-                                    bundle.putString(NetworkProbe.IFACE_DISPLAY_NAME, iface.getDisplayName());
-                                }
-                                catch (SocketException | UnknownHostException e)
-                                {
-                                    LogManager.getInstance(context).logException(e);
+                                        bundle.putString(NetworkProbe.IFACE_NAME, iface.getName());
+                                        bundle.putString(NetworkProbe.IFACE_DISPLAY_NAME, iface.getDisplayName());
+                                    } catch (SocketException | UnknownHostException e) {
+                                        LogManager.getInstance(context).logException(e);
+                                    }
                                 }
 
                                 me.transmitData(context, bundle);
@@ -312,5 +320,10 @@ public class NetworkProbe extends Probe
         }
 
         return settings;
+    }
+
+    public String assetPath(Context context)
+    {
+        return "network-probe.html";
     }
 }

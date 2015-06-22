@@ -514,4 +514,9 @@ public class TelephonyProbe extends Probe
 
         return settings;
     }
+
+    public String assetPath(Context context)
+    {
+        return "telephony-probe.html";
+    }
 }

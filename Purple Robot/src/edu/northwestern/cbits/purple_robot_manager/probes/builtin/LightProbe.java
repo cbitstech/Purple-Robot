@@ -71,6 +71,14 @@ public class LightProbe extends Continuous1DProbe implements SensorEventListener
     private static Handler _handler = null;
 
     @Override
+    public boolean getUsesThread()
+    {
+        SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
+
+        return prefs.getBoolean(LightProbe.USE_HANDLER, LightProbe.DEFAULT_USE_HANDLER);
+    }
+
+    @Override
     public String probeCategory(Context context)
     {
         return context.getString(R.string.probe_sensor_category);
