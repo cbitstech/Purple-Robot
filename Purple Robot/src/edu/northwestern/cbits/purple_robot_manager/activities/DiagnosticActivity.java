@@ -125,31 +125,8 @@ public class DiagnosticActivity extends AppCompatActivity
             lastUpload.setText(String.format(this.getString(R.string.last_upload_format), dateString, lastPayloadSize));
         }
 
-        if (prefs.getBoolean("config_enable_data_server", false))
-        {
-            OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(this, HttpUploadPlugin.class);
-
-            if (plugin instanceof HttpUploadPlugin)
-            {
-                HttpUploadPlugin http = (HttpUploadPlugin) plugin;
-
-                TextView uploadCount = (TextView) this.findViewById(R.id.pending_files_value);
-                uploadCount.setText(this.getString(R.string.pending_files_file, http.pendingFilesCount()));
-            }
-        }
-        else
-        {
-            OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(this,
-                    StreamingJacksonUploadPlugin.class);
-
-            if (plugin instanceof StreamingJacksonUploadPlugin)
-            {
-                StreamingJacksonUploadPlugin http = (StreamingJacksonUploadPlugin) plugin;
-
-                TextView uploadCount = (TextView) this.findViewById(R.id.pending_files_value);
-                uploadCount.setText(this.getString(R.string.pending_files_file, http.pendingFilesCount()));
-            }
-        }
+        TextView uploadCount = (TextView) this.findViewById(R.id.pending_files_value);
+        uploadCount.setText(this.getString(R.string.pending_files_file, DataUploadPlugin.pendingFileCount(this)));
 
         if (prefs.getBoolean("config_enable_log_server", false))
         {

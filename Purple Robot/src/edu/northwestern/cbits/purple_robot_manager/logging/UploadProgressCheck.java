@@ -9,6 +9,7 @@ import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.plugins.DataUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
 
@@ -31,7 +32,7 @@ public class UploadProgressCheck extends SanityCheck
 
         PurpleRobotApplication.fixPreferences(context, false);
 
-        if (prefs.getBoolean("config_enable_data_server", false) == false)
+        if (DataUploadPlugin.uploadEnabled(context) == false)
         {
             this._errorLevel = SanityCheck.OK;
             return;

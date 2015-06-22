@@ -499,4 +499,34 @@ public abstract class DataUploadPlugin extends OutputPlugin
 
         return lastSize;
     }
+
+    public static int pendingFileCount(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        if (prefs.getBoolean(HttpUploadPlugin.ENABLED, HttpUploadPlugin.ENABLED_DEFAULT))
+        {
+            OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(context, HttpUploadPlugin.class);
+
+            if (plugin instanceof HttpUploadPlugin)
+            {
+                HttpUploadPlugin http = (HttpUploadPlugin) plugin;
+
+                return http.pendingFilesCount();
+            }
+        }
+        else
+        {
+            OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(context, StreamingJacksonUploadPlugin.class);
+
+            if (plugin instanceof StreamingJacksonUploadPlugin)
+            {
+                StreamingJacksonUploadPlugin http = (StreamingJacksonUploadPlugin) plugin;
+
+                return http.pendingFilesCount();
+            }
+        }
+
+        return 0;
+    }
 }
