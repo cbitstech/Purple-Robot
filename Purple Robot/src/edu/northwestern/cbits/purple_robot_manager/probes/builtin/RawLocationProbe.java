@@ -215,6 +215,11 @@ public class RawLocationProbe extends Probe implements LocationListener
 
             if (prefs.getBoolean(RawLocationProbe.ENABLED, RawLocationProbe.DEFAULT_ENABLED))
             {
+                if (Looper.myLooper() == null) {
+                    Looper.prepare();
+                    Looper.loop();
+                }
+
                 long freq = Long.parseLong(prefs.getString(RawLocationProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
 
                 if (this._lastFrequency != freq || this._listening == false)
