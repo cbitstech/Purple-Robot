@@ -581,6 +581,8 @@ public class CommunicationEventProbe extends Probe
             enabled.put(Probe.PROBE_VALUES, values);
             settings.put(Probe.PROBE_ENABLED, enabled);
 
+            settings.put(Probe.PROBE_CALIBRATION_NOTIFICATIONS, enabled);
+
             JSONObject encrypt = new JSONObject();
             encrypt.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
             encrypt.put(Probe.PROBE_VALUES, values);
