@@ -99,6 +99,8 @@
 
         <item>studies.LivewellActivityCountsProbe</item>
         <item>studies.LivewellPebbleActivityCountsProbe</item>
+
+        <item>builtin.WakeLockInformationProbe</item>
     </array>
 
 	<array name="output_plugin_classes">

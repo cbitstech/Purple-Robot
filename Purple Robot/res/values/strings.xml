@@ -1559,4 +1559,8 @@
     <string name="message_export_jekyll_subject">The attached ZIP file contains a collection of static Jekyll pages.\n\nEnjoy!\n\n-Purple Robot\n\n</string>
 
     <string name="toast_compiling_export">Compiling export&#8230;</string>
+
+    <string name="title_wakelock_info_probe">Wake Lock Information</string>
+    <string name="summary_wakelock_info_probe_desc">Reports details about wake locks that affect power management and efficiency.</string>
+    <string name="summary_wakelock_info_probe">Wake Locks: %1$d Partial, %2$d Dim, %3$d Bright, %4$d Full</string>
 </resources>

@@ -53,6 +53,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TelephonyProbe
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TemperatureProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TouchEventsProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.VisibleSatelliteProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.WakeLockInformationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.WifiAccessPointsProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.devices.AndroidWearProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.devices.wear.WearAccelerometerProbe;
@@ -677,6 +678,13 @@ public class ProbeManager
                 WearMagneticFieldProbe wear = (WearMagneticFieldProbe) probe;
 
                 if (wear.name(context).equalsIgnoreCase(name))
+                    found = true;
+            }
+            else if (probe instanceof WakeLockInformationProbe)
+            {
+                WakeLockInformationProbe wakelock = (WakeLockInformationProbe) probe;
+
+                if (wakelock.name(context).equalsIgnoreCase(name))
                     found = true;
             }
 

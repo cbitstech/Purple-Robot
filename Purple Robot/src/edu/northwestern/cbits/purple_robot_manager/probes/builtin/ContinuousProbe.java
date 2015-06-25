@@ -13,7 +13,6 @@ import android.content.SharedPreferences.Editor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.os.Bundle;
-import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceManager;
@@ -22,6 +21,7 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
+import edu.northwestern.cbits.purple_robot_manager.util.WakeLockManager;
 
 public abstract class ContinuousProbe extends Probe
 {
@@ -350,7 +350,7 @@ public abstract class ContinuousProbe extends Probe
             {
                 if (this._wakeLock != null)
                 {
-                    this._wakeLock.release();
+                    WakeLockManager.getInstance(context).releaseWakeLock(this._wakeLock);
 
                     this._wakeLock = null;
                 }
@@ -359,18 +359,13 @@ public abstract class ContinuousProbe extends Probe
             }
 
             if (this._wakeLockLevel != -1 && this._wakeLock == null)
-            {
-                PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-
-                this._wakeLock = pm.newWakeLock(this._wakeLockLevel, "key");
-                this._wakeLock.acquire();
-            }
+                this._wakeLock = WakeLockManager.getInstance(context).requestWakeLock(this._wakeLockLevel, this.getClass().getCanonicalName());
         }
         else
         {
             if (this._wakeLock != null)
             {
-                this._wakeLock.release();
+                WakeLockManager.getInstance(context).releaseWakeLock(this._wakeLock);
                 this._wakeLock = null;
             }
         }
