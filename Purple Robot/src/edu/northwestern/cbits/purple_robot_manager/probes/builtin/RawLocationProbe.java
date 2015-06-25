@@ -36,13 +36,11 @@ public class RawLocationProbe extends Probe implements LocationListener
     private static final String BEARING = "BEARING";
     private static final String SPEED = "SPEED";
     private static final String TIME_FIX = "TIME_FIX";
-    public static final String LONGITUDE_KEY = LONGITUDE;
-    public static final String LATITUDE_KEY = LATITUDE;
 
     public static String ENABLED = "config_probe_raw_location_enabled";
     public static String FREQUENCY = "config_probe_raw_location_frequency";
 
-    private static final boolean DEFAULT_ENABLED = false;
+    public static final boolean DEFAULT_ENABLED = false;
 
     private static final String GPS_AVAILABLE = "GPS_AVAILABLE";
     private static final String NETWORK_AVAILABLE = "NETWORK_AVAILABLE";
@@ -56,6 +54,9 @@ public class RawLocationProbe extends Probe implements LocationListener
     private static final String PROVIDER_STATUS_AVAILABLE = "AVAILABLE";
     private static final String PROVIDER_STATUS_OUT_OF_SERVICE = "OUT_OF_SERVICE";
     private static final String PROVIDER_STATUS_TEMPORARILY_UNAVAILABLE = "TEMPORARILY_UNAVAILABLE";
+
+    public static final boolean DEFAULT_ENABLE_CALIBRATION_NOTIFICATIONS = true;
+    public static final String ENABLE_CALIBRATION_NOTIFICATIONS = "config_probe_raw_location_calibration_notifications";
 
     protected Context _context = null;
 

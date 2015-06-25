@@ -55,23 +55,20 @@ public class AddressBookLabelActivity extends AppCompatActivity
     @SuppressLint("ValidFragment")
     public boolean onOptionsItemSelected(MenuItem item)
     {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
+
+        Editor e = prefs.edit();
+        e.putLong("last_address_book_calibration", System.currentTimeMillis());
+        e.commit();
+
+        final SanityManager sanity = SanityManager.getInstance(this);
+        final String title = this.getString(R.string.title_address_book_label_check);
+        sanity.clearAlert(title);
+
         if (item.getItemId() == android.R.id.home)
             this.finish();
         else if (item.getItemId() == R.id.menu_accept_label)
-        {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
-
-            Editor e = prefs.edit();
-            e.putLong("last_address_book_calibration", System.currentTimeMillis());
-            e.commit();
-
             this.finish();
-
-            final SanityManager sanity = SanityManager.getInstance(this);
-            final String title = this.getString(R.string.title_address_book_label_check);
-            sanity.clearAlert(title);
-
-        }
 
         return true;
     }

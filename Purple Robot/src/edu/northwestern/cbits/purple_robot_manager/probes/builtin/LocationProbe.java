@@ -51,9 +51,9 @@ public class LocationProbe extends Probe implements LocationListener
     private static final String GPS_AVAILABLE = "GPS_AVAILABLE";
     private static final String NETWORK_AVAILABLE = "NETWORK_AVAILABLE";
 
-    private static final boolean DEFAULT_ENABLED = true;
+    public static final boolean DEFAULT_ENABLED = true;
 
-    private static final String ENABLED = "config_probe_location_enabled";
+    public static final String ENABLED = "config_probe_location_enabled";
     private static final String FREQUENCY = "config_probe_location_frequency";
 
     public static final boolean DEFAULT_ENABLE_CALIBRATION_NOTIFICATIONS = true;
