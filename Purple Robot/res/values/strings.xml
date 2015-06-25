@@ -940,6 +940,12 @@
     <string name="name_sanity_wear_battery">Android Wear Battery</string>
     <string name="name_sanity_wear_battery_warning">The connected Android Wear device is running low on power. Please charge the device soon.</string>
 
+    <string name="name_sanity_wifi_enabled">WiFi Network Status</string>
+    <string name="name_sanity_wifi_enabled_warning">Data uploads are restricted to WiFi networks, but the device\'s WiFi connection is disabled.</string>
+    <string name="name_sanity_wifi_enabled_error">Data uploads are restricted to WiFi networks, but the device\'s WiFi connection is disabled and a significant amount of data is accumulating on the device.</string>
+
+    <string name="name_sanity_charging_required">Charging Status</string>
+    <string name="name_sanity_charging_required_error">Data uploads are restricted to when the device is plugged-in and a significant amount of data is accumulated. Please plug in the device to upload the accumulated files.</string>
 
     <string name="message_clearing_archive">Clearing archive files&#8230;</string>
     
