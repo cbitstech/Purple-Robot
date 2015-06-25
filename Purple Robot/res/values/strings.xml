@@ -37,7 +37,13 @@
     
 	<string name="type_trigger_unknown">Unknown Trigger</string>
 	<string name="type_trigger_probe">Probe Trigger</string>
-	<string name="type_trigger_datetime">Time-Based Trigger</string>
+    <string name="type_trigger_datetime">Time-Based Trigger</string>
+    <string name="type_trigger_battery">Battery Level Trigger</string>
+
+    <string name="label_trigger_battery_threshold">Battery Level Fire Threshold</string>
+    <string name="label_trigger_battery_direction">Change Direction</string>
+    <string name="label_trigger_battery_increasing">Battery Level Increasing</string>
+    <string name="label_trigger_battery_decreasing">Battery Level Decreasing</string>
 
 	<string name="label_trigger_last_fire">Last Fired</string>
 	<string name="label_trigger_last_fire_never">Never</string>
