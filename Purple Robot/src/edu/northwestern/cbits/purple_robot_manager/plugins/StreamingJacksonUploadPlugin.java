@@ -5,6 +5,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +26,7 @@ import android.net.wifi.ScanResult;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.util.MutableInt;
 
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactory;
@@ -58,6 +60,7 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
 
     private long _lastAttempt = 0;
     private File _currentFile = null;
+    private boolean _hasPriorityPayloads = false;
 
     public String[] respondsTo()
     {
@@ -92,25 +95,50 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
 
                         File pendingFolder = me.getPendingFolder();
 
-                        String[] priorityFilenames = pendingFolder.list(new FilenameFilter()
-                        {
-                            public boolean accept(File dir, String filename)
-                            {
-                                return filename.endsWith(StreamingJacksonUploadPlugin.PRIORITY_FILE_EXTENSION);
-                            }
-                        });
+                        String[] filenames = {};
 
-                        String[] filenames = null;
+                        final MutableInt found = new MutableInt(0);
 
-                        if (priorityFilenames != null && priorityFilenames.length > 0)
+                        if (me._hasPriorityPayloads) {
+                            String[] priorityFilenames = pendingFolder.list(new FilenameFilter() {
+                                public boolean accept(File dir, String filename) {
+                                    // Only return first 256 for performance reasons...
+                                    if (found.value >= 256)
+                                        return false;
+
+                                    if (filename.endsWith(StreamingJacksonUploadPlugin.PRIORITY_FILE_EXTENSION)) {
+                                        found.value += 1;
+
+                                        return true;
+                                    }
+
+                                    return false;
+                                }
+                            });
+
                             filenames = priorityFilenames;
-                        else
+                        }
+
+                        if (filenames == null || found.value == 0)
                         {
+                            me._hasPriorityPayloads = false;
+
                             filenames = pendingFolder.list(new FilenameFilter()
                             {
                                 public boolean accept(File dir, String filename)
                                 {
-                                    return filename.endsWith(StreamingJacksonUploadPlugin.FILE_EXTENSION);
+                                    // Only return first 1024 for performance reasons...
+                                    if (found.value >= 1024)
+                                        return false;
+
+                                    if (filename.endsWith(StreamingJacksonUploadPlugin.FILE_EXTENSION))
+                                    {
+                                        found.value += 1;
+
+                                        return true;
+                                    }
+
+                                    return false;
                                 }
                             });
 
@@ -284,7 +312,11 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
         String finalFile = tempFile.replace(TEMP_FILE_EXTENSION, FILE_EXTENSION);
 
         if (this._priorityPayload)
+        {
+            this._hasPriorityPayloads = true;
+
             finalFile = finalFile.replace(FILE_EXTENSION, PRIORITY_FILE_EXTENSION);
+        }
 
         this._currentFile = null;
         this._priorityPayload = false;
