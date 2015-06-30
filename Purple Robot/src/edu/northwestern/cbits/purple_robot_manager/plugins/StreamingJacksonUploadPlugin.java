@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +30,6 @@ import android.util.MutableInt;
 
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -62,6 +61,9 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
     private File _currentFile = null;
     private boolean _hasPriorityPayloads = false;
 
+    private ArrayList<String> _regularFilenames = new ArrayList<>();
+    private ArrayList<String> _priorityFilenames = new ArrayList<>();
+
     public String[] respondsTo()
     {
         String[] activeActions = { Probe.PROBE_READING, OutputPlugin.FORCE_UPLOAD };
@@ -69,7 +71,7 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
         return activeActions;
     }
 
-    private void uploadFiles(final Context context, final SharedPreferences prefs)
+    private void uploadFiles(final Context context, final SharedPreferences prefs, final int callLevel)
     {
         long now = System.currentTimeMillis();
 
@@ -100,50 +102,57 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
                         final MutableInt found = new MutableInt(0);
 
                         if (me._hasPriorityPayloads) {
-                            String[] priorityFilenames = pendingFolder.list(new FilenameFilter() {
-                                public boolean accept(File dir, String filename) {
-                                    // Only return first 256 for performance reasons...
-                                    if (found.value >= 256)
+                            if (me._priorityFilenames.size() == 0) {
+                                String[] priorityFilenames = pendingFolder.list(new FilenameFilter() {
+                                    public boolean accept(File dir, String filename) {
+                                        // Only return first 256 for performance reasons...
+                                        if (found.value >= 256)
+                                            return false;
+
+                                        if (filename.endsWith(StreamingJacksonUploadPlugin.PRIORITY_FILE_EXTENSION)) {
+                                            found.value += 1;
+
+                                            return true;
+                                        }
+
                                         return false;
-
-                                    if (filename.endsWith(StreamingJacksonUploadPlugin.PRIORITY_FILE_EXTENSION)) {
-                                        found.value += 1;
-
-                                        return true;
                                     }
+                                });
 
-                                    return false;
-                                }
-                            });
+                                for (String filename : priorityFilenames)
+                                    me._priorityFilenames.add(filename);
+                            }
 
-                            filenames = priorityFilenames;
+                            filenames = me._priorityFilenames.toArray(new String[0]);
                         }
 
                         if (filenames == null || found.value == 0)
                         {
                             me._hasPriorityPayloads = false;
 
-                            filenames = pendingFolder.list(new FilenameFilter()
-                            {
-                                public boolean accept(File dir, String filename)
-                                {
-                                    // Only return first 1024 for performance reasons...
-                                    if (found.value >= 1024)
+                            if (me._regularFilenames.size() == 0) {
+                                String[] regularFilenames = pendingFolder.list(new FilenameFilter() {
+                                    public boolean accept(File dir, String filename) {
+                                        // Only return first 1024 for performance reasons...
+                                        if (found.value >= 1024)
+                                            return false;
+
+                                        if (filename.endsWith(StreamingJacksonUploadPlugin.FILE_EXTENSION)) {
+                                            found.value += 1;
+
+                                            return true;
+                                        }
+
                                         return false;
-
-                                    if (filename.endsWith(StreamingJacksonUploadPlugin.FILE_EXTENSION))
-                                    {
-                                        found.value += 1;
-
-                                        return true;
                                     }
+                                });
 
-                                    return false;
-                                }
-                            });
 
-                            if (filenames == null)
-                                filenames = new String[0];
+                                for (String filename : regularFilenames)
+                                    me._regularFilenames.add(filename);
+                            }
+
+                            filenames = me._regularFilenames.toArray(new String[0]);
                         }
 
                         if (filenames.length < 1)
@@ -156,7 +165,11 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
                         if (filenames.length > 1)
                             index = random.nextInt(filenames.length);
 
-                        File payloadFile = new File(pendingFolder, filenames[index]);
+                        String filename = filenames[index];
+                        me._priorityFilenames.remove(filename);
+                        me._regularFilenames.remove(filename);
+
+                        File payloadFile = new File(pendingFolder, filename);
 
                         String payload = FileUtils.readFileToString(payloadFile, "UTF-8");
 
@@ -172,7 +185,7 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
                             payloadFile.delete();
 
                             me._lastAttempt = 0;
-                            me.uploadFiles(context, prefs);
+                            me.uploadFiles(context, prefs, callLevel + 1);
                         }
                         else if (result == DataUploadPlugin.RESULT_NO_CONNECTION)
                         {
@@ -235,7 +248,7 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
             {
                 this._lastAttempt = 0;
 
-                this.uploadFiles(context, prefs);
+                this.uploadFiles(context, prefs, 0);
             }
             else if (Probe.PROBE_READING.equals(action))
             {
@@ -267,7 +280,7 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
                                 this.closeOpenSession();
                         }
 
-                        this.uploadFiles(context, prefs);
+                        this.uploadFiles(context, prefs, 0);
 
                         if (this._generator == null)
                         {
