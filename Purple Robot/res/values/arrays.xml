@@ -79,6 +79,7 @@
         <item>builtin.SignificantMotionProbe</item>
 
         <item>builtin.RawLocationProbe</item>
+        <item>builtin.FusedLocationProbe</item>
         <item>builtin.MediaRouterDeviceProbe</item>
         <item>builtin.ShionProbe</item>
         <item>builtin.SaintProbe</item>
@@ -884,4 +885,34 @@
         <item>MD5</item>
         <item>SHA-256</item>
     </array>
+
+    <string-array name="probe_fused_location_distance">
+        <item>0</item>
+        <item>50</item>
+        <item>100</item>
+        <item>200</item>
+        <item>400</item>
+        <item>800</item>
+        <item>1000</item>
+        <item>1600</item>
+        <item>3200</item>
+        <item>5000</item>
+        <item>10000</item>
+        <item>16000</item>
+    </string-array>
+
+    <string-array name="probe_fused_location_distance_labels">
+        <item>None</item>
+        <item>50 meters</item>
+        <item>100 meters</item>
+        <item>200 meters</item>
+        <item>400 meters</item>
+        <item>800 meters</item>
+        <item>1 kilometer</item>
+        <item>1.6 km (approx. 1 mile)</item>
+        <item>3.2 km</item>
+        <item>5 km</item>
+        <item>10 km</item>
+        <item>16.0 km (approx. 10 miles)</item>
+    </string-array>
 </resources>

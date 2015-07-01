@@ -649,8 +649,13 @@
     <!-- Raw Location Probe -->
     <string name="title_raw_location_probe">Raw Location Probe (Beta)</string>
     <string name="summary_raw_location_probe_desc">Variation of the location probe, but with battery conservation functionality removed for testing purposes.</string>
-    
-	<!-- Purple Robot Health Probe -->
+
+    <!-- Fused Location Probe -->
+    <string name="title_fused_location_probe">Fused Location Probe</string>
+    <string name="summary_fused_location_probe_desc">Location probe using Google Play Services\' location features.</string>
+    <string name="probe_fused_location_distance_label">Minimum Distance Threshold</string>
+
+    <!-- Purple Robot Health Probe -->
     <string name="title_robot_probe">Purple Robot Health</string>
     <string name="summary_robot_probe_desc">Summarizes the current state of the Purple Robot app, including the amount of data to be transmitted to the server.</string>
 

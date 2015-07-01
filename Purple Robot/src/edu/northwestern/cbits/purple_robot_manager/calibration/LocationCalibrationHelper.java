@@ -12,6 +12,7 @@ import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.FusedLocationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RawLocationProbe;
 
@@ -33,7 +34,11 @@ public class LocationCalibrationHelper
         {
             sanity.clearAlert(title);
         }
-        else if (prefs.getBoolean(LocationProbe.ENABLED, LocationProbe.DEFAULT_ENABLED) || prefs.getBoolean(RawLocationProbe.ENABLED, RawLocationProbe.DEFAULT_ENABLED))
+        else if (prefs.getBoolean(FusedLocationProbe.ENABLED, FusedLocationProbe.DEFAULT_ENABLED) && prefs.getBoolean(FusedLocationProbe.ENABLE_CALIBRATION_NOTIFICATIONS, FusedLocationProbe.DEFAULT_ENABLE_CALIBRATION_NOTIFICATIONS) == false)
+        {
+            sanity.clearAlert(title);
+        }
+        else if (prefs.getBoolean(LocationProbe.ENABLED, LocationProbe.DEFAULT_ENABLED) || prefs.getBoolean(RawLocationProbe.ENABLED, RawLocationProbe.DEFAULT_ENABLED) || prefs.getBoolean(FusedLocationProbe.ENABLED, FusedLocationProbe.DEFAULT_ENABLED))
         {
             String message = context.getString(R.string.message_location_label_check);
 

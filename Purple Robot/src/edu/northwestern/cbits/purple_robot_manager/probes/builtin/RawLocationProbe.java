@@ -8,6 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.location.Location;
@@ -20,9 +21,12 @@ import android.preference.CheckBoxPreference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.probes.LocationProbeActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
+import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
+import edu.northwestern.cbits.purple_robot_manager.probes.services.FoursquareProbe;
 
 public class RawLocationProbe extends Probe implements LocationListener
 {
@@ -36,6 +40,10 @@ public class RawLocationProbe extends Probe implements LocationListener
     private static final String BEARING = "BEARING";
     private static final String SPEED = "SPEED";
     private static final String TIME_FIX = "TIME_FIX";
+    public static final String LATITUDE_KEY = LATITUDE;
+    public static final String LONGITUDE_KEY = LONGITUDE;
+
+    public static final String DB_TABLE = "raw_location_probe";
 
     public static String ENABLED = "config_probe_raw_location_enabled";
     public static String FREQUENCY = "config_probe_raw_location_frequency";
@@ -65,6 +73,18 @@ public class RawLocationProbe extends Probe implements LocationListener
 
     private final HashMap<String, Boolean> _lastEnabled = new HashMap<>();
     private final HashMap<String, Integer> _lastStatus = new HashMap<>();
+    private long _lastCache = 0;
+    private Location _lastLocation = null;
+
+    public static Map<String, String> databaseSchema()
+    {
+        HashMap<String, String> schema = new HashMap<>();
+
+        schema.put(LocationProbe.LATITUDE_KEY, ProbeValuesProvider.REAL_TYPE);
+        schema.put(LocationProbe.LONGITUDE_KEY, ProbeValuesProvider.REAL_TYPE);
+
+        return schema;
+    }
 
     @Override
     public String probeCategory(Context context)
@@ -301,7 +321,43 @@ public class RawLocationProbe extends Probe implements LocationListener
 
         bundle.putLong(RawLocationProbe.TIME_FIX, location.getTime());
 
-        this.transmitData(this._context, bundle);
+        synchronized (this) {
+            long time = location.getTime();
+
+            if (time - this._lastCache > 30000 || this._lastLocation == null) {
+                boolean include = true;
+
+                if (this._lastLocation != null && this._lastLocation.distanceTo(location) < 50.0)
+                    include = false;
+
+                if (include) {
+                    Map<String, Object> values = new HashMap<>();
+
+                    values.put(LocationProbe.LONGITUDE_KEY, location.getLongitude());
+                    values.put(LocationProbe.LATITUDE_KEY, location.getLatitude());
+                    values.put(ProbeValuesProvider.TIMESTAMP, (double) (location.getTime() / 1000));
+
+                    ProbeValuesProvider.getProvider(this._context).insertValue(this._context, RawLocationProbe.DB_TABLE, RawLocationProbe.databaseSchema(), values);
+
+                    this._lastCache = time;
+                    this._lastLocation = new Location(location);
+                }
+            }
+
+            final RawLocationProbe me = this;
+
+            Runnable r = new Runnable() {
+                @Override
+                public void run() {
+                    FoursquareProbe.annotate(me._context, bundle);
+
+                    me.transmitData(me._context, bundle);
+                }
+            };
+
+            Thread t = new Thread(r);
+            t.start();
+        }
     }
 
     private void logEvent(Bundle bundle)
@@ -398,5 +454,23 @@ public class RawLocationProbe extends Probe implements LocationListener
         double longitude = bundle.getDouble(RawLocationProbe.LONGITUDE);
 
         return String.format(context.getResources().getString(R.string.summary_location_probe), latitude, longitude);
+    }
+
+    @Override
+    public Intent viewIntent(Context context)
+    {
+        try
+        {
+            Class.forName("com.google.android.maps.MapActivity");
+
+            Intent i = new Intent(context, LocationProbeActivity.class);
+            i.putExtra(LocationProbeActivity.DB_TABLE_NAME, RawLocationProbe.DB_TABLE);
+
+            return i;
+        }
+        catch (Exception e)
+        {
+            return super.viewIntent(context);
+        }
     }
 }

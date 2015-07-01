@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<fragment android:name="edu.northwestern.cbits.purple_robot_manager.activities.probes.LocationProbeFragment"
-	xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/map_fragment"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+    android:layout_height="match_parent">
+    <fragment android:name="edu.northwestern.cbits.purple_robot_manager.activities.probes.LocationProbeFragment"
+        android:id="@+id/map_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_marginTop="0dp"
+        android:layout_height="8dp"
+        android:layout_gravity="top"
+        android:background="@drawable/shadow" />
+</FrameLayout>

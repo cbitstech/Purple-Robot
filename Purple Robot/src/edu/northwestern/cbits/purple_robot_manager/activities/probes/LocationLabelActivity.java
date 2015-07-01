@@ -37,7 +37,9 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.calibration.LocationCalibrationHelper;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.FusedLocationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RawLocationProbe;
 import edu.northwestern.cbits.purple_robot_manager.util.DBSCAN;
 import edu.northwestern.cbits.purple_robot_manager.util.DBSCAN.Cluster;
 import edu.northwestern.cbits.purple_robot_manager.util.DBSCAN.Point;
@@ -62,6 +64,28 @@ public class LocationLabelActivity extends AppCompatActivity
         {
             dbscan.addPoint(new Point(cursor.getDouble(cursor.getColumnIndex(LocationProbe.LATITUDE_KEY)), cursor
                     .getDouble(cursor.getColumnIndex(LocationProbe.LONGITUDE_KEY))));
+        }
+
+        cursor.close();
+
+        cursor = ProbeValuesProvider.getProvider(this).retrieveValues(this, RawLocationProbe.DB_TABLE,
+                RawLocationProbe.databaseSchema());
+
+        while (cursor.moveToNext())
+        {
+            dbscan.addPoint(new Point(cursor.getDouble(cursor.getColumnIndex(RawLocationProbe.LATITUDE_KEY)), cursor
+                    .getDouble(cursor.getColumnIndex(RawLocationProbe.LONGITUDE_KEY))));
+        }
+
+        cursor.close();
+
+        cursor = ProbeValuesProvider.getProvider(this).retrieveValues(this, FusedLocationProbe.DB_TABLE,
+                FusedLocationProbe.databaseSchema());
+
+        while (cursor.moveToNext())
+        {
+            dbscan.addPoint(new Point(cursor.getDouble(cursor.getColumnIndex(FusedLocationProbe.LATITUDE_KEY)), cursor
+                    .getDouble(cursor.getColumnIndex(FusedLocationProbe.LONGITUDE_KEY))));
         }
 
         cursor.close();

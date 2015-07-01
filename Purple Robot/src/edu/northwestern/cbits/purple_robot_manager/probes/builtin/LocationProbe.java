@@ -81,6 +81,7 @@ public class LocationProbe extends Probe implements LocationListener
             Class.forName("com.google.android.maps.MapActivity");
 
             Intent i = new Intent(context, LocationProbeActivity.class);
+            i.putExtra(LocationProbeActivity.DB_TABLE_NAME, LocationProbe.DB_TABLE);
 
             return i;
         }

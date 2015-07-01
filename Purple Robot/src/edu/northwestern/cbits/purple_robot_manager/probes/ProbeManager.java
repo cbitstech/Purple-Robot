@@ -30,6 +30,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CommunicationE
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CommunicationLogProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.DateCalendarProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.FusedLocationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.GeomagneticRotationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.GravityProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.HardwareInformationProbe;
@@ -284,6 +285,13 @@ public class ProbeManager
             else if (probe instanceof RawLocationProbe)
             {
                 RawLocationProbe location = (RawLocationProbe) probe;
+
+                if (location.name(context).equalsIgnoreCase(name))
+                    found = true;
+            }
+            else if (probe instanceof FusedLocationProbe)
+            {
+                FusedLocationProbe location = (FusedLocationProbe) probe;
 
                 if (location.name(context).equalsIgnoreCase(name))
                     found = true;

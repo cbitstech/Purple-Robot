@@ -46,6 +46,7 @@ public abstract class Probe
     public static final Object PROBE_TYPE_DOUBLE = "double";
     public static final String PROBE_TYPE = "type";
     public static final String PROBE_VALUES = "values";
+    public static final String PROBE_DISTANCE = "distance";
 
     private static List<Class<Probe>> _probeClasses = new ArrayList<>();
 

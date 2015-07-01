@@ -21,6 +21,9 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
 @SuppressLint("SimpleDateFormat")
 public class LocationProbeActivity extends AppCompatActivity
 {
+    public static final String DB_TABLE_NAME = "DB_TABLE_NAME";
+    private String _tableName = null;
+
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
@@ -34,8 +37,12 @@ public class LocationProbeActivity extends AppCompatActivity
         long minTime = Long.MAX_VALUE;
         long maxTime = Long.MIN_VALUE;
 
-        Cursor cursor = ProbeValuesProvider.getProvider(this).retrieveValues(this, LocationProbe.DB_TABLE,
-                LocationProbe.databaseSchema());
+        this._tableName = this.getIntent().getStringExtra(LocationProbeActivity.DB_TABLE_NAME);
+
+        if (this._tableName == null)
+            this._tableName = LocationProbe.DB_TABLE;
+
+        Cursor cursor = ProbeValuesProvider.getProvider(this).retrieveValues(this, this._tableName, LocationProbe.databaseSchema());
 
         while (cursor.moveToNext())
         {
@@ -59,6 +66,8 @@ public class LocationProbeActivity extends AppCompatActivity
         this.getSupportActionBar().setSubtitle(subtitle);
 
         cursor.close();
+
+        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     public boolean onCreateOptionsMenu(Menu menu)
@@ -90,6 +99,10 @@ public class LocationProbeActivity extends AppCompatActivity
             dataIntent.putExtra("probe_bundle", this.getIntent().getParcelableExtra("probe_bundle"));
 
             this.startActivity(dataIntent);
+        }
+        else if (itemId == android.R.id.home)
+        {
+            this.finish();
         }
 
         return true;
