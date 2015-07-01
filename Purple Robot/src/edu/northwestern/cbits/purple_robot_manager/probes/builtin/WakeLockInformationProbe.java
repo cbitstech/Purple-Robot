@@ -163,10 +163,10 @@ public class WakeLockInformationProbe extends Probe
     @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
-        int partialCount = bundle.getInt(WakeLockInformationProbe.PARTIAL_COUNT);
-        int dimCount = bundle.getInt(WakeLockInformationProbe.DIM_COUNT);
-        int brightCount = bundle.getInt(WakeLockInformationProbe.BRIGHT_COUNT);
-        int fullCount = bundle.getInt(WakeLockInformationProbe.FULL_COUNT);
+        int partialCount = (int) bundle.getDouble(WakeLockInformationProbe.PARTIAL_COUNT);
+        int dimCount =  (int) bundle.getDouble(WakeLockInformationProbe.DIM_COUNT);
+        int brightCount =  (int) bundle.getDouble(WakeLockInformationProbe.BRIGHT_COUNT);
+        int fullCount =  (int) bundle.getDouble(WakeLockInformationProbe.FULL_COUNT);
 
         return String.format(context.getResources().getString(R.string.summary_wakelock_info_probe), partialCount, dimCount, brightCount, fullCount);
     }
