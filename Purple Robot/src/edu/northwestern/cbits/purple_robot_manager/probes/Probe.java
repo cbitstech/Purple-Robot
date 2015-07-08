@@ -48,6 +48,9 @@ public abstract class Probe
     public static final String PROBE_VALUES = "values";
     public static final String PROBE_DISTANCE = "distance";
     public static final String PROBE_DURATION = "duration";
+    public static final String PROBE_MEDIA_URL = "media_url";
+    public static final String PROBE_MEDIA_CONTENT_TYPE = "media_content_type";
+    public static final String PROBE_GUID = "GUID";
 
     private static List<Class<Probe>> _probeClasses = new ArrayList<>();
 
@@ -186,7 +189,7 @@ public abstract class Probe
         if (context != null)
         {
             UUID uuid = UUID.randomUUID();
-            data.putString("GUID", uuid.toString());
+            data.putString(Probe.PROBE_GUID, uuid.toString());
 
             LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(context);
             Intent intent = new Intent(edu.northwestern.cbits.purple_robot_manager.probes.Probe.PROBE_READING);

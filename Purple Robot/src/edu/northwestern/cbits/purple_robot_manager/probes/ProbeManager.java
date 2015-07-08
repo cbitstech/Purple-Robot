@@ -64,6 +64,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.devices.wear.WearHeart
 import edu.northwestern.cbits.purple_robot_manager.probes.devices.wear.WearLightProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.devices.wear.WearLivewellActivityCountProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.devices.wear.WearMagneticFieldProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.media.AudioCaptureProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.services.FitbitBetaProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.studies.LivewellActivityCountsProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.studies.LivewellPebbleActivityCountsProbe;
@@ -120,7 +121,11 @@ public class ProbeManager
 
                     ProbeManager._probeInstances.add(probe);
                 }
-                catch (InstantiationException | IllegalAccessException e)
+                catch (InstantiationException e)
+                {
+                    LogManager.getInstance(context).logException(e);
+                }
+                catch (IllegalAccessException e)
                 {
                     LogManager.getInstance(context).logException(e);
                 }
@@ -693,6 +698,13 @@ public class ProbeManager
                 WakeLockInformationProbe wakelock = (WakeLockInformationProbe) probe;
 
                 if (wakelock.name(context).equalsIgnoreCase(name))
+                    found = true;
+            }
+            else if (probe instanceof AudioCaptureProbe)
+            {
+                AudioCaptureProbe audio = (AudioCaptureProbe) probe;
+
+                if (audio.name(context).equalsIgnoreCase(name))
                     found = true;
             }
 

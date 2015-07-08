@@ -102,6 +102,7 @@
         <item>studies.LivewellPebbleActivityCountsProbe</item>
 
         <item>builtin.WakeLockInformationProbe</item>
+        <item>media.AudioCaptureProbe</item>
     </array>
 
 	<array name="output_plugin_classes">

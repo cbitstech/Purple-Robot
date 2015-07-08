@@ -1079,6 +1079,7 @@
     <string name="probe_sensor_category">Hardware Sensor Probes</string>
     <string name="probe_studies_category">Study-Specific Probes</string>
     <string name="probe_beta_category">Beta &amp; Testing Probes</string>
+    <string name="probe_media_capture_category">Media Capture &amp; Recording Probes</string>
 
     <!-- Audio features probe -->
     <string name="title_audio_features_probe">Audio Features Probe</string>
@@ -1087,6 +1088,8 @@
     <string name="probe_audio_feature_duration_label">Sampling Duration</string>
     <string name="probe_audio_feature_sample_rate_label">Maximum Sample Rate</string>
 
+    <string name="title_audio_capture_probe">Audio Capture Probe</string>
+    <string name="summary_audio_capture_probe_desc">Periodically creates a recording of the audio environment.</string>
 
     <!-- Comm. events probe -->
     <string name="title_communication_event_probe">Communication Events Probe</string>
