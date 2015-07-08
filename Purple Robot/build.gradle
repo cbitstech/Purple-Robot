@@ -46,6 +46,7 @@ android {
     dependencies {
         compile fileTree(dir: 'libs', include: '*.jar')
 	    wearApp project(':watch')
+        compile 'com.squareup.okhttp:okhttp:2.4.0'
         compile 'com.android.support:appcompat-v7:22.2.0'
         compile 'com.android.support:design:22.2.0'
         compile 'com.android.support:mediarouter-v7:22.1.1'
@@ -66,6 +67,9 @@ android {
     packagingOptions {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
     }
 
     signingConfigs {
