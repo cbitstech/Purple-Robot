@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.mutable.MutableInt;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -26,7 +27,6 @@ import android.net.wifi.ScanResult;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.util.MutableInt;
 
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactory;
@@ -106,11 +106,11 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
                                 String[] priorityFilenames = pendingFolder.list(new FilenameFilter() {
                                     public boolean accept(File dir, String filename) {
                                         // Only return first 256 for performance reasons...
-                                        if (found.value >= 256)
+                                        if (found.intValue() >= 256)
                                             return false;
 
                                         if (filename.endsWith(StreamingJacksonUploadPlugin.PRIORITY_FILE_EXTENSION)) {
-                                            found.value += 1;
+                                            found.add(1);
 
                                             return true;
                                         }
@@ -126,7 +126,7 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
                             filenames = me._priorityFilenames.toArray(new String[0]);
                         }
 
-                        if (filenames == null || found.value == 0)
+                        if (filenames == null || found.intValue() == 0)
                         {
                             me._hasPriorityPayloads = false;
 
@@ -134,11 +134,11 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
                                 String[] regularFilenames = pendingFolder.list(new FilenameFilter() {
                                     public boolean accept(File dir, String filename) {
                                         // Only return first 1024 for performance reasons...
-                                        if (found.value >= 1024)
+                                        if (found.intValue() >= 1024)
                                             return false;
 
                                         if (filename.endsWith(StreamingJacksonUploadPlugin.FILE_EXTENSION)) {
-                                            found.value += 1;
+                                            found.add(1);
 
                                             return true;
                                         }
