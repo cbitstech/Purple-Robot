@@ -386,7 +386,7 @@
     <string name="title_external_storage_enabled">Use External Storage</string>
     <string name="summary_external_storage_enabled">Persist data prior to transmission in an publicly-accessible location on the device.</string>
 
-    <string name="probe_frequency_label">Sampling Rate</string>
+    <string name="probe_frequency_label">Sampling Frequency</string>
 
     <string name="display_date_format">HH:mm:ss.SSS, MMM d, yyyy</string>
     <string name="display_raw_data">Raw Values</string>
@@ -416,10 +416,8 @@
     
     <string name="display_humidity_readings">Humidity Measurements</string>
     <string name="display_humidity_reading">%1$.3f%% relative humidity</string>
-    
 
     <string name="display_probe_values">%1$d values</string>
-
 
     <string name="display_bluetooth_devices_title">Visible Devices (%1$d)</string>
     <string name="display_bluetooth_device_title">%1$s: %2$s</string>
@@ -1086,6 +1084,9 @@
     <string name="title_audio_features_probe">Audio Features Probe</string>
     <string name="summary_audio_features_probe_desc">Extracts information about the audible environment at regular intervals.</string>
     <string name="summary_audio_features_probe">Strongest frequency %1$.2f Hz</string>
+    <string name="probe_audio_feature_duration_label">Sampling Duration</string>
+    <string name="probe_audio_feature_sample_rate_label">Maximum Sample Rate</string>
+
 
     <!-- Comm. events probe -->
     <string name="title_communication_event_probe">Communication Events Probe</string>

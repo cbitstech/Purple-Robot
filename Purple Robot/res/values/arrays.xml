@@ -915,4 +915,34 @@
         <item>10 km</item>
         <item>16.0 km (approx. 10 miles)</item>
     </string-array>
+
+    <string-array name="probe_audio_feature_duration_values">
+        <item>1000</item>
+        <item>5000</item>
+        <item>10000</item>
+        <item>15000</item>
+        <item>30000</item>
+    </string-array>
+
+    <string-array name="probe_audio_feature_duration_labels">
+        <item>1 second</item>
+        <item>5 seconds</item>
+        <item>10 seconds</item>
+        <item>15 seconds</item>
+        <item>30 seconds</item>
+    </string-array>
+
+    <string-array name="probe_audio_feature_sample_rate_values">
+        <item>44100</item>
+        <item>22050</item>
+        <item>11025</item>
+        <item>8000</item>
+    </string-array>
+
+    <string-array name="probe_audio_feature_sample_rate_labels">
+        <item>44.1 kHz (CD Quality)</item>
+        <item>22.05 kHz (AM Radio Quality)</item>
+        <item>11.025 Khz (Voice Quality)</item>
+        <item>8 Khz (Telephone Quality)</item>
+    </string-array>
 </resources>
