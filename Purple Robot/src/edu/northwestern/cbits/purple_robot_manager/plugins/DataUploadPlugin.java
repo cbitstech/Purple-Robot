@@ -281,9 +281,7 @@ public abstract class DataUploadPlugin extends OutputPlugin
                 me.broadcastMessage(uploadMessage, false);
 
                 MultipartBuilder builder = new MultipartBuilder();
-
-                builder.type(MultipartBuilder.FORM);
-                builder.addPart(Headers.of("Content-Disposition", "form-data; name=\"json\""), RequestBody.create(null, jsonString));
+                builder = builder.type(MultipartBuilder.FORM);
 
                 ArrayList<File> toDelete = new ArrayList<>();
 
@@ -297,21 +295,24 @@ public abstract class DataUploadPlugin extends OutputPlugin
 
                         if (reading.has(Probe.PROBE_MEDIA_URL))
                         {
+                            Uri u = Uri.parse(reading.getString(Probe.PROBE_MEDIA_URL));
+
                             String mimeType = "application/octet-stream";
 
                             if (reading.has(Probe.PROBE_MEDIA_CONTENT_TYPE))
                                 mimeType = reading.getString(Probe.PROBE_MEDIA_CONTENT_TYPE);
 
                             String guid = reading.getString(Probe.PROBE_GUID);
-                            Uri u = Uri.parse(reading.getString(Probe.PROBE_MEDIA_URL));
                             File file = new File(u.getPath());
 
-                            builder.addPart(Headers.of("Content-Disposition", "form-data; name=\"" + guid + "\""), RequestBody.create(MediaType.parse(mimeType), file));
+                            builder = builder.addFormDataPart(guid, file.getName(), RequestBody.create(MediaType.parse(mimeType), file));
 
                             toDelete.add(file);
                         }
                     }
                 }
+
+                builder = builder.addPart(Headers.of("Content-Disposition", "form-data; name=\"json\""), RequestBody.create(null, jsonString));
 
                 String version = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
 
@@ -376,26 +377,36 @@ public abstract class DataUploadPlugin extends OutputPlugin
             }
             catch (HttpHostConnectException | ConnectTimeoutException e)
             {
+                e.printStackTrace();
+
                 me.broadcastMessage(context.getString(R.string.message_http_connection_error), true);
                 LogManager.getInstance(context).logException(e);
             } catch (SocketTimeoutException e)
             {
+                e.printStackTrace();
+
                 me.broadcastMessage(context.getString(R.string.message_socket_timeout_error), true);
                 LogManager.getInstance(me.getContext()).logException(e);
             }
             catch (SocketException e)
             {
+                e.printStackTrace();
+
                 String errorMessage = String.format(context.getString(R.string.message_socket_error), e.getMessage());
                 me.broadcastMessage(errorMessage, true);
                 LogManager.getInstance(me.getContext()).logException(e);
             }
             catch (UnknownHostException e)
             {
+                e.printStackTrace();
+
                 me.broadcastMessage(context.getString(R.string.message_unreachable_error), true);
                 LogManager.getInstance(me.getContext()).logException(e);
             }
             catch (JSONException e)
             {
+                e.printStackTrace();
+
                 me.broadcastMessage(context.getString(R.string.message_response_error), true);
                 LogManager.getInstance(me.getContext()).logException(e);
             }
