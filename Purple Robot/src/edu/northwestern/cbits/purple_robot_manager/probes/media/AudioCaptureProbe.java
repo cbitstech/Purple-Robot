@@ -1,14 +1,20 @@
 package edu.northwestern.cbits.purple_robot_manager.probes.media;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.media.MediaRecorder;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.support.v4.app.NotificationCompat;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,8 +25,10 @@ import java.io.IOException;
 import java.util.Map;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.StartActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class AudioCaptureProbe extends Probe
@@ -30,6 +38,8 @@ public class AudioCaptureProbe extends Probe
     private static final String FREQUENCY = "config_probe_audio_capture_frequency";
     private static final String DURATION = "config_probe_audio_capture_duration";
     private static final String DEFAULT_DURATION = "15000";
+    private static final int NOTE_ID = 684756384;
+    private static final String RECORDING_DURATION = "RECORDING_DURATION";
 
     private boolean _recording = false;
     private long _lastCheck = System.currentTimeMillis();
@@ -109,6 +119,23 @@ public class AudioCaptureProbe extends Probe
                 if (now - this._lastCheck > freq) {
                     this._recording = true;
 
+                    final NotificationManager noteManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+                    PendingIntent contentIntent = PendingIntent.getActivity(context, AudioCaptureProbe.NOTE_ID, new Intent(context, StartActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+
+                    NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+                    builder = builder.setContentIntent(contentIntent);
+                    builder = builder.setContentTitle(context.getString(R.string.notify_audio_recording_active));
+                    builder.setOngoing(true);
+
+                    builder = builder.setSmallIcon(R.drawable.ic_note_mic);
+                    builder = builder.setContentText(context.getString(R.string.notify_audio_recording_active_details));
+                    builder = builder.setTicker(context.getString(R.string.notify_audio_recording_active));
+
+                    Notification note = builder.build();
+
+                    noteManager.notify(AudioCaptureProbe.NOTE_ID, note);
+
                     Runnable r = new Runnable() {
                         @Override
                         @SuppressWarnings("deprecation")
@@ -145,6 +172,8 @@ public class AudioCaptureProbe extends Probe
                                 recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
 
                                 recorder.prepare();
+
+                                final long start = System.currentTimeMillis();
                                 recorder.start();
 
                                 Runnable stop = new Runnable()
@@ -161,11 +190,15 @@ public class AudioCaptureProbe extends Probe
                                         }
 
                                         recorder.stop();
+                                        long end = System.currentTimeMillis();
                                         recorder.release();
 
+                                        bundle.putLong(AudioCaptureProbe.RECORDING_DURATION, end - start);
                                         bundle.putString(Probe.PROBE_MEDIA_URL, Uri.fromFile(audioFile).toString());
                                         bundle.putString(Probe.PROBE_MEDIA_CONTENT_TYPE, "audio/mp4");
                                         me.transmitData(context, bundle);
+
+                                        noteManager.cancel(AudioCaptureProbe.NOTE_ID);
                                         me._recording = false;
                                     }
                                 };
@@ -178,12 +211,14 @@ public class AudioCaptureProbe extends Probe
                                 LogManager.getInstance(context).logException(e);
 
                                 me._recording = false;
+                                noteManager.cancel(AudioCaptureProbe.NOTE_ID);
                             }
                             catch (IllegalStateException e)
                             {
                                 LogManager.getInstance(context).logException(e);
 
                                 me._recording = false;
+                                noteManager.cancel(AudioCaptureProbe.NOTE_ID);
                             }
                         }
                     };
@@ -229,14 +264,14 @@ public class AudioCaptureProbe extends Probe
         e.commit();
     }
 
-/*    @Override
+    @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
-        double freq = bundle.getDouble("FREQUENCY");
+        long duration = (long) bundle.getDouble(AudioCaptureProbe.RECORDING_DURATION);
 
-        return String.format(context.getResources().getString(R.string.summary_audio_capture_probe), freq);
+        return String.format(context.getResources().getString(R.string.summary_audio_capture_probe), duration);
     }
-*/
+
     @Override
     public JSONObject fetchSettings(Context context)
     {

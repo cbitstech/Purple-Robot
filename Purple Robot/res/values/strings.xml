@@ -1084,12 +1084,13 @@
     <!-- Audio features probe -->
     <string name="title_audio_features_probe">Audio Features Probe</string>
     <string name="summary_audio_features_probe_desc">Extracts information about the audible environment at regular intervals.</string>
-    <string name="summary_audio_features_probe">Strongest frequency %1$.2f Hz</string>
+    <string name="summary_audio_features_probe">Strongest frequency: %1$.2f Hz</string>
     <string name="probe_audio_feature_duration_label">Sampling Duration</string>
     <string name="probe_audio_feature_sample_rate_label">Maximum Sample Rate</string>
 
     <string name="title_audio_capture_probe">Audio Capture Probe</string>
     <string name="summary_audio_capture_probe_desc">Periodically creates a recording of the audio environment.</string>
+    <string name="summary_audio_capture_probe">%1$d milliseconds of audio recorded</string>
 
     <!-- Comm. events probe -->
     <string name="title_communication_event_probe">Communication Events Probe</string>
@@ -1584,4 +1585,7 @@
     <string name="title_wakelock_info_probe">Wake Lock Information</string>
     <string name="summary_wakelock_info_probe_desc">Reports details about wake locks that affect power management and efficiency.</string>
     <string name="summary_wakelock_info_probe">Wake Locks: %1$d Partial, %2$d Dim, %3$d Bright, %4$d Full</string>
+
+    <string name="notify_audio_recording_active">Audio Recording</string>
+    <string name="notify_audio_recording_active_details">The audio capture probe is currently recording&#8230;</string>
 </resources>
