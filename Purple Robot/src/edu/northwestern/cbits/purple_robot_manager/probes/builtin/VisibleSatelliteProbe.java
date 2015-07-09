@@ -377,7 +377,7 @@ public class VisibleSatelliteProbe extends Probe implements GpsStatus.Listener, 
     public String summarizeValue(Context context, Bundle bundle)
     {
         int count = (int) bundle.getDouble("SATELLITE_COUNT");
-        float snr = bundle.getFloat("AVERAGE_SIGNAL_RATIO");
+        double snr = bundle.getDouble("AVERAGE_SIGNAL_RATIO");
 
         return String.format(context.getResources().getString(R.string.summary_satellite_probe), count, snr);
     }
