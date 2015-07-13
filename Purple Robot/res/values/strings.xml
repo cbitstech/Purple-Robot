@@ -1588,4 +1588,6 @@
 
     <string name="notify_audio_recording_active">Audio Recording</string>
     <string name="notify_audio_recording_active_details">The audio capture probe is currently recording&#8230;</string>
+
+    <string name="permission_fetch_data">fetch data from Purple Robot</string>
 </resources>
