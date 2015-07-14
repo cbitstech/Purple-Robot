@@ -18,6 +18,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Map;
 
@@ -70,8 +71,11 @@ public class FitbitBetaProbe extends Probe
 //    private static final String ENABLE_ELEVATION = "config_fitbit-beta_enable_elevation";
 //    private static final boolean DEFAULT_ENABLE_ELEVATION = false;
 
-
     private long _lastUpdate = 0;
+    private long _lastStepTimestamp = 0;
+    private long _lastCalorieTimestamp = 0;
+    private long _lastDistanceTimestamp = 0;
+    private long _lastHeartTimestamp = 0;
 
     @Override
     public String summary(Context context)
@@ -200,7 +204,8 @@ public class FitbitBetaProbe extends Probe
                                         JSONArray stepsValues = stepsIntraday.getJSONArray("dataset");
 
                                         long[] steps = new long[stepsValues.length()];
-                                        long[] stepTimestamps = new long[stepsValues.length()];
+
+                                        ArrayList<Long> stepTimestamps = new ArrayList<>();
 
                                         Calendar c = Calendar.getInstance();
 
@@ -219,10 +224,20 @@ public class FitbitBetaProbe extends Probe
                                             c.set(Calendar.SECOND, Integer.parseInt(tokens[2]));
                                             c.set(Calendar.MILLISECOND, 0);
 
-                                            stepTimestamps[i] = c.getTimeInMillis();
+                                            long timestamp = c.getTimeInMillis();
+
+                                            if (timestamp > me._lastStepTimestamp) {
+                                                stepTimestamps.add(timestamp);
+                                                me._lastStepTimestamp = timestamp;
+                                            }
                                         }
 
-                                        bundle.putLongArray(FitbitBetaProbe.STEP_TIMESTAMPS, stepTimestamps);
+                                        long[] timestamps = new long[stepTimestamps.size()];
+
+                                        for (int i = 0; i < stepTimestamps.size(); i++)
+                                            timestamps[i] = stepTimestamps.get(i);
+
+                                        bundle.putLongArray(FitbitBetaProbe.STEP_TIMESTAMPS, timestamps);
                                         bundle.putLongArray(FitbitBetaProbe.STEPS, steps);
                                     }
 
@@ -234,7 +249,7 @@ public class FitbitBetaProbe extends Probe
                                         JSONArray valuesArray = intraday.getJSONArray("dataset");
 
                                         long[] values = new long[valuesArray.length()];
-                                        long[] valueTimestamps = new long[valuesArray.length()];
+                                        ArrayList<Long> valueTimestamps = new ArrayList<>();
 
                                         Calendar c = Calendar.getInstance();
 
@@ -253,10 +268,20 @@ public class FitbitBetaProbe extends Probe
                                             c.set(Calendar.SECOND, Integer.parseInt(tokens[2]));
                                             c.set(Calendar.MILLISECOND, 0);
 
-                                            valueTimestamps[i] = c.getTimeInMillis();
+                                            long timestamp = c.getTimeInMillis();
+
+                                            if (timestamp > me._lastCalorieTimestamp) {
+                                                valueTimestamps.add(timestamp);
+                                                me._lastCalorieTimestamp = timestamp;
+                                            }
                                         }
 
-                                        bundle.putLongArray(FitbitBetaProbe.CALORIES_TIMESTAMPS, valueTimestamps);
+                                        long[] timestamps = new long[valueTimestamps.size()];
+
+                                        for (int i = 0; i < valueTimestamps.size(); i++)
+                                            timestamps[i] = valueTimestamps.get(i);
+
+                                        bundle.putLongArray(FitbitBetaProbe.CALORIES_TIMESTAMPS, timestamps);
                                         bundle.putLongArray(FitbitBetaProbe.CALORIES, values);
                                     }
 
@@ -268,7 +293,7 @@ public class FitbitBetaProbe extends Probe
                                         JSONArray valuesArray = intraday.getJSONArray("dataset");
 
                                         long[] values = new long[valuesArray.length()];
-                                        long[] valueTimestamps = new long[valuesArray.length()];
+                                        ArrayList<Long> valueTimestamps = new ArrayList<>();
 
                                         Calendar c = Calendar.getInstance();
 
@@ -287,10 +312,20 @@ public class FitbitBetaProbe extends Probe
                                             c.set(Calendar.SECOND, Integer.parseInt(tokens[2]));
                                             c.set(Calendar.MILLISECOND, 0);
 
-                                            valueTimestamps[i] = c.getTimeInMillis();
+                                            long timestamp = c.getTimeInMillis();
+
+                                            if (timestamp > me._lastDistanceTimestamp) {
+                                                valueTimestamps.add(timestamp);
+                                                me._lastDistanceTimestamp = timestamp;
+                                            }
                                         }
 
-                                        bundle.putLongArray(FitbitBetaProbe.DISTANCE_TIMESTAMPS, valueTimestamps);
+                                        long[] timestamps = new long[valueTimestamps.size()];
+
+                                        for (int i = 0; i < valueTimestamps.size(); i++)
+                                            timestamps[i] = valueTimestamps.get(i);
+
+                                        bundle.putLongArray(FitbitBetaProbe.DISTANCE_TIMESTAMPS, timestamps);
                                         bundle.putLongArray(FitbitBetaProbe.DISTANCE, values);
                                     }
 
@@ -338,7 +373,7 @@ public class FitbitBetaProbe extends Probe
                                         JSONArray valuesArray = intraday.getJSONArray("dataset");
 
                                         long[] values = new long[valuesArray.length()];
-                                        long[] valueTimestamps = new long[valuesArray.length()];
+                                        ArrayList<Long> valueTimestamps = new ArrayList<>();
 
                                         Calendar c = Calendar.getInstance();
 
@@ -357,10 +392,20 @@ public class FitbitBetaProbe extends Probe
                                             c.set(Calendar.SECOND, Integer.parseInt(tokens[2]));
                                             c.set(Calendar.MILLISECOND, 0);
 
-                                            valueTimestamps[i] = c.getTimeInMillis();
+                                            long timestamp = c.getTimeInMillis();
+
+                                            if (timestamp > me._lastHeartTimestamp) {
+                                                valueTimestamps.add(timestamp);
+                                                me._lastHeartTimestamp = timestamp;
+                                            }
                                         }
 
-                                        bundle.putLongArray(FitbitBetaProbe.HEART_TIMESTAMPS, valueTimestamps);
+                                        long[] timestamps = new long[valueTimestamps.size()];
+
+                                        for (int i = 0; i < valueTimestamps.size(); i++)
+                                            timestamps[i] = valueTimestamps.get(i);
+
+                                        bundle.putLongArray(FitbitBetaProbe.HEART_TIMESTAMPS, timestamps);
                                         bundle.putLongArray(FitbitBetaProbe.HEART, values);
                                     }
 
