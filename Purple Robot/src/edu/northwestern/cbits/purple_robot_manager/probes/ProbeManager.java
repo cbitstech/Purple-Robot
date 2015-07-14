@@ -65,6 +65,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.devices.wear.WearLight
 import edu.northwestern.cbits.purple_robot_manager.probes.devices.wear.WearLivewellActivityCountProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.devices.wear.WearMagneticFieldProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.media.AudioCaptureProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.sensors.AccelerometerSensorProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.services.FitbitBetaProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.studies.LivewellActivityCountsProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.studies.LivewellPebbleActivityCountsProbe;
@@ -705,6 +706,13 @@ public class ProbeManager
                 AudioCaptureProbe audio = (AudioCaptureProbe) probe;
 
                 if (audio.name(context).equalsIgnoreCase(name))
+                    found = true;
+            }
+            else if (probe instanceof AccelerometerSensorProbe)
+            {
+                AccelerometerSensorProbe accelerometer = (AccelerometerSensorProbe) probe;
+
+                if (accelerometer.name(context).equalsIgnoreCase(name))
                     found = true;
             }
 

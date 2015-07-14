@@ -386,7 +386,9 @@
     <string name="title_external_storage_enabled">Use External Storage</string>
     <string name="summary_external_storage_enabled">Persist data prior to transmission in an publicly-accessible location on the device.</string>
 
+    <string name="probe_sensor_frequency_label">Sensor Frequency</string>
     <string name="probe_frequency_label">Sampling Frequency</string>
+    <string name="probe_duration_label">Sampling Duration</string>
 
     <string name="display_date_format">HH:mm:ss.SSS, MMM d, yyyy</string>
     <string name="display_raw_data">Raw Values</string>
@@ -553,6 +555,11 @@
     <!-- Accelerometer Probe -->
     <string name="title_wear_accelerometer_probe">Android Wear Accelerometer Probe</string>
     <string name="summary_wear_accelerometer_probe_desc">Measures the acceleration applied to the Android Wear device. All values are in SI units (m/s^2).</string>
+
+    <!-- Accelerometer Sensor Probe -->
+    <string name="title_accelerometer_sensor_probe">Accelerometer Sensor Probe</string>
+    <string name="summary_accelerometer_sensor_probe_desc">Measures the acceleration applied to the device. All values are in SI units (m/s^2).</string>
+    <string name="summary_accelerator_sensor_probe">%1$.1f kB of accelerometer data</string>
 
     <!-- Gravity Probe -->
     <string name="title_gravity_probe">Gravity Probe</string>

@@ -28,6 +28,7 @@ public abstract class Probe
 
     public static final String PROBE_CALIBRATION_NOTIFICATIONS = "enable_calibration_notifications";
     public static final String PROBE_FREQUENCY = "frequency";
+    public static final String PROBE_SAMPLE_FREQUENCY = "sample_frequency";
     public static final String HASH_DATA = "hash_data";
 
     public static final String DEFAULT_FREQUENCY = "300000";
@@ -50,6 +51,8 @@ public abstract class Probe
     public static final String PROBE_DURATION = "duration";
     public static final String PROBE_MEDIA_URL = "media_url";
     public static final String PROBE_MEDIA_CONTENT_TYPE = "media_content_type";
+    public static final String PROBE_MEDIA_SIZE = "media_size";
+
     public static final String PROBE_GUID = "GUID";
 
     private static List<Class<Probe>> _probeClasses = new ArrayList<>();

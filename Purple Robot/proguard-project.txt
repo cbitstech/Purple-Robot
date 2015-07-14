@@ -77,6 +77,11 @@
 -dontwarn com.google.android.maps.**
 -dontwarn java.nio.file.**
 -dontwarn org.codehaus.mojo.**
+-dontwarn javax.tools.**
+-dontwarn com.sun.jdi.**
+-dontwarn com.sun.jdi.**
+-dontwarn java.applet.**
+
 
 -keep class edu.northwestern.cbits.** { *; }
 -keep class jscheme.** { *; }

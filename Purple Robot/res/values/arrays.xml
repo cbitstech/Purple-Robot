@@ -94,6 +94,8 @@
         <item>devices.wear.WearGyroscopeProbe</item>
         <item>devices.wear.WearMagneticFieldProbe</item>
 
+        <item>sensors.AccelerometerSensorProbe</item>
+
         <item>builtin.TouchEventsProbe</item>
         <!-- <item>builtin.BluetoothReceiverProbe</item> -->
         <!-- <item>builtin.ZeroconfProbe</item> -->
@@ -140,7 +142,23 @@
        	<item>2 minutes</item>
     </string-array>
 
-	<string-array name="frequency_probe_duration_values">
+    <string-array name="probe_duration_with_none_values">
+        <item>0</item>
+        <item>5</item>
+        <item>15</item>
+        <item>60</item>
+        <item>120</item>
+    </string-array>
+
+    <string-array name="probe_duration_with_none_labels">
+        <item>Continuous</item>
+        <item>5 seconds</item>
+        <item>15 seconds</item>
+        <item>1 minute</item>
+        <item>2 minutes</item>
+    </string-array>
+
+    <string-array name="frequency_probe_duration_values">
         <item>0</item>
         <item>5</item>
         <item>15</item>
@@ -349,16 +367,6 @@
         <item>1800000</item>
  	</string-array>
 
-	<string-array name="probe_low_frequency_labels">
-        <item>Every minute</item>
-        <item>Every 5 minutes</item>
-        <item>Every 30 minutes</item>
-        <item>Every hour</item>
-        <item>Every 4 hours</item>
-        <item>Every 12 hours</item>
-        <item>Every day</item>
-   	</string-array>
-
 	<string-array name="probe_activity_recognition_frequency_values">
         <item>0</item>
         <item>1000</item>
@@ -386,8 +394,33 @@
         <item>Every 12 hours</item>
         <item>Every day</item>
    	</string-array>
-	
-	
+
+    <string-array name="probe_sample_frequency_labels">
+        <item>Every minute</item>
+        <item>Every 5 minutes</item>
+        <item>Every 30 minutes</item>
+        <item>Every hour</item>
+    </string-array>
+
+    <string-array name="probe_sample_frequency_values">
+        <item>60000</item>
+        <item>300000</item>
+        <item>600000</item>
+        <item>1800000</item>
+        <item>3600000</item>
+    </string-array>
+
+
+    <string-array name="probe_low_frequency_labels">
+        <item>Every minute</item>
+        <item>Every 5 minutes</item>
+        <item>Every 30 minutes</item>
+        <item>Every hour</item>
+        <item>Every 4 hours</item>
+        <item>Every 12 hours</item>
+        <item>Every day</item>
+    </string-array>
+
 	<string-array name="probe_low_frequency_values">
         <item>60000</item>
         <item>300000</item>
