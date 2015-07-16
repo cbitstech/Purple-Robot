@@ -203,17 +203,14 @@ public class FitbitBetaProbe extends Probe
                                         JSONObject stepsIntraday = stepsObj.getJSONObject("activities-steps-intraday");
                                         JSONArray stepsValues = stepsIntraday.getJSONArray("dataset");
 
-                                        long[] steps = new long[stepsValues.length()];
-
                                         ArrayList<Long> stepTimestamps = new ArrayList<>();
+                                        ArrayList<Long> valueList = new ArrayList<>();
 
                                         Calendar c = Calendar.getInstance();
 
                                         for (int i = 0; i < stepsValues.length(); i++)
                                         {
                                             JSONObject value = stepsValues.getJSONObject(i);
-
-                                            steps[i] = value.getLong("value");
 
                                             String time = value.getString("time");
 
@@ -229,13 +226,18 @@ public class FitbitBetaProbe extends Probe
                                             if (timestamp > me._lastStepTimestamp) {
                                                 stepTimestamps.add(timestamp);
                                                 me._lastStepTimestamp = timestamp;
+
+                                                valueList.add(value.getLong("value"));
                                             }
                                         }
 
                                         long[] timestamps = new long[stepTimestamps.size()];
+                                        long[] steps = new long[stepTimestamps.size()];
 
-                                        for (int i = 0; i < stepTimestamps.size(); i++)
+                                        for (int i = 0; i < stepTimestamps.size(); i++) {
                                             timestamps[i] = stepTimestamps.get(i);
+                                            steps[i] = valueList.get(i);
+                                        }
 
                                         bundle.putLongArray(FitbitBetaProbe.STEP_TIMESTAMPS, timestamps);
                                         bundle.putLongArray(FitbitBetaProbe.STEPS, steps);
@@ -248,16 +250,14 @@ public class FitbitBetaProbe extends Probe
                                         JSONObject intraday = stepsObj.getJSONObject("activities-calories-intraday");
                                         JSONArray valuesArray = intraday.getJSONArray("dataset");
 
-                                        long[] values = new long[valuesArray.length()];
                                         ArrayList<Long> valueTimestamps = new ArrayList<>();
+                                        ArrayList<Long> valueList = new ArrayList<>();
 
                                         Calendar c = Calendar.getInstance();
 
                                         for (int i = 0; i < valuesArray.length(); i++)
                                         {
                                             JSONObject value = valuesArray.getJSONObject(i);
-
-                                            values[i] = value.getLong("value");
 
                                             String time = value.getString("time");
 
@@ -273,13 +273,18 @@ public class FitbitBetaProbe extends Probe
                                             if (timestamp > me._lastCalorieTimestamp) {
                                                 valueTimestamps.add(timestamp);
                                                 me._lastCalorieTimestamp = timestamp;
+
+                                                valueList.add(value.getLong("value"));
                                             }
                                         }
 
                                         long[] timestamps = new long[valueTimestamps.size()];
+                                        long[] values = new long[valueList.size()];
 
-                                        for (int i = 0; i < valueTimestamps.size(); i++)
+                                        for (int i = 0; i < valueTimestamps.size(); i++) {
                                             timestamps[i] = valueTimestamps.get(i);
+                                            values[i] = valueList.get(i);
+                                        }
 
                                         bundle.putLongArray(FitbitBetaProbe.CALORIES_TIMESTAMPS, timestamps);
                                         bundle.putLongArray(FitbitBetaProbe.CALORIES, values);
@@ -292,16 +297,14 @@ public class FitbitBetaProbe extends Probe
                                         JSONObject intraday = stepsObj.getJSONObject("activities-distance-intraday");
                                         JSONArray valuesArray = intraday.getJSONArray("dataset");
 
-                                        long[] values = new long[valuesArray.length()];
                                         ArrayList<Long> valueTimestamps = new ArrayList<>();
+                                        ArrayList<Long> valueList = new ArrayList<>();
 
                                         Calendar c = Calendar.getInstance();
 
                                         for (int i = 0; i < valuesArray.length(); i++)
                                         {
                                             JSONObject value = valuesArray.getJSONObject(i);
-
-                                            values[i] = value.getLong("value");
 
                                             String time = value.getString("time");
 
@@ -317,13 +320,18 @@ public class FitbitBetaProbe extends Probe
                                             if (timestamp > me._lastDistanceTimestamp) {
                                                 valueTimestamps.add(timestamp);
                                                 me._lastDistanceTimestamp = timestamp;
+
+                                                valueList.add(value.getLong("value"));
                                             }
                                         }
 
                                         long[] timestamps = new long[valueTimestamps.size()];
+                                        long[] values = new long[valueList.size()];
 
-                                        for (int i = 0; i < valueTimestamps.size(); i++)
+                                        for (int i = 0; i < valueTimestamps.size(); i++) {
                                             timestamps[i] = valueTimestamps.get(i);
+                                            values[i] = valueList.get(i);
+                                        }
 
                                         bundle.putLongArray(FitbitBetaProbe.DISTANCE_TIMESTAMPS, timestamps);
                                         bundle.putLongArray(FitbitBetaProbe.DISTANCE, values);
@@ -372,16 +380,14 @@ public class FitbitBetaProbe extends Probe
                                         JSONObject intraday = stepsObj.getJSONObject("activities-heart-intraday");
                                         JSONArray valuesArray = intraday.getJSONArray("dataset");
 
-                                        long[] values = new long[valuesArray.length()];
                                         ArrayList<Long> valueTimestamps = new ArrayList<>();
+                                        ArrayList<Long> valueList = new ArrayList<>();
 
                                         Calendar c = Calendar.getInstance();
 
                                         for (int i = 0; i < valuesArray.length(); i++)
                                         {
                                             JSONObject value = valuesArray.getJSONObject(i);
-
-                                            values[i] = value.getLong("value");
 
                                             String time = value.getString("time");
 
@@ -397,13 +403,18 @@ public class FitbitBetaProbe extends Probe
                                             if (timestamp > me._lastHeartTimestamp) {
                                                 valueTimestamps.add(timestamp);
                                                 me._lastHeartTimestamp = timestamp;
+
+                                                valueList.add(value.getLong("value"));
                                             }
                                         }
 
                                         long[] timestamps = new long[valueTimestamps.size()];
+                                        long[] values = new long[valueList.size()];
 
-                                        for (int i = 0; i < valueTimestamps.size(); i++)
+                                        for (int i = 0; i < valueTimestamps.size(); i++) {
                                             timestamps[i] = valueTimestamps.get(i);
+                                            values[i] = valueList.get(i);
+                                        }
 
                                         bundle.putLongArray(FitbitBetaProbe.HEART_TIMESTAMPS, timestamps);
                                         bundle.putLongArray(FitbitBetaProbe.HEART, values);
