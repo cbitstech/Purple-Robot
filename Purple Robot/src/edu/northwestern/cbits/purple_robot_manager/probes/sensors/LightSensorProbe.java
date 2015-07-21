@@ -6,6 +6,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 
 import org.msgpack.MessagePack;
 import org.msgpack.packer.Packer;
@@ -21,7 +22,7 @@ import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
-public class AccelerometerSensorProbe extends SensorProbe
+public class LightSensorProbe extends SensorProbe
 {
     private double[] _sensorTimeBuffer = null;
     private double[] _timeBuffer = null;
@@ -32,12 +33,12 @@ public class AccelerometerSensorProbe extends SensorProbe
 
     @Override
     public String getPreferenceKey() {
-        return "accelerometer_sensor";
+        return "light_sensor";
     }
 
     @Override
     protected int getSensorType() {
-        return Sensor.TYPE_ACCELEROMETER;
+        return Sensor.TYPE_LIGHT;
     }
 
     @Override
@@ -64,7 +65,7 @@ public class AccelerometerSensorProbe extends SensorProbe
         this._sensorTimeBuffer = new double[samples];
         this._timeBuffer = new double[samples];
         this._accuracyBuffer = new double[samples];
-        this._valueBuffer = new double[3][samples];
+        this._valueBuffer = new double[1][samples];
 
         this._bufferIndex = 0;
     }
@@ -97,12 +98,12 @@ public class AccelerometerSensorProbe extends SensorProbe
         if (internalStorage != null && !internalStorage.exists())
             internalStorage.mkdirs();
 
-        File folder = new File(internalStorage, "Accelerometer Files");
+        File folder = new File(internalStorage, "Light Sensor Files");
 
         if (folder != null && !folder.exists())
             folder.mkdirs();
 
-        final File accelFile = new File(folder, "accel-" +  now + ".msgpack");
+        final File accelFile = new File(folder, "light-" +  now + ".msgpack");
 
         try
         {
@@ -111,7 +112,7 @@ public class AccelerometerSensorProbe extends SensorProbe
             MessagePack msgpack = new MessagePack();
             Packer packer = msgpack.createPacker(out);
 
-            packer.write("CpuTime,SensorTime,NormalTime,Accuracy,X,Y,Z");
+            packer.write("CpuTime,SensorTime,NormalTime,Accuracy,Lux");
 
             packer.write(Arrays.copyOf(this._timeBuffer, this._bufferIndex));
             packer.write(Arrays.copyOf(this._sensorTimeBuffer, this._bufferIndex));
@@ -142,17 +143,17 @@ public class AccelerometerSensorProbe extends SensorProbe
 
     @Override
     public String name(Context context) {
-        return "edu.northwestern.cbits.purple_robot_manager.probes.sensors.AccelerometerSensorProbe";
+        return "edu.northwestern.cbits.purple_robot_manager.probes.sensors.LightSensorProbe";
     }
 
     @Override
     public String title(Context context) {
-        return context.getString(R.string.title_accelerometer_sensor_probe);
+        return context.getString(R.string.title_light_sensor_probe);
     }
 
     @Override
     public String summary(Context context) {
-        return context.getString(R.string.summary_accelerometer_sensor_probe_desc);
+        return context.getString(R.string.summary_light_sensor_probe_desc);
     }
 
     @Override
@@ -207,7 +208,7 @@ public class AccelerometerSensorProbe extends SensorProbe
 
         size = size / 1024;
 
-        return context.getString(R.string.summary_accelerator_sensor_probe, size);
+        return context.getString(R.string.summary_light_sensor_probe, size);
     }
 
 }

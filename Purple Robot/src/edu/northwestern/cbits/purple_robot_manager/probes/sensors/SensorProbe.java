@@ -18,7 +18,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Date;
 import java.util.Map;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -373,11 +372,11 @@ public abstract class SensorProbe extends Probe implements SensorEventListener
 
     public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
     {
+        String key = this.getPreferenceKey();
+
         PreferenceScreen screen = manager.createPreferenceScreen(context);
         screen.setTitle(this.title(context));
         screen.setSummary(this.summary(context));
-
-        String key = this.getPreferenceKey();
 
         CheckBoxPreference enabled = new CheckBoxPreference(context);
         enabled.setTitle(R.string.title_enable_probe);
@@ -391,7 +390,7 @@ public abstract class SensorProbe extends Probe implements SensorEventListener
         frequency.setEntryValues(this.getResourceSensorFrequencyValues());
         frequency.setEntries(this.getResourceSensorFrequencyLabels());
         frequency.setTitle(R.string.probe_sensor_frequency_label);
-        frequency.setDefaultValue(SensorProbe.DEFAULT_FREQUENCY);
+        frequency.setDefaultValue(SensorProbe.DEFAULT_SENSOR_FREQUENCY);
 
         screen.addPreference(frequency);
 
@@ -403,6 +402,8 @@ public abstract class SensorProbe extends Probe implements SensorEventListener
         sample.setDefaultValue(SensorProbe.DEFAULT_SAMPLE_FREQUENCY);
 
         screen.addPreference(sample);
+
+        String[] sampValues = context.getResources().getStringArray(this.getResourceSampleFrequencyValues());
 
         FlexibleListPreference duration = new FlexibleListPreference(context);
         duration.setKey("config_probe_" + key + "_duration");

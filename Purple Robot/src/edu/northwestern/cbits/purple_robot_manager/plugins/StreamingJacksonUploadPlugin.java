@@ -59,7 +59,7 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
 
     private long _lastAttempt = 0;
     private File _currentFile = null;
-    private boolean _hasPriorityPayloads = false;
+    private boolean _hasPriorityPayloads = true;
 
     private ArrayList<String> _regularFilenames = new ArrayList<>();
     private ArrayList<String> _priorityFilenames = new ArrayList<>();
@@ -101,30 +101,23 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
 
                         final MutableInt found = new MutableInt(0);
 
-                        if (me._hasPriorityPayloads) {
-                            if (me._priorityFilenames.size() == 0) {
-                                String[] priorityFilenames = pendingFolder.list(new FilenameFilter() {
-                                    public boolean accept(File dir, String filename) {
-                                        // Only return first 256 for performance reasons...
-                                        if (found.intValue() >= 256)
-                                            return false;
+                        String[] priorityFilenames = pendingFolder.list(new FilenameFilter() {
+                            public boolean accept(File dir, String filename) {
+                                // Only return first 256 for performance reasons...
+                                if (found.intValue() >= 256)
+                                    return false;
 
-                                        if (filename.endsWith(StreamingJacksonUploadPlugin.PRIORITY_FILE_EXTENSION)) {
-                                            found.add(1);
+                                if (filename.endsWith(StreamingJacksonUploadPlugin.PRIORITY_FILE_EXTENSION)) {
+                                    found.add(1);
 
-                                            return true;
-                                        }
+                                    return true;
+                                }
 
-                                        return false;
-                                    }
-                                });
-
-                                for (String filename : priorityFilenames)
-                                    me._priorityFilenames.add(filename);
+                                return false;
                             }
+                        });
 
-                            filenames = me._priorityFilenames.toArray(new String[0]);
-                        }
+                        filenames = priorityFilenames;
 
                         if (filenames == null || found.intValue() == 0)
                         {

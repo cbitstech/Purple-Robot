@@ -95,6 +95,7 @@
         <item>devices.wear.WearMagneticFieldProbe</item>
 
         <item>sensors.AccelerometerSensorProbe</item>
+        <item>sensors.LightSensorProbe</item>
 
         <item>builtin.TouchEventsProbe</item>
         <!-- <item>builtin.BluetoothReceiverProbe</item> -->
@@ -294,7 +295,7 @@
 	<string-array name="probe_continuous_frequency_values">
         <item>0</item>
         <item>1</item>
-        <item>2</item>probe_livewell_wear_bin_values
+        <item>2</item>
         <item>3</item>
    	</string-array>
 

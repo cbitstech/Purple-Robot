@@ -593,6 +593,13 @@
     <string name="title_wear_light_probe">Android Wear Light Probe</string>
     <string name="summary_wear_light_probe_desc">Detects the ambient light level in SI lux units.</string>
 
+
+    <!-- Light Sensor Probe -->
+    <string name="title_light_sensor_probe">Light Sensor Probe</string>
+    <string name="summary_light_sensor_probe_desc">Detects the ambient light level in SI lux units.</string>
+    <string name="summary_light_sensor_probe">%1$.1f kB of light sensor data</string>
+
+
     <!-- Magnetic Probe -->
     <string name="title_magnetic_field_probe">Magnetic Field Probe</string>
     <string name="summary_magnetic_field_probe_desc">Detect the local magnetic field. Can be used as to detect the earth\'s magnetic field, but may be distorted by metal objects around device.</string>

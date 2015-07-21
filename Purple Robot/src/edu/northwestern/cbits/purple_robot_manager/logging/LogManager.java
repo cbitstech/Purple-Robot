@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.util.Log;
+
 import edu.northwestern.cbits.anthracite.Logger;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 
@@ -106,6 +108,8 @@ public class LogManager
 
     public void upload()
     {
+        Log.e("PR", "----- ATTEMPT LOG UPLOADS ------");
+
         this._logger.attemptUploads(true);
     }
 
