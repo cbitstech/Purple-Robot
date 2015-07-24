@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,13 +23,16 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.SettingsKeys;
 import edu.northwestern.cbits.purple_robot_manager.config.LegacyJSONConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
+import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ActivityDetectionProbe;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
@@ -94,7 +98,19 @@ public class ManagerService extends IntentService
 
         final ManagerService me = this;
 
-        if (GOOGLE_PLAY_ACTIVITY_DETECTED.equalsIgnoreCase(action))
+        if (INCOMING_DATA_INTENT.equalsIgnoreCase(action)) {
+            Bundle data = intent.getBundleExtra(Probe.PROBE_DATA);
+
+            UUID uuid = UUID.randomUUID();
+            data.putString(Probe.PROBE_GUID, uuid.toString());
+
+            LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(this);
+            Intent probeIntent = new Intent(edu.northwestern.cbits.purple_robot_manager.probes.Probe.PROBE_READING);
+            probeIntent.putExtras(data);
+
+            localManager.sendBroadcast(probeIntent);
+        }
+        else if (GOOGLE_PLAY_ACTIVITY_DETECTED.equalsIgnoreCase(action))
             ActivityDetectionProbe.activityDetected(this, intent);
         else if (REFRESH_ERROR_STATE_INTENT.equalsIgnoreCase(action))
         {

@@ -54,6 +54,9 @@ public abstract class Probe
     public static final String PROBE_MEDIA_SIZE = "media_size";
 
     public static final String PROBE_GUID = "GUID";
+    public static final String PROBE_DATA = "PROBE_DATA";
+    public static final String PROBE_DISPLAY_NAME = "PROBE_DISPLAY_NAME";
+    public static final String PROBE_DISPLAY_MESSAGE = "PROBE_DISPLAY_MESSAGE";
 
     private static List<Class<Probe>> _probeClasses = new ArrayList<>();
 
