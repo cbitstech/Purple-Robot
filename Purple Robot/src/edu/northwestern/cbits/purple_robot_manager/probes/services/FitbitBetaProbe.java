@@ -480,7 +480,7 @@ public class FitbitBetaProbe extends Probe
 
                                                 if (timestamp > lastUpdate) {
                                                     valueTimestamps.add(timestamp);
-                                                    _lastUpdate = timestamp;
+                                                    lastUpdate = timestamp;
 
                                                     valueList.add(value.getLong("value"));
                                                 }
@@ -542,7 +542,7 @@ public class FitbitBetaProbe extends Probe
 
                                                 if (timestamp > lastUpdate) {
                                                     valueTimestamps.add(timestamp);
-                                                    _lastUpdate = timestamp;
+                                                    lastUpdate = timestamp;
 
                                                     valueList.add(value.getLong("value"));
                                                 }
