@@ -3,6 +3,7 @@ package edu.northwestern.cbits.purple_robot_manager.probes.services;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -110,6 +111,8 @@ public class GooglePlacesProbe extends Probe implements GoogleApiClient.Connecti
 
                 if (now - this._lastCheck > 300000) // 5 minutes
                 {
+                    this._lastCheck = now;
+
                     final GooglePlacesProbe me = this;
 
                     if (this._client == null)
