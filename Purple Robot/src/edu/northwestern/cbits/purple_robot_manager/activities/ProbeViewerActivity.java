@@ -178,6 +178,9 @@ public class ProbeViewerActivity extends AppCompatActivity
 
     private void mapScreens(PreferenceGroup screen)
     {
+        if (screen == null)
+            return;
+
         // If the screen does not have a key, generate one.
 
         if (screen.getKey() == null)
