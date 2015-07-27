@@ -317,8 +317,10 @@ public class FusedLocationProbe extends Probe implements GoogleApiClient.Connect
 
                 if (this._apiClient != null)
                 {
-                    if (this._apiClient.isConnected()) {
-                        try {
+                    if (this._apiClient.isConnected())
+                    {
+                        try
+                        {
                             LocationServices.FusedLocationApi.removeLocationUpdates(this._apiClient, this);
                             this._apiClient.disconnect();
                         }
@@ -472,13 +474,13 @@ public class FusedLocationProbe extends Probe implements GoogleApiClient.Connect
         if (distance != 0)
             request.setSmallestDisplacement(distance);
 
-        if (this._apiClient.isConnected())
+        if (this._apiClient != null && this._apiClient.isConnected())
             LocationServices.FusedLocationApi.requestLocationUpdates(this._apiClient, request, this, this._context.getMainLooper());
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-        if (this._apiClient.isConnected())
+        if (this._apiClient != null && this._apiClient.isConnected())
             LocationServices.FusedLocationApi.removeLocationUpdates(this._apiClient, this);
     }
 

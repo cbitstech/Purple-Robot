@@ -729,8 +729,8 @@
     <string name="summary_call_history_probe">%1$.0f Calls, %2$.1f Avg. Length (%3$.1f std.)</string>
 
     <!-- Call History Probe -->
-    <string name="title_weather_underground_feature">Current Weather Conditions</string>
-    <string name="summary_weather_underground_feature_desc">Acquires the latest weather data for the user\'s location from a Weather Underground station.</string>
+    <string name="title_weather_underground_feature">Weather Underground</string>
+    <string name="summary_weather_underground_feature_desc">Acquires the latest weather data for the user\'s location from a nearby Weather Underground station.</string>
     <string name="summary_weather_underground_probe">%1$s: %2$.1f&#176;C (%3$s)</string>
 
     <!-- Accelerometer Statistics Probe -->
@@ -1604,4 +1604,10 @@
     <string name="notify_audio_recording_active_details">The audio capture probe is currently recording&#8230;</string>
 
     <string name="permission_fetch_data">fetch data from Purple Robot</string>
+
+    <string name="config_weather_underground_api_key_title">Weather Underground API Key</string>
+    <string name="title_weather_underground_check">Missing Weather Underground API key</string>
+    <string name="url_weather_api_key">http://www.wunderground.com/weather/api</string>
+    <string name="message_weather_underground_check">A custom Weather Underground API key is required for fetching weather data. Please obtain one and enter it in the Settings. (Probe Configuration &#8594; External Service Probes &#8594; Weather Underground &#8594; API Key)</string>
+    <string name="config_weather_underground_api_key_message">Please enter a custom API key obtained from Weather Underground.</string>
 </resources>

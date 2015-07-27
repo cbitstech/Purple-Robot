@@ -65,7 +65,7 @@ public abstract class DataUploadPlugin extends OutputPlugin
     private final static String CACHE_DIR = "pending_uploads";
     public static final String TRANSMIT_KEY = "TRANSMIT";
 
-    private static final String RESTRICT_TO_WIFI = "config_restrict_data_wifi";
+    public static final String RESTRICT_TO_WIFI = "config_restrict_data_wifi";
     private static final boolean RESTRICT_TO_WIFI_DEFAULT = true;
     public static final String UPLOAD_URI = "config_data_server_uri";
 
@@ -305,9 +305,10 @@ public abstract class DataUploadPlugin extends OutputPlugin
                             String guid = reading.getString(Probe.PROBE_GUID);
                             File file = new File(u.getPath());
 
-                            builder = builder.addFormDataPart(guid, file.getName(), RequestBody.create(MediaType.parse(mimeType), file));
-
-                            toDelete.add(file);
+                            if (file.exists()) {
+                                builder = builder.addFormDataPart(guid, file.getName(), RequestBody.create(MediaType.parse(mimeType), file));
+                                toDelete.add(file);
+                            }
                         }
                     }
                 }

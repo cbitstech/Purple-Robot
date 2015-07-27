@@ -44,7 +44,8 @@ public abstract class Probe
 
     public static final String PROBE_TYPE_LONG = "long";
     public static final String PROBE_TYPE_BOOLEAN = "boolean";
-    public static final Object PROBE_TYPE_DOUBLE = "double";
+    public static final String PROBE_TYPE_DOUBLE = "double";
+    public static final String PROBE_TYPE_STRING = "string";
     public static final String PROBE_TYPE = "type";
     public static final String PROBE_VALUES = "values";
     public static final String PROBE_DISTANCE = "distance";

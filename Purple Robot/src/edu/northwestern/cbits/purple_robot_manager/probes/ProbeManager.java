@@ -84,7 +84,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.features.PressureProbe
 import edu.northwestern.cbits.purple_robot_manager.probes.features.ProximityProbeBasicStatisticsFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.SunriseSunsetFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.TemperatureProbeBasicStatisticsFeature;
-import edu.northwestern.cbits.purple_robot_manager.probes.features.WeatherUndergroundFeature;
+import edu.northwestern.cbits.purple_robot_manager.probes.services.WeatherUndergroundProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.p20.P20FeaturesProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.sample.SampleProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.services.FitbitProbe;
@@ -352,9 +352,9 @@ public class ProbeManager
                 if (device.name(context).equalsIgnoreCase(name))
                     found = true;
             }
-            else if (probe instanceof WeatherUndergroundFeature)
+            else if (probe instanceof WeatherUndergroundProbe)
             {
-                WeatherUndergroundFeature weather = (WeatherUndergroundFeature) probe;
+                WeatherUndergroundProbe weather = (WeatherUndergroundProbe) probe;
 
                 if (weather.name(context).equalsIgnoreCase(name))
                     found = true;
