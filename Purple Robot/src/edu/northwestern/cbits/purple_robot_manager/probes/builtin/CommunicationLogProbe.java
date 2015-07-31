@@ -195,7 +195,7 @@ public class CommunicationLogProbe extends Probe
                                 contactBundle.putLong(CommunicationLogProbe.CALL_DURATION, c.getLong(c.getColumnIndex(Calls.DURATION)));
                                 contactBundle.putString(CommunicationLogProbe.NUMBER, phoneNumber);
 
-                                int callType = c.getInt(c.getColumnIndex(Calls.CACHED_NUMBER_TYPE));
+                                int callType = c.getInt(c.getColumnIndex(Calls.TYPE));
 
                                 contactBundle.putInt(CommunicationLogProbe.NUMBER_TYPE, callType);
 
@@ -691,7 +691,7 @@ public class CommunicationLogProbe extends Probe
         formatted.putString(context.getString(R.string.display_calls_recent_caller_title), bundle.getString(CommunicationLogProbe.RECENT_CALLER));
         formatted.putString(context.getString(R.string.display_calls_recent_number_title), bundle.getString(CommunicationLogProbe.RECENT_NUMBER));
 
-        Date d = new Date(bundle.getLong(CommunicationLogProbe.RECENT_TIME));
+        Date d = new Date((long) bundle.getDouble(CommunicationLogProbe.RECENT_TIME));
 
         formatted.putString(context.getString(R.string.display_calls_recent_time_title), d.toString());
 

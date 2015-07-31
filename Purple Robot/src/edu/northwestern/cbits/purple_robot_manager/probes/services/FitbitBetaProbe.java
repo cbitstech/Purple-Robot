@@ -176,7 +176,7 @@ public class FitbitBetaProbe extends Probe
 
                     sanity.clearAlert(title);
 
-                    if (now - this._lastUpdate > 1000 * 60 * 15)
+                    if (now - this._lastUpdate > 1000 * 60 * 5)
                     {
                         this._lastUpdate = now;
 
@@ -205,9 +205,9 @@ public class FitbitBetaProbe extends Probe
                                     {
                                         long lastUpdate = prefs.getLong(FitbitBetaProbe.LAST_STEP_TIMESTAMP, 0);
 
-                                        JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/steps/date/today/1d/1min.json"));
-
                                         try {
+                                            JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/steps/date/today/1d/1min.json"));
+
                                             JSONObject stepsIntraday = stepsObj.getJSONObject("activities-steps-intraday");
                                             JSONArray stepsValues = stepsIntraday.getJSONArray("dataset");
 
@@ -229,12 +229,13 @@ public class FitbitBetaProbe extends Probe
                                                 c.set(Calendar.MILLISECOND, 0);
 
                                                 long timestamp = c.getTimeInMillis();
+                                                long valueQty = value.getLong("value");
 
-                                                if (timestamp > lastUpdate) {
+                                                if (timestamp > lastUpdate && valueQty > 0) {
                                                     stepTimestamps.add(timestamp);
                                                     lastUpdate = timestamp;
 
-                                                    valueList.add(value.getLong("value"));
+                                                    valueList.add(valueQty);
                                                 }
                                             }
 
@@ -255,9 +256,9 @@ public class FitbitBetaProbe extends Probe
 
                                             transmit = true;
                                         }
-                                        catch (JSONException e)
+                                        catch (Exception e)
                                         {
-
+                                            e.printStackTrace();
                                         }
                                     }
 
@@ -265,10 +266,10 @@ public class FitbitBetaProbe extends Probe
                                     {
                                         long lastUpdate = prefs.getLong(FitbitBetaProbe.LAST_CALORIE_TIMESTAMP, 0);
 
-                                        JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/calories/date/today/1d/1min.json"));
-
                                         try
                                         {
+                                            JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/calories/date/today/1d/1min.json"));
+
                                             JSONObject intraday = stepsObj.getJSONObject("activities-calories-intraday");
                                             JSONArray valuesArray = intraday.getJSONArray("dataset");
 
@@ -291,12 +292,13 @@ public class FitbitBetaProbe extends Probe
                                                 c.set(Calendar.MILLISECOND, 0);
 
                                                 long timestamp = c.getTimeInMillis();
+                                                long valueQty = value.getLong("value");
 
-                                                if (timestamp > lastUpdate) {
+                                                if (timestamp > lastUpdate && valueQty > 0) {
                                                     valueTimestamps.add(timestamp);
                                                     lastUpdate = timestamp;
 
-                                                    valueList.add(value.getLong("value"));
+                                                    valueList.add(valueQty);
                                                 }
                                             }
 
@@ -317,9 +319,9 @@ public class FitbitBetaProbe extends Probe
 
                                             transmit = true;
                                         }
-                                        catch (JSONException e)
+                                        catch (Exception e)
                                         {
-
+                                            e.printStackTrace();
                                         }
                                     }
 
@@ -327,10 +329,10 @@ public class FitbitBetaProbe extends Probe
                                     {
                                         long lastUpdate = prefs.getLong(FitbitBetaProbe.LAST_DISTANCE_TIMESTAMP, 0);
 
-                                        JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/distance/date/today/1d/1min.json"));
-
                                         try
                                         {
+                                            JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/distance/date/today/1d/1min.json"));
+
                                             JSONObject intraday = stepsObj.getJSONObject("activities-distance-intraday");
                                             JSONArray valuesArray = intraday.getJSONArray("dataset");
 
@@ -353,12 +355,13 @@ public class FitbitBetaProbe extends Probe
                                                 c.set(Calendar.MILLISECOND, 0);
 
                                                 long timestamp = c.getTimeInMillis();
+                                                long valueQty = value.getLong("value");
 
-                                                if (timestamp > lastUpdate) {
+                                                if (timestamp > lastUpdate && valueQty > 0) {
                                                     valueTimestamps.add(timestamp);
                                                     lastUpdate = timestamp;
 
-                                                    valueList.add(value.getLong("value"));
+                                                    valueList.add(valueQty);
                                                 }
                                             }
 
@@ -379,9 +382,9 @@ public class FitbitBetaProbe extends Probe
 
                                             transmit = true;
                                         }
-                                        catch (JSONException e)
+                                        catch (Exception e)
                                         {
-
+                                            e.printStackTrace();
                                         }
                                     }
 
@@ -389,10 +392,10 @@ public class FitbitBetaProbe extends Probe
                                     {
                                         long lastUpdate = prefs.getLong(FitbitBetaProbe.LAST_FLOOR_TIMESTAMP, 0);
 
-                                        JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/floors/date/today/1d/1min.json"));
-
                                         try
                                         {
+                                            JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/floors/date/today/1d/1min.json"));
+
                                             JSONObject intraday = stepsObj.getJSONObject("activities-floors-intraday");
                                             JSONArray valuesArray = intraday.getJSONArray("dataset");
 
@@ -415,12 +418,13 @@ public class FitbitBetaProbe extends Probe
                                                 c.set(Calendar.MILLISECOND, 0);
 
                                                 long timestamp = c.getTimeInMillis();
+                                                long valueQty = value.getLong("value");
 
-                                                if (timestamp > lastUpdate) {
+                                                if (timestamp > lastUpdate && valueQty > 0) {
                                                     valueTimestamps.add(timestamp);
                                                     lastUpdate = timestamp;
 
-                                                    valueList.add(value.getLong("value"));
+                                                    valueList.add(valueQty);
                                                 }
                                             }
 
@@ -443,7 +447,7 @@ public class FitbitBetaProbe extends Probe
                                         }
                                         catch (JSONException e)
                                         {
-
+                                            e.printStackTrace();
                                         }
                                     }
 
@@ -451,10 +455,10 @@ public class FitbitBetaProbe extends Probe
                                     {
                                         long lastUpdate = prefs.getLong(FitbitBetaProbe.LAST_HEART_TIMESTAMP, 0);
 
-                                        JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/heart/date/today/1d/1min.json"));
-
                                         try
                                         {
+                                            JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/heart/date/today/1d/1min.json"));
+
                                             JSONObject intraday = stepsObj.getJSONObject("activities-heart-intraday");
                                             JSONArray valuesArray = intraday.getJSONArray("dataset");
 
@@ -477,12 +481,13 @@ public class FitbitBetaProbe extends Probe
                                                 c.set(Calendar.MILLISECOND, 0);
 
                                                 long timestamp = c.getTimeInMillis();
+                                                long valueQty = value.getLong("value");
 
-                                                if (timestamp > lastUpdate) {
+                                                if (timestamp > lastUpdate && valueQty > 0) {
                                                     valueTimestamps.add(timestamp);
                                                     lastUpdate = timestamp;
 
-                                                    valueList.add(value.getLong("value"));
+                                                    valueList.add(valueQty);
                                                 }
                                             }
 
@@ -505,18 +510,19 @@ public class FitbitBetaProbe extends Probe
                                         }
                                         catch (JSONException e)
                                         {
-
+                                            e.printStackTrace();
                                         }
+
                                     }
 
                                     if (prefs.getBoolean(FitbitBetaProbe.ENABLE_ELEVATION, FitbitBetaProbe.DEFAULT_ENABLE_ELEVATION))
                                     {
                                         long lastUpdate = prefs.getLong(FitbitBetaProbe.LAST_ELEVATION_TIMESTAMP, 0);
 
-                                        JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/elevation/date/today/1d/1min.json"));
-
                                         try
                                         {
+                                            JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/elevation/date/today/1d/1min.json"));
+
                                             JSONObject intraday = stepsObj.getJSONObject("activities-elevation-intraday");
                                             JSONArray valuesArray = intraday.getJSONArray("dataset");
 
@@ -539,12 +545,13 @@ public class FitbitBetaProbe extends Probe
                                                 c.set(Calendar.MILLISECOND, 0);
 
                                                 long timestamp = c.getTimeInMillis();
+                                                long valueQty = value.getLong("value");
 
-                                                if (timestamp > lastUpdate) {
+                                                if (timestamp > lastUpdate && valueQty > 0) {
                                                     valueTimestamps.add(timestamp);
                                                     lastUpdate = timestamp;
 
-                                                    valueList.add(value.getLong("value"));
+                                                    valueList.add(valueQty);
                                                 }
                                             }
 
@@ -567,7 +574,7 @@ public class FitbitBetaProbe extends Probe
                                         }
                                         catch (JSONException e)
                                         {
-
+                                            e.printStackTrace();
                                         }
                                     }
 

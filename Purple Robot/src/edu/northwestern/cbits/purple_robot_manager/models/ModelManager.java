@@ -121,7 +121,7 @@ public class ModelManager extends BroadcastReceiver
     {
         Bundle extras = intent.getExtras();
 
-        if (extras.containsKey("FROM_MODEL"))
+        if (extras.containsKey("FROM_MODEL") || extras.getString("PROBE") == null)
             return;
 
         String[] nameComponents = extras.getString("PROBE").split("\\.");

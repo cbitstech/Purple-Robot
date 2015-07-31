@@ -10,6 +10,7 @@ import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.provider.Settings;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -31,6 +32,8 @@ import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleL
 import edu.northwestern.cbits.purple_robot_manager.calibration.LocationCalibrationHelper;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.services.FoursquareProbe;
 
@@ -48,6 +51,8 @@ public class FusedLocationProbe extends Probe implements GoogleApiClient.Connect
 
     public static final String LATITUDE_KEY = LATITUDE;
     public static final String LONGITUDE_KEY = LONGITUDE;
+
+    private static final long LOCATION_TIMEOUT = (1000 * 60 * 5);
 
     public static final String DB_TABLE = "fused_location_probe";
 
@@ -72,6 +77,9 @@ public class FusedLocationProbe extends Probe implements GoogleApiClient.Connect
     private long _lastDistance = 0;
     private long _lastCache = 0;
     private Location _lastLocation = null;
+
+    private long _probeEnabled = 0;
+    private long _lastReading = 0;
 
     @Override
     public String probeCategory(Context context)
@@ -297,12 +305,17 @@ public class FusedLocationProbe extends Probe implements GoogleApiClient.Connect
     }
 
     @Override
-    public boolean isEnabled(Context context)
+    public boolean isEnabled(final Context context)
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         if (super.isEnabled(context) && prefs.getBoolean(FusedLocationProbe.ENABLED, FusedLocationProbe.DEFAULT_ENABLED))
         {
+            long now = System.currentTimeMillis();
+
+            if (this._probeEnabled == 0)
+                this._probeEnabled = now;
+
             this._context = context.getApplicationContext();
 
             long freq = Long.parseLong(prefs.getString(FusedLocationProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
@@ -347,10 +360,30 @@ public class FusedLocationProbe extends Probe implements GoogleApiClient.Connect
                 this._apiClient.connect();
             }
 
+            String name = context.getString(R.string.name_location_services_check);
+            String message = context.getString(R.string.message_location_services_check);
+
+            if (now - this._probeEnabled > FusedLocationProbe.LOCATION_TIMEOUT && now - this._lastReading > FusedLocationProbe.LOCATION_TIMEOUT)
+            {
+                SanityManager.getInstance(context).addAlert(SanityCheck.WARNING, name, message, new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                        context.startActivity(intent);
+                    }
+               });
+            }
+            else
+                SanityManager.getInstance(context).clearAlert(name);
+
             return true;
         }
         else
         {
+            this._probeEnabled = 0;
+
             if (this._apiClient != null)
             {
                 this._apiClient.disconnect();
@@ -382,6 +415,8 @@ public class FusedLocationProbe extends Probe implements GoogleApiClient.Connect
             return;
 
         long now = System.currentTimeMillis();
+
+        this._lastReading = now;
 
         final Bundle bundle = new Bundle();
 
@@ -474,8 +509,14 @@ public class FusedLocationProbe extends Probe implements GoogleApiClient.Connect
         if (distance != 0)
             request.setSmallestDisplacement(distance);
 
-        if (this._apiClient != null && this._apiClient.isConnected())
-            LocationServices.FusedLocationApi.requestLocationUpdates(this._apiClient, request, this, this._context.getMainLooper());
+        try {
+            if (this._apiClient != null && this._apiClient.isConnected())
+                LocationServices.FusedLocationApi.requestLocationUpdates(this._apiClient, request, this, this._context.getMainLooper());
+        }
+        catch (IllegalStateException e)
+        {
+            LogManager.getInstance(this._context).logException(e);
+        }
     }
 
     @Override
