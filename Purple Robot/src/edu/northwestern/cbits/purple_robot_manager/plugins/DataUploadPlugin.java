@@ -526,4 +526,17 @@ public abstract class DataUploadPlugin extends OutputPlugin
 
         return 0;
     }
+
+    public static boolean multipleUploadersEnabled(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        if (prefs.getBoolean(HttpUploadPlugin.ENABLED, HttpUploadPlugin.ENABLED_DEFAULT) &&
+            prefs.getBoolean(StreamingJacksonUploadPlugin.ENABLED, StreamingJacksonUploadPlugin.ENABLED_DEFAULT))
+        {
+            return true;
+        }
+
+        return false;
+    }
 }

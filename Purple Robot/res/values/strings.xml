@@ -197,7 +197,7 @@
 
     <string name="config_mute_warnings">Mute Status Notifications</string>
     <string name="summary_mute_warnings">Do not display sanity check notifications.</string>
-    
+
     <string name="error_json_set_uri_password">Unable to automatically set configuration from the web while the password is set.</string>
     <string name="success_json_set_uri">Successfully configured via the web.</string>
 
@@ -969,6 +969,9 @@
 
     <string name="name_sanity_charging_required">Charging Status</string>
     <string name="name_sanity_charging_required_error">Data uploads are restricted to when the device is plugged-in and a significant amount of data is accumulated. Please plug in the device to upload the accumulated files.</string>
+
+    <string name="name_sanity_multiple_uploaders_enabled">Multiple Uploaders Enabled</string>
+    <string name="name_sanity_multiple_uploaders_enabled_warning">Multiple data upload plugins are currently enabled. This will likely result in duplicate readings at the data destination.</string>
 
     <string name="message_clearing_archive">Clearing archive files&#8230;</string>
     

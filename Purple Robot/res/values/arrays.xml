@@ -668,6 +668,7 @@
         <item>Android50MemoryCheck</item>
         <item>WifiEnabledCheck</item>
         <item>ChargingRequiredCheck</item>
+        <item>MultipleUploadersEnabledCheck</item>
         <!-- <item>TestErrorCheck</item> -->
         <!-- <item>TestWarningCheck</item> -->
    	</array>

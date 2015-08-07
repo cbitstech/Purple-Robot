@@ -18,7 +18,9 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.os.BatteryManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
@@ -264,6 +266,13 @@ public class BatteryProbe extends Probe
                         bundle.putBoolean("PRIORITY", true);
 
                         bundle.putAll(intent.getExtras());
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                        {
+                            PowerManager power = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+
+                            bundle.putBoolean("PRIORITY", power.isPowerSaveMode());
+                        }
 
                         me.transmitData(context, bundle);
 

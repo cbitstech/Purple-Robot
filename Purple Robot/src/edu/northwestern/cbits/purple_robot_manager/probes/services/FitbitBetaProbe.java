@@ -811,8 +811,8 @@ public class FitbitBetaProbe extends Probe
     @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
-        double[] steps = bundle.getDoubleArray(FitbitBetaProbe.STEP_TIMESTAMPS);
+        double[] timestamps = bundle.getDoubleArray(FitbitBetaProbe.CALORIES_TIMESTAMPS);
 
-        return String.format(context.getResources().getString(R.string.summary_fitbit_beta), steps.length);
+        return String.format(context.getResources().getString(R.string.summary_fitbit_beta), timestamps.length);
     }
 }
