@@ -973,6 +973,9 @@
     <string name="name_sanity_multiple_uploaders_enabled">Multiple Uploaders Enabled</string>
     <string name="name_sanity_multiple_uploaders_enabled_warning">Multiple data upload plugins are currently enabled. This will likely result in duplicate readings at the data destination.</string>
 
+    <string name="name_sanity_location_services_enabled">Location Services Disabled</string>
+    <string name="name_sanity_location_services_enabled_warning">Required location services are currently disabled. Tap here to correct the issue.</string>
+
     <string name="message_clearing_archive">Clearing archive files&#8230;</string>
     
     <string name="pending_files_label">Pending Uploads Count</string>

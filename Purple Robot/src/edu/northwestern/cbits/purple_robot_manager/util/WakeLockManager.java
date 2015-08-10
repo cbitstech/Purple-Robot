@@ -42,6 +42,8 @@ public class WakeLockManager
 
     public PowerManager.WakeLock requestWakeLock(int lockType, String tag)
     {
+        tag = tag.replace("edu.northwestern.cbits.purple_robot_manager.", "");
+
         PowerManager power = (PowerManager) this._context.getSystemService(Context.POWER_SERVICE);
 
         PowerManager.WakeLock lock = power.newWakeLock(lockType, tag);

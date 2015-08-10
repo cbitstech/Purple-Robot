@@ -669,6 +669,7 @@
         <item>WifiEnabledCheck</item>
         <item>ChargingRequiredCheck</item>
         <item>MultipleUploadersEnabledCheck</item>
+        <item>LocationServicesEnabledCheck</item>
         <!-- <item>TestErrorCheck</item> -->
         <!-- <item>TestWarningCheck</item> -->
    	</array>

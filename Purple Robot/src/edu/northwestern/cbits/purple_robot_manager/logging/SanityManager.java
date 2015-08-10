@@ -180,6 +180,9 @@ public class SanityManager
 
             Notification note = builder.build();
 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                note.color = 0xff4e015c;
+
             noteManager.notify(SanityManager.NOTE_ID, note);
         }
     }

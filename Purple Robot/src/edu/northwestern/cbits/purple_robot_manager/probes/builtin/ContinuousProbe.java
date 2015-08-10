@@ -17,6 +17,7 @@ import android.os.PowerManager.WakeLock;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -341,6 +342,9 @@ public abstract class ContinuousProbe extends Probe
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         String key = this.getPreferenceKey();
+
+        if (enabled)
+            enabled = prefs.getBoolean("config_probe_" + key + "_enabled", ContinuousProbe.DEFAULT_ENABLED);
 
         int wakeLevel = Integer.parseInt(prefs.getString("config_probe_" + key + "_wakelock", "-1"));
 

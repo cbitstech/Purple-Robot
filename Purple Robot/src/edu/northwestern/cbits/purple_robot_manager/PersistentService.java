@@ -63,6 +63,10 @@ public class PersistentService extends Service
         Notification note = new Notification(R.drawable.ic_note_normal, title, System.currentTimeMillis());
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, StartActivity.class),
                 PendingIntent.FLAG_UPDATE_CURRENT);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            note.color = 0xff4e015c;
+
         note.setLatestEventInfo(this, title, message, contentIntent);
 
         this.startForeground(SanityManager.NOTE_ID, note);
