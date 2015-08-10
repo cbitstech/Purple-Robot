@@ -150,6 +150,8 @@ public abstract class Trigger
             type = context.getString(R.string.type_trigger_probe);
         if (this instanceof DateTrigger)
             type = context.getString(R.string.type_trigger_datetime);
+        if (this instanceof BatteryLevelTrigger)
+            type = context.getString(R.string.type_trigger_battery);
 
         screen.setSummary(type);
 
@@ -160,11 +162,9 @@ public abstract class Trigger
         viewAction.setSummary(R.string.label_trigger_show_action_desc);
         viewAction.setOrder(Integer.MAX_VALUE);
 
-        viewAction.setOnPreferenceClickListener(new OnPreferenceClickListener()
-        {
+        viewAction.setOnPreferenceClickListener(new OnPreferenceClickListener() {
             @Override
-            public boolean onPreferenceClick(Preference preference)
-            {
+            public boolean onPreferenceClick(Preference preference) {
                 Intent intent = new Intent(context, CodeViewerActivity.class);
                 intent.putExtra(CodeViewerActivity.SOURCE_CODE, me._action);
                 intent.putExtra(CodeViewerActivity.TITLE, me.name());
@@ -185,16 +185,16 @@ public abstract class Trigger
 
         enabled.setOrder(Integer.MAX_VALUE);
 
-        enabled.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
-        {
+        enabled.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue)
-            {
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
                 return true;
             }
         });
 
         screen.addPreference(enabled);
+
+        this.addCustomPreferences(context, screen);
 
         Preference fireNow = new Preference(context);
         fireNow.setTitle(R.string.label_trigger_fire_now);
@@ -217,6 +217,10 @@ public abstract class Trigger
         return screen;
     }
 
+    public void addCustomPreferences(Context context, PreferenceScreen screen) {
+        // Do nothing by default...
+    }
+
     private String enabledKey()
     {
         return "trigger_enabled_" + this._identifier;
@@ -230,6 +234,8 @@ public abstract class Trigger
             return new DateTrigger(context, params);
         else if (ProbeTrigger.TYPE_NAME.equals(type))
             return new ProbeTrigger(context, params);
+        else if (BatteryLevelTrigger.TYPE_NAME.equals(type))
+            return new BatteryLevelTrigger(context, params);
 
         return null;
     }

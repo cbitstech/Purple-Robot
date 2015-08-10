@@ -3,7 +3,6 @@ package edu.northwestern.cbits.purple_robot_manager.output;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.net.Uri;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,7 +37,8 @@ public class BootstrapSiteExporter
     private static final String METHOD_CATEGORY = "category";
     private static final String METHOD_ASSET_PATH = "path";
     private static final String METHOD_FULL_NAME = "full_name";
-
+    public static final int TEMPLATE_TYPE_BOOTSTRAP = 0;
+    private static final int TEMPLATE_TYPE_JEKYLL = 1;
 
     public static Uri exportSite(Context context)
     {
@@ -62,9 +62,9 @@ public class BootstrapSiteExporter
                 BootstrapSiteExporter.writeStaticAssets(assets, zos, "embedded_website/images");
                 BootstrapSiteExporter.writeStaticAssets(assets, zos, "embedded_website/js");
 
-                BootstrapSiteExporter.writeScriptDocumentation(context, zos, "embedded_website/docs/all");
-                BootstrapSiteExporter.writeScriptDocumentation(context, zos, "embedded_website/docs/scheme");
-                BootstrapSiteExporter.writeScriptDocumentation(context, zos, "embedded_website/docs/javascript");
+                BootstrapSiteExporter.writeScriptDocumentation(context, zos, "embedded_website/docs/all", BootstrapSiteExporter.TEMPLATE_TYPE_BOOTSTRAP);
+                BootstrapSiteExporter.writeScriptDocumentation(context, zos, "embedded_website/docs/scheme", BootstrapSiteExporter.TEMPLATE_TYPE_BOOTSTRAP);
+                BootstrapSiteExporter.writeScriptDocumentation(context, zos, "embedded_website/docs/javascript", BootstrapSiteExporter.TEMPLATE_TYPE_BOOTSTRAP);
             } finally {
                 zos.close();
             }
@@ -75,13 +75,13 @@ public class BootstrapSiteExporter
         return Uri.fromFile(exportedFile);
     }
 
-    private static void writeScriptDocumentation(Context context, ZipOutputStream out, String path)
+    private static void writeScriptDocumentation(Context context, ZipOutputStream out, String path, int templateType)
     {
         String[] components = path.split("/");
 
         String language = components[components.length - 1];
 
-        byte[] indexPage = BootstrapSiteExporter.fetchContent(context, language, null, true);
+        byte[] indexPage = BootstrapSiteExporter.fetchContent(context, language, null, true, templateType);
 
         try {
             ZipEntry entry = new ZipEntry(path + "/index.html");
@@ -111,7 +111,7 @@ public class BootstrapSiteExporter
                             if (page.startsWith("all_"))
                                 pageLanguage = "all";
 
-                            byte[] methodContent = BootstrapSiteExporter.fetchContent(context, pageLanguage, page, true);
+                            byte[] methodContent = BootstrapSiteExporter.fetchContent(context, pageLanguage, page, true, templateType);
 
                             try {
                                 ZipEntry methodEntry = new ZipEntry(path + "/" + page);
@@ -119,7 +119,7 @@ public class BootstrapSiteExporter
                                 out.write(methodContent);
                                 out.closeEntry();
                             } catch (ZipException e) {
-                                // File already exists...
+                                e.printStackTrace();
                             }
 
                             loaded.add(page);
@@ -247,9 +247,11 @@ public class BootstrapSiteExporter
         return declaredMethods;
     }
 
-    public static byte[] fetchContent(Context context, String language, String page, boolean readOnly)
+    public static byte[] fetchContent(Context context, String language, String page, boolean readOnly, int templateType)
     {
         Class[] scriptingClasses = { JavaScriptEngine.class, SchemeEngine.class };
+
+        language = language.toLowerCase();
 
         ArrayList<String> languages = new ArrayList<>();
         languages.add(BootstrapSiteExporter.LANGUAGE_ALL.toLowerCase());
@@ -267,8 +269,10 @@ public class BootstrapSiteExporter
 
                 String template = "embedded_website/docs/scripting_template.html";
 
-                if (readOnly)
+                if (readOnly && templateType == BootstrapSiteExporter.TEMPLATE_TYPE_BOOTSTRAP)
                     template = "embedded_website/docs/scripting_template_readonly.html";
+                else if (templateType == BootstrapSiteExporter.TEMPLATE_TYPE_JEKYLL)
+                    template = "embedded_website/docs/scripting_template_jekyll.html";
 
                 InputStream in = am.open(template);
 
@@ -281,7 +285,7 @@ public class BootstrapSiteExporter
                     content = s.next();
 
                 content = content.replace("{{ METHOD_DEFINITIONS }}", declaredMethods.toString(2));
-                content = content.replace("{{ LANGUAGE }}", language);
+                content = content.replace("{{ LANGUAGE }}", language.toLowerCase());
 
                 return content.getBytes(Charset.forName("UTF-8"));
             }
@@ -303,8 +307,10 @@ public class BootstrapSiteExporter
 
                 String template = "embedded_website/docs/method_template.html";
 
-                if (readOnly)
+                if (readOnly && templateType == BootstrapSiteExporter.TEMPLATE_TYPE_BOOTSTRAP)
                     template = "embedded_website/docs/method_template_readonly.html";
+                else if (templateType == BootstrapSiteExporter.TEMPLATE_TYPE_JEKYLL)
+                    template = "embedded_website/docs/method_template_jekyll.html";
 
                 InputStream in = am.open(template);
 
@@ -356,7 +362,8 @@ public class BootstrapSiteExporter
                                     }
 
                                     content = content.replace("{{ METHOD_NAME }}", method.getName() +  "(" + args.toString() + ")");
-                                    content = content.replace("{{ LANGUAGE }}", ((ScriptingEngineMethod) annotation).language());
+                                    content = content.replace("{{ LANGUAGE }}", ((ScriptingEngineMethod) annotation).language().toLowerCase());
+                                    content = content.replace("{{ PAGE }}", page);
                                 }
                             }
                         }
@@ -374,5 +381,32 @@ public class BootstrapSiteExporter
         }
 
         return "404 ERROR".getBytes(Charset.forName("UTF-8"));
+    }
+
+    public static Uri exportJekyllPages(Context context) {
+        File exportDirectory = context.getExternalFilesDir(null);
+
+        String filename = System.currentTimeMillis() + "_jekyll.zip";
+
+        File exportedFile = new File(exportDirectory, filename);
+
+        try {
+            FileOutputStream out = new FileOutputStream(exportedFile);
+
+            ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(out));
+
+            try
+            {
+                BootstrapSiteExporter.writeScriptDocumentation(context, zos, "embedded_website/docs/all", BootstrapSiteExporter.TEMPLATE_TYPE_JEKYLL);
+                BootstrapSiteExporter.writeScriptDocumentation(context, zos, "embedded_website/docs/scheme", BootstrapSiteExporter.TEMPLATE_TYPE_JEKYLL);
+                BootstrapSiteExporter.writeScriptDocumentation(context, zos, "embedded_website/docs/javascript", BootstrapSiteExporter.TEMPLATE_TYPE_JEKYLL);
+            } finally {
+                zos.close();
+            }
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
+
+        return Uri.fromFile(exportedFile);
     }
 }

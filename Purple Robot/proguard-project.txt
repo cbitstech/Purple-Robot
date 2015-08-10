@@ -75,12 +75,20 @@
 -dontwarn org.apache.commons.codec.binary.Base64
 -dontwarn edu.northwestern.cbits.**
 -dontwarn com.google.android.maps.**
+-dontwarn java.nio.file.**
+-dontwarn org.codehaus.mojo.**
+-dontwarn javax.tools.**
+-dontwarn com.sun.jdi.**
+-dontwarn com.sun.jdi.**
+-dontwarn java.applet.**
+
 
 -keep class edu.northwestern.cbits.** { *; }
 -keep class jscheme.** { *; }
 -keep class jsint.** { *; }
 -keep class org.mozilla.** { *; }
 -keep class org.scribe.** { *; }
+
 
 # Allow obfuscation of android.support.v7.internal.view.menu.**
 # to avoid problem on Samsung 4.2.2 devices with appcompat v21

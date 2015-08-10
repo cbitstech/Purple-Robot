@@ -30,6 +30,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CommunicationE
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.CommunicationLogProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.DateCalendarProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.FusedLocationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.GeomagneticRotationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.GravityProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.HardwareInformationProbe;
@@ -53,6 +54,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TelephonyProbe
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TemperatureProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.TouchEventsProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.VisibleSatelliteProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.WakeLockInformationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.WifiAccessPointsProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.devices.AndroidWearProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.devices.wear.WearAccelerometerProbe;
@@ -62,6 +64,9 @@ import edu.northwestern.cbits.purple_robot_manager.probes.devices.wear.WearHeart
 import edu.northwestern.cbits.purple_robot_manager.probes.devices.wear.WearLightProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.devices.wear.WearLivewellActivityCountProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.devices.wear.WearMagneticFieldProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.media.AudioCaptureProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.sensors.AccelerometerSensorProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.sensors.LightSensorProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.services.FitbitBetaProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.studies.LivewellActivityCountsProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.studies.LivewellPebbleActivityCountsProbe;
@@ -79,7 +84,7 @@ import edu.northwestern.cbits.purple_robot_manager.probes.features.PressureProbe
 import edu.northwestern.cbits.purple_robot_manager.probes.features.ProximityProbeBasicStatisticsFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.SunriseSunsetFeature;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.TemperatureProbeBasicStatisticsFeature;
-import edu.northwestern.cbits.purple_robot_manager.probes.features.WeatherUndergroundFeature;
+import edu.northwestern.cbits.purple_robot_manager.probes.services.WeatherUndergroundProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.features.p20.P20FeaturesProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.sample.SampleProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.services.FitbitProbe;
@@ -118,7 +123,11 @@ public class ProbeManager
 
                     ProbeManager._probeInstances.add(probe);
                 }
-                catch (InstantiationException | IllegalAccessException e)
+                catch (InstantiationException e)
+                {
+                    LogManager.getInstance(context).logException(e);
+                }
+                catch (IllegalAccessException e)
                 {
                     LogManager.getInstance(context).logException(e);
                 }
@@ -287,6 +296,13 @@ public class ProbeManager
                 if (location.name(context).equalsIgnoreCase(name))
                     found = true;
             }
+            else if (probe instanceof FusedLocationProbe)
+            {
+                FusedLocationProbe location = (FusedLocationProbe) probe;
+
+                if (location.name(context).equalsIgnoreCase(name))
+                    found = true;
+            }
             else if (probe instanceof MediaRouterDeviceProbe)
             {
                 MediaRouterDeviceProbe devices = (MediaRouterDeviceProbe) probe;
@@ -336,9 +352,9 @@ public class ProbeManager
                 if (device.name(context).equalsIgnoreCase(name))
                     found = true;
             }
-            else if (probe instanceof WeatherUndergroundFeature)
+            else if (probe instanceof WeatherUndergroundProbe)
             {
-                WeatherUndergroundFeature weather = (WeatherUndergroundFeature) probe;
+                WeatherUndergroundProbe weather = (WeatherUndergroundProbe) probe;
 
                 if (weather.name(context).equalsIgnoreCase(name))
                     found = true;
@@ -677,6 +693,34 @@ public class ProbeManager
                 WearMagneticFieldProbe wear = (WearMagneticFieldProbe) probe;
 
                 if (wear.name(context).equalsIgnoreCase(name))
+                    found = true;
+            }
+            else if (probe instanceof WakeLockInformationProbe)
+            {
+                WakeLockInformationProbe wakelock = (WakeLockInformationProbe) probe;
+
+                if (wakelock.name(context).equalsIgnoreCase(name))
+                    found = true;
+            }
+            else if (probe instanceof AudioCaptureProbe)
+            {
+                AudioCaptureProbe audio = (AudioCaptureProbe) probe;
+
+                if (audio.name(context).equalsIgnoreCase(name))
+                    found = true;
+            }
+            else if (probe instanceof AccelerometerSensorProbe)
+            {
+                AccelerometerSensorProbe accelerometer = (AccelerometerSensorProbe) probe;
+
+                if (accelerometer.name(context).equalsIgnoreCase(name))
+                    found = true;
+            }
+            else if (probe instanceof LightSensorProbe)
+            {
+                LightSensorProbe light = (LightSensorProbe) probe;
+
+                if (light.name(context).equalsIgnoreCase(name))
                     found = true;
             }
 

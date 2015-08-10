@@ -121,6 +121,7 @@ public class SanityManager
         if (prefs.getBoolean("config_mute_warnings", false) == false)
         {
             this._lastStatus = this.getErrorLevel();
+
             int issueCount = this._errors.size() + this._warnings.size();
 
             PendingIntent contentIntent = PendingIntent.getActivity(this._context, SanityManager.NOTE_ID, new Intent(this._context, StartActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
@@ -178,6 +179,9 @@ public class SanityManager
             }
 
             Notification note = builder.build();
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                note.color = 0xff4e015c;
 
             noteManager.notify(SanityManager.NOTE_ID, note);
         }

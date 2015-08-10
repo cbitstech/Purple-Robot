@@ -414,8 +414,15 @@ public class EncryptionManager
 
             for (String key : keys)
             {
-                if ("user_id".equals(key))
-                    this.setUserId(context, uri.getQueryParameter(key));
+                if ("user_id".equals(key)) {
+                    try {
+                        this.setUserId(context, uri.getQueryParameter(key));
+                    }
+                    catch (UnsupportedOperationException e)
+                    {
+                        LogManager.getInstance(context).logException(e);
+                    }
+                }
                 else
                     builder.appendQueryParameter(key, uri.getQueryParameter(key));
             }

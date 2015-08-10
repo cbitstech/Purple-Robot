@@ -47,6 +47,7 @@ import edu.northwestern.cbits.purple_robot_manager.config.SchemeConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
+import edu.northwestern.cbits.purple_robot_manager.plugins.DataUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
@@ -93,25 +94,30 @@ public class DiagnosticActivity extends AppCompatActivity
 
         PurpleRobotApplication.fixPreferences(this, true);
 
-        boolean uploadEnabled = prefs.getBoolean("config_enable_data_server", false);
+        boolean uploadEnabled = DataUploadPlugin.uploadEnabled(this);
 
         if (uploadEnabled)
         {
-            boolean wifiOnly = prefs.getBoolean("config_restrict_data_wifi", true);
+            boolean wifiOnly = DataUploadPlugin.restrictToWifi(prefs);
+            boolean powerOnly = DataUploadPlugin.restrictToCharging(prefs);
 
-            if (wifiOnly)
+            if (wifiOnly && powerOnly)
+                uploadStatus.setText(R.string.upload_status_enabled_wifi_charging_only);
+            else if (wifiOnly)
                 uploadStatus.setText(R.string.upload_status_enabled_wifi_only);
+            else if (powerOnly)
+                uploadStatus.setText(R.string.upload_status_enabled_charging_only);
             else
                 uploadStatus.setText(R.string.upload_status_enabled);
         }
         else
             uploadStatus.setText(R.string.upload_status_disabled);
 
-        if (prefs.contains("http_last_upload") && prefs.contains("http_last_payload_size"))
-        {
-            long lastUploadTime = prefs.getLong("http_last_upload", 0);
-            long lastPayloadSize = prefs.getLong("http_last_payload_size", 0) / 1024;
+        long lastUploadTime = DataUploadPlugin.lastUploadTime(prefs);
+        long lastPayloadSize = DataUploadPlugin.lastUploadSize(prefs) / 1024;
 
+        if (lastUploadTime != -1 && lastPayloadSize != -1)
+        {
             SimpleDateFormat sdf = new SimpleDateFormat("MMM d - HH:mm:ss");
 
             String dateString = sdf.format(new Date(lastUploadTime));
@@ -119,31 +125,8 @@ public class DiagnosticActivity extends AppCompatActivity
             lastUpload.setText(String.format(this.getString(R.string.last_upload_format), dateString, lastPayloadSize));
         }
 
-        if (prefs.getBoolean("config_enable_data_server", false))
-        {
-            OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(this, HttpUploadPlugin.class);
-
-            if (plugin instanceof HttpUploadPlugin)
-            {
-                HttpUploadPlugin http = (HttpUploadPlugin) plugin;
-
-                TextView uploadCount = (TextView) this.findViewById(R.id.pending_files_value);
-                uploadCount.setText(this.getString(R.string.pending_files_file, http.pendingFilesCount()));
-            }
-        }
-        else
-        {
-            OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(this,
-                    StreamingJacksonUploadPlugin.class);
-
-            if (plugin instanceof StreamingJacksonUploadPlugin)
-            {
-                StreamingJacksonUploadPlugin http = (StreamingJacksonUploadPlugin) plugin;
-
-                TextView uploadCount = (TextView) this.findViewById(R.id.pending_files_value);
-                uploadCount.setText(this.getString(R.string.pending_files_file, http.pendingFilesCount()));
-            }
-        }
+        TextView uploadCount = (TextView) this.findViewById(R.id.pending_files_value);
+        uploadCount.setText(this.getString(R.string.pending_files_file, DataUploadPlugin.pendingFileCount(this)));
 
         if (prefs.getBoolean("config_enable_log_server", false))
         {

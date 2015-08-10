@@ -254,6 +254,12 @@ public class StartActivity extends AppCompatActivity
                             displayName = value.getString("MODEL_NAME");
                         }
 
+                        if (value.containsKey(Probe.PROBE_DISPLAY_NAME))
+                            displayName = value.getString(Probe.PROBE_DISPLAY_NAME);
+
+                        if (value.containsKey(Probe.PROBE_DISPLAY_MESSAGE))
+                            formattedValue = value.getString(Probe.PROBE_DISPLAY_MESSAGE);
+
                         final String name = displayName + " (" + sdf.format(sensorDate) + ")";
                         final String display = formattedValue;
 

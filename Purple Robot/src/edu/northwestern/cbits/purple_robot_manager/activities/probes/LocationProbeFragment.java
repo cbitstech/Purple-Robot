@@ -29,8 +29,13 @@ public class LocationProbeFragment extends SupportMapFragment
 
         List<Location> locations = new ArrayList<>();
 
+        String tableName = this.getActivity().getIntent().getStringExtra(LocationProbeActivity.DB_TABLE_NAME);
+
+        if (tableName == null)
+            tableName = LocationProbe.DB_TABLE;
+
         Cursor cursor = ProbeValuesProvider.getProvider(this.getActivity()).retrieveValues(this.getActivity(),
-                LocationProbe.DB_TABLE, LocationProbe.databaseSchema());
+                tableName, LocationProbe.databaseSchema());
 
         while (cursor.moveToNext())
         {

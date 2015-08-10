@@ -259,6 +259,7 @@ public class RobotHealthProbe extends Probe
                                     Bundle bundle = new Bundle();
                                     bundle.putString("PROBE", me.name(context));
                                     bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+                                    bundle.putBoolean("PRIORITY", true);
 
                                     bundle.putInt(RobotHealthProbe.PENDING_COUNT, pendingCount);
                                     bundle.putLong(RobotHealthProbe.PENDING_SIZE, pendingSize);

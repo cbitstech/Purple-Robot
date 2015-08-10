@@ -1,10 +1,10 @@
-package edu.northwestern.cbits.purple_robot_manager.probes.features;
+package edu.northwestern.cbits.purple_robot_manager.probes.services;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
-import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,14 +17,24 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
+import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.WiFiHelper;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleEditTextPreference;
+import edu.northwestern.cbits.purple_robot_manager.calibration.WeatherUndergroundCalibrationHelper;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.plugins.DataUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.FusedLocationProbe;
 import edu.northwestern.cbits.purple_robot_manager.probes.builtin.LocationProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.builtin.RawLocationProbe;
+import edu.northwestern.cbits.purple_robot_manager.probes.features.Feature;
 
-public class WeatherUndergroundFeature extends Feature
+public class WeatherUndergroundProbe extends Feature
 {
     private static final String FEATURE_KEY = "weather_underground";
     protected static final String OBS_TIMESTAMP = "OBS_TIMESTAMP";
@@ -41,21 +51,30 @@ public class WeatherUndergroundFeature extends Feature
     protected static final String STATION_ID = "STATION_ID";
     protected static final String LOCATION = "LOCATION";
 
+    public static final String ENABLED = "config_feature_weather_underground_enabled";
+    public static final boolean DEFAULT_ENABLED = false;
+
+    public static final String API_KEY = "config_last_weather_underground_api_key";
+    public static final String DEFAULT_API_KEY = "";
+
+    public static final String LAST_CHECK = "config_last_weather_underground_check";
+    private static final String PROBE_API_KEY = "api_key";
+
     private boolean _isInited = false;
     private boolean _isEnabled = false;
 
     @Override
     public String probeCategory(Context context)
     {
-        return context.getString(R.string.probe_external_environment_category);
+        return context.getString(R.string.probe_external_services_category);
     }
 
     @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
-        String weather = bundle.getString(WeatherUndergroundFeature.WEATHER);
-        String station = bundle.getString(WeatherUndergroundFeature.STATION_ID);
-        double temp = bundle.getDouble(WeatherUndergroundFeature.TEMPERATURE);
+        String weather = bundle.getString(WeatherUndergroundProbe.WEATHER);
+        String station = bundle.getString(WeatherUndergroundProbe.STATION_ID);
+        double temp = bundle.getDouble(WeatherUndergroundProbe.TEMPERATURE);
 
         return context.getResources().getString(R.string.summary_weather_underground_probe, weather, temp, station);
     }
@@ -63,7 +82,7 @@ public class WeatherUndergroundFeature extends Feature
     @Override
     protected String featureKey()
     {
-        return WeatherUndergroundFeature.FEATURE_KEY;
+        return WeatherUndergroundProbe.FEATURE_KEY;
     }
 
     @Override
@@ -90,7 +109,7 @@ public class WeatherUndergroundFeature extends Feature
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_feature_weather_underground_enabled", true);
+        e.putBoolean(WeatherUndergroundProbe.ENABLED, true);
 
         e.commit();
     }
@@ -99,7 +118,7 @@ public class WeatherUndergroundFeature extends Feature
     {
         SharedPreferences prefs = Probe.getPreferences(context);
 
-        return prefs.getLong("config_last_weather_underground_check", 0);
+        return prefs.getLong(WeatherUndergroundProbe.LAST_CHECK, 0);
     }
 
     @Override
@@ -108,7 +127,7 @@ public class WeatherUndergroundFeature extends Feature
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();
-        e.putBoolean("config_feature_weather_underground_enabled", false);
+        e.putBoolean(WeatherUndergroundProbe.ENABLED, false);
 
         e.commit();
     }
@@ -120,7 +139,7 @@ public class WeatherUndergroundFeature extends Feature
         {
             IntentFilter intentFilter = new IntentFilter(Probe.PROBE_READING);
 
-            final WeatherUndergroundFeature me = this;
+            final WeatherUndergroundProbe me = this;
 
             BroadcastReceiver receiver = new BroadcastReceiver()
             {
@@ -129,17 +148,19 @@ public class WeatherUndergroundFeature extends Feature
                 {
                     Bundle extras = intent.getExtras();
 
-                    String probeName = extras.getString("PROBE");
+                    String probeName = extras.getString(Probe.BUNDLE_PROBE);
+                    SharedPreferences prefs = Probe.getPreferences(context);
 
-                    if (probeName != null && (LocationProbe.NAME.equals(probeName)))
+                    final String apiKey = prefs.getString(WeatherUndergroundProbe.API_KEY, WeatherUndergroundProbe.DEFAULT_API_KEY);
+
+                    if (probeName != null && ((LocationProbe.NAME.equals(probeName)) || RawLocationProbe.NAME.equals(probeName) || FusedLocationProbe.NAME.equals(probeName)) && apiKey != null && apiKey.trim().length() > 0)
                     {
                         long now = System.currentTimeMillis();
 
                         if (now - me.lastCheck(context) > (1000 * 60 * 60))
                         {
-                            SharedPreferences prefs = Probe.getPreferences(context);
 
-                            if (prefs.getBoolean("config_restrict_data_wifi", true))
+                            if (prefs.getBoolean(DataUploadPlugin.RESTRICT_TO_WIFI, true))
                             {
                                 if (WiFiHelper.wifiAvailable(context) == false)
                                     return;
@@ -147,7 +168,7 @@ public class WeatherUndergroundFeature extends Feature
 
                             Editor e = prefs.edit();
 
-                            e.putLong("config_last_weather_underground_check", now);
+                            e.putLong(WeatherUndergroundProbe.LAST_CHECK, now);
                             e.commit();
 
                             final double latitude = extras.getDouble(LocationProbe.LATITUDE);
@@ -160,7 +181,7 @@ public class WeatherUndergroundFeature extends Feature
                                 {
                                     try
                                     {
-                                        URL u = new URL("http://api.wunderground.com/api/eb50926364bb4c4f/conditions/q/" + latitude + "," + longitude + ".json");
+                                        URL u = new URL("http://api.wunderground.com/api/" + apiKey + "/conditions/q/" + latitude + "," + longitude + ".json");
 
                                         HttpURLConnection conn = (HttpURLConnection) u.openConnection();
 
@@ -203,23 +224,23 @@ public class WeatherUndergroundFeature extends Feature
                                         String pressureTrend = obs.getString("pressure_trend");
 
                                         Bundle bundle = new Bundle();
-                                        bundle.putString("PROBE", me.name(context));
-                                        bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+                                        bundle.putString(Probe.BUNDLE_PROBE, me.name(context));
+                                        bundle.putLong(Probe.BUNDLE_TIMESTAMP, System.currentTimeMillis() / 1000);
 
-                                        bundle.putLong(WeatherUndergroundFeature.OBS_TIMESTAMP, obsTimestamp);
-                                        bundle.putString(WeatherUndergroundFeature.STATION_ID, stationId);
-                                        bundle.putString(WeatherUndergroundFeature.LOCATION, location);
-                                        bundle.putString(WeatherUndergroundFeature.WEATHER, weather);
-                                        bundle.putDouble(WeatherUndergroundFeature.TEMPERATURE, temp);
-                                        bundle.putString(WeatherUndergroundFeature.WIND_DIR, windDir);
-                                        bundle.putDouble(WeatherUndergroundFeature.WIND_DEGREES, windDegrees);
-                                        bundle.putDouble(WeatherUndergroundFeature.WIND_SPEED, windSpeed);
-                                        bundle.putDouble(WeatherUndergroundFeature.GUST_SPEED, gustSpeed);
-                                        bundle.putString(WeatherUndergroundFeature.PRESSURE_TREND, pressureTrend);
-                                        bundle.putDouble(WeatherUndergroundFeature.PRESSURE, pressure);
+                                        bundle.putLong(WeatherUndergroundProbe.OBS_TIMESTAMP, obsTimestamp);
+                                        bundle.putString(WeatherUndergroundProbe.STATION_ID, stationId);
+                                        bundle.putString(WeatherUndergroundProbe.LOCATION, location);
+                                        bundle.putString(WeatherUndergroundProbe.WEATHER, weather);
+                                        bundle.putDouble(WeatherUndergroundProbe.TEMPERATURE, temp);
+                                        bundle.putString(WeatherUndergroundProbe.WIND_DIR, windDir);
+                                        bundle.putDouble(WeatherUndergroundProbe.WIND_DEGREES, windDegrees);
+                                        bundle.putDouble(WeatherUndergroundProbe.WIND_SPEED, windSpeed);
+                                        bundle.putDouble(WeatherUndergroundProbe.GUST_SPEED, gustSpeed);
+                                        bundle.putString(WeatherUndergroundProbe.PRESSURE_TREND, pressureTrend);
+                                        bundle.putDouble(WeatherUndergroundProbe.PRESSURE, pressure);
 
-                                        bundle.putDouble(WeatherUndergroundFeature.DEWPOINT, dewPoint);
-                                        bundle.putDouble(WeatherUndergroundFeature.VISIBILITY, visiblility);
+                                        bundle.putDouble(WeatherUndergroundProbe.DEWPOINT, dewPoint);
+                                        bundle.putDouble(WeatherUndergroundProbe.VISIBILITY, visiblility);
 
                                         me.transmitData(context, bundle);
                                     } catch (Exception e)
@@ -240,7 +261,7 @@ public class WeatherUndergroundFeature extends Feature
             localManager.registerReceiver(receiver, intentFilter);
 
             SharedPreferences prefs = Probe.getPreferences(context);
-            prefs.edit().putLong("config_last_weather_underground_check", 0).commit();
+            prefs.edit().putLong(WeatherUndergroundProbe.LAST_CHECK, 0).commit();
 
             this._isInited = true;
         }
@@ -251,9 +272,11 @@ public class WeatherUndergroundFeature extends Feature
 
         if (super.isEnabled(context))
         {
-            if (prefs.getBoolean("config_feature_weather_underground_enabled", true))
+            if (prefs.getBoolean(WeatherUndergroundProbe.ENABLED, WeatherUndergroundProbe.DEFAULT_ENABLED))
                 this._isEnabled = true;
         }
+
+        WeatherUndergroundCalibrationHelper.check(context, this._isEnabled);
 
         return this._isEnabled;
     }
@@ -272,6 +295,10 @@ public class WeatherUndergroundFeature extends Feature
             values.put(false);
             enabled.put(Probe.PROBE_VALUES, values);
             settings.put(Probe.PROBE_ENABLED, enabled);
+
+            JSONObject apiKey = new JSONObject();
+            apiKey.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_STRING);
+            settings.put(WeatherUndergroundProbe.PROBE_API_KEY, apiKey);
         }
         catch (JSONException e)
         {
@@ -279,5 +306,63 @@ public class WeatherUndergroundFeature extends Feature
         }
 
         return settings;
+    }
+
+    public String assetPath(Context context)
+    {
+        return "current-weather-probe.html";
+    }
+
+    @Override
+    public Map<String, Object> configuration(Context context)
+    {
+        Map<String, Object> map = super.configuration(context);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        map.put(WeatherUndergroundProbe.PROBE_API_KEY, prefs.getString(WeatherUndergroundProbe.API_KEY, WeatherUndergroundProbe.DEFAULT_API_KEY));
+
+        return map;
+    }
+
+    @Override
+    public void updateFromMap(Context context, Map<String, Object> params)
+    {
+        super.updateFromMap(context, params);
+
+        if (params.containsKey(WeatherUndergroundProbe.PROBE_API_KEY))
+        {
+            String value = params.get(WeatherUndergroundProbe.PROBE_API_KEY).toString();
+
+            SharedPreferences prefs = Probe.getPreferences(context);
+            Editor e = prefs.edit();
+
+            e.putString(WeatherUndergroundProbe.API_KEY, value);
+            e.commit();
+        }
+    }
+
+    @Override
+    public PreferenceScreen preferenceScreen(final Context context, PreferenceManager manager)
+    {
+        final PreferenceScreen screen = manager.createPreferenceScreen(context);
+        screen.setTitle(this.title(context));
+        screen.setSummary(this.summary(context));
+
+        CheckBoxPreference enabled = new CheckBoxPreference(context);
+        enabled.setTitle(R.string.title_enable_probe);
+        enabled.setKey(WeatherUndergroundProbe.ENABLED);
+        enabled.setDefaultValue(WeatherUndergroundProbe.DEFAULT_ENABLED);
+
+        screen.addPreference(enabled);
+
+        FlexibleEditTextPreference apiKey = new FlexibleEditTextPreference(context);
+        apiKey.setKey(WeatherUndergroundProbe.API_KEY);
+        apiKey.setTitle(R.string.config_weather_underground_api_key_title);
+        apiKey.setDialogTitle(R.string.config_weather_underground_api_key_title);
+        apiKey.setDialogMessage(R.string.config_weather_underground_api_key_message);
+        screen.addPreference(apiKey);
+
+        return screen;
     }
 }

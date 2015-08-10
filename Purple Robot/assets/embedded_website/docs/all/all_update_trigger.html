@@ -160,6 +160,52 @@ PurpleRobot.persistString('battery-probe', 'level', level.toString());
 // Return whether or not to fire this trigger... (Omit return keyword because of Rhino oddness.)
 fire;</pre>
 
+
+<h4 style="margin-top: 2em;">Battery Level Triggers</h4>
+
+<p>
+    This is a trigger that fires when the device drops below a specified battery level:
+</p>
+
+<pre>{ 
+    "identifier": "97-battery-chime",
+    "name": "97% Battery Chime",
+    "type": "battery_level",
+    "action": "PurpleRobot.playDefaultTone();",
+    "is_decreasing": true,
+    "threshold": 97
+}</pre>
+
+<p>
+    The fields specific to battery level triggers:
+</p>
+
+<ul>
+    <li>
+        <p>
+            <code>is_decreasing</code>: Specifies whether the trigger should fire when the battery level is decreasing (default behavior).
+            If set to <code>false</code>, the trigger will fire when the device passes the threshold while charging.
+        </p>
+    </li>
+    <li>
+        <p>
+            <code>threshold</code>: Battery level threshold that fires the trigged.
+            Valid values are integers from <code>0</code> to <code>100</code>.
+        </p>
+    </li>
+</ul>
+
+<p>
+    In Scheme, the trigger above would be specified in the following manner using a list of pairs:
+</p>
+
+<pre>'(("identifier" . "97-battery-chime")
+  ("name" . "97% Battery Chime")
+  ("type" . "battery_level")
+  ("action" . "(pr-play-default-tone)")
+  ("is_decreasing" . #t)
+  ("threshold" . 97))</pre>
+
 <h4 class="code_arguments_label">Arguments</h4>
 
 <p><code>identifier</code>: Unique identifier for the trigger.</p>
@@ -195,7 +241,18 @@ var batteryTrigger = {
     "test": "var level = extras['level']; var threshold = 30; var lastLevel = PurpleRobot.fetchString('battery-probe', 'level');  if (lastLevel == null) lastLevel = 101.0; else lastLevel = parseFloat(lastLevel); var fire = false; PurpleRobot.log('Reading level: ' + level); PurpleRobot.log('Last level: ' + lastLevel); if (level < threshold && lastLevel >= threshold) fire = true; PurpleRobot.persistString('battery-probe', 'level', level.toString()); fire;"
 };
 
-PurpleRobot.updateTrigger('low-battery', batteryTrigger);</pre>
+PurpleRobot.updateTrigger('low-battery', batteryTrigger);
+
+var otherBatteryTrigger = { 
+    "identifier": "97-battery-chime",
+    "name": "97% Battery Chime",
+    "type": "battery_level",
+    "action": "PurpleRobot.playDefaultTone();",
+    "is_decreasing": true,
+    "threshold": 97
+};
+
+PurpleRobot.updateTrigger('97-battery-chime', otherBatteryTrigger);</pre>
 
 <h3 class="language_definition">Scheme Example</h3>
 
@@ -210,10 +267,16 @@ PurpleRobot.updateTrigger('low-battery', batteryTrigger);</pre>
                      ("datetime_repeat" . "FREQ=HOURLY;INTERVAL=1;")
                      ("fire_on_boot" . #t)))
 
-;;; Scheme test function coming soon...
 (pr-update-trigger '(("identifier" . "low-battery")
                      ("name" . "Low Battery Warning")
                      ("type" . "probe")
                      ("probe" . "edu.northwestern.cbits.purple_robot_manager.probes.builtin.BatteryProbe")
                      ("action" . "(begin (pr-play-default-tone) (pr-show-native-dialog \"Battery Warning\" \"Your battery is running low.\n\Please plug it in!\" \"Sure\" \"Maybe Later\" \"\" \"\"))")
-                     ("test" . "var level = extras['level']; var lastLevel = PurpleRobot.fetchString('battery-probe', 'level');  if (lastLevel == null) lastLevel = 101.0; else lastLevel = parseFloat(lastLevel); var threshold = 30; var fire = false; PurpleRobot.log('Reading level: ' + level); PurpleRobot.log('Last level: ' + lastLevel); if (level < threshold && lastLevel >= threshold) fire = true; PurpleRobot.persistString('battery-probe', 'level', level.toString()); fire;")))</pre>
+                     ("test" . "var level = extras['level']; var lastLevel = PurpleRobot.fetchString('battery-probe', 'level');  if (lastLevel == null) lastLevel = 101.0; else lastLevel = parseFloat(lastLevel); var threshold = 30; var fire = false; PurpleRobot.log('Reading level: ' + level); PurpleRobot.log('Last level: ' + lastLevel); if (level < threshold && lastLevel >= threshold) fire = true; PurpleRobot.persistString('battery-probe', 'level', level.toString()); fire;")))
+                     
+(pr-update-trigger '(("identifier" . "97-battery-chime")
+                    ("name" . "97% Battery Chime")
+                    ("type" . "battery_level")
+                    ("action" . "(pr-play-default-tone)")
+                    ("is_decreasing" . #t)
+                    ("threshold" . 97)))</pre>

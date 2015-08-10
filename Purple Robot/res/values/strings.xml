@@ -37,7 +37,13 @@
     
 	<string name="type_trigger_unknown">Unknown Trigger</string>
 	<string name="type_trigger_probe">Probe Trigger</string>
-	<string name="type_trigger_datetime">Time-Based Trigger</string>
+    <string name="type_trigger_datetime">Time-Based Trigger</string>
+    <string name="type_trigger_battery">Battery Level Trigger</string>
+
+    <string name="label_trigger_battery_threshold">Battery Level Fire Threshold</string>
+    <string name="label_trigger_battery_direction">Change Direction</string>
+    <string name="label_trigger_battery_increasing">Battery Level Increasing</string>
+    <string name="label_trigger_battery_decreasing">Battery Level Decreasing</string>
 
 	<string name="label_trigger_last_fire">Last Fired</string>
 	<string name="label_trigger_last_fire_never">Never</string>
@@ -93,6 +99,8 @@
     <string name="probe_status_enabled">Sensors &amp; probes enabled and collecting readings&#8230;</string>
     <string name="probe_status_disabled">Sensors &amp; probes disabled.</string>
     <string name="upload_status_enabled_wifi_only">Transmissions enabled when Wi-Fi is present.</string>
+    <string name="upload_status_enabled_wifi_charging_only">Transmissions enabled when Wi-Fi is present and the device is plugged-in.</string>
+    <string name="upload_status_enabled_charging_only">Transmissions enabled when the device is pluggged-in.</string>
     <string name="upload_status_enabled">Transmissions enabled.</string>
     <string name="upload_status_disabled">Transmissions disabled.</string>
     <string name="last_upload_format">%1$s (%2$d KB)</string>
@@ -189,7 +197,7 @@
 
     <string name="config_mute_warnings">Mute Status Notifications</string>
     <string name="summary_mute_warnings">Do not display sanity check notifications.</string>
-    
+
     <string name="error_json_set_uri_password">Unable to automatically set configuration from the web while the password is set.</string>
     <string name="success_json_set_uri">Successfully configured via the web.</string>
 
@@ -378,7 +386,9 @@
     <string name="title_external_storage_enabled">Use External Storage</string>
     <string name="summary_external_storage_enabled">Persist data prior to transmission in an publicly-accessible location on the device.</string>
 
-    <string name="probe_frequency_label">Sampling Rate</string>
+    <string name="probe_sensor_frequency_label">Sensor Frequency</string>
+    <string name="probe_frequency_label">Sampling Frequency</string>
+    <string name="probe_duration_label">Sampling Duration</string>
 
     <string name="display_date_format">HH:mm:ss.SSS, MMM d, yyyy</string>
     <string name="display_raw_data">Raw Values</string>
@@ -408,10 +418,8 @@
     
     <string name="display_humidity_readings">Humidity Measurements</string>
     <string name="display_humidity_reading">%1$.3f%% relative humidity</string>
-    
 
     <string name="display_probe_values">%1$d values</string>
-
 
     <string name="display_bluetooth_devices_title">Visible Devices (%1$d)</string>
     <string name="display_bluetooth_device_title">%1$s: %2$s</string>
@@ -548,6 +556,11 @@
     <string name="title_wear_accelerometer_probe">Android Wear Accelerometer Probe</string>
     <string name="summary_wear_accelerometer_probe_desc">Measures the acceleration applied to the Android Wear device. All values are in SI units (m/s^2).</string>
 
+    <!-- Accelerometer Sensor Probe -->
+    <string name="title_accelerometer_sensor_probe">Accelerometer Sensor Probe</string>
+    <string name="summary_accelerometer_sensor_probe_desc">Measures the acceleration applied to the device. All values are in SI units (m/s^2).</string>
+    <string name="summary_accelerator_sensor_probe">%1$.1f kB of accelerometer data</string>
+
     <!-- Gravity Probe -->
     <string name="title_gravity_probe">Gravity Probe</string>
     <string name="summary_gravity_probe_desc">Measures the gravitational force applied to the device. All values are in SI units (m/s^2).</string>
@@ -579,6 +592,13 @@
     <!-- Light Probe -->
     <string name="title_wear_light_probe">Android Wear Light Probe</string>
     <string name="summary_wear_light_probe_desc">Detects the ambient light level in SI lux units.</string>
+
+
+    <!-- Light Sensor Probe -->
+    <string name="title_light_sensor_probe">Light Sensor Probe</string>
+    <string name="summary_light_sensor_probe_desc">Detects the ambient light level in SI lux units.</string>
+    <string name="summary_light_sensor_probe">%1$.1f kB of light sensor data</string>
+
 
     <!-- Magnetic Probe -->
     <string name="title_magnetic_field_probe">Magnetic Field Probe</string>
@@ -641,8 +661,13 @@
     <!-- Raw Location Probe -->
     <string name="title_raw_location_probe">Raw Location Probe (Beta)</string>
     <string name="summary_raw_location_probe_desc">Variation of the location probe, but with battery conservation functionality removed for testing purposes.</string>
-    
-	<!-- Purple Robot Health Probe -->
+
+    <!-- Fused Location Probe -->
+    <string name="title_fused_location_probe">Fused Location Probe</string>
+    <string name="summary_fused_location_probe_desc">Location probe using Google Play Services\' location features.</string>
+    <string name="probe_fused_location_distance_label">Minimum Distance Threshold</string>
+
+    <!-- Purple Robot Health Probe -->
     <string name="title_robot_probe">Purple Robot Health</string>
     <string name="summary_robot_probe_desc">Summarizes the current state of the Purple Robot app, including the amount of data to be transmitted to the server.</string>
 
@@ -704,8 +729,8 @@
     <string name="summary_call_history_probe">%1$.0f Calls, %2$.1f Avg. Length (%3$.1f std.)</string>
 
     <!-- Call History Probe -->
-    <string name="title_weather_underground_feature">Current Weather Conditions</string>
-    <string name="summary_weather_underground_feature_desc">Acquires the latest weather data for the user\'s location from a Weather Underground station.</string>
+    <string name="title_weather_underground_feature">Weather Underground</string>
+    <string name="summary_weather_underground_feature_desc">Acquires the latest weather data for the user\'s location from a nearby Weather Underground station.</string>
     <string name="summary_weather_underground_probe">%1$s: %2$.1f&#176;C (%3$s)</string>
 
     <!-- Accelerometer Statistics Probe -->
@@ -938,6 +963,18 @@
     <string name="name_sanity_wear_battery">Android Wear Battery</string>
     <string name="name_sanity_wear_battery_warning">The connected Android Wear device is running low on power. Please charge the device soon.</string>
 
+    <string name="name_sanity_wifi_enabled">WiFi Network Status</string>
+    <string name="name_sanity_wifi_enabled_warning">Data uploads are restricted to WiFi networks, but the device\'s WiFi connection is disabled.</string>
+    <string name="name_sanity_wifi_enabled_error">Data uploads are restricted to WiFi networks, but the device\'s WiFi connection is disabled and a significant amount of data is accumulating on the device.</string>
+
+    <string name="name_sanity_charging_required">Charging Status</string>
+    <string name="name_sanity_charging_required_error">Data uploads are restricted to when the device is plugged-in and a significant amount of data is accumulated. Please plug in the device to upload the accumulated files.</string>
+
+    <string name="name_sanity_multiple_uploaders_enabled">Multiple Uploaders Enabled</string>
+    <string name="name_sanity_multiple_uploaders_enabled_warning">Multiple data upload plugins are currently enabled. This will likely result in duplicate readings at the data destination.</string>
+
+    <string name="name_sanity_location_services_enabled">Location Services Disabled</string>
+    <string name="name_sanity_location_services_enabled_warning">Required location services are currently disabled. Tap here to correct the issue.</string>
 
     <string name="message_clearing_archive">Clearing archive files&#8230;</string>
     
@@ -1062,11 +1099,18 @@
     <string name="probe_sensor_category">Hardware Sensor Probes</string>
     <string name="probe_studies_category">Study-Specific Probes</string>
     <string name="probe_beta_category">Beta &amp; Testing Probes</string>
+    <string name="probe_media_capture_category">Media Capture &amp; Recording Probes</string>
 
     <!-- Audio features probe -->
     <string name="title_audio_features_probe">Audio Features Probe</string>
     <string name="summary_audio_features_probe_desc">Extracts information about the audible environment at regular intervals.</string>
-    <string name="summary_audio_features_probe">Strongest frequency %1$.2f Hz</string>
+    <string name="summary_audio_features_probe">Strongest frequency: %1$.2f Hz</string>
+    <string name="probe_audio_feature_duration_label">Sampling Duration</string>
+    <string name="probe_audio_feature_sample_rate_label">Maximum Sample Rate</string>
+
+    <string name="title_audio_capture_probe">Audio Capture Probe</string>
+    <string name="summary_audio_capture_probe_desc">Periodically creates a recording of the audio environment.</string>
+    <string name="summary_audio_capture_probe">%1$d milliseconds of audio recorded</string>
 
     <!-- Comm. events probe -->
     <string name="title_communication_event_probe">Communication Events Probe</string>
@@ -1548,9 +1592,31 @@
 
     <string name="title_export_content">Export Documentation</string>
     <string name="title_export_bootstrap_site">Export Bootstrap Site</string>
+    <string name="title_export_jekyll_site">Export Jekyll Documentation Pages</string>
 
     <string name="email_export_bootstrap_subject">Purple Robot Bootstrap Site</string>
     <string name="message_export_bootstrap_subject">The attached ZIP file contains a static Bootstrap site.\n\nEnjoy!\n\n-Purple Robot\n\n</string>
 
+    <string name="email_export_jekyll_subject">Purple Robot Jekyll Pages</string>
+    <string name="message_export_jekyll_subject">The attached ZIP file contains a collection of static Jekyll pages.\n\nEnjoy!\n\n-Purple Robot\n\n</string>
+
     <string name="toast_compiling_export">Compiling export&#8230;</string>
+
+    <string name="title_wakelock_info_probe">Wake Lock Information</string>
+    <string name="summary_wakelock_info_probe_desc">Reports details about wake locks that affect power management and efficiency.</string>
+    <string name="summary_wakelock_info_probe">Wake Locks: %1$d Partial, %2$d Dim, %3$d Bright, %4$d Full</string>
+
+    <string name="notify_audio_recording_active">Audio Recording</string>
+    <string name="notify_audio_recording_active_details">The audio capture probe is currently recording&#8230;</string>
+
+    <string name="permission_fetch_data">fetch data from Purple Robot</string>
+
+    <string name="config_weather_underground_api_key_title">Weather Underground API Key</string>
+    <string name="title_weather_underground_check">Missing Weather Underground API key</string>
+    <string name="url_weather_api_key">http://www.wunderground.com/weather/api</string>
+    <string name="message_weather_underground_check">A custom Weather Underground API key is required for fetching weather data. Please obtain one and enter it in the Settings. (Probe Configuration &#8594; External Service Probes &#8594; Weather Underground &#8594; API Key)</string>
+    <string name="config_weather_underground_api_key_message">Please enter a custom API key obtained from Weather Underground.</string>
+
+    <string name="name_location_services_check">Location services are unavailable.</string>
+    <string name="message_location_services_check">Unable to fetch location information. Tap here to inspect your system settings.</string>
 </resources>

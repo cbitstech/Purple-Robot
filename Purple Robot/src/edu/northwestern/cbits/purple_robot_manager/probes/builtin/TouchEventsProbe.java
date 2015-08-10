@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.PixelFormat;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.preference.CheckBoxPreference;
@@ -25,9 +26,8 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class TouchEventsProbe extends Probe
 {
+    private static final String ENABLED = "config_probe_touch_events_enabled";
     private static final boolean DEFAULT_ENABLED = false;
-
-    private static final String ENABLED = "config_probe_activity_detection_enabled";
 
     private Context _context = null;
     private View _overlay = null;
@@ -160,14 +160,10 @@ public class TouchEventsProbe extends Probe
         {
             WindowManager wm = (WindowManager) this._context.getSystemService(Context.WINDOW_SERVICE);
 
-            try
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
             {
                 if (this._overlay.isAttachedToWindow())
                     wm.removeView(this._overlay);
-            }
-            catch (NoSuchMethodError e)
-            {
-                LogManager.getInstance(this._context).logException(e);
             }
 
             this._overlay = null;

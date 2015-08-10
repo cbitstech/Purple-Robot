@@ -80,6 +80,14 @@ public class RotationProbe extends ContinuousProbe implements SensorEventListene
     private static Handler _handler = null;
 
     @Override
+    public boolean getUsesThread()
+    {
+        SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
+
+        return prefs.getBoolean(RotationProbe.USE_HANDLER, RotationProbe.DEFAULT_USE_HANDLER);
+    }
+
+    @Override
     public Intent viewIntent(Context context)
     {
         Intent i = new Intent(context, WebkitLandscapeActivity.class);

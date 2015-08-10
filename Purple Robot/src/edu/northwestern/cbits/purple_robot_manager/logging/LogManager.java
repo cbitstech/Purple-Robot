@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.util.Log;
+
 import edu.northwestern.cbits.anthracite.Logger;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 
@@ -47,7 +49,7 @@ public class LogManager
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        this._logger.setDebug(true);
+        this._logger.setDebug(false);
         this._logger.setEnabled(prefs.getBoolean(LogManager.ENABLED, LogManager.ENABLED_DEFAULT));
         this._logger.setHeartbeat(prefs.getBoolean(LogManager.HEARTBEAT, LogManager.HEARTBEAT_DEFAULT));
         this._logger.setIncludeLocation(prefs.getBoolean(LogManager.INCLUDE_LOCATION, LogManager.INCLUDE_LOCATION_DEFAULT));
@@ -106,6 +108,8 @@ public class LogManager
 
     public void upload()
     {
+        Log.e("PR", "----- ATTEMPT LOG UPLOADS ------");
+
         this._logger.attemptUploads(true);
     }
 

@@ -38,7 +38,6 @@
         
         <item>features.DeviceInUseFeature</item>
         <item>features.CallHistoryFeature</item>
-        <item>features.WeatherUndergroundFeature</item>
         <item>features.SunriseSunsetFeature</item>
         <item>features.AccelerometerBasicStatisticsFeature</item>
         <item>features.GyroscopeBasicStatisticsFeature</item>
@@ -59,6 +58,7 @@
         <item>services.FacebookProbe</item>
         <item>services.FacebookEventsProbe</item>
         <item>services.GooglePlacesProbe</item>
+        <item>services.WeatherUndergroundProbe</item>
 
         <item>builtin.RandomNoiseProbe</item>
         <item>builtin.NfcProbe</item>
@@ -79,6 +79,7 @@
         <item>builtin.SignificantMotionProbe</item>
 
         <item>builtin.RawLocationProbe</item>
+        <item>builtin.FusedLocationProbe</item>
         <item>builtin.MediaRouterDeviceProbe</item>
         <item>builtin.ShionProbe</item>
         <item>builtin.SaintProbe</item>
@@ -93,12 +94,18 @@
         <item>devices.wear.WearGyroscopeProbe</item>
         <item>devices.wear.WearMagneticFieldProbe</item>
 
+        <item>sensors.AccelerometerSensorProbe</item>
+        <item>sensors.LightSensorProbe</item>
+
         <item>builtin.TouchEventsProbe</item>
         <!-- <item>builtin.BluetoothReceiverProbe</item> -->
         <!-- <item>builtin.ZeroconfProbe</item> -->
 
         <item>studies.LivewellActivityCountsProbe</item>
         <item>studies.LivewellPebbleActivityCountsProbe</item>
+
+        <item>builtin.WakeLockInformationProbe</item>
+        <item>media.AudioCaptureProbe</item>
     </array>
 
 	<array name="output_plugin_classes">
@@ -136,7 +143,23 @@
        	<item>2 minutes</item>
     </string-array>
 
-	<string-array name="frequency_probe_duration_values">
+    <string-array name="probe_duration_with_none_values">
+        <item>0</item>
+        <item>5</item>
+        <item>15</item>
+        <item>60</item>
+        <item>120</item>
+    </string-array>
+
+    <string-array name="probe_duration_with_none_labels">
+        <item>Continuous</item>
+        <item>5 seconds</item>
+        <item>15 seconds</item>
+        <item>1 minute</item>
+        <item>2 minutes</item>
+    </string-array>
+
+    <string-array name="frequency_probe_duration_values">
         <item>0</item>
         <item>5</item>
         <item>15</item>
@@ -272,7 +295,7 @@
 	<string-array name="probe_continuous_frequency_values">
         <item>0</item>
         <item>1</item>
-        <item>2</item>probe_livewell_wear_bin_values
+        <item>2</item>
         <item>3</item>
    	</string-array>
 
@@ -345,16 +368,6 @@
         <item>1800000</item>
  	</string-array>
 
-	<string-array name="probe_low_frequency_labels">
-        <item>Every minute</item>
-        <item>Every 5 minutes</item>
-        <item>Every 30 minutes</item>
-        <item>Every hour</item>
-        <item>Every 4 hours</item>
-        <item>Every 12 hours</item>
-        <item>Every day</item>
-   	</string-array>
-
 	<string-array name="probe_activity_recognition_frequency_values">
         <item>0</item>
         <item>1000</item>
@@ -382,8 +395,33 @@
         <item>Every 12 hours</item>
         <item>Every day</item>
    	</string-array>
-	
-	
+
+    <string-array name="probe_sample_frequency_labels">
+        <item>Every minute</item>
+        <item>Every 5 minutes</item>
+        <item>Every 30 minutes</item>
+        <item>Every hour</item>
+    </string-array>
+
+    <string-array name="probe_sample_frequency_values">
+        <item>60000</item>
+        <item>300000</item>
+        <item>600000</item>
+        <item>1800000</item>
+        <item>3600000</item>
+    </string-array>
+
+
+    <string-array name="probe_low_frequency_labels">
+        <item>Every minute</item>
+        <item>Every 5 minutes</item>
+        <item>Every 30 minutes</item>
+        <item>Every hour</item>
+        <item>Every 4 hours</item>
+        <item>Every 12 hours</item>
+        <item>Every day</item>
+    </string-array>
+
 	<string-array name="probe_low_frequency_values">
         <item>60000</item>
         <item>300000</item>
@@ -628,6 +666,10 @@
         <item>LogEventCheck</item>
         <item>PebbleProbesCheck</item>
         <item>Android50MemoryCheck</item>
+        <item>WifiEnabledCheck</item>
+        <item>ChargingRequiredCheck</item>
+        <item>MultipleUploadersEnabledCheck</item>
+        <item>LocationServicesEnabledCheck</item>
         <!-- <item>TestErrorCheck</item> -->
         <!-- <item>TestWarningCheck</item> -->
    	</array>
@@ -880,4 +922,64 @@
         <item>MD5</item>
         <item>SHA-256</item>
     </array>
+
+    <string-array name="probe_fused_location_distance">
+        <item>0</item>
+        <item>50</item>
+        <item>100</item>
+        <item>200</item>
+        <item>400</item>
+        <item>800</item>
+        <item>1000</item>
+        <item>1600</item>
+        <item>3200</item>
+        <item>5000</item>
+        <item>10000</item>
+        <item>16000</item>
+    </string-array>
+
+    <string-array name="probe_fused_location_distance_labels">
+        <item>None</item>
+        <item>50 meters</item>
+        <item>100 meters</item>
+        <item>200 meters</item>
+        <item>400 meters</item>
+        <item>800 meters</item>
+        <item>1 kilometer</item>
+        <item>1.6 km (approx. 1 mile)</item>
+        <item>3.2 km</item>
+        <item>5 km</item>
+        <item>10 km</item>
+        <item>16.0 km (approx. 10 miles)</item>
+    </string-array>
+
+    <string-array name="probe_audio_feature_duration_values">
+        <item>1000</item>
+        <item>5000</item>
+        <item>10000</item>
+        <item>15000</item>
+        <item>30000</item>
+    </string-array>
+
+    <string-array name="probe_audio_feature_duration_labels">
+        <item>1 second</item>
+        <item>5 seconds</item>
+        <item>10 seconds</item>
+        <item>15 seconds</item>
+        <item>30 seconds</item>
+    </string-array>
+
+    <string-array name="probe_audio_feature_sample_rate_values">
+        <item>44100</item>
+        <item>22050</item>
+        <item>11025</item>
+        <item>8000</item>
+    </string-array>
+
+    <string-array name="probe_audio_feature_sample_rate_labels">
+        <item>44.1 kHz (CD Quality)</item>
+        <item>22.05 kHz (AM Radio Quality)</item>
+        <item>11.025 Khz (Voice Quality)</item>
+        <item>8 Khz (Telephone Quality)</item>
+    </string-array>
 </resources>

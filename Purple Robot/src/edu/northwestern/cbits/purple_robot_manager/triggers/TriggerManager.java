@@ -26,6 +26,7 @@ import edu.northwestern.cbits.purple_robot_manager.activities.settings.SettingsK
 import edu.northwestern.cbits.purple_robot_manager.config.SchemeConfigFile;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.scripting.BaseScriptEngine;
+import edu.northwestern.cbits.purple_robot_manager.util.WakeLockManager;
 
 public class TriggerManager
 {
@@ -56,9 +57,7 @@ public class TriggerManager
     @SuppressLint("Wakelock")
     public void nudgeTriggers(Context context)
     {
-        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-        WakeLock wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, "trigger_wakelock");
-        wakeLock.acquire();
+        WakeLock wakeLock = WakeLockManager.getInstance(context).requestWakeLock(PowerManager.PARTIAL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, "trigger_manager_wakelock");
 
         Date now = new Date();
 
@@ -81,7 +80,7 @@ public class TriggerManager
             }
         }
 
-        wakeLock.release();
+        WakeLockManager.getInstance(context).releaseWakeLock(wakeLock);
     }
 
     public void updateTriggers(Context context, List<Trigger> triggerList)
@@ -382,9 +381,7 @@ public class TriggerManager
     {
         ArrayList<Long> upcoming = new ArrayList<>();
 
-        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-        WakeLock wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, "trigger_wakelock");
-        wakeLock.acquire();
+        WakeLock wakeLock = WakeLockManager.getInstance(context).requestWakeLock(PowerManager.PARTIAL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, "trigger_wakelock");
 
         long now = System.currentTimeMillis();
 
@@ -403,7 +400,7 @@ public class TriggerManager
 
         Collections.sort(upcoming);
 
-        wakeLock.release();
+        WakeLockManager.getInstance(context).releaseWakeLock(wakeLock);
 
         return upcoming;
     }

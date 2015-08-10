@@ -8,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,6 +24,7 @@ import android.preference.PreferenceScreen;
 import android.provider.CallLog;
 import android.provider.CallLog.Calls;
 import android.telephony.PhoneNumberUtils;
+
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.probes.AddressBookLabelActivity;
@@ -52,6 +54,14 @@ public class CommunicationLogProbe extends Probe
     private static final String NUMBER_GROUP = "NUMBER_GROUP";
     private static final String RECENT_GROUP = "RECENT_GROUP";
 
+    private static final String SMS_MESSAGES = "SMS_MESSAGES";
+    private static final String MESSAGE_TIMESTAMP = "MESSAGE_TIMESTAMP";
+    private static final String MESSAGE_DIRECTION = "MESSAGE_DIRECTION";
+    private static final String MESSAGE_OUTGOING = "OUTGOING";
+    private static final String MESSAGE_INCOMING = "INCOMING";
+    private static final String MESSAGE_BODY = "BODY";
+
+
     public static final boolean DEFAULT_ENABLED = true;
     public static final String ENABLED = "config_probe_communication_enabled";
     private static final String FREQUENCY = "config_probe_communication_frequency";
@@ -59,6 +69,12 @@ public class CommunicationLogProbe extends Probe
 
     public static final boolean DEFAULT_ENABLE_CALIBRATION_NOTIFICATIONS = true;
     public static final String ENABLE_CALIBRATION_NOTIFICATIONS = "config_probe_communication_calibration_notifications";
+
+    private static final String RETRIEVE_DATA = "config_probe_communication_log_retrieve_data";
+    private static final boolean DEFAULT_RETRIEVE = false;
+
+    private static final String ENCRYPT_DATA = "config_probe_communication_log_encrypt_data";
+    private static final boolean DEFAULT_ENCRYPT = true;
 
     private long _lastCheck = 0;
 
@@ -179,7 +195,7 @@ public class CommunicationLogProbe extends Probe
                                 contactBundle.putLong(CommunicationLogProbe.CALL_DURATION, c.getLong(c.getColumnIndex(Calls.DURATION)));
                                 contactBundle.putString(CommunicationLogProbe.NUMBER, phoneNumber);
 
-                                int callType = c.getInt(c.getColumnIndex(Calls.CACHED_NUMBER_TYPE));
+                                int callType = c.getInt(c.getColumnIndex(Calls.TYPE));
 
                                 contactBundle.putInt(CommunicationLogProbe.NUMBER_TYPE, callType);
 
@@ -232,18 +248,122 @@ public class CommunicationLogProbe extends Probe
                             sentCount = 0;
                             receivedCount = 0;
 
+                            ArrayList<Bundle> messages = new ArrayList<>();
+
                             Uri smsInboxUri = Uri.parse("content://sms/inbox");
                             c = context.getContentResolver().query(smsInboxUri, null, null, null, null);
                             receivedCount = c.getCount();
+
+                            while (c.moveToNext())
+                            {
+                                Bundle message = new Bundle();
+
+                                String numberName = c.getString(c.getColumnIndex("person"));
+                                String phoneNumber = PhoneNumberUtils.formatNumber(c.getString(c.getColumnIndex("address")));
+
+                                if (numberName == null)
+                                    numberName = phoneNumber;
+
+                                group = ContactCalibrationHelper.getGroup(context, numberName, false);
+
+                                if (group == null)
+                                    group = ContactCalibrationHelper.getGroup(context, phoneNumber, true);
+
+                                if (group != null)
+                                    message.putString(CommunicationLogProbe.NUMBER_GROUP, group);
+
+                                if (doHash)
+                                {
+                                    numberName = em.createHash(context, numberName);
+                                    phoneNumber = em.createHash(context, phoneNumber);
+                                }
+
+                                message.putString(CommunicationLogProbe.NUMBER_NAME, numberName);
+                                message.putString(CommunicationLogProbe.NUMBER, phoneNumber);
+
+                                long callTime = c.getLong(c.getColumnIndex("date"));
+
+                                message.putLong(CommunicationLogProbe.MESSAGE_TIMESTAMP, callTime);
+
+                                message.putString(CommunicationLogProbe.MESSAGE_DIRECTION, CommunicationLogProbe.MESSAGE_OUTGOING);
+
+                                boolean retrieve = prefs.getBoolean(CommunicationLogProbe.RETRIEVE_DATA, CommunicationLogProbe.DEFAULT_RETRIEVE);
+                                boolean encrypt = prefs.getBoolean(CommunicationLogProbe.ENCRYPT_DATA, CommunicationLogProbe.DEFAULT_ENCRYPT);
+
+                                if (retrieve)
+                                {
+                                    String body = c.getString(c.getColumnIndex("body"));
+
+                                    if (encrypt)
+                                        body = em.encryptString(context, body);
+
+                                    message.putString(CommunicationLogProbe.MESSAGE_BODY, body);
+                                }
+
+                                messages.add(message);
+                            }
+
                             c.close();
 
                             Uri smsOutboxUri = Uri.parse("content://sms/sent");
                             c = context.getContentResolver().query(smsOutboxUri, null, null, null, null);
                             sentCount = c.getCount();
+
+                            while (c.moveToNext())
+                            {
+                                Bundle message = new Bundle();
+
+                                String numberName = c.getString(c.getColumnIndex("person"));
+                                String phoneNumber = PhoneNumberUtils.formatNumber(c.getString(c.getColumnIndex("address")));
+
+                                if (numberName == null)
+                                    numberName = phoneNumber;
+
+                                group = ContactCalibrationHelper.getGroup(context, numberName, false);
+
+                                if (group == null)
+                                    group = ContactCalibrationHelper.getGroup(context, phoneNumber, true);
+
+                                if (group != null)
+                                    message.putString(CommunicationLogProbe.NUMBER_GROUP, group);
+
+                                if (doHash)
+                                {
+                                    numberName = em.createHash(context, numberName);
+                                    phoneNumber = em.createHash(context, phoneNumber);
+                                }
+
+                                message.putString(CommunicationLogProbe.NUMBER_NAME, numberName);
+                                message.putString(CommunicationLogProbe.NUMBER, phoneNumber);
+
+                                long callTime = c.getLong(c.getColumnIndex("date"));
+
+                                message.putLong(CommunicationLogProbe.MESSAGE_TIMESTAMP, callTime);
+
+                                message.putString(CommunicationLogProbe.MESSAGE_DIRECTION, CommunicationLogProbe.MESSAGE_INCOMING);
+
+                                boolean retrieve = prefs.getBoolean(CommunicationLogProbe.RETRIEVE_DATA, CommunicationLogProbe.DEFAULT_RETRIEVE);
+                                boolean encrypt = prefs.getBoolean(CommunicationLogProbe.ENCRYPT_DATA, CommunicationLogProbe.DEFAULT_ENCRYPT);
+
+                                if (retrieve)
+                                {
+                                    String body = c.getString(c.getColumnIndex("body"));
+
+                                    if (encrypt)
+                                        body = em.encryptString(context, body);
+
+                                    message.putString(CommunicationLogProbe.MESSAGE_BODY, body);
+                                }
+
+                                messages.add(message);
+                            }
+
                             c.close();
 
                             bundle.putInt(CommunicationLogProbe.SMS_OUTGOING_COUNT, sentCount);
                             bundle.putInt(CommunicationLogProbe.SMS_INCOMING_COUNT, receivedCount);
+
+                            bundle.putParcelableArrayList(CommunicationLogProbe.SMS_MESSAGES, messages);
 
                             this.transmitData(context, bundle);
                         }
@@ -288,6 +408,12 @@ public class CommunicationLogProbe extends Probe
 
         boolean hash = prefs.getBoolean(CommunicationLogProbe.HASH_DATA, Probe.DEFAULT_HASH_DATA);
         map.put(Probe.HASH_DATA, hash);
+
+        boolean encrypt = prefs.getBoolean(CommunicationLogProbe.ENCRYPT_DATA, CommunicationLogProbe.DEFAULT_ENCRYPT);
+        map.put(CommunicationLogProbe.ENCRYPT_DATA, encrypt);
+
+        boolean retrieve = prefs.getBoolean(CommunicationLogProbe.RETRIEVE_DATA, CommunicationLogProbe.DEFAULT_RETRIEVE);
+        map.put(CommunicationLogProbe.RETRIEVE_DATA, retrieve);
 
         boolean calibrateNotes = prefs.getBoolean(CommunicationLogProbe.ENABLE_CALIBRATION_NOTIFICATIONS, CommunicationLogProbe.DEFAULT_ENABLE_CALIBRATION_NOTIFICATIONS);
 
@@ -347,6 +473,34 @@ public class CommunicationLogProbe extends Probe
                 e.commit();
             }
         }
+
+        if (params.containsKey(CommunicationLogProbe.RETRIEVE_DATA))
+        {
+            Object retrieve = params.get(CommunicationLogProbe.RETRIEVE_DATA);
+
+            if (retrieve instanceof Boolean)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putBoolean(CommunicationLogProbe.RETRIEVE_DATA, (Boolean) retrieve);
+                e.commit();
+            }
+        }
+
+        if (params.containsKey(CommunicationLogProbe.ENCRYPT_DATA))
+        {
+            Object encrypt = params.get(CommunicationLogProbe.ENCRYPT_DATA);
+
+            if (encrypt instanceof Boolean)
+            {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putBoolean(CommunicationLogProbe.ENCRYPT_DATA, (Boolean) encrypt);
+                e.commit();
+            }
+        }
     }
 
     @Override
@@ -386,6 +540,43 @@ public class CommunicationLogProbe extends Probe
         hash.setSummary(R.string.config_probe_communication_hash_summary);
 
         screen.addPreference(hash);
+
+        CheckBoxPreference retrieve = new CheckBoxPreference(context);
+        retrieve.setKey(CommunicationLogProbe.RETRIEVE_DATA);
+        retrieve.setDefaultValue(CommunicationLogProbe.DEFAULT_RETRIEVE);
+        retrieve.setTitle(R.string.config_probe_communication_retrieve_title);
+        retrieve.setSummary(R.string.config_probe_communication_retrieve_summary);
+
+        retrieve.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
+        {
+            @Override
+            public boolean onPreferenceChange(Preference arg0, Object newValue)
+            {
+                Boolean b = (Boolean) newValue;
+
+                if (b)
+                {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder = builder.setTitle(R.string.config_probe_communication_retrieve_warning_title);
+                    builder = builder.setMessage(R.string.config_probe_communication_retrieve_warning);
+                    builder = builder.setPositiveButton(R.string.button_continue, null);
+
+                    builder.create().show();
+                }
+
+                return true;
+            }
+        });
+
+        screen.addPreference(retrieve);
+
+        CheckBoxPreference encrypt = new CheckBoxPreference(context);
+        encrypt.setKey(CommunicationLogProbe.ENCRYPT_DATA);
+        encrypt.setDefaultValue(CommunicationLogProbe.DEFAULT_ENCRYPT);
+        encrypt.setTitle(R.string.config_probe_communication_encrypt_title);
+        encrypt.setSummary(R.string.config_probe_communication_encrypt_summary);
+
+        screen.addPreference(encrypt);
 
         Preference calibrate = new Preference(context);
         calibrate.setTitle(R.string.config_probe_calibrate_title);
@@ -500,7 +691,7 @@ public class CommunicationLogProbe extends Probe
         formatted.putString(context.getString(R.string.display_calls_recent_caller_title), bundle.getString(CommunicationLogProbe.RECENT_CALLER));
         formatted.putString(context.getString(R.string.display_calls_recent_number_title), bundle.getString(CommunicationLogProbe.RECENT_NUMBER));
 
-        Date d = new Date(bundle.getLong(CommunicationLogProbe.RECENT_TIME));
+        Date d = new Date((long) bundle.getDouble(CommunicationLogProbe.RECENT_TIME));
 
         formatted.putString(context.getString(R.string.display_calls_recent_time_title), d.toString());
 

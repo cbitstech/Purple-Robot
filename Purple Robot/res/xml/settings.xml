@@ -380,6 +380,7 @@
 		<Preference android:title="@string/title_run_tests"	android:key="config_run_tests" />
 		<PreferenceScreen android:title="@string/title_export_content">
 			<Preference android:title="@string/title_export_bootstrap_site" android:key="config_export_bootstrap" />
+			<Preference android:title="@string/title_export_jekyll_site" android:key="config_export_jekyll" />
 		</PreferenceScreen>
 	</PreferenceCategory>
 </PreferenceScreen>

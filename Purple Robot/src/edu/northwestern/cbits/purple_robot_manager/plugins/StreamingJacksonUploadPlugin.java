@@ -4,11 +4,13 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.mutable.MutableInt;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -28,7 +30,6 @@ import android.util.Log;
 
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
@@ -43,18 +44,25 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
     private static final String TEMP_FILE_EXTENSION = ".jackson-temp";
     private static final String PRIORITY_FILE_EXTENSION = ".priority";
 
-    private static final String ENABLED = "config_enable_streaming_jackson_data_server";
+    public static final String ENABLED = "config_enable_streaming_jackson_data_server";
     private static final String UPLOAD_SIZE = "config_streaming_jackson_upload_size";
     private static final String UPLOAD_INTERVAL = "config_streaming_jackson_upload_interval";
 
     private static final String UPLOAD_SIZE_DEFAULT = "262114";
     private static final String UPLOAD_INTERVAL_DEFAULT = "300";
+    public static final boolean ENABLED_DEFAULT = false;
+    public static final String LAST_UPLOAD_TIME = "streaming_json_last_upload";
+    public static final String LAST_UPLOAD_SIZE = "streaming_json_last_upload_size";
 
     private JsonGenerator _generator = null;
     private boolean _priorityPayload = false;
 
     private long _lastAttempt = 0;
     private File _currentFile = null;
+    private boolean _hasPriorityPayloads = true;
+
+    private ArrayList<String> _regularFilenames = new ArrayList<>();
+    private ArrayList<String> _priorityFilenames = new ArrayList<>();
 
     public String[] respondsTo()
     {
@@ -63,7 +71,7 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
         return activeActions;
     }
 
-    private void uploadFiles(final Context context, final SharedPreferences prefs)
+    private void uploadFiles(final Context context, final SharedPreferences prefs, final int callLevel)
     {
         long now = System.currentTimeMillis();
 
@@ -89,30 +97,55 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
 
                         File pendingFolder = me.getPendingFolder();
 
-                        String[] priorityFilenames = pendingFolder.list(new FilenameFilter()
-                        {
-                            public boolean accept(File dir, String filename)
-                            {
-                                return filename.endsWith(StreamingJacksonUploadPlugin.PRIORITY_FILE_EXTENSION);
+                        String[] filenames = {};
+
+                        final MutableInt found = new MutableInt(0);
+
+                        String[] priorityFilenames = pendingFolder.list(new FilenameFilter() {
+                            public boolean accept(File dir, String filename) {
+                                // Only return first 256 for performance reasons...
+                                if (found.intValue() >= 256)
+                                    return false;
+
+                                if (filename.endsWith(StreamingJacksonUploadPlugin.PRIORITY_FILE_EXTENSION)) {
+                                    found.add(1);
+
+                                    return true;
+                                }
+
+                                return false;
                             }
                         });
 
-                        String[] filenames = null;
+                        filenames = priorityFilenames;
 
-                        if (priorityFilenames != null && priorityFilenames.length > 0)
-                            filenames = priorityFilenames;
-                        else
+                        if (filenames == null || found.intValue() == 0)
                         {
-                            filenames = pendingFolder.list(new FilenameFilter()
-                            {
-                                public boolean accept(File dir, String filename)
-                                {
-                                    return filename.endsWith(StreamingJacksonUploadPlugin.FILE_EXTENSION);
-                                }
-                            });
+                            me._hasPriorityPayloads = false;
 
-                            if (filenames == null)
-                                filenames = new String[0];
+                            if (me._regularFilenames.size() == 0) {
+                                String[] regularFilenames = pendingFolder.list(new FilenameFilter() {
+                                    public boolean accept(File dir, String filename) {
+                                        // Only return first 1024 for performance reasons...
+                                        if (found.intValue() >= 1024)
+                                            return false;
+
+                                        if (filename.endsWith(StreamingJacksonUploadPlugin.FILE_EXTENSION)) {
+                                            found.add(1);
+
+                                            return true;
+                                        }
+
+                                        return false;
+                                    }
+                                });
+
+
+                                for (String filename : regularFilenames)
+                                    me._regularFilenames.add(filename);
+                            }
+
+                            filenames = me._regularFilenames.toArray(new String[0]);
                         }
 
                         if (filenames.length < 1)
@@ -125,16 +158,35 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
                         if (filenames.length > 1)
                             index = random.nextInt(filenames.length);
 
-                        File payloadFile = new File(pendingFolder, filenames[index]);
+                        String filename = filenames[index];
+                        me._priorityFilenames.remove(filename);
+                        me._regularFilenames.remove(filename);
+
+                        File payloadFile = new File(pendingFolder, filename);
 
                         String payload = FileUtils.readFileToString(payloadFile, "UTF-8");
 
-                        if (me.transmitPayload(prefs, payload) == DataUploadPlugin.RESULT_SUCCESS)
+                        int result = me.transmitPayload(prefs, payload);
+
+                        if (result == DataUploadPlugin.RESULT_SUCCESS)
                         {
+                            SharedPreferences.Editor e = prefs.edit();
+                            e.putLong(StreamingJacksonUploadPlugin.LAST_UPLOAD_TIME, System.currentTimeMillis());
+                            e.putLong(StreamingJacksonUploadPlugin.LAST_UPLOAD_SIZE, payloadFile.length());
+                            e.commit();
+
                             payloadFile.delete();
 
                             me._lastAttempt = 0;
-                            me.uploadFiles(context, prefs);
+                            me.uploadFiles(context, prefs, callLevel + 1);
+                        }
+                        else if (result == DataUploadPlugin.RESULT_NO_CONNECTION)
+                        {
+                            // WiFi only or no connection...
+                        }
+                        else if (result == DataUploadPlugin.RESULT_NO_POWER)
+                        {
+                            // Device isn't charging...
                         }
                         else
                         {
@@ -178,7 +230,7 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
         final Context context = this.getContext().getApplicationContext();
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        if (prefs.getBoolean(StreamingJacksonUploadPlugin.ENABLED, false) == false)
+        if (prefs.getBoolean(StreamingJacksonUploadPlugin.ENABLED, StreamingJacksonUploadPlugin.ENABLED_DEFAULT) == false)
             return;
 
         synchronized (this)
@@ -189,7 +241,7 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
             {
                 this._lastAttempt = 0;
 
-                this.uploadFiles(context, prefs);
+                this.uploadFiles(context, prefs, 0);
             }
             else if (Probe.PROBE_READING.equals(action))
             {
@@ -221,7 +273,7 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
                                 this.closeOpenSession();
                         }
 
-                        this.uploadFiles(context, prefs);
+                        this.uploadFiles(context, prefs, 0);
 
                         if (this._generator == null)
                         {
@@ -249,7 +301,7 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
         }
     }
 
-    private void closeOpenSession() throws JsonGenerationException, IOException
+    private void closeOpenSession() throws IOException
     {
         if (this._generator == null || this._currentFile == null)
             return;
@@ -266,7 +318,11 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
         String finalFile = tempFile.replace(TEMP_FILE_EXTENSION, FILE_EXTENSION);
 
         if (this._priorityPayload)
+        {
+            this._hasPriorityPayloads = true;
+
             finalFile = finalFile.replace(FILE_EXTENSION, PRIORITY_FILE_EXTENSION);
+        }
 
         this._currentFile = null;
         this._priorityPayload = false;
@@ -597,6 +653,6 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
     {
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        return prefs.getBoolean(StreamingJacksonUploadPlugin.ENABLED, false);
+        return prefs.getBoolean(StreamingJacksonUploadPlugin.ENABLED, StreamingJacksonUploadPlugin.ENABLED_DEFAULT);
     }
 }

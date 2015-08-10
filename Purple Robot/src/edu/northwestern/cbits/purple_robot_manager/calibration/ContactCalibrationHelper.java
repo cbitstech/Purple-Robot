@@ -10,9 +10,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.CallLog;
 import android.provider.CallLog.Calls;
+import android.provider.ContactsContract;
 import android.telephony.PhoneNumberUtils;
 
 import edu.emory.mathcs.backport.java.util.Collections;
@@ -69,7 +71,6 @@ public class ContactCalibrationHelper
                     context.startActivity(intent);
                 }
             };
-
 
             sanity.addAlert(SanityCheck.WARNING, title, message, action);
         }
@@ -130,6 +131,8 @@ public class ContactCalibrationHelper
         ArrayList<ContactRecord> contacts = new ArrayList<>();
         ArrayList<ContactRecord> normalizedContacts = new ArrayList<>();
 
+        HashMap<String, String> nameCache = new HashMap<String, String>();
+
         try
         {
             Cursor c = context.getContentResolver().query(CallLog.Calls.CONTENT_URI, null, null, null, null);
@@ -188,9 +191,126 @@ public class ContactCalibrationHelper
                 }
             }
 
-            Collections.sort(contacts);
+            c.close();
+
+            c = context.getContentResolver().query(Uri.parse("content://sms/inbox"), null, null, null, "date");
+
+            while (c != null && c.moveToNext())
+            {
+                String numberName = c.getString(c.getColumnIndex("person"));
+                String phoneNumber = PhoneNumberUtils.formatNumber(c.getString(c.getColumnIndex("address")));
+
+                if (numberName == null)
+                    numberName = phoneNumber;
+
+                boolean found = false;
+
+                for (ContactRecord contact : contacts)
+                {
+                    if (contact.number.endsWith(phoneNumber) || phoneNumber.endsWith(contact.number))
+                    {
+                        String largerNumber = contact.number;
+
+                        if (phoneNumber.length() > largerNumber.length())
+                            largerNumber = phoneNumber;
+
+                        contact.number = largerNumber;
+
+                        found = true;
+                        contact.count += 1;
+
+                        if ("".equals(numberName) == false && "".equals(contact.name))
+                            contact.name = numberName;
+                    }
+                }
+
+                if (nameCache.containsKey(phoneNumber) == false)
+                {
+                    nameCache.put(phoneNumber, "");
+
+                    Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
+                    Cursor contactsCursor = context.getContentResolver().query(uri, null, null, null, null);
+
+                    while (contactsCursor.moveToNext())
+                    {
+                        nameCache.put(phoneNumber, contactsCursor.getString(contactsCursor.getColumnIndex(ContactsContract.CommonDataKinds.Identity.DISPLAY_NAME)));
+                    }
+
+                    contactsCursor.close();
+                }
+
+                if (found == false && nameCache.get(phoneNumber).length() > 0)
+                {
+                    ContactRecord contact = new ContactRecord();
+                    contact.name = nameCache.get(phoneNumber);
+                    contact.number = phoneNumber;
+
+                    contacts.add(contact);
+                }
+            }
 
             c.close();
+
+            c = context.getContentResolver().query(Uri.parse("content://sms/sent"), null, null, null, "date");
+
+            while (c.moveToNext())
+            {
+                String numberName = c.getString(c.getColumnIndex("person"));
+                String phoneNumber = PhoneNumberUtils.formatNumber(c.getString(c.getColumnIndex("address")));
+
+                if (numberName == null)
+                    numberName = phoneNumber;
+
+                boolean found = false;
+
+                for (ContactRecord contact : contacts)
+                {
+                    if (contact.number.endsWith(phoneNumber) || phoneNumber.endsWith(contact.number))
+                    {
+                        String largerNumber = contact.number;
+
+                        if (phoneNumber.length() > largerNumber.length())
+                            largerNumber = phoneNumber;
+
+                        contact.number = largerNumber;
+
+                        found = true;
+                        contact.count += 1;
+
+                        if ("".equals(numberName) == false && "".equals(contact.name))
+                            contact.name = numberName;
+                    }
+                }
+
+
+                if (nameCache.containsKey(phoneNumber) == false)
+                {
+                    nameCache.put(phoneNumber, "");
+
+                    Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
+                    Cursor contactsCursor = context.getContentResolver().query(uri, null, null, null, null);
+
+                    while (contactsCursor.moveToNext())
+                    {
+                        nameCache.put(phoneNumber, contactsCursor.getString(contactsCursor.getColumnIndex(ContactsContract.CommonDataKinds.Identity.DISPLAY_NAME)));
+                    }
+
+                    contactsCursor.close();
+                }
+
+                if (found == false && nameCache.get(phoneNumber).length() > 0)
+                {
+                    ContactRecord contact = new ContactRecord();
+                    contact.name = nameCache.get(phoneNumber);
+                    contact.number = phoneNumber;
+
+                    contacts.add(contact);
+                }
+            }
+
+            c.close();
+
+            Collections.sort(contacts);
 
             for (ContactRecord contact : contacts)
             {

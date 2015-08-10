@@ -188,4 +188,9 @@ public class DeviceInUseFeature extends Feature
 
         return settings;
     }
+
+    public String assetPath(Context context)
+    {
+        return "device-in-use-probe.html";
+    }
 }

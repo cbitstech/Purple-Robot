@@ -7,6 +7,7 @@ import java.net.URLConnection;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -41,8 +42,10 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -187,6 +190,8 @@ public abstract class BaseScriptEngine
     {
         Intent intent = new Intent(ManagerService.RINGTONE_INTENT);
         intent.setClass(this._context, ManagerService.class);
+
+        Log.e("PR", "TONE: " + tone);
 
         if (tone != null)
             intent.putExtra(ManagerService.RINGTONE_NAME, tone);
@@ -1876,5 +1881,33 @@ public abstract class BaseScriptEngine
     public void cancelNFCScan()
     {
         NfcActivity.cancelScan();
+    }
+
+    public List<String> fetchToneList()
+    {
+        ArrayList<String> tones = new ArrayList<>();
+
+        RingtoneManager rm = new RingtoneManager(this._context);
+        rm.setType(RingtoneManager.TYPE_NOTIFICATION);
+
+        Cursor cursor = rm.getCursor();
+
+        do
+        {
+            String title = cursor.getString(RingtoneManager.TITLE_COLUMN_INDEX);
+
+            tones.add(title);
+        }
+        while (cursor.moveToNext());
+
+        cursor.deactivate();
+
+        String[] included = this._context.getResources().getStringArray(R.array.sound_effect_labels);
+        for (String tone : included)
+            tones.add(tone);
+
+        Collections.sort(tones);
+
+        return tones;
     }
 }

@@ -28,6 +28,7 @@ public abstract class Probe
 
     public static final String PROBE_CALIBRATION_NOTIFICATIONS = "enable_calibration_notifications";
     public static final String PROBE_FREQUENCY = "frequency";
+    public static final String PROBE_SAMPLE_FREQUENCY = "sample_frequency";
     public static final String HASH_DATA = "hash_data";
 
     public static final String DEFAULT_FREQUENCY = "300000";
@@ -43,9 +44,20 @@ public abstract class Probe
 
     public static final String PROBE_TYPE_LONG = "long";
     public static final String PROBE_TYPE_BOOLEAN = "boolean";
-    public static final Object PROBE_TYPE_DOUBLE = "double";
+    public static final String PROBE_TYPE_DOUBLE = "double";
+    public static final String PROBE_TYPE_STRING = "string";
     public static final String PROBE_TYPE = "type";
     public static final String PROBE_VALUES = "values";
+    public static final String PROBE_DISTANCE = "distance";
+    public static final String PROBE_DURATION = "duration";
+    public static final String PROBE_MEDIA_URL = "media_url";
+    public static final String PROBE_MEDIA_CONTENT_TYPE = "media_content_type";
+    public static final String PROBE_MEDIA_SIZE = "media_size";
+
+    public static final String PROBE_GUID = "GUID";
+    public static final String PROBE_DATA = "PROBE_DATA";
+    public static final String PROBE_DISPLAY_NAME = "PROBE_DISPLAY_NAME";
+    public static final String PROBE_DISPLAY_MESSAGE = "PROBE_DISPLAY_MESSAGE";
 
     private static List<Class<Probe>> _probeClasses = new ArrayList<>();
 
@@ -184,7 +196,7 @@ public abstract class Probe
         if (context != null)
         {
             UUID uuid = UUID.randomUUID();
-            data.putString("GUID", uuid.toString());
+            data.putString(Probe.PROBE_GUID, uuid.toString());
 
             LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(context);
             Intent intent = new Intent(edu.northwestern.cbits.purple_robot_manager.probes.Probe.PROBE_READING);

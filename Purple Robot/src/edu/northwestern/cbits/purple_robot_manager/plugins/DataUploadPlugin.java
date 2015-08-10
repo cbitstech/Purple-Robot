@@ -1,43 +1,27 @@
 package edu.northwestern.cbits.purple_robot_manager.plugins;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.math.BigInteger;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.net.URI;
 import java.net.UnknownHostException;
 import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLPeerUnverifiedException;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.SingleClientConnManager;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.protocol.HTTP;
-import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -48,8 +32,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.net.http.AndroidHttpClient;
+import android.net.Uri;
 import android.preference.PreferenceManager;
+
+import com.squareup.okhttp.Headers;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.MultipartBuilder;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
 
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.PowerHelper;
@@ -58,6 +50,7 @@ import edu.northwestern.cbits.purple_robot_manager.WiFiHelper;
 import edu.northwestern.cbits.purple_robot_manager.activities.StartActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.LiberalSSLSocketFactory;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("NewApi")
 public abstract class DataUploadPlugin extends OutputPlugin
@@ -72,7 +65,7 @@ public abstract class DataUploadPlugin extends OutputPlugin
     private final static String CACHE_DIR = "pending_uploads";
     public static final String TRANSMIT_KEY = "TRANSMIT";
 
-    private static final String RESTRICT_TO_WIFI = "config_restrict_data_wifi";
+    public static final String RESTRICT_TO_WIFI = "config_restrict_data_wifi";
     private static final boolean RESTRICT_TO_WIFI_DEFAULT = true;
     public static final String UPLOAD_URI = "config_data_server_uri";
 
@@ -107,7 +100,7 @@ public abstract class DataUploadPlugin extends OutputPlugin
         return pendingFolder;
     }
 
-    private boolean restrictToWifi(SharedPreferences prefs)
+    public static boolean restrictToWifi(SharedPreferences prefs)
     {
         try
         {
@@ -128,7 +121,7 @@ public abstract class DataUploadPlugin extends OutputPlugin
         }
     }
 
-    private boolean restrictToCharging(SharedPreferences prefs)
+    public static boolean restrictToCharging(SharedPreferences prefs)
     {
         try
         {
@@ -154,7 +147,7 @@ public abstract class DataUploadPlugin extends OutputPlugin
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         final DataUploadPlugin me = this;
 
-        if (this.restrictToWifi(prefs))
+        if (DataUploadPlugin.restrictToWifi(prefs))
         {
             if (WiFiHelper.wifiAvailable(context) == false)
             {
@@ -164,7 +157,7 @@ public abstract class DataUploadPlugin extends OutputPlugin
             }
         }
 
-        if (this.restrictToCharging(prefs))
+        if (DataUploadPlugin.restrictToCharging(prefs))
         {
             if (PowerHelper.isPluggedIn(context) == false)
             {
@@ -195,11 +188,9 @@ public abstract class DataUploadPlugin extends OutputPlugin
 
         try
         {
-            AndroidHttpClient androidClient = AndroidHttpClient.newInstance("Purple Robot", context);
-
             try
             {
-                if (this.restrictToWifi(prefs))
+                if (DataUploadPlugin.restrictToWifi(prefs))
                 {
                     if (WiFiHelper.wifiAvailable(context) == false)
                     {
@@ -209,7 +200,7 @@ public abstract class DataUploadPlugin extends OutputPlugin
                     }
                 }
 
-                if (this.restrictToCharging(prefs))
+                if (DataUploadPlugin.restrictToCharging(prefs))
                 {
                     if (PowerHelper.isPluggedIn(context) == false)
                     {
@@ -269,78 +260,75 @@ public abstract class DataUploadPlugin extends OutputPlugin
 
                 registry.register(new Scheme("https", socketFactory, 443));
 
-                HttpParams params = androidClient.getParams();
-                HttpConnectionParams.setConnectionTimeout(params, 180000);
-                HttpConnectionParams.setSoTimeout(params, 180000);
-
-                SingleClientConnManager mgr = new SingleClientConnManager(params, registry);
-                HttpClient httpClient = new DefaultHttpClient(mgr, params);
-
-                HttpsURLConnection.setDefaultHostnameVerifier(hostnameVerifier);
+                OkHttpClient client = new OkHttpClient();
+                client.setConnectTimeout(3, TimeUnit.MINUTES);
+                client.setReadTimeout(3, TimeUnit.MINUTES);
 
                 String title = me.getContext().getString(R.string.notify_upload_data);
 
                 Notification note = new Notification(R.drawable.ic_note_normal, title, System.currentTimeMillis());
-                PendingIntent contentIntent = PendingIntent.getActivity(me.getContext(), 0, new Intent(me.getContext(), StartActivity.class), Notification.FLAG_ONGOING_EVENT);
+                PendingIntent contentIntent = PendingIntent.getActivity(me.getContext(), 0, new Intent(me.getContext(), StartActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
                 note.setLatestEventInfo(me.getContext(), title, title, contentIntent);
 
                 note.flags = Notification.FLAG_ONGOING_EVENT;
 
-                String body = null;
-
                 String uriString = prefs.getString(DataUploadPlugin.UPLOAD_URI, context.getString(R.string.sensor_upload_url));
-
-                URI siteUri = new URI(uriString);
-
-                HttpPost httpPost = new HttpPost(siteUri);
-                httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
 
                 String jsonString = jsonMessage.toString();
 
-                List<NameValuePair> nameValuePairs = new ArrayList<>();
-                nameValuePairs.add(new BasicNameValuePair("json", jsonString));
-                HttpEntity entity = new UrlEncodedFormEntity(nameValuePairs, HTTP.UTF_8);
-
-                httpPost.setEntity(entity);
-
-                String uploadMessage = String.format(context.getString(R.string.message_transmit_bytes), (httpPost.getEntity().getContentLength() / 1024));
+                String uploadMessage = String.format(context.getString(R.string.message_transmit_bytes), (jsonString.length() / 1024));
                 me.broadcastMessage(uploadMessage, false);
 
-                HttpResponse response = httpClient.execute(httpPost);
+                MultipartBuilder builder = new MultipartBuilder();
+                builder = builder.type(MultipartBuilder.FORM);
 
-                HttpEntity httpEntity = response.getEntity();
+                ArrayList<File> toDelete = new ArrayList<>();
 
-                String contentHeader = null;
-
-                if (response.containsHeader("Content-Encoding"))
-                    contentHeader = response.getFirstHeader("Content-Encoding").getValue();
-
-                if (contentHeader != null && contentHeader.endsWith("gzip"))
+                if (payload.contains("\"" + Probe.PROBE_MEDIA_URL + "\":"))
                 {
-                    BufferedInputStream in = new BufferedInputStream(AndroidHttpClient.getUngzippedContent(httpEntity));
+                    JSONArray payloadJson = new JSONArray(payload);
 
-                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    for (int i = 0; i < payloadJson.length(); i++)
+                    {
+                        JSONObject reading = payloadJson.getJSONObject(i);
 
-                    int read = 0;
-                    byte[] buffer = new byte[1024];
+                        if (reading.has(Probe.PROBE_MEDIA_URL))
+                        {
+                            Uri u = Uri.parse(reading.getString(Probe.PROBE_MEDIA_URL));
 
-                    while ((read = in.read(buffer, 0, buffer.length)) != -1)
-                        out.write(buffer, 0, read);
+                            String mimeType = "application/octet-stream";
 
-                    in.close();
+                            if (reading.has(Probe.PROBE_MEDIA_CONTENT_TYPE))
+                                mimeType = reading.getString(Probe.PROBE_MEDIA_CONTENT_TYPE);
 
-                    body = out.toString("UTF-8");
+                            String guid = reading.getString(Probe.PROBE_GUID);
+                            File file = new File(u.getPath());
+
+                            if (file.exists()) {
+                                builder = builder.addFormDataPart(guid, file.getName(), RequestBody.create(MediaType.parse(mimeType), file));
+                                toDelete.add(file);
+                            }
+                        }
+                    }
                 }
-                else
-                    body = EntityUtils.toString(httpEntity);
 
-                JSONObject json = new JSONObject(body);
+                builder = builder.addPart(Headers.of("Content-Disposition", "form-data; name=\"json\""), RequestBody.create(null, jsonString));
 
-                int index = body.length() - 512;
+                String version = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
 
-                if (index < 0)
-                    index = 0;
+                RequestBody requestBody = builder.build();
+
+                Request request = new Request.Builder()
+                        .removeHeader("User-Agent")
+                        .addHeader("User-Agent", "Purple Robot " + version)
+                        .url(uriString)
+                        .post(requestBody)
+                        .build();
+
+                Response response = client.newCall(request).execute();
+
+                JSONObject json = new JSONObject(response.body().string());
 
                 String status = json.getString(STATUS_KEY);
 
@@ -360,9 +348,12 @@ public abstract class DataUploadPlugin extends OutputPlugin
                     if (responseChecksum.equals(json.getString(CHECKSUM_KEY)))
                     {
                         String uploadedMessage = String.format(context.getString(R.string.message_upload_successful),
-                                (httpPost.getEntity().getContentLength() / 1024));
+                                (jsonString.length() / 1024));
 
                         me.broadcastMessage(uploadedMessage, false);
+
+                        for (File f : toDelete)
+                            f.delete();
 
                         return DataUploadPlugin.RESULT_SUCCESS;
                     }
@@ -387,26 +378,36 @@ public abstract class DataUploadPlugin extends OutputPlugin
             }
             catch (HttpHostConnectException | ConnectTimeoutException e)
             {
+                e.printStackTrace();
+
                 me.broadcastMessage(context.getString(R.string.message_http_connection_error), true);
                 LogManager.getInstance(context).logException(e);
             } catch (SocketTimeoutException e)
             {
+                e.printStackTrace();
+
                 me.broadcastMessage(context.getString(R.string.message_socket_timeout_error), true);
                 LogManager.getInstance(me.getContext()).logException(e);
             }
             catch (SocketException e)
             {
+                e.printStackTrace();
+
                 String errorMessage = String.format(context.getString(R.string.message_socket_error), e.getMessage());
                 me.broadcastMessage(errorMessage, true);
                 LogManager.getInstance(me.getContext()).logException(e);
             }
             catch (UnknownHostException e)
             {
+                e.printStackTrace();
+
                 me.broadcastMessage(context.getString(R.string.message_unreachable_error), true);
                 LogManager.getInstance(me.getContext()).logException(e);
             }
             catch (JSONException e)
             {
+                e.printStackTrace();
+
                 me.broadcastMessage(context.getString(R.string.message_response_error), true);
                 LogManager.getInstance(me.getContext()).logException(e);
             }
@@ -419,14 +420,12 @@ public abstract class DataUploadPlugin extends OutputPlugin
             }
             catch (Exception e)
             {
+                e.printStackTrace();
+
                 LogManager.getInstance(me.getContext()).logException(e);
                 me.broadcastMessage(context.getString(R.string.message_general_error, e.getMessage()), true);
 
                 LogManager.getInstance(context).logException(e);
-            }
-            finally
-            {
-                androidClient.close();
             }
         }
         catch (OutOfMemoryError e)
@@ -441,4 +440,103 @@ public abstract class DataUploadPlugin extends OutputPlugin
     }
 
     public abstract boolean isEnabled(Context context);
+
+    public static boolean uploadEnabled(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        if (prefs.getBoolean(HttpUploadPlugin.ENABLED, HttpUploadPlugin.ENABLED_DEFAULT))
+            return true;
+        else if (prefs.getBoolean(StreamingJacksonUploadPlugin.ENABLED, StreamingJacksonUploadPlugin.ENABLED_DEFAULT))
+            return true;
+
+        return false;
+    }
+
+    public static long lastUploadTime(SharedPreferences prefs)
+    {
+        long lastUpload = -1;
+
+        if (prefs.contains(HttpUploadPlugin.LAST_UPLOAD_TIME))
+            lastUpload = prefs.getLong(HttpUploadPlugin.LAST_UPLOAD_TIME, -1);
+
+        if (prefs.contains(StreamingJacksonUploadPlugin.LAST_UPLOAD_TIME))
+        {
+            long streamingUpload = prefs.getLong(StreamingJacksonUploadPlugin.LAST_UPLOAD_TIME, -1);
+
+            if (streamingUpload > lastUpload)
+                lastUpload = streamingUpload;
+        }
+
+        return lastUpload;
+    }
+
+    public static long lastUploadSize(SharedPreferences prefs)
+    {
+        long lastSize = -1;
+
+        if (prefs.contains(HttpUploadPlugin.LAST_UPLOAD_SIZE))
+            lastSize = prefs.getLong(HttpUploadPlugin.LAST_UPLOAD_SIZE, -1);
+
+        if (prefs.contains(StreamingJacksonUploadPlugin.LAST_UPLOAD_SIZE))
+        {
+            long lastUpload = -1;
+
+            if (prefs.contains(HttpUploadPlugin.LAST_UPLOAD_TIME))
+                lastUpload = prefs.getLong(HttpUploadPlugin.LAST_UPLOAD_TIME, -1);
+
+            if (prefs.contains(StreamingJacksonUploadPlugin.LAST_UPLOAD_TIME))
+            {
+                long streamingUpload = prefs.getLong(StreamingJacksonUploadPlugin.LAST_UPLOAD_TIME, -1);
+
+                if (streamingUpload > lastUpload)
+                    lastSize = prefs.getLong(StreamingJacksonUploadPlugin.LAST_UPLOAD_SIZE, -1);
+            }
+        }
+
+        return lastSize;
+    }
+
+    public static int pendingFileCount(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        if (prefs.getBoolean(HttpUploadPlugin.ENABLED, HttpUploadPlugin.ENABLED_DEFAULT))
+        {
+            OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(context, HttpUploadPlugin.class);
+
+            if (plugin instanceof HttpUploadPlugin)
+            {
+                HttpUploadPlugin http = (HttpUploadPlugin) plugin;
+
+                return http.pendingFilesCount();
+            }
+        }
+        else
+        {
+            OutputPlugin plugin = OutputPluginManager.sharedInstance.pluginForClass(context, StreamingJacksonUploadPlugin.class);
+
+            if (plugin instanceof StreamingJacksonUploadPlugin)
+            {
+                StreamingJacksonUploadPlugin http = (StreamingJacksonUploadPlugin) plugin;
+
+                return http.pendingFilesCount();
+            }
+        }
+
+        return 0;
+    }
+
+    public static boolean multipleUploadersEnabled(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        if (prefs.getBoolean(HttpUploadPlugin.ENABLED, HttpUploadPlugin.ENABLED_DEFAULT) &&
+            prefs.getBoolean(StreamingJacksonUploadPlugin.ENABLED, StreamingJacksonUploadPlugin.ENABLED_DEFAULT))
+        {
+            return true;
+        }
+
+        return false;
+    }
 }

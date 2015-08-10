@@ -237,4 +237,9 @@ public class DateCalendarProbe extends Probe
 
         return map;
     }
+
+    public String assetPath(Context context)
+    {
+        return "date-calendar-probe.html";
+    }
 }

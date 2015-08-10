@@ -394,4 +394,9 @@ public class RunningSoftwareProbe extends Probe
 
         return settings;
     }
+
+    public String assetPath(Context context)
+    {
+        return "running-software-probe.html";
+    }
 }

@@ -64,6 +64,14 @@ public class TemperatureProbe extends ContinuousProbe implements SensorEventList
     private static Handler _handler = null;
 
     @Override
+    public boolean getUsesThread()
+    {
+        SharedPreferences prefs = ContinuousProbe.getPreferences(this._context);
+
+        return prefs.getBoolean(TemperatureProbe.USE_HANDLER, TemperatureProbe.DEFAULT_USE_HANDLER);
+    }
+
+    @Override
     public String probeCategory(Context context)
     {
         return context.getString(R.string.probe_sensor_category);
