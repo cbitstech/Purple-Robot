@@ -341,6 +341,10 @@ public class FusedLocationProbe extends Probe implements GoogleApiClient.Connect
                         {
                             LogManager.getInstance(context).logException(e);
                         }
+                        catch (NullPointerException e)
+                        {
+                            LogManager.getInstance(context).logException(e);
+                        }
                     }
 
                     this._apiClient = null;
@@ -442,7 +446,8 @@ public class FusedLocationProbe extends Probe implements GoogleApiClient.Connect
 
         bundle.putLong(FusedLocationProbe.TIME_FIX, location.getTime());
 
-        synchronized (this) {
+        synchronized (this)
+        {
             long time = location.getTime();
 
             if (time - this._lastCache > 30000 || this._lastLocation == null) {
@@ -469,7 +474,8 @@ public class FusedLocationProbe extends Probe implements GoogleApiClient.Connect
 
             Runnable r = new Runnable() {
                 @Override
-                public void run() {
+                public void run()
+                {
                     FoursquareProbe.annotate(me._context, bundle);
 
                     me.transmitData(me._context, bundle);
@@ -479,8 +485,6 @@ public class FusedLocationProbe extends Probe implements GoogleApiClient.Connect
             Thread t = new Thread(r);
             t.start();
         }
-
-        this.transmitData(this._context, bundle);
     }
 
     @Override
