@@ -21,38 +21,35 @@ public class BootUpReceiver extends BroadcastReceiver
 
     public void onReceive(Context context, Intent intent)
     {
-        long now = System.currentTimeMillis();
+        if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
+            long now = System.currentTimeMillis();
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        Editor e = prefs.edit();
+            Editor e = prefs.edit();
 
-        e.putLong(BootUpReceiver.BOOT_KEY, now);
+            e.putLong(BootUpReceiver.BOOT_KEY, now);
 
-        e.commit();
+            e.commit();
+
+            LegacyJSONConfigFile.getSharedFile(context.getApplicationContext());
+
+            TriggerManager.getInstance(context).fireMissedTriggers(context, now);
+
+            if (prefs.contains(BaseScriptEngine.STICKY_NOTIFICATION_PARAMS)) {
+                try {
+                    JSONObject json = new JSONObject(prefs.getString(BaseScriptEngine.STICKY_NOTIFICATION_PARAMS, "{}"));
+
+                    JavaScriptEngine engine = new JavaScriptEngine(context);
+
+                    engine.showScriptNotification(json.getString("title"), json.getString("message"),
+                            json.getBoolean("persistent"), json.getBoolean("sticky"), json.getString("script"));
+                } catch (JSONException ex) {
+                    LogManager.getInstance(context).logException(ex);
+                }
+            }
+        }
 
         ManagerService.setupPeriodicCheck(context);
-
-        LegacyJSONConfigFile.getSharedFile(context.getApplicationContext());
-
-        TriggerManager.getInstance(context).fireMissedTriggers(context, now);
-
-        if (prefs.contains(BaseScriptEngine.STICKY_NOTIFICATION_PARAMS))
-        {
-            try
-            {
-                JSONObject json = new JSONObject(prefs.getString(BaseScriptEngine.STICKY_NOTIFICATION_PARAMS, "{}"));
-
-                JavaScriptEngine engine = new JavaScriptEngine(context);
-
-                engine.showScriptNotification(json.getString("title"), json.getString("message"),
-                        json.getBoolean("persistent"), json.getBoolean("sticky"), json.getString("script"));
-            }
-            catch (JSONException ex)
-            {
-                LogManager.getInstance(context).logException(ex);
-            }
-
-        }
     }
 }
