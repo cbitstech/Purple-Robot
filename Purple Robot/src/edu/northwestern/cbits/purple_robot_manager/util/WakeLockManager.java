@@ -7,6 +7,8 @@ import android.support.v4.util.LongSparseArray;
 
 import java.util.ArrayList;
 
+import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+
 public class WakeLockManager
 {
     private static final String TIMESTAMP_KEY = "TIMESTAMP";
@@ -93,17 +95,24 @@ public class WakeLockManager
         for (int i = 0; i < locks.size(); i++) {
             long timestamp = locks.keyAt(i);
 
-            PowerManager.WakeLock lock = locks.valueAt(i);
+            try {
+                PowerManager.WakeLock lock = locks.valueAt(i);
 
-            Bundle lockBundle = new Bundle();
-            lockBundle.putLong(WakeLockManager.TIMESTAMP_KEY, timestamp);
-            lockBundle.putString(WakeLockManager.LOCK_TYPE_KEY, lockType);
-            lockBundle.putString(WakeLockManager.LOCK_DESCRIPTION_KEY, lock.toString());
-            lockBundle.putBoolean(WakeLockManager.LOCK_IS_HELD_KEY, lock.isHeld());
-            lockBundle.putString(WakeLockManager.LOCK_TAG, this._tags.get(timestamp));
+                Bundle lockBundle = new Bundle();
+                lockBundle.putLong(WakeLockManager.TIMESTAMP_KEY, timestamp);
+                lockBundle.putString(WakeLockManager.LOCK_TYPE_KEY, lockType);
+                lockBundle.putString(WakeLockManager.LOCK_DESCRIPTION_KEY, lock.toString());
+                lockBundle.putBoolean(WakeLockManager.LOCK_IS_HELD_KEY, lock.isHeld());
+                lockBundle.putString(WakeLockManager.LOCK_TAG, this._tags.get(timestamp));
 
-            bundles.add(lockBundle);
+                bundles.add(lockBundle);
+            }
+            catch (ClassCastException e)
+            {
+                LogManager.getInstance(this._context).logException(e);
+            }
         }
+
         return bundles;
     }
 

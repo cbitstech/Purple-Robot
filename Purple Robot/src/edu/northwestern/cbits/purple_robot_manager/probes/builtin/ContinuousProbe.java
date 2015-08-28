@@ -346,7 +346,7 @@ public abstract class ContinuousProbe extends Probe
         if (enabled)
             enabled = prefs.getBoolean("config_probe_" + key + "_enabled", ContinuousProbe.DEFAULT_ENABLED);
 
-        int wakeLevel = Integer.parseInt(prefs.getString("config_probe_" + key + "_wakelock", "-1"));
+        int wakeLevel = (int) Float.parseFloat(prefs.getString("config_probe_" + key + "_wakelock", "-1"));
 
         if (enabled)
         {

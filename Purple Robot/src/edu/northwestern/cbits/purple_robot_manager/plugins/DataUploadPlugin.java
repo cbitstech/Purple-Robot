@@ -50,6 +50,7 @@ import edu.northwestern.cbits.purple_robot_manager.WiFiHelper;
 import edu.northwestern.cbits.purple_robot_manager.activities.StartActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.LiberalSSLSocketFactory;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("NewApi")
@@ -266,10 +267,17 @@ public abstract class DataUploadPlugin extends OutputPlugin
 
                 String title = me.getContext().getString(R.string.notify_upload_data);
 
-                Notification note = new Notification(R.drawable.ic_note_normal, title, System.currentTimeMillis());
                 PendingIntent contentIntent = PendingIntent.getActivity(me.getContext(), 0, new Intent(me.getContext(), StartActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
-                note.setLatestEventInfo(me.getContext(), title, title, contentIntent);
+                Notification.Builder noteBuilder = new Notification.Builder(me.getContext());
+                noteBuilder.setContentTitle(title);
+                noteBuilder.setContentText(title);
+                noteBuilder.setContentIntent(contentIntent);
+                noteBuilder.setSmallIcon(R.drawable.ic_note_normal);
+                noteBuilder.setWhen(System.currentTimeMillis());
+                noteBuilder.setColor(0xff4e015c);
+
+                Notification note = noteBuilder.build();
 
                 note.flags = Notification.FLAG_ONGOING_EVENT;
 

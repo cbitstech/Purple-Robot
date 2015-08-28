@@ -294,42 +294,37 @@ public class ManagerService extends IntentService
                 {
                     String path = ManagerService.pathForSound(this, name);
 
-                    final AssetFileDescriptor afd = this.getAssets().openFd(path);
+                    if (path != null) {
+                        final AssetFileDescriptor afd = this.getAssets().openFd(path);
 
-                    Runnable r = new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            ManagerService._player = new MediaPlayer();
+                        Runnable r = new Runnable() {
+                            @Override
+                            public void run() {
+                                ManagerService._player = new MediaPlayer();
 
-                            try
-                            {
-                                ManagerService._player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-                                ManagerService._player.setLooping(intent.getBooleanExtra(ManagerService.RINGTONE_LOOPS, false));
+                                try {
+                                    ManagerService._player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+                                    ManagerService._player.setLooping(intent.getBooleanExtra(ManagerService.RINGTONE_LOOPS, false));
 
-                                ManagerService._player.prepare();
+                                    ManagerService._player.prepare();
 
-                                ManagerService._player.setOnCompletionListener(new OnCompletionListener()
-                                {
-                                    @Override
-                                    public void onCompletion(MediaPlayer player)
-                                    {
-                                        ManagerService._player = null;
-                                    }
-                                });
+                                    ManagerService._player.setOnCompletionListener(new OnCompletionListener() {
+                                        @Override
+                                        public void onCompletion(MediaPlayer player) {
+                                            ManagerService._player = null;
+                                        }
+                                    });
 
-                                ManagerService._player.start();
+                                    ManagerService._player.start();
+                                } catch (IllegalArgumentException | IOException | IllegalStateException e) {
+                                    LogManager.getInstance(me).logException(e);
+                                }
                             }
-                            catch (IllegalArgumentException | IOException | IllegalStateException e)
-                            {
-                                LogManager.getInstance(me).logException(e);
-                            }
-                        }
-                    };
+                        };
 
-                    Thread t = new Thread(r);
-                    t.start();
+                        Thread t = new Thread(r);
+                        t.start();
+                    }
                 }
                 catch (IOException e)
                 {
@@ -536,16 +531,18 @@ public class ManagerService extends IntentService
         String[] values = context.getResources().getStringArray(R.array.sound_effect_values);
         String[] labels = context.getResources().getStringArray(R.array.sound_effect_labels);
 
-        for (int i = 0; i < labels.length && i < values.length; i++)
+        if (name != null)
         {
-            if (labels[i].toLowerCase(Locale.getDefault()).equals(name.toLowerCase(Locale.getDefault())))
-                return values[i];
-        }
+            for (int i = 0; i < labels.length && i < values.length; i++) {
+                if (labels[i].toLowerCase(Locale.getDefault()).equals(name.toLowerCase(Locale.getDefault())))
+                    return values[i];
+            }
 
-        for (int i = 0; i < labels.length && i < values.length; i++)
-        {
-            if (labels[i].toLowerCase(Locale.getDefault()).endsWith(name.toLowerCase(Locale.getDefault())))
-                return values[i];
+            for (int i = 0; i < labels.length && i < values.length; i++)
+            {
+                if (labels[i].toLowerCase(Locale.getDefault()).endsWith(name.toLowerCase(Locale.getDefault())))
+                    return values[i];
+            }
         }
 
         return name;

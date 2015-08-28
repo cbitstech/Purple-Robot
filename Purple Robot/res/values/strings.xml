@@ -1619,4 +1619,7 @@
 
     <string name="name_location_services_check">Location services are unavailable.</string>
     <string name="message_location_services_check">Unable to fetch location information. Tap here to inspect your system settings.</string>
+
+    <string name="title_preference_probes_nudge_interval">Probe Check Interval</string>
+    <string name="summary_preference_probes_nudge_interval">Select the time interval between probes\' fresh data checks.</string>
 </resources>

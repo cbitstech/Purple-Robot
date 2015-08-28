@@ -1,5 +1,6 @@
 package edu.northwestern.cbits.purple_robot_manager;
 
+import java.util.Date;
 import java.util.HashMap;
 
 import org.json.JSONArray;
@@ -20,6 +21,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+
 import edu.northwestern.cbits.purple_robot_manager.activities.StartActivity;
 import edu.northwestern.cbits.purple_robot_manager.http.JsonScriptRequestHandler;
 import edu.northwestern.cbits.purple_robot_manager.http.LocalHttpServer;
@@ -39,6 +41,8 @@ public class PersistentService extends Service
     public static final String SCRIPT_ACTION = "edu.northwestern.cbits.purplerobot.run_script";
     public static final String START_HTTP_SERVICE = "purple_robot_start_http_service";
     public static final String STOP_HTTP_SERVICE = "purple_robot_stop_http_service";
+    public static final String PROBE_NUDGE_INTERVAL = "probe_nudge_interval";
+    public static final String PROBE_NUDGE_INTERVAL_DEFAULT = "15000";
 
     private LocalHttpServer _httpServer = new LocalHttpServer();
 
@@ -60,28 +64,31 @@ public class PersistentService extends Service
         String title = this.getString(R.string.notify_running_title);
         String message = this.getString(R.string.notify_running);
 
-        Notification note = new Notification(R.drawable.ic_note_normal, title, System.currentTimeMillis());
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, StartActivity.class),
-                PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, StartActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            note.color = 0xff4e015c;
+        Notification.Builder builder = new Notification.Builder(this);
+        builder.setContentTitle(title);
+        builder.setContentText(message);
+        builder.setContentIntent(contentIntent);
+        builder.setSmallIcon(R.drawable.ic_note_normal);
+        builder.setWhen(System.currentTimeMillis());
+        builder.setColor(0xff4e015c);
 
-        note.setLatestEventInfo(this, title, message, contentIntent);
+        Notification note = builder.build();
 
         this.startForeground(SanityManager.NOTE_ID, note);
 
         AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
 
-        PendingIntent pi = PendingIntent.getService(this, 0, new Intent(PersistentService.NUDGE_PROBES),
-                PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pi = PendingIntent.getService(this, 0, new Intent(PersistentService.NUDGE_PROBES), PendingIntent.FLAG_UPDATE_CURRENT);
 
         long now = System.currentTimeMillis();
+        long interval = Long.parseLong(prefs.getString(PersistentService.PROBE_NUDGE_INTERVAL, PersistentService.PROBE_NUDGE_INTERVAL_DEFAULT));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, now + 15000, pi);
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, now + interval, pi);
         else
-            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 15000, pi);
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), interval, pi);
 
         OutputPlugin.loadPluginClasses(this);
 
@@ -198,12 +205,14 @@ public class PersistentService extends Service
                 {
                     AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
 
-                    PendingIntent pi = PendingIntent.getService(this, 0, new Intent(PersistentService.NUDGE_PROBES),
-                            PendingIntent.FLAG_UPDATE_CURRENT);
+                    PendingIntent pi = PendingIntent.getService(this, 0, new Intent(PersistentService.NUDGE_PROBES), PendingIntent.FLAG_UPDATE_CURRENT);
 
                     long now = System.currentTimeMillis();
 
-                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, now + 15000, pi);
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+                    long interval = Long.parseLong(prefs.getString(PersistentService.PROBE_NUDGE_INTERVAL, PersistentService.PROBE_NUDGE_INTERVAL_DEFAULT));
+
+                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, now + interval, pi);
                 }
             }
             else if (RandomNoiseProbe.ACTION.equals(action) && RandomNoiseProbe.instance != null)

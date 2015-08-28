@@ -1,6 +1,8 @@
 package edu.northwestern.cbits.purple_robot_manager.activities.settings;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,6 +11,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
@@ -259,6 +262,38 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
             Thread t = new Thread(r);
             t.start();
         }
+        else if (PersistentService.PROBE_NUDGE_INTERVAL.equals(preference.getKey()))
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this._context);
+
+            int selected = -1;
+
+            final String[] values = this._context.getResources().getStringArray(R.array.probe_nudge_interval_values);
+
+            final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this._context);
+            String selectedInterval = prefs.getString(PersistentService.PROBE_NUDGE_INTERVAL, PersistentService.PROBE_NUDGE_INTERVAL_DEFAULT);
+
+            for (int i = 0; i < values.length; i++)
+            {
+                if (values[i].equals(selectedInterval))
+                    selected = i;
+            }
+
+            builder.setSingleChoiceItems(R.array.probe_nudge_interval_labels, selected, new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i)
+                {
+                    String newInterval = values[i];
+
+                    SharedPreferences.Editor e = prefs.edit();
+                    e.putString(PersistentService.PROBE_NUDGE_INTERVAL, newInterval);
+                    e.commit();
+                }
+            });
+
+            builder.create().show();
+        }
 
         return false;
     }
@@ -470,6 +505,25 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
 
             Thread t = new Thread(r);
             t.start();
+
+            return true;
+        }
+        else if (PersistentService.PROBE_NUDGE_INTERVAL.equals(pref.getKey()))
+        {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(me._context);
+
+            PendingIntent pi = PendingIntent.getService(this._context, 0, new Intent(PersistentService.NUDGE_PROBES), PendingIntent.FLAG_UPDATE_CURRENT);
+
+            AlarmManager alarmManager = (AlarmManager) this._context.getSystemService(Context.ALARM_SERVICE);
+            alarmManager.cancel(pi);
+
+            long now = System.currentTimeMillis();
+            long interval = Long.parseLong(prefs.getString(PersistentService.PROBE_NUDGE_INTERVAL, PersistentService.PROBE_NUDGE_INTERVAL_DEFAULT));
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, now + interval, pi);
+            else
+                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), interval, pi);
 
             return true;
         }
