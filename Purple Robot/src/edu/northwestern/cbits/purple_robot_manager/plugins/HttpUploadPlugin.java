@@ -69,6 +69,7 @@ import android.net.Uri;
 import android.net.http.AndroidHttpClient;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 import edu.emory.mathcs.backport.java.util.Arrays;
@@ -576,7 +577,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
                             String title = me.getContext().getString(R.string.notify_upload_data);
 
-                            Notification.Builder builder = new Notification.Builder(me.getContext());
+                            NotificationCompat.Builder builder = new NotificationCompat.Builder(me.getContext());
                             builder.setContentTitle(title);
                             builder.setContentText(title);
                             builder.setContentIntent(contentIntent);
@@ -813,7 +814,7 @@ public class HttpUploadPlugin extends OutputPlugin
                             String message = me.getContext().getString(R.string.notify_running);
                             String messageTitle = me.getContext().getString(R.string.notify_running_title);
 
-                            builder = new Notification.Builder(me.getContext());
+                            builder = new NotificationCompat.Builder(me.getContext());
                             builder.setContentTitle(messageTitle);
                             builder.setContentText(message);
                             builder.setContentIntent(contentIntent);
