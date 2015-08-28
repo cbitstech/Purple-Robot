@@ -34,6 +34,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.support.v7.app.NotificationCompat;
 
 import com.squareup.okhttp.Headers;
 import com.squareup.okhttp.MediaType;
@@ -269,7 +270,7 @@ public abstract class DataUploadPlugin extends OutputPlugin
 
                 PendingIntent contentIntent = PendingIntent.getActivity(me.getContext(), 0, new Intent(me.getContext(), StartActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
-                Notification.Builder noteBuilder = new Notification.Builder(me.getContext());
+                NotificationCompat.Builder noteBuilder = new NotificationCompat.Builder(me.getContext());
                 noteBuilder.setContentTitle(title);
                 noteBuilder.setContentText(title);
                 noteBuilder.setContentIntent(contentIntent);

@@ -21,6 +21,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.v7.app.NotificationCompat;
 
 import edu.northwestern.cbits.purple_robot_manager.activities.StartActivity;
 import edu.northwestern.cbits.purple_robot_manager.http.JsonScriptRequestHandler;
@@ -66,7 +67,7 @@ public class PersistentService extends Service
 
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, StartActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Notification.Builder builder = new Notification.Builder(this);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         builder.setContentTitle(title);
         builder.setContentText(message);
         builder.setContentIntent(contentIntent);
