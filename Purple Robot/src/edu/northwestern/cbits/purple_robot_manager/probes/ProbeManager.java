@@ -9,12 +9,15 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.CheckBoxPreference;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 
+import edu.northwestern.cbits.purple_robot_manager.PersistentService;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.SettingsKeys;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.RobotPreferenceListener;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
@@ -776,10 +779,22 @@ public class ProbeManager
 
         globalCategory.addPreference(enabled);
 
+        RobotPreferenceListener listener = new RobotPreferenceListener(context);
+        FlexibleListPreference nudgeInterval = new FlexibleListPreference(context);
+        nudgeInterval.setTitle(R.string.title_preference_probes_nudge_interval);
+        nudgeInterval.setSummary(R.string.summary_preference_probes_nudge_interval);
+        nudgeInterval.setKey(PersistentService.PROBE_NUDGE_INTERVAL);
+        nudgeInterval.setDefaultValue(PersistentService.PROBE_NUDGE_INTERVAL_DEFAULT);
+        nudgeInterval.setEntries(R.array.probe_nudge_interval_labels);
+        nudgeInterval.setEntryValues(R.array.probe_nudge_interval_values);
+        nudgeInterval.setOnPreferenceChangeListener(listener);
+
+        screen.addPreference(nudgeInterval);
+
         Preference disableAll = new Preference(context);
         disableAll.setTitle(R.string.title_preference_probes_disable_each_probe);
         disableAll.setKey(SettingsKeys.PROBES_DISABLE_EACH_KEY);
-        disableAll.setOnPreferenceClickListener(new RobotPreferenceListener(context));
+        disableAll.setOnPreferenceClickListener(listener);
 
         globalCategory.addPreference(disableAll);
 

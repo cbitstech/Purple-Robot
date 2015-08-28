@@ -451,6 +451,15 @@ public class EncryptionManager
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
+        if (userId != null && userId.trim().length() == 0)
+        {
+            Editor e = prefs.edit();
+            e.remove(SettingsKeys.USER_ID_KEY);
+            e.commit();
+
+            userId = this.getUserId(context);
+        }
+
         HashMap<String, Object> payload = new HashMap<>();
         payload.put("source", "EncryptionManager");
         payload.put("new_id", userId);

@@ -221,6 +221,8 @@ public class SettingsActivity extends AppCompatActivity
 
                         flexible.setContext(activity);
                     }
+                    else if (pref instanceof PreferenceGroup)
+                        activity.mapScreens((PreferenceGroup) pref);
                 }
             }
         }

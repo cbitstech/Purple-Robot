@@ -982,4 +982,24 @@
         <item>11.025 Khz (Voice Quality)</item>
         <item>8 Khz (Telephone Quality)</item>
     </string-array>
+
+    <string-array name="probe_nudge_interval_labels">
+        <item>5 seconds</item>
+        <item>10 seconds</item>
+        <item>15 seconds</item>
+        <item>30 seconds</item>
+        <item>1 minute</item>
+        <item>2 minutes</item>
+        <item>5 minutes</item>
+    </string-array>
+
+    <string-array name="probe_nudge_interval_values">
+        <item>5000</item>
+        <item>10000</item>
+        <item>15000</item>
+        <item>30000</item>
+        <item>60000</item>
+        <item>120000</item>
+        <item>300000</item>
+    </string-array>
 </resources>
