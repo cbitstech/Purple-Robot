@@ -572,14 +572,19 @@ public class HttpUploadPlugin extends OutputPlugin
 
                             HttpsURLConnection.setDefaultHostnameVerifier(hostnameVerifier);
 
+                            PendingIntent contentIntent = PendingIntent.getActivity(me.getContext(), 0, new Intent(me.getContext(), StartActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+
                             String title = me.getContext().getString(R.string.notify_upload_data);
 
-                            Notification note = new Notification(R.drawable.ic_note_normal, title,
-                                    System.currentTimeMillis());
-                            PendingIntent contentIntent = PendingIntent.getActivity(me.getContext(), 0,
-                                    new Intent(me.getContext(), StartActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+                            Notification.Builder builder = new Notification.Builder(me.getContext());
+                            builder.setContentTitle(title);
+                            builder.setContentText(title);
+                            builder.setContentIntent(contentIntent);
+                            builder.setSmallIcon(R.drawable.ic_note_normal);
+                            builder.setWhen(System.currentTimeMillis());
+                            builder.setColor(0xff4e015c);
 
-                            note.setLatestEventInfo(me.getContext(), title, title, contentIntent);
+                            Notification note = builder.build();
 
                             note.flags = Notification.FLAG_ONGOING_EVENT;
 
@@ -807,7 +812,19 @@ public class HttpUploadPlugin extends OutputPlugin
 
                             String message = me.getContext().getString(R.string.notify_running);
                             String messageTitle = me.getContext().getString(R.string.notify_running_title);
-                            note.setLatestEventInfo(me.getContext(), messageTitle, message, contentIntent);
+
+                            builder = new Notification.Builder(me.getContext());
+                            builder.setContentTitle(messageTitle);
+                            builder.setContentText(message);
+                            builder.setContentIntent(contentIntent);
+                            builder.setSmallIcon(R.drawable.ic_note_normal);
+                            builder.setWhen(System.currentTimeMillis());
+                            builder.setColor(0xff4e015c);
+
+                            note = builder.build();
+
+                            note.flags = Notification.FLAG_ONGOING_EVENT;
+
                             // noteManager.notify(12345, note);
                         } catch (IOException e)
                         {
