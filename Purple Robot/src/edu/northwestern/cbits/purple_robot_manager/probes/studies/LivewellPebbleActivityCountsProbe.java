@@ -34,6 +34,8 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class LivewellPebbleActivityCountsProbe extends Probe
 {
+    public final static String PROBE_NAME = "edu.northwestern.cbits.purple_robot_manager.probes.studies.LivewellPebbleActivityCountsProbe";
+
     private static final String FIRMWARE_VERSION = "FIRMWARE_VERSION";
     private static final byte COMMAND_FLUSH_BUFFER = 0x00;
 

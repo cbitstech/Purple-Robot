@@ -22,6 +22,8 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 @SuppressLint("NewApi")
 public class BluetoothReceiverProbe extends Probe
 {
+    public final static String PROBE_NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.BluetoothReceiverProbe";
+
     private boolean isRegistered = false;
 
     @Override

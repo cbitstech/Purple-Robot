@@ -670,6 +670,7 @@
         <item>ChargingRequiredCheck</item>
         <item>MultipleUploadersEnabledCheck</item>
         <item>LocationServicesEnabledCheck</item>
+        <item>BluetoothEnabledCheck</item>
         <!-- <item>TestErrorCheck</item> -->
         <!-- <item>TestWarningCheck</item> -->
    	</array>
