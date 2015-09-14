@@ -3,7 +3,7 @@ Warnings & Alerts
 
 During the normal course of operation, Purple Robot may emit a variety of warnings and errors that reflect how changing environmental conditions may adversely affect the optimal functioning of the app. This document describes those errors and warnings.
 
-*Note that this is a temporary document intended for use until the official Purple Robot documentation package comes together*
+*Note that this is a temporary document intended for use until the official Purple Robot documentation package comes together.*
 
 #Sanity Checks#
 
@@ -49,7 +49,7 @@ This sanity check inspects the local triggers on the device and emits a warning 
 
 `TRIGGER trigger defined using both FREQ=MINUTELY and BYMINUTE, introducing performance issues.`
 
-**Corrective action:** The trigger must be corrected in the remote configuration or via scripting and teh triggers must be reloaded on the device.
+**Corrective action:** The trigger must be corrected in the remote configuration or via scripting and the triggers must be reloaded on the device.
 
 
 ##Charging-Required Upload Check##
@@ -213,7 +213,7 @@ The following probes emit warnings when a probe uses an online service and Purpl
 * Fitbit
 * iHealth
 
-**Corrective action:** Tap the warning from teh diagnostics screen and authenticate witht the given service.
+**Corrective action:** Tap the warning from the diagnostics screen and authenticate witht the given service.
 
 
 ##Android Wear Devices##
@@ -263,3 +263,30 @@ If the Weather Underground probe is enabled and no key has been provided, Purple
 `A custom Weather Underground API key is required for fetching weather data. Please obtain one and enter it in the Settings. (Probe Configuration &#8594; External Service Probes &#8594; Weather Underground &#8594; API Key)`
 
 **Corrective action:** Obtain a Weather Underground key and enter the key in the probe configuration.
+
+
+#Upload Warnings#
+
+In addition to the sanity checks, Purple Robot may also report any data upload issues on its main screen. The following messages may be visible:
+
+`Waiting for WiFi&#8230;`: Device is configured to upload over WiFi, but no such network is available or configured.
+
+`Waiting for power&#8230;`: Device is configured to upload when charging, but the device is not plugged in.
+
+`Checksum error.`: Server did not return the expected checksum. Possible error in data transmission.
+
+`Application error: ERROR`: Unspecified server error. Review the server logs for specifics.
+
+`HTTP connection failure.`: HTTP protocol error. Verify that the upload server is reachable.
+
+`Socket timeout.`: Network connection timed out. Verify that the local network is configured properly.
+
+`Socket error: ERROR`: Network error. Verify that the local network is configured properly.
+
+`Upload unavailable.`: Remote upload server is unreachable. Verify that the local network is configured properly.
+
+`Server response error.`: Received a misformatted response. Inspect the server logs or response contents to diagnose the error.
+
+`Unverified server.`: Server does not have a valid SSL certificate.
+
+`General error: ERROR`: Unknown or uncaught error. Contents of `ERROR` will indicate next diagnosis steps.
