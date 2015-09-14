@@ -32,7 +32,6 @@ This sanity check inspects the device's Bluetooth configuration to determine if 
 
 This check emits a warning if a Bluetooth probe is enabled and no Bluetooth hardware exists on the device for completing the probe's task.
 
-name_sanity_bluetooth_missing_error
 
 **Corrective action:** None.
 
@@ -65,9 +64,9 @@ If the device is configured to upload payloads only when the device is connected
 
 If the device is configured to refresh its configuration more than once every ten minutes (600 seconds) or data uploads are configured to attempt more than once every five minutes (300 seconds), this sanity check will emit a warning due to the negative effects these settings will have on power usage.
 
-`The configuration refresh interval is less than 10 minutes. Consider extending this interval to extend battery life. (Settings &#8594; Refresh Interval)`
+`The configuration refresh interval is less than 10 minutes. Consider extending this interval to extend battery life. (Settings > Refresh Interval)`
 
-`The HTTP data upload interval is less than 10 minutes. Consider extending this interval to extend battery life. (Settings &#8594; HTTP Upload Settings &#8594;HTTP Upload Interval)`
+`The HTTP data upload interval is less than 10 minutes. Consider extending this interval to extend battery life. (Settings > HTTP Upload Settings > HTTP Upload Interval)`
 
 **Corrective action:** Update the device configuration to slow down configuration refreshes or data uploads.
 
@@ -260,7 +259,7 @@ If a communication probe has calibration enabled, Purple Robot will request info
 
 If the Weather Underground probe is enabled and no key has been provided, Purple Robot will emit a warning.
 
-`A custom Weather Underground API key is required for fetching weather data. Please obtain one and enter it in the Settings. (Probe Configuration &#8594; External Service Probes &#8594; Weather Underground &#8594; API Key)`
+`A custom Weather Underground API key is required for fetching weather data. Please obtain one and enter it in the Settings. (Probe Configuration > External Service Probes > Weather Underground > API Key)`
 
 **Corrective action:** Obtain a Weather Underground key and enter the key in the probe configuration.
 
@@ -269,9 +268,9 @@ If the Weather Underground probe is enabled and no key has been provided, Purple
 
 In addition to the sanity checks, Purple Robot may also report any data upload issues on its main screen. The following messages may be visible:
 
-`Waiting for WiFi&#8230;`: Device is configured to upload over WiFi, but no such network is available or configured.
+`Waiting for WiFi...`: Device is configured to upload over WiFi, but no such network is available or configured.
 
-`Waiting for power&#8230;`: Device is configured to upload when charging, but the device is not plugged in.
+`Waiting for power...`: Device is configured to upload when charging, but the device is not plugged in.
 
 `Checksum error.`: Server did not return the expected checksum. Possible error in data transmission.
 
