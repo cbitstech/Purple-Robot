@@ -32,12 +32,13 @@ This sanity check inspects the device's Bluetooth configuration to determine if 
 
 This check emits a warning if a Bluetooth probe is enabled and no Bluetooth hardware exists on the device for completing the probe's task.
 
+`Some probes are unable to collect data due to missing Bluetooth hardware components. Please select a different device for use with this configuration.`
 
 **Corrective action:** None.
 
 This check emits an error if Bluetooth hardware is present on the device, but has been disabled by the system or the user.
 
-name_sanity_bluetooth_disabled_error
+`Required Bluetooth features are currently disabled. Tap here to re-enable Bluetooth features.`
 
 **Corrective action:** Enable Bluetooth from the system settings.
 
