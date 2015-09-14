@@ -42,7 +42,7 @@ name_sanity_bluetooth_disabled_error
 **Corrective action:** Enable Bluetooth from the system settings.
 
 
-##By-Minute Trigger Check##
+###By-Minute Trigger Check###
 
 This sanity check inspects the local triggers on the device and emits a warning if a trigger uses the `FREQ=MINUTELY` and `BYMINUTE` parameters in the iCalendar recurrence string. Ths 
 
@@ -51,7 +51,7 @@ This sanity check inspects the local triggers on the device and emits a warning 
 **Corrective action:** The trigger must be corrected in the remote configuration or via scripting and the triggers must be reloaded on the device.
 
 
-##Charging-Required Upload Check##
+###Charging-Required Upload Check###
 
 If the device is configured to upload payloads only when the device is connected to power, this check emits an error when the device is unconnected from power and more than 1000 pending payloads have accumulated on the device.
 
@@ -60,7 +60,7 @@ If the device is configured to upload payloads only when the device is connected
 **Corrective action:** Connect the device to power until all payloads have been uploaded from the device.
 
 
-##Configuration Setup Check##
+###Configuration Setup Check###
 
 If the device is configured to refresh its configuration more than once every ten minutes (600 seconds) or data uploads are configured to attempt more than once every five minutes (300 seconds), this sanity check will emit a warning due to the negative effects these settings will have on power usage.
 
@@ -71,11 +71,9 @@ If the device is configured to refresh its configuration more than once every te
 **Corrective action:** Update the device configuration to slow down configuration refreshes or data uploads.
 
 
-##Disk Space Check##
+###Disk Space Check###
 
 This sanity check emits an warning if less than 10MB of disk space is available locally or an error if free space is less than 4MB.
-
-name_sanity_disk_space_local_error
 
 `Less than 4MB of space is available on local storage.`
 
@@ -90,7 +88,7 @@ name_sanity_disk_space_local_error
 **Corrective action:** Clear unneeded files from the device to free more disk space.
 
 
-##Google Services Check##
+###Google Services Check###
 
 This sanity check verifies that the local device has a sufficiently-recent version of the Google Play Services installed.
 
@@ -105,7 +103,7 @@ This sanity check verifies that the local device has a sufficiently-recent versi
 **Corrective action:** Install, update or enable Google Play Services to meet Purple Robot requirements.
 
 
-##Last Upload Check##
+###Last Upload Check###
 
 This sanity check verifies that data payloads have been uploaded recently. If the last upload has been more than 24 hours, an error is emitted. If the last upload has been between 12 and 24 hours, a warning is emitted.
 
@@ -118,7 +116,7 @@ This sanity check verifies that data payloads have been uploaded recently. If th
 **Corrective action:** Place the device in a context (power/WiFi) that will permit it to begin uploading payloads from the device.
 
 
-##Location Services Enabled Check##
+###Location Services Enabled Check###
 
 This sanity check verifies that device location services are enabled if a location-aware probe is enabled.
 
@@ -128,7 +126,7 @@ This sanity check verifies that device location services are enabled if a locati
 **Corrective action:** Enable location services on the device.
 
 
-##Log Event Check##
+###Log Event Check###
 
 This sanity check verifies than an excessive number of log events have not accumulated on the device. If more than 512 events are awaiting transmission, an error is emitted. If between 256 and 512 events are pending, a warning is emitted.
 
@@ -139,7 +137,7 @@ This sanity check verifies than an excessive number of log events have not accum
 **Corrective action:** Place the device in a context (power/WiFi) that will permit it to begin uploading events from the device.
 
 
-##Multiple Uploaders Enabled Check##
+###Multiple Uploaders Enabled Check###
 
 This sanity check verifies that only one HTTP data uploader is enabled at a time.
 
@@ -149,7 +147,7 @@ This sanity check verifies that only one HTTP data uploader is enabled at a time
 **Corrective action:** Disable the extraneous HTTP data uploaders.
 
 
-##Pebble Probe Checks##
+###Pebble Probe Checks###
 
 This check emits a warning if more than one probe using a Pebble wearable device is enabled.
 
@@ -158,7 +156,7 @@ This check emits a warning if more than one probe using a Pebble wearable device
 **Corrective action:** Disable the unneeded Pebble probes.
 
 
-##Scheme Configuration Check##
+###Scheme Configuration Check###
 
 This check emits a warning if the local configuration varies from a remote Scheme configuration file and errors if the remote configuration is invalid or missing.
 
@@ -171,7 +169,7 @@ This check emits a warning if the local configuration varies from a remote Schem
 **Corrective action:** Correct the configuration or configuration location on the local device.
 
 
-##Upload Progress Check##
+###Upload Progress Check###
 
 This check emits errors or warnings if the local device's data accumulation rate exceeds its ability to transmit data payloads to the server in a quick-enough manner to prevent data from filling up the device. An error is emitted when accumulation exceeds transmission. A warning is emitted when accumulation exceeds 50% of transmission rate.
 
@@ -184,7 +182,7 @@ This check emits errors or warnings if the local device's data accumulation rate
 **Corrective action:** Either configure the device to collect less data over a given duration or situate the device in a networking context that is capable of keeping up with data accumulation.
 
 
-##WiFi-Enabled Check##
+###WiFi-Enabled Check###
 
 This check determines if WiFi is enabled when upload plugins are configured to wait until WLAN connectivity is available to transmit payload data. If more than 100 payloads are pending, an is emitted, otherwise a warning is used.
 
@@ -199,7 +197,7 @@ This check determines if WiFi is enabled when upload plugins are configured to w
 
 In addition to the sanity checks that run on a fixed schedule, probes may also emit errors and warnings when the device is misconfigured or in a suboptimal state. The following errors and warnings may be emitted by probes.
 
-##Online Service Logins##
+###Online Service Logins###
 
 The following probes emit warnings when a probe uses an online service and Purple Robot has not been authenticated to use the service:
 
@@ -215,7 +213,7 @@ The following probes emit warnings when a probe uses an online service and Purpl
 **Corrective action:** Tap the warning from the diagnostics screen and authenticate witht the given service.
 
 
-##Android Wear Devices##
+###Android Wear Devices###
 
 If an Android Wear probe is enababled and the device has not been set up with a Wear device or the device itself is experiencing issues, a variety of warnings may be emitted.
 
@@ -226,7 +224,7 @@ If an Android Wear probe is enababled and the device has not been set up with a 
 **Corrective action:** Install and configure an Android Wear device or being the wearable device out of the warning state by addressing the active issue (e.g. charge its battery).
 
 
-##Pebble Devices##
+###Pebble Devices###
 
 If a probe uses Pebble wearables and the device isn't connected or configured, the probes may emit a variety of warnings.
 
@@ -237,7 +235,7 @@ If a probe uses Pebble wearables and the device isn't connected or configured, t
 **Corrective action:** Install, connect or upgrade the Pebble wearable.
 
 
-##Location Labeling##
+###Location Labeling###
 
 If a location probe has calibration enabled, Purple Robot will request the name of location clusters for associating semantic details with raw latitude and longitude values.
 
@@ -246,7 +244,7 @@ If a location probe has calibration enabled, Purple Robot will request the name 
 **Corrective action:** Label location clusters as the device requests.
 
 
-##Contact Labelling##
+###Contact Labelling###
 
 If a communication probe has calibration enabled, Purple Robot will request information about contact records for associating relationship details with the call and text log.
 
@@ -255,7 +253,7 @@ If a communication probe has calibration enabled, Purple Robot will request info
 **Corrective action:** Label contact records as the device requests.
 
 
-##Weather Underground Key##
+###Weather Underground Key###
 
 If the Weather Underground probe is enabled and no key has been provided, Purple Robot will emit a warning.
 
