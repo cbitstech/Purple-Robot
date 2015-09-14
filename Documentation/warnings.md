@@ -19,7 +19,7 @@ All sanity warnings and errors are visible within the diagnostics screen of the 
 
 Android 5.0 shipped with a serious memory issue that degrades Purple Robot's data collection ability after an extended runtime:
 
-name_sanity_android_five_memory_warning
+`Your device is likely to experience widespread instability due to a system memory leak, causing Purple Robot and other apps to crash. Please restart your device to reclaim the leaked resources.`
 
 This sanity check emits a warning when an Android 5.0.x device running Purple Robot has been running for more than 18 hours.
 
@@ -47,7 +47,7 @@ name_sanity_bluetooth_disabled_error
 
 This sanity check inspects the local triggers on the device and emits a warning if a trigger uses the `FREQ=MINUTELY` and `BYMINUTE` parameters in the iCalendar recurrence string. Ths 
 
-name_sanity_trigger_byminute_warning
+`TRIGGER trigger defined using both FREQ=MINUTELY and BYMINUTE, introducing performance issues.`
 
 **Corrective action:** The trigger must be corrected in the remote configuration or via scripting and teh triggers must be reloaded on the device.
 
@@ -56,7 +56,7 @@ name_sanity_trigger_byminute_warning
 
 If the device is configured to upload payloads only when the device is connected to power, this check emits an error when the device is unconnected from power and more than 1000 pending payloads have accumulated on the device.
 
-name_sanity_charging_required_error
+`Data uploads are restricted to when the device is plugged-in and a significant amount of data is accumulated. Please plug in the device to upload the accumulated files.`
 
 **Corrective action:** Connect the device to power until all payloads have been uploaded from the device.
 
@@ -65,9 +65,9 @@ name_sanity_charging_required_error
 
 If the device is configured to refresh its configuration more than once every ten minutes (600 seconds) or data uploads are configured to attempt more than once every five minutes (300 seconds), this sanity check will emit a warning due to the negative effects these settings will have on power usage.
 
-name_sanity_configuration_refresh_warning
+`The configuration refresh interval is less than 10 minutes. Consider extending this interval to extend battery life. (Settings &#8594; Refresh Interval)`
 
-name_sanity_configuration_upload_warning
+`The HTTP data upload interval is less than 10 minutes. Consider extending this interval to extend battery life. (Settings &#8594; HTTP Upload Settings &#8594;HTTP Upload Interval)`
 
 **Corrective action:** Update the device configuration to slow down configuration refreshes or data uploads.
 
@@ -78,13 +78,15 @@ This sanity check emits an warning if less than 10MB of disk space is available 
 
 name_sanity_disk_space_local_error
 
-name_sanity_disk_space_local_warning
+`Less than 4MB of space is available on local storage.`
 
-name_sanity_disk_space_external_error
+`Less than 10MB of space is available on local storage.`
 
-name_sanity_disk_space_external_warning
+`Less than 4MB of space is available on external storage (SD Card).`
 
-name_sanity_disk_space_external_unknown_warning
+`Less than 10MB of space is available on external storage (SD Card).`
+
+`Unable to inspect external storage (SD Card).`
 
 **Corrective action:** Clear unneeded files from the device to free more disk space.
 
@@ -93,26 +95,26 @@ name_sanity_disk_space_external_unknown_warning
 
 This sanity check verifies that the local device has a sufficiently-recent version of the Google Play Services installed.
 
-name_sanity_google_play_update_invalid
+`Google Play Services are missing.`
 
-name_sanity_google_play_update_disabled
+`Google Play Services are out of date.`
 
-name_sanity_google_play_update_required
+`Google Play Services are disabled.`
 
-name_sanity_google_play_missing
+`Google Play Services are invalid.`
 
-**Corrective action:** Install or update Google Play Services to meet Purple Robot requirements.
+**Corrective action:** Install, update or enable Google Play Services to meet Purple Robot requirements.
 
 
 ##Last Upload Check##
 
 This sanity check verifies that data payloads have been uploaded recently. If the last upload has been more than 24 hours, an error is emitted. If the last upload has been between 12 and 24 hours, a warning is emitted.
 
-name_sanity_last_upload_never
+`Sensor data has not ever been uploaded.`
 
-name_sanity_last_upload_error
+`Sensor data has not been uploaded in the last day.`
 
-name_sanity_last_upload_warning
+`Sensor data has not been uploaded in the last 12 hours.`
 
 **Corrective action:** Place the device in a context (power/WiFi) that will permit it to begin uploading payloads from the device.
 
@@ -121,7 +123,8 @@ name_sanity_last_upload_warning
 
 This sanity check verifies that device location services are enabled if a location-aware probe is enabled.
 
-name_sanity_location_services_enabled_warning
+`Required location services are currently disabled. Tap here to correct the issue.`
+
 
 **Corrective action:** Enable location services on the device.
 
@@ -130,17 +133,19 @@ name_sanity_location_services_enabled_warning
 
 This sanity check verifies than an excessive number of log events have not accumulated on the device. If more than 512 events are awaiting transmission, an error is emitted. If between 256 and 512 events are pending, a warning is emitted.
 
-name_sanity_log_events_error
+`A very significant number of log events are awaiting transmission. Connect your device to the network as soon as possible.`
 
-name_sanity_log_events_warning
+`A significant number of log events log events are awaiting transmission. Connect your device to the network soon.`
 
 **Corrective action:** Place the device in a context (power/WiFi) that will permit it to begin uploading events from the device.
+
 
 ##Multiple Uploaders Enabled Check##
 
 This sanity check verifies that only one HTTP data uploader is enabled at a time.
 
-name_sanity_multiple_uploaders_enabled_warning
+`Multiple data upload plugins are currently enabled. This will likely result in duplicate readings at the data destination.`
+
 
 **Corrective action:** Disable the extraneous HTTP data uploaders.
 
@@ -149,7 +154,7 @@ name_sanity_multiple_uploaders_enabled_warning
 
 This check emits a warning if more than one probe using a Pebble wearable device is enabled.
 
-name_sanity_pebble_probes_warning
+`Multiple Pebble probes are currently enabled. Please disable all but one.`
 
 **Corrective action:** Disable the unneeded Pebble probes.
 
@@ -158,11 +163,11 @@ name_sanity_pebble_probes_warning
 
 This check emits a warning if the local configuration varies from a remote Scheme configuration file and errors if the remote configuration is invalid or missing.
 
-scheme_config_check_changed
+`Missing configuration value: KEY`
 
-scheme_config_check_missing
+`Changed configuration value: KEY`
 
-scheme_config_invalid_config
+`Invalid Scheme configuration file`
 
 **Corrective action:** Correct the configuration or configuration location on the local device.
 
@@ -171,13 +176,11 @@ scheme_config_invalid_config
 
 This check emits errors or warnings if the local device's data accumulation rate exceeds its ability to transmit data payloads to the server in a quick-enough manner to prevent data from filling up the device. An error is emitted when accumulation exceeds transmission. A warning is emitted when accumulation exceeds 50% of transmission rate.
 
-name_sanity_upload_progress_unknown
+`Current sensor acquisition exceeds the available outbound bandwidth.`
 
-name_sanity_upload_progress_unknown
+`Current sensor acquisition consumes a significant amount of the available outbound bandwidth.`
 
-name_sanity_upload_progress_error
-
-name_sanity_upload_progress_warning
+`Unable to compare available bandwidth with current sensor data acquisition rates.`
 
 **Corrective action:** Either configure the device to collect less data over a given duration or situate the device in a networking context that is capable of keeping up with data accumulation.
 
@@ -186,14 +189,77 @@ name_sanity_upload_progress_warning
 
 This check determines if WiFi is enabled when upload plugins are configured to wait until WLAN connectivity is available to transmit payload data. If more than 100 payloads are pending, an is emitted, otherwise a warning is used.
 
-name_sanity_wifi_enabled_error
+`Data uploads are restricted to WiFi networks, but the device's WiFi connection is disabled.`
 
-name_sanity_wifi_enabled_warning
+`Data uploads are restricted to WiFi networks, but the device's WiFi connection is disabled and a significant amount of data is accumulating on the device.`
 
 **Corrective action:** Situate the device in a network context where WiFi is available and the device is configured to use a local WiFi network.
 
 
 #Probe Checks#
 
-In addition to the sanity checks that run on a fixed schedule, probes may also emit errors and warnings when the device is misconfigured or in a suboptimal state.
+In addition to the sanity checks that run on a fixed schedule, probes may also emit errors and warnings when the device is misconfigured or in a suboptimal state. The following errors and warnings may be emitted by probes.
 
+##Online Service Logins##
+
+The following probes emit warnings when a probe uses an online service and Purple Robot has not been authenticated to use the service:
+
+* Facebook
+* GitHub
+* Instagram
+* Jawbone
+* Twitter
+* Foursquare
+* Fitbit
+* iHealth
+
+**Corrective action:** Tap the warning from teh diagnostics screen and authenticate witht the given service.
+
+
+##Android Wear Devices##
+
+If an Android Wear probe is enababled and the device has not been set up with a Wear device or the device itself is experiencing issues, a variety of warnings may be emitted.
+
+`Please install the Android Wear companion app to use the Android Wear probe.`
+
+`The connected Android Wear device is running low on power. Please charge the device soon.`
+
+**Corrective action:** Install and configure an Android Wear device or being the wearable device out of the warning state by addressing the active issue (e.g. charge its battery).
+
+
+##Pebble Devices##
+
+If a probe uses Pebble wearables and the device isn't connected or configured, the probes may emit a variety of warnings.
+
+`Please connect your Pebble device to the Pebble companion app.`
+
+`Received data from an obsolete Livewell Pebble watchface. Please upgrade your watchface.`
+
+**Corrective action:** Install, connect or upgrade the Pebble wearable.
+
+
+##Location Labeling##
+
+If a location probe has calibration enabled, Purple Robot will request the name of location clusters for associating semantic details with raw latitude and longitude values.
+
+`Please provide some information about places you have visited to help the system function better.`
+
+**Corrective action:** Label location clusters as the device requests.
+
+
+##Contact Labelling##
+
+If a communication probe has calibration enabled, Purple Robot will request information about contact records for associating relationship details with the call and text log.
+
+`Please provide some information about your friends and family to help the system function better.`
+
+**Corrective action:** Label contact records as the device requests.
+
+
+##Weather Underground Key##
+
+If the Weather Underground probe is enabled and no key has been provided, Purple Robot will emit a warning.
+
+`A custom Weather Underground API key is required for fetching weather data. Please obtain one and enter it in the Settings. (Probe Configuration &#8594; External Service Probes &#8594; Weather Underground &#8594; API Key)`
+
+**Corrective action:** Obtain a Weather Underground key and enter the key in the probe configuration.
