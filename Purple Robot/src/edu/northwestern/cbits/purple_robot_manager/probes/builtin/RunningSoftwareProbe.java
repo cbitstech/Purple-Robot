@@ -2,6 +2,7 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -19,14 +20,20 @@ import android.app.ActivityManager.RunningTaskInfo;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.WiFiHelper;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class RunningSoftwareProbe extends Probe
@@ -96,8 +103,7 @@ public class RunningSoftwareProbe extends Probe
             {
                 synchronized (this)
                 {
-                    long freq = Long
-                            .parseLong(prefs.getString(RunningSoftwareProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
+                    long freq = Long.parseLong(prefs.getString(RunningSoftwareProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
 
                     if (now - this._lastCheck > freq)
                     {
@@ -109,46 +115,150 @@ public class RunningSoftwareProbe extends Probe
                             @SuppressWarnings("deprecation")
                             public void run()
                             {
-                                Bundle bundle = new Bundle();
-                                bundle.putString("PROBE", me.name(context));
-                                bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
-
-                                ActivityManager am = (ActivityManager) context.getApplicationContext()
-                                        .getSystemService(Context.ACTIVITY_SERVICE);
-
-                                List<RunningTaskInfo> tasks = am.getRunningTasks(9999);
-
-                                if (tasks != null)
+                                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
                                 {
+                                    ActivityManager am = (ActivityManager) context.getApplicationContext()
+                                            .getSystemService(Context.ACTIVITY_SERVICE);
+
+                                    List<RunningTaskInfo> tasks = am.getRunningTasks(9999);
+
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString("PROBE", me.name(context));
+                                    bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+
                                     ArrayList<Bundle> running = new ArrayList<>();
 
-                                    for (int i = 0; i < tasks.size(); i++)
+                                    if (tasks != null)
                                     {
-                                        RunningTaskInfo info = tasks.get(i);
+                                        for (int i = 0; i < tasks.size(); i++) {
+                                            RunningTaskInfo info = tasks.get(i);
 
-                                        Bundle taskBundle = new Bundle();
+                                            Bundle taskBundle = new Bundle();
 
-                                        taskBundle.putString(RunningSoftwareProbe.PACKAGE_NAME,
-                                                info.baseActivity.getPackageName());
-                                        taskBundle.putInt(RunningSoftwareProbe.TASK_STACK_INDEX, i);
+                                            taskBundle.putString(RunningSoftwareProbe.PACKAGE_NAME, info.baseActivity.getPackageName());
+                                            taskBundle.putInt(RunningSoftwareProbe.TASK_STACK_INDEX, i);
 
-                                        String category = RunningSoftwareProbe.fetchCategory(context,
-                                                info.baseActivity.getPackageName());
-                                        taskBundle.putString(RunningSoftwareProbe.PACKAGE_CATEGORY, category);
+                                            String category = RunningSoftwareProbe.fetchCategory(context,  info.baseActivity.getPackageName());
+                                            taskBundle.putString(RunningSoftwareProbe.PACKAGE_CATEGORY, category);
 
-                                        running.add(taskBundle);
+                                            running.add(taskBundle);
+                                        }
+
+                                        bundle.putInt(RunningSoftwareProbe.RUNNING_TASK_COUNT, running.size());
+
+                                        bundle.putParcelableArrayList(RunningSoftwareProbe.RUNNING_TASKS, running);
+
+                                        me.transmitData(context, bundle);
                                     }
-
-                                    bundle.putParcelableArrayList(RunningSoftwareProbe.RUNNING_TASKS, running);
-                                    bundle.putInt(RunningSoftwareProbe.RUNNING_TASK_COUNT, running.size());
-
-                                    me.transmitData(context, bundle);
                                 }
+                                else
+                                {
+                                    final SanityManager sanity = SanityManager.getInstance(context);
+
+                                    final String title = context.getString(R.string.title_app_usage_data_unavailable_rsp);
+                                    final String message = context.getString(R.string.message_app_usage_data_unavailable_rsp);
+
+                                    sanity.addAlert(SanityCheck.WARNING, title, message, null);
+
+/*                                    UsageStatsManager usage = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
+
+                                    Log.e("PR", "RSP USAGE: " + usage.hashCode());
+
+                                    synchronized(usage)
+                                    {
+                                        final SanityManager sanity = SanityManager.getInstance(context);
+
+                                        final String title = context.getString(R.string.title_app_usage_data_required);
+                                        final String message = context.getString(R.string.message_app_usage_data_required);
+
+                                        final long now = System.currentTimeMillis();
+
+                                        if (usage.queryEvents(now - (1 * 60 * 60 * 1000), now).hasNextEvent() == false)
+                                        {
+                                            Runnable action = new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+                                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                                                    try
+                                                    {
+                                                        context.startActivity(intent);
+
+                                                        sanity.clearAlert(title);
+                                                    }
+                                                    catch(Exception e)
+                                                    {
+                                                        LogManager.getInstance(context).logException(e);
+
+                                                        Toast.makeText(context, R.string.toast_missing_access_settings, Toast.LENGTH_LONG).show();
+                                                    }
+                                                }
+                                            };
+
+                                            sanity.addAlert(SanityCheck.WARNING, title, message, action);
+                                        }
+                                        else
+                                        {
+                                            sanity.clearAlert(title);
+
+                                            me._lastCheck = now;
+
+                                            UsageEvents events = usage.queryEvents(now - (5 * 60 * 1000), now);
+
+                                            ArrayList<String> packages = new ArrayList<>();
+
+                                            UsageEvents.Event event = new UsageEvents.Event();
+
+                                            while (events.getNextEvent(event)) {
+                                                if (event.getEventType() == UsageEvents.Event.MOVE_TO_FOREGROUND)
+                                                {
+                                                    String pkgName = new String(event.getPackageName());
+                                                    if (packages.contains(pkgName))
+                                                        packages.remove(pkgName);
+
+                                                    packages.add(pkgName);
+                                                }
+
+                                                event = new UsageEvents.Event();
+                                            }
+
+                                            Bundle bundle = new Bundle();
+                                            bundle.putString("PROBE", me.name(context));
+                                            bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+
+                                            ArrayList<Bundle> running = new ArrayList<>();
+
+                                            Collections.reverse(packages);
+
+                                            for (int i = 0; i < packages.size(); i++) {
+                                                Bundle taskBundle = new Bundle();
+
+                                                String pkgName = packages.get(i);
+
+                                                taskBundle.putString(RunningSoftwareProbe.PACKAGE_NAME, pkgName);
+                                                taskBundle.putInt(RunningSoftwareProbe.TASK_STACK_INDEX, i);
+
+                                                String category = RunningSoftwareProbe.fetchCategory(context, pkgName);
+                                                taskBundle.putString(RunningSoftwareProbe.PACKAGE_CATEGORY, category);
+
+                                                running.add(taskBundle);
+                                            }
+
+                                            if (running.size() > 0) {
+                                                bundle.putInt(RunningSoftwareProbe.RUNNING_TASK_COUNT, running.size());
+                                                bundle.putParcelableArrayList(RunningSoftwareProbe.RUNNING_TASKS, running);
+
+                                                me.transmitData(context, bundle);
+                                            }
+                                        }
+                                    }
+                               */
+                               }
                             }
                         };
 
-                        Thread t = new Thread(r);
-                        t.start();
+                        new Handler(Looper.getMainLooper()).post(r);
 
                         me._lastCheck = now;
                     }

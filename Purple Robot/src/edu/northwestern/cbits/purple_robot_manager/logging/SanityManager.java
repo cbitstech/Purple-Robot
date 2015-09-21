@@ -168,11 +168,16 @@ public class SanityManager
                     else
                         style = style.setSummaryText(this._context.getString(R.string.note_purple_robot_message_multiple, issueCount));
 
-                    for (String key : this._errors.keySet())
-                        style = style.addLine(this._errors.get(key));
+                    synchronized(this._errors)
+                    {
+                        for (String key : this._errors.keySet())
+                            style = style.addLine(this._errors.get(key));
+                    }
 
-                    for (String key : this._warnings.keySet())
-                        style = style.addLine(this._warnings.get(key));
+                    synchronized(this._warnings) {
+                        for (String key : this._warnings.keySet())
+                            style = style.addLine(this._warnings.get(key));
+                    }
 
                     builder = builder.setStyle(style);
                 }
@@ -216,17 +221,25 @@ public class SanityManager
 
         if (level == SanityCheck.WARNING && this._warnings.containsKey(name) == false)
         {
-            this._warnings.put(name, message);
-            alert = true;
+            synchronized(this._warnings) {
+                this._warnings.put(name, message);
+                alert = true;
+            }
         }
         else if (this._warnings.containsKey(name) == false)
         {
-            this._errors.put(name, message);
-            alert = true;
+            synchronized(this._errors) {
+                this._errors.put(name, message);
+                alert = true;
+            }
         }
 
         if (action != null)
-            this._actions.put(name, action);
+        {
+            synchronized(this._actions) {
+                this._actions.put(name, action);
+            }
+        }
 
         if (alert)
         {
@@ -282,8 +295,16 @@ public class SanityManager
 
     public void clearAlert(String title)
     {
-        this._warnings.remove(title);
-        this._errors.remove(title);
-        this._actions.remove(title);
+        synchronized(this._warnings) {
+            this._warnings.remove(title);
+        }
+
+        synchronized(this._errors) {
+            this._errors.remove(title);
+        }
+
+        synchronized (this._actions) {
+            this._actions.remove(title);
+        }
     }
 }

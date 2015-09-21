@@ -1626,4 +1626,16 @@
     <string name="name_sanity_bluetooth_missing_error">Some probes are unable to collect data due to missing Bluetooth hardware components. Please select a different device for use with this configuration.</string>
     <string name="name_sanity_bluetooth_disabled_error">Required Bluetooth features are currently disabled. Tap here to re-enable Bluetooth features.</string>
     <string name="toast_google_play_required">Purple Robot requires Google Play, but this does not appear to be available on your device.</string>
+    <string name="toast_transmitting_events">Attempting to upload %1$d events&#8230;</string>
+
+    <string name="title_app_usage_data_required">App usage data permission required</string>
+    <string name="message_app_usage_data_required">Tap here to grant Purple Robot access to the app usage data that it\'s configuration requires.</string>
+
+    <string name="toast_missing_access_settings">Unable to access the app usage system settings. Please locate the setting and grant Purple Robot access.</string>
+
+    <string name="title_app_usage_data_unavailable_alp">Unable to gather app launch events</string>
+    <string name="message_app_usage_data_unavailable_alp">This version of Android is unable to report app launch events in a stable and consistent fashion. This information will be unavailable to Purple Robot until a future system update.</string>
+
+    <string name="title_app_usage_data_unavailable_rsp">Unable to gather running app information</string>
+    <string name="message_app_usage_data_unavailable_rsp">This version of Android is unable to report running app activity in a stable and consistent fashion. This information will be unavailable to Purple Robot until a future system update.</string>
 </resources>

@@ -6,7 +6,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 
 import org.msgpack.MessagePack;
 import org.msgpack.packer.Packer;

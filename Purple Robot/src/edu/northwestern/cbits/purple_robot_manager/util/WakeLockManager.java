@@ -6,6 +6,7 @@ import android.os.PowerManager;
 import android.support.v4.util.LongSparseArray;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
@@ -24,6 +25,7 @@ public class WakeLockManager
     private LongSparseArray<PowerManager.WakeLock> _fullLocks = new LongSparseArray<PowerManager.WakeLock>();
 
     private LongSparseArray<String> _tags = new LongSparseArray<String>();
+    private HashMap<String, PowerManager.WakeLock> _locks = new HashMap<>();
 
     private static WakeLockManager _instance = null;
 
@@ -46,6 +48,9 @@ public class WakeLockManager
     {
         tag = tag.replace("edu.northwestern.cbits.purple_robot_manager.", "");
 
+        if (this._locks.containsKey(tag))
+            this.releaseWakeLock(this._locks.get(tag));
+
         PowerManager power = (PowerManager) this._context.getSystemService(Context.POWER_SERVICE);
 
         PowerManager.WakeLock lock = power.newWakeLock(lockType, tag);
@@ -64,6 +69,8 @@ public class WakeLockManager
         this._tags.put(now, tag);
 
         lock.acquire();
+
+        this._locks.put(tag, lock);
 
         return lock;
     }
@@ -86,7 +93,8 @@ public class WakeLockManager
             }
         }
 
-        lock.release();
+        if (lock.isHeld())
+            lock.release();
     }
 
     private ArrayList<Bundle> locks(LongSparseArray<PowerManager.WakeLock> locks, String lockType) {

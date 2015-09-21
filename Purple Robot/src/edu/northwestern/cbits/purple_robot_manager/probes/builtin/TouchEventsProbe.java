@@ -95,7 +95,6 @@ public class TouchEventsProbe extends Probe
             {
                 if (this._overlay == null)
                 {
-
                     WindowManager.LayoutParams params = new WindowManager.LayoutParams();
 
                     params.format = PixelFormat.TRANSLUCENT;
@@ -124,7 +123,6 @@ public class TouchEventsProbe extends Probe
 
                     if (Looper.myLooper() == null)
                         Looper.prepare();
-
 
                     try
                     {

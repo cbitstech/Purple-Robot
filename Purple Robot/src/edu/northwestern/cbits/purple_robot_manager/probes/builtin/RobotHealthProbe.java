@@ -376,16 +376,14 @@ public class RobotHealthProbe extends Probe
                                     for (String check : SanityManager.getInstance(context).errors().values())
                                         errors.add(check);
 
-                                    if (errors.size() > 0)
-                                        bundle.putStringArrayList("CHECK_ERRORS", errors);
+                                    bundle.putStringArrayList("CHECK_ERRORS", errors);
 
                                     ArrayList<String> warnings = new ArrayList<>();
 
                                     for (String check : SanityManager.getInstance(context).warnings().values())
                                         warnings.add(check);
 
-                                    if (warnings.size() > 0)
-                                        bundle.putStringArrayList("CHECK_WARNINGS", warnings);
+                                    bundle.putStringArrayList("CHECK_WARNINGS", warnings);
 
                                     bundle.putParcelableArrayList("TRIGGERS", TriggerManager.getInstance(context).allTriggersBundles(context));
 

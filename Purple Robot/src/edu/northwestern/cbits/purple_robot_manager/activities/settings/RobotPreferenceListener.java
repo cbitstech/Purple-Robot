@@ -102,6 +102,12 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
                 refreshIntent.putExtra(LogService.LOG_FORCE_UPLOAD, true);
                 refreshIntent.setClass(this._context, LogService.class);
 
+                int eventCount = LogManager.getInstance(this._context).pendingEventsCount();
+
+                String message = this._context.getString(R.string.toast_transmitting_events, eventCount);
+
+                Toast.makeText(this._context, message, Toast.LENGTH_SHORT).show();
+
                 this._context.startService(refreshIntent);
             }
             catch (PackageManager.NameNotFoundException e)
