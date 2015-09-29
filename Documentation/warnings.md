@@ -263,6 +263,17 @@ If the Weather Underground probe is enabled and no key has been provided, Purple
 **Corrective action:** Obtain a Weather Underground key and enter the key in the probe configuration.
 
 
+###Android 5.x App Usage Data###
+
+Android 5.0 changed the access to running app data and this affected the Application Launch Events probe and the Running Software probe. The current implementations of the UsageStatsManager functionality exhibits some serious stability bugs on the Nexus 5 and cannot be reliably used.
+
+`This version of Android is unable to report app launch events in a stable and consistent fashion. This information will be unavailable to Purple Robot until a future system update.`
+
+`This version of Android is unable to report running app activity in a stable and consistent fashion. This information will be unavailable to Purple Robot until a future system update.`
+
+**Corrective action:** The only corrective action is to disable these probes until a more reliable UsageStatsManager becomes available.
+
+
 #Upload Warnings#
 
 In addition to the sanity checks, Purple Robot may also report any data upload issues on its main screen. The following messages may be visible:
