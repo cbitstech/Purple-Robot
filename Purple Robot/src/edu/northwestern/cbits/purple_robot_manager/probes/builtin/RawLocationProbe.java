@@ -6,6 +6,7 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.mozilla.javascript.ast.Loop;
 
 import android.content.Context;
 import android.content.Intent;
@@ -227,7 +228,7 @@ public class RawLocationProbe extends Probe implements LocationListener
     @Override
     public boolean isEnabled(Context context)
     {
-        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        final LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
         if (super.isEnabled(context))
         {
@@ -237,24 +238,44 @@ public class RawLocationProbe extends Probe implements LocationListener
 
             if (prefs.getBoolean(RawLocationProbe.ENABLED, RawLocationProbe.DEFAULT_ENABLED))
             {
-                long freq = Long.parseLong(prefs.getString(RawLocationProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
+                final long freq = Long.parseLong(prefs.getString(RawLocationProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
 
                 if (this._lastFrequency != freq || this._listening == false)
                 {
+                    final RawLocationProbe me = this;
+
                     this._lastFrequency = freq;
                     this._listening = false;
 
-                    locationManager.removeUpdates(this);
 
-                    if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
-                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, freq, 1, this);
+                    Runnable r = new Runnable()
+                    {
+                        @Override
+                        public void run() {
+                            Looper looper = Looper.myLooper();
 
-                    if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
-                        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, freq, 1, this);
+                            if (looper == null)
+                                Looper.prepare();
+
+                            locationManager.removeUpdates(me);
+
+                            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+                                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, freq, 1, me);
+
+                            if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
+                                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, freq, 1, me);
+
+                            me.onLocationChanged(locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER));
+
+                            if (looper == null)
+                                Looper.loop();
+                        }
+                    };
+
+                    Thread t = new Thread(r);
+                    t.start();
 
                     this._listening = true;
-
-                    this.onLocationChanged(locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER));
                 }
 
                 return true;

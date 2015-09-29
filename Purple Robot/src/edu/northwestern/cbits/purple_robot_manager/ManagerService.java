@@ -17,6 +17,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.Ringtone;
@@ -221,7 +222,10 @@ public class ManagerService extends IntentService
                     else if (toneString.startsWith("sounds/") == false)
                         toneUri = Uri.parse(toneString);
                     else
+                    {
                         toneUri = null;
+                        name = toneString;
+                    }
                 }
                 else
                 {
@@ -305,6 +309,7 @@ public class ManagerService extends IntentService
                                 try {
                                     ManagerService._player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
                                     ManagerService._player.setLooping(intent.getBooleanExtra(ManagerService.RINGTONE_LOOPS, false));
+                                    ManagerService._player.setAudioStreamType(AudioManager.STREAM_NOTIFICATION);
 
                                     ManagerService._player.prepare();
 
@@ -312,6 +317,15 @@ public class ManagerService extends IntentService
                                         @Override
                                         public void onCompletion(MediaPlayer player) {
                                             ManagerService._player = null;
+
+                                            try
+                                            {
+                                                afd.close();
+                                            }
+                                            catch (IOException e)
+                                            {
+                                                LogManager.getInstance(me).logException(e);
+                                            }
                                         }
                                     });
 

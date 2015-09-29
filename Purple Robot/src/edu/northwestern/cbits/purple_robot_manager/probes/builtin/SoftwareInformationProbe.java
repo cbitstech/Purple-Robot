@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Build;
@@ -32,6 +33,9 @@ public class SoftwareInformationProbe extends Probe
     private static final String SDK_INT = "SDK_INT";
     private static final String APP_NAME = "APP_NAME";
     private static final String PACKAGE_NAME = "PACKAGE_NAME";
+    private static final String PACKAGE_VERSION_NAME = "PACKAGE_VERSION_NAME";
+    private static final String PACKAGE_VERSION_CODE = "PACKAGE_VERSION_CODE";
+
     private static final String INSTALLED_APPS = "INSTALLED_APPS";
     private static final String INSTALLED_APP_COUNT = "INSTALLED_APP_COUNT";
 
@@ -124,11 +128,24 @@ public class SoftwareInformationProbe extends Probe
                                     appBundle.putString(SoftwareInformationProbe.APP_NAME, info.loadLabel(pm).toString());
                                     appBundle.putString(SoftwareInformationProbe.PACKAGE_NAME, info.packageName);
 
+                                    try
+                                    {
+                                        PackageInfo pkgInfo = pm.getPackageInfo(info.packageName, 0);
+
+                                        appBundle.putString(SoftwareInformationProbe.PACKAGE_VERSION_NAME, pkgInfo.versionName);
+                                        appBundle.putInt(SoftwareInformationProbe.PACKAGE_VERSION_CODE, pkgInfo.versionCode);
+                                    }
+                                    catch (Resources.NotFoundException e)
+                                    {
+                                        appBundle.putString(SoftwareInformationProbe.PACKAGE_VERSION_NAME, "");
+                                        appBundle.putInt(SoftwareInformationProbe.PACKAGE_VERSION_CODE, -1);
+                                    }
+
                                     installed.add(appBundle);
                                 }
-                                catch (Resources.NotFoundException e)
+                                catch (PackageManager.NameNotFoundException e)
                                 {
-
+                                    e.printStackTrace();
                                 }
                             }
 

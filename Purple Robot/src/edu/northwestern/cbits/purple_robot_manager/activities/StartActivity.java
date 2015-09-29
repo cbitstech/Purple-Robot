@@ -574,6 +574,17 @@ public class StartActivity extends AppCompatActivity
             this.getContentResolver().unregisterContentObserver(this._observer);
             this._observer = null;
         }
+
+        ListAdapter listAdapter = listView.getAdapter();
+
+        if (listAdapter instanceof CursorAdapter)
+        {
+            CursorAdapter adapter = (CursorAdapter) listAdapter;
+
+            Cursor oldCursor = adapter.getCursor();
+
+            oldCursor.close();
+        }
     }
 
     protected void onNewIntent (Intent intent)
@@ -709,14 +720,17 @@ public class StartActivity extends AppCompatActivity
                 {
                     ListAdapter listAdapter = listView.getAdapter();
 
-                    Cursor c = listView.getContext().getContentResolver()
-                            .query(RobotContentProvider.RECENT_PROBE_VALUES, null, null, null, "recorded DESC");
+                    Cursor c = listView.getContext().getContentResolver().query(RobotContentProvider.RECENT_PROBE_VALUES, null, null, null, "recorded DESC");
 
                     if (listAdapter instanceof CursorAdapter)
                     {
                         CursorAdapter adapter = (CursorAdapter) listAdapter;
 
+                        Cursor oldCursor = adapter.getCursor();
+
                         adapter.changeCursor(c);
+
+                        oldCursor.close();
                     }
 
                     if (prefs.getBoolean("config_probes_enabled", false))

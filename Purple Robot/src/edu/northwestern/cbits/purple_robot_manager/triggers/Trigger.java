@@ -83,6 +83,13 @@ public abstract class Trigger
                 }
             };
 
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+            String key = "last_fired_" + this.identifier();
+            Editor edit = prefs.edit();
+            edit.putLong(key, System.currentTimeMillis());
+            edit.commit();
+
             Thread t = new Thread(new ThreadGroup("Triggers"), r, this.name(), 32768);
             t.start();
 
@@ -304,11 +311,7 @@ public abstract class Trigger
 
         bundle.putBoolean(Trigger.ENABLED, this.enabled(context));
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-
-        String key = "last_fired_" + this._identifier;
-
-        bundle.putLong(Trigger.LAST_FIRED, prefs.getLong(key, 0));
+        bundle.putLong(Trigger.LAST_FIRED, this.lastFireTime(context));
 
         return bundle;
     }
