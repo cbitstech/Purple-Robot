@@ -79,6 +79,7 @@ import edu.northwestern.cbits.purple_robot_manager.PurpleRobotApplication;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.WiFiHelper;
 import edu.northwestern.cbits.purple_robot_manager.activities.StartActivity;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.LiberalSSLSocketFactory;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -961,7 +962,7 @@ public class HttpUploadPlugin extends OutputPlugin
 
     private boolean useExternalStorage(SharedPreferences prefs)
     {
-        return this.coerceBoolean(prefs, "config_external_storage", false);
+        return SettingsActivity.useExternalStorage(this.getContext());
     }
 
     public File getArchiveFolder()

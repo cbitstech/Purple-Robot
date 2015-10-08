@@ -1484,6 +1484,9 @@
     <string name="summary_nfc_probe">Scanned Tag: %1$s</string>
     <string name="action_scan_nfc">Scan NFC tag</string>
     
+    <string name="name_sanity_permissions">Missing Permissions</string>
+    <string name="name_sanity_permission_error">Required permissions are missing. Tap here to grant the required permissions.</string>
+
     <string name="title_pebble_check">Pebble Software Missing</string>
     <string name="message_pebble_check">Please install the Pebble companion app to use the Pebble Watch probe.</string>
 
@@ -1638,4 +1641,18 @@
 
     <string name="title_app_usage_data_unavailable_rsp">Unable to gather running app information</string>
     <string name="message_app_usage_data_unavailable_rsp">This version of Android is unable to report running app activity in a stable and consistent fashion. This information will be unavailable to Purple Robot until a future system update.</string>
+
+    <string name="pr_permissions_label">System Permissions</string>
+
+    <string name="status_permissions">%1$d requested: %2$d granted, %3$d denied</string>
+
+    <string name="title_permissions">Permissions</string>
+    <string name="toast_permission_granted">Permission granted.</string>
+    <string name="toast_permission_denied">Permission not granted. System may not function properly until permission is granted&#8230;</string>
+
+    <string name="label_permission_required">Required Permission</string>
+
+    <string name="dialog_title_permissions_missing">Missing Permissions</string>
+    <string name="dialog_message_permissions_missing">Purple Robot does not yet have all its required permissions.</string>
+    <string name="button_grant_permissions">Grant Permissions</string>
 </resources>

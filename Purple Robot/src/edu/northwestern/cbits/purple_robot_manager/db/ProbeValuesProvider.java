@@ -13,6 +13,7 @@ import java.util.Map;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -36,9 +37,10 @@ public class ProbeValuesProvider
 
     public static final String TIMESTAMP = "timestamp";
     private static final String ID = "_id";
+    private Context _context = null;
 
-    private SQLiteDatabase _database = null;
-    private ProbeValuesSqlHelper _dbHelper = null;
+//    private SQLiteDatabase _database = null;
+//    private ProbeValuesSqlHelper _dbHelper = null;
 
     private ArrayList<Filter> _filters = new ArrayList<>();
 
@@ -58,16 +60,7 @@ public class ProbeValuesProvider
 
     public ProbeValuesProvider(Context context)
     {
-        this._dbHelper = new ProbeValuesSqlHelper(context);
-
-        try
-        {
-            this._database = this._dbHelper.getWritableDatabase();
-        }
-        catch (SQLException e)
-        {
-            LogManager.getInstance(context).logException(e);
-        }
+        this._context = context.getApplicationContext();
 
         HashSet<String> highFreq = new HashSet<>();
         highFreq.add(AccelerometerProbe.DB_TABLE);
@@ -118,7 +111,7 @@ public class ProbeValuesProvider
 
     public void close()
     {
-        this._dbHelper.close();
+//        this._dbHelper.close();
     }
 
     private String tableName(Context context, String name, Map<String, String> schema)
@@ -154,9 +147,13 @@ public class ProbeValuesProvider
 
         boolean tableExists = false;
 
+        ProbeValuesSqlHelper helper = new ProbeValuesSqlHelper(context);
+
+        SQLiteDatabase database = helper.getWritableDatabase();
+
         try
         {
-            c = this._database.query(tableName, null, null, null, null, null, null);
+            c = database.query(tableName, null, null, null, null, null, null);
 
             tableExists = true;
         }
@@ -169,6 +166,8 @@ public class ProbeValuesProvider
             if (c != null)
                 c.close();
         }
+
+        database.close();
 
         return tableExists;
     }
@@ -209,9 +208,15 @@ public class ProbeValuesProvider
 
         createSql += ");";
 
-        this._database.execSQL(createSql);
+        ProbeValuesSqlHelper helper = new ProbeValuesSqlHelper(this._context);
 
-        return false;
+        SQLiteDatabase database = helper.getWritableDatabase();
+
+        database.execSQL(createSql);
+
+        database.close();
+
+        return true;
     }
 
     public void insertValue(final Context context, final String name, final Map<String, String> schema,
@@ -235,7 +240,11 @@ public class ProbeValuesProvider
         {
             public void run()
             {
-                synchronized (me._database)
+                ProbeValuesSqlHelper helper = new ProbeValuesSqlHelper(context);
+
+                SQLiteDatabase database = helper.getWritableDatabase();
+
+                synchronized (database)
                 {
                     for (Filter f : me._filters)
                     {
@@ -293,8 +302,10 @@ public class ProbeValuesProvider
 
                     toInsert.put(ProbeValuesProvider.TIMESTAMP, (Double) values.get(ProbeValuesProvider.TIMESTAMP));
 
-                    me._database.insert(localName, null, toInsert);
+                    database.insert(localName, null, toInsert);
                 }
+
+                database.close();
             }
         };
 
@@ -317,7 +328,11 @@ public class ProbeValuesProvider
 
             String tableSelect = "select name from sqlite_master where type='table';";
 
-            Cursor c = this._database.rawQuery(tableSelect, null);
+            ProbeValuesSqlHelper helper = new ProbeValuesSqlHelper(context);
+
+            SQLiteDatabase database = helper.getWritableDatabase();
+
+            Cursor c = database.rawQuery(tableSelect, null);
 
             while (c.moveToNext())
             {
@@ -327,16 +342,16 @@ public class ProbeValuesProvider
                 {
                     if (tableName.startsWith("table_"))
                     {
-                        Cursor cursor = this._database.query(tableName, null, null, null, null, null, null);
+                        Cursor cursor = database.query(tableName, null, null, null, null, null, null);
 
                         cursor.close();
 
-                        SQLiteStatement delete = this._database.compileStatement("delete from " + tableName + " where "
+                        SQLiteStatement delete = database.compileStatement("delete from " + tableName + " where "
                                 + ProbeValuesProvider.ID + " not in (select " + ProbeValuesProvider.ID + " from "
                                 + tableName + " order by " + ProbeValuesProvider.TIMESTAMP + " desc limit 2048);");
                         delete.execute();
 
-                        cursor = this._database.query(tableName, null, null, null, null, null, null);
+                        cursor = database.query(tableName, null, null, null, null, null, null);
 
                         cursor.close();
                     }
@@ -346,6 +361,8 @@ public class ProbeValuesProvider
                     LogManager.getInstance(context).logException(e);
                 }
             }
+
+            database.close();
 
             c.close();
         }
@@ -357,9 +374,13 @@ public class ProbeValuesProvider
 
     public void clear(Context context)
     {
+        ProbeValuesSqlHelper helper = new ProbeValuesSqlHelper(context);
+
         String tableSelect = "select name from sqlite_master where type='table';";
 
-        Cursor c = this._database.rawQuery(tableSelect, null);
+        SQLiteDatabase database = helper.getWritableDatabase();
+
+        Cursor c = database.rawQuery(tableSelect, null);
 
         ArrayList<String> names = new ArrayList<>();
 
@@ -372,7 +393,7 @@ public class ProbeValuesProvider
         {
             try
             {
-                SQLiteStatement delete = this._database.compileStatement("delete from " + name + " where (_id != -1)");
+                SQLiteStatement delete = database.compileStatement("delete from " + name + " where (_id != -1)");
                 delete.execute();
             }
             catch (SQLException e)
@@ -380,22 +401,60 @@ public class ProbeValuesProvider
                 LogManager.getInstance(context).logException(e);
             }
         }
+
+        database.close();
     }
 
     public Cursor retrieveValues(Context context, String name, Map<String, String> schema)
     {
-        Cursor c = null;
+        MatrixCursor matrix = null;
 
-        synchronized (this._database)
+        ProbeValuesSqlHelper helper = new ProbeValuesSqlHelper(context);
+
+        SQLiteDatabase database = helper.getWritableDatabase();
+
+        synchronized (database)
         {
             String localName = this.tableName(context, name, schema);
 
             if (this.tableExists(context, localName) == false)
                 this.createTable(localName, schema);
-
             try
             {
-                c = this._database.query(localName, null, null, null, null, null, ProbeValuesProvider.TIMESTAMP);
+                Cursor c = database.query(localName, null, null, null, null, null, ProbeValuesProvider.TIMESTAMP);
+
+                matrix = new MatrixCursor(c.getColumnNames());
+
+                while (c.moveToNext())
+                {
+                    Object[] values = new Object[c.getColumnCount()];
+
+                    for (int i = 0; i < c.getColumnCount(); i++)
+                    {
+                        switch(c.getType(i))
+                        {
+                            case Cursor.FIELD_TYPE_BLOB:
+                                values[i] = c.getBlob(i);
+                                break;
+                            case Cursor.FIELD_TYPE_INTEGER:
+                                values[i] = c.getInt(i);
+                                break;
+                            case Cursor.FIELD_TYPE_FLOAT:
+                                values[i] = c.getFloat(i);
+                                break;
+                            case Cursor.FIELD_TYPE_STRING:
+                                values[i] = c.getString(i);
+                                break;
+                            case Cursor.FIELD_TYPE_NULL:
+                                values[i] = null;
+                                break;
+                        }
+                    }
+
+                    matrix.addRow(values);
+                }
+
+                c.close();
             }
             catch (Exception e)
             {
@@ -403,6 +462,8 @@ public class ProbeValuesProvider
             }
         }
 
-        return c;
+        database.close();
+
+        return matrix;
     }
 }

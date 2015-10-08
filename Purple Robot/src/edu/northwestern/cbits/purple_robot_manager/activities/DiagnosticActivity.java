@@ -1,7 +1,6 @@
 package edu.northwestern.cbits.purple_robot_manager.activities;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -51,7 +50,6 @@ import edu.northwestern.cbits.purple_robot_manager.plugins.DataUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.HttpUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPlugin;
 import edu.northwestern.cbits.purple_robot_manager.plugins.OutputPluginManager;
-import edu.northwestern.cbits.purple_robot_manager.plugins.StreamingJacksonUploadPlugin;
 import edu.northwestern.cbits.purple_robot_manager.triggers.Trigger;
 import edu.northwestern.cbits.purple_robot_manager.triggers.TriggerManager;
 
@@ -80,6 +78,7 @@ public class DiagnosticActivity extends AppCompatActivity
         TextView lastUpload = (TextView) this.findViewById(R.id.last_upload_value);
         TextView prVersion = (TextView) this.findViewById(R.id.pr_version_value);
         TextView gpsVersion = (TextView) this.findViewById(R.id.play_services_version_value);
+        TextView permissionsStatus = (TextView) this.findViewById(R.id.pr_permissions_value);
 
         userId.setText("\"" + EncryptionManager.getInstance().getUserId(this) + "\"");
 
@@ -307,6 +306,29 @@ public class DiagnosticActivity extends AppCompatActivity
             TextView ipAddressView = (TextView) this.findViewById(R.id.ip_address_value);
             ipAddressView.setText(ipAddress);
         }
+
+        final DiagnosticActivity me = this;
+
+        permissionsStatus.setText(PermissionsActivity.status(this));
+
+        switch(PermissionsActivity.statusCode(this))
+        {
+            case REQUIRED_MISSING:
+                permissionsStatus.setTextColor(0xffff4444);
+                break;
+            case OPTIONAL_MISSING:
+                permissionsStatus.setTextColor(0xffffbb33);
+                break;
+        }
+
+        permissionsStatus.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view)
+            {
+                Intent intent = new Intent(me, PermissionsActivity.class);
+                me.startActivity(intent);
+            }
+        });
     }
 
     public boolean onCreateOptionsMenu(Menu menu)

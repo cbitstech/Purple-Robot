@@ -143,6 +143,20 @@
             android:layout_marginTop="16dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/pr_permissions_label"
+            android:textIsSelectable="true"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+        <TextView
+            android:id="@+id/pr_permissions_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="0dp"
+            android:textIsSelectable="true"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:layout_marginTop="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="@string/play_services_version_label"
             android:textIsSelectable="true"
             android:textAppearance="?android:attr/textAppearanceSmall" />

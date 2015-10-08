@@ -19,6 +19,7 @@ import android.content.res.AssetManager;
 import android.net.Uri;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.models.trees.LeafNode;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -69,7 +70,7 @@ public abstract class TrainedModel extends Model
 
                 File internalStorage = context.getFilesDir();
 
-                if (prefs.getBoolean("config_external_storage", false))
+                if (SettingsActivity.useExternalStorage(context))
                     internalStorage = context.getExternalFilesDir(null);
 
                 if (internalStorage != null && !internalStorage.exists())

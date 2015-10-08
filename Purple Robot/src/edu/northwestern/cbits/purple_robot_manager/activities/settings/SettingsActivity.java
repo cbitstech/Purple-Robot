@@ -3,7 +3,10 @@ package edu.northwestern.cbits.purple_robot_manager.activities.settings;
 import android.annotation.TargetApi;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -11,7 +14,9 @@ import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceGroup;
+import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -33,6 +38,13 @@ public class SettingsActivity extends AppCompatActivity
 {
     private static final String PREFERENCE_SCREEN_KEY = "PREFERENCE_SCREEN_KEY";
     private static HashMap<String, PreferenceScreen> _screens = new HashMap<>();
+
+    public static boolean useExternalStorage(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        return prefs.getBoolean("config_external_storage", false);
+    }
 
     public static class SettingsPreferenceFragment extends PreferenceFragment
     {
@@ -161,6 +173,14 @@ public class SettingsActivity extends AppCompatActivity
 
                 Preference exportJekyll = prefs.findPreference("config_export_jekyll");
                 exportJekyll.setOnPreferenceClickListener(listener);
+
+                Preference externalStorage = prefs.findPreference("config_external_storage");
+
+                if (ContextCompat.checkSelfPermission(activity, "android.permission.WRITE_EXTERNAL_STORAGE") != PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(activity, "android.permission.READ_EXTERNAL_STORAGE") != PackageManager.PERMISSION_GRANTED)
+                    externalStorage.setEnabled(false);
+                else
+                    externalStorage.setEnabled(false);
 
                 final PreferenceFragment meFragment = this;
 

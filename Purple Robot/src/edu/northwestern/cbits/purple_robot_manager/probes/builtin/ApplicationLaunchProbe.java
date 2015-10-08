@@ -11,6 +11,8 @@ import android.app.ActivityManager;
 import android.app.ActivityManager.RunningTaskInfo;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.app.usage.UsageEvents;
+import android.app.usage.UsageStatsManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -22,9 +24,13 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.provider.Settings;
+import android.widget.Toast;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
@@ -44,7 +50,7 @@ public class ApplicationLaunchProbe extends Probe
     private static final String FREQUENCY = "config_probe_application_launch_frequency";
 
     private PendingIntent _pollIntent = null;
-    private final long _lastInterval = 0;
+    private long _lastInterval = 0;
 
     private String _lastPkgName = null;
     private String _lastName = null;
@@ -110,14 +116,16 @@ public class ApplicationLaunchProbe extends Probe
         {
             if (prefs.getBoolean(ApplicationLaunchProbe.ENABLED, ApplicationLaunchProbe.DEFAULT_ENABLED))
             {
-                interval = Long.parseLong(prefs.getString(ApplicationLaunchProbe.FREQUENCY, "10"));
+                isEnabled = true;
+
+                interval = Long.parseLong(prefs.getString(ApplicationLaunchProbe.FREQUENCY, "10000"));
 
                 if (interval != this._lastInterval)
                 {
                     disable = true;
                     set = true;
 
-                    isEnabled = true;
+                    this._lastInterval = interval;
                 }
             }
             else
@@ -140,6 +148,7 @@ public class ApplicationLaunchProbe extends Probe
                 public void onReceive(final Context context, Intent intent)
                 {
                     ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+                    final SanityManager sanity = SanityManager.getInstance(context);
 
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
                     {
@@ -190,23 +199,20 @@ public class ApplicationLaunchProbe extends Probe
                             t.start();
                         }
                     }
-                    else
-                    {
-                        final SanityManager sanity = SanityManager.getInstance(context);
-
+                    else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                         final String title = context.getString(R.string.title_app_usage_data_unavailable_alp);
                         final String message = context.getString(R.string.message_app_usage_data_unavailable_alp);
 
                         sanity.addAlert(SanityCheck.WARNING, title, message, null);
-
-/*                        Runnable r = new Runnable() {
+                    }
+                    else
+                    {
+                        Runnable r = new Runnable() {
                             @Override
                             public void run() {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
                                     UsageStatsManager usage = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
-
-                                    Log.e("PR", "ALP USAGE: " + usage.hashCode());
 
                                     synchronized(usage)
                                     {
@@ -234,13 +240,23 @@ public class ApplicationLaunchProbe extends Probe
                                                     {
                                                         LogManager.getInstance(context).logException(e);
 
-                                                        Toast.makeText(context, R.string.toast_missing_access_settings, Toast.LENGTH_LONG).show();
+                                                        Runnable r = new Runnable()
+                                                        {
+                                                            @Override
+                                                            public void run() {
+                                                                Toast.makeText(context, R.string.toast_missing_access_settings, Toast.LENGTH_LONG).show();
+                                                            }
+                                                        };
+
+
+                                                        new Handler(Looper.getMainLooper()).post(r);
                                                     }
                                                 }
                                             };
 
                                             sanity.addAlert(SanityCheck.WARNING, title, message, action);
-                                        } else {
+                                        } else
+                                        {
                                             sanity.clearAlert(title);
 
                                             UsageEvents events = usage.queryEvents(me._lastCheck, now);
@@ -251,7 +267,6 @@ public class ApplicationLaunchProbe extends Probe
 
                                             while (events.getNextEvent(event)) {
                                                 if (event.getEventType() == UsageEvents.Event.MOVE_TO_FOREGROUND) {
-
                                                     Bundle bundle = new Bundle();
 
                                                     if (me._lastPkgName != null) {
@@ -294,18 +309,19 @@ public class ApplicationLaunchProbe extends Probe
                             }
                         };
 
-                        // new Handler(Looper.getMainLooper()).post(r);
+                        Thread t = new Thread(r);
+                        t.start();
 
-                        alarm.set(AlarmManager.RTC, System.currentTimeMillis() + 60000, me._pollIntent);
-
-                        */
+                        alarm.setExact(AlarmManager.RTC, System.currentTimeMillis() + 60000, me._pollIntent);
                     }
                 }
             }, new IntentFilter(ApplicationLaunchProbe.WAKE_ACTION));
         }
 
         if (disable && this._pollIntent != null)
+        {
             alarm.cancel(this._pollIntent);
+        }
 
         synchronized (this)
         {
@@ -316,7 +332,7 @@ public class ApplicationLaunchProbe extends Probe
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                     alarm.setRepeating(AlarmManager.ELAPSED_REALTIME, 0, interval, this._pollIntent);
                 } else {
-                    alarm.set(AlarmManager.RTC, System.currentTimeMillis(), this._pollIntent);
+                    alarm.setExact(AlarmManager.RTC, System.currentTimeMillis(), this._pollIntent);
                 }
             }
         }

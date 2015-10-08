@@ -5,15 +5,20 @@ import java.util.ArrayList;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageManager;
 import android.graphics.PixelFormat;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.provider.Settings;
+import android.support.v4.content.ContextCompat;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,6 +27,7 @@ import android.view.WindowManager;
 import android.widget.LinearLayout;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class TouchEventsProbe extends Probe
@@ -75,7 +81,7 @@ public class TouchEventsProbe extends Probe
     }
 
     @Override
-    public boolean isEnabled(Context context)
+    public boolean isEnabled(final Context context)
     {
         final SharedPreferences prefs = Probe.getPreferences(context);
 
@@ -93,44 +99,72 @@ public class TouchEventsProbe extends Probe
 
             synchronized (wm)
             {
-                if (this._overlay == null)
+                boolean canDraw = (ContextCompat.checkSelfPermission(context, "android.permission.SYSTEM_ALERT_WINDOW") == PackageManager.PERMISSION_GRANTED);
+
+                if (canDraw == false && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                    canDraw = Settings.canDrawOverlays(context);
+
+                if (canDraw)
                 {
-                    WindowManager.LayoutParams params = new WindowManager.LayoutParams();
-
-                    params.format = PixelFormat.TRANSLUCENT;
-                    params.height = 1; // WindowManager.LayoutParams.MATCH_PARENT;
-                    params.width = 1; // WindowManager.LayoutParams.MATCH_PARENT;
-                    params.gravity = Gravity.RIGHT | Gravity.BOTTOM;
-                    params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
-                    params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH;
-
-                    final TouchEventsProbe me = this;
-
-                    this._overlay = new LinearLayout(this._context.getApplicationContext());
-                    this._overlay.setBackgroundColor(android.graphics.Color.argb(0, 255, 255, 255));
-                    this._overlay.setHapticFeedbackEnabled(true);
-                    this._overlay.setOnTouchListener(new OnTouchListener()
+                    if (this._overlay == null)
                     {
-                        @Override
-                        public boolean onTouch(View arg0, MotionEvent event)
+                        WindowManager.LayoutParams params = new WindowManager.LayoutParams();
+
+                        params.format = PixelFormat.TRANSLUCENT;
+                        params.height = 1; // WindowManager.LayoutParams.MATCH_PARENT;
+                        params.width = 1; // WindowManager.LayoutParams.MATCH_PARENT;
+                        params.gravity = Gravity.RIGHT | Gravity.BOTTOM;
+                        params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+                        params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH;
+
+                        final TouchEventsProbe me = this;
+
+                        this._overlay = new LinearLayout(this._context.getApplicationContext());
+                        this._overlay.setBackgroundColor(android.graphics.Color.argb(0, 255, 255, 255));
+                        this._overlay.setHapticFeedbackEnabled(true);
+                        this._overlay.setOnTouchListener(new OnTouchListener()
                         {
-                            me._lastTouch = System.currentTimeMillis();
-                            me._timestamps.add(me._lastTouch);
+                            @Override
+                            public boolean onTouch(View arg0, MotionEvent event)
+                            {
+                                me._lastTouch = System.currentTimeMillis();
+                                me._timestamps.add(me._lastTouch);
 
-                            return false;
+                                return false;
+                            }
+                        });
+
+                        if (Looper.myLooper() == null)
+                            Looper.prepare();
+
+                        try
+                        {
+                            wm.addView(this._overlay, params);
                         }
-                    });
-
-                    if (Looper.myLooper() == null)
-                        Looper.prepare();
-
-                    try
-                    {
-                        wm.addView(this._overlay, params);
+                        catch (IllegalStateException e)
+                        {
+                            LogManager.getInstance(context).logException(e);
+                        }
                     }
-                    catch (IllegalStateException e)
-                    {
-                        LogManager.getInstance(context).logException(e);
+
+                    SanityManager.getInstance(context).clearPermissionAlert("android.permission.SYSTEM_ALERT_WINDOW");
+                }
+                else
+                {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        Runnable r = new Runnable() {
+                            @Override
+                            public void run() {
+                                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+                                intent.setData(Uri.parse("package:" + context.getPackageName()));
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                context.startActivity(intent);
+
+                                SanityManager.getInstance(context).clearPermissionAlert("android.permission.SYSTEM_ALERT_WINDOW");
+                            }
+                        };
+
+                        SanityManager.getInstance(context).addPermissionAlert(this.name(context), "android.permission.SYSTEM_ALERT_WINDOW", context.getString(R.string.rationale_system_alert_probe), r);
                     }
                 }
             }

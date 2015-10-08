@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -11,6 +12,7 @@ import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.provider.Settings;
+import android.support.v4.content.ContextCompat;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -311,77 +313,71 @@ public class FusedLocationProbe extends Probe implements GoogleApiClient.Connect
 
         if (super.isEnabled(context) && prefs.getBoolean(FusedLocationProbe.ENABLED, FusedLocationProbe.DEFAULT_ENABLED))
         {
-            long now = System.currentTimeMillis();
+            if (ContextCompat.checkSelfPermission(context, "android.permission.ACCESS_FINE_LOCATION") == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(context, "android.permission.ACCESS_COARSE_LOCATION") == PackageManager.PERMISSION_GRANTED) {
 
-            if (this._probeEnabled == 0)
-                this._probeEnabled = now;
+                long now = System.currentTimeMillis();
 
-            this._context = context.getApplicationContext();
+                if (this._probeEnabled == 0)
+                    this._probeEnabled = now;
 
-            long freq = Long.parseLong(prefs.getString(FusedLocationProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
-            long distance = Long.parseLong(prefs.getString(FusedLocationProbe.DISTANCE, FusedLocationProbe.DEFAULT_DISTANCE));
+                this._context = context.getApplicationContext();
 
-            if (this._lastFrequency != freq || this._listening == false || this._lastDistance != distance)
-            {
-                LocationCalibrationHelper.check(context);
+                long freq = Long.parseLong(prefs.getString(FusedLocationProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
+                long distance = Long.parseLong(prefs.getString(FusedLocationProbe.DISTANCE, FusedLocationProbe.DEFAULT_DISTANCE));
 
-                this._lastFrequency = freq;
-                this._listening = false;
+                if (this._lastFrequency != freq || this._listening == false || this._lastDistance != distance) {
+                    LocationCalibrationHelper.check(context);
 
-                if (this._apiClient != null)
-                {
-                    if (this._apiClient.isConnected())
-                    {
-                        try
-                        {
-                            LocationServices.FusedLocationApi.removeLocationUpdates(this._apiClient, this);
-                            this._apiClient.disconnect();
+                    this._lastFrequency = freq;
+                    this._listening = false;
+
+                    if (this._apiClient != null) {
+                        if (this._apiClient.isConnected()) {
+                            try {
+                                LocationServices.FusedLocationApi.removeLocationUpdates(this._apiClient, this);
+                                this._apiClient.disconnect();
+                            } catch (IllegalStateException e) {
+                                LogManager.getInstance(context).logException(e);
+                            } catch (NullPointerException e) {
+                                LogManager.getInstance(context).logException(e);
+                            }
                         }
-                        catch (IllegalStateException e)
-                        {
-                            LogManager.getInstance(context).logException(e);
-                        }
-                        catch (NullPointerException e)
-                        {
-                            LogManager.getInstance(context).logException(e);
-                        }
+
+                        this._apiClient = null;
                     }
 
-                    this._apiClient = null;
+                    this._listening = true;
                 }
 
-                this._listening = true;
+                if (this._apiClient == null) {
+                    GoogleApiClient.Builder builder = new GoogleApiClient.Builder(this._context);
+                    builder.addConnectionCallbacks(this);
+                    builder.addOnConnectionFailedListener(this);
+                    builder.addApi(LocationServices.API);
+
+                    this._apiClient = builder.build();
+                    this._apiClient.connect();
+                }
+
+                String name = context.getString(R.string.name_location_services_check);
+                String message = context.getString(R.string.message_location_services_check);
+
+                if (now - this._probeEnabled > FusedLocationProbe.LOCATION_TIMEOUT && now - this._lastReading > FusedLocationProbe.LOCATION_TIMEOUT) {
+                    SanityManager.getInstance(context).addAlert(SanityCheck.WARNING, name, message, new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                            context.startActivity(intent);
+                        }
+                    });
+                } else
+                    SanityManager.getInstance(context).clearAlert(name);
             }
-
-            if (this._apiClient == null)
-            {
-                GoogleApiClient.Builder builder = new GoogleApiClient.Builder(this._context);
-                builder.addConnectionCallbacks(this);
-                builder.addOnConnectionFailedListener(this);
-                builder.addApi(LocationServices.API);
-
-                this._apiClient = builder.build();
-                this._apiClient.connect();
+            else {
+                SanityManager.getInstance(context).addPermissionAlert(this.name(context), "android.permission.ACCESS_FINE_LOCATION", context.getString(R.string.rationale_fused_location_probe), null);
             }
-
-            String name = context.getString(R.string.name_location_services_check);
-            String message = context.getString(R.string.message_location_services_check);
-
-            if (now - this._probeEnabled > FusedLocationProbe.LOCATION_TIMEOUT && now - this._lastReading > FusedLocationProbe.LOCATION_TIMEOUT)
-            {
-                SanityManager.getInstance(context).addAlert(SanityCheck.WARNING, name, message, new Runnable() {
-                    @Override
-                    public void run() {
-                        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                        context.startActivity(intent);
-                    }
-               });
-            }
-            else
-                SanityManager.getInstance(context).clearAlert(name);
-
             return true;
         }
         else

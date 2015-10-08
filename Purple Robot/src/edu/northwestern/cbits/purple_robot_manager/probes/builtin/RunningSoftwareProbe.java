@@ -17,7 +17,10 @@ import org.jsoup.select.Elements;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningTaskInfo;
+import android.app.usage.UsageEvents;
+import android.app.usage.UsageStatsManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Build;
@@ -27,6 +30,8 @@ import android.os.Looper;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.provider.Settings;
+import android.widget.Toast;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.WiFiHelper;
@@ -151,18 +156,17 @@ public class RunningSoftwareProbe extends Probe
                                         me.transmitData(context, bundle);
                                     }
                                 }
-                                else
-                                {
+                                else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                                     final SanityManager sanity = SanityManager.getInstance(context);
 
                                     final String title = context.getString(R.string.title_app_usage_data_unavailable_rsp);
                                     final String message = context.getString(R.string.message_app_usage_data_unavailable_rsp);
 
                                     sanity.addAlert(SanityCheck.WARNING, title, message, null);
-
-/*                                    UsageStatsManager usage = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
-
-                                    Log.e("PR", "RSP USAGE: " + usage.hashCode());
+                                }
+                                else
+                                {
+                                    UsageStatsManager usage = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
 
                                     synchronized(usage)
                                     {
@@ -191,7 +195,17 @@ public class RunningSoftwareProbe extends Probe
                                                     {
                                                         LogManager.getInstance(context).logException(e);
 
-                                                        Toast.makeText(context, R.string.toast_missing_access_settings, Toast.LENGTH_LONG).show();
+                                                        LogManager.getInstance(context).logException(e);
+
+                                                        Runnable r = new Runnable()
+                                                        {
+                                                            @Override
+                                                            public void run() {
+                                                                Toast.makeText(context, R.string.toast_missing_access_settings, Toast.LENGTH_LONG).show();
+                                                            }
+                                                        };
+
+                                                        new Handler(Looper.getMainLooper()).post(r);
                                                     }
                                                 }
                                             };
@@ -253,12 +267,12 @@ public class RunningSoftwareProbe extends Probe
                                             }
                                         }
                                     }
-                               */
                                }
                             }
                         };
 
-                        new Handler(Looper.getMainLooper()).post(r);
+                        Thread t = new Thread(r);
+                        t.start();
 
                         me._lastCheck = now;
                     }
