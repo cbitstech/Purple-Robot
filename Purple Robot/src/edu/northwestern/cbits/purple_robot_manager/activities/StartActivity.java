@@ -518,6 +518,8 @@ public class StartActivity extends AppCompatActivity
                         builder.create().show();
                 }
 
+                c.close();
+
                 return true;
             }
         });
