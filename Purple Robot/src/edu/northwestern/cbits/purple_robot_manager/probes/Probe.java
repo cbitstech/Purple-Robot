@@ -53,6 +53,7 @@ public abstract class Probe
     public static final String PROBE_MEDIA_URL = "media_url";
     public static final String PROBE_MEDIA_CONTENT_TYPE = "media_content_type";
     public static final String PROBE_MEDIA_SIZE = "media_size";
+    public static final String PROBE_MUTE_WARNING = "mute_warning";
 
     public static final String PROBE_GUID = "GUID";
     public static final String PROBE_DATA = "PROBE_DATA";

@@ -15,6 +15,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.CallLog;
 import android.support.v4.content.ContextCompat;
@@ -104,7 +105,7 @@ public class CallHistoryFeature extends Feature
         {
             if (prefs.getBoolean("config_feature_call_history_enabled", true))
             {
-                if (ContextCompat.checkSelfPermission(context, "android.permission.READ_CALL_LOG") == PackageManager.PERMISSION_GRANTED) {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || ContextCompat.checkSelfPermission(context, "android.permission.READ_CALL_LOG") == PackageManager.PERMISSION_GRANTED) {
                     synchronized (this)
                     {
                         if (now - this._lastCheck > 15 * 60 * 1000)
@@ -374,7 +375,7 @@ public class CallHistoryFeature extends Feature
                         }
                     }
                 }
-                else
+                else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
                     SanityManager.getInstance(context).addPermissionAlert(this.name(context), "android.permission.READ_CALL_LOG", context.getString(R.string.rationale_history_call_log_probe), null);
 
                 return true;

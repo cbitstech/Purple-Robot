@@ -52,6 +52,8 @@ public class RunningSoftwareProbe extends Probe
     private static final boolean DEFAULT_ENABLED = true;
     private static final String ENABLED = "config_probe_running_software_enabled";
     private static final String FREQUENCY = "config_probe_running_software_frequency";
+    private static final String MUTE_ANDROID_FIVE_WARNING = "config_probe_running_software_mute_android_five_warning";
+    private static final boolean DEFAULT_ANDROID_FIVE_WARNING = false;
 
     private long _lastCheck = 0;
 
@@ -98,7 +100,7 @@ public class RunningSoftwareProbe extends Probe
     @Override
     public boolean isEnabled(final Context context)
     {
-        SharedPreferences prefs = Probe.getPreferences(context);
+        final SharedPreferences prefs = Probe.getPreferences(context);
 
         if (super.isEnabled(context))
         {
@@ -156,13 +158,19 @@ public class RunningSoftwareProbe extends Probe
                                         me.transmitData(context, bundle);
                                     }
                                 }
-                                else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                                else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
+                                {
                                     final SanityManager sanity = SanityManager.getInstance(context);
-
                                     final String title = context.getString(R.string.title_app_usage_data_unavailable_rsp);
-                                    final String message = context.getString(R.string.message_app_usage_data_unavailable_rsp);
 
-                                    sanity.addAlert(SanityCheck.WARNING, title, message, null);
+                                    if (prefs.getBoolean(RunningSoftwareProbe.MUTE_ANDROID_FIVE_WARNING, RunningSoftwareProbe.DEFAULT_ANDROID_FIVE_WARNING) == false) {
+
+                                        final String message = context.getString(R.string.message_app_usage_data_unavailable_rsp);
+
+                                        sanity.addAlert(SanityCheck.WARNING, title, message, null);
+                                    }
+                                    else
+                                        sanity.clearAlert(title);
                                 }
                                 else
                                 {
@@ -424,6 +432,10 @@ public class RunningSoftwareProbe extends Probe
 
         map.put(Probe.PROBE_FREQUENCY, freq);
 
+        boolean muteWarning = prefs.getBoolean(RunningSoftwareProbe.MUTE_ANDROID_FIVE_WARNING, RunningSoftwareProbe.DEFAULT_ANDROID_FIVE_WARNING);
+
+        map.put(Probe.PROBE_MUTE_WARNING, muteWarning);
+
         return map;
     }
 
@@ -432,8 +444,10 @@ public class RunningSoftwareProbe extends Probe
     {
         super.updateFromMap(context, params);
 
-        if (params.containsKey(Probe.PROBE_FREQUENCY))
-        {
+        SharedPreferences prefs = Probe.getPreferences(context);
+        Editor e = prefs.edit();
+
+        if (params.containsKey(Probe.PROBE_FREQUENCY)) {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
 
             if ((frequency instanceof Double) == false)
@@ -441,12 +455,18 @@ public class RunningSoftwareProbe extends Probe
             else
                 frequency = ((Double) frequency).longValue();
 
-            SharedPreferences prefs = Probe.getPreferences(context);
-            Editor e = prefs.edit();
 
             e.putString(RunningSoftwareProbe.FREQUENCY, frequency.toString());
-            e.commit();
         }
+
+        if (params.containsKey(Probe.PROBE_MUTE_WARNING))
+        {
+            Boolean muteWarning = (Boolean) params.get(Probe.PROBE_MUTE_WARNING);
+
+            e.putBoolean(RunningSoftwareProbe.MUTE_ANDROID_FIVE_WARNING, muteWarning);
+        }
+
+        e.commit();
     }
 
     @Override
@@ -479,6 +499,13 @@ public class RunningSoftwareProbe extends Probe
 
         screen.addPreference(duration);
 
+        CheckBoxPreference muteWarning = new CheckBoxPreference(context);
+        muteWarning.setTitle(R.string.title_mute_android_five_warning);
+        muteWarning.setKey(RunningSoftwareProbe.MUTE_ANDROID_FIVE_WARNING);
+        muteWarning.setDefaultValue(RunningSoftwareProbe.DEFAULT_ANDROID_FIVE_WARNING);
+
+        screen.addPreference(muteWarning);
+
         return screen;
     }
 
@@ -496,6 +523,11 @@ public class RunningSoftwareProbe extends Probe
             values.put(false);
             enabled.put(Probe.PROBE_VALUES, values);
             settings.put(Probe.PROBE_ENABLED, enabled);
+
+            JSONObject muteWarning = new JSONObject();
+            muteWarning.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            muteWarning.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_MUTE_WARNING, muteWarning);
 
             JSONObject frequency = new JSONObject();
             frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);

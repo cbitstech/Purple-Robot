@@ -26,6 +26,7 @@ import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.Formatter;
@@ -533,7 +534,11 @@ public class DiagnosticActivity extends AppCompatActivity
 
                 SchemeConfigFile scheme = new SchemeConfigFile(this);
 
-                File cacheDir = this.getExternalCacheDir();
+                File cacheDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+
+                if (cacheDir.exists() == false)
+                    cacheDir.mkdirs();
+
                 File configFile = new File(cacheDir, "config.scm");
 
                 FileOutputStream fout = new FileOutputStream(configFile);
@@ -561,11 +566,11 @@ public class DiagnosticActivity extends AppCompatActivity
                 {
                     Toast.makeText(this, R.string.toast_mail_not_found, Toast.LENGTH_LONG).show();
                 }
-            } catch (IOException e)
+            }
+            catch (IOException e)
             {
                 LogManager.getInstance(this).logException(e);
             }
-
         }
 
         return true;

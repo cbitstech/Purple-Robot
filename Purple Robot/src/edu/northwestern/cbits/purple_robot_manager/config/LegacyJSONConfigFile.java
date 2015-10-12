@@ -2,6 +2,7 @@ package edu.northwestern.cbits.purple_robot_manager.config;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -355,7 +356,8 @@ public class LegacyJSONConfigFile
                     catch (JSONException e)
                     {
                         LogManager.getInstance(context).logException(e);
-                    } catch (Exception e)
+                    }
+                    catch (Exception e)
                     {
                         LogManager.getInstance(context).logException(e);
                     }

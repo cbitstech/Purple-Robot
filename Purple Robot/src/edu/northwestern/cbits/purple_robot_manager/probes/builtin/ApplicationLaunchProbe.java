@@ -49,6 +49,9 @@ public class ApplicationLaunchProbe extends Probe
     private static final String ENABLED = "config_probe_application_launch_enabled";
     private static final String FREQUENCY = "config_probe_application_launch_frequency";
 
+    private static final String MUTE_ANDROID_FIVE_WARNING = "config_probe_application_launch_mute_android_five_warning";
+    private static final boolean DEFAULT_ANDROID_FIVE_WARNING = false;
+
     private PendingIntent _pollIntent = null;
     private long _lastInterval = 0;
 
@@ -102,7 +105,7 @@ public class ApplicationLaunchProbe extends Probe
     @Override
     public boolean isEnabled(final Context context)
     {
-        SharedPreferences prefs = Probe.getPreferences(context);
+        final SharedPreferences prefs = Probe.getPreferences(context);
 
         final AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
@@ -201,9 +204,14 @@ public class ApplicationLaunchProbe extends Probe
                     }
                     else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                         final String title = context.getString(R.string.title_app_usage_data_unavailable_alp);
-                        final String message = context.getString(R.string.message_app_usage_data_unavailable_alp);
 
-                        sanity.addAlert(SanityCheck.WARNING, title, message, null);
+                        if (prefs.getBoolean(ApplicationLaunchProbe.MUTE_ANDROID_FIVE_WARNING, ApplicationLaunchProbe.DEFAULT_ANDROID_FIVE_WARNING) == false) {
+                            final String message = context.getString(R.string.message_app_usage_data_unavailable_alp);
+
+                            sanity.addAlert(SanityCheck.WARNING, title, message, null);
+                        }
+                        else
+                            sanity.clearAlert(title);
                     }
                     else
                     {
@@ -360,6 +368,10 @@ public class ApplicationLaunchProbe extends Probe
 
         map.put(Probe.PROBE_FREQUENCY, freq);
 
+        boolean muteWarning = prefs.getBoolean(ApplicationLaunchProbe.MUTE_ANDROID_FIVE_WARNING, ApplicationLaunchProbe.DEFAULT_ANDROID_FIVE_WARNING);
+
+        map.put(Probe.PROBE_MUTE_WARNING, muteWarning);
+
         return map;
     }
 
@@ -367,6 +379,9 @@ public class ApplicationLaunchProbe extends Probe
     public void updateFromMap(Context context, Map<String, Object> params)
     {
         super.updateFromMap(context, params);
+
+        SharedPreferences prefs = Probe.getPreferences(context);
+        Editor e = prefs.edit();
 
         if (params.containsKey(Probe.PROBE_FREQUENCY))
         {
@@ -378,14 +393,17 @@ public class ApplicationLaunchProbe extends Probe
             }
 
             if (frequency instanceof Long)
-            {
-                SharedPreferences prefs = Probe.getPreferences(context);
-                Editor e = prefs.edit();
-
                 e.putString(ApplicationLaunchProbe.FREQUENCY, frequency.toString());
-                e.commit();
-            }
         }
+
+        if (params.containsKey(Probe.PROBE_MUTE_WARNING))
+        {
+            Boolean muteWarning = (Boolean) params.get(Probe.PROBE_MUTE_WARNING);
+
+            e.putBoolean(ApplicationLaunchProbe.MUTE_ANDROID_FIVE_WARNING, muteWarning);
+        }
+
+        e.commit();
     }
 
     @Override
@@ -418,6 +436,13 @@ public class ApplicationLaunchProbe extends Probe
 
         screen.addPreference(duration);
 
+        CheckBoxPreference muteWarning = new CheckBoxPreference(context);
+        muteWarning.setTitle(R.string.title_mute_android_five_warning);
+        muteWarning.setKey(ApplicationLaunchProbe.MUTE_ANDROID_FIVE_WARNING);
+        muteWarning.setDefaultValue(ApplicationLaunchProbe.DEFAULT_ANDROID_FIVE_WARNING);
+
+        screen.addPreference(muteWarning);
+
         return screen;
     }
 
@@ -435,6 +460,11 @@ public class ApplicationLaunchProbe extends Probe
             values.put(false);
             enabled.put(Probe.PROBE_VALUES, values);
             settings.put(Probe.PROBE_ENABLED, enabled);
+
+            JSONObject muteWarning = new JSONObject();
+            muteWarning.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            muteWarning.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_MUTE_WARNING, muteWarning);
 
             JSONObject frequency = new JSONObject();
             frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);

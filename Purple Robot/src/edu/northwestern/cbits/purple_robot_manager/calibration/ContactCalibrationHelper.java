@@ -12,6 +12,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.provider.CallLog;
 import android.provider.CallLog.Calls;
@@ -139,14 +140,16 @@ public class ContactCalibrationHelper
         {
             boolean ready = true;
 
-            if (ContextCompat.checkSelfPermission(context, "android.permission.READ_CALL_LOG") != PackageManager.PERMISSION_GRANTED) {
-                SanityManager.getInstance(context).addPermissionAlert("Contact Calibration Helper", "android.permission.READ_CALL_LOG", context.getString(R.string.rationale_calibration_call_log), null);
-                ready = false;
-            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (ContextCompat.checkSelfPermission(context, "android.permission.READ_CALL_LOG") != PackageManager.PERMISSION_GRANTED) {
+                    SanityManager.getInstance(context).addPermissionAlert("Contact Calibration Helper", "android.permission.READ_CALL_LOG", context.getString(R.string.rationale_calibration_call_log), null);
+                    ready = false;
+                }
 
-            if (ContextCompat.checkSelfPermission(context, "android.permission.READ_CONTACTS") != PackageManager.PERMISSION_GRANTED) {
-                SanityManager.getInstance(context).addPermissionAlert("Contact Calibration Helper", "android.permission.READ_CONTACTS", context.getString(R.string.rationale_calibration_contacts), null);
-                ready = false;
+                if (ContextCompat.checkSelfPermission(context, "android.permission.READ_CONTACTS") != PackageManager.PERMISSION_GRANTED) {
+                    SanityManager.getInstance(context).addPermissionAlert("Contact Calibration Helper", "android.permission.READ_CONTACTS", context.getString(R.string.rationale_calibration_contacts), null);
+                    ready = false;
+                }
             }
 
             if (ready)

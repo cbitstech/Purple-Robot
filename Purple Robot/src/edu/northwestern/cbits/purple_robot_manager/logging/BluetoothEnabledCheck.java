@@ -4,7 +4,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.provider.Settings;
-import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -65,8 +64,6 @@ public class BluetoothEnabledCheck extends SanityCheck
                 if (probe.isEnabled(context))
                     needsBluetooth = true;
             }
-            else
-                Log.e("PR", "NULL PROBE: " + name);
         }
 
         this._errorLevel = SanityCheck.OK;

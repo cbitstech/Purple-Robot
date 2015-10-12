@@ -1632,7 +1632,7 @@
     <string name="toast_transmitting_events">Attempting to upload %1$d events&#8230;</string>
 
     <string name="title_app_usage_data_required">App usage data permission required</string>
-    <string name="message_app_usage_data_required">Tap here to grant Purple Robot access to the app usage data that it\'s configuration requires.</string>
+    <string name="message_app_usage_data_required">Tap here to grant Purple Robot access to the app usage data that its configuration requires.</string>
 
     <string name="toast_missing_access_settings">Unable to access the app usage system settings. Please locate the setting and grant Purple Robot access.</string>
 
@@ -1655,4 +1655,6 @@
     <string name="dialog_title_permissions_missing">Missing Permissions</string>
     <string name="dialog_message_permissions_missing">Purple Robot does not yet have all its required permissions.</string>
     <string name="button_grant_permissions">Grant Permissions</string>
+
+    <string name="title_mute_android_five_warning">Mute Android 5.0 Warning</string>
 </resources>

@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -40,8 +39,6 @@ public class BatteryLevelTrigger extends Trigger
 
         IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
 
-        Log.e("PR", "INITING BATTERY LISTENER " + this.identifier());
-
         this._receiver = new BroadcastReceiver()
         {
             @Override
@@ -53,24 +50,13 @@ public class BatteryLevelTrigger extends Trigger
 
                 int level = extras.getInt(BatteryManager.EXTRA_LEVEL);
 
-                Log.e("PR", "NEW LEVEL " + level);
-
-                Log.e("PR", "TEST E: " + enabled + " IS D: " + me._isDecreasing + " LAST: " + me._lastLevel + " THR: " + me._threshold + " LVL: " + level);
-
                 if (enabled && me._isDecreasing && (me._lastLevel > me._threshold && level <= me._threshold))
                 {
-                    Log.e("PR", "EXEC1");
-
                     me.execute(context, true);
                 }
-                else if (enabled && me._isDecreasing == false && (me._lastLevel < me._threshold && level >= me._threshold)) {
-                    Log.e("PR", "EXEC2");
-
-                    me.execute(context, true);
-                }
-                else
+                else if (enabled && me._isDecreasing == false && (me._lastLevel < me._threshold && level >= me._threshold))
                 {
-                    Log.e("PR", "NO EXEC");
+                    me.execute(context, true);
                 }
 
                 me._lastLevel = level;
@@ -116,14 +102,10 @@ public class BatteryLevelTrigger extends Trigger
         {
             if (map.containsKey(BatteryLevelTrigger.TRIGGER_THRESHOLD)) {
                 this._threshold = (int) map.get(BatteryLevelTrigger.TRIGGER_THRESHOLD);
-
-                Log.e("PR", "SETTING THRESHOLD " + this._threshold);
             }
 
             if (map.containsKey(BatteryLevelTrigger.TRIGGER_DECREASING)) {
                 this._isDecreasing = (boolean) map.get(BatteryLevelTrigger.TRIGGER_DECREASING);
-
-                Log.e("PR", "SETTING DECREASING " + this._isDecreasing);
             }
 
             return true;

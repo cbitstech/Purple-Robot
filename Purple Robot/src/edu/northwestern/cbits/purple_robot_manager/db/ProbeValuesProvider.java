@@ -13,8 +13,10 @@ import java.util.Map;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.CursorWindow;
 import android.database.MatrixCursor;
 import android.database.SQLException;
+import android.database.sqlite.SQLiteCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteStatement;
@@ -39,8 +41,12 @@ public class ProbeValuesProvider
     private static final String ID = "_id";
     private Context _context = null;
 
-//    private SQLiteDatabase _database = null;
-//    private ProbeValuesSqlHelper _dbHelper = null;
+    protected static final int FIELD_TYPE_UNKNOWN = -1;
+    protected static final int FIELD_TYPE_NULL = 0;
+    protected static final int FIELD_TYPE_INTEGER = 1;
+    protected static final int FIELD_TYPE_FLOAT = 2;
+    protected static final int FIELD_TYPE_STRING = 3;
+    protected static final int FIELD_TYPE_BLOB = 4;
 
     private ArrayList<Filter> _filters = new ArrayList<>();
 
@@ -405,16 +411,38 @@ public class ProbeValuesProvider
         database.close();
     }
 
+    static int getType(Cursor cursor, int i) throws Exception
+    {
+        SQLiteCursor sqLiteCursor = (SQLiteCursor) cursor;
+
+        CursorWindow cursorWindow = sqLiteCursor.getWindow();
+
+        int pos = cursor.getPosition();
+
+        if (cursorWindow.isNull(pos, i))
+            return ProbeValuesProvider.FIELD_TYPE_NULL;
+        else if (cursorWindow.isLong(pos, i))
+            return ProbeValuesProvider.FIELD_TYPE_INTEGER;
+        else if (cursorWindow.isFloat(pos, i))
+            return ProbeValuesProvider.FIELD_TYPE_FLOAT;
+        else if (cursorWindow.isString(pos, i))
+            return ProbeValuesProvider.FIELD_TYPE_STRING;
+        else if (cursorWindow.isBlob(pos, i))
+            return ProbeValuesProvider.FIELD_TYPE_BLOB;
+
+        return ProbeValuesProvider.FIELD_TYPE_UNKNOWN;
+    }
+
     public Cursor retrieveValues(Context context, String name, Map<String, String> schema)
     {
         MatrixCursor matrix = null;
 
         ProbeValuesSqlHelper helper = new ProbeValuesSqlHelper(context);
 
-        SQLiteDatabase database = helper.getWritableDatabase();
-
-        synchronized (database)
+        synchronized (this)
         {
+            SQLiteDatabase database = helper.getWritableDatabase();
+
             String localName = this.tableName(context, name, schema);
 
             if (this.tableExists(context, localName) == false)
@@ -431,21 +459,21 @@ public class ProbeValuesProvider
 
                     for (int i = 0; i < c.getColumnCount(); i++)
                     {
-                        switch(c.getType(i))
+                        switch(ProbeValuesProvider.getType(c, i))
                         {
-                            case Cursor.FIELD_TYPE_BLOB:
+                            case ProbeValuesProvider.FIELD_TYPE_BLOB:
                                 values[i] = c.getBlob(i);
                                 break;
-                            case Cursor.FIELD_TYPE_INTEGER:
+                            case ProbeValuesProvider.FIELD_TYPE_INTEGER:
                                 values[i] = c.getInt(i);
                                 break;
-                            case Cursor.FIELD_TYPE_FLOAT:
+                            case ProbeValuesProvider.FIELD_TYPE_FLOAT:
                                 values[i] = c.getFloat(i);
                                 break;
-                            case Cursor.FIELD_TYPE_STRING:
+                            case ProbeValuesProvider.FIELD_TYPE_STRING:
                                 values[i] = c.getString(i);
                                 break;
-                            case Cursor.FIELD_TYPE_NULL:
+                            case ProbeValuesProvider.FIELD_TYPE_NULL:
                                 values[i] = null;
                                 break;
                         }
@@ -460,9 +488,9 @@ public class ProbeValuesProvider
             {
                 LogManager.getInstance(context).logException(e);
             }
-        }
 
-        database.close();
+            database.close();
+        }
 
         return matrix;
     }
