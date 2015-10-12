@@ -18,14 +18,12 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.Map;
 
 import edu.northwestern.cbits.anthracite.LogService;
@@ -101,6 +99,12 @@ public class RobotPreferenceListener implements Preference.OnPreferenceClickList
                 Intent refreshIntent = new Intent(info.packageName + ".UPLOAD_LOGS_INTENT");
                 refreshIntent.putExtra(LogService.LOG_FORCE_UPLOAD, true);
                 refreshIntent.setClass(this._context, LogService.class);
+
+                int eventCount = LogManager.getInstance(this._context).pendingEventsCount();
+
+                String message = this._context.getString(R.string.toast_transmitting_events, eventCount);
+
+                Toast.makeText(this._context, message, Toast.LENGTH_SHORT).show();
 
                 this._context.startService(refreshIntent);
             }

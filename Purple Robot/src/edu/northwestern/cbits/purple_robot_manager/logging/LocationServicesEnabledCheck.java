@@ -31,7 +31,6 @@ public class LocationServicesEnabledCheck extends SanityCheck
         return r;
     }
 
-
     public void runCheck(Context context)
     {
         PurpleRobotApplication.fixPreferences(context, false);

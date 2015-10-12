@@ -19,13 +19,16 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.ActionBar;
@@ -114,6 +117,15 @@ public class StartActivity extends AppCompatActivity
     @SuppressLint("SimpleDateFormat")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+//            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+//                    .detectLeakedSqlLiteObjects()
+//                    .detectLeakedClosableObjects()
+//                    .penaltyLog()
+//                    .penaltyDeath()
+//                    .build());
+ //       }
 
         LogManager.getInstance(this);
         ModelManager.getInstance(this);
@@ -311,16 +323,12 @@ public class StartActivity extends AppCompatActivity
 
         listView.setAdapter(adapter);
 
-        listView.setOnItemClickListener(new OnItemClickListener()
-        {
+        listView.setOnItemClickListener(new OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, final long id)
-            {
-                Runnable r = new Runnable()
-                {
+            public void onItemClick(AdapterView<?> parent, View view, int position, final long id) {
+                Runnable r = new Runnable() {
                     @Override
-                    public void run()
-                    {
+                    public void run() {
                         Uri uri = ContentUris.withAppendedId(RobotContentProvider.RECENT_PROBE_VALUES, id);
 
                         Cursor c = me.getContentResolver().query(uri, null, null, null, null);
@@ -333,16 +341,13 @@ public class StartActivity extends AppCompatActivity
 
                             me.runOnUiThread(new Runnable() {
                                 @Override
-                                public void run()
-                                {
+                                public void run() {
                                     final Probe probe = ProbeManager.probeForName(sensorName, me);
 
-                                    if (probe != null)
-                                    {
+                                    if (probe != null) {
                                         Intent intent = probe.viewIntent(me);
 
-                                        if (intent == null)
-                                        {
+                                        if (intent == null) {
                                             Intent dataIntent = new Intent(me, LegacyProbeViewerActivity.class);
 
                                             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB)
@@ -352,17 +357,13 @@ public class StartActivity extends AppCompatActivity
                                             dataIntent.putExtra("probe_bundle", value);
 
                                             me.startActivity(dataIntent);
-                                        }
-                                        else
-                                        {
+                                        } else {
                                             intent.putExtra("probe_name", sensorName);
                                             intent.putExtra("probe_bundle", value);
 
                                             me.startActivity(intent);
                                         }
-                                    }
-                                    else
-                                    {
+                                    } else {
                                         Model model = ModelManager.getInstance(me).fetchModelByName(me, sensorName);
 
                                         Intent dataIntent = new Intent(me, LegacyProbeViewerActivity.class);
@@ -394,17 +395,14 @@ public class StartActivity extends AppCompatActivity
 
         final String savedPassword = prefs.getString("config_password", null);
 
-        listView.setOnItemLongClickListener(new OnItemLongClickListener()
-        {
+        listView.setOnItemLongClickListener(new OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
-            {
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 Uri uri = ContentUris.withAppendedId(RobotContentProvider.RECENT_PROBE_VALUES, id);
 
                 Cursor c = me.getContentResolver().query(uri, null, null, null, null);
 
-                if (c.moveToNext())
-                {
+                if (c.moveToNext()) {
                     final String sensorName = c.getString(c.getColumnIndex("source"));
 
                     final Probe probe = ProbeManager.probeForName(sensorName, me);
@@ -412,15 +410,12 @@ public class StartActivity extends AppCompatActivity
                     AlertDialog.Builder builder = new AlertDialog.Builder(me);
                     boolean inited = false;
 
-                    if (probe != null)
-                    {
+                    if (probe != null) {
                         builder = builder.setTitle(probe.title(me));
                         builder = builder.setMessage(probe.summary(me));
 
-                        if (savedPassword == null || savedPassword.trim().length() == 0)
-                        {
-                            if (probe.isEnabled(me))
-                            {
+                        if (savedPassword == null || savedPassword.trim().length() == 0) {
+                            if (probe.isEnabled(me)) {
                                 builder.setNegativeButton(R.string.button_disable, new OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface arg0, int arg1) {
@@ -441,8 +436,7 @@ public class StartActivity extends AppCompatActivity
                                         }
                                     });
                                 }
-                            }
-                            else {
+                            } else {
                                 builder.setNegativeButton(R.string.button_enable, new OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface arg0, int arg1) {
@@ -460,18 +454,14 @@ public class StartActivity extends AppCompatActivity
                         }
 
                         inited = true;
-                    }
-                    else
-                    {
+                    } else {
                         final Model model = ModelManager.getInstance(me).fetchModelByName(me, sensorName);
 
-                        if (model != null)
-                        {
+                        if (model != null) {
                             builder = builder.setTitle(model.title(me));
                             builder = builder.setMessage(model.summary(me));
 
-                            if (savedPassword == null || savedPassword.trim().length() == 0)
-                            {
+                            if (savedPassword == null || savedPassword.trim().length() == 0) {
                                 if (model.isEnabled(me)) {
                                     builder.setNegativeButton(R.string.button_disable, new OnClickListener() {
                                         @Override
@@ -483,8 +473,7 @@ public class StartActivity extends AppCompatActivity
                                             adapter.notifyDataSetChanged();
                                         }
                                     });
-                                }
-                                else {
+                                } else {
                                     builder.setNegativeButton(R.string.button_enable, new OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface arg0, int arg1) {
@@ -498,14 +487,11 @@ public class StartActivity extends AppCompatActivity
                                 }
 
                                 builder.setPositiveButton(R.string.button_close, null);
-                            }
-                            else
+                            } else
                                 builder.setPositiveButton(R.string.button_close, null);
 
                             inited = true;
-                        }
-                        else
-                        {
+                        } else {
                             // Clear obsolete probe or user-provided label...
 
                             builder = builder.setTitle(R.string.title_clear_probe_display);
@@ -531,6 +517,8 @@ public class StartActivity extends AppCompatActivity
                     if (inited)
                         builder.create().show();
                 }
+
+                c.close();
 
                 return true;
             }
@@ -563,6 +551,17 @@ public class StartActivity extends AppCompatActivity
         {
             this.getContentResolver().unregisterContentObserver(this._observer);
             this._observer = null;
+        }
+
+        ListAdapter listAdapter = listView.getAdapter();
+
+        if (listAdapter instanceof CursorAdapter)
+        {
+            CursorAdapter adapter = (CursorAdapter) listAdapter;
+
+            Cursor oldCursor = adapter.getCursor();
+
+            oldCursor.close();
         }
     }
 
@@ -699,14 +698,17 @@ public class StartActivity extends AppCompatActivity
                 {
                     ListAdapter listAdapter = listView.getAdapter();
 
-                    Cursor c = listView.getContext().getContentResolver()
-                            .query(RobotContentProvider.RECENT_PROBE_VALUES, null, null, null, "recorded DESC");
+                    Cursor c = listView.getContext().getContentResolver().query(RobotContentProvider.RECENT_PROBE_VALUES, null, null, null, "recorded DESC");
 
                     if (listAdapter instanceof CursorAdapter)
                     {
                         CursorAdapter adapter = (CursorAdapter) listAdapter;
 
+                        Cursor oldCursor = adapter.getCursor();
+
                         adapter.changeCursor(c);
+
+                        oldCursor.close();
                     }
 
                     if (prefs.getBoolean("config_probes_enabled", false))
@@ -730,6 +732,35 @@ public class StartActivity extends AppCompatActivity
                 this._observer);
 
         this.refreshList();
+
+        boolean hasRequired = true;
+
+        String[] required = this.getResources().getStringArray(R.array.required_permissions);
+
+        for (String permission : required) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED)
+                hasRequired = false;
+        }
+
+        if (hasRequired == false)
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+            builder.setTitle(R.string.dialog_title_permissions_missing);
+            builder.setMessage(R.string.dialog_message_permissions_missing);
+            builder.setCancelable(false);
+
+            builder.setPositiveButton(R.string.button_grant_permissions, new OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    Intent intent = new Intent(me, PermissionsActivity.class);
+
+                    me.startActivity(intent);
+                }
+            });
+
+            builder.create().show();
+        }
     }
 
     private void updateAlertIcon()

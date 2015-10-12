@@ -1,5 +1,6 @@
 package edu.northwestern.cbits.purple_robot_manager.logging;
 
+import java.security.Permissions;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,16 +12,19 @@ import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.ManagerService;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.DiagnosticActivity;
+import edu.northwestern.cbits.purple_robot_manager.activities.PermissionsActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.StartActivity;
 
 public class SanityManager
@@ -168,11 +172,16 @@ public class SanityManager
                     else
                         style = style.setSummaryText(this._context.getString(R.string.note_purple_robot_message_multiple, issueCount));
 
-                    for (String key : this._errors.keySet())
-                        style = style.addLine(this._errors.get(key));
+                    synchronized(this._errors)
+                    {
+                        for (String key : this._errors.keySet())
+                            style = style.addLine(this._errors.get(key));
+                    }
 
-                    for (String key : this._warnings.keySet())
-                        style = style.addLine(this._warnings.get(key));
+                    synchronized(this._warnings) {
+                        for (String key : this._warnings.keySet())
+                            style = style.addLine(this._warnings.get(key));
+                    }
 
                     builder = builder.setStyle(style);
                 }
@@ -216,17 +225,25 @@ public class SanityManager
 
         if (level == SanityCheck.WARNING && this._warnings.containsKey(name) == false)
         {
-            this._warnings.put(name, message);
-            alert = true;
+            synchronized(this._warnings) {
+                this._warnings.put(name, message);
+                alert = true;
+            }
         }
         else if (this._warnings.containsKey(name) == false)
         {
-            this._errors.put(name, message);
-            alert = true;
+            synchronized(this._errors) {
+                this._errors.put(name, message);
+                alert = true;
+            }
         }
 
         if (action != null)
-            this._actions.put(name, action);
+        {
+            synchronized(this._actions) {
+                this._actions.put(name, action);
+            }
+        }
 
         if (alert)
         {
@@ -282,8 +299,43 @@ public class SanityManager
 
     public void clearAlert(String title)
     {
-        this._warnings.remove(title);
-        this._errors.remove(title);
-        this._actions.remove(title);
+        synchronized(this._warnings) {
+            this._warnings.remove(title);
+        }
+
+        synchronized(this._errors) {
+            this._errors.remove(title);
+        }
+
+        synchronized (this._actions) {
+            this._actions.remove(title);
+        }
+    }
+
+    public void addPermissionAlert(String requester, String permission, String rationale, Runnable r)
+    {
+        final SanityManager me = this;
+
+        if (r == null) {
+            r = new Runnable() {
+                @Override
+                public void run() {
+                    Intent intent = new Intent(me._context, PermissionsActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    me._context.startActivity(intent);
+                }
+            };
+        }
+
+        String title = requester + ": " + PermissionsActivity.getTitle(this._context, permission);
+
+        this.addAlert(SanityCheck.ERROR, title, rationale, r);
+    }
+
+    public void clearPermissionAlert(String permission)
+    {
+        String title = PermissionsActivity.getTitle(this._context, permission);
+
+        this.clearAlert(title);
     }
 }

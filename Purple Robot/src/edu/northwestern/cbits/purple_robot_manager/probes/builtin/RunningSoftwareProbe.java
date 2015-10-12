@@ -2,6 +2,7 @@ package edu.northwestern.cbits.purple_robot_manager.probes.builtin;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -16,17 +17,28 @@ import org.jsoup.select.Elements;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningTaskInfo;
+import android.app.usage.UsageEvents;
+import android.app.usage.UsageStatsManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.provider.Settings;
+import android.widget.Toast;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.WiFiHelper;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class RunningSoftwareProbe extends Probe
@@ -40,6 +52,8 @@ public class RunningSoftwareProbe extends Probe
     private static final boolean DEFAULT_ENABLED = true;
     private static final String ENABLED = "config_probe_running_software_enabled";
     private static final String FREQUENCY = "config_probe_running_software_frequency";
+    private static final String MUTE_ANDROID_FIVE_WARNING = "config_probe_running_software_mute_android_five_warning";
+    private static final boolean DEFAULT_ANDROID_FIVE_WARNING = false;
 
     private long _lastCheck = 0;
 
@@ -86,7 +100,7 @@ public class RunningSoftwareProbe extends Probe
     @Override
     public boolean isEnabled(final Context context)
     {
-        SharedPreferences prefs = Probe.getPreferences(context);
+        final SharedPreferences prefs = Probe.getPreferences(context);
 
         if (super.isEnabled(context))
         {
@@ -96,8 +110,7 @@ public class RunningSoftwareProbe extends Probe
             {
                 synchronized (this)
                 {
-                    long freq = Long
-                            .parseLong(prefs.getString(RunningSoftwareProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
+                    long freq = Long.parseLong(prefs.getString(RunningSoftwareProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
 
                     if (now - this._lastCheck > freq)
                     {
@@ -109,41 +122,160 @@ public class RunningSoftwareProbe extends Probe
                             @SuppressWarnings("deprecation")
                             public void run()
                             {
-                                Bundle bundle = new Bundle();
-                                bundle.putString("PROBE", me.name(context));
-                                bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
-
-                                ActivityManager am = (ActivityManager) context.getApplicationContext()
-                                        .getSystemService(Context.ACTIVITY_SERVICE);
-
-                                List<RunningTaskInfo> tasks = am.getRunningTasks(9999);
-
-                                if (tasks != null)
+                                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
                                 {
+                                    ActivityManager am = (ActivityManager) context.getApplicationContext()
+                                            .getSystemService(Context.ACTIVITY_SERVICE);
+
+                                    List<RunningTaskInfo> tasks = am.getRunningTasks(9999);
+
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString("PROBE", me.name(context));
+                                    bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+
                                     ArrayList<Bundle> running = new ArrayList<>();
 
-                                    for (int i = 0; i < tasks.size(); i++)
+                                    if (tasks != null)
                                     {
-                                        RunningTaskInfo info = tasks.get(i);
+                                        for (int i = 0; i < tasks.size(); i++) {
+                                            RunningTaskInfo info = tasks.get(i);
 
-                                        Bundle taskBundle = new Bundle();
+                                            Bundle taskBundle = new Bundle();
 
-                                        taskBundle.putString(RunningSoftwareProbe.PACKAGE_NAME,
-                                                info.baseActivity.getPackageName());
-                                        taskBundle.putInt(RunningSoftwareProbe.TASK_STACK_INDEX, i);
+                                            taskBundle.putString(RunningSoftwareProbe.PACKAGE_NAME, info.baseActivity.getPackageName());
+                                            taskBundle.putInt(RunningSoftwareProbe.TASK_STACK_INDEX, i);
 
-                                        String category = RunningSoftwareProbe.fetchCategory(context,
-                                                info.baseActivity.getPackageName());
-                                        taskBundle.putString(RunningSoftwareProbe.PACKAGE_CATEGORY, category);
+                                            String category = RunningSoftwareProbe.fetchCategory(context,  info.baseActivity.getPackageName());
+                                            taskBundle.putString(RunningSoftwareProbe.PACKAGE_CATEGORY, category);
 
-                                        running.add(taskBundle);
+                                            running.add(taskBundle);
+                                        }
+
+                                        bundle.putInt(RunningSoftwareProbe.RUNNING_TASK_COUNT, running.size());
+
+                                        bundle.putParcelableArrayList(RunningSoftwareProbe.RUNNING_TASKS, running);
+
+                                        me.transmitData(context, bundle);
                                     }
-
-                                    bundle.putParcelableArrayList(RunningSoftwareProbe.RUNNING_TASKS, running);
-                                    bundle.putInt(RunningSoftwareProbe.RUNNING_TASK_COUNT, running.size());
-
-                                    me.transmitData(context, bundle);
                                 }
+                                else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
+                                {
+                                    final SanityManager sanity = SanityManager.getInstance(context);
+                                    final String title = context.getString(R.string.title_app_usage_data_unavailable_rsp);
+
+                                    if (prefs.getBoolean(RunningSoftwareProbe.MUTE_ANDROID_FIVE_WARNING, RunningSoftwareProbe.DEFAULT_ANDROID_FIVE_WARNING) == false) {
+
+                                        final String message = context.getString(R.string.message_app_usage_data_unavailable_rsp);
+
+                                        sanity.addAlert(SanityCheck.WARNING, title, message, null);
+                                    }
+                                    else
+                                        sanity.clearAlert(title);
+                                }
+                                else
+                                {
+                                    UsageStatsManager usage = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
+
+                                    synchronized(usage)
+                                    {
+                                        final SanityManager sanity = SanityManager.getInstance(context);
+
+                                        final String title = context.getString(R.string.title_app_usage_data_required);
+                                        final String message = context.getString(R.string.message_app_usage_data_required);
+
+                                        final long now = System.currentTimeMillis();
+
+                                        if (usage.queryEvents(now - (1 * 60 * 60 * 1000), now).hasNextEvent() == false)
+                                        {
+                                            Runnable action = new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+                                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                                                    try
+                                                    {
+                                                        context.startActivity(intent);
+
+                                                        sanity.clearAlert(title);
+                                                    }
+                                                    catch(Exception e)
+                                                    {
+                                                        LogManager.getInstance(context).logException(e);
+
+                                                        LogManager.getInstance(context).logException(e);
+
+                                                        Runnable r = new Runnable()
+                                                        {
+                                                            @Override
+                                                            public void run() {
+                                                                Toast.makeText(context, R.string.toast_missing_access_settings, Toast.LENGTH_LONG).show();
+                                                            }
+                                                        };
+
+                                                        new Handler(Looper.getMainLooper()).post(r);
+                                                    }
+                                                }
+                                            };
+
+                                            sanity.addAlert(SanityCheck.WARNING, title, message, action);
+                                        }
+                                        else
+                                        {
+                                            sanity.clearAlert(title);
+
+                                            me._lastCheck = now;
+
+                                            UsageEvents events = usage.queryEvents(now - (5 * 60 * 1000), now);
+
+                                            ArrayList<String> packages = new ArrayList<>();
+
+                                            UsageEvents.Event event = new UsageEvents.Event();
+
+                                            while (events.getNextEvent(event)) {
+                                                if (event.getEventType() == UsageEvents.Event.MOVE_TO_FOREGROUND)
+                                                {
+                                                    String pkgName = new String(event.getPackageName());
+                                                    if (packages.contains(pkgName))
+                                                        packages.remove(pkgName);
+
+                                                    packages.add(pkgName);
+                                                }
+
+                                                event = new UsageEvents.Event();
+                                            }
+
+                                            Bundle bundle = new Bundle();
+                                            bundle.putString("PROBE", me.name(context));
+                                            bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+
+                                            ArrayList<Bundle> running = new ArrayList<>();
+
+                                            Collections.reverse(packages);
+
+                                            for (int i = 0; i < packages.size(); i++) {
+                                                Bundle taskBundle = new Bundle();
+
+                                                String pkgName = packages.get(i);
+
+                                                taskBundle.putString(RunningSoftwareProbe.PACKAGE_NAME, pkgName);
+                                                taskBundle.putInt(RunningSoftwareProbe.TASK_STACK_INDEX, i);
+
+                                                String category = RunningSoftwareProbe.fetchCategory(context, pkgName);
+                                                taskBundle.putString(RunningSoftwareProbe.PACKAGE_CATEGORY, category);
+
+                                                running.add(taskBundle);
+                                            }
+
+                                            if (running.size() > 0) {
+                                                bundle.putInt(RunningSoftwareProbe.RUNNING_TASK_COUNT, running.size());
+                                                bundle.putParcelableArrayList(RunningSoftwareProbe.RUNNING_TASKS, running);
+
+                                                me.transmitData(context, bundle);
+                                            }
+                                        }
+                                    }
+                               }
                             }
                         };
 
@@ -300,6 +432,10 @@ public class RunningSoftwareProbe extends Probe
 
         map.put(Probe.PROBE_FREQUENCY, freq);
 
+        boolean muteWarning = prefs.getBoolean(RunningSoftwareProbe.MUTE_ANDROID_FIVE_WARNING, RunningSoftwareProbe.DEFAULT_ANDROID_FIVE_WARNING);
+
+        map.put(Probe.PROBE_MUTE_WARNING, muteWarning);
+
         return map;
     }
 
@@ -308,8 +444,10 @@ public class RunningSoftwareProbe extends Probe
     {
         super.updateFromMap(context, params);
 
-        if (params.containsKey(Probe.PROBE_FREQUENCY))
-        {
+        SharedPreferences prefs = Probe.getPreferences(context);
+        Editor e = prefs.edit();
+
+        if (params.containsKey(Probe.PROBE_FREQUENCY)) {
             Object frequency = params.get(Probe.PROBE_FREQUENCY);
 
             if ((frequency instanceof Double) == false)
@@ -317,12 +455,18 @@ public class RunningSoftwareProbe extends Probe
             else
                 frequency = ((Double) frequency).longValue();
 
-            SharedPreferences prefs = Probe.getPreferences(context);
-            Editor e = prefs.edit();
 
             e.putString(RunningSoftwareProbe.FREQUENCY, frequency.toString());
-            e.commit();
         }
+
+        if (params.containsKey(Probe.PROBE_MUTE_WARNING))
+        {
+            Boolean muteWarning = (Boolean) params.get(Probe.PROBE_MUTE_WARNING);
+
+            e.putBoolean(RunningSoftwareProbe.MUTE_ANDROID_FIVE_WARNING, muteWarning);
+        }
+
+        e.commit();
     }
 
     @Override
@@ -355,6 +499,13 @@ public class RunningSoftwareProbe extends Probe
 
         screen.addPreference(duration);
 
+        CheckBoxPreference muteWarning = new CheckBoxPreference(context);
+        muteWarning.setTitle(R.string.title_mute_android_five_warning);
+        muteWarning.setKey(RunningSoftwareProbe.MUTE_ANDROID_FIVE_WARNING);
+        muteWarning.setDefaultValue(RunningSoftwareProbe.DEFAULT_ANDROID_FIVE_WARNING);
+
+        screen.addPreference(muteWarning);
+
         return screen;
     }
 
@@ -372,6 +523,11 @@ public class RunningSoftwareProbe extends Probe
             values.put(false);
             enabled.put(Probe.PROBE_VALUES, values);
             settings.put(Probe.PROBE_ENABLED, enabled);
+
+            JSONObject muteWarning = new JSONObject();
+            muteWarning.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            muteWarning.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_MUTE_WARNING, muteWarning);
 
             JSONObject frequency = new JSONObject();
             frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);

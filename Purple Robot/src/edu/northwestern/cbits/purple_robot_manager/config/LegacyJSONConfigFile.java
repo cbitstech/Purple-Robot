@@ -2,12 +2,10 @@ package edu.northwestern.cbits.purple_robot_manager.config;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -40,7 +38,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.content.pm.PackageInfo;
 import android.net.Uri;
 import android.os.Looper;
 import android.preference.PreferenceManager;
@@ -359,7 +356,8 @@ public class LegacyJSONConfigFile
                     catch (JSONException e)
                     {
                         LogManager.getInstance(context).logException(e);
-                    } catch (Exception e)
+                    }
+                    catch (Exception e)
                     {
                         LogManager.getInstance(context).logException(e);
                     }

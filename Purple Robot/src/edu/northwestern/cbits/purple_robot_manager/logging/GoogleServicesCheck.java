@@ -2,9 +2,16 @@ package edu.northwestern.cbits.purple_robot_manager.logging;
 
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.net.Uri;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+
+import java.util.List;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
 
@@ -33,14 +40,22 @@ public class GoogleServicesCheck extends SanityCheck
                 {
                     public void run()
                     {
-                        try
-                        {
-                            PendingIntent intent = GooglePlayServicesUtil.getErrorPendingIntent(me._status, context, 0);
-                            intent.send();
+                        Intent testIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.google.android.gms"));
+
+                        PackageManager manager = context.getPackageManager();
+                        List<ResolveInfo> infos = manager.queryIntentActivities(testIntent, 0);
+
+                        if (infos.size() > 0) {
+                            try {
+                                PendingIntent intent = GooglePlayServicesUtil.getErrorPendingIntent(me._status, context, 0);
+                                intent.send();
+                            } catch (PendingIntent.CanceledException e) {
+                                LogManager.getInstance(context).logException(e);
+                            }
                         }
-                        catch (PendingIntent.CanceledException e)
+                        else
                         {
-                            LogManager.getInstance(context).logException(e);
+                            Toast.makeText(context, R.string.toast_google_play_required, Toast.LENGTH_LONG);
                         }
                     }
                 };

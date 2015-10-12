@@ -18,6 +18,7 @@ import android.preference.PreferenceManager;
 import android.widget.Toast;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.RobotContentProvider;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.ProbeManager;
@@ -53,7 +54,7 @@ public class SnapshotManager
         return SnapshotManager._instance;
     }
 
-    public long takeSnapshot(Context context, String source, final Runnable r) throws EmptySnapshotException
+    public long takeSnapshot(final Context context, String source, final Runnable r) throws EmptySnapshotException
     {
         final long now = System.currentTimeMillis();
 
@@ -139,7 +140,7 @@ public class SnapshotManager
 
                     File internalStorage = me._context.getCacheDir();
 
-                    if (prefs.getBoolean("config_external_storage", false))
+                    if (SettingsActivity.useExternalStorage(context))
                         internalStorage = me._context.getExternalCacheDir();
 
                     if (internalStorage != null && !internalStorage.exists())

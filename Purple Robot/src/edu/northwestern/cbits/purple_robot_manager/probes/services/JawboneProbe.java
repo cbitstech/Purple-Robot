@@ -32,7 +32,10 @@ import edu.northwestern.cbits.xsi.oauth.OAuthActivity;
 
 public class JawboneProbe extends Probe
 {
+    public final static String PROBE_NAME = "edu.northwestern.cbits.purple_robot_manager.probes.services.JawboneProbe";
+
     private static final String ENABLED = "config_feature_jawbone_probe_enabled";
+
     private static final boolean DEFAULT_ENABLED = false;
 
     private long _lastUpdate = 0;

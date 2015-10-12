@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="permissions_system_only">
+        <item>android.permission.BATTERY_STATS</item>
+        <item>android.permission.READ_LOGS</item>
+        <item>android.permission.REAL_GET_TASKS</item>
+        <item>android.permission.SYSTEM_ALERT_WINDOW</item>
+        <item>android.permission.PACKAGE_USAGE_STATS</item>
+        <item>com.google.android.permission.PROVIDE_BACKGROUND</item>
+    </string-array>
+
+    <string-array name="required_permissions">
+        <item>android.permission.WRITE_EXTERNAL_STORAGE</item>
+        <item>android.permission.GET_ACCOUNTS</item>
+        <item>android.permission.INTERNET</item>
+        <item>android.permission.WAKE_LOCK</item>
+        <item>android.permission.RECEIVE_BOOT_COMPLETED</item>
+        <item>android.permission.GET_ACCOUNTS</item>
+        <item>android.permission.GET_ACCOUNTS</item>
+        <item>android.permission.GET_ACCOUNTS</item>
+        <item>android.permission.GET_ACCOUNTS</item>
+    </string-array>
+
+    <string name="permission_android_permission_access_coarse_location">Access general location</string>
+    <string name="permission_android_permission_access_fine_location">Access specific location</string>
+    <string name="permission_android_permission_access_network_state">Access network details</string>
+    <string name="permission_android_permission_access_wifi_state">Access wireless network details</string>
+    <string name="permission_android_permission_bluetooth">Use paired Bluetooth devices</string>
+    <string name="permission_android_permission_bluetooth_admin">Discover Bluetooth devices</string>
+    <string name="permission_android_permission_body_sensors">Read body sensors (e.g. heartrate)</string>
+    <string name="permission_android_permission_change_wifi_multicast_state">Scan for devices on the wireless network</string>
+    <string name="permission_android_permission_change_wifi_state">Change wireless state</string>
+    <string name="permission_android_permission_get_tasks">List running apps and software on device</string>
+    <string name="permission_android_permission_internet">Connect to the Internet</string>
+    <string name="permission_android_permission_nfc">Read NFC tags</string>
+    <string name="permission_android_permission_read_call_log">Access phone call log</string>
+    <string name="permission_android_permission_read_contacts">Access local contact address book</string>
+    <string name="permission_android_permission_read_external_storage">Read Purple Robot data on user-accessible storage</string>
+    <string name="permission_android_permission_get_accounts">Use local accounts to generate unique identifier (e.g. Gmail e-mail address)</string>
+    <string name="permission_android_permission_read_sms">Access SMS text conversations</string>
+    <string name="permission_android_permission_receive_boot_completed">Launch when device boots</string>
+    <string name="permission_android_permission_vibrate">Enable haptic vibration notifications</string>
+    <string name="permission_android_permission_wake_lock">Prevent device\'s low-power mode from affecting data collection and schedules</string>
+    <string name="permission_android_permission_write_external_storage">Write Purple Robot data to user-accessible storage</string>
+    <string name="permission_android_permission_read_phone_state">Determine when a call is in-progress or access other information about the device (including hardware identifiers)</string>
+    <string name="permission_android_permission_record_audio">Use microphone to record audio (when Audio Capture Probe is enabled) and analyze sound in the ambient environment</string>
+    <string name="permission_com_android_browser_permission_read_history_bookmarks">Access mobile browser history and bookmarks</string>
+    <string name="permission_com_google_android_gms_permission_activity_recognition">Use sensors to predict current activity (running, walking, etc.)</string>
+    <string name="permission_com_google_android_providers_gsf_permission_read_gservices">Access Google Services details</string>
+
+    <string name="rationale_raw_location_probe">The Raw Location probe needs permission to access your location to gather the information it is intended to collect.</string>
+    <string name="rationale_fused_location_probe">The Fused Location probe needs permission to access your location to gather the information it is intended to collect.</string>
+    <string name="rationale_pr_location_probe">The Location probe needs permission to access your location to gather the information it is intended to collect.</string>
+    <string name="rationale_system_alert_probe">The Touch Events probe needs permission to collect data about how you interact with this device. Tap here to grant Purple Robot permission to draw over other apps.</string>
+    <string name="rationale_audio_features_probe">The Audio Features probe needs access to your microphone to analyze the sound pitch and volume of the area around you.</string>
+    <string name="rationale_wifi_access_probe">The WiFi Access Points probe needs access to your location to report details about the access points in your area.</string>
+    <string name="rationale_hardware_info_probe">The Hardware Information probe requires access to your phone state to report your device\'s unique hardware identifier.</string>
+    <string name="rationale_telephony_probe">The Telephony probe needs access to the device\'s call state and identifiers.</string>
+    <string name="rationale_log_sms_log_probe">The Communication Log probe needs access to your text messaging logs to analyze your communication patterns.</string>
+    <string name="rationale_log_call_log_probe">The Communication Log probe needs access to your phone call logs to analyze your communication patterns.</string>
+    <string name="rationale_event_sms_log_probe">The Communication Event probe needs access to your text messaging logs to analyze your communication patterns.</string>
+    <string name="rationale_event_call_log_probe">The Communication Event probe needs access to your phone call logs to analyze your communication patterns.</string>
+    <string name="rationale_history_call_log_probe">The Call History probe needs access to your phone call logs to analyze your communication patterns.</string>
+
+    <string name="rationale_calibration_call_log">Cannot categorize or label contacts until permission is granted to read the device\'s call log.</string>
+    <string name="rationale_calibration_contacts">Cannot categorize or label contacts until permission is granted to read the device\'s address book.</string>
+</resources>

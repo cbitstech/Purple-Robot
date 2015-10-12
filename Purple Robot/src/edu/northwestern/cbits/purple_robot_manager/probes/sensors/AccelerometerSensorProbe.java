@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
@@ -87,11 +88,9 @@ public class AccelerometerSensorProbe extends SensorProbe
 
         long now = System.currentTimeMillis();
 
-        SharedPreferences prefs = Probe.getPreferences(this._context);
-
         File internalStorage = this._context.getCacheDir();
 
-        if (prefs.getBoolean("config_external_storage", false))
+        if (SettingsActivity.useExternalStorage(this._context))
             internalStorage = this._context.getExternalCacheDir();
 
         if (internalStorage != null && !internalStorage.exists())

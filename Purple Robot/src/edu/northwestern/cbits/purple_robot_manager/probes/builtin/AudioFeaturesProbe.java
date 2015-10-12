@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
@@ -18,12 +19,16 @@ import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.support.v4.content.ContextCompat;
 
 import java.util.Map;
 
+import edu.northwestern.cbits.purple_robot_manager.Manifest;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class AudioFeaturesProbe extends Probe
@@ -113,127 +118,132 @@ public class AudioFeaturesProbe extends Probe
 
             if (this._recording == false && enabled)
             {
-                long now = System.currentTimeMillis();
+                if (ContextCompat.checkSelfPermission(context, "android.permission.RECORD_AUDIO") == PackageManager.PERMISSION_GRANTED) {
 
-                long freq = Long.parseLong(prefs.getString(AudioFeaturesProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
-                final int duration = Integer.parseInt(prefs.getString(AudioFeaturesProbe.DURATION, AudioFeaturesProbe.DEFAULT_DURATION));
-                final int sampleRate = Integer.parseInt(prefs.getString(AudioFeaturesProbe.MAX_SAMPLE_RATE, AudioFeaturesProbe.DEFAULT_MAX_SAMPLE_RATE));
+                    long now = System.currentTimeMillis();
 
-                if (now - this._lastCheck > freq) {
-                    this._recording = true;
+                    long freq = Long.parseLong(prefs.getString(AudioFeaturesProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
+                    final int duration = Integer.parseInt(prefs.getString(AudioFeaturesProbe.DURATION, AudioFeaturesProbe.DEFAULT_DURATION));
+                    final int sampleRate = Integer.parseInt(prefs.getString(AudioFeaturesProbe.MAX_SAMPLE_RATE, AudioFeaturesProbe.DEFAULT_MAX_SAMPLE_RATE));
 
-                    final AudioFeaturesProbe me = this;
+                    if (now - this._lastCheck > freq) {
+                        this._recording = true;
 
-                    Runnable r = new Runnable() {
-                        @Override
-                        @SuppressWarnings("deprecation")
-                        public void run() {
-                            int bufferSize = AudioRecord.getMinBufferSize(44100, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
+                        final AudioFeaturesProbe me = this;
 
-                            AudioRecord recorder = null;
+                        Runnable r = new Runnable() {
+                            @Override
+                            @SuppressWarnings("deprecation")
+                            public void run() {
+                                int bufferSize = AudioRecord.getMinBufferSize(44100, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
 
-                            int[] rates = new int[]{44100, 22050, 11025, 8000};
+                                AudioRecord recorder = null;
 
-                            for (int rate : rates) {
-                                if (rate <= sampleRate && recorder == null) {
-                                    AudioRecord newRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC, rate, AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize);
+                                int[] rates = new int[]{44100, 22050, 11025, 8000};
 
-                                    if (newRecorder.getState() == AudioRecord.STATE_INITIALIZED)
-                                        recorder = newRecorder;
-                                    else
-                                        newRecorder.release();
+                                for (int rate : rates) {
+                                    if (rate <= sampleRate && recorder == null) {
+                                        AudioRecord newRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC, rate, AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize);
+
+                                        if (newRecorder.getState() == AudioRecord.STATE_INITIALIZED)
+                                            recorder = newRecorder;
+                                        else
+                                            newRecorder.release();
+                                    }
                                 }
-                            }
 
-                            int sampleCount = recorder.getSampleRate() * (duration / 1000);
+                                int sampleCount = recorder.getSampleRate() * (duration / 1000);
 
-                            int twoPower = 2;
+                                int twoPower = 2;
 
-                            while (sampleCount > twoPower)
-                                twoPower *= 2;
+                                while (sampleCount > twoPower)
+                                    twoPower *= 2;
 
-                            sampleCount = twoPower / 2;
+                                sampleCount = twoPower / 2;
 
-                            if (recorder != null) {
-                                double[] samples = new double[sampleCount];
-                                recorder.startRecording();
+                                if (recorder != null) {
+                                    double[] samples = new double[sampleCount];
+                                    recorder.startRecording();
 
-                                short[] buffer = new short[bufferSize];
+                                    short[] buffer = new short[bufferSize];
 
-                                int index = 0;
+                                    int index = 0;
 
-                                int read = 0;
+                                    int read = 0;
 
-                                double sampleSum = 0;
-                                double samplePower = 0;
+                                    double sampleSum = 0;
+                                    double samplePower = 0;
 
-                                while (index < samples.length && 0 <= (read = recorder.read(buffer, 0, bufferSize))) {
-                                    for (int i = 0; i < read; i++) {
-                                        if (index < samples.length) {
-                                            sampleSum += Math.abs(buffer[i]);
-                                            samplePower += Math.pow(((double) buffer[i]) / Short.MAX_VALUE, 2);
+                                    while (index < samples.length && 0 <= (read = recorder.read(buffer, 0, bufferSize))) {
+                                        for (int i = 0; i < read; i++) {
+                                            if (index < samples.length) {
+                                                sampleSum += Math.abs(buffer[i]);
+                                                samplePower += Math.pow(((double) buffer[i]) / Short.MAX_VALUE, 2);
 
-                                            samples[index] = (double) buffer[i];
-                                            index += 1;
+                                                samples[index] = (double) buffer[i];
+                                                index += 1;
+                                            }
                                         }
                                     }
-                                }
 
-                                recorder.stop();
+                                    recorder.stop();
 
-                                Bundle bundle = new Bundle();
-                                bundle.putString("PROBE", me.name(context));
-                                bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
-                                bundle.putInt("SAMPLE_RATE", recorder.getSampleRate());
-                                bundle.putInt("SAMPLE_BUFFER_SIZE", samples.length);
-                                bundle.putInt("SAMPLES_RECORDED", index);
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString("PROBE", me.name(context));
+                                    bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+                                    bundle.putInt("SAMPLE_RATE", recorder.getSampleRate());
+                                    bundle.putInt("SAMPLE_BUFFER_SIZE", samples.length);
+                                    bundle.putInt("SAMPLES_RECORDED", index);
 
-                                recorder.release();
+                                    recorder.release();
 
-                                FastFourierTransformer fft = new FastFourierTransformer(DftNormalization.STANDARD);
+                                    FastFourierTransformer fft = new FastFourierTransformer(DftNormalization.STANDARD);
 
-                                Complex[] values = fft.transform(samples, TransformType.FORWARD);
+                                    Complex[] values = fft.transform(samples, TransformType.FORWARD);
 
-                                double maxFrequency = 0;
-                                double maxMagnitude = Double.NEGATIVE_INFINITY;
-                                double minMagnitude = Double.POSITIVE_INFINITY;
+                                    double maxFrequency = 0;
+                                    double maxMagnitude = Double.NEGATIVE_INFINITY;
+                                    double minMagnitude = Double.POSITIVE_INFINITY;
 
-                                for (int i = 0; i < values.length / 2; i++) {
-                                    Complex value = values[i];
+                                    for (int i = 0; i < values.length / 2; i++) {
+                                        Complex value = values[i];
 
-                                    double magnitude = value.abs();
+                                        double magnitude = value.abs();
 
-                                    if (magnitude > maxMagnitude) {
-                                        maxMagnitude = magnitude;
-                                        maxFrequency = (i * recorder.getSampleRate()) / (double) samples.length;
+                                        if (magnitude > maxMagnitude) {
+                                            maxMagnitude = magnitude;
+                                            maxFrequency = (i * recorder.getSampleRate()) / (double) samples.length;
+                                        }
+
+                                        if (magnitude < minMagnitude)
+                                            minMagnitude = magnitude;
                                     }
 
-                                    if (magnitude < minMagnitude)
-                                        minMagnitude = magnitude;
+                                    bundle.putDouble("FREQUENCY", maxFrequency);
+                                    bundle.putDouble("NORMALIZED_AVG_MAGNITUDE", (sampleSum / Short.MAX_VALUE) / samples.length);
+                                    bundle.putDouble("POWER", samplePower / samples.length);
+
+                                    me.transmitData(context, bundle);
                                 }
 
-                                bundle.putDouble("FREQUENCY", maxFrequency);
-                                bundle.putDouble("NORMALIZED_AVG_MAGNITUDE", (sampleSum / Short.MAX_VALUE) / samples.length);
-                                bundle.putDouble("POWER", samplePower / samples.length);
+                                try {
+                                    Thread.sleep(5000);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
 
-                                me.transmitData(context, bundle);
+                                me._recording = false;
                             }
+                        };
 
-                            try {
-                                Thread.sleep(5000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
+                        Thread t = new Thread(r);
+                        t.start();
 
-                            me._recording = false;
-                        }
-                    };
-
-                    Thread t = new Thread(r);
-                    t.start();
-
-                    this._lastCheck = now;
+                        this._lastCheck = now;
+                    }
                 }
+                else
+                    SanityManager.getInstance(context).addPermissionAlert(this.name(context), "android.permission.RECORD_AUDIO", context.getString(R.string.rationale_audio_features_probe), null);
             }
 
             return enabled;

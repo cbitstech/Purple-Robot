@@ -34,6 +34,8 @@ import edu.northwestern.cbits.xsi.oauth.OAuthActivity;
 
 public class FitbitProbe extends Probe
 {
+    public final static String PROBE_NAME = "edu.northwestern.cbits.purple_robot_manager.probes.services.FitbitProbe";
+
     protected static final String VERY_ACTIVE_MINUTES = "VERY_ACTIVE_MINUTES";
     protected static final String LIGHTLY_ACTIVE_MINUTES = "LIGHTLY_ACTIVE_MINUTES";
     protected static final String STEPS = "STEPS";

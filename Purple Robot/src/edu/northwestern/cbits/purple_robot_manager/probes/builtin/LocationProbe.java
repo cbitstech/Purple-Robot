@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -21,6 +22,8 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.support.v4.content.ContextCompat;
+
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.probes.LocationLabelActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.probes.LocationProbeActivity;
@@ -28,6 +31,8 @@ import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleL
 import edu.northwestern.cbits.purple_robot_manager.calibration.LocationCalibrationHelper;
 import edu.northwestern.cbits.purple_robot_manager.db.ProbeValuesProvider;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 import edu.northwestern.cbits.purple_robot_manager.probes.services.FoursquareProbe;
 import edu.northwestern.cbits.purple_robot_manager.util.DBSCAN;
@@ -280,38 +285,38 @@ public class LocationProbe extends Probe implements LocationListener
 
             if (prefs.getBoolean(LocationProbe.ENABLED, LocationProbe.DEFAULT_ENABLED))
             {
-                long now = System.currentTimeMillis();
+                if (ContextCompat.checkSelfPermission(this._context, "android.permission.ACCESS_FINE_LOCATION") == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this._context, "android.permission.ACCESS_COARSE_LOCATION") == PackageManager.PERMISSION_GRANTED) {
+                    long now = System.currentTimeMillis();
 
-                synchronized (this)
-                {
-                    Looper looper = Looper.myLooper();
+                    synchronized (this) {
+                        Looper looper = Looper.myLooper();
 
-                    if (looper == null)
-                        Looper.prepare();
+                        if (looper == null)
+                            Looper.prepare();
 
-                    long freq = Long.parseLong(prefs.getString(LocationProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
+                        long freq = Long.parseLong(prefs.getString(LocationProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
 
-                    if (now - this._lastCheck > 30000 && now - this._lastCheck < freq && this._listening)
-                    {
-                        locationManager.removeUpdates(this);
-                        this._listening = false;
-                    }
-                    else if (now - this._lastCheck > freq && this._listening == false)
-                    {
-                        LocationCalibrationHelper.check(context);
+                        if (now - this._lastCheck > 30000 && now - this._lastCheck < freq && this._listening) {
+                            locationManager.removeUpdates(this);
+                            this._listening = false;
+                        } else if (now - this._lastCheck > freq && this._listening == false) {
+                            LocationCalibrationHelper.check(context);
 
-                        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
-                            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
+                            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+                                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
 
-                        if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
-                            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, this);
+                            if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
+                                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, this);
 
-                        this._lastCheck = now;
-                        this._listening = true;
+                            this._lastCheck = now;
+                            this._listening = true;
 
-                        this.onLocationChanged(locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER));
+                            this.onLocationChanged(locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER));
+                        }
                     }
                 }
+                else
+                    SanityManager.getInstance(context).addPermissionAlert(this.name(context), "android.permission.ACCESS_FINE_LOCATION", context.getString(R.string.rationale_pr_location_probe), null);
 
                 return true;
             }

@@ -31,6 +31,8 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class BluetoothDevicesProbe extends Probe
 {
+    public static final String PROBE_NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.BluetoothDevicesProbe";
+
     protected static final String NAME = "BLUETOOTH_NAME";
     protected static final String ADDRESS = "BLUETOOTH_ADDRESS";
     protected static final String MAJOR_CLASS = "DEVICE MAJOR CLASS";
@@ -54,7 +56,7 @@ public class BluetoothDevicesProbe extends Probe
     @Override
     public String name(Context context)
     {
-        return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.BluetoothDevicesProbe";
+        return BluetoothDevicesProbe.PROBE_NAME;
     }
 
     @Override

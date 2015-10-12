@@ -36,6 +36,8 @@ import edu.northwestern.cbits.purple_robot_manager.probes.devices.wear.WearBatte
 
 public class AndroidWearProbe extends Probe implements DataApi.DataListener
 {
+    public final static String PROBE_NAME = "edu.northwestern.cbits.purple_robot_manager.probes.devices.AndroidWearProbe";
+
     public static final String ENABLED = "config_probe_android_wear_enabled";
     public static final boolean DEFAULT_ENABLED = false;
     public static final String URI_READING_PREFIX = "/purple-robot-reading";

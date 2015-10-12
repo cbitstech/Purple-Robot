@@ -40,6 +40,8 @@ import edu.northwestern.cbits.purple_robot_manager.probes.builtin.ContinuousProb
 
 public class PebbleProbe extends Continuous3DProbe
 {
+    public final static String PROBE_NAME = "edu.northwestern.cbits.purple_robot_manager.probes.devices.PebbleProbe";
+
     private static final String FIRMWARE_VERSION = "FIRMWARE_VERSION";
     private static final String BUNDLE_IS_CHARGING = "IS_CHARGING";
     private static final String BUNDLE_CHARGE_LEVEL = "CHARGE_LEVEL";

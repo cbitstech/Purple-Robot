@@ -13,8 +13,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
@@ -23,6 +25,7 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.provider.CallLog;
 import android.provider.CallLog.Calls;
+import android.support.v4.content.ContextCompat;
 import android.telephony.PhoneNumberUtils;
 
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
@@ -31,6 +34,8 @@ import edu.northwestern.cbits.purple_robot_manager.activities.probes.AddressBook
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
 import edu.northwestern.cbits.purple_robot_manager.calibration.ContactCalibrationHelper;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
+import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 public class CommunicationLogProbe extends Probe
@@ -130,252 +135,257 @@ public class CommunicationLogProbe extends Probe
 
             if (prefs.getBoolean(CommunicationLogProbe.ENABLED, CommunicationLogProbe.DEFAULT_ENABLED))
             {
-                synchronized (this)
+                boolean ready = true;
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (ContextCompat.checkSelfPermission(context, "android.permission.READ_CALL_LOG") != PackageManager.PERMISSION_GRANTED) {
+                        SanityManager.getInstance(context).addPermissionAlert(this.name(context), "android.permission.READ_CALL_LOG", context.getString(R.string.rationale_log_call_log_probe), null);
+                        ready = false;
+                    }
+
+                    if (ContextCompat.checkSelfPermission(context, "android.permission.READ_SMS") != PackageManager.PERMISSION_GRANTED) {
+                        SanityManager.getInstance(context).addPermissionAlert(this.name(context), "android.permission.READ_SMS", context.getString(R.string.rationale_log_sms_log_probe), null);
+                        ready = false;
+                    }
+                }
+
+                if (ready)
                 {
-                    long freq = Long.parseLong(prefs.getString(CommunicationLogProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
-                    boolean doHash = prefs.getBoolean(CommunicationLogProbe.HASH_DATA, Probe.DEFAULT_HASH_DATA);
+                    SanityManager.getInstance(context).clearPermissionAlert("android.permission.READ_CALL_LOG");
+                    SanityManager.getInstance(context).clearPermissionAlert("android.permission.READ_SMS");
 
-                    if (now - this._lastCheck > freq)
-                    {
-                        ContactCalibrationHelper.check(context);
+                    synchronized (this) {
+                        long freq = Long.parseLong(prefs.getString(CommunicationLogProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
+                        boolean doHash = prefs.getBoolean(CommunicationLogProbe.HASH_DATA, Probe.DEFAULT_HASH_DATA);
 
-                        Bundle bundle = new Bundle();
-                        bundle.putString("PROBE", this.name(context));
-                        bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
+                        if (now - this._lastCheck > freq) {
+                            ContactCalibrationHelper.check(context);
 
-                        ArrayList<Bundle> calls = new ArrayList<>();
+                            Bundle bundle = new Bundle();
+                            bundle.putString("PROBE", this.name(context));
+                            bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
 
-                        int sentCount = 0;
-                        int receivedCount = 0;
-                        int missedCount = 0;
+                            ArrayList<Bundle> calls = new ArrayList<>();
 
-                        String recentName = null;
-                        String recentNumber = null;
-                        long recentTimestamp = 0;
+                            int sentCount = 0;
+                            int receivedCount = 0;
+                            int missedCount = 0;
 
-                        try
-                        {
-                            EncryptionManager em = EncryptionManager.getInstance();
+                            String recentName = null;
+                            String recentNumber = null;
+                            long recentTimestamp = 0;
 
-                            Cursor c = context.getContentResolver().query(CallLog.Calls.CONTENT_URI, null, null, null, null);
+                            try {
+                                EncryptionManager em = EncryptionManager.getInstance();
 
-                            while (c.moveToNext())
-                            {
-                                Bundle contactBundle = new Bundle();
+                                Cursor c = context.getContentResolver().query(CallLog.Calls.CONTENT_URI, null, null, null, null);
 
-                                String numberName = c.getString(c.getColumnIndex(Calls.CACHED_NAME));
-                                String phoneNumber = PhoneNumberUtils.formatNumber(c.getString(c.getColumnIndex(Calls.NUMBER)));
+                                while (c.moveToNext()) {
+                                    Bundle contactBundle = new Bundle();
 
-                                if (numberName == null)
-                                    numberName = phoneNumber;
+                                    String numberName = c.getString(c.getColumnIndex(Calls.CACHED_NAME));
+                                    String phoneNumber = PhoneNumberUtils.formatNumber(c.getString(c.getColumnIndex(Calls.NUMBER)));
 
-                                String group = ContactCalibrationHelper.getGroup(context, numberName, false);
+                                    if (numberName == null)
+                                        numberName = phoneNumber;
 
-                                if (group == null)
-                                    group = ContactCalibrationHelper.getGroup(context, phoneNumber, true);
+                                    String group = ContactCalibrationHelper.getGroup(context, numberName, false);
 
-                                if (group != null)
-                                    contactBundle.putString(CommunicationLogProbe.NUMBER_GROUP, group);
+                                    if (group == null)
+                                        group = ContactCalibrationHelper.getGroup(context, phoneNumber, true);
 
-                                if (doHash)
-                                {
-                                    numberName = em.createHash(context, numberName);
-                                    phoneNumber = em.createHash(context, phoneNumber);
-                                }
+                                    if (group != null)
+                                        contactBundle.putString(CommunicationLogProbe.NUMBER_GROUP, group);
 
-                                contactBundle.putString(CommunicationLogProbe.NUMBER_NAME, numberName);
-                                contactBundle.putString(CommunicationLogProbe.NUMBER_LABEL, phoneNumber);
+                                    if (doHash) {
+                                        numberName = em.createHash(context, numberName);
+                                        phoneNumber = em.createHash(context, phoneNumber);
+                                    }
 
-                                if (c.getColumnIndex(Calls.CACHED_NUMBER_TYPE) != -1)
-                                    contactBundle.putString(CommunicationLogProbe.NUMBER_TYPE, c.getString(c.getColumnIndex(Calls.CACHED_NUMBER_TYPE)));
+                                    contactBundle.putString(CommunicationLogProbe.NUMBER_NAME, numberName);
+                                    contactBundle.putString(CommunicationLogProbe.NUMBER_LABEL, phoneNumber);
 
-                                long callTime = c.getLong(c.getColumnIndex(Calls.DATE));
+                                    if (c.getColumnIndex(Calls.CACHED_NUMBER_TYPE) != -1)
+                                        contactBundle.putString(CommunicationLogProbe.NUMBER_TYPE, c.getString(c.getColumnIndex(Calls.CACHED_NUMBER_TYPE)));
 
-                                contactBundle.putLong(CommunicationLogProbe.CALL_TIMESTAMP, callTime);
-                                contactBundle.putLong(CommunicationLogProbe.CALL_DURATION, c.getLong(c.getColumnIndex(Calls.DURATION)));
-                                contactBundle.putString(CommunicationLogProbe.NUMBER, phoneNumber);
+                                    long callTime = c.getLong(c.getColumnIndex(Calls.DATE));
 
-                                int callType = c.getInt(c.getColumnIndex(Calls.TYPE));
+                                    contactBundle.putLong(CommunicationLogProbe.CALL_TIMESTAMP, callTime);
+                                    contactBundle.putLong(CommunicationLogProbe.CALL_DURATION, c.getLong(c.getColumnIndex(Calls.DURATION)));
+                                    contactBundle.putString(CommunicationLogProbe.NUMBER, phoneNumber);
 
-                                contactBundle.putInt(CommunicationLogProbe.NUMBER_TYPE, callType);
+                                    int callType = c.getInt(c.getColumnIndex(Calls.TYPE));
 
-                                if (callType == Calls.OUTGOING_TYPE)
-                                    sentCount += 1;
-                                else if (callType == Calls.INCOMING_TYPE)
-                                    receivedCount += 1;
-                                else if (callType == Calls.MISSED_TYPE)
-                                    missedCount += 1;
+                                    contactBundle.putInt(CommunicationLogProbe.NUMBER_TYPE, callType);
 
-                                if (callType > 0)
-                                {
-                                    calls.add(contactBundle);
+                                    if (callType == Calls.OUTGOING_TYPE)
+                                        sentCount += 1;
+                                    else if (callType == Calls.INCOMING_TYPE)
+                                        receivedCount += 1;
+                                    else if (callType == Calls.MISSED_TYPE)
+                                        missedCount += 1;
 
-                                    if (callTime > recentTimestamp)
-                                    {
-                                        recentName = numberName;
-                                        recentNumber = phoneNumber;
+                                    if (callType > 0) {
+                                        calls.add(contactBundle);
 
-                                        recentTimestamp = callTime;
+                                        if (callTime > recentTimestamp) {
+                                            recentName = numberName;
+                                            recentNumber = phoneNumber;
+
+                                            recentTimestamp = callTime;
+                                        }
                                     }
                                 }
-                            }
 
-                            c.close();
+                                c.close();
 
-                            bundle.putParcelableArrayList(CommunicationLogProbe.PHONE_CALLS, calls);
-                            bundle.putInt(CommunicationLogProbe.CALL_OUTGOING_COUNT, sentCount);
-                            bundle.putInt(CommunicationLogProbe.CALL_INCOMING_COUNT, receivedCount);
-                            bundle.putInt(CommunicationLogProbe.CALL_MISSED_COUNT, missedCount);
-                            bundle.putInt(CommunicationLogProbe.CALL_TOTAL_COUNT, missedCount + receivedCount + sentCount);
+                                bundle.putParcelableArrayList(CommunicationLogProbe.PHONE_CALLS, calls);
+                                bundle.putInt(CommunicationLogProbe.CALL_OUTGOING_COUNT, sentCount);
+                                bundle.putInt(CommunicationLogProbe.CALL_INCOMING_COUNT, receivedCount);
+                                bundle.putInt(CommunicationLogProbe.CALL_MISSED_COUNT, missedCount);
+                                bundle.putInt(CommunicationLogProbe.CALL_TOTAL_COUNT, missedCount + receivedCount + sentCount);
 
-                            if (recentName != null)
-                                bundle.putString(CommunicationLogProbe.RECENT_CALLER, recentName);
+                                if (recentName != null)
+                                    bundle.putString(CommunicationLogProbe.RECENT_CALLER, recentName);
 
-                            if (recentNumber != null)
-                                bundle.putString(CommunicationLogProbe.RECENT_NUMBER, recentNumber);
+                                if (recentNumber != null)
+                                    bundle.putString(CommunicationLogProbe.RECENT_NUMBER, recentNumber);
 
-                            String group = ContactCalibrationHelper.getGroup(context, recentName, false);
-
-                            if (group == null)
-                                group = ContactCalibrationHelper.getGroup(context, recentNumber, true);
-
-                            if (group != null)
-                                bundle.putString(CommunicationLogProbe.RECENT_GROUP, group);
-
-                            if (recentTimestamp > 0)
-                                bundle.putLong(CommunicationLogProbe.RECENT_TIME, recentTimestamp);
-
-                            sentCount = 0;
-                            receivedCount = 0;
-
-                            ArrayList<Bundle> messages = new ArrayList<>();
-
-                            Uri smsInboxUri = Uri.parse("content://sms/inbox");
-                            c = context.getContentResolver().query(smsInboxUri, null, null, null, null);
-                            receivedCount = c.getCount();
-
-                            while (c.moveToNext())
-                            {
-                                Bundle message = new Bundle();
-
-                                String numberName = c.getString(c.getColumnIndex("person"));
-                                String phoneNumber = PhoneNumberUtils.formatNumber(c.getString(c.getColumnIndex("address")));
-
-                                if (numberName == null)
-                                    numberName = phoneNumber;
-
-                                group = ContactCalibrationHelper.getGroup(context, numberName, false);
+                                String group = ContactCalibrationHelper.getGroup(context, recentName, false);
 
                                 if (group == null)
-                                    group = ContactCalibrationHelper.getGroup(context, phoneNumber, true);
+                                    group = ContactCalibrationHelper.getGroup(context, recentNumber, true);
 
                                 if (group != null)
-                                    message.putString(CommunicationLogProbe.NUMBER_GROUP, group);
+                                    bundle.putString(CommunicationLogProbe.RECENT_GROUP, group);
 
-                                if (doHash)
-                                {
-                                    numberName = em.createHash(context, numberName);
-                                    phoneNumber = em.createHash(context, phoneNumber);
+                                if (recentTimestamp > 0)
+                                    bundle.putLong(CommunicationLogProbe.RECENT_TIME, recentTimestamp);
+
+                                sentCount = 0;
+                                receivedCount = 0;
+
+                                ArrayList<Bundle> messages = new ArrayList<>();
+
+                                Uri smsInboxUri = Uri.parse("content://sms/inbox");
+                                c = context.getContentResolver().query(smsInboxUri, null, null, null, null);
+                                receivedCount = c.getCount();
+
+                                while (c.moveToNext()) {
+                                    Bundle message = new Bundle();
+
+                                    String numberName = c.getString(c.getColumnIndex("person"));
+                                    String phoneNumber = PhoneNumberUtils.formatNumber(c.getString(c.getColumnIndex("address")));
+
+                                    if (numberName == null)
+                                        numberName = phoneNumber;
+
+                                    group = ContactCalibrationHelper.getGroup(context, numberName, false);
+
+                                    if (group == null)
+                                        group = ContactCalibrationHelper.getGroup(context, phoneNumber, true);
+
+                                    if (group != null)
+                                        message.putString(CommunicationLogProbe.NUMBER_GROUP, group);
+
+                                    if (doHash) {
+                                        numberName = em.createHash(context, numberName);
+                                        phoneNumber = em.createHash(context, phoneNumber);
+                                    }
+
+                                    message.putString(CommunicationLogProbe.NUMBER_NAME, numberName);
+                                    message.putString(CommunicationLogProbe.NUMBER, phoneNumber);
+
+                                    long callTime = c.getLong(c.getColumnIndex("date"));
+
+                                    message.putLong(CommunicationLogProbe.MESSAGE_TIMESTAMP, callTime);
+
+                                    message.putString(CommunicationLogProbe.MESSAGE_DIRECTION, CommunicationLogProbe.MESSAGE_OUTGOING);
+
+                                    boolean retrieve = prefs.getBoolean(CommunicationLogProbe.RETRIEVE_DATA, CommunicationLogProbe.DEFAULT_RETRIEVE);
+                                    boolean encrypt = prefs.getBoolean(CommunicationLogProbe.ENCRYPT_DATA, CommunicationLogProbe.DEFAULT_ENCRYPT);
+
+                                    if (retrieve) {
+                                        String body = c.getString(c.getColumnIndex("body"));
+
+                                        if (encrypt)
+                                            body = em.encryptString(context, body);
+
+                                        message.putString(CommunicationLogProbe.MESSAGE_BODY, body);
+                                    }
+
+                                    messages.add(message);
                                 }
 
-                                message.putString(CommunicationLogProbe.NUMBER_NAME, numberName);
-                                message.putString(CommunicationLogProbe.NUMBER, phoneNumber);
+                                c.close();
 
-                                long callTime = c.getLong(c.getColumnIndex("date"));
+                                Uri smsOutboxUri = Uri.parse("content://sms/sent");
+                                c = context.getContentResolver().query(smsOutboxUri, null, null, null, null);
+                                sentCount = c.getCount();
 
-                                message.putLong(CommunicationLogProbe.MESSAGE_TIMESTAMP, callTime);
+                                while (c.moveToNext()) {
+                                    Bundle message = new Bundle();
 
-                                message.putString(CommunicationLogProbe.MESSAGE_DIRECTION, CommunicationLogProbe.MESSAGE_OUTGOING);
+                                    String numberName = c.getString(c.getColumnIndex("person"));
+                                    String phoneNumber = PhoneNumberUtils.formatNumber(c.getString(c.getColumnIndex("address")));
 
-                                boolean retrieve = prefs.getBoolean(CommunicationLogProbe.RETRIEVE_DATA, CommunicationLogProbe.DEFAULT_RETRIEVE);
-                                boolean encrypt = prefs.getBoolean(CommunicationLogProbe.ENCRYPT_DATA, CommunicationLogProbe.DEFAULT_ENCRYPT);
+                                    if (numberName == null)
+                                        numberName = phoneNumber;
 
-                                if (retrieve)
-                                {
-                                    String body = c.getString(c.getColumnIndex("body"));
+                                    group = ContactCalibrationHelper.getGroup(context, numberName, false);
 
-                                    if (encrypt)
-                                        body = em.encryptString(context, body);
+                                    if (group == null)
+                                        group = ContactCalibrationHelper.getGroup(context, phoneNumber, true);
 
-                                    message.putString(CommunicationLogProbe.MESSAGE_BODY, body);
+                                    if (group != null)
+                                        message.putString(CommunicationLogProbe.NUMBER_GROUP, group);
+
+                                    if (doHash) {
+                                        numberName = em.createHash(context, numberName);
+                                        phoneNumber = em.createHash(context, phoneNumber);
+                                    }
+
+                                    message.putString(CommunicationLogProbe.NUMBER_NAME, numberName);
+                                    message.putString(CommunicationLogProbe.NUMBER, phoneNumber);
+
+                                    long callTime = c.getLong(c.getColumnIndex("date"));
+
+                                    message.putLong(CommunicationLogProbe.MESSAGE_TIMESTAMP, callTime);
+
+                                    message.putString(CommunicationLogProbe.MESSAGE_DIRECTION, CommunicationLogProbe.MESSAGE_INCOMING);
+
+                                    boolean retrieve = prefs.getBoolean(CommunicationLogProbe.RETRIEVE_DATA, CommunicationLogProbe.DEFAULT_RETRIEVE);
+                                    boolean encrypt = prefs.getBoolean(CommunicationLogProbe.ENCRYPT_DATA, CommunicationLogProbe.DEFAULT_ENCRYPT);
+
+                                    if (retrieve) {
+                                        String body = c.getString(c.getColumnIndex("body"));
+
+                                        if (encrypt)
+                                            body = em.encryptString(context, body);
+
+                                        message.putString(CommunicationLogProbe.MESSAGE_BODY, body);
+                                    }
+
+                                    messages.add(message);
                                 }
 
-                                messages.add(message);
+                                c.close();
+
+                                bundle.putInt(CommunicationLogProbe.SMS_OUTGOING_COUNT, sentCount);
+                                bundle.putInt(CommunicationLogProbe.SMS_INCOMING_COUNT, receivedCount);
+
+                                bundle.putParcelableArrayList(CommunicationLogProbe.SMS_MESSAGES, messages);
+
+                                this.transmitData(context, bundle);
+                            } catch (Exception e) {
+                                // Broken call & SMS databases on several devices...
+                                // Ignoring.
+
+                                LogManager.getInstance(context).logException(e);
                             }
 
-                            c.close();
-
-                            Uri smsOutboxUri = Uri.parse("content://sms/sent");
-                            c = context.getContentResolver().query(smsOutboxUri, null, null, null, null);
-                            sentCount = c.getCount();
-
-                            while (c.moveToNext())
-                            {
-                                Bundle message = new Bundle();
-
-                                String numberName = c.getString(c.getColumnIndex("person"));
-                                String phoneNumber = PhoneNumberUtils.formatNumber(c.getString(c.getColumnIndex("address")));
-
-                                if (numberName == null)
-                                    numberName = phoneNumber;
-
-                                group = ContactCalibrationHelper.getGroup(context, numberName, false);
-
-                                if (group == null)
-                                    group = ContactCalibrationHelper.getGroup(context, phoneNumber, true);
-
-                                if (group != null)
-                                    message.putString(CommunicationLogProbe.NUMBER_GROUP, group);
-
-                                if (doHash)
-                                {
-                                    numberName = em.createHash(context, numberName);
-                                    phoneNumber = em.createHash(context, phoneNumber);
-                                }
-
-                                message.putString(CommunicationLogProbe.NUMBER_NAME, numberName);
-                                message.putString(CommunicationLogProbe.NUMBER, phoneNumber);
-
-                                long callTime = c.getLong(c.getColumnIndex("date"));
-
-                                message.putLong(CommunicationLogProbe.MESSAGE_TIMESTAMP, callTime);
-
-                                message.putString(CommunicationLogProbe.MESSAGE_DIRECTION, CommunicationLogProbe.MESSAGE_INCOMING);
-
-                                boolean retrieve = prefs.getBoolean(CommunicationLogProbe.RETRIEVE_DATA, CommunicationLogProbe.DEFAULT_RETRIEVE);
-                                boolean encrypt = prefs.getBoolean(CommunicationLogProbe.ENCRYPT_DATA, CommunicationLogProbe.DEFAULT_ENCRYPT);
-
-                                if (retrieve)
-                                {
-                                    String body = c.getString(c.getColumnIndex("body"));
-
-                                    if (encrypt)
-                                        body = em.encryptString(context, body);
-
-                                    message.putString(CommunicationLogProbe.MESSAGE_BODY, body);
-                                }
-
-                                messages.add(message);
-                            }
-
-                            c.close();
-
-                            bundle.putInt(CommunicationLogProbe.SMS_OUTGOING_COUNT, sentCount);
-                            bundle.putInt(CommunicationLogProbe.SMS_INCOMING_COUNT, receivedCount);
-
-                            bundle.putParcelableArrayList(CommunicationLogProbe.SMS_MESSAGES, messages);
-
-                            this.transmitData(context, bundle);
+                            this._lastCheck = now;
                         }
-                        catch (Exception e)
-                        {
-                            // Broken call & SMS databases on several devices...
-                            // Ignoring.
-
-                            LogManager.getInstance(context).logException(e);
-                        }
-
-                        this._lastCheck = now;
                     }
                 }
 

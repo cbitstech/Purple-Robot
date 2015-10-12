@@ -27,6 +27,7 @@ import java.util.Map;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.activities.StartActivity;
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.SettingsActivity;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
@@ -148,7 +149,7 @@ public class AudioCaptureProbe extends Probe
 
                             File internalStorage = context.getCacheDir();
 
-                            if (prefs.getBoolean("config_external_storage", false))
+                            if (SettingsActivity.useExternalStorage(context))
                                 internalStorage = context.getExternalCacheDir();
 
                             if (internalStorage != null && !internalStorage.exists())

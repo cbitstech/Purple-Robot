@@ -46,15 +46,18 @@ public class BatteryLevelTrigger extends Trigger
             {
                 boolean enabled = me.enabled(context);
 
-
                 Bundle extras = intent.getExtras();
 
                 int level = extras.getInt(BatteryManager.EXTRA_LEVEL);
 
                 if (enabled && me._isDecreasing && (me._lastLevel > me._threshold && level <= me._threshold))
+                {
                     me.execute(context, true);
+                }
                 else if (enabled && me._isDecreasing == false && (me._lastLevel < me._threshold && level >= me._threshold))
+                {
                     me.execute(context, true);
+                }
 
                 me._lastLevel = level;
             }
@@ -97,11 +100,13 @@ public class BatteryLevelTrigger extends Trigger
     {
         if (super.updateFromMap(context, map))
         {
-            if (map.containsKey(BatteryLevelTrigger.TRIGGER_THRESHOLD))
+            if (map.containsKey(BatteryLevelTrigger.TRIGGER_THRESHOLD)) {
                 this._threshold = (int) map.get(BatteryLevelTrigger.TRIGGER_THRESHOLD);
+            }
 
-            if (map.containsKey(BatteryLevelTrigger.TRIGGER_DECREASING))
+            if (map.containsKey(BatteryLevelTrigger.TRIGGER_DECREASING)) {
                 this._isDecreasing = (boolean) map.get(BatteryLevelTrigger.TRIGGER_DECREASING);
+            }
 
             return true;
         }

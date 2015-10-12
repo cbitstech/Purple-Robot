@@ -30,6 +30,8 @@ import edu.northwestern.cbits.xsi.oauth.iHealthApi;
 
 public class iHealthProbe extends Probe
 {
+    public final static String PROBE_NAME = "edu.northwestern.cbits.purple_robot_manager.probes.services.iHealthProbe";
+
     private static final String ENABLED = "config_feature_ihealth_probe_enabled";
     private static final boolean DEFAULT_ENABLED = false;
 

@@ -77,7 +77,11 @@ public class SchemeEngine extends BaseScriptEngine
         {
             scheme.load(new InputStreamReader(this._context.getAssets().open("scheme/pregexp.scm")));
         }
-        catch (IOException | StackOverflowError e)
+        catch (IOException e)
+        {
+            LogManager.getInstance(this._context).logException(e);
+        }
+        catch (StackOverflowError e)
         {
             LogManager.getInstance(this._context).logException(e);
         }
@@ -86,7 +90,11 @@ public class SchemeEngine extends BaseScriptEngine
         {
             scheme.load(new InputStreamReader(this._context.getAssets().open("scheme/json.scm")));
         }
-        catch (IOException | StackOverflowError e)
+        catch (IOException e)
+        {
+            LogManager.getInstance(this._context).logException(e);
+        }
+        catch (StackOverflowError e)
         {
             LogManager.getInstance(this._context).logException(e);
         }
@@ -95,7 +103,11 @@ public class SchemeEngine extends BaseScriptEngine
         {
             scheme.load(new InputStreamReader(this._context.getAssets().open("scheme/purple-robot.scm")));
         }
-        catch (IOException | StackOverflowError e)
+        catch (IOException e)
+        {
+            LogManager.getInstance(this._context).logException(e);
+        }
+        catch (StackOverflowError e)
         {
             LogManager.getInstance(this._context).logException(e);
         }
