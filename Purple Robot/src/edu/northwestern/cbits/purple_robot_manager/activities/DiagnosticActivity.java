@@ -534,7 +534,7 @@ public class DiagnosticActivity extends AppCompatActivity
 
                 SchemeConfigFile scheme = new SchemeConfigFile(this);
 
-                File cacheDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+                File cacheDir = this.getExternalCacheDir(); //  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
 
                 if (cacheDir.exists() == false)
                     cacheDir.mkdirs();

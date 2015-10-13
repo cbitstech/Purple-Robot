@@ -914,6 +914,7 @@ public class StartActivity extends AppCompatActivity
                         alertDialog.dismiss();
                     }
                 });
+
                 builder.setView(me.getLayoutInflater().inflate(R.layout.dialog_password, null));
 
                 AlertDialog alert = builder.create();
