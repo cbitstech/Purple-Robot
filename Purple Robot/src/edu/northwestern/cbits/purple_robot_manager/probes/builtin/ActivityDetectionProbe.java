@@ -114,8 +114,13 @@ public class ActivityDetectionProbe extends Probe implements ConnectionCallbacks
 
                 if (ActivityDetectionProbe._apiClient.isConnected())
                 {
-                    ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(ActivityDetectionProbe._apiClient,
-                            this._pendingIntent);
+                    try {
+                        ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(ActivityDetectionProbe._apiClient, this._pendingIntent);
+                    }
+                    catch (NullPointerException e)
+                    {
+                        LogManager.getInstance(context).logException(e);
+                    }
 
                     ActivityDetectionProbe._apiClient.disconnect();
                 }

@@ -42,13 +42,15 @@ public class RobotContentProvider extends ContentProvider
 
         switch (this._uriMatcher.match(uri))
         {
-        case RobotContentProvider.RECENT_PROBE_VALUE_LIST:
-            result = db.delete(RobotContentProvider.RECENT_PROBE_VALUES_TABLE, selection, selectionArgs);
-            break;
-        case RobotContentProvider.SNAPSHOT_LIST:
-            result = db.delete(RobotContentProvider.SNAPSHOTS_TABLE, selection, selectionArgs);
-            break;
+            case RobotContentProvider.RECENT_PROBE_VALUE_LIST:
+                result = db.delete(RobotContentProvider.RECENT_PROBE_VALUES_TABLE, selection, selectionArgs);
+                break;
+            case RobotContentProvider.SNAPSHOT_LIST:
+                result = db.delete(RobotContentProvider.SNAPSHOTS_TABLE, selection, selectionArgs);
+                break;
         }
+
+        db.close();
 
         return result;
     }
@@ -78,9 +80,9 @@ public class RobotContentProvider extends ContentProvider
 
             long id = db.insert(RobotContentProvider.SNAPSHOTS_TABLE, null, values);
 
-            ContentUris.withAppendedId(uri, id);
+            db.close();
 
-            break;
+            return ContentUris.withAppendedId(uri, id);
         }
 
         return null;
@@ -114,14 +116,14 @@ public class RobotContentProvider extends ContentProvider
             {
                 switch (oldVersion)
                 {
-                case 0:
-                    db.execSQL(me.getContext().getString(R.string.create_recent_probe_values_sql));
-                case 1:
-                    db.execSQL(me.getContext().getString(R.string.create_snapshots_sql));
-                case 2:
-                    db.execSQL(me.getContext().getString(R.string.db_update_snapshots_add_audio));
-                default:
-                    break;
+                    case 0:
+                        db.execSQL(me.getContext().getString(R.string.create_recent_probe_values_sql));
+                    case 1:
+                        db.execSQL(me.getContext().getString(R.string.create_snapshots_sql));
+                    case 2:
+                        db.execSQL(me.getContext().getString(R.string.db_update_snapshots_add_audio));
+                    default:
+                        break;
                 }
             }
         };
@@ -141,30 +143,30 @@ public class RobotContentProvider extends ContentProvider
 
         switch (this._uriMatcher.match(uri))
         {
-        case RobotContentProvider.RECENT_PROBE_VALUE:
-            c = this.query(uri, projection, selection, selectionArgs, null);
+            case RobotContentProvider.RECENT_PROBE_VALUE:
+                c = this.query(uri, projection, selection, selectionArgs, null);
 
-            if (c.getCount() == 0)
-            {
-                db.insert(RobotContentProvider.RECENT_PROBE_VALUES_TABLE, null, values);
-                count = 1;
-            }
-            else
-                count = this.update(RobotContentProvider.RECENT_PROBE_VALUES, values, selection, selectionArgs);
+                if (c.getCount() == 0)
+                {
+                    db.insert(RobotContentProvider.RECENT_PROBE_VALUES_TABLE, null, values);
+                    count = 1;
+                }
+                else
+                    count = this.update(RobotContentProvider.RECENT_PROBE_VALUES, values, selection, selectionArgs);
 
-            break;
-        case RobotContentProvider.SNAPSHOT:
-            c = this.query(uri, projection, selection, selectionArgs, null);
+                break;
+            case RobotContentProvider.SNAPSHOT:
+                c = this.query(uri, projection, selection, selectionArgs, null);
 
-            if (c.getCount() == 0)
-            {
-                db.insert(RobotContentProvider.SNAPSHOTS_TABLE, null, values);
-                count = 1;
-            }
-            else
-                count = this.update(RobotContentProvider.SNAPSHOTS, values, selection, selectionArgs);
+                if (c.getCount() == 0)
+                {
+                    db.insert(RobotContentProvider.SNAPSHOTS_TABLE, null, values);
+                    count = 1;
+                }
+                else
+                    count = this.update(RobotContentProvider.SNAPSHOTS, values, selection, selectionArgs);
 
-            break;
+                break;
         }
 
         if (c != null && c.isClosed() == false)
@@ -185,43 +187,45 @@ public class RobotContentProvider extends ContentProvider
         {
             switch (this._uriMatcher.match(uri))
             {
-            case RobotContentProvider.RECENT_PROBE_VALUE_LIST:
-                result = db.update(RobotContentProvider.RECENT_PROBE_VALUES_TABLE, values, selection, selectionArgs);
+                case RobotContentProvider.RECENT_PROBE_VALUE_LIST:
+                    result = db.update(RobotContentProvider.RECENT_PROBE_VALUES_TABLE, values, selection, selectionArgs);
 
-                if (result == 0)
-                {
-                    db.insert(RobotContentProvider.RECENT_PROBE_VALUES_TABLE, null, values);
+                    if (result == 0)
+                    {
+                        db.insert(RobotContentProvider.RECENT_PROBE_VALUES_TABLE, null, values);
 
-                    result = 1;
-                }
+                        result = 1;
+                    }
 
-                break;
-            case RobotContentProvider.RECENT_PROBE_VALUE:
-                result = this.updateOrInsert(uri, values, this.buildSingleSelection(selection),
-                        this.buildSingleSelectionArgs(uri, selectionArgs));
-                break;
+                    break;
+                case RobotContentProvider.RECENT_PROBE_VALUE:
+                    result = this.updateOrInsert(uri, values, this.buildSingleSelection(selection),
+                            this.buildSingleSelectionArgs(uri, selectionArgs));
+                    break;
 
-            case RobotContentProvider.SNAPSHOT_LIST:
-                result = db.update(RobotContentProvider.SNAPSHOTS_TABLE, values, selection, selectionArgs);
+                case RobotContentProvider.SNAPSHOT_LIST:
+                    result = db.update(RobotContentProvider.SNAPSHOTS_TABLE, values, selection, selectionArgs);
 
-                if (result == 0)
-                {
-                    db.insert(RobotContentProvider.SNAPSHOTS_TABLE, null, values);
+                    if (result == 0)
+                    {
+                        db.insert(RobotContentProvider.SNAPSHOTS_TABLE, null, values);
 
-                    result = 1;
-                }
+                        result = 1;
+                    }
 
-                break;
-            case RobotContentProvider.SNAPSHOT:
-                result = this.updateOrInsert(uri, values, this.buildSingleSelection(selection),
-                        this.buildSingleSelectionArgs(uri, selectionArgs));
-                break;
+                    break;
+                case RobotContentProvider.SNAPSHOT:
+                    result = this.updateOrInsert(uri, values, this.buildSingleSelection(selection),
+                            this.buildSingleSelectionArgs(uri, selectionArgs));
+                    break;
             }
         }
         catch (SQLiteException e)
         {
             LogManager.getInstance(this.getContext()).logException(e);
         }
+
+        db.close();
 
         return result;
     }
@@ -230,14 +234,14 @@ public class RobotContentProvider extends ContentProvider
     {
         switch (this._uriMatcher.match(uri))
         {
-        case RobotContentProvider.RECENT_PROBE_VALUE_LIST:
-            return "vnd.android.cursor.dir/vnd.edu.northwestern.cbits.purple_robot_manager.content.recent_probe_value";
-        case RobotContentProvider.RECENT_PROBE_VALUE:
-            return "vnd.android.cursor.item/vnd.edu.northwestern.cbits.purple_robot_manager.content.recent_probe_value";
-        case RobotContentProvider.SNAPSHOT_LIST:
-            return "vnd.android.cursor.dir/vnd.edu.northwestern.cbits.purple_robot_manager.content.snapshot";
-        case RobotContentProvider.SNAPSHOT:
-            return "vnd.android.cursor.item/vnd.edu.northwestern.cbits.purple_robot_manager.content.snapshot";
+            case RobotContentProvider.RECENT_PROBE_VALUE_LIST:
+                return "vnd.android.cursor.dir/vnd.edu.northwestern.cbits.purple_robot_manager.content.recent_probe_value";
+            case RobotContentProvider.RECENT_PROBE_VALUE:
+                return "vnd.android.cursor.item/vnd.edu.northwestern.cbits.purple_robot_manager.content.recent_probe_value";
+            case RobotContentProvider.SNAPSHOT_LIST:
+                return "vnd.android.cursor.dir/vnd.edu.northwestern.cbits.purple_robot_manager.content.snapshot";
+            case RobotContentProvider.SNAPSHOT:
+                return "vnd.android.cursor.item/vnd.edu.northwestern.cbits.purple_robot_manager.content.snapshot";
         }
 
         return null;
@@ -247,27 +251,29 @@ public class RobotContentProvider extends ContentProvider
     {
         SQLiteDatabase db = this._openHelper.getReadableDatabase();
 
+        Cursor c = null;
         switch (this._uriMatcher.match(uri))
         {
-        case RobotContentProvider.RECENT_PROBE_VALUE_LIST:
-            return db.query(RobotContentProvider.RECENT_PROBE_VALUES_TABLE, projection, selection, selectionArgs, null,
-                    null, sortOrder);
-        case RobotContentProvider.RECENT_PROBE_VALUE:
-            return db.query(RobotContentProvider.RECENT_PROBE_VALUES_TABLE, projection,
-                    this.buildSingleSelection(selection), this.buildSingleSelectionArgs(uri, selectionArgs), null,
-                    null, sortOrder);
-        case RobotContentProvider.SNAPSHOT_LIST:
-            return db.query(RobotContentProvider.SNAPSHOTS_TABLE, projection, selection, selectionArgs, null, null,
-                    sortOrder);
-        case RobotContentProvider.SNAPSHOT:
-            return db.query(RobotContentProvider.SNAPSHOTS_TABLE, projection, this.buildSingleSelection(selection),
-                    this.buildSingleSelectionArgs(uri, selectionArgs), null, null, sortOrder);
+            case RobotContentProvider.RECENT_PROBE_VALUE_LIST:
+                c = db.query(RobotContentProvider.RECENT_PROBE_VALUES_TABLE, projection, selection, selectionArgs, null, null, sortOrder);
+                break;
+            case RobotContentProvider.RECENT_PROBE_VALUE:
+                c = db.query(RobotContentProvider.RECENT_PROBE_VALUES_TABLE, projection, this.buildSingleSelection(selection), this.buildSingleSelectionArgs(uri, selectionArgs), null, null, sortOrder);
+                break;
+            case RobotContentProvider.SNAPSHOT_LIST:
+                c = db.query(RobotContentProvider.SNAPSHOTS_TABLE, projection, selection, selectionArgs, null, null, sortOrder);
+                break;
+            case RobotContentProvider.SNAPSHOT:
+                c = db.query(RobotContentProvider.SNAPSHOTS_TABLE, projection, this.buildSingleSelection(selection), this.buildSingleSelectionArgs(uri, selectionArgs), null, null, sortOrder);
+                break;
         }
 
-        String[] colNames =
-        { "_id" };
+        String[] colNames = { "_id" };
 
-        return new MatrixCursor(colNames);
+        if (c == null)
+            c = new MatrixCursor(colNames);
+
+        return c;
     }
 
     public String[] buildSingleSelectionArgs(Uri uri, String[] selectionArgs)

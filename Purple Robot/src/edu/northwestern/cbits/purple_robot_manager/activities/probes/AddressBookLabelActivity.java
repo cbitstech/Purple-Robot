@@ -77,20 +77,21 @@ public class AddressBookLabelActivity extends AppCompatActivity
     {
         super.onCreateContextMenu(menu, v, menuInfo);
 
-        ContactRecord contact = this._contacts.get(this._clickedIndex);
+        if (this._clickedIndex != -1) {
+            ContactRecord contact = this._contacts.get(this._clickedIndex);
 
-        if ("".equals(contact.name) == false)
-            menu.setHeaderTitle(contact.name);
-        else
-            menu.setHeaderTitle(contact.number);
+            if ("".equals(contact.name) == false)
+                menu.setHeaderTitle(contact.name);
+            else
+                menu.setHeaderTitle(contact.number);
 
-        String[] groups = this.getResources().getStringArray(R.array.contact_groups);
+            String[] groups = this.getResources().getStringArray(R.array.contact_groups);
 
-        for (int i = 0; i < groups.length; i++)
-        {
-            String group = groups[i];
+            for (int i = 0; i < groups.length; i++) {
+                String group = groups[i];
 
-            menu.add(Menu.NONE, i, i, group);
+                menu.add(Menu.NONE, i, i, group);
+            }
         }
     }
 

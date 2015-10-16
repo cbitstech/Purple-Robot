@@ -119,7 +119,6 @@ public class AudioFeaturesProbe extends Probe
             if (this._recording == false && enabled)
             {
                 if (ContextCompat.checkSelfPermission(context, "android.permission.RECORD_AUDIO") == PackageManager.PERMISSION_GRANTED) {
-
                     long now = System.currentTimeMillis();
 
                     long freq = Long.parseLong(prefs.getString(AudioFeaturesProbe.FREQUENCY, Probe.DEFAULT_FREQUENCY));
@@ -151,6 +150,17 @@ public class AudioFeaturesProbe extends Probe
                                             newRecorder.release();
                                     }
                                 }
+
+                                if (recorder == null)
+                                {
+                                    me._recording = false;
+
+                                    SanityManager.getInstance(context).addAlert(SanityCheck.WARNING, context.getString(R.string.name_sanity_audio_features_title), context.getString(R.string.name_sanity_audio_features_warning), null);
+
+                                    return;
+                                }
+
+                                SanityManager.getInstance(context).clearAlert(context.getString(R.string.name_sanity_audio_features_title));
 
                                 int sampleCount = recorder.getSampleRate() * (duration / 1000);
 

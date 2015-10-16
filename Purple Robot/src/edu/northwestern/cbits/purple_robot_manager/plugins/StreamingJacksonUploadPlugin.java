@@ -140,9 +140,10 @@ public class StreamingJacksonUploadPlugin extends DataUploadPlugin
                                     }
                                 });
 
-
-                                for (String filename : regularFilenames)
-                                    me._regularFilenames.add(filename);
+                                if (regularFilenames != null) {
+                                    for (String filename : regularFilenames)
+                                        me._regularFilenames.add(filename);
+                                }
                             }
 
                             filenames = me._regularFilenames.toArray(new String[0]);
