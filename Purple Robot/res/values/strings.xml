@@ -1565,6 +1565,9 @@
     <string name="name_sanity_android_five_memory">Android 5.0 Runtime Check</string>
     <string name="name_sanity_android_five_memory_warning">Your device is likely to experience widespread instability due to a system memory leak, causing Purple Robot and other apps to crash. Please restart your device to reclaim the leaked resources.</string>
 
+    <string name="name_sanity_audio_features_title">Unable to Sample Audio</string>
+    <string name="name_sanity_audio_features_warning">Unable to configure microphone to collect audio frequency and power levels.</string>
+
     <!-- Documentation Strings -->
     <string name="docs_script_category_unknown">Unknown</string>
     <string name="docs_script_category_todo">TODO / Incomplete</string>

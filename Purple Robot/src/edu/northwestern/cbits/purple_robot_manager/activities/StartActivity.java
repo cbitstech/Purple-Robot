@@ -193,7 +193,9 @@ public class StartActivity extends AppCompatActivity
 
         final SimpleDateFormat sdf = new SimpleDateFormat("MMM d, H:mm:ss");
 
-        Cursor c = this.getContentResolver().query(RobotContentProvider.RECENT_PROBE_VALUES, null, null, null, "recorded DESC");
+        String[] projection = { "_id", "source", "recorded", "value" };
+
+        Cursor c = this.getContentResolver().query(RobotContentProvider.RECENT_PROBE_VALUES, projection, null, null, "recorded DESC");
 
         final CursorAdapter adapter = new CursorAdapter(this, c, true)
         {

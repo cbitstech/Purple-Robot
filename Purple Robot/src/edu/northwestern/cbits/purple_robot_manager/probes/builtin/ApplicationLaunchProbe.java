@@ -224,7 +224,6 @@ public class ApplicationLaunchProbe extends Probe
 
                                     synchronized(usage)
                                     {
-
                                         final String title = context.getString(R.string.title_app_usage_data_required);
                                         final String message = context.getString(R.string.message_app_usage_data_required);
 
