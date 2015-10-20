@@ -695,9 +695,31 @@
         <item>sounds/vision-i/Off.m4a</item>
         <item>sounds/vision-i/On.m4a</item>
    	</string-array>
-   	
 
-	<string-array name="probe_distance_frequency_values">
+    <string-array name="probe_fitbit_retrospective_values">
+        <item>1</item>
+        <item>3</item>
+        <item>5</item>
+        <item>7</item>
+        <item>14</item>
+        <item>30</item>
+        <item>60</item>
+        <item>90</item>
+    </string-array>
+
+    <string-array name="probe_fitbit_retrospective_labels">
+        <item>1 day</item>
+        <item>3 days</item>
+        <item>5 days</item>
+        <item>7 days</item>
+        <item>14 days</item>
+        <item>30 days</item>
+        <item>60 days</item>
+        <item>90 days</item>
+    </string-array>
+
+
+    <string-array name="probe_distance_frequency_values">
         <item>600000</item>
         <item>1800000</item>
         <item>3600000</item>
