@@ -20,10 +20,15 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.Map;
 
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
@@ -35,6 +40,8 @@ import edu.northwestern.cbits.xsi.oauth.OAuthActivity;
 public class FitbitBetaProbe extends Probe
 {
     public final static String PROBE_NAME = "edu.northwestern.cbits.purple_robot_manager.probes.services.FitbitBetaProbe";
+
+    public static final String COVERED_RANGES = "fitbit-beta_covered_ranges";
 
     protected static final String STEPS = "STEPS";
     public static final String STEP_TIMESTAMPS = "STEP_TIMESTAMPS";
@@ -73,14 +80,176 @@ public class FitbitBetaProbe extends Probe
     private static final String ENABLE_ELEVATION = "config_fitbit-beta_enable_elevation";
     private static final boolean DEFAULT_ENABLE_ELEVATION = false;
 
-    private static final String LAST_STEP_TIMESTAMP = "config_fitbit-beta_last_step_timestamp";
-    private static final String LAST_HEART_TIMESTAMP = "config_fitbit-beta_last_heart_timestamp";
+    private static final String RETROSPECTIVE_PERIOD = "config_fitbit-beta_retrospective_period";
+    private static final String DEFAULT_RETROSPECTIVE_PERIOD = "7";
+
+
+//    private static final String LAST_STEP_TIMESTAMP = "config_fitbit-beta_last_step_timestamp";
+//    private static final String LAST_HEART_TIMESTAMP = "config_fitbit-beta_last_heart_timestamp";
     private static final String LAST_CALORIE_TIMESTAMP = "config_fitbit-beta_last_calorie_timestamp";
-    private static final String LAST_FLOOR_TIMESTAMP = "config_fitbit-beta_last_floor_timestamp";
-    private static final String LAST_DISTANCE_TIMESTAMP = "config_fitbit-beta_last_distance_timestamp";
-    private static final String LAST_ELEVATION_TIMESTAMP = "config_fitbit-beta_last_elevation_timestamp";
+//    private static final String LAST_FLOOR_TIMESTAMP = "config_fitbit-beta_last_floor_timestamp";
+//    private static final String LAST_DISTANCE_TIMESTAMP = "config_fitbit-beta_last_distance_timestamp";
+//    private static final String LAST_ELEVATION_TIMESTAMP = "config_fitbit-beta_last_elevation_timestamp";
 
     private long _lastUpdate = 0;
+
+    public static class MinuteRange
+    {
+        public long start = 0;
+        public long end = 0;
+
+        public MinuteRange(long minute)
+        {
+            this.start = minute;
+            this.end = minute;
+        }
+
+        public MinuteRange(long start, long end)
+        {
+            this.start = start;
+            this.end = end;
+        }
+
+        public static MinuteRange rangeFromString(String token)
+        {
+            if (token.contains("-"))
+            {
+                String[] tokens = token.split("-");
+
+                return new MinuteRange(Long.parseLong(tokens[0]), Long.parseLong(tokens[1]));
+            }
+
+            return new MinuteRange(Long.parseLong(token));
+        }
+
+        public String toString()
+        {
+            if (start == end)
+                return "" + start;
+
+            return (start + "-" + end);
+        }
+
+        public boolean containsMinute(long minute)
+        {
+            return ((this.start) <= minute && (this.end >= minute));
+        }
+
+        public boolean overlaps(MinuteRange range)
+        {
+            if (this.start >= range.start && this.start <= range.end)
+                return true;
+            else if (this.end >= range.start && this.end <= range.end)
+                return true;
+            else if (range.start >= this.start && range.start <= this.end)
+                return true;
+            else if (range.end >= this.start && range.end <= this.end)
+                return true;
+
+            return false;
+        }
+
+        public void merge(MinuteRange range) {
+            if (range.start < this.start)
+                this.start = range.start;
+
+            if (range.end > this.end)
+                this.end = range.end;
+        }
+    }
+
+    public static class MinuteRanges
+    {
+        ArrayList<MinuteRange> ranges = new ArrayList<>();
+
+        public void addMinute(long minute)
+        {
+            for (MinuteRange range : this.ranges)
+            {
+                if (range.start - 1 == minute)
+                {
+                    range.start = minute;
+
+                    return;
+                }
+
+                if (range.end + 1 == minute)
+                {
+                    range.end = minute;
+
+                    return;
+                }
+            }
+
+            this.ranges.add(new MinuteRange(minute));
+        }
+
+        public void addRange(MinuteRange range)
+        {
+            this.ranges.add(range);
+        }
+
+        public boolean containsMinute(long minute)
+        {
+            for (MinuteRange range : this.ranges)
+            {
+                if (range.containsMinute(minute))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public String coalescedJSON()
+        {
+            Collections.sort(this.ranges, new Comparator<MinuteRange>() {
+                @Override
+                public int compare(MinuteRange one, MinuteRange two) {
+                    if (one.start < two.start)
+                        return -1;
+                    else if (one.start > two.start)
+                        return 1;
+
+                    return 0;
+                }
+            });
+
+            ArrayList<MinuteRange> newRanges = new ArrayList<>();
+
+            for (MinuteRange range : this.ranges)
+            {
+                boolean add = true;
+
+                for (MinuteRange newRange : newRanges)
+                {
+                    if (newRange.overlaps(range)) {
+                        newRange.merge(range);
+                        add = false;
+                    }
+                }
+
+                if (add)
+                    newRanges.add(range);
+            }
+
+            JSONArray jsonArray = new JSONArray();
+
+            for (MinuteRange newRange : newRanges)
+            {
+                jsonArray.put(newRange.toString());
+            }
+
+            int oldCount = this.ranges.size();
+            int newCount = newRanges.size();
+
+            this.ranges = newRanges;
+
+            if (oldCount != newCount)
+                return this.coalescedJSON();
+
+            return jsonArray.toString();
+        }
+    }
 
     @Override
     public String summary(Context context)
@@ -178,8 +347,13 @@ public class FitbitBetaProbe extends Probe
 
                     sanity.clearAlert(title);
 
-                    if (now - this._lastUpdate > 1000 * 60 * 5)
+                    final String warningTitle = context.getString(R.string.config_probe_fitbit_rate_limit_warning_title);
+                    final String warningMessage = context.getString(R.string.config_probe_fitbit_rate_limit_warning);
+
+                    if (now - this._lastUpdate > 1000 * 60 * 10)
                     {
+                        sanity.clearAlert(warningTitle);
+
                         this._lastUpdate = now;
 
                         Runnable r = new Runnable()
@@ -197,391 +371,460 @@ public class FitbitBetaProbe extends Probe
                                         Keystore.put(FitbitBetaApi.USER_TOKEN_EXPIRES, "" + expires);
                                     }
 
-                                    Bundle bundle = new Bundle();
-                                    bundle.putString(Probe.BUNDLE_PROBE, me.name(context));
-                                    bundle.putLong(Probe.BUNDLE_TIMESTAMP, System.currentTimeMillis() / 1000);
+                                    int retrospectivePeriod = Integer.parseInt(prefs.getString(FitbitBetaProbe.RETROSPECTIVE_PERIOD, FitbitBetaProbe.DEFAULT_RETROSPECTIVE_PERIOD));
 
-                                    boolean transmit = false;
+                                    ArrayList<Long> minutesToEval = new ArrayList<>();
 
-                                    if (prefs.getBoolean(FitbitBetaProbe.ENABLE_STEPS, FitbitBetaProbe.DEFAULT_ENABLE_STEPS))
+                                    for(int i = 0; i < (retrospectivePeriod * 24 * 60); i++)
+                                        minutesToEval.add((now / (60 * 1000)) - i);
+
+                                    ArrayList<Long> minutesToSkip = new ArrayList<>();
+
+                                    JSONArray coveredRanges = new JSONArray(prefs.getString(FitbitBetaProbe.COVERED_RANGES, "[]"));
+
+                                    MinuteRanges coveredMinutes = new MinuteRanges();
+
+                                    for (int i = 0; i < coveredRanges.length(); i++)
                                     {
-                                        long lastUpdate = prefs.getLong(FitbitBetaProbe.LAST_STEP_TIMESTAMP, 0);
+                                        coveredMinutes.addRange(MinuteRange.rangeFromString(coveredRanges.getString(i)));
+                                    }
 
-                                        try {
-                                            JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/steps/date/today/1d/1min.json"));
+                                    String coveredMinutesString = coveredMinutes.coalescedJSON();
 
-                                            JSONObject stepsIntraday = stepsObj.getJSONObject("activities-steps-intraday");
-                                            JSONArray stepsValues = stepsIntraday.getJSONArray("dataset");
+                                    for (long minute : minutesToEval)
+                                    {
+                                        if (coveredMinutes.containsMinute(minute))
+                                            minutesToSkip.add(minute);
+                                    }
 
-                                            ArrayList<Long> stepTimestamps = new ArrayList<>();
-                                            ArrayList<Long> valueList = new ArrayList<>();
+                                    minutesToEval.removeAll(minutesToSkip);
 
-                                            Calendar c = Calendar.getInstance();
+                                    HashSet<Long> evaledDays = new HashSet<>();
 
-                                            for (int i = 0; i < stepsValues.length(); i++) {
-                                                JSONObject value = stepsValues.getJSONObject(i);
+                                    Calendar cal = Calendar.getInstance();
 
-                                                String time = value.getString("time");
+                                    long lastMinute = -1;
 
-                                                String[] tokens = time.split(":");
+                                    for (long minute : minutesToEval)
+                                    {
+                                        lastMinute = minute;
 
-                                                c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tokens[0]));
-                                                c.set(Calendar.MINUTE, Integer.parseInt(tokens[1]));
-                                                c.set(Calendar.SECOND, Integer.parseInt(tokens[2]));
-                                                c.set(Calendar.MILLISECOND, 0);
+                                        if (evaledDays.contains(minute / (24 * 60)))
+                                        {
 
-                                                long timestamp = c.getTimeInMillis();
-                                                long valueQty = value.getLong("value");
+                                        }
+                                        else
+                                        {
+                                            cal.setTimeInMillis(minute * 60 * 1000);
 
-                                                if (timestamp > lastUpdate && valueQty > 0) {
-                                                    stepTimestamps.add(timestamp);
-                                                    lastUpdate = timestamp;
+                                            String month = "" + (cal.get(Calendar.MONTH) + 1);
 
-                                                    valueList.add(valueQty);
+                                            if (month.length() < 2)
+                                                month = "0" + month;
+
+
+                                            String monthDay = "" + cal.get(Calendar.DAY_OF_MONTH);
+
+                                            if (monthDay.length() < 2)
+                                                monthDay = "0" + monthDay;
+
+
+                                            String dayString = cal.get(Calendar.YEAR) + "-" + month + "-" + monthDay;
+
+                                            Bundle bundle = new Bundle();
+
+                                            bundle.putString(Probe.BUNDLE_PROBE, me.name(context));
+                                            bundle.putLong(Probe.BUNDLE_TIMESTAMP, System.currentTimeMillis() / 1000);
+
+                                            boolean transmit = false;
+
+                                            HashSet<Long> minutesToday = new HashSet<>();
+
+                                            if (prefs.getBoolean(FitbitBetaProbe.ENABLE_STEPS, FitbitBetaProbe.DEFAULT_ENABLE_STEPS)) {
+                                                try {
+                                                    JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/steps/date/" + dayString + "/1d/1min.json"));
+
+                                                    JSONObject stepsIntraday = stepsObj.getJSONObject("activities-steps-intraday");
+                                                    JSONArray stepsValues = stepsIntraday.getJSONArray("dataset");
+
+                                                    ArrayList<Long> stepTimestamps = new ArrayList<>();
+                                                    ArrayList<Long> valueList = new ArrayList<>();
+
+                                                    Calendar c = Calendar.getInstance();
+
+                                                    for (int i = 0; i < stepsValues.length(); i++) {
+                                                        JSONObject value = stepsValues.getJSONObject(i);
+
+                                                        String time = value.getString("time");
+
+                                                        String[] tokens = time.split(":");
+
+                                                        c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tokens[0]));
+                                                        c.set(Calendar.MINUTE, Integer.parseInt(tokens[1]));
+                                                        c.set(Calendar.SECOND, Integer.parseInt(tokens[2]));
+                                                        c.set(Calendar.MILLISECOND, 0);
+
+                                                        long timestamp = c.getTimeInMillis();
+                                                        long valueQty = value.getLong("value");
+
+                                                        if (coveredMinutes.containsMinute(minute) == false && valueQty > 0) {
+                                                            stepTimestamps.add(timestamp);
+
+                                                            valueList.add(valueQty);
+
+                                                            minutesToday.add(timestamp / (60 * 1000));
+                                                        }
+                                                    }
+
+                                                    long[] timestamps = new long[stepTimestamps.size()];
+                                                    long[] steps = new long[stepTimestamps.size()];
+
+                                                    for (int i = 0; i < stepTimestamps.size(); i++) {
+                                                        timestamps[i] = stepTimestamps.get(i);
+                                                        steps[i] = valueList.get(i);
+                                                    }
+
+                                                    bundle.putLongArray(FitbitBetaProbe.STEP_TIMESTAMPS, timestamps);
+                                                    bundle.putLongArray(FitbitBetaProbe.STEPS, steps);
+
+                                                    transmit = true;
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
+
+                                                    me._lastUpdate = System.currentTimeMillis() + (1000 * 60 * 15);
+
+                                                    SanityManager.getInstance(context).addAlert(SanityCheck.WARNING, warningTitle, warningMessage, null);
+
+                                                    break;
                                                 }
                                             }
 
-                                            long[] timestamps = new long[stepTimestamps.size()];
-                                            long[] steps = new long[stepTimestamps.size()];
+                                            if (prefs.getBoolean(FitbitBetaProbe.ENABLE_CALORIES, FitbitBetaProbe.DEFAULT_ENABLE_CALORIES)) {
+                                                long lastUpdate = prefs.getLong(FitbitBetaProbe.LAST_CALORIE_TIMESTAMP, 0);
 
-                                            for (int i = 0; i < stepTimestamps.size(); i++) {
-                                                timestamps[i] = stepTimestamps.get(i);
-                                                steps[i] = valueList.get(i);
+                                                try {
+                                                    JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/calories/date/" + dayString + "/1d/1min.json"));
+
+                                                    JSONObject intraday = stepsObj.getJSONObject("activities-calories-intraday");
+                                                    JSONArray valuesArray = intraday.getJSONArray("dataset");
+
+                                                    ArrayList<Long> valueTimestamps = new ArrayList<>();
+                                                    ArrayList<Long> valueList = new ArrayList<>();
+
+                                                    Calendar c = Calendar.getInstance();
+
+                                                    for (int i = 0; i < valuesArray.length(); i++) {
+                                                        JSONObject value = valuesArray.getJSONObject(i);
+
+                                                        String time = value.getString("time");
+
+                                                        String[] tokens = time.split(":");
+
+                                                        c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tokens[0]));
+                                                        c.set(Calendar.MINUTE, Integer.parseInt(tokens[1]));
+                                                        c.set(Calendar.SECOND, Integer.parseInt(tokens[2]));
+                                                        c.set(Calendar.MILLISECOND, 0);
+
+                                                        long timestamp = c.getTimeInMillis();
+                                                        long valueQty = value.getLong("value");
+
+                                                        if (timestamp > lastUpdate && valueQty > 0) {
+                                                            valueTimestamps.add(timestamp);
+                                                            lastUpdate = timestamp;
+
+                                                            valueList.add(valueQty);
+
+                                                            // Don't add to evaled since automatically calculated...
+                                                        }
+                                                    }
+
+                                                    long[] timestamps = new long[valueTimestamps.size()];
+                                                    long[] values = new long[valueList.size()];
+
+                                                    for (int i = 0; i < valueTimestamps.size(); i++) {
+                                                        timestamps[i] = valueTimestamps.get(i);
+                                                        values[i] = valueList.get(i);
+                                                    }
+
+                                                    bundle.putLongArray(FitbitBetaProbe.CALORIES_TIMESTAMPS, timestamps);
+                                                    bundle.putLongArray(FitbitBetaProbe.CALORIES, values);
+
+                                                    Editor e = prefs.edit();
+                                                    e.putLong(FitbitBetaProbe.LAST_CALORIE_TIMESTAMP, lastUpdate);
+                                                    e.commit();
+
+                                                    transmit = true;
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
+
+                                                    me._lastUpdate = System.currentTimeMillis() + (1000 * 60 * 15);
+
+                                                    SanityManager.getInstance(context).addAlert(SanityCheck.WARNING, warningTitle, warningMessage, null);
+
+                                                    break;
+                                                }
                                             }
 
-                                            bundle.putLongArray(FitbitBetaProbe.STEP_TIMESTAMPS, timestamps);
-                                            bundle.putLongArray(FitbitBetaProbe.STEPS, steps);
+                                            if (prefs.getBoolean(FitbitBetaProbe.ENABLE_DISTANCE, FitbitBetaProbe.DEFAULT_ENABLE_DISTANCE)) {
+                                                try {
+                                                    JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/distance/date/" + dayString + "/1d/1min.json"));
 
-                                            Editor e = prefs.edit();
-                                            e.putLong(FitbitBetaProbe.LAST_STEP_TIMESTAMP, lastUpdate);
-                                            e.commit();
+                                                    JSONObject intraday = stepsObj.getJSONObject("activities-distance-intraday");
+                                                    JSONArray valuesArray = intraday.getJSONArray("dataset");
 
-                                            transmit = true;
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            e.printStackTrace();
-                                        }
-                                    }
+                                                    ArrayList<Long> valueTimestamps = new ArrayList<>();
+                                                    ArrayList<Long> valueList = new ArrayList<>();
 
-                                    if (prefs.getBoolean(FitbitBetaProbe.ENABLE_CALORIES, FitbitBetaProbe.DEFAULT_ENABLE_CALORIES))
-                                    {
-                                        long lastUpdate = prefs.getLong(FitbitBetaProbe.LAST_CALORIE_TIMESTAMP, 0);
+                                                    Calendar c = Calendar.getInstance();
 
-                                        try
-                                        {
-                                            JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/calories/date/today/1d/1min.json"));
+                                                    for (int i = 0; i < valuesArray.length(); i++) {
+                                                        JSONObject value = valuesArray.getJSONObject(i);
 
-                                            JSONObject intraday = stepsObj.getJSONObject("activities-calories-intraday");
-                                            JSONArray valuesArray = intraday.getJSONArray("dataset");
+                                                        String time = value.getString("time");
 
-                                            ArrayList<Long> valueTimestamps = new ArrayList<>();
-                                            ArrayList<Long> valueList = new ArrayList<>();
+                                                        String[] tokens = time.split(":");
 
-                                            Calendar c = Calendar.getInstance();
+                                                        c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tokens[0]));
+                                                        c.set(Calendar.MINUTE, Integer.parseInt(tokens[1]));
+                                                        c.set(Calendar.SECOND, Integer.parseInt(tokens[2]));
+                                                        c.set(Calendar.MILLISECOND, 0);
 
-                                            for (int i = 0; i < valuesArray.length(); i++)
+                                                        long timestamp = c.getTimeInMillis();
+                                                        long valueQty = value.getLong("value");
+
+                                                        if (coveredMinutes.containsMinute(minute) == false && valueQty > 0) {
+                                                            valueTimestamps.add(timestamp);
+
+                                                            valueList.add(valueQty);
+
+                                                            minutesToday.add(timestamp / (60 * 1000));
+                                                        }
+                                                    }
+
+                                                    long[] timestamps = new long[valueTimestamps.size()];
+                                                    long[] values = new long[valueList.size()];
+
+                                                    for (int i = 0; i < valueTimestamps.size(); i++) {
+                                                        timestamps[i] = valueTimestamps.get(i);
+                                                        values[i] = valueList.get(i);
+                                                    }
+
+                                                    bundle.putLongArray(FitbitBetaProbe.DISTANCE_TIMESTAMPS, timestamps);
+                                                    bundle.putLongArray(FitbitBetaProbe.DISTANCE, values);
+
+                                                    transmit = true;
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
+
+                                                    me._lastUpdate = System.currentTimeMillis() + (1000 * 60 * 15);
+
+                                                    SanityManager.getInstance(context).addAlert(SanityCheck.WARNING, warningTitle, warningMessage, null);
+
+                                                    break;
+                                                }
+                                            }
+
+                                            if (prefs.getBoolean(FitbitBetaProbe.ENABLE_FLOORS, FitbitBetaProbe.DEFAULT_ENABLE_FLOORS)) {
+                                                try {
+                                                    JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/floors/date/" + dayString + "/1d/1min.json"));
+
+                                                    JSONObject intraday = stepsObj.getJSONObject("activities-floors-intraday");
+                                                    JSONArray valuesArray = intraday.getJSONArray("dataset");
+
+                                                    ArrayList<Long> valueTimestamps = new ArrayList<>();
+                                                    ArrayList<Long> valueList = new ArrayList<>();
+
+                                                    Calendar c = Calendar.getInstance();
+
+                                                    for (int i = 0; i < valuesArray.length(); i++) {
+                                                        JSONObject value = valuesArray.getJSONObject(i);
+
+                                                        String time = value.getString("time");
+
+                                                        String[] tokens = time.split(":");
+
+                                                        c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tokens[0]));
+                                                        c.set(Calendar.MINUTE, Integer.parseInt(tokens[1]));
+                                                        c.set(Calendar.SECOND, Integer.parseInt(tokens[2]));
+                                                        c.set(Calendar.MILLISECOND, 0);
+
+                                                        long timestamp = c.getTimeInMillis();
+                                                        long valueQty = value.getLong("value");
+
+                                                        if (coveredMinutes.containsMinute(minute) == false && valueQty > 0) {
+                                                            valueTimestamps.add(timestamp);
+
+                                                            valueList.add(valueQty);
+
+                                                            minutesToday.add(timestamp / (60 * 1000));
+                                                        }
+                                                    }
+
+                                                    long[] timestamps = new long[valueTimestamps.size()];
+                                                    long[] values = new long[valueList.size()];
+
+                                                    for (int i = 0; i < valueTimestamps.size(); i++) {
+                                                        timestamps[i] = valueTimestamps.get(i);
+                                                        values[i] = valueList.get(i);
+                                                    }
+
+                                                    bundle.putLongArray(FitbitBetaProbe.FLOORS_TIMESTAMPS, timestamps);
+                                                    bundle.putLongArray(FitbitBetaProbe.FLOORS, values);
+
+                                                    transmit = true;
+                                                } catch (JSONException e) {
+                                                    e.printStackTrace();
+
+                                                    me._lastUpdate = System.currentTimeMillis() + (1000 * 60 * 15);
+
+                                                    SanityManager.getInstance(context).addAlert(SanityCheck.WARNING, warningTitle, warningMessage, null);
+
+                                                    break;
+                                                }
+                                            }
+
+                                            if (prefs.getBoolean(FitbitBetaProbe.ENABLE_HEART, FitbitBetaProbe.DEFAULT_ENABLE_HEART)) {
+                                                try {
+                                                    JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/heart/date/" + dayString + "/1d/1min.json"));
+
+                                                    JSONObject intraday = stepsObj.getJSONObject("activities-heart-intraday");
+                                                    JSONArray valuesArray = intraday.getJSONArray("dataset");
+
+                                                    ArrayList<Long> valueTimestamps = new ArrayList<>();
+                                                    ArrayList<Long> valueList = new ArrayList<>();
+
+                                                    Calendar c = Calendar.getInstance();
+
+                                                    for (int i = 0; i < valuesArray.length(); i++) {
+                                                        JSONObject value = valuesArray.getJSONObject(i);
+
+                                                        String time = value.getString("time");
+
+                                                        String[] tokens = time.split(":");
+
+                                                        c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tokens[0]));
+                                                        c.set(Calendar.MINUTE, Integer.parseInt(tokens[1]));
+                                                        c.set(Calendar.SECOND, Integer.parseInt(tokens[2]));
+                                                        c.set(Calendar.MILLISECOND, 0);
+
+                                                        long timestamp = c.getTimeInMillis();
+                                                        long valueQty = value.getLong("value");
+
+                                                        if (coveredMinutes.containsMinute(minute) == false && valueQty > 0) {
+                                                            valueTimestamps.add(timestamp);
+
+                                                            valueList.add(valueQty);
+
+                                                            minutesToday.add(timestamp / (60 * 1000));
+                                                        }
+                                                    }
+
+                                                    long[] timestamps = new long[valueTimestamps.size()];
+                                                    long[] values = new long[valueList.size()];
+
+                                                    for (int i = 0; i < valueTimestamps.size(); i++) {
+                                                        timestamps[i] = valueTimestamps.get(i);
+                                                        values[i] = valueList.get(i);
+                                                    }
+
+                                                    bundle.putLongArray(FitbitBetaProbe.HEART_TIMESTAMPS, timestamps);
+                                                    bundle.putLongArray(FitbitBetaProbe.HEART, values);
+
+                                                    transmit = true;
+                                                } catch (JSONException e) {
+                                                    e.printStackTrace();
+
+                                                    me._lastUpdate = System.currentTimeMillis() + (1000 * 60 * 15);
+
+                                                    SanityManager.getInstance(context).addAlert(SanityCheck.WARNING, warningTitle, warningMessage, null);
+
+                                                    break;
+                                                }
+                                            }
+
+                                            if (prefs.getBoolean(FitbitBetaProbe.ENABLE_ELEVATION, FitbitBetaProbe.DEFAULT_ENABLE_ELEVATION)) {
+                                                try {
+                                                    JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/elevation/date/" + dayString + "/1d/1min.json"));
+
+                                                    JSONObject intraday = stepsObj.getJSONObject("activities-elevation-intraday");
+                                                    JSONArray valuesArray = intraday.getJSONArray("dataset");
+
+                                                    ArrayList<Long> valueTimestamps = new ArrayList<>();
+                                                    ArrayList<Long> valueList = new ArrayList<>();
+
+                                                    Calendar c = Calendar.getInstance();
+
+                                                    for (int i = 0; i < valuesArray.length(); i++) {
+                                                        JSONObject value = valuesArray.getJSONObject(i);
+
+                                                        String time = value.getString("time");
+
+                                                        String[] tokens = time.split(":");
+
+                                                        c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tokens[0]));
+                                                        c.set(Calendar.MINUTE, Integer.parseInt(tokens[1]));
+                                                        c.set(Calendar.SECOND, Integer.parseInt(tokens[2]));
+                                                        c.set(Calendar.MILLISECOND, 0);
+
+                                                        long timestamp = c.getTimeInMillis();
+                                                        long valueQty = value.getLong("value");
+
+                                                        if (coveredMinutes.containsMinute(minute) == false && valueQty > 0) {
+                                                            valueTimestamps.add(timestamp);
+
+                                                            valueList.add(valueQty);
+
+                                                            minutesToday.add(timestamp / (60 * 1000));
+                                                        }
+                                                    }
+
+                                                    long[] timestamps = new long[valueTimestamps.size()];
+                                                    long[] values = new long[valueList.size()];
+
+                                                    for (int i = 0; i < valueTimestamps.size(); i++) {
+                                                        timestamps[i] = valueTimestamps.get(i);
+                                                        values[i] = valueList.get(i);
+                                                    }
+
+                                                    bundle.putLongArray(FitbitBetaProbe.ELEVATION_TIMESTAMPS, timestamps);
+                                                    bundle.putLongArray(FitbitBetaProbe.ELEVATION, values);
+
+                                                    transmit = true;
+                                                } catch (JSONException e) {
+                                                    e.printStackTrace();
+
+                                                    me._lastUpdate = System.currentTimeMillis() + (1000 * 60 * 15);
+
+                                                    SanityManager.getInstance(context).addAlert(SanityCheck.WARNING, warningTitle, warningMessage, null);
+
+                                                    break;
+                                                }
+                                            }
+
+                                            if (transmit) {
+                                                me.transmitData(context, bundle);
+                                            }
+
+                                            evaledDays.add(minute / (24 * 60));
+
+                                            for (Long todayMinute : minutesToday)
                                             {
-                                                JSONObject value = valuesArray.getJSONObject(i);
-
-                                                String time = value.getString("time");
-
-                                                String[] tokens = time.split(":");
-
-                                                c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tokens[0]));
-                                                c.set(Calendar.MINUTE, Integer.parseInt(tokens[1]));
-                                                c.set(Calendar.SECOND, Integer.parseInt(tokens[2]));
-                                                c.set(Calendar.MILLISECOND, 0);
-
-                                                long timestamp = c.getTimeInMillis();
-                                                long valueQty = value.getLong("value");
-
-                                                if (timestamp > lastUpdate && valueQty > 0) {
-                                                    valueTimestamps.add(timestamp);
-                                                    lastUpdate = timestamp;
-
-                                                    valueList.add(valueQty);
-                                                }
+                                                coveredMinutes.addMinute(todayMinute);
                                             }
-
-                                            long[] timestamps = new long[valueTimestamps.size()];
-                                            long[] values = new long[valueList.size()];
-
-                                            for (int i = 0; i < valueTimestamps.size(); i++) {
-                                                timestamps[i] = valueTimestamps.get(i);
-                                                values[i] = valueList.get(i);
-                                            }
-
-                                            bundle.putLongArray(FitbitBetaProbe.CALORIES_TIMESTAMPS, timestamps);
-                                            bundle.putLongArray(FitbitBetaProbe.CALORIES, values);
-
-                                            Editor e = prefs.edit();
-                                            e.putLong(FitbitBetaProbe.LAST_CALORIE_TIMESTAMP, lastUpdate);
-                                            e.commit();
-
-                                            transmit = true;
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            e.printStackTrace();
                                         }
                                     }
 
-                                    if (prefs.getBoolean(FitbitBetaProbe.ENABLE_DISTANCE, FitbitBetaProbe.DEFAULT_ENABLE_DISTANCE))
-                                    {
-                                        long lastUpdate = prefs.getLong(FitbitBetaProbe.LAST_DISTANCE_TIMESTAMP, 0);
+                                    long firstMinute = (now / (60 * 1000)) - (5 * 24 * 60);
 
-                                        try
-                                        {
-                                            JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/distance/date/today/1d/1min.json"));
-
-                                            JSONObject intraday = stepsObj.getJSONObject("activities-distance-intraday");
-                                            JSONArray valuesArray = intraday.getJSONArray("dataset");
-
-                                            ArrayList<Long> valueTimestamps = new ArrayList<>();
-                                            ArrayList<Long> valueList = new ArrayList<>();
-
-                                            Calendar c = Calendar.getInstance();
-
-                                            for (int i = 0; i < valuesArray.length(); i++)
-                                            {
-                                                JSONObject value = valuesArray.getJSONObject(i);
-
-                                                String time = value.getString("time");
-
-                                                String[] tokens = time.split(":");
-
-                                                c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tokens[0]));
-                                                c.set(Calendar.MINUTE, Integer.parseInt(tokens[1]));
-                                                c.set(Calendar.SECOND, Integer.parseInt(tokens[2]));
-                                                c.set(Calendar.MILLISECOND, 0);
-
-                                                long timestamp = c.getTimeInMillis();
-                                                long valueQty = value.getLong("value");
-
-                                                if (timestamp > lastUpdate && valueQty > 0) {
-                                                    valueTimestamps.add(timestamp);
-                                                    lastUpdate = timestamp;
-
-                                                    valueList.add(valueQty);
-                                                }
-                                            }
-
-                                            long[] timestamps = new long[valueTimestamps.size()];
-                                            long[] values = new long[valueList.size()];
-
-                                            for (int i = 0; i < valueTimestamps.size(); i++) {
-                                                timestamps[i] = valueTimestamps.get(i);
-                                                values[i] = valueList.get(i);
-                                            }
-
-                                            bundle.putLongArray(FitbitBetaProbe.DISTANCE_TIMESTAMPS, timestamps);
-                                            bundle.putLongArray(FitbitBetaProbe.DISTANCE, values);
-
-                                            Editor e = prefs.edit();
-                                            e.putLong(FitbitBetaProbe.LAST_DISTANCE_TIMESTAMP, lastUpdate);
-                                            e.commit();
-
-                                            transmit = true;
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            e.printStackTrace();
-                                        }
+                                    if (lastMinute < firstMinute) {
+                                        coveredMinutes.addRange(new MinuteRange(lastMinute, firstMinute));
                                     }
 
-                                    if (prefs.getBoolean(FitbitBetaProbe.ENABLE_FLOORS, FitbitBetaProbe.DEFAULT_ENABLE_FLOORS))
-                                    {
-                                        long lastUpdate = prefs.getLong(FitbitBetaProbe.LAST_FLOOR_TIMESTAMP, 0);
+                                    String coalescedRanges = coveredMinutes.coalescedJSON();
 
-                                        try
-                                        {
-                                            JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/floors/date/today/1d/1min.json"));
-
-                                            JSONObject intraday = stepsObj.getJSONObject("activities-floors-intraday");
-                                            JSONArray valuesArray = intraday.getJSONArray("dataset");
-
-                                            ArrayList<Long> valueTimestamps = new ArrayList<>();
-                                            ArrayList<Long> valueList = new ArrayList<>();
-
-                                            Calendar c = Calendar.getInstance();
-
-                                            for (int i = 0; i < valuesArray.length(); i++)
-                                            {
-                                                JSONObject value = valuesArray.getJSONObject(i);
-
-                                                String time = value.getString("time");
-
-                                                String[] tokens = time.split(":");
-
-                                                c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tokens[0]));
-                                                c.set(Calendar.MINUTE, Integer.parseInt(tokens[1]));
-                                                c.set(Calendar.SECOND, Integer.parseInt(tokens[2]));
-                                                c.set(Calendar.MILLISECOND, 0);
-
-                                                long timestamp = c.getTimeInMillis();
-                                                long valueQty = value.getLong("value");
-
-                                                if (timestamp > lastUpdate && valueQty > 0) {
-                                                    valueTimestamps.add(timestamp);
-                                                    lastUpdate = timestamp;
-
-                                                    valueList.add(valueQty);
-                                                }
-                                            }
-
-                                            long[] timestamps = new long[valueTimestamps.size()];
-                                            long[] values = new long[valueList.size()];
-
-                                            for (int i = 0; i < valueTimestamps.size(); i++) {
-                                                timestamps[i] = valueTimestamps.get(i);
-                                                values[i] = valueList.get(i);
-                                            }
-
-                                            bundle.putLongArray(FitbitBetaProbe.FLOORS_TIMESTAMPS, timestamps);
-                                            bundle.putLongArray(FitbitBetaProbe.FLOORS, values);
-
-                                            Editor e = prefs.edit();
-                                            e.putLong(FitbitBetaProbe.LAST_FLOOR_TIMESTAMP, lastUpdate);
-                                            e.commit();
-
-                                            transmit = true;
-                                        }
-                                        catch (JSONException e)
-                                        {
-                                            e.printStackTrace();
-                                        }
-                                    }
-
-                                    if (prefs.getBoolean(FitbitBetaProbe.ENABLE_HEART, FitbitBetaProbe.DEFAULT_ENABLE_HEART))
-                                    {
-                                        long lastUpdate = prefs.getLong(FitbitBetaProbe.LAST_HEART_TIMESTAMP, 0);
-
-                                        try
-                                        {
-                                            JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/heart/date/today/1d/1min.json"));
-
-                                            JSONObject intraday = stepsObj.getJSONObject("activities-heart-intraday");
-                                            JSONArray valuesArray = intraday.getJSONArray("dataset");
-
-                                            ArrayList<Long> valueTimestamps = new ArrayList<>();
-                                            ArrayList<Long> valueList = new ArrayList<>();
-
-                                            Calendar c = Calendar.getInstance();
-
-                                            for (int i = 0; i < valuesArray.length(); i++)
-                                            {
-                                                JSONObject value = valuesArray.getJSONObject(i);
-
-                                                String time = value.getString("time");
-
-                                                String[] tokens = time.split(":");
-
-                                                c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tokens[0]));
-                                                c.set(Calendar.MINUTE, Integer.parseInt(tokens[1]));
-                                                c.set(Calendar.SECOND, Integer.parseInt(tokens[2]));
-                                                c.set(Calendar.MILLISECOND, 0);
-
-                                                long timestamp = c.getTimeInMillis();
-                                                long valueQty = value.getLong("value");
-
-                                                if (timestamp > lastUpdate && valueQty > 0) {
-                                                    valueTimestamps.add(timestamp);
-                                                    lastUpdate = timestamp;
-
-                                                    valueList.add(valueQty);
-                                                }
-                                            }
-
-                                            long[] timestamps = new long[valueTimestamps.size()];
-                                            long[] values = new long[valueList.size()];
-
-                                            for (int i = 0; i < valueTimestamps.size(); i++) {
-                                                timestamps[i] = valueTimestamps.get(i);
-                                                values[i] = valueList.get(i);
-                                            }
-
-                                            bundle.putLongArray(FitbitBetaProbe.HEART_TIMESTAMPS, timestamps);
-                                            bundle.putLongArray(FitbitBetaProbe.HEART, values);
-
-                                            Editor e = prefs.edit();
-                                            e.putLong(FitbitBetaProbe.LAST_HEART_TIMESTAMP, lastUpdate);
-                                            e.commit();
-
-                                            transmit = true;
-                                        }
-                                        catch (JSONException e)
-                                        {
-                                            e.printStackTrace();
-                                        }
-
-                                    }
-
-                                    if (prefs.getBoolean(FitbitBetaProbe.ENABLE_ELEVATION, FitbitBetaProbe.DEFAULT_ENABLE_ELEVATION))
-                                    {
-                                        long lastUpdate = prefs.getLong(FitbitBetaProbe.LAST_ELEVATION_TIMESTAMP, 0);
-
-                                        try
-                                        {
-                                            JSONObject stepsObj = FitbitBetaApi.fetch(Uri.parse("https://api.fitbit.com/1/user/-/activities/elevation/date/today/1d/1min.json"));
-
-                                            JSONObject intraday = stepsObj.getJSONObject("activities-elevation-intraday");
-                                            JSONArray valuesArray = intraday.getJSONArray("dataset");
-
-                                            ArrayList<Long> valueTimestamps = new ArrayList<>();
-                                            ArrayList<Long> valueList = new ArrayList<>();
-
-                                            Calendar c = Calendar.getInstance();
-
-                                            for (int i = 0; i < valuesArray.length(); i++)
-                                            {
-                                                JSONObject value = valuesArray.getJSONObject(i);
-
-                                                String time = value.getString("time");
-
-                                                String[] tokens = time.split(":");
-
-                                                c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tokens[0]));
-                                                c.set(Calendar.MINUTE, Integer.parseInt(tokens[1]));
-                                                c.set(Calendar.SECOND, Integer.parseInt(tokens[2]));
-                                                c.set(Calendar.MILLISECOND, 0);
-
-                                                long timestamp = c.getTimeInMillis();
-                                                long valueQty = value.getLong("value");
-
-                                                if (timestamp > lastUpdate && valueQty > 0) {
-                                                    valueTimestamps.add(timestamp);
-                                                    lastUpdate = timestamp;
-
-                                                    valueList.add(valueQty);
-                                                }
-                                            }
-
-                                            long[] timestamps = new long[valueTimestamps.size()];
-                                            long[] values = new long[valueList.size()];
-
-                                            for (int i = 0; i < valueTimestamps.size(); i++) {
-                                                timestamps[i] = valueTimestamps.get(i);
-                                                values[i] = valueList.get(i);
-                                            }
-
-                                            bundle.putLongArray(FitbitBetaProbe.ELEVATION_TIMESTAMPS, timestamps);
-                                            bundle.putLongArray(FitbitBetaProbe.ELEVATION, values);
-
-                                            Editor e = prefs.edit();
-                                            e.putLong(FitbitBetaProbe.LAST_ELEVATION_TIMESTAMP, lastUpdate);
-                                            e.commit();
-
-                                            transmit = true;
-                                        }
-                                        catch (JSONException e)
-                                        {
-                                            e.printStackTrace();
-                                        }
-                                    }
-
-                                    if (transmit)
-                                        me.transmitData(context, bundle);
+                                    Editor e = prefs.edit();
+                                    e.putString(FitbitBetaProbe.COVERED_RANGES, coalescedRanges);
+                                    e.commit();
                                 }
                                 catch (Exception e)
                                 {
@@ -642,6 +885,22 @@ public class FitbitBetaProbe extends Probe
             settings.put(FitbitBetaProbe.ENABLE_ELEVATION, enabled);
             settings.put(FitbitBetaProbe.ENABLE_HEART, enabled);
             settings.put(FitbitBetaProbe.ENABLE_FLOORS, enabled);
+
+            JSONObject retro = new JSONObject();
+            retro.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_STRING);
+
+            JSONArray retroValues = new JSONArray();
+            retroValues.put("1");
+            retroValues.put("3");
+            retroValues.put("5");
+            retroValues.put("7");
+            retroValues.put("14");
+            retroValues.put("30");
+            retroValues.put("60");
+            retroValues.put("90");
+            retro.put(Probe.PROBE_VALUES, retroValues);
+
+            settings.put(FitbitBetaProbe.RETROSPECTIVE_PERIOD, retro);
         }
         catch (JSONException e)
         {
@@ -664,6 +923,7 @@ public class FitbitBetaProbe extends Probe
         map.put(FitbitBetaProbe.ENABLE_DISTANCE, prefs.getBoolean(FitbitBetaProbe.ENABLE_DISTANCE, FitbitBetaProbe.DEFAULT_ENABLE_DISTANCE));
         map.put(FitbitBetaProbe.ENABLE_ELEVATION, prefs.getBoolean(FitbitBetaProbe.ENABLE_ELEVATION, FitbitBetaProbe.DEFAULT_ENABLE_ELEVATION));
         map.put(FitbitBetaProbe.FLOORS, prefs.getBoolean(FitbitBetaProbe.FLOORS, FitbitBetaProbe.DEFAULT_ENABLE_FLOORS));
+        map.put(FitbitBetaProbe.RETROSPECTIVE_PERIOD, prefs.getString(FitbitBetaProbe.RETROSPECTIVE_PERIOD, FitbitBetaProbe.DEFAULT_RETROSPECTIVE_PERIOD));
 
         return map;
     }
@@ -686,6 +946,19 @@ public class FitbitBetaProbe extends Probe
                     e.putBoolean(key, ((Boolean) value));
                     e.commit();
                 }
+            }
+        }
+
+        if (params.containsKey(FitbitBetaProbe.RETROSPECTIVE_PERIOD))
+        {
+            Object value = params.get(FitbitBetaProbe.RETROSPECTIVE_PERIOD);
+
+            if (value instanceof String) {
+                SharedPreferences prefs = Probe.getPreferences(context);
+                Editor e = prefs.edit();
+
+                e.putString(FitbitBetaProbe.RETROSPECTIVE_PERIOD, value.toString());
+                e.commit();
             }
         }
     }
@@ -739,6 +1012,15 @@ public class FitbitBetaProbe extends Probe
         heartPref.setDefaultValue(FitbitBetaProbe.DEFAULT_ENABLE_HEART);
         heartPref.setTitle(R.string.config_fitbit_heart_title);
         screen.addPreference(heartPref);
+
+        FlexibleListPreference retrospective = new FlexibleListPreference(context);
+        retrospective.setKey(FitbitBetaProbe.RETROSPECTIVE_PERIOD);
+        retrospective.setDefaultValue(FitbitBetaProbe.DEFAULT_RETROSPECTIVE_PERIOD);
+        retrospective.setEntryValues(R.array.probe_fitbit_retrospective_values);
+        retrospective.setEntries(R.array.probe_fitbit_retrospective_labels);
+        retrospective.setTitle(R.string.probe_fitbit_retrospective_label);
+
+        screen.addPreference(retrospective);
 
         final SharedPreferences prefs = Probe.getPreferences(context);
 
@@ -813,8 +1095,37 @@ public class FitbitBetaProbe extends Probe
     @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
-        double[] timestamps = bundle.getDoubleArray(FitbitBetaProbe.CALORIES_TIMESTAMPS);
+        if (bundle.containsKey(FitbitBetaProbe.CALORIES_TIMESTAMPS)) {
+            double[] timestamps = bundle.getDoubleArray(FitbitBetaProbe.CALORIES_TIMESTAMPS);
 
-        return String.format(context.getResources().getString(R.string.summary_fitbit_beta), timestamps.length);
+            return String.format(context.getResources().getString(R.string.summary_fitbit_beta), timestamps.length);
+        }
+        else if (bundle.containsKey(FitbitBetaProbe.DISTANCE_TIMESTAMPS)) {
+            double[] timestamps = bundle.getDoubleArray(FitbitBetaProbe.DISTANCE_TIMESTAMPS);
+
+            return String.format(context.getResources().getString(R.string.summary_fitbit_beta), timestamps.length);
+        }
+        else if (bundle.containsKey(FitbitBetaProbe.ELEVATION_TIMESTAMPS)) {
+            double[] timestamps = bundle.getDoubleArray(FitbitBetaProbe.ELEVATION_TIMESTAMPS);
+
+            return String.format(context.getResources().getString(R.string.summary_fitbit_beta), timestamps.length);
+        }
+        else if (bundle.containsKey(FitbitBetaProbe.FLOORS_TIMESTAMPS)) {
+            double[] timestamps = bundle.getDoubleArray(FitbitBetaProbe.FLOORS_TIMESTAMPS);
+
+            return String.format(context.getResources().getString(R.string.summary_fitbit_beta), timestamps.length);
+        }
+        else if (bundle.containsKey(FitbitBetaProbe.HEART_TIMESTAMPS)) {
+            double[] timestamps = bundle.getDoubleArray(FitbitBetaProbe.HEART_TIMESTAMPS);
+
+            return String.format(context.getResources().getString(R.string.summary_fitbit_beta), timestamps.length);
+        }
+        else if (bundle.containsKey(FitbitBetaProbe.STEP_TIMESTAMPS)) {
+            double[] timestamps = bundle.getDoubleArray(FitbitBetaProbe.STEP_TIMESTAMPS);
+
+            return String.format(context.getResources().getString(R.string.summary_fitbit_beta), timestamps.length);
+        }
+
+        return context.getString(R.string.summary_fitbit_beta_no_datapoints);
     }
 }
