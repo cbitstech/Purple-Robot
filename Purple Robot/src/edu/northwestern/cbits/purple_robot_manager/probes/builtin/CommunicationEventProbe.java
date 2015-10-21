@@ -54,6 +54,7 @@ public class CommunicationEventProbe extends Probe
     private static final String TIMESTAMP = "COMM_TIMESTAMP";
     private static final String DURATION = "DURATION";
     private static final String MESSAGE_BODY = "MESSAGE_BODY";
+    private static final String NORMALIZED_HASH = "NORMALIZED_HASH";
 
     public static final boolean DEFAULT_ENABLED = true;
     private static final boolean DEFAULT_RETRIEVE = false;
@@ -186,6 +187,7 @@ public class CommunicationEventProbe extends Probe
 
                                     bundle.putString(CommunicationEventProbe.NAME, numberName);
                                     bundle.putString(CommunicationEventProbe.NUMBER, phoneNumber);
+                                    bundle.putString(CommunicationEventProbe.NORMALIZED_HASH, EncryptionManager.normalizedPhoneHash(context, phoneNumber));
 
                                     long callTime = c.getLong(c.getColumnIndex(Calls.DATE));
 
@@ -242,6 +244,7 @@ public class CommunicationEventProbe extends Probe
 
                                     bundle.putString(CommunicationEventProbe.NAME, numberName);
                                     bundle.putString(CommunicationEventProbe.NUMBER, phoneNumber);
+                                    bundle.putString(CommunicationEventProbe.NORMALIZED_HASH, EncryptionManager.normalizedPhoneHash(context, phoneNumber));
 
                                     long callTime = c.getLong(c.getColumnIndex("date"));
 
@@ -280,6 +283,7 @@ public class CommunicationEventProbe extends Probe
 
                                     String numberName = c.getString(c.getColumnIndex("person"));
                                     String phoneNumber = PhoneNumberUtils.formatNumber(c.getString(c.getColumnIndex("address")));
+                                    bundle.putString(CommunicationEventProbe.NORMALIZED_HASH, EncryptionManager.normalizedPhoneHash(context, phoneNumber));
 
                                     if (numberName == null)
                                         numberName = phoneNumber;

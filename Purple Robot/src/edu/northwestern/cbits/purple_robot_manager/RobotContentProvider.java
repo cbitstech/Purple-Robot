@@ -33,24 +33,21 @@ public class RobotContentProvider extends ContentProvider
 
     private UriMatcher _uriMatcher = null;
     private SQLiteOpenHelper _openHelper = null;
+    private SQLiteDatabase _db = null;
 
     public int delete(Uri uri, String selection, String[] selectionArgs)
     {
-        SQLiteDatabase db = this._openHelper.getWritableDatabase();
-
         int result = 0;
 
         switch (this._uriMatcher.match(uri))
         {
             case RobotContentProvider.RECENT_PROBE_VALUE_LIST:
-                result = db.delete(RobotContentProvider.RECENT_PROBE_VALUES_TABLE, selection, selectionArgs);
+                result = this._db.delete(RobotContentProvider.RECENT_PROBE_VALUES_TABLE, selection, selectionArgs);
                 break;
             case RobotContentProvider.SNAPSHOT_LIST:
-                result = db.delete(RobotContentProvider.SNAPSHOTS_TABLE, selection, selectionArgs);
+                result = this._db.delete(RobotContentProvider.SNAPSHOTS_TABLE, selection, selectionArgs);
                 break;
         }
-
-        db.close();
 
         return result;
     }
@@ -76,11 +73,7 @@ public class RobotContentProvider extends ContentProvider
 
             break;
         case RobotContentProvider.SNAPSHOT_LIST:
-            SQLiteDatabase db = this._openHelper.getWritableDatabase();
-
-            long id = db.insert(RobotContentProvider.SNAPSHOTS_TABLE, null, values);
-
-            db.close();
+            long id = this._db.insert(RobotContentProvider.SNAPSHOTS_TABLE, null, values);
 
             return ContentUris.withAppendedId(uri, id);
         }
@@ -128,15 +121,14 @@ public class RobotContentProvider extends ContentProvider
             }
         };
 
+        this._db = this._openHelper.getWritableDatabase();
+
         return true;
     }
 
     public int updateOrInsert(Uri uri, ContentValues values, String selection, String[] selectionArgs)
     {
-        SQLiteDatabase db = this._openHelper.getWritableDatabase();
-
-        String[] projection =
-        { "_id" };
+        String[] projection = { "_id" };
 
         int count = 0;
         Cursor c = null;
@@ -148,7 +140,7 @@ public class RobotContentProvider extends ContentProvider
 
                 if (c.getCount() == 0)
                 {
-                    db.insert(RobotContentProvider.RECENT_PROBE_VALUES_TABLE, null, values);
+                    this._db.insert(RobotContentProvider.RECENT_PROBE_VALUES_TABLE, null, values);
                     count = 1;
                 }
                 else
@@ -160,7 +152,7 @@ public class RobotContentProvider extends ContentProvider
 
                 if (c.getCount() == 0)
                 {
-                    db.insert(RobotContentProvider.SNAPSHOTS_TABLE, null, values);
+                    this._db.insert(RobotContentProvider.SNAPSHOTS_TABLE, null, values);
                     count = 1;
                 }
                 else
@@ -179,8 +171,6 @@ public class RobotContentProvider extends ContentProvider
 
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs)
     {
-        SQLiteDatabase db = this._openHelper.getWritableDatabase();
-
         int result = 0;
 
         try
@@ -188,11 +178,11 @@ public class RobotContentProvider extends ContentProvider
             switch (this._uriMatcher.match(uri))
             {
                 case RobotContentProvider.RECENT_PROBE_VALUE_LIST:
-                    result = db.update(RobotContentProvider.RECENT_PROBE_VALUES_TABLE, values, selection, selectionArgs);
+                    result = this._db.update(RobotContentProvider.RECENT_PROBE_VALUES_TABLE, values, selection, selectionArgs);
 
                     if (result == 0)
                     {
-                        db.insert(RobotContentProvider.RECENT_PROBE_VALUES_TABLE, null, values);
+                        this._db.insert(RobotContentProvider.RECENT_PROBE_VALUES_TABLE, null, values);
 
                         result = 1;
                     }
@@ -204,19 +194,18 @@ public class RobotContentProvider extends ContentProvider
                     break;
 
                 case RobotContentProvider.SNAPSHOT_LIST:
-                    result = db.update(RobotContentProvider.SNAPSHOTS_TABLE, values, selection, selectionArgs);
+                    result = this._db.update(RobotContentProvider.SNAPSHOTS_TABLE, values, selection, selectionArgs);
 
                     if (result == 0)
                     {
-                        db.insert(RobotContentProvider.SNAPSHOTS_TABLE, null, values);
+                        this._db.insert(RobotContentProvider.SNAPSHOTS_TABLE, null, values);
 
                         result = 1;
                     }
 
                     break;
                 case RobotContentProvider.SNAPSHOT:
-                    result = this.updateOrInsert(uri, values, this.buildSingleSelection(selection),
-                            this.buildSingleSelectionArgs(uri, selectionArgs));
+                    result = this.updateOrInsert(uri, values, this.buildSingleSelection(selection), this.buildSingleSelectionArgs(uri, selectionArgs));
                     break;
             }
         }
@@ -224,8 +213,6 @@ public class RobotContentProvider extends ContentProvider
         {
             LogManager.getInstance(this.getContext()).logException(e);
         }
-
-        db.close();
 
         return result;
     }
@@ -249,22 +236,20 @@ public class RobotContentProvider extends ContentProvider
 
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder)
     {
-        SQLiteDatabase db = this._openHelper.getReadableDatabase();
-
         Cursor c = null;
         switch (this._uriMatcher.match(uri))
         {
             case RobotContentProvider.RECENT_PROBE_VALUE_LIST:
-                c = db.query(RobotContentProvider.RECENT_PROBE_VALUES_TABLE, projection, selection, selectionArgs, null, null, sortOrder);
+                c = this._db.query(RobotContentProvider.RECENT_PROBE_VALUES_TABLE, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
             case RobotContentProvider.RECENT_PROBE_VALUE:
-                c = db.query(RobotContentProvider.RECENT_PROBE_VALUES_TABLE, projection, this.buildSingleSelection(selection), this.buildSingleSelectionArgs(uri, selectionArgs), null, null, sortOrder);
+                c = this._db.query(RobotContentProvider.RECENT_PROBE_VALUES_TABLE, projection, this.buildSingleSelection(selection), this.buildSingleSelectionArgs(uri, selectionArgs), null, null, sortOrder);
                 break;
             case RobotContentProvider.SNAPSHOT_LIST:
-                c = db.query(RobotContentProvider.SNAPSHOTS_TABLE, projection, selection, selectionArgs, null, null, sortOrder);
+                c = this._db.query(RobotContentProvider.SNAPSHOTS_TABLE, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
             case RobotContentProvider.SNAPSHOT:
-                c = db.query(RobotContentProvider.SNAPSHOTS_TABLE, projection, this.buildSingleSelection(selection), this.buildSingleSelectionArgs(uri, selectionArgs), null, null, sortOrder);
+                c = this._db.query(RobotContentProvider.SNAPSHOTS_TABLE, projection, this.buildSingleSelection(selection), this.buildSingleSelectionArgs(uri, selectionArgs), null, null, sortOrder);
                 break;
         }
 

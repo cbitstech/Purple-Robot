@@ -23,7 +23,6 @@ import android.telephony.PhoneNumberUtils;
 import edu.northwestern.cbits.purple_robot_manager.EncryptionManager;
 import edu.northwestern.cbits.purple_robot_manager.R;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
-import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
@@ -146,7 +145,7 @@ public class CallHistoryFeature extends Feature
 
                                     Cursor cursor = context.getContentResolver().query(CallLog.Calls.CONTENT_URI, null, selection, selectionArgs, null);
 
-                                    while (cursor.moveToNext())
+                                    while (cursor != null && cursor.moveToNext())
                                     {
                                         total += 1;
 
@@ -201,7 +200,8 @@ public class CallHistoryFeature extends Feature
                                         calls.add(phoneCall);
                                     }
 
-                                    cursor.close();
+                                    if (cursor != null)
+                                        cursor.close();
 
                                     if (total > 0)
                                     {

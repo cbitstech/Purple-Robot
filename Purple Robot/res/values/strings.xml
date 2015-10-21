@@ -144,7 +144,10 @@
 
     <string name="config_probe_communication_retrieve_warning_title">Privacy Warning</string>
     <string name="config_probe_communication_retrieve_warning">Setting this option to true will transmit the contents of outgoing messages (sent from this device) to the server automatically. This option should only be enabled under extremely rigorous oversight by an authorized privacy official or institutional review board.</string>
-    
+
+    <string name="config_probe_fitbit_rate_limit_warning_title">Rate Limited</string>
+    <string name="config_probe_fitbit_rate_limit_warning">Exceeded current user\'s Fitbit rate limit. Will resume data collection within the next hour.</string>
+
     <string name="config_probe_communication_encrypt_title">Encrypt Message Contents</string>
     <string name="config_probe_communication_encrypt_summary">Encrypts any transmitted message contents before sending to the server.</string>
     
@@ -1660,4 +1663,7 @@
     <string name="button_grant_permissions">Grant Permissions</string>
 
     <string name="title_mute_android_five_warning">Mute Android 5.0 Warning</string>
+
+    <string name="probe_fitbit_retrospective_label">Retrospective Fetch Period</string>
+    <string name="summary_fitbit_beta_no_datapoints">No datapoints enabled to capture.</string>
 </resources>

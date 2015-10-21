@@ -503,4 +503,44 @@ public class EncryptionManager
     {
         return this._configurationReady;
     }
+
+    public static String normalizedPhoneHash(Context context, String phoneNumber)
+    {
+        if (phoneNumber == null)
+            return null;
+
+        String hash = null;
+
+        try
+        {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+
+            phoneNumber = phoneNumber.replaceAll("[^\\d.]", "");
+
+            if (phoneNumber.length() > 10)
+                phoneNumber = phoneNumber.substring(0, 10);
+
+            while (phoneNumber.length() < 10)
+                phoneNumber += "0";
+
+            byte[] digest = md.digest(phoneNumber.getBytes("UTF-8"));
+
+            hash = (new BigInteger(1, digest)).toString(16);
+
+            while (hash.length() < 32)
+            {
+                hash = "0" + hash;
+            }
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return hash;
+    }
 }

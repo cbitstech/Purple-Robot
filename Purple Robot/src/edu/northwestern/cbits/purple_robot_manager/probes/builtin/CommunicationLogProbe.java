@@ -34,7 +34,6 @@ import edu.northwestern.cbits.purple_robot_manager.activities.probes.AddressBook
 import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
 import edu.northwestern.cbits.purple_robot_manager.calibration.ContactCalibrationHelper;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
-import edu.northwestern.cbits.purple_robot_manager.logging.SanityCheck;
 import edu.northwestern.cbits.purple_robot_manager.logging.SanityManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
@@ -58,6 +57,7 @@ public class CommunicationLogProbe extends Probe
     private static final String RECENT_NUMBER = "RECENT_NUMBER";
     private static final String NUMBER_GROUP = "NUMBER_GROUP";
     private static final String RECENT_GROUP = "RECENT_GROUP";
+    private static final String NORMALIZED_HASH = "NORMALIZED_HASH";
 
     private static final String SMS_MESSAGES = "SMS_MESSAGES";
     private static final String MESSAGE_TIMESTAMP = "MESSAGE_TIMESTAMP";
@@ -213,6 +213,7 @@ public class CommunicationLogProbe extends Probe
                                     contactBundle.putLong(CommunicationLogProbe.CALL_TIMESTAMP, callTime);
                                     contactBundle.putLong(CommunicationLogProbe.CALL_DURATION, c.getLong(c.getColumnIndex(Calls.DURATION)));
                                     contactBundle.putString(CommunicationLogProbe.NUMBER, phoneNumber);
+                                    contactBundle.putString(CommunicationLogProbe.NORMALIZED_HASH, EncryptionManager.normalizedPhoneHash(context, phoneNumber));
 
                                     int callType = c.getInt(c.getColumnIndex(Calls.TYPE));
 
@@ -295,6 +296,7 @@ public class CommunicationLogProbe extends Probe
 
                                     message.putString(CommunicationLogProbe.NUMBER_NAME, numberName);
                                     message.putString(CommunicationLogProbe.NUMBER, phoneNumber);
+                                    message.putString(CommunicationLogProbe.NORMALIZED_HASH, EncryptionManager.normalizedPhoneHash(context, phoneNumber));
 
                                     long callTime = c.getLong(c.getColumnIndex("date"));
 
@@ -347,6 +349,7 @@ public class CommunicationLogProbe extends Probe
 
                                     message.putString(CommunicationLogProbe.NUMBER_NAME, numberName);
                                     message.putString(CommunicationLogProbe.NUMBER, phoneNumber);
+                                    message.putString(CommunicationLogProbe.NORMALIZED_HASH, EncryptionManager.normalizedPhoneHash(context, phoneNumber));
 
                                     long callTime = c.getLong(c.getColumnIndex("date"));
 
