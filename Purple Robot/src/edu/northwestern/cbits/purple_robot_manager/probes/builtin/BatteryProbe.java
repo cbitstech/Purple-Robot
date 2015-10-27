@@ -42,10 +42,10 @@ public class BatteryProbe extends Probe
 
     private static final String ENABLED = "config_probe_battery_enabled";
 
-    private boolean _isInited = false;
     private boolean _isEnabled = false;
 
     private BroadcastReceiver _receiver = null;
+    private long _lastCheck = 0;
 
     @Override
     public Intent viewIntent(Context context)
@@ -247,10 +247,8 @@ public class BatteryProbe extends Probe
     @Override
     public boolean isEnabled(Context context)
     {
-        if (!this._isInited)
+        if (this._receiver == null)
         {
-            IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-
             final BatteryProbe me = this;
 
             this._receiver = new BroadcastReceiver()
@@ -286,10 +284,24 @@ public class BatteryProbe extends Probe
                     }
                 }
             };
+        }
+
+        long now = System.currentTimeMillis();
+
+        if (now - this._lastCheck > 5 * 60 * 1000) {
+            this._lastCheck = now;
+
+            try {
+                context.unregisterReceiver(this._receiver);
+            }
+            catch (IllegalArgumentException e)
+            {
+                // Do nothing - receiver not registered...
+            }
+
+            IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
 
             context.registerReceiver(this._receiver, filter);
-
-            this._isInited = true;
         }
 
         SharedPreferences prefs = Probe.getPreferences(context);
@@ -317,8 +329,7 @@ public class BatteryProbe extends Probe
     }
 
     @Override
-    public void disable(Context context)
-    {
+    public void disable(Context context) {
         SharedPreferences prefs = Probe.getPreferences(context);
 
         Editor e = prefs.edit();

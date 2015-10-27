@@ -197,6 +197,8 @@ public class CommunicationLogProbe extends Probe
                                     if (group != null)
                                         contactBundle.putString(CommunicationLogProbe.NUMBER_GROUP, group);
 
+                                    contactBundle.putString(CommunicationLogProbe.NORMALIZED_HASH, EncryptionManager.normalizedPhoneHash(context, phoneNumber));
+
                                     if (doHash) {
                                         numberName = em.createHash(context, numberName);
                                         phoneNumber = em.createHash(context, phoneNumber);
@@ -213,7 +215,6 @@ public class CommunicationLogProbe extends Probe
                                     contactBundle.putLong(CommunicationLogProbe.CALL_TIMESTAMP, callTime);
                                     contactBundle.putLong(CommunicationLogProbe.CALL_DURATION, c.getLong(c.getColumnIndex(Calls.DURATION)));
                                     contactBundle.putString(CommunicationLogProbe.NUMBER, phoneNumber);
-                                    contactBundle.putString(CommunicationLogProbe.NORMALIZED_HASH, EncryptionManager.normalizedPhoneHash(context, phoneNumber));
 
                                     int callType = c.getInt(c.getColumnIndex(Calls.TYPE));
 
@@ -289,6 +290,8 @@ public class CommunicationLogProbe extends Probe
                                     if (group != null)
                                         message.putString(CommunicationLogProbe.NUMBER_GROUP, group);
 
+                                    message.putString(CommunicationLogProbe.NORMALIZED_HASH, EncryptionManager.normalizedPhoneHash(context, phoneNumber));
+
                                     if (doHash) {
                                         numberName = em.createHash(context, numberName);
                                         phoneNumber = em.createHash(context, phoneNumber);
@@ -296,13 +299,12 @@ public class CommunicationLogProbe extends Probe
 
                                     message.putString(CommunicationLogProbe.NUMBER_NAME, numberName);
                                     message.putString(CommunicationLogProbe.NUMBER, phoneNumber);
-                                    message.putString(CommunicationLogProbe.NORMALIZED_HASH, EncryptionManager.normalizedPhoneHash(context, phoneNumber));
 
                                     long callTime = c.getLong(c.getColumnIndex("date"));
 
                                     message.putLong(CommunicationLogProbe.MESSAGE_TIMESTAMP, callTime);
 
-                                    message.putString(CommunicationLogProbe.MESSAGE_DIRECTION, CommunicationLogProbe.MESSAGE_OUTGOING);
+                                    message.putString(CommunicationLogProbe.MESSAGE_DIRECTION, CommunicationLogProbe.MESSAGE_INCOMING);
 
                                     boolean retrieve = prefs.getBoolean(CommunicationLogProbe.RETRIEVE_DATA, CommunicationLogProbe.DEFAULT_RETRIEVE);
                                     boolean encrypt = prefs.getBoolean(CommunicationLogProbe.ENCRYPT_DATA, CommunicationLogProbe.DEFAULT_ENCRYPT);
@@ -342,6 +344,8 @@ public class CommunicationLogProbe extends Probe
                                     if (group != null)
                                         message.putString(CommunicationLogProbe.NUMBER_GROUP, group);
 
+                                    message.putString(CommunicationLogProbe.NORMALIZED_HASH, EncryptionManager.normalizedPhoneHash(context, phoneNumber));
+
                                     if (doHash) {
                                         numberName = em.createHash(context, numberName);
                                         phoneNumber = em.createHash(context, phoneNumber);
@@ -349,13 +353,12 @@ public class CommunicationLogProbe extends Probe
 
                                     message.putString(CommunicationLogProbe.NUMBER_NAME, numberName);
                                     message.putString(CommunicationLogProbe.NUMBER, phoneNumber);
-                                    message.putString(CommunicationLogProbe.NORMALIZED_HASH, EncryptionManager.normalizedPhoneHash(context, phoneNumber));
 
                                     long callTime = c.getLong(c.getColumnIndex("date"));
 
                                     message.putLong(CommunicationLogProbe.MESSAGE_TIMESTAMP, callTime);
 
-                                    message.putString(CommunicationLogProbe.MESSAGE_DIRECTION, CommunicationLogProbe.MESSAGE_INCOMING);
+                                    message.putString(CommunicationLogProbe.MESSAGE_DIRECTION, CommunicationLogProbe.MESSAGE_OUTGOING);
 
                                     boolean retrieve = prefs.getBoolean(CommunicationLogProbe.RETRIEVE_DATA, CommunicationLogProbe.DEFAULT_RETRIEVE);
                                     boolean encrypt = prefs.getBoolean(CommunicationLogProbe.ENCRYPT_DATA, CommunicationLogProbe.DEFAULT_ENCRYPT);

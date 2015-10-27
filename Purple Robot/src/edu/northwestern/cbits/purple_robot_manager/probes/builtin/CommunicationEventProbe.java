@@ -180,6 +180,8 @@ public class CommunicationEventProbe extends Probe
                                     if (group != null)
                                         bundle.putString(CommunicationEventProbe.GROUP, group);
 
+                                    bundle.putString(CommunicationEventProbe.NORMALIZED_HASH, EncryptionManager.normalizedPhoneHash(context, phoneNumber));
+
                                     if (doHash) {
                                         numberName = em.createHash(context, numberName);
                                         phoneNumber = em.createHash(context, phoneNumber);
@@ -187,7 +189,6 @@ public class CommunicationEventProbe extends Probe
 
                                     bundle.putString(CommunicationEventProbe.NAME, numberName);
                                     bundle.putString(CommunicationEventProbe.NUMBER, phoneNumber);
-                                    bundle.putString(CommunicationEventProbe.NORMALIZED_HASH, EncryptionManager.normalizedPhoneHash(context, phoneNumber));
 
                                     long callTime = c.getLong(c.getColumnIndex(Calls.DATE));
 
