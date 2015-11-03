@@ -160,9 +160,11 @@ public class AudioFeaturesProbe extends Probe
                                     return;
                                 }
 
+                                int sampleRate = recorder.getSampleRate();
+
                                 SanityManager.getInstance(context).clearAlert(context.getString(R.string.name_sanity_audio_features_title));
 
-                                int sampleCount = recorder.getSampleRate() * (duration / 1000);
+                                int sampleCount = sampleRate * (duration / 1000);
 
                                 int twoPower = 2;
 
@@ -201,7 +203,7 @@ public class AudioFeaturesProbe extends Probe
                                     Bundle bundle = new Bundle();
                                     bundle.putString("PROBE", me.name(context));
                                     bundle.putLong("TIMESTAMP", System.currentTimeMillis() / 1000);
-                                    bundle.putInt("SAMPLE_RATE", recorder.getSampleRate());
+                                    bundle.putInt("SAMPLE_RATE", sampleRate);
                                     bundle.putInt("SAMPLE_BUFFER_SIZE", samples.length);
                                     bundle.putInt("SAMPLES_RECORDED", index);
 
@@ -222,7 +224,7 @@ public class AudioFeaturesProbe extends Probe
 
                                         if (magnitude > maxMagnitude) {
                                             maxMagnitude = magnitude;
-                                            maxFrequency = (i * recorder.getSampleRate()) / (double) samples.length;
+                                            maxFrequency = (i * sampleRate) / (double) samples.length;
                                         }
 
                                         if (magnitude < minMagnitude)

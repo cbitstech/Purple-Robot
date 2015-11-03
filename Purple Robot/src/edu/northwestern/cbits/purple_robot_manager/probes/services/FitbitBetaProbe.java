@@ -350,7 +350,7 @@ public class FitbitBetaProbe extends Probe
                     final String warningTitle = context.getString(R.string.config_probe_fitbit_rate_limit_warning_title);
                     final String warningMessage = context.getString(R.string.config_probe_fitbit_rate_limit_warning);
 
-                    if (now - this._lastUpdate > 1000 * 60 * 10)
+                    if (now - this._lastUpdate > 1000 * 60 * 15)
                     {
                         sanity.clearAlert(warningTitle);
 

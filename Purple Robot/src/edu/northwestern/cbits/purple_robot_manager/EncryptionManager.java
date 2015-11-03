@@ -517,8 +517,8 @@ public class EncryptionManager
 
             phoneNumber = phoneNumber.replaceAll("[^\\d.]", "");
 
-            if (phoneNumber.length() > 10)
-                phoneNumber = phoneNumber.substring(0, 10);
+            while (phoneNumber.length() > 10)
+                phoneNumber = phoneNumber.substring(1);
 
             while (phoneNumber.length() < 10)
                 phoneNumber += "0";
