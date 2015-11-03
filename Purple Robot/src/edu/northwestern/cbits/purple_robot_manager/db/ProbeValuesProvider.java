@@ -242,76 +242,80 @@ public class ProbeValuesProvider
 
         final ProbeValuesProvider me = this;
 
+        final HashSet<Long> attempts = new HashSet<>();
+
         Runnable r = new Runnable()
         {
             public void run()
             {
-                ProbeValuesSqlHelper helper = new ProbeValuesSqlHelper(context);
-
-                SQLiteDatabase database = helper.getWritableDatabase();
-
-                synchronized (database)
+                try
                 {
-                    for (Filter f : me._filters)
-                    {
-                        if (f.allow(name, values) == false)
-                            return;
+                    ProbeValuesSqlHelper helper = new ProbeValuesSqlHelper(context);
+
+                    SQLiteDatabase database = helper.getWritableDatabase();
+
+                    synchronized (database) {
+                        for (Filter f : me._filters) {
+                            if (f.allow(name, values) == false)
+                                return;
+                        }
+
+                        long now = System.currentTimeMillis();
+
+                        if (now - me._lastCleanup > 300000) // Flush old entries
+                            me.cleanup(context);
+
+                        String localName = me.tableName(context, name, schema);
+
+                        if (me.tableExists(context, localName) == false)
+                            me.createTable(localName, schema);
+
+                        ContentValues toInsert = new ContentValues();
+
+                        for (String key : schema.keySet()) {
+                            String type = schema.get(key);
+
+                            if (ProbeValuesProvider.REAL_TYPE.equals(type)) {
+                                try {
+                                    Double d = (Double) values.get(key);
+                                    toInsert.put(key, d);
+                                } catch (ClassCastException e) {
+                                    try {
+                                        Float f = (Float) values.get(key);
+                                        toInsert.put(key, f.doubleValue());
+                                    } catch (ClassCastException ee) {
+                                        Integer i = (Integer) values.get(key);
+                                        toInsert.put(key, i.doubleValue());
+                                    }
+                                }
+                            } else if (ProbeValuesProvider.INTEGER_TYPE.equals(type)) {
+                                Integer i = (Integer) values.get(key);
+
+                                toInsert.put(key, i);
+                            } else if (ProbeValuesProvider.TEXT_TYPE.equals(type))
+                                toInsert.put(key, values.get(key).toString());
+                        }
+
+                        toInsert.put(ProbeValuesProvider.TIMESTAMP, (Double) values.get(ProbeValuesProvider.TIMESTAMP));
+
+                        database.insert(localName, null, toInsert);
                     }
 
-                    long now = System.currentTimeMillis();
-
-                    if (now - me._lastCleanup > 300000) // Flush old entries
-                                                        // every 5 minutes...
-                        me.cleanup(context);
-
-                    String localName = me.tableName(context, name, schema);
-
-                    if (me.tableExists(context, localName) == false)
-                        me.createTable(localName, schema);
-
-                    ContentValues toInsert = new ContentValues();
-
-                    for (String key : schema.keySet())
-                    {
-                        String type = schema.get(key);
-
-                        if (ProbeValuesProvider.REAL_TYPE.equals(type))
-                        {
-                            try
-                            {
-                                Double d = (Double) values.get(key);
-                                toInsert.put(key, d);
-                            }
-                            catch (ClassCastException e)
-                            {
-                                try
-                                {
-                                    Float f = (Float) values.get(key);
-                                    toInsert.put(key, f.doubleValue());
-                                }
-                                catch (ClassCastException ee)
-                                {
-                                    Integer i = (Integer) values.get(key);
-                                    toInsert.put(key, i.doubleValue());
-                                }
-                            }
-                        }
-                        else if (ProbeValuesProvider.INTEGER_TYPE.equals(type))
-                        {
-                            Integer i = (Integer) values.get(key);
-
-                            toInsert.put(key, i);
-                        }
-                        else if (ProbeValuesProvider.TEXT_TYPE.equals(type))
-                            toInsert.put(key, values.get(key).toString());
-                    }
-
-                    toInsert.put(ProbeValuesProvider.TIMESTAMP, (Double) values.get(ProbeValuesProvider.TIMESTAMP));
-
-                    database.insert(localName, null, toInsert);
+                    database.close();
                 }
+                catch (SQLiteException e)
+                {
+                    try {
+                        Thread.sleep(250);
+                    } catch (InterruptedException e1) {
 
-                database.close();
+                    }
+
+                    attempts.add(System.currentTimeMillis());
+
+                    if (attempts.size() < 10)
+                        this.run();
+                }
             }
         };
 

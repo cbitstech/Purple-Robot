@@ -167,7 +167,18 @@ public abstract class ContinuousProbe extends Probe
 
         SharedPreferences prefs = Probe.getPreferences(this._context);
 
-        return Integer.parseInt(prefs.getString("config_probe_" + key + "_wakelock", "-1"));
+        int lock = -1;
+
+        try
+        {
+            lock = Integer.parseInt(prefs.getString("config_probe_" + key + "_wakelock", "-1"));
+        }
+        catch (NumberFormatException e)
+        {
+            lock = (int) Float.parseFloat(prefs.getString("config_probe_" + key + "_wakelock", "-1"));
+        }
+
+        return lock;
     }
 
     protected abstract boolean getUsesThread();
