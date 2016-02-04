@@ -1,3 +1,5 @@
+import com.android.builder.core.DefaultManifestParser
+
 buildscript {
     repositories {
         mavenCentral()
@@ -89,6 +91,15 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.pro'
             signingConfig signingConfigs.release
             debuggable false
+
+            applicationVariants.all { variant ->
+                variant.outputs.each { output ->
+                    def file = output.outputFile
+                    def manifestParser = new DefaultManifestParser()
+                    def String versionName = manifestParser.getVersionName((File) android.sourceSets.main.manifest.srcFile)
+                    output.outputFile = new File(file.parent, file.name.replace(".apk", "-" + versionName + ".apk").replace(" ", "-").toLowerCase())
+                }
+            }
         }
         debug {
             minifyEnabled true
