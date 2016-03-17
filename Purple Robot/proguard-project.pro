@@ -17,8 +17,8 @@
 # project.properties file.
 
 -keepattributes *Annotation*
--keep public class com.google.vending.licensing.ILicensingService
--keep public class com.android.vending.licensing.ILicensingService
+# -keep public class com.google.vending.licensing.ILicensingService
+# -keep public class com.android.vending.licensing.ILicensingService
 
 # For native methods, see http://proguard.sourceforge.net/manual/examples.html#native
 -keepclasseswithmembernames class * {
@@ -81,6 +81,9 @@
 -dontwarn com.sun.jdi.**
 -dontwarn com.sun.jdi.**
 -dontwarn java.applet.**
+-dontwarn java.awt.**
+-dontwarn sun.misc.**
+-dontwarn edu.umd.cs.findbugs.annotations.**
 
 
 -keep class edu.northwestern.cbits.** { *; }

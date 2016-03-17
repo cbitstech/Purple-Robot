@@ -1,4 +1,4 @@
-import com.android.builder.core.DefaultManifestParser
+// import com.android.builder.core.DefaultManifestParser
 
 buildscript {
     repositories {
@@ -6,7 +6,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.3.0'
+        classpath 'com.android.tools.build:gradle:1.5.0'
     }
 }
 
@@ -33,7 +33,7 @@ android {
     }
 
     compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    buildToolsVersion "23.0.2"
     useLibrary 'org.apache.http.legacy'
 
     defaultConfig {
@@ -50,13 +50,13 @@ android {
         compile fileTree(dir: 'libs', include: '*.jar')
 	    wearApp project(':watch')
         compile 'com.squareup.okhttp:okhttp:2.4.0'
-        compile 'com.android.support:appcompat-v7:23.0.1'
-        compile 'com.android.support:design:23.0.1'
-        compile 'com.android.support:mediarouter-v7:23.0.1'
-        compile 'com.google.android.gms:play-services-cast:8.1.0'
-        compile 'com.google.android.gms:play-services-location:8.1.0'
-        compile 'com.google.android.gms:play-services-maps:8.1.0'
-        compile 'com.google.android.gms:play-services-wearable:8.1.0'
+        compile 'com.android.support:appcompat-v7:23.2.1'
+        compile 'com.android.support:design:23.2.1'
+        compile 'com.android.support:mediarouter-v7:23.2.1'
+        compile 'com.google.android.gms:play-services-cast:8.4.0'
+        compile 'com.google.android.gms:play-services-location:8.4.0'
+        compile 'com.google.android.gms:play-services-maps:8.4.0'
+        compile 'com.google.android.gms:play-services-wearable:8.4.0'
 //        compile 'com.squareup.leakcanary:leakcanary-android:1.4-SNAPSHOT'
         compile 'org.msgpack:msgpack:0.6.12'
         compile 'com.getpebble:pebblekit:2.6.0@aar'
@@ -92,14 +92,14 @@ android {
             signingConfig signingConfigs.release
             debuggable false
 
-            applicationVariants.all { variant ->
-                variant.outputs.each { output ->
-                    def file = output.outputFile
-                    def manifestParser = new DefaultManifestParser()
-                    def String versionName = manifestParser.getVersionName((File) android.sourceSets.main.manifest.srcFile)
-                    output.outputFile = new File(file.parent, file.name.replace(".apk", "-" + versionName + ".apk").replace(" ", "-").toLowerCase())
-                }
-            }
+//            applicationVariants.all { variant ->
+//                variant.outputs.each { output ->
+//                    def file = output.outputFile
+//                    def manifestParser = new DefaultManifestParser()
+//                    def String versionName = manifestParser.getVersionName((File) android.sourceSets.main.manifest.srcFile)
+//                    output.outputFile = new File(file.parent, file.name.replace(".apk", "-" + versionName + ".apk").replace(" ", "-").toLowerCase())
+//                }
+//            }
         }
         debug {
             minifyEnabled true
