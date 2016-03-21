@@ -62,6 +62,8 @@
 (define pr-stop-playback (lambda () (.stopPlayback PurpleRobot)))
 (define pr-stop-vibrate (lambda () (.stopVibrate PurpleRobot)))
 (define pr-take-snapshot (lambda (source) (.takeSnapshot PurpleRobot source)))
+(define pr-transmit-now (lambda () (.transmitNow PurpleRobot)))
+(define pr-transmit-probe-buffer (lambda () (.transmitProbeBuffer PurpleRobot)))
 (define pr-update-config (lambda args (apply .updateConfig (cons PurpleRobot args))))
 (define pr-update-config-url (lambda (url) (.updateConfigUrl PurpleRobot url)))
 (define pr-update-probe (lambda (probe-config) (.updateProbe PurpleRobot probe-config)))

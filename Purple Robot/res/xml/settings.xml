@@ -142,6 +142,17 @@
 	            android:entryValues="@array/streaming_jackson_upload_size_values"
 	            android:title="@string/config_streaming_jackson_upload_size_label"
 	            android:defaultValue="@string/value_256k" />
+			<CheckBoxPreference
+				android:key="config_streaming_jackson_enable_buffer"
+				android:title="@string/config_streaming_jackson_enable_buffer_label"
+				android:summary="@string/config_streaming_jackson_enable_buffer_summary"
+				android:defaultValue="false" />
+			<edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference
+				android:key="config_streaming_jackson_buffer_duration"
+				android:entries="@array/streaming_jackson_buffer_duration_labels"
+				android:entryValues="@array/streaming_jackson_buffer_duration_values"
+				android:title="@string/config_streaming_jackson_buffer_duration_label"
+				android:defaultValue="@string/value_15min" />
 		</PreferenceScreen>
         <PreferenceScreen android:title="@string/title_builtin_http_server_section"
 			android:key="screen_builtin_http_server">

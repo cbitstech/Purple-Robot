@@ -1593,6 +1593,11 @@
     <string name="config_fitbit_calories_title">Calories</string>
     <string name="config_fitbit_heart_title">Heart Rate</string>
 
+    <string name="config_streaming_jackson_enable_buffer_label">Enable Time-Limited Readings Buffer</string>
+    <string name="config_streaming_jackson_enable_buffer_summary">Enables a buffer where readings are stored for a limited duration before being discarded. The buffer contents may be flushed with a script command.</string>
+    <string name="config_streaming_jackson_buffer_duration_label">Time-Limited Buffer Readings Duration</string>
+    <string name="value_15min">900000</string>
+
     <string name="title_builtin_http_server_zeroconf_enabled">Enable Zeroconf Discovery</string>
     <string name="summary_builtin_http_server_zeroconf_enabled">Allow devices on the local network to discover embedded website.</string>
 

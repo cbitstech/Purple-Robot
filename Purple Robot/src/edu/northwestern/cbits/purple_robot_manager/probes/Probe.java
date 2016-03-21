@@ -25,6 +25,7 @@ import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 public abstract class Probe
 {
     public static final String PROBE_READING = "edu.northwestern.cbits.purple_robot.PROBE_READING";
+    public static final String PROBE_TRANSMIT_BUFFER = "edu.northwestern.cbits.purple_robot.PROBE_TRANSMIT_BUFFER";
 
     public static final String PROBE_CALIBRATION_NOTIFICATIONS = "enable_calibration_notifications";
     public static final String PROBE_FREQUENCY = "frequency";

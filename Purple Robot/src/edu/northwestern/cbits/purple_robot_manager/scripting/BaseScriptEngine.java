@@ -1910,4 +1910,24 @@ public abstract class BaseScriptEngine
 
         return tones;
     }
+
+    @ScriptingEngineMethod(language = "All", assetPath = "all_transmit_probe_buffer.html", category = R.string.docs_script_category_data_collection, arguments = { })
+    public void transmitProbeBuffer()
+    {
+        LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(this._context);
+        Intent intent = new Intent(edu.northwestern.cbits.purple_robot_manager.probes.Probe.PROBE_TRANSMIT_BUFFER);
+
+        localManager.sendBroadcast(intent);
+    }
+
+
+    @ScriptingEngineMethod(language = "All", assetPath = "all_transmit_now.html", category = R.string.docs_script_category_data_collection, arguments = { })
+    public void transmitNow()
+    {
+        LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(this._context);
+        Intent intent = new Intent(OutputPlugin.FORCE_UPLOAD);
+
+        localManager.sendBroadcast(intent);
+    }
+
 }
