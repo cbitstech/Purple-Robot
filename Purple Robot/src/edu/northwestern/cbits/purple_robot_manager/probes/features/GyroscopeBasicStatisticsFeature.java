@@ -35,4 +35,9 @@ public class GyroscopeBasicStatisticsFeature extends XYZBasicStatisticsFeature
     {
         return context.getString(R.string.title_gyroscope_statistics_feature);
     }
+
+    @Override
+    public String getPreferenceKey() {
+        return "features_gyroscope_statistics";
+    }
 }

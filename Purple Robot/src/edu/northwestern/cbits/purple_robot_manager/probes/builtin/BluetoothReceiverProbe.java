@@ -20,7 +20,7 @@ import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 
 @SuppressLint("NewApi")
-public class BluetoothReceiverProbe extends Probe
+public abstract class BluetoothReceiverProbe extends Probe
 {
     public final static String PROBE_NAME = "edu.northwestern.cbits.purple_robot_manager.probes.builtin.BluetoothReceiverProbe";
 
@@ -50,11 +50,13 @@ public class BluetoothReceiverProbe extends Probe
         return "PIZZA PIE";
     }
 
+
     @Override
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
     {
-        PreferenceScreen screen = manager.createPreferenceScreen(context);
+        PreferenceScreen screen = super.preferenceScreen(context, manager);
+
         screen.setTitle(this.title(context));
 
         return screen;

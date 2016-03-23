@@ -51,6 +51,11 @@ public class FoursquareProbe extends Probe
     private long _lastCheck = 0;
 
     @Override
+    public String getPreferenceKey() {
+        return "services_foursquare";
+    }
+
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_foursquare_probe_desc);
@@ -344,7 +349,8 @@ public class FoursquareProbe extends Probe
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(final Context context, PreferenceManager manager)
     {
-        final PreferenceScreen screen = manager.createPreferenceScreen(context);
+        final PreferenceScreen screen = super.preferenceScreen(context, manager);
+
         screen.setTitle(this.title(context));
         screen.setSummary(R.string.summary_foursquare_probe_desc);
 
@@ -446,18 +452,13 @@ public class FoursquareProbe extends Probe
     @Override
     public JSONObject fetchSettings(Context context)
     {
-        JSONObject settings = new JSONObject();
+        JSONObject settings = super.fetchSettings(context);
 
         try
         {
             JSONArray values = new JSONArray();
             values.put(true);
             values.put(false);
-
-            JSONObject enabled = new JSONObject();
-            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
-            enabled.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_ENABLED, enabled);
 
             JSONObject encrypt = new JSONObject();
             encrypt.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);

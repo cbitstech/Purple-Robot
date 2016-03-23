@@ -33,6 +33,11 @@ public class ScreenProbe extends Probe
     private BroadcastReceiver _receiver = null;
 
     @Override
+    public String getPreferenceKey() {
+        return "built_in_screen";
+    }
+
+    @Override
     public String name(Context context)
     {
         return ScreenProbe.NAME;
@@ -161,7 +166,8 @@ public class ScreenProbe extends Probe
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
     {
-        PreferenceScreen screen = manager.createPreferenceScreen(context);
+        PreferenceScreen screen = super.preferenceScreen(context, manager);
+
         screen.setTitle(this.title(context));
         screen.setSummary(R.string.summary_screen_probe_desc);
 
@@ -173,29 +179,6 @@ public class ScreenProbe extends Probe
         screen.addPreference(enabled);
 
         return screen;
-    }
-
-    @Override
-    public JSONObject fetchSettings(Context context)
-    {
-        JSONObject settings = new JSONObject();
-
-        try
-        {
-            JSONObject enabled = new JSONObject();
-            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
-            JSONArray values = new JSONArray();
-            values.put(true);
-            values.put(false);
-            enabled.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_ENABLED, enabled);
-        }
-        catch (JSONException e)
-        {
-            LogManager.getInstance(context).logException(e);
-        }
-
-        return settings;
     }
 
     public String assetPath(Context context)

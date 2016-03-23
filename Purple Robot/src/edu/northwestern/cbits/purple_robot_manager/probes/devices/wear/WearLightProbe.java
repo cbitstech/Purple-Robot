@@ -35,11 +35,8 @@ public class WearLightProbe extends WearSensorProbe
         return String.format(context.getResources().getString(R.string.summary_light_probe), lux);
     }
 
-
     @Override
-    protected String getPreferenceKey()
-    {
-        return AndroidWearProbe.LIGHT_METER_ENABLED;
+    public String getPreferenceKey() {
+        return "devices_wear_light";
     }
-
 }

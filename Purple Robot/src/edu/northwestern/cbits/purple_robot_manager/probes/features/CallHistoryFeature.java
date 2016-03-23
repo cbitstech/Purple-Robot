@@ -52,6 +52,11 @@ public class CallHistoryFeature extends Feature
     private long _lastCheck = 0;
 
     @Override
+    public String getPreferenceKey() {
+        return "features_call_history";
+    }
+
+    @Override
     protected String featureKey()
     {
         return "call_history";
@@ -409,28 +414,4 @@ public class CallHistoryFeature extends Feature
 
         e.commit();
     }
-
-    @Override
-    public JSONObject fetchSettings(Context context)
-    {
-        JSONObject settings = new JSONObject();
-
-        try
-        {
-            JSONObject enabled = new JSONObject();
-            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
-            JSONArray values = new JSONArray();
-            values.put(true);
-            values.put(false);
-            enabled.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_ENABLED, enabled);
-        }
-        catch (JSONException e)
-        {
-            LogManager.getInstance(context).logException(e);
-        }
-
-        return settings;
-    }
-
 }

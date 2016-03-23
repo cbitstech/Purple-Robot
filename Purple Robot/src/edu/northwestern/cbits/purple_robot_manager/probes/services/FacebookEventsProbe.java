@@ -15,6 +15,11 @@ public class FacebookEventsProbe extends Probe
     public static final String PROBE_NAME = "edu.northwestern.cbits.purple_robot_manager.probes.services.FacebookEventsProbe";
 
     @Override
+    public String getPreferenceKey() {
+        return "services_facebook_events";
+    }
+
+    @Override
     public String name(Context context)
     {
         return FacebookEventsProbe.PROBE_NAME;
@@ -71,13 +76,5 @@ public class FacebookEventsProbe extends Probe
             return String.format(context.getResources().getString(R.string.facebook_event_obfuscated_desc), message, type);
 
         return String.format(context.getResources().getString(R.string.facebook_event_clear_desc), message, type);
-    }
-
-    @Override
-    public JSONObject fetchSettings(Context context)
-    {
-        JSONObject settings = new JSONObject();
-
-        return settings;
     }
 }

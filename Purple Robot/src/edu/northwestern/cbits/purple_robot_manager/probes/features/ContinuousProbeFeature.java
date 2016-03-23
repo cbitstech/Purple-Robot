@@ -110,27 +110,4 @@ public abstract class ContinuousProbeFeature extends Feature
 
         this.isEnabled(context);
     }
-
-    @Override
-    public JSONObject fetchSettings(Context context)
-    {
-        JSONObject settings = new JSONObject();
-
-        try
-        {
-            JSONObject enabled = new JSONObject();
-            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
-            JSONArray values = new JSONArray();
-            values.put(true);
-            values.put(false);
-            enabled.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_ENABLED, enabled);
-        }
-        catch (JSONException e)
-        {
-            LogManager.getInstance(context).logException(e);
-        }
-
-        return settings;
-    }
 }

@@ -66,7 +66,6 @@ public class CommunicationLogProbe extends Probe
     private static final String MESSAGE_INCOMING = "INCOMING";
     private static final String MESSAGE_BODY = "BODY";
 
-
     public static final boolean DEFAULT_ENABLED = true;
     public static final String ENABLED = "config_probe_communication_enabled";
     private static final String FREQUENCY = "config_probe_communication_frequency";
@@ -82,6 +81,11 @@ public class CommunicationLogProbe extends Probe
     private static final boolean DEFAULT_ENCRYPT = true;
 
     private long _lastCheck = 0;
+
+    @Override
+    public String getPreferenceKey() {
+        return "built_in_communication_log";
+    }
 
     @Override
     public String name(Context context)
@@ -529,7 +533,8 @@ public class CommunicationLogProbe extends Probe
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(final Context context, PreferenceManager manager)
     {
-        PreferenceScreen screen = manager.createPreferenceScreen(context);
+        PreferenceScreen screen = super.preferenceScreen(context, manager);
+
         screen.setTitle(this.title(context));
         screen.setSummary(R.string.summary_communication_probe_desc);
 
@@ -624,7 +629,7 @@ public class CommunicationLogProbe extends Probe
     @Override
     public JSONObject fetchSettings(Context context)
     {
-        JSONObject settings = new JSONObject();
+        JSONObject settings = super.fetchSettings(context);
 
         try
         {
@@ -632,12 +637,10 @@ public class CommunicationLogProbe extends Probe
             values.put(true);
             values.put(false);
 
-            JSONObject enabled = new JSONObject();
-            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
-            enabled.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_ENABLED, enabled);
-
-            settings.put(Probe.PROBE_CALIBRATION_NOTIFICATIONS, enabled);
+            JSONObject calibrate = new JSONObject();
+            calibrate.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            calibrate.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_CALIBRATION_NOTIFICATIONS, calibrate);
 
             JSONObject hash = new JSONObject();
             hash.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);

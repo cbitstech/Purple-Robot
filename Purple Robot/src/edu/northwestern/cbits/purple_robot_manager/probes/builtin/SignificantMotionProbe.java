@@ -39,6 +39,11 @@ public class SignificantMotionProbe extends Probe
     private TriggerEventListener _trigger = null;
 
     @Override
+    public String getPreferenceKey() {
+        return "built_in_significant_motion";
+    }
+
+    @Override
     public String probeCategory(Context context)
     {
         return context.getResources().getString(R.string.probe_sensor_category);
@@ -176,7 +181,8 @@ public class SignificantMotionProbe extends Probe
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
     {
-        PreferenceScreen screen = manager.createPreferenceScreen(context);
+        PreferenceScreen screen = super.preferenceScreen(context, manager);
+
         screen.setTitle(this.title(context));
         screen.setSummary(R.string.summary_significant_motion_probe_desc);
 
@@ -194,7 +200,7 @@ public class SignificantMotionProbe extends Probe
     @Override
     public JSONObject fetchSettings(Context context)
     {
-        JSONObject settings = new JSONObject();
+        JSONObject settings = super.fetchSettings(context);
 
         if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) == false)
         {
@@ -202,24 +208,7 @@ public class SignificantMotionProbe extends Probe
             Sensor sensor = sensors.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION);
 
             if (sensor == null)
-                return settings;
-        }
-        else
-            return settings;
-
-        try
-        {
-            JSONObject enabled = new JSONObject();
-            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
-            JSONArray values = new JSONArray();
-            values.put(true);
-            values.put(false);
-            enabled.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_ENABLED, enabled);
-        }
-        catch (JSONException e)
-        {
-            LogManager.getInstance(context).logException(e);
+                return new JSONObject();
         }
 
         return settings;

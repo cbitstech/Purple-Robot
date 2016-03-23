@@ -42,8 +42,7 @@ public class WearBatteryProbe extends WearSensorProbe
     }
 
     @Override
-    protected String getPreferenceKey()
-    {
-        return AndroidWearProbe.ENABLED;
+    public String getPreferenceKey() {
+        return "devices_wear_battery";
     }
 }

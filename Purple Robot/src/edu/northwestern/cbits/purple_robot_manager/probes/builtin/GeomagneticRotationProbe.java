@@ -244,7 +244,7 @@ public class GeomagneticRotationProbe extends RotationProbe
     @Override
     public JSONObject fetchSettings(Context context)
     {
-        JSONObject settings = new JSONObject();
+        JSONObject settings = super.fetchSettings(context);
 
         if (Build.VERSION.SDK_INT < 19)
             return settings;

@@ -41,6 +41,11 @@ public class JawboneProbe extends Probe
     private long _lastUpdate = 0;
 
     @Override
+    public String getPreferenceKey() {
+        return "services_jawbone";
+    }
+
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_jawbone_probe_desc);
@@ -269,29 +274,6 @@ public class JawboneProbe extends Probe
     }
 
     @Override
-    public JSONObject fetchSettings(Context context)
-    {
-        JSONObject settings = new JSONObject();
-
-        try
-        {
-            JSONObject enabled = new JSONObject();
-            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
-            JSONArray values = new JSONArray();
-            values.put(true);
-            values.put(false);
-            enabled.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_ENABLED, enabled);
-        }
-        catch (JSONException e)
-        {
-            LogManager.getInstance(context).logException(e);
-        }
-
-        return settings;
-    }
-
-    @Override
     public Map<String, Object> configuration(Context context)
     {
         Map<String, Object> map = super.configuration(context);
@@ -311,7 +293,8 @@ public class JawboneProbe extends Probe
     @Override
     public PreferenceScreen preferenceScreen(final Context context, PreferenceManager manager)
     {
-        final PreferenceScreen screen = manager.createPreferenceScreen(context);
+        final PreferenceScreen screen = super.preferenceScreen(context, manager);
+
         screen.setTitle(this.title(context));
         screen.setSummary(this.summary(context));
 

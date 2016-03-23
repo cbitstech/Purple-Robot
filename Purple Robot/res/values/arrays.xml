@@ -1057,4 +1057,15 @@
         <item>86400000</item>
     </string-array>
 
+    <string-array name="probe_transmit_mode_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="probe_transmit_mode_labels">
+        <item>Normal</item>
+        <item>Prioritized</item>
+        <item>On-Demand</item>
+    </string-array>
 </resources>

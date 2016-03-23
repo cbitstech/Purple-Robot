@@ -45,6 +45,11 @@ public class AudioFeaturesProbe extends Probe
     private long _lastCheck = 0;
 
     @Override
+    public String getPreferenceKey() {
+        return "built_in_audio_features";
+    }
+
+    @Override
     public String name(Context context)
     {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.AudioFeaturesProbe";
@@ -66,7 +71,8 @@ public class AudioFeaturesProbe extends Probe
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
     {
-        PreferenceScreen screen = manager.createPreferenceScreen(context);
+        PreferenceScreen screen = super.preferenceScreen(context, manager);
+
         screen.setTitle(this.title(context));
         screen.setSummary(this.summary(context));
 
@@ -303,17 +309,13 @@ public class AudioFeaturesProbe extends Probe
     @Override
     public JSONObject fetchSettings(Context context)
     {
-        JSONObject settings = new JSONObject();
+        JSONObject settings = super.fetchSettings(context);
 
         try
         {
-            JSONObject enabled = new JSONObject();
-            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
             JSONArray values = new JSONArray();
             values.put(true);
             values.put(false);
-            enabled.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_ENABLED, enabled);
 
             JSONObject frequency = new JSONObject();
             frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);

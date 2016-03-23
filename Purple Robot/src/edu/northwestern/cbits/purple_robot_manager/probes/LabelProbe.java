@@ -65,4 +65,9 @@ public class LabelProbe extends Probe
     {
         return null;
     }
+
+    @Override
+    public String getPreferenceKey() {
+        return "features_label";
+    }
 }

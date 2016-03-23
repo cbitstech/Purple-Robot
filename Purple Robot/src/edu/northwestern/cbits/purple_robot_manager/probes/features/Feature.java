@@ -16,7 +16,8 @@ public abstract class Feature extends Probe
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
     {
-        PreferenceScreen screen = manager.createPreferenceScreen(context);
+        PreferenceScreen screen = super.preferenceScreen(context, manager);
+
         screen.setTitle(this.title(context));
         screen.setSummary(this.summary(context));
 

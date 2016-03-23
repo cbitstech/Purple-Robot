@@ -93,6 +93,11 @@ public class FitbitBetaProbe extends Probe
 
     private long _lastUpdate = 0;
 
+    @Override
+    public String getPreferenceKey() {
+        return "services_fitbit_beta";
+    }
+
     public static class MinuteRange
     {
         public long start = 0;
@@ -867,7 +872,7 @@ public class FitbitBetaProbe extends Probe
     @Override
     public JSONObject fetchSettings(Context context)
     {
-        JSONObject settings = new JSONObject();
+        JSONObject settings = super.fetchSettings(context);
 
         try
         {
@@ -877,7 +882,6 @@ public class FitbitBetaProbe extends Probe
             values.put(true);
             values.put(false);
             enabled.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_ENABLED, enabled);
 
             settings.put(FitbitBetaProbe.ENABLE_STEPS, enabled);
             settings.put(FitbitBetaProbe.ENABLE_DISTANCE, enabled);

@@ -55,8 +55,6 @@ public abstract class WearSensorProbe extends Probe
         return enabled;
     }
 
-    protected abstract String getPreferenceKey();
-
     @Override
     public JSONObject fetchSettings(Context context)
     {

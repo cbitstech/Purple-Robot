@@ -36,6 +36,11 @@ public class DeviceInUseFeature extends Feature
     }
 
     @Override
+    public String getPreferenceKey() {
+        return "features_device_use";
+    }
+
+    @Override
     public String name(Context context)
     {
         return "edu.northwestern.cbits.purple_robot_manager.probes.features.DeviceInUseFeature";
@@ -164,29 +169,6 @@ public class DeviceInUseFeature extends Feature
         e.putBoolean("config_probe_device_use_enabled", false);
 
         e.commit();
-    }
-
-    @Override
-    public JSONObject fetchSettings(Context context)
-    {
-        JSONObject settings = new JSONObject();
-
-        try
-        {
-            JSONObject enabled = new JSONObject();
-            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
-            JSONArray values = new JSONArray();
-            values.put(true);
-            values.put(false);
-            enabled.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_ENABLED, enabled);
-        }
-        catch (JSONException e)
-        {
-            LogManager.getInstance(context).logException(e);
-        }
-
-        return settings;
     }
 
     public String assetPath(Context context)

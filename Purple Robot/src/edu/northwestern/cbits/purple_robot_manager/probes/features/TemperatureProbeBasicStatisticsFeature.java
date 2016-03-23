@@ -40,4 +40,9 @@ public class TemperatureProbeBasicStatisticsFeature extends UnivariateContinuous
     {
         return context.getString(R.string.title_temperature_statistics_feature);
     }
+
+    @Override
+    public String getPreferenceKey() {
+        return "features_temperature_statistics";
+    }
 }

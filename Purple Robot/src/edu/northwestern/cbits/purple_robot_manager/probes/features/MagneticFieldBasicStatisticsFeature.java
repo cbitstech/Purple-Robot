@@ -35,4 +35,9 @@ public class MagneticFieldBasicStatisticsFeature extends XYZBasicStatisticsFeatu
     {
         return context.getString(R.string.title_magnetic_statistics_feature);
     }
+
+    @Override
+    public String getPreferenceKey() {
+        return "features_magnetometer_statistics";
+    }
 }

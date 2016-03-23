@@ -42,6 +42,11 @@ public class MediaRouterDeviceProbe extends Probe
     private final long _lastScan = 0;
     private boolean _isScanning = false;
 
+    @Override
+    public String getPreferenceKey() {
+        return "built_in_mediarouter";
+    }
+
     private final MediaRouter.Callback _callback = new MediaRouter.Callback()
     {
         @Override
@@ -298,7 +303,8 @@ public class MediaRouterDeviceProbe extends Probe
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
     {
-        PreferenceScreen screen = manager.createPreferenceScreen(context);
+        PreferenceScreen screen = super.preferenceScreen(context, manager);
+
         screen.setTitle(this.title(context));
         screen.setSummary(R.string.summary_mediarouter_probe_desc);
 
@@ -330,21 +336,13 @@ public class MediaRouterDeviceProbe extends Probe
     @Override
     public JSONObject fetchSettings(Context context)
     {
-        JSONObject settings = new JSONObject();
+        JSONObject settings = super.fetchSettings(context);
 
         try
         {
-            JSONObject enabled = new JSONObject();
-            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
-            JSONArray values = new JSONArray();
-            values.put(true);
-            values.put(false);
-            enabled.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_ENABLED, enabled);
-
             JSONObject frequency = new JSONObject();
             frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
-            values = new JSONArray();
+            JSONArray values = new JSONArray();
 
             String[] options = context.getResources().getStringArray(R.array.probe_satellite_frequency_values);
 

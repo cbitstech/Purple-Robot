@@ -41,4 +41,9 @@ public class AccelerometerFrequencyFeature extends XYZBasicFrequencyFeature
     {
         return context.getString(R.string.title_accelerator_frequencies_feature);
     }
+
+    @Override
+    public String getPreferenceKey() {
+        return "features_accelerometer_frequency";
+    }
 }

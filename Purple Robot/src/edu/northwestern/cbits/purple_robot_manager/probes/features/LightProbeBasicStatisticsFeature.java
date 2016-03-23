@@ -40,4 +40,9 @@ public class LightProbeBasicStatisticsFeature extends UnivariateContinuousProbeF
     {
         return context.getString(R.string.title_light_statistics_feature);
     }
+
+    @Override
+    public String getPreferenceKey() {
+        return "features_light_statistics";
+    }
 }

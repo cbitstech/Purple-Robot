@@ -46,4 +46,9 @@ public class AccelerometerBasicStatisticsFeature extends XYZBasicStatisticsFeatu
     {
         return "accelerometer-statistics-probe.html";
     }
+
+    @Override
+    public String getPreferenceKey() {
+        return "features_accelerometer_statistics";
+    }
 }

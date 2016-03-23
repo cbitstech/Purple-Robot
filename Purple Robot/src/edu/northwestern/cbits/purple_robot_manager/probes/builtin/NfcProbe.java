@@ -18,8 +18,13 @@ import edu.northwestern.cbits.purple_robot_manager.probes.Probe;
 public class NfcProbe extends Probe
 {
 
-    private static final String ENABLED = "config_probe_network_enabled";
+    private static final String ENABLED = "config_probe_nfc_enabled";
     private static final boolean DEFAULT_ENABLED = true;
+
+    @Override
+    public String getPreferenceKey() {
+        return "built_in_nfc";
+    }
 
     @Override
     public String name(Context context)
@@ -56,7 +61,8 @@ public class NfcProbe extends Probe
     @Override
     public PreferenceScreen preferenceScreen(final Context context, PreferenceManager manager)
     {
-        PreferenceScreen screen = manager.createPreferenceScreen(context);
+        PreferenceScreen screen = super.preferenceScreen(context, manager);
+
         screen.setTitle(this.title(context));
         screen.setSummary(R.string.summary_nfc_probe_desc);
 
@@ -104,28 +110,5 @@ public class NfcProbe extends Probe
         String tagId = bundle.getString("TAG_ID");
 
         return String.format(context.getResources().getString(R.string.summary_nfc_probe), tagId);
-    }
-
-    @Override
-    public JSONObject fetchSettings(Context context)
-    {
-        JSONObject settings = new JSONObject();
-
-        try
-        {
-            JSONObject enabled = new JSONObject();
-            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
-            JSONArray values = new JSONArray();
-            values.put(true);
-            values.put(false);
-            enabled.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_ENABLED, enabled);
-        }
-        catch (JSONException e)
-        {
-            LogManager.getInstance(context).logException(e);
-        }
-
-        return settings;
     }
 }

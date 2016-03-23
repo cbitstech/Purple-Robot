@@ -53,7 +53,6 @@ public class iHealthProbe extends Probe
     private static final String ACTIVITY_ENABLED = "config_feature_ihealth_activity_enabled";
     private static final boolean ACTIVITY_DEFAULT = true;
 
-
     private static final String OAUTH_TOKEN = "oauth_ihealth_token";
     private static final String OAUTH_SECRET = "oauth_ihealth_secret";
 
@@ -96,6 +95,11 @@ public class iHealthProbe extends Probe
     private static final String GLUCOSE_BG = "ACTIVITY_CALORIES";
 
     private long _lastUpdate = 0;
+
+    @Override
+    public String getPreferenceKey() {
+        return "services_ihealth";
+    }
 
     @Override
     public String summarizeValue(Context context, Bundle bundle)
@@ -179,7 +183,8 @@ public class iHealthProbe extends Probe
     @Override
     public PreferenceScreen preferenceScreen(final Context context, PreferenceManager manager)
     {
-        final PreferenceScreen screen = manager.createPreferenceScreen(context);
+        final PreferenceScreen screen = super.preferenceScreen(context, manager);
+
         screen.setTitle(this.title(context));
         screen.setSummary(this.summary(context));
 
@@ -326,7 +331,7 @@ public class iHealthProbe extends Probe
     @Override
     public JSONObject fetchSettings(Context context)
     {
-        JSONObject settings = new JSONObject();
+        JSONObject settings = super.fetchSettings(context);
 
         try
         {
@@ -337,7 +342,6 @@ public class iHealthProbe extends Probe
             values.put(true);
             values.put(false);
             enabled.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_ENABLED, enabled);
 
 //            settings.put(iHealthProbe.SLEEP_ENABLED, enabled);
             settings.put(iHealthProbe.ACTIVITY_ENABLED, enabled);

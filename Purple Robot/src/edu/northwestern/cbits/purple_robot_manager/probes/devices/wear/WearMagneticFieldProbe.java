@@ -36,8 +36,7 @@ public class WearMagneticFieldProbe extends WearSensorProbe
     }
 
     @Override
-    protected String getPreferenceKey()
-    {
-        return AndroidWearProbe.MAGNETOMETER_ENABLED;
+    public String getPreferenceKey() {
+        return "devices_wear_magnetometer";
     }
 }

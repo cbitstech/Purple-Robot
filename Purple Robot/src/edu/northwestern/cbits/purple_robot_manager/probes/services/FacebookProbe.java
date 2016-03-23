@@ -57,6 +57,11 @@ public class FacebookProbe extends Probe
     private long _lastCheck = 0;
 
     @Override
+    public String getPreferenceKey() {
+        return "services_facebook";
+    }
+
+    @Override
     public String name(Context context)
     {
         return "edu.northwestern.cbits.purple_robot_manager.probes.services.FacebookProbe";
@@ -379,18 +384,13 @@ public class FacebookProbe extends Probe
     @Override
     public JSONObject fetchSettings(Context context)
     {
-        JSONObject settings = new JSONObject();
+        JSONObject settings = super.fetchSettings(context);
 
         try
         {
             JSONArray values = new JSONArray();
             values.put(true);
             values.put(false);
-
-            JSONObject enabled = new JSONObject();
-            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
-            enabled.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_ENABLED, enabled);
 
             JSONObject encrypt = new JSONObject();
             encrypt.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);

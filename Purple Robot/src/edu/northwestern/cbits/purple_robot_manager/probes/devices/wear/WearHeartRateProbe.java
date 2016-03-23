@@ -28,15 +28,12 @@ public class WearHeartRateProbe extends WearSensorProbe
     @Override
     public String summarizeValue(Context context, Bundle bundle)
     {
-        boolean charging = bundle.getBoolean("BATTERY_CHARGING", false);
         int beats = (int) bundle.getDoubleArray("BPM")[0];
         return String.format(context.getResources().getString(R.string.summary_wear_heart_probe), beats);
     }
 
     @Override
-    protected String getPreferenceKey()
-    {
-        return AndroidWearProbe.HEART_METER_ENABLED;
+    public String getPreferenceKey() {
+        return "devices_wear_heart_meter";
     }
-
 }

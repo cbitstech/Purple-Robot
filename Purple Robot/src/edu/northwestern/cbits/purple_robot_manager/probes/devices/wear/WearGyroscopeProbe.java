@@ -36,8 +36,7 @@ public class WearGyroscopeProbe extends WearSensorProbe
     }
 
     @Override
-    protected String getPreferenceKey()
-    {
-        return AndroidWearProbe.GYROSCOPE_ENABLED;
+    public String getPreferenceKey() {
+        return "devices_wear_gyroscope";
     }
 }

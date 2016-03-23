@@ -36,8 +36,7 @@ public class WearAccelerometerProbe extends WearSensorProbe
     }
 
     @Override
-    protected String getPreferenceKey()
-    {
-        return AndroidWearProbe.ACCELEROMETER_ENABLED;
+    public String getPreferenceKey() {
+        return "devices_wear_accelerometer";
     }
 }

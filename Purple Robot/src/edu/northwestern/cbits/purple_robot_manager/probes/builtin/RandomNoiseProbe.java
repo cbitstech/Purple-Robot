@@ -36,6 +36,11 @@ public class RandomNoiseProbe extends Probe
     public static RandomNoiseProbe instance = null;
 
     @Override
+    public String getPreferenceKey() {
+        return "built_in_random_noise";
+    }
+
+    @Override
     public String name(Context context)
     {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.RandomNoiseProbe";
@@ -144,7 +149,8 @@ public class RandomNoiseProbe extends Probe
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(final Context context, PreferenceManager manager)
     {
-        PreferenceScreen screen = manager.createPreferenceScreen(context);
+        PreferenceScreen screen = super.preferenceScreen(context, manager);
+
         screen.setTitle(this.title(context));
         screen.setSummary(R.string.summary_random_noise_probe_desc);
 
@@ -199,7 +205,7 @@ public class RandomNoiseProbe extends Probe
     @Override
     public JSONObject fetchSettings(Context context)
     {
-        JSONObject settings = new JSONObject();
+        JSONObject settings = super.fetchSettings(context);
 
         try
         {
@@ -210,7 +216,6 @@ public class RandomNoiseProbe extends Probe
             JSONObject enabled = new JSONObject();
             enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
             enabled.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_ENABLED, enabled);
 
             JSONObject persist = new JSONObject();
             persist.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);

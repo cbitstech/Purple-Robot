@@ -64,6 +64,11 @@ public class WeatherUndergroundProbe extends Feature
     private boolean _isEnabled = false;
 
     @Override
+    public String getPreferenceKey() {
+        return "services_weather_underground";
+    }
+
+    @Override
     public String probeCategory(Context context)
     {
         return context.getString(R.string.probe_external_services_category);
@@ -284,18 +289,10 @@ public class WeatherUndergroundProbe extends Feature
     @Override
     public JSONObject fetchSettings(Context context)
     {
-        JSONObject settings = new JSONObject();
+        JSONObject settings = super.fetchSettings(context);
 
         try
         {
-            JSONObject enabled = new JSONObject();
-            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
-            JSONArray values = new JSONArray();
-            values.put(true);
-            values.put(false);
-            enabled.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_ENABLED, enabled);
-
             JSONObject apiKey = new JSONObject();
             apiKey.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_STRING);
             settings.put(WeatherUndergroundProbe.PROBE_API_KEY, apiKey);
@@ -345,7 +342,8 @@ public class WeatherUndergroundProbe extends Feature
     @Override
     public PreferenceScreen preferenceScreen(final Context context, PreferenceManager manager)
     {
-        final PreferenceScreen screen = manager.createPreferenceScreen(context);
+        PreferenceScreen screen = super.preferenceScreen(context, manager);
+
         screen.setTitle(this.title(context));
         screen.setSummary(this.summary(context));
 

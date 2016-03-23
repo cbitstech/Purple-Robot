@@ -85,6 +85,11 @@ public class RobotHealthProbe extends Probe
     private long _lastTimeCheck = 0;
 
     @Override
+    public String getPreferenceKey() {
+        return "built_in_robot_health";
+    }
+
+    @Override
     public String name(Context context)
     {
         return RobotHealthProbe.NAME;
@@ -514,7 +519,8 @@ public class RobotHealthProbe extends Probe
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
     {
-        PreferenceScreen screen = manager.createPreferenceScreen(context);
+        PreferenceScreen screen = super.preferenceScreen(context, manager);
+
         screen.setTitle(this.title(context));
         screen.setSummary(R.string.summary_robot_probe_desc);
 
@@ -552,17 +558,17 @@ public class RobotHealthProbe extends Probe
     @Override
     public JSONObject fetchSettings(Context context)
     {
-        JSONObject settings = new JSONObject();
+        JSONObject settings = super.fetchSettings(context);
 
         try
         {
-            JSONObject enabled = new JSONObject();
-            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
             JSONArray values = new JSONArray();
             values.put(true);
             values.put(false);
+
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
             enabled.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_ENABLED, enabled);
 
             settings.put(RobotHealthProbe.INCLUDE_JSON_CONFIG, enabled);
             settings.put(RobotHealthProbe.INCLUDE_SCHEME_CONFIG, enabled);

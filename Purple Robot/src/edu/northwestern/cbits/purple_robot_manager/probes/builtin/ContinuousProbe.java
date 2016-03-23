@@ -106,9 +106,18 @@ public abstract class ContinuousProbe extends Probe
         return this._lastEnableResult;
     }
 
+    public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager, boolean includePreferences)
+    {
+        if (includePreferences)
+            return this.preferenceScreen(context, manager);
+
+        return super.preferenceScreen(context, manager);
+    }
+
     public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
     {
-        PreferenceScreen screen = manager.createPreferenceScreen(context);
+        PreferenceScreen screen = super.preferenceScreen(context, manager);
+
         screen.setTitle(this.title(context));
         screen.setSummary(this.summary(context));
 
@@ -121,24 +130,29 @@ public abstract class ContinuousProbe extends Probe
 
         screen.addPreference(enabled);
 
-        FlexibleListPreference duration = new FlexibleListPreference(context);
-        duration.setKey("config_probe_" + key + "_frequency");
-        duration.setEntryValues(this.getResourceFrequencyValues());
-        duration.setEntries(this.getResourceFrequencyLabels());
-        duration.setTitle(R.string.probe_frequency_label);
-        duration.setDefaultValue(ContinuousProbe.DEFAULT_FREQUENCY);
+        int values = this.getResourceFrequencyValues();
+        int labels = this.getResourceFrequencyLabels();
 
-        screen.addPreference(duration);
+        if (values != -1 && labels != -1) {
+            FlexibleListPreference duration = new FlexibleListPreference(context);
+            duration.setKey("config_probe_" + key + "_frequency");
+            duration.setEntryValues(values);
+            duration.setEntries(labels);
+            duration.setTitle(R.string.probe_frequency_label);
+            duration.setDefaultValue(ContinuousProbe.DEFAULT_FREQUENCY);
 
-        FlexibleListPreference wakelock = new FlexibleListPreference(context);
-        wakelock.setKey("config_probe_" + key + "_wakelock");
-        wakelock.setEntryValues(R.array.wakelock_values);
-        wakelock.setEntries(R.array.wakelock_labels);
-        wakelock.setTitle(R.string.probe_wakelock_title);
-        wakelock.setSummary(R.string.probe_wakelock_summary);
-        wakelock.setDefaultValue("-1");
+            screen.addPreference(duration);
 
-        screen.addPreference(wakelock);
+            FlexibleListPreference wakelock = new FlexibleListPreference(context);
+            wakelock.setKey("config_probe_" + key + "_wakelock");
+            wakelock.setEntryValues(R.array.wakelock_values);
+            wakelock.setEntries(R.array.wakelock_labels);
+            wakelock.setTitle(R.string.probe_wakelock_title);
+            wakelock.setSummary(R.string.probe_wakelock_summary);
+            wakelock.setDefaultValue("-1");
+
+            screen.addPreference(wakelock);
+        }
 
         return screen;
     }
@@ -323,8 +337,6 @@ public abstract class ContinuousProbe extends Probe
 
     public abstract int getSummaryResource();
 
-    public abstract String getPreferenceKey();
-
     protected abstract boolean passesThreshold(SensorEvent event);
 
     public void onAccuracyChanged(Sensor sensor, int accuracy)
@@ -391,25 +403,17 @@ public abstract class ContinuousProbe extends Probe
     @Override
     public JSONObject fetchSettings(Context context)
     {
-        JSONObject settings = new JSONObject();
+        JSONObject settings = super.fetchSettings(context);
 
         try
         {
-            JSONObject enabled = new JSONObject();
-            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
-            JSONArray values = new JSONArray();
-            values.put(true);
-            values.put(false);
-            enabled.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_ENABLED, enabled);
-
             int frequencyValues = this.getResourceFrequencyValues();
 
             if (frequencyValues != -1)
             {
                 JSONObject frequency = new JSONObject();
                 frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
-                values = new JSONArray();
+                JSONArray values = new JSONArray();
 
                 String[] options = context.getResources().getStringArray(frequencyValues);
 
@@ -428,7 +432,7 @@ public abstract class ContinuousProbe extends Probe
             {
                 JSONObject threshold = new JSONObject();
                 threshold.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_DOUBLE);
-                values = new JSONArray();
+                JSONArray values = new JSONArray();
 
                 String[] options = context.getResources().getStringArray(thresholdValues);
 
@@ -443,7 +447,7 @@ public abstract class ContinuousProbe extends Probe
 
             JSONObject wakelock = new JSONObject();
             wakelock.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
-            values = new JSONArray();
+            JSONArray values = new JSONArray();
 
             String[] options = context.getResources().getStringArray(R.array.wakelock_values);
 

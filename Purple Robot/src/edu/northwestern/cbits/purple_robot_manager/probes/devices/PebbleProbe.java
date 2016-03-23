@@ -162,7 +162,8 @@ public class PebbleProbe extends Continuous3DProbe
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(final Context context, PreferenceManager manager)
     {
-        PreferenceScreen screen = manager.createPreferenceScreen(context);
+        PreferenceScreen screen = super.preferenceScreen(context, manager, false);
+
         screen.setTitle(this.title(context));
         screen.setSummary(R.string.summary_pebble_probe_desc);
 
@@ -178,7 +179,6 @@ public class PebbleProbe extends Continuous3DProbe
         installWatchApp.setIntent(new Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.probe_pebble_install_url))));
 
         screen.addPreference(installWatchApp);
-
 
         return screen;
     }

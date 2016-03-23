@@ -112,6 +112,11 @@ public class FitbitProbe extends Probe
     private long _lastUpdate = 0;
 
     @Override
+    public String getPreferenceKey() {
+        return "services_fitbit";
+    }
+
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_fitbit_probe_desc);
@@ -422,17 +427,11 @@ public class FitbitProbe extends Probe
     @Override
     public JSONObject fetchSettings(Context context)
     {
-        JSONObject settings = new JSONObject();
+        JSONObject settings = super.fetchSettings(context);
 
         try
         {
             JSONObject enabled = new JSONObject();
-            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
-            JSONArray values = new JSONArray();
-            values.put(true);
-            values.put(false);
-            enabled.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_ENABLED, enabled);
 
             settings.put(FitbitProbe.SLEEP_ENABLED, enabled);
             settings.put(FitbitProbe.FOOD_ENABLED, enabled);

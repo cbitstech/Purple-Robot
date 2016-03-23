@@ -77,6 +77,11 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
 
     private Runnable _featureRunnable = null;
 
+    @Override
+    public String getPreferenceKey() {
+        return "features_p20";
+    }
+
     public P20FeaturesProbe()
     {
         this._accelerometerClip = new Clip(3, P20FeaturesProbe.WINDOW_SIZE, Clip.ACCELEROMETER);
@@ -240,7 +245,8 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
     @Override
     public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
     {
-        PreferenceScreen screen = manager.createPreferenceScreen(context);
+        PreferenceScreen screen = super.preferenceScreen(context, manager);
+
         screen.setTitle(this.title(context));
         screen.setSummary(this.summary(context));
 
@@ -447,28 +453,5 @@ public class P20FeaturesProbe extends Probe implements SensorEventListener
     public String summarizeValue(Context context, Bundle bundle)
     {
         return String.format(context.getResources().getString(R.string.summary_p20_features_probe), (int) bundle.getDouble("PROCESSING_TIME"));
-    }
-
-    @Override
-    public JSONObject fetchSettings(Context context)
-    {
-        JSONObject settings = new JSONObject();
-
-        try
-        {
-            JSONObject enabled = new JSONObject();
-            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
-            JSONArray values = new JSONArray();
-            values.put(true);
-            values.put(false);
-            enabled.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_ENABLED, enabled);
-        }
-        catch (JSONException e)
-        {
-            LogManager.getInstance(context).logException(e);
-        }
-
-        return settings;
     }
 }

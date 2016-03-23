@@ -1671,4 +1671,7 @@
 
     <string name="probe_fitbit_retrospective_label">Retrospective Fetch Period</string>
     <string name="summary_fitbit_beta_no_datapoints">No datapoints enabled to capture.</string>
+
+    <string name="probe_transmit_mode_label">Data Transmission Mode</string>
+    <string name="probe_transmit_mode_summary">Determines how readings from this probe are transmitted to a remote server.</string>
 </resources>

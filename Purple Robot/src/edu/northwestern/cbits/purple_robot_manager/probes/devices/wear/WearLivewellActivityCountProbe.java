@@ -36,8 +36,7 @@ public class WearLivewellActivityCountProbe extends WearSensorProbe
     }
 
     @Override
-    protected String getPreferenceKey()
-    {
-        return AndroidWearProbe.LIVEWELL_COUNTS_ENABLED;
+    public String getPreferenceKey() {
+        return "devices_wear_livewell_counts";
     }
 }

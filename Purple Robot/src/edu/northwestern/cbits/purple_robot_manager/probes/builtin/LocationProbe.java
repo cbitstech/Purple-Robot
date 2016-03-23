@@ -73,6 +73,11 @@ public class LocationProbe extends Probe implements LocationListener
     private Location _lastLocation = null;
 
     @Override
+    public String getPreferenceKey() {
+        return "built_in_location";
+    }
+
+    @Override
     public String probeCategory(Context context)
     {
         return context.getString(R.string.probe_sensor_category);
@@ -184,17 +189,17 @@ public class LocationProbe extends Probe implements LocationListener
     @Override
     public JSONObject fetchSettings(Context context)
     {
-        JSONObject settings = new JSONObject();
+        JSONObject settings = super.fetchSettings(context);
 
         try
         {
-            JSONObject enabled = new JSONObject();
-            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
             JSONArray values = new JSONArray();
             values.put(true);
             values.put(false);
+
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
             enabled.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_ENABLED, enabled);
 
             settings.put(Probe.PROBE_CALIBRATION_NOTIFICATIONS, enabled);
 

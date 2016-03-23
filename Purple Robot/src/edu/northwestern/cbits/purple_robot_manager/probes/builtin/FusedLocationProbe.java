@@ -84,6 +84,11 @@ public class FusedLocationProbe extends Probe implements GoogleApiClient.Connect
     private long _lastReading = 0;
 
     @Override
+    public String getPreferenceKey() {
+        return "built_in_fused_location";
+    }
+
+    @Override
     public String probeCategory(Context context)
     {
         return context.getString(R.string.probe_sensor_category);
@@ -256,7 +261,7 @@ public class FusedLocationProbe extends Probe implements GoogleApiClient.Connect
     @Override
     public JSONObject fetchSettings(Context context)
     {
-        JSONObject settings = new JSONObject();
+        JSONObject settings = super.fetchSettings(context);
 
         try
         {
@@ -266,7 +271,6 @@ public class FusedLocationProbe extends Probe implements GoogleApiClient.Connect
             values.put(true);
             values.put(false);
             enabled.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_ENABLED, enabled);
 
             settings.put(Probe.PROBE_CALIBRATION_NOTIFICATIONS, enabled);
 

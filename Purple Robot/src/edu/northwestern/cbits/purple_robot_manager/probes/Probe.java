@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
@@ -14,12 +16,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import edu.northwestern.cbits.purple_robot_manager.R;
+import edu.northwestern.cbits.purple_robot_manager.activities.settings.FlexibleListPreference;
 import edu.northwestern.cbits.purple_robot_manager.logging.LogManager;
 
 public abstract class Probe
@@ -60,6 +64,11 @@ public abstract class Probe
     public static final String PROBE_DATA = "PROBE_DATA";
     public static final String PROBE_DISPLAY_NAME = "PROBE_DISPLAY_NAME";
     public static final String PROBE_DISPLAY_MESSAGE = "PROBE_DISPLAY_MESSAGE";
+    public static final String PROBE_TRANSMIT_MODE = "PROBE_TRANSMIT_MODE";
+
+    public static final int PROBE_TRANSMIT_MODE_NORMAL = 0;
+    public static final int PROBE_TRANSMIT_MODE_PRIORITY = 1;
+    public static final int PROBE_TRANSMIT_MODE_ON_DEMAND = 2;
 
     private static List<Class<Probe>> _probeClasses = new ArrayList<>();
 
@@ -69,7 +78,22 @@ public abstract class Probe
 
     public abstract String probeCategory(Context context);
 
-    public abstract PreferenceScreen preferenceScreen(Context context, PreferenceManager manager);
+    public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
+    {
+        PreferenceScreen screen = manager.createPreferenceScreen(context);
+
+        FlexibleListPreference threshold = new FlexibleListPreference(context);
+        threshold.setKey("config_" + this.getPreferenceKey() + "_transmit_mode");
+        threshold.setDefaultValue("" + Probe.PROBE_TRANSMIT_MODE_NORMAL);
+        threshold.setEntryValues(R.array.probe_transmit_mode_values);
+        threshold.setEntries(R.array.probe_transmit_mode_labels);
+        threshold.setTitle(R.string.probe_transmit_mode_label);
+        threshold.setSummary(R.string.probe_transmit_mode_summary);
+
+        screen.addPreference(threshold);
+
+        return screen;
+    }
 
     public abstract String summary(Context context);
 
@@ -200,6 +224,8 @@ public abstract class Probe
             UUID uuid = UUID.randomUUID();
             data.putString(Probe.PROBE_GUID, uuid.toString());
 
+            data.putInt(Probe.PROBE_TRANSMIT_MODE, this.getTransmitMode(context));
+
             LocalBroadcastManager localManager = LocalBroadcastManager.getInstance(context);
             Intent intent = new Intent(edu.northwestern.cbits.purple_robot_manager.probes.Probe.PROBE_READING);
             intent.putExtras(data);
@@ -250,10 +276,60 @@ public abstract class Probe
                 else
                     this.disable(context);
             }
+
+            Object transmitMode = params.get(Probe.PROBE_TRANSMIT_MODE);
+
+            if (transmitMode instanceof Integer)
+            {
+                int intTransmitMode = (Integer) transmitMode;
+
+                if (intTransmitMode < 0 || intTransmitMode > Probe.PROBE_TRANSMIT_MODE_ON_DEMAND)
+                    intTransmitMode = Probe.PROBE_TRANSMIT_MODE_NORMAL;
+
+                this.setTransmitMode(context, intTransmitMode);
+            }
         }
     }
 
-    public abstract JSONObject fetchSettings(Context context);
+    private void setTransmitMode(Context context, int transmitMode)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        SharedPreferences.Editor e = prefs.edit();
+        e.putString("config_" + this.getPreferenceKey() + "_transmit_mode", "" + transmitMode);
+        e.commit();
+    }
+
+    private int getTransmitMode(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        String transmitMode = prefs.getString("config_" + this.getPreferenceKey() + "_transmit_mode", "" + Probe.PROBE_TRANSMIT_MODE_NORMAL);
+
+        return Integer.parseInt(transmitMode);
+    }
+
+    public JSONObject fetchSettings(Context context)
+    {
+        JSONObject settings = new JSONObject();
+
+        try
+        {
+            JSONObject enabled = new JSONObject();
+            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
+            JSONArray values = new JSONArray();
+            values.put(true);
+            values.put(false);
+            enabled.put(Probe.PROBE_VALUES, values);
+            settings.put(Probe.PROBE_ENABLED, enabled);
+        }
+        catch (JSONException e)
+        {
+            LogManager.getInstance(context).logException(e);
+        }
+
+        return settings;
+    }
 
     public JSONObject fetchSettingsFoo(Context context)
     {
@@ -280,6 +356,8 @@ public abstract class Probe
     {
         Log.e("PR", "Unimplemented main screen action for probe " + this.title(context) + "...");
     }
+
+    public abstract String getPreferenceKey();
 
     // Override in subclasses as documentation is completed...
 

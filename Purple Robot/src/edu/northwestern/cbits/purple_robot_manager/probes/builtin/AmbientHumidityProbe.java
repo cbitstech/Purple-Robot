@@ -395,7 +395,7 @@ public class AmbientHumidityProbe extends ContinuousProbe implements SensorEvent
     @Override
     public JSONObject fetchSettings(Context context)
     {
-        JSONObject settings = new JSONObject();
+        JSONObject settings = super.fetchSettings(context);
 
         if (Build.VERSION.SDK_INT < 14)
             return settings;

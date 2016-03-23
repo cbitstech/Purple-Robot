@@ -37,6 +37,11 @@ public class JavascriptFeature extends Feature
     private boolean _embedded = false;
     private final List<String> _sources = new ArrayList<>();
 
+    @Override
+    public String getPreferenceKey() {
+        return "features_javascript";
+    }
+
     public JavascriptFeature()
     {
         throw new RuntimeException("Invalid constructor. Please use JavascriptFeature(scriptName) instead...");

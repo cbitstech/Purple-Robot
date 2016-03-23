@@ -40,4 +40,10 @@ public class PressureProbeBasicStatisticsFeature extends UnivariateContinuousPro
     {
         return context.getString(R.string.title_pressure_statistics_feature);
     }
+
+    @Override
+    public String getPreferenceKey() {
+        return "features_pressure_statistics";
+    }
+
 }

@@ -59,6 +59,11 @@ public class LivewellPebbleActivityCountsProbe extends Probe
     private final ArrayList<Bundle> _pendingReadings = new ArrayList<>();
     private boolean _isTransmitting = false;
 
+    @Override
+    public String getPreferenceKey() {
+        return "services_livewell_pebble";
+    }
+
     private static class ActivityCount
     {
         // Inspired by https://github.com/kramimus/pebble-accel-analyzer
@@ -160,7 +165,8 @@ public class LivewellPebbleActivityCountsProbe extends Probe
     {
         final LivewellPebbleActivityCountsProbe me = this;
 
-        PreferenceScreen screen = manager.createPreferenceScreen(context);
+        PreferenceScreen screen = super.preferenceScreen(context, manager);
+
         screen.setTitle(this.title(context));
         screen.setSummary(R.string.summary_livewell_pebble_probe_desc);
 
@@ -262,22 +268,13 @@ public class LivewellPebbleActivityCountsProbe extends Probe
     @Override
     public JSONObject fetchSettings(Context context)
     {
-        JSONObject settings = new JSONObject();
+        JSONObject settings = super.fetchSettings(context);
 
         try
         {
-            JSONObject enabled = new JSONObject();
-            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
-
-            JSONArray values = new JSONArray();
-            values.put(true);
-            values.put(false);
-            enabled.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_ENABLED, enabled);
-
             JSONObject frequency = new JSONObject();
             frequency.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
-            values = new JSONArray();
+            JSONArray values = new JSONArray();
 
             String[] options = context.getResources().getStringArray(R.array.probe_satellite_frequency_values);
 

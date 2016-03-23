@@ -40,4 +40,9 @@ public class ProximityProbeBasicStatisticsFeature extends UnivariateContinuousPr
     {
         return context.getString(R.string.title_proximity_statistics_feature);
     }
+
+    @Override
+    public String getPreferenceKey() {
+        return "features_proximity_statistics";
+    }
 }

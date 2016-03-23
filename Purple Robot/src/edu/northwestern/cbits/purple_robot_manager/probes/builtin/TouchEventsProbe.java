@@ -41,6 +41,11 @@ public class TouchEventsProbe extends Probe
     private long _lastTouch = 0;
 
     @Override
+    public String getPreferenceKey() {
+        return "built_in_touch_events";
+    }
+
+    @Override
     public String name(Context context)
     {
         return "edu.northwestern.cbits.purple_robot_manager.probes.builtin.TouchEventsProbe";
@@ -220,7 +225,8 @@ public class TouchEventsProbe extends Probe
     @SuppressWarnings("deprecation")
     public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
     {
-        PreferenceScreen screen = manager.createPreferenceScreen(context);
+        PreferenceScreen screen = super.preferenceScreen(context, manager);
+
         screen.setTitle(this.title(context));
         screen.setSummary(R.string.summary_touch_events_probe_desc);
 
@@ -238,30 +244,5 @@ public class TouchEventsProbe extends Probe
     public String summary(Context context)
     {
         return context.getString(R.string.summary_touch_events_probe_desc);
-    }
-
-    @Override
-    public JSONObject fetchSettings(Context context)
-    {
-        return null;
-
-        // JSONObject settings = new JSONObject();
-        //
-        // try
-        // {
-        // JSONObject enabled = new JSONObject();
-        // enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
-        // JSONArray values = new JSONArray();
-        // values.put(true);
-        // values.put(false);
-        // enabled.put(Probe.PROBE_VALUES, values);
-        // settings.put(Probe.PROBE_ENABLED, enabled);
-        // }
-        // catch (JSONException e)
-        // {
-        // LogManager.getInstance(context).logException(e);
-        // }
-        //
-        // return settings;
     }
 }

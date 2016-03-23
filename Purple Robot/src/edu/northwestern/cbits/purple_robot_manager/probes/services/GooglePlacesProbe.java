@@ -55,6 +55,11 @@ public class GooglePlacesProbe extends Probe implements GoogleApiClient.Connecti
     private GoogleApiClient _client = null;
 
     @Override
+    public String getPreferenceKey() {
+        return "services_google_places";
+    }
+
+    @Override
     public String summary(Context context)
     {
         return context.getString(R.string.summary_google_places_probe_desc);
@@ -319,7 +324,8 @@ public class GooglePlacesProbe extends Probe implements GoogleApiClient.Connecti
     @Override
     public PreferenceScreen preferenceScreen(Context context, PreferenceManager manager)
     {
-        final PreferenceScreen screen = manager.createPreferenceScreen(context);
+        final PreferenceScreen screen = super.preferenceScreen(context, manager);
+
         screen.setTitle(this.title(context));
         screen.setSummary(this.summary(context));
 
@@ -357,21 +363,13 @@ public class GooglePlacesProbe extends Probe implements GoogleApiClient.Connecti
     @Override
     public JSONObject fetchSettings(Context context)
     {
-        JSONObject settings = new JSONObject();
+        JSONObject settings = super.fetchSettings(context);
 
         try
         {
-            JSONObject enabled = new JSONObject();
-            enabled.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_BOOLEAN);
-            JSONArray values = new JSONArray();
-            values.put(true);
-            values.put(false);
-            enabled.put(Probe.PROBE_VALUES, values);
-            settings.put(Probe.PROBE_ENABLED, enabled);
-
             JSONObject radius = new JSONObject();
             radius.put(Probe.PROBE_TYPE, Probe.PROBE_TYPE_LONG);
-            values = new JSONArray();
+            JSONArray values = new JSONArray();
 
             String[] options = context.getResources().getStringArray(R.array.feature_google_places_values);
 
