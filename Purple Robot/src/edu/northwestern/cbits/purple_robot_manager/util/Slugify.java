@@ -1,10 +1,11 @@
 package edu.northwestern.cbits.purple_robot_manager.util;
 
 import android.annotation.SuppressLint;
+
+import org.apache.commons.lang3.StringUtils;
+
 import java.text.Normalizer;
 import java.util.Locale;
-
-import org.apache.commons.lang.StringUtils;
 
 public class Slugify
 {

@@ -633,7 +633,7 @@ public class StartActivity extends AppCompatActivity
         CrashManager.register(this, "7550093e020b1a4a6df90f1e9dde68b6", new CrashManagerListener()
         {
             @Override
-            public Boolean onCrashesFound()
+            public boolean onCrashesFound()
             {
                 return true;
             }
